@@ -290,7 +290,7 @@ public class Crawler
         public ControllerActionId(String rootRelativeURL)
         {
             rootRelativeURL = stripQueryParams(rootRelativeURL);
-            rootRelativeURL = BaseWebDriverTest.stripContextPath(rootRelativeURL);
+            rootRelativeURL = WebTestHelper.stripContextPath(rootRelativeURL);
 
             if (rootRelativeURL.startsWith("_webdav/"))
             {
@@ -538,7 +538,7 @@ public class Crawler
 
     private boolean underCreatedProject(String relativeURL)
     {
-        relativeURL = BaseWebDriverTest.stripContextPath(relativeURL);
+        relativeURL = WebTestHelper.stripContextPath(relativeURL);
         ControllerActionId cid = new ControllerActionId(relativeURL);
         String folder = StringUtils.strip(cid.getFolder(),"/");
         StringTokenizer st = new StringTokenizer(folder, "/");

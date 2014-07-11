@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     public void testSteps()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        startImportStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
+        startImportStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
 
         log("Cancel import");
         waitForText("Delaying import");

@@ -17,8 +17,8 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
@@ -93,15 +93,15 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
         addWebPart("Assay List");
 
-        _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1);
+        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1);
 
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
         clickEditAssayDesign(false);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
         clickButton("Save & Close");
         goToProjectHome();
-        _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
+        _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
     }
 
     private void defineTransformAssay(String assayName, boolean addQCScript)
@@ -120,9 +120,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         if (addQCScript)
-            addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 1);
+            addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 1);
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {

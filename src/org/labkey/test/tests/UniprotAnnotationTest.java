@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 
@@ -56,7 +57,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         assertTextNotPresent(UNIPROT_FILENAME);
 
         clickButton("Load New Annot File");
-        setFormElement(Locator.id("fname"), getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
+        setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
         selectOptionByText(Locator.name("fileType"), "uniprot");
         clickButton("Load Annotations");
 

@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
@@ -52,7 +53,7 @@ public class HTTPApiTest extends SimpleApiTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/http-api.xml")};
+        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/http-api.xml")};
     }
 
     @Override

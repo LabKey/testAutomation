@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
@@ -37,10 +38,10 @@ public class ElisaAssayTest extends ElispotAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
-    protected final String TEST_ASSAY_ELISA_FILE1 = getLabKeyRoot() + "/sampledata/Elisa/biotek_01.xlsx";
-    protected final String TEST_ASSAY_ELISA_FILE2 = getLabKeyRoot() + "/sampledata/Elisa/biotek_02.xls";
-    protected final String TEST_ASSAY_ELISA_FILE3 = getLabKeyRoot() + "/sampledata/Elisa/biotek_03.xls";
-    protected final String TEST_ASSAY_ELISA_FILE4 = getLabKeyRoot() + "/sampledata/Elisa/biotek_04.xls";
+    protected final String TEST_ASSAY_ELISA_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_01.xlsx";
+    protected final String TEST_ASSAY_ELISA_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_02.xls";
+    protected final String TEST_ASSAY_ELISA_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_03.xls";
+    protected final String TEST_ASSAY_ELISA_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elisa/biotek_04.xls";
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";
 

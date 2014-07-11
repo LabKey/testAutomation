@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
@@ -71,7 +72,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Assay");
         addWebPart("Pipeline Files");
-        setPipelineRoot(getLabKeyRoot() + "/sampledata/GPAT");
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/GPAT");
         clickProject(PROJECT_NAME);
 
         log("Import XLS GPAT assay");

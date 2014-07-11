@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 
 import java.io.File;
 
@@ -80,7 +81,7 @@ public class WikiHelper
 
     private void setSourceFromFile(File file)
     {
-        setSource(BaseWebDriverTest.getFileContents(file));
+        setSource(TestFileUtils.getFileContents(file));
     }
 
     private void setSource(String srcFragment)
@@ -208,7 +209,7 @@ public class WikiHelper
      */
     public String setSourceFromFile(String fileName, String wikiName)
     {
-        return setSource(_test.getFileContents("server/test/data/api/" + fileName), wikiName);
+        return setSource(TestFileUtils.getFileContents("server/test/data/api/" + fileName), wikiName);
     }
 
     /**

@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 
@@ -33,14 +34,14 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         initializeFolder();
-        importStudyFromZip(new File(getSampledataPath(), "studyreload/original.zip"));
+        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "studyreload/original.zip"));
     }
 
     @Override
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/edited.zip"));
+        reloadStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/studyreload/edited.zip"));
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText("update_test"));

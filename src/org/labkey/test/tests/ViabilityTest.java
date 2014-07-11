@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
@@ -234,7 +235,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickEditAssayDesign(true);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
         final String runName = "transformed assayId";

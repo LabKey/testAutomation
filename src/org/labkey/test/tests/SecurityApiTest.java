@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 
@@ -32,7 +33,7 @@ public class SecurityApiTest extends SimpleApiTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/security-api.xml")};
+        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/security-api.xml")};
     }
 
     @Override

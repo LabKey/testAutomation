@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -50,7 +51,7 @@ import static org.junit.Assert.assertTrue;
 public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 {
     private static final String PIPELINETEST_MODULE = "pipelinetest";
-    private static final File SAMPLE_FILE = new File(getSampledataPath(), "fileTypes/sample.txt");
+    private static final File SAMPLE_FILE = new File(TestFileUtils.getSampledataPath(), "fileTypes/sample.txt");
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
 
     @BeforeClass
@@ -76,7 +77,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     {
         final String folderName = "rCopy";
         final String containerPath = getProjectName() + "/" + folderName;
-        final File fileRoot = getDefaultFileRoot(containerPath);
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(containerPath);
         final String pipelineName = "r-copy";
         final String importAction = "Use R to duplicate a file";
         final String protocolName = "RCopy";
@@ -104,7 +105,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     {
         final String folderName = "rCopyInline";
         final String containerPath = getProjectName() + "/" + folderName;
-        final File fileRoot = getDefaultFileRoot(containerPath);
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(containerPath);
         final String pipelineName = "r-copy-inline";
         final String importAction = "Use R to duplicate a file and generate xar exp run (r-copy-inline)";
         final String protocolName = "InlineRCopy";
@@ -150,7 +151,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     {
         final String folderName = "rAssayImport";
         final String containerPath = getProjectName() + "/" + folderName;
-        final File fileRoot = getDefaultFileRoot(containerPath);
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(containerPath);
         final String pipelineName = "r-localtask-assayimport";
         final String importAction = "Use R to create tsv file using locally defined task and import into 'myassay' (r-localtask-assayimport)";
         final String protocolName = "assay_import";

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
@@ -88,7 +89,7 @@ public class FlowCBCTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
-        importFolderFromZip(new File(getLabKeyRoot() + PIPELINE_PATH, "/FlowStudy.folder.zip"), false, 1);       //Issue 16697: dataset ignored when importing study archive
+        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "/FlowStudy.folder.zip"), false, 1);       //Issue 16697: dataset ignored when importing study archive
     }
 
     @Override
@@ -160,7 +161,7 @@ public class FlowCBCTest extends BaseFlowTest
 
         setFormElement(Locator.name("name"), "run01");
         String cbcDataPath = "/server/modules/cbcassay/data/ex_20081016_131859.small.dat";
-        setFormElement(Locator.id("TextAreaDataCollector.textArea"), getFileContents(cbcDataPath));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TestFileUtils.getFileContents(cbcDataPath));
         clickButton("Save and Finish", 8000);
 
         // filter to rows we'd like to copy

@@ -31,6 +31,7 @@ import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -167,7 +168,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             clickAndWait(Locator.linkWithText("new external schema"));
             setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
             setFormElement(Locator.name("sourceSchemaName"), DB_SCHEMA_NAME);
-            setFormElement(Locator.name("metaData"), getFileContents("server/modules/core/resources/schemas/test.xml"));
+            setFormElement(Locator.name("metaData"), TestFileUtils.getFileContents("server/modules/core/resources/schemas/test.xml"));
             clickButton("Create");
         }
 

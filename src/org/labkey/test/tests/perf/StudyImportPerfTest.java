@@ -17,6 +17,7 @@ package org.labkey.test.tests.perf;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Perf;
 
 import java.io.File;
@@ -37,7 +38,7 @@ public class StudyImportPerfTest extends PerformanceTest
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();
-        importFolderFromZip(new File(getLabKeyRoot(), "/sampledata/study/LabkeyDemoStudy.zip"));
+        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/LabkeyDemoStudy.zip"));
         elapsedTime = System.currentTimeMillis() - startTime;
         writePerfDataToFile();
     }

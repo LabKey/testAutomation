@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -280,7 +280,7 @@ public class StudyScheduleTest extends StudyBaseTest
                 clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
-                File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
+                File file = new File(TestFileUtils.getLabKeyRoot(), datasetFileName);
 
                 if (file.exists())
                 {
@@ -358,7 +358,7 @@ public class StudyScheduleTest extends StudyBaseTest
                 clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
-                File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
+                File file = new File(TestFileUtils.getLabKeyRoot(), datasetFileName);
 
                 if (file.exists())
                 {

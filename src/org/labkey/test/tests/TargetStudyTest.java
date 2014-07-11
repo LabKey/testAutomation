@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -92,10 +93,10 @@ public class TargetStudyTest extends AbstractAssayTest
     {
         log("** Import specimens into Study 1 and Study 2");
         setupPipeline(TEST_ASSAY_PRJ_SECURITY);
-        SpecimenImporter importer1 = new SpecimenImporter(getTestTempDir(), new File(getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY1, 1);
+        SpecimenImporter importer1 = new SpecimenImporter(getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY1, 1);
         importer1.startImport();
 
-        SpecimenImporter importer2 = new SpecimenImporter(getTestTempDir(), new File(getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY2, 1);
+        SpecimenImporter importer2 = new SpecimenImporter(getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY2, 1);
         importer2.startImport();
 
         importer1.waitForComplete();
@@ -142,7 +143,7 @@ public class TargetStudyTest extends AbstractAssayTest
         if (!isElementPresent(Locator.linkWithText("Assay List")))
             portalHelper.addWebPart("Assay List");
 
-        _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1);
+        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampledataPath() + "/TargetStudy/Assay.xar", 1);
     }
 
     protected void uploadRuns()

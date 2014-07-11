@@ -22,6 +22,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -196,7 +197,7 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
 
     protected final void assertTextExportContents(File exportedFile, int expectedDataRowCount)
     {
-        String fileContents = getFileContents(exportedFile);
+        String fileContents = TestFileUtils.getFileContents(exportedFile);
         String[] exportedRows = fileContents.split("\n");
 
         assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedDataRowCount + 1, exportedRows.length);

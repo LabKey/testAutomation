@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.MS2;
@@ -39,7 +40,7 @@ public class LibraTest extends MS2TestBase
     protected void configure()
     {
         _containerHelper.createProject(getProjectName(), "MS2");
-        setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
         clickProject(getProjectName());
 
         clickButton("Process and Import Data");

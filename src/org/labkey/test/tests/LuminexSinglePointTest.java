@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
@@ -132,7 +133,7 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
 
         importLuminexRunPageTwo(filename, isotype, conjugate, "", "", "Notebook"+runNumber,
                 "Experimental", "TECH", df.format(testDate.getTime()),
-                new File(getLabKeyRoot(),"sampledata/Luminex/"+filename), 1);
+                new File(TestFileUtils.getLabKeyRoot(),"sampledata/Luminex/"+filename), 1);
 
          switch(runNumber){
              case 1 :

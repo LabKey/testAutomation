@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -49,9 +50,9 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     private static final String ASSAY_NAME = "Test Expression Matrix";
     private static final String FEATURE_SET_NAME = "Expression Matrix Test Feature Set";
     private static final String FEATURE_SET_VENDOR = "Vendor";
-    private static final File FEATURE_SET_DATA = getSampleData("Microarray/expressionMatrix/sample-feature-set.txt");
-    private static final File CEL_FILE1 = getSampleData("Affymetrix/CEL_files/sample_file_1.CEL");
-    private static final File CEL_FILE2 = getSampleData("Affymetrix/CEL_files/sample_file_2.CEL");
+    private static final File FEATURE_SET_DATA = TestFileUtils.getSampleData("Microarray/expressionMatrix/sample-feature-set.txt");
+    private static final File CEL_FILE1 = TestFileUtils.getSampleData("Affymetrix/CEL_files/sample_file_1.CEL");
+    private static final File CEL_FILE2 = TestFileUtils.getSampleData("Affymetrix/CEL_files/sample_file_2.CEL");
     private static final String PROTOCOL_NAME = "Expression Matrix Protocol";
     private static int featureSetId;
     private static int expectedPipelineJobCount;
@@ -127,7 +128,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
 
         final String pipelineName = PIPELINE_NAME;
-        final File fileRoot = getDefaultFileRoot(getProjectName());
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
                 pipelineName + ".xml", Collections.<String>emptySet(),
                 protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
@@ -170,7 +171,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
 
         final String pipelineName = PIPELINE_NAME;
-        final File fileRoot = getDefaultFileRoot(getProjectName());
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
                 pipelineName + ".xml", Collections.<String>emptySet(),
                 protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),

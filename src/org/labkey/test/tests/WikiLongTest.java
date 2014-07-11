@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
@@ -202,7 +204,7 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT);
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
-        File file = new File(getLabKeyRoot() + "/common.properties");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
         _wikiHelper.saveWikiPage();
         assertTextPresent("common.properties");
@@ -217,7 +219,7 @@ public class WikiLongTest extends BaseWebDriverTest
         String wikiPage3ContentEdited =
             "<b>Some HTML content</b><br>\n" +
             "<b>More HTML content</b><br>\n" +
-            "<a href='" + getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
+            "<a href='" + WebTestHelper.getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
         _wikiHelper.setWikiBody(wikiPage3ContentEdited);
         _wikiHelper.saveWikiPage();
 
@@ -483,8 +485,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        click(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"));
-        waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.linkWithImage(WebTestHelper.getContextPath() + "/_images/partdelete.png"));
+        waitForElementToDisappear(Locator.linkWithImage(WebTestHelper.getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
         assertElementNotPresent(Locator.linkWithText("Welcome"));
 
         log("test wiki TOC customize link");

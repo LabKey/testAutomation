@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import com.thoughtworks.selenium.SeleniumException;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Study;
 import org.labkey.test.categories.Disabled;
 import org.labkey.test.util.ListHelper;
@@ -35,7 +36,7 @@ public class StudyManualTest extends StudyTest
 
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
-    protected final File VISIT_MAP = new File(getLabKeyRoot(), getStudySampleDataPath() + "v068_visit_map.txt");
+    protected final File VISIT_MAP = new File(TestFileUtils.getLabKeyRoot(), getStudySampleDataPath() + "v068_visit_map.txt");
 
     protected final StudyHelper _studyHelper = new StudyHelper(this);
 
@@ -76,7 +77,7 @@ public class StudyManualTest extends StudyTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
-        String visitMapData = getFileContents(VISIT_MAP);
+        String visitMapData = TestFileUtils.getFileContents(VISIT_MAP);
         setFormElement(Locator.name("content"), visitMapData);
         clickButton("Import");
 
@@ -91,7 +92,7 @@ public class StudyManualTest extends StudyTest
         setFormElement(Locator.name("typeNameColumn"), "platename");
         setFormElement(Locator.name("labelColumn"), "platelabel");
         setFormElement(Locator.name("typeIdColumn"), "plateno");
-        setFormElement(Locator.name("tsv"), getFileContents(CRF_SCHEMAS));
+        setFormElement(Locator.name("tsv"), TestFileUtils.getFileContents(CRF_SCHEMAS));
         clickButton("Submit", 180000);
 
         // setup cohorts:

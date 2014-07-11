@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
@@ -151,7 +152,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
          * Flow Script = Read
          */
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        importFolderFromZip(new File(getLabKeyRoot(), "/sampledata/webpartPerm/webPerms.folder.zip"));
+        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
         _securityHelper.setSiteGroupPermissions("All Site Users", "Reader");
     }

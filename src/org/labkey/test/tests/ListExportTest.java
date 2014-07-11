@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
@@ -26,7 +27,7 @@ import java.io.File;
 @Category({DailyB.class})
 public class ListExportTest extends AbstractExportTest
 {
-    private static final File LIST_ARCHIVE = new File(getSampledataPath(), "lists/ListDemo.lists.zip");
+    private static final File LIST_ARCHIVE = new File(TestFileUtils.getSampledataPath(), "lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
 
     @Override

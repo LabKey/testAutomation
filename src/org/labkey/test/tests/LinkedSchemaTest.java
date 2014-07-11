@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
@@ -501,7 +502,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     void importListData()
     {
-        File lists = new File(getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
+        File lists = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
         _listHelper.importListArchive(SOURCE_FOLDER, lists);
 
         //Create second folder that should be not visible to linked schemas and import lists again

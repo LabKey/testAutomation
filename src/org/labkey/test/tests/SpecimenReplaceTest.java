@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
@@ -45,7 +46,7 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
 
     private void verifyReplaceWithNewData()
     {
-        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), new File[] {new File(getLabKeyRoot(), LAB15_SPECIMENS)}, new File(getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, ++pipelineJobCount);
+        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), new File[] {new File(TestFileUtils.getLabKeyRoot(), LAB15_SPECIMENS)}, new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, ++pipelineJobCount);
         importer.setExpectError(true);
         importer.importAndWaitForComplete();
         //go to individual vial list
@@ -59,7 +60,7 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
 
     private void verifyReplaceWithSlightlyModifiedData()
     {
-        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), new File[] {new File(getLabKeyRoot(), LAB_EDITED_SPECIMENS)}, new File(getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, ++pipelineJobCount);
+        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), new File[] {new File(TestFileUtils.getLabKeyRoot(), LAB_EDITED_SPECIMENS)}, new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, ++pipelineJobCount);
         importer.setExpectError(true);
         importer.importAndWaitForComplete();
         //go to individual vial list

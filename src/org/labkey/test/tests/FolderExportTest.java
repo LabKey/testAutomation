@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
@@ -39,7 +40,7 @@ public class FolderExportTest extends BaseWebDriverTest
 {
 
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
-    File dataDir = new File(getSampledataPath(), "FolderExport");
+    File dataDir = new File(TestFileUtils.getSampledataPath(), "FolderExport");
     private final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
     private final String folderFromPipelineZip = "2 Folder From Pipeline Zip";
     private final String folderFromPipelineExport = "3 Folder From Pipeline Export";

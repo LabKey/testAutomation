@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
@@ -100,7 +101,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
-        File file = new File(getLabKeyRoot() + "/common.properties");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
         wikiHelper.saveWikiPage();
 

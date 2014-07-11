@@ -40,13 +40,15 @@ import org.apache.http.util.EntityUtils;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+/**
+ * Static methods for getting properties of and communicating with a running LabKey server
+ */
 public class WebTestHelper
 {
     public static final String DEFAULT_CONTEXT_PATH = "/labkey"; //TODO: Make private
@@ -67,12 +69,12 @@ public class WebTestHelper
                 _webPort = System.getProperty("labkey.port");
                 if (_webPort == null || _webPort.length() == 0)
                 {
-                    log("Using default labkey port (" + DEFAULT_WEB_PORT +
-                            ").\nThis can be changed by passing VM arg '-Dlabkey.port=[yourport]'.");
+                    System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
+                                        ").\nThis can be changed by passing VM arg '-Dlabkey.port=[yourport]'.");
                     _webPort = DEFAULT_WEB_PORT;
                 }
                 else
-                    log("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
+                    System.out.println("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
             }
             return _webPort;
         }
@@ -87,42 +89,27 @@ public class WebTestHelper
                 _targetServer = System.getProperty("labkey.server");
                 if (_targetServer == null || _targetServer.length() == 0)
                 {
-                    log("Using default target server (" + DEFAULT_TARGET_SERVER +
-                            ").\nThis can be changed by passing VM arg '-Dlabkey.server=[yourserver]'.");
+                    System.out.println("Using default target server (" + DEFAULT_TARGET_SERVER +
+                                        ").\nThis can be changed by passing VM arg '-Dlabkey.server=[yourserver]'.");
                     _targetServer = DEFAULT_TARGET_SERVER;
                 }
                 else
-                    log("Using target server '" + _targetServer + "', as provided by system property 'labkey.server'.");
+                    System.out.println("Using target server '" + _targetServer + "', as provided by system property 'labkey.server'.");
             }
             return _targetServer;
         }
     }
 
-    public static String getLabKeyRoot()
+    public static String stripContextPath(String url)
     {
-        if (_labkeyRoot == null)
-        {
-            _labkeyRoot = System.getProperty("labkey.root", "..");
-
-            File labkeyRoot = new File(_labkeyRoot);
-
-            if (!labkeyRoot.exists())
-            {
-                throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
-            }
-
-            try
-            {
-                _labkeyRoot = labkeyRoot.getCanonicalPath();
-            }
-            catch (IOException badPath)
-            {
-                throw new IllegalStateException("Unable to canonicalize specified LabKey root [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
-            }
-
-            log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
-        }
-        return _labkeyRoot;
+        String root = getContextPath() + "/";
+        int rootLoc = url.indexOf(root);
+        int endOfAction = url.indexOf("?");
+        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
+            url = url.substring(rootLoc + root.length());
+        else if (url.indexOf("/") == 0)
+            url = url.substring(1);
+        return url;
     }
 
     public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
@@ -154,7 +141,6 @@ public class WebTestHelper
                 getDatabaseType() == DatabaseType.MicrosoftSQLServer && !"2005".equals(getDatabaseVersion());
     }
 
-    private static String _labkeyRoot = null;
     private static String _targetServer = null;
 
     public static String getBaseURL()
@@ -163,7 +149,6 @@ public class WebTestHelper
 
         return getTargetServer() + portPortion + getContextPath();
     }
-
 
     public static String getContextPath()
     {
@@ -174,20 +159,15 @@ public class WebTestHelper
                 _contextPath = System.getProperty("labkey.contextpath");
                 if (_contextPath == null)
                 {
-                    log("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
-                            ").\nThis can be changed by passing VM arg '-Dlabkey.contextpath=[yourpath]'.");
+                    System.out.println("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
+                                        ").\nThis can be changed by passing VM arg '-Dlabkey.contextpath=[yourpath]'.");
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
-                    log("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
+                    System.out.println("Using labkey context path '" + _contextPath + "', as provided by system property 'labkey.contextPath'.");
             }
             return _contextPath;
         }
-    }
-
-    public static void log(String message)
-    {
-        System.out.println(message);
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.

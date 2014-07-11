@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
@@ -79,7 +80,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
         assertTextPresent("100");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
+        clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");

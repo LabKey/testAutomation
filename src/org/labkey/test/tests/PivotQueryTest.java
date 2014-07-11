@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 
@@ -46,7 +47,7 @@ public class PivotQueryTest extends BaseWebDriverTest
     protected void setupProject()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
     }
 
     @Test

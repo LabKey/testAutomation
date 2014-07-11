@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 
 import java.io.File;
@@ -25,7 +26,7 @@ import java.io.File;
 @Category({DailyA.class})
 public class QueryExportTest extends AbstractExportTest
 {
-    private static final File LIST_ARCHIVE = new File(getSampledataPath(), "lists/ListDemo.lists.zip");
+    private static final File LIST_ARCHIVE = new File(TestFileUtils.getSampledataPath(), "lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
     private static final String QUERY_NAME = "NIMHQuery";
 

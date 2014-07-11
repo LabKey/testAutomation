@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIContainerHelper;
@@ -40,7 +41,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class SpecimenProgressReportTest extends BaseWebDriverTest
 {
-    public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
+    public static final String STUDY_PIPELINE_ROOT = TestFileUtils.getLabKeyRoot() + "/sampledata/specimenprogressreport";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public PortalHelper _portalHelper = new PortalHelper(this);
     private static final String studyFolder = "study folder";

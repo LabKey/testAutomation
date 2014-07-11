@@ -24,8 +24,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.labkey.test.WebTestHelper.getLabKeyRoot;
-import static org.labkey.test.WebTestHelper.log;
+import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 
 public class PipelineToolsHelper
 {
@@ -92,13 +91,13 @@ public class PipelineToolsHelper
         if (directoriesToAppend.size() > 0)
         {
             _currentToolsDir = previousToolsDir + _pathSeparator + StringUtils.join(directoriesToAppend, _pathSeparator);
-            log("New pipeline tools config: " + _currentToolsDir);
+            _test.log("New pipeline tools config: " + _currentToolsDir);
             _test.setFormElement(Locators.pipelineToolsDirectoryField(), _currentToolsDir);
             _test.clickButton("Save");
         }
         else
         {
-            log("All directories are already present in pipeline tools config");
+            _test.log("All directories are already present in pipeline tools config");
         }
         _test.popLocation();
     }

@@ -16,12 +16,12 @@
 
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
@@ -127,8 +127,8 @@ public class ListTest extends BaseWebDriverTest
     public static final String LIST_AUDIT_EVENT = "List events";
     public static final String DOMAIN_AUDIT_EVENT = "Domain events";
 
-    private final File EXCEL_DATA_FILE = getSampleData("dataLoading/excel/fruits.xls");
-    private final File TSV_DATA_FILE = getSampleData("dataLoading/excel/fruits.tsv");
+    private final File EXCEL_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/fruits.xls");
+    private final File TSV_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/fruits.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
     public String getAssociatedModuleDirectory()

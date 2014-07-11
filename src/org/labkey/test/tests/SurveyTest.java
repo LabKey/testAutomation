@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
@@ -77,7 +78,7 @@ public class SurveyTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
 
         log("Create survey disign at the project level");
-        _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
+        _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA", null);
@@ -89,7 +90,7 @@ public class SurveyTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), folderName, null);
 
         log("Create survey disign at the subfolder level");
-        _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
+        _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule("Survey");
         portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA", null);
@@ -135,7 +136,7 @@ public class SurveyTest extends BaseWebDriverTest
             File metadataFile = new File(metadataFilePath);
 
             assertTrue(metadataFile.exists());
-            String json = getFileContents(metadataFile);
+            String json = TestFileUtils.getFileContents(metadataFile);
             _extHelper.setCodeMirrorValue("metadata", json);
         }
 
@@ -270,7 +271,7 @@ public class SurveyTest extends BaseWebDriverTest
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);
         clickEditForLabel(subfolderSurveyDesign);
-        String json = getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
+        String json = TestFileUtils.getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
         _extHelper.setCodeMirrorValue("metadata", json);
         clickButton("Save Survey");
 

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.AssayImportOptions;
@@ -35,7 +36,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
     public static final String THAW_LIST_ASSAY_ID = "thaw list ptid + visit";
 
-    private final String SAMPLE_DATA_ROOT = getLabKeyRoot() + "/sampledata/Nab/";
+    private final String SAMPLE_DATA_ROOT = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/";
     protected final String TEST_ASSAY_NAB_FILE1 = SAMPLE_DATA_ROOT + "m0902051;3997.xls";
     private final String THAW_LIST_NAME = "NabThawList";
     private final String THAW_LIST_ARCHIVE = SAMPLE_DATA_ROOT + THAW_LIST_NAME + ".zip";

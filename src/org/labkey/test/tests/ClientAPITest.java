@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
@@ -46,7 +47,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String SUBFOLDER_NAME = "subfolder";
     protected final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
-    private final static String TEST_XLS_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
+    private final static String TEST_XLS_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
@@ -494,7 +495,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected File getApiFileRoot()
     {
-        return new File(getLabKeyRoot(), "server/test/data/api/");
+        return new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/");
     }
 
     /**
@@ -510,7 +511,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected String setSourceFromFile(String fileName, boolean excludeTags)
     {
-        return setSource(getFileContents("server/test/data/api/" + fileName ), excludeTags);
+        return setSource(TestFileUtils.getFileContents("server/test/data/api/" + fileName), excludeTags);
     }
 
     protected String setSource(String srcFragment)
@@ -543,7 +544,7 @@ public class ClientAPITest extends BaseWebDriverTest
         portalHelper.clickWebpartMenuItem("Pages", "New");
 
         String fullSource;
-        String srcFragment = getFileContents(testSource);
+        String srcFragment = TestFileUtils.getFileContents(testSource);
 
         if (wrapSource)
             fullSource = getFullSource(srcFragment);

@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -45,7 +46,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
         hideDatasets();
 

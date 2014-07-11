@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
@@ -172,7 +173,7 @@ public class ETLErrorTest extends ETLBaseTest
         // study to use the same type of ETL source and target that one of our customer uses.
         //
         clickTab("Study");
-        importStudyFromZip(new File(getLabKeyRoot(), TRANSFORM_REMOTE_STUDY), true /*ignore query validation*/);
+        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), TRANSFORM_REMOTE_STUDY), true /*ignore query validation*/);
         // bump our pipeline job count since we used the pipeline to import the study
         _jobsComplete++;
     }

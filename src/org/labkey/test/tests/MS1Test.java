@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.UIContainerHelper;
@@ -57,7 +58,7 @@ public class MS1Test extends BaseWebDriverTest
     public static final String PIPELINE_PROCESS_AND_IMPORT_BUTTON = "Process and Import Data";
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
 
-    private static final File _pipelinePathMain = new File(getLabKeyRoot(), "/sampledata/ms1/bvt");
+    private static final File _pipelinePathMain = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/ms1/bvt");
 
     public MS1Test()
     {

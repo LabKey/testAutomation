@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
@@ -370,7 +371,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.clickWindowButton("Confirmation...", "Yes", 0, 0);
         clickButton("Enable", 0);
         // test use-case to navigate to participang page on click
-        String function = getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
+        String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
         applyChanges();
         openSaveMenu();

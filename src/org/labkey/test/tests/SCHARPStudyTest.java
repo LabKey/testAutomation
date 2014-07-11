@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.PostgresOnlyTest;
@@ -32,7 +33,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
 {
     public static final String PROJECT_NAME="SCHARP Study Test";
 
-    private String _labkeyRoot = getLabKeyRoot();
+    private String _labkeyRoot = TestFileUtils.getLabKeyRoot();
     private String _pipelinePathMain = new File(_labkeyRoot, "/sampledata/study").getPath();
     private String _zipFilePath = new File(_labkeyRoot, "/sampledata/study/studyshell.zip").getPath();
 

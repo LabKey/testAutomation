@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -48,8 +49,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
-    private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
-    private final File PROTOCOL_DOC2 = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol2.txt");
+    private final File PROTOCOL_DOC = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
+    private final File PROTOCOL_DOC2 = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol2.txt");
 
     @Override
     protected BrowserType bestBrowser()
@@ -372,7 +373,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickTab("Mice");
         addWebPart("Wiki");
         WikiHelper wh = new WikiHelper(this);
-        wh.createWikiPage("17021", "17021 Regression", new File(getApiScriptFolder(), "filterTest.html"));
+        wh.createWikiPage("17021", "17021 Regression", new File(TestFileUtils.getApiScriptFolder(), "filterTest.html"));
         setUpFacetedFilter("test17021", "PrimaryType", "Blood (Whole)");
         assertElementNotPresent(Locator.linkWithText("Semen"));
         clickButton("CANCEL",0);

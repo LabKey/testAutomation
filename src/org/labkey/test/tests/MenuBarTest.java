@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
@@ -100,7 +101,7 @@ public class MenuBarTest extends BaseWebDriverTest
         hoverMenu("Assays");
         waitForElement(Locator.lkButton("Manage Assays"), 3000);
 
-        _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1);
+        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampledataPath() + "/menubar/Test Assay.xar", 1);
         clickProject(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
@@ -140,7 +141,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         // Another custom menu with links to Participant Report
         createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
-        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
 
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));

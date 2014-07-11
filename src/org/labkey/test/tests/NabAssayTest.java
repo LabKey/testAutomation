@@ -18,8 +18,8 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
@@ -48,11 +48,11 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
-    protected final String TEST_ASSAY_NAB_FILE1 = getLabKeyRoot() + "/sampledata/Nab/m0902051;3997.xls";
-    protected final String TEST_ASSAY_NAB_FILE2 = getLabKeyRoot() + "/sampledata/Nab/m0902053;3999.xls";
-    protected final String TEST_ASSAY_NAB_FILE3 = getLabKeyRoot() + "/sampledata/Nab/m0902055;4001.xlsx";
-    protected final String TEST_ASSAY_NAB_FILE4 = getLabKeyRoot() + "/sampledata/Nab/m0902057;4003.xls";
-    protected final String TEST_ASSAY_NAB_FILE5 = getLabKeyRoot() + "/sampledata/Nab/m0902059;4005.xls";
+    protected final String TEST_ASSAY_NAB_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902051;3997.xls";
+    protected final String TEST_ASSAY_NAB_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902053;3999.xls";
+    protected final String TEST_ASSAY_NAB_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902055;4001.xlsx";
+    protected final String TEST_ASSAY_NAB_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902057;4003.xls";
+    protected final String TEST_ASSAY_NAB_FILE5 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902059;4005.xls";
 
     // AUC Column Names.
     private static final String AUC_COL_TITLE = "AUC";
@@ -768,7 +768,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickEditAssayDesign(false);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
         clickFolder(TEST_ASSAY_FLDR_NAB);
@@ -822,7 +822,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected File[] getTestFiles()
     {
         return new File[] {
-            new File(getLabKeyRoot() + "/server/test/data/api/nab-api.xml")
+            new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/nab-api.xml")
         };
     }
 

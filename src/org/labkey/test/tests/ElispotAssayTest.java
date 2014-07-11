@@ -20,8 +20,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
@@ -44,11 +44,11 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected static final String TEST_ASSAY_ELISPOT = "TestAssayElispot";
     protected static final String TEST_ASSAY_ELISPOT_DESC = "Description for Elispot assay";
 
-    protected final String TEST_ASSAY_ELISPOT_FILE1 = getLabKeyRoot() + "/sampledata/Elispot/CTL_040A20042503-0001p.xls";
-    protected final String TEST_ASSAY_ELISPOT_FILE2 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W4.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE3 = getLabKeyRoot() + "/sampledata/Elispot/Zeiss_datafile.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE4 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W5.txt";
-    protected final String TEST_ASSAY_ELISPOT_FILE5 = getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W8.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/CTL_040A20042503-0001p.xls";
+    protected final String TEST_ASSAY_ELISPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W4.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/Zeiss_datafile.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W5.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE5 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W8.txt";
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
@@ -376,7 +376,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickEditAssayDesign(false);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
         waitForElement(Locator.id("dataregion_Runs"));
 

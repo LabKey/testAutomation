@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
@@ -80,7 +81,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Assay");
 
         log("Setup the pipeline");
-        setPipelineRoot(getLabKeyRoot() + PIPELINE_ROOT);
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + PIPELINE_ROOT);
         assertTextPresent("The pipeline root was set to");
         _containerHelper.enableModule("Microarray");
 

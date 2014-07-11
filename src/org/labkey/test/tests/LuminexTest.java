@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
@@ -46,26 +47,26 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
 
     protected static final String TEST_ASSAY_XAR_NAME = "TestLuminexAssay";
-    protected final File TEST_ASSAY_XAR_FILE = new File(getLabKeyRoot() + "/sampledata/Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
+    protected final File TEST_ASSAY_XAR_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
 
     protected static final String TEST_ASSAY_LUM_SET_PROP_SPECIES = "testSpecies1";
-    protected final File TEST_ASSAY_LUM_FILE1 = new File(getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
-    protected final File TEST_ASSAY_LUM_FILE2 = new File(getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
-    protected final File TEST_ASSAY_LUM_FILE3 = new File(getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
-    protected final File TEST_ASSAY_LUM_FILE4 = new File(getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls");
-    protected final File TEST_ASSAY_LUM_FILE5 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls");
-    protected final File TEST_ASSAY_LUM_FILE6 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls");
-    protected final File TEST_ASSAY_LUM_FILE7 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls");
-    protected final File TEST_ASSAY_LUM_FILE8 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls");
-    protected final File TEST_ASSAY_LUM_FILE9 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
-    protected final File TEST_ASSAY_LUM_FILE10 = new File(getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
-    protected final File TEST_ASSAY_LUM_FILE11 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityWithBaseline.xls");
-    protected final File TEST_ASSAY_LUM_FILE12 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityWithoutBaseline.xls");
-    protected final File TEST_ASSAY_LUM_FILE13 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityThreshold.xls");
+    protected final File TEST_ASSAY_LUM_FILE1 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
+    protected final File TEST_ASSAY_LUM_FILE2 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
+    protected final File TEST_ASSAY_LUM_FILE3 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
+    protected final File TEST_ASSAY_LUM_FILE4 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls");
+    protected final File TEST_ASSAY_LUM_FILE5 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls");
+    protected final File TEST_ASSAY_LUM_FILE6 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls");
+    protected final File TEST_ASSAY_LUM_FILE7 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls");
+    protected final File TEST_ASSAY_LUM_FILE8 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls");
+    protected final File TEST_ASSAY_LUM_FILE9 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
+    protected final File TEST_ASSAY_LUM_FILE10 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
+    protected final File TEST_ASSAY_LUM_FILE11 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityWithBaseline.xls");
+    protected final File TEST_ASSAY_LUM_FILE12 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityWithoutBaseline.xls");
+    protected final File TEST_ASSAY_LUM_FILE13 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityThreshold.xls");
 
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
+    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
 
     protected static final String RTRANSFORM_SCRIPT_FILE_LABKEY = "/resources/transformscripts/labkey_luminex_transform.R";
     protected static final String RTRANSFORM_SCRIPT_FILE_LAB = "/resources/transformscripts/tomaras_luminex_transform.R";

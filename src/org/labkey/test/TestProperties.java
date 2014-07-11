@@ -112,7 +112,7 @@ public abstract class TestProperties
             }
             if (chromeExe != null)
             {
-                File testBin = new File(WebTestHelper.getLabKeyRoot(), "server/test/bin");
+                File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
                 File chromePath = new File(testBin, chromeExe);
                 System.setProperty(key, chromePath.getAbsolutePath());
             }

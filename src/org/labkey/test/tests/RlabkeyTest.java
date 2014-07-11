@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -52,7 +53,7 @@ public class RlabkeyTest extends SimpleApiTest
         portalHelper.addWebPart("Lists");
        
         log("Import Lists");
-        File listArchive = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
+        File listArchive = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
 
         if (!listArchive.exists())
             fail("Unable to locate the list archive: " + listArchive.getName());
@@ -97,7 +98,7 @@ public class RlabkeyTest extends SimpleApiTest
     @Override
     public void runApiTests() throws Exception
     {
-        File testData = new File(getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml");
+        File testData = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml");
         if (testData.exists())
         {
             // cheating here, to use the api test framework to store rlabkey tests
@@ -110,7 +111,7 @@ public class RlabkeyTest extends SimpleApiTest
                 _extHelper.clickMenuButton("Views", "Create", "R View");
 
                 // we want to load the Rlabkey package from the override location
-                File libPath = new File(getLabKeyRoot() + "/sampledata/rlabkey");
+                File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");
                 String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
                 for (ApiTestCase test : tests)
@@ -134,7 +135,7 @@ public class RlabkeyTest extends SimpleApiTest
     @Override
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml")};
+        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml")};
     }
 
     @Override

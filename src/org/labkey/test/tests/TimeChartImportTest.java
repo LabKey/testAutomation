@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
@@ -62,7 +63,7 @@ public class TimeChartImportTest extends StudyBaseTest
         TimeChartImportTest initTest = (TimeChartImportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-        initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest.importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), MULTI_FOLDER_ZIP));
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
         initTest.populateChartConfigs();
     }

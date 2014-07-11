@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
@@ -26,9 +27,9 @@ import java.io.File;
 @Category({DailyB.class})
 public class AssayResultsExportTest extends AbstractExportTest
 {
-    private static final File ASSAY_DESIGN_FILE = new File(getSampledataPath(), "studyextra/TestAssay1.xar");
+    private static final File ASSAY_DESIGN_FILE = new File(TestFileUtils.getSampledataPath(), "studyextra/TestAssay1.xar");
     protected static final String ASSAY_NAME = "TestAssay1";
-    protected static final File ASSAY_RUN_FILE = new File(getSampledataPath(), "studyextra/TestAssayRun1.tsv");
+    protected static final File ASSAY_RUN_FILE = new File(TestFileUtils.getSampledataPath(), "studyextra/TestAssayRun1.tsv");
 
     @Override
     protected String getProjectName()

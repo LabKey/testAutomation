@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
@@ -106,7 +107,7 @@ public class StudyTest extends StudyBaseTest
 
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
+        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
     }
 
     protected void doCreateSteps()

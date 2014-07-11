@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.LogMethod;
@@ -54,7 +55,7 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
         initializeFolder();
         _containerHelper.enableModule("nPOD");
 
-        importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
 
         setPipelineRoot(getPipelinePath());
 

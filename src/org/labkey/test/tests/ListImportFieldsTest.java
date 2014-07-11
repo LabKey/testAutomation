@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.ListHelper;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 public class ListImportFieldsTest extends BaseWebDriverMultipleTest
 {
     private static final String PROJECT_NAME = "List Import Fields Test";
-    private static final File LIST_FIELD_IMPORT = new File(getSampledataPath(), "lists/ListImportFields.txt");
+    private static final File LIST_FIELD_IMPORT = new File(TestFileUtils.getSampledataPath(), "lists/ListImportFields.txt");
     private static final String LIST_NAME = "Test List";
     private static final String REPLACEMENT_COL = "Nukeum";
     private ListHelper listHelper = new ListHelper(this);
@@ -84,7 +85,7 @@ public class ListImportFieldsTest extends BaseWebDriverMultipleTest
         assertElementNotPresent(Locator.xpath("//input[@name='ff_type0']"));
 
         clickButton("Import Fields", "WARNING");
-        String listCols = getFileContents(LIST_FIELD_IMPORT);
+        String listCols = TestFileUtils.getFileContents(LIST_FIELD_IMPORT);
         setFormElement(Locator.id("schemaImportBox"), listCols);
 
         clickButton("Import", 0);

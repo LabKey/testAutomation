@@ -18,6 +18,7 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
@@ -175,7 +176,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Not a member of a sample set");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
+        clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");

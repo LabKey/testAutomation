@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -43,7 +44,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 {
     private final String ID_PREFIX = "PUBLISHED-";
     private final int ID_DIGITS = 8;
-    private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
+    private final File PROTOCOL_DOC = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
     private final String STUDY_LABEL = "Original Study";
     private final String STUDY_INVESTIGATOR = "Original Investigator";
     private final String STUDY_GRANT = "Original Grant";
@@ -85,7 +86,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String CUSTOM_VIEW2 = "Private Custom View";
     private final String[] CUSTOM_VIEW_PTIDS2 = {};
 
-    private final File LIST_ARCHIVE =  new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
+    private final File LIST_ARCHIVE = new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
     private final String[] LISTS = {"CustomIndexing", "Indexed as one doc", "List To Delete", "List1", "List2", "MetaDataSet"};
 
     private final String PUB1_NAME = "PublishedStudy";
@@ -768,7 +769,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickButton("Developer", 0);
         waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
         clickButton("Enable", 0);
-        setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
+        setFormElement("point-click-fn-textarea", TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         _ext4Helper.waitForMaskToDisappear();
 

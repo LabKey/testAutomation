@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
@@ -441,7 +442,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
         click(Ext4Helper.Locators.ext4Button("Enable"));
-        String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
+        String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");

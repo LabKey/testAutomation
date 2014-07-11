@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
@@ -50,7 +51,7 @@ public class PipelineTest extends PipelineWebTestBase
         super("Pipeline BVT");
 
         MS2PipelineFolder folder = new MS2PipelineFolder(this, "pipe1",
-                getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe");
+                TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe");
         folder.setFolderType("None");
         folder.setTabs("Pipeline", "MS1", "MS2", "Dumbster");
         folder.setWebParts("Data Pipeline", "MS1 Runs", "MS2 Runs", "Mail Record");
@@ -132,7 +133,7 @@ public class PipelineTest extends PipelineWebTestBase
         checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
-        _pipelineToolsHelper.setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
+        _pipelineToolsHelper.setPipelineToolsDirectory(TestFileUtils.getLabKeyRoot() + "/external/noexist");
         runProcessing(_testSetMS1);
         checkEmail(emailTable, 4);
 

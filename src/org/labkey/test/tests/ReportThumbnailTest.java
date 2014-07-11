@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -35,9 +36,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ReportThumbnailTest";
     private static final String PROJECT_NAME_ROUNDTRIP = "ReportThumbnailTest_Roundtrip";
-    private static final File TEST_STUDY = new File(getSampledataPath(), "study/LabkeyDemoStudyWithCharts.folder.zip");
-    private static final File TEST_THUMBNAIL = new File(getSampledataPath(), "Microarray/test1.jpg");
-    private static final File TEST_ICON = new File(getSampledataPath(), "icemr/piggy.JPG");
+    private static final File TEST_STUDY = new File(TestFileUtils.getSampledataPath(), "study/LabkeyDemoStudyWithCharts.folder.zip");
+    private static final File TEST_THUMBNAIL = new File(TestFileUtils.getSampledataPath(), "Microarray/test1.jpg");
+    private static final File TEST_ICON = new File(TestFileUtils.getSampledataPath(), "icemr/piggy.JPG");
     private static final String BOX_PLOT = "Example Box Plot";
     private static final String SCATTER_PLOT = "Example Scatter Plot";
     private static final String R_PARTICIPANT_VIEWS = "R Participant Views: Physical Exam";

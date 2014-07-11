@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
@@ -54,7 +55,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        File specimenDir = new File(getLabKeyRoot() + "/sampledata/study/specimens");
+        File specimenDir = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/study/specimens");
         File specimenArchive = new File(specimenDir, "SampleMindedExport.specimens");
         specimenArchive.delete();
 
@@ -90,7 +91,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         // "overview" is a dumb place for this link
         clickAndWait(Locator.linkWithText("Overview"));
         clickAndWait(Locator.linkWithText("manage files"));
-        setPipelineRoot(getLabKeyRoot() + "/sampledata/study");
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/study");
         clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
         clickAndWait(Locator.linkWithText("Manage Files"));
 

@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
@@ -52,7 +53,7 @@ public class ListPublishTest extends BaseWebDriverTest
         initializePtids("249318596", "249320107", "249320127", "249320489", "249320897", "249325717");
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
         setUpLists();
         setListIds();

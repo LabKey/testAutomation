@@ -16,8 +16,8 @@
 package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 
 import java.io.File;
 
@@ -127,7 +127,7 @@ public class PipelineFolder
 
         if (getPipelineType() == Type.enterprise)
         {
-            String pathLabKey = BaseWebDriverTest.getLabKeyRoot();
+            String pathLabKey = TestFileUtils.getLabKeyRoot();
             _test.setFormElement(Locator.name("keyFile"), new File(pathLabKey + USER_KEY));
             _test.setFormElement("keyPassword", USER_KEY_PASSWORD);
             _test.setFormElement(Locator.name("certFile"), new File(pathLabKey + USER_CERT));

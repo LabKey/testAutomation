@@ -15,21 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.Connection;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -108,7 +104,7 @@ public class StudyVisitTagTest extends StudyBaseTest
 
     protected void importStudies()
     {
-        String visitTagsPath = getSampledataPath() + "/study/VisitTags";
+        String visitTagsPath = TestFileUtils.getSampledataPath() + "/study/VisitTags";
         goToProjectHome();
         startImportStudyFromZip(new File(visitTagsPath, PARENT_FOLDER_STUDY + ".folder.zip"), false, false);
         goToProjectHome();
@@ -192,7 +188,7 @@ public class StudyVisitTagTest extends StudyBaseTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody(getFileContents(TEST_DATA_API_PATH + "/getDataVisitTest.html"));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/getDataVisitTest.html"));
         wikiHelper.saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
     }

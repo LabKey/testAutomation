@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.categories.Sequest;
 
@@ -98,7 +99,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
     protected void basicChecks()
     {
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
+        clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");

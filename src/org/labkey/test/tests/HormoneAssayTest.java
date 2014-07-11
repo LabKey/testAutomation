@@ -27,6 +27,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
@@ -206,7 +207,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Ext4Helper.Locators.radiobutton(this, "File Upload"));
         Ext4CmpRef.waitForComponent(this, "filefield");
         Ext4FileFieldRef ff = Ext4FileFieldRef.create(this);
-        File sampleExcel = new File(getSampledataPath(), "HormoneAssay/HormoneAssayPivotData.xlsx");
+        File sampleExcel = new File(TestFileUtils.getSampledataPath(), "HormoneAssay/HormoneAssayPivotData.xlsx");
         assert sampleExcel.exists();
         ff.setToFile(sampleExcel);
 

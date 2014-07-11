@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.ListHelper;
@@ -88,7 +89,7 @@ public class MicroarrayTest extends BaseWebDriverTest
 
         log("Setup the pipeline");
 
-        setPipelineRoot(getLabKeyRoot() + "/sampledata/Microarray");
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray");
         assertTextPresent("The pipeline root was set to");
         clickAndWait(Locator.linkWithText("Microarray Dashboard"));
 

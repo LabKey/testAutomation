@@ -23,6 +23,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -489,7 +490,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("test attachments too");
         click(Locator.linkContainingText("Attach a file"));
-        File file = new File(getLabKeyRoot() + "/common.properties");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Submit");
         assertTextPresent("common.properties");

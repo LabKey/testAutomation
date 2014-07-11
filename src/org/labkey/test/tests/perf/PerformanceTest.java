@@ -16,6 +16,7 @@
 package org.labkey.test.tests.perf;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -38,7 +39,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
 
     public void writePerfDataToFile()
     {
-        File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
+        File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
 
         try (FileWriter writer = new FileWriter(xmlFile);)
         {

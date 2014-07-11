@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.FileBrowser;
@@ -187,7 +188,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     @Test
     public void testDoubleClickDisplaysTxtInWindow()
     {
-        File textFile = getSampleData("fileTypes/sample.txt");
+        File textFile = TestFileUtils.getSampleData("fileTypes/sample.txt");
 
         _fileBrowserHelper.uploadFile(textFile);
 
@@ -203,7 +204,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     @Test
     public void testRenderAsRedirect()
     {
-        File textFile = getSampleData("fileTypes/sample.txt");
+        File textFile = TestFileUtils.getSampleData("fileTypes/sample.txt");
 
         String folderName = "redirectTest";
         _fileBrowserHelper.createFolder(folderName);
@@ -240,7 +241,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     private static int sampleFileCounter = 0;
     private File getNextSampleFile()
     {
-        return getSampleData("Affymetrix/CEL_files/sample_file_" + (++sampleFileCounter) + ".CEL");
+        return TestFileUtils.getSampleData("Affymetrix/CEL_files/sample_file_" + (++sampleFileCounter) + ".CEL");
     }
 
     @Nullable

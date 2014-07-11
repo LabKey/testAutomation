@@ -263,6 +263,7 @@ src/org/labkey/test/Runner.java -text
 src/org/labkey/test/SortDirection.java -text
 src/org/labkey/test/SuiteBuilder.java -text
 src/org/labkey/test/TestConfig.java -text
+src/org/labkey/test/TestFileUtils.java -text
 src/org/labkey/test/TestProperties.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text

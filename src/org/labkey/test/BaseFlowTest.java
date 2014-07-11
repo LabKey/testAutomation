@@ -97,7 +97,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected File getPipelineWorkDirectory()
     {
-        return new File(getLabKeyRoot() + "/sampledata/flow/work");
+        return new File(TestFileUtils.getLabKeyRoot() + "/sampledata/flow/work");
     }
 
     protected void deletePipelineWorkDirectory()
@@ -185,7 +185,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
 
-        setFlowPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
+        setFlowPipelineRoot(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH);
     }
 
     protected void after() throws Exception
@@ -261,7 +261,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("** Uploading sample set");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-        setFormElement("data", getFileContents(sampleFilePath));
+        setFormElement("data", TestFileUtils.getFileContents(sampleFilePath));
         click(Locator.name("idColumn1")); //need to trigger an event to populate the columns
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("idColumn" + (i+1)), idCols[i]);

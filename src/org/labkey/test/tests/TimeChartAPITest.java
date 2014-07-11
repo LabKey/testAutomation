@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
@@ -305,7 +306,7 @@ public class TimeChartAPITest extends TimeChartTest
             setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         }
         // insert JS for getData calls and querywebpart
-        wikiHelper.setWikiBody(getFileContents(htmlPage));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(htmlPage));
         wikiHelper.saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
@@ -404,7 +405,7 @@ public class TimeChartAPITest extends TimeChartTest
     @Override
     protected File[] getTestFiles()
     {
-        return new File[]{new File(getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
+        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
     }
 
     @Override

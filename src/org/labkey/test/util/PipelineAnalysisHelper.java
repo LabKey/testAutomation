@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -115,7 +116,7 @@ public class PipelineAnalysisHelper
             File actualFile = new File(fileRoot, filePath);
             if (!fileContents.isEmpty())
             {
-                String actualFileContents = BaseWebDriverTest.getFileContents(actualFile);
+                String actualFileContents = TestFileUtils.getFileContents(actualFile);
                 for (String fileContent : fileContents)
                 {
                     assertTrue("File didn't contain expected text:" + fileContent, actualFileContents.contains(fileContent));

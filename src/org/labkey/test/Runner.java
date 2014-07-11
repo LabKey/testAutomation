@@ -180,7 +180,7 @@ public class Runner extends TestSuite
 
     private static File getRemainingTestsFile()
     {
-        String labkeyRoot = WebTestHelper.getLabKeyRoot();
+        String labkeyRoot = TestFileUtils.getLabKeyRoot();
         return new File(labkeyRoot, "server/test/remainingTests.txt");
     }
 
@@ -903,7 +903,7 @@ public class Runner extends TestSuite
                     if (directory == null || directory.length() == 0)
                         continue;
 
-                    File testDir = new File(WebTestHelper.getLabKeyRoot(), directory);
+                    File testDir = new File(TestFileUtils.getLabKeyRoot(), directory);
 
                     if (!testDir.exists())
                     {
@@ -942,7 +942,7 @@ public class Runner extends TestSuite
     // Return a list of modified module directories, ordered starting with most recently modified.
     private static List<String> getModifiedModuleDirectories(String changedFilesFile)
     {
-        String labkeyRoot = WebTestHelper.getLabKeyRoot();
+        String labkeyRoot = TestFileUtils.getLabKeyRoot();
         File changedFiles = new File(changedFilesFile);
         Map<String, Long> moduleDirs = new HashMap<>(10);
         String modulePrefix = "server/modules/";

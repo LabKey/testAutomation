@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
@@ -49,7 +49,7 @@ public class LuminexJavaTransformTest extends LuminexTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickEditAssayDesign(false);
 
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
         goToTestAssayHome();

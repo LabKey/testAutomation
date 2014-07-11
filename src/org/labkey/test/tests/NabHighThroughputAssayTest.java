@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
@@ -48,10 +49,10 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
-    protected final String TEST_ASSAY_NAB_METADATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) metadata.xlsx";
-    protected final String TEST_ASSAY_NAB_DATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) test data.xlsx";
+    protected final String TEST_ASSAY_NAB_METADATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) metadata.xlsx";
+    protected final String TEST_ASSAY_NAB_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) test data.xlsx";
 
-    protected final String COMBINED_NAB_DATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) single file.xlsx";
+    protected final String COMBINED_NAB_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) single file.xlsx";
 
     @Override
     protected void runUITests() throws Exception

@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
@@ -118,7 +119,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private String getSampleRoot()
     {
-        return getLabKeyRoot() + "/sampledata/mvIndicators/";
+        return TestFileUtils.getLabKeyRoot() + "/sampledata/mvIndicators/";
     }
 
     @Test
@@ -263,7 +264,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("typeNameColumn"), "datasetName");
         setFormElement(Locator.name("labelColumn"), "datasetLabel");
         setFormElement(Locator.name("typeIdColumn"), "datasetId");
-        setFormElementJS(Locator.name("tsv"), getFileContents(DATASET_SCHEMA_FILE));
+        setFormElementJS(Locator.name("tsv"), TestFileUtils.getFileContents(DATASET_SCHEMA_FILE));
         clickButton("Submit", 180000);
         assertNoLabkeyErrors();
         assertTextPresent("MV Dataset");

@@ -15,17 +15,15 @@
  */
 package org.labkey.test.util;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,7 +129,7 @@ public class RReportHelper extends AbstractHelper
         {
             if (local)
             {
-                File rPackage = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/Rlabkey.zip");
+                File rPackage = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/Rlabkey.zip");
 
                 if (!rPackage.exists())
                     fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
@@ -233,8 +231,8 @@ public class RReportHelper extends AbstractHelper
             Process p = rt.exec(new String[]{r.getCanonicalPath(), "--version"});
 
             // Different platforms output version info differently; just combine all std/err output
-            versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getInputStream());
-            versionOutput += BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
+            versionOutput = TestFileUtils.getStreamContentsAsString(p.getInputStream());
+            versionOutput += TestFileUtils.getStreamContentsAsString(p.getErrorStream());
 
             Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);

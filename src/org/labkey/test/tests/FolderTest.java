@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -32,7 +33,7 @@ public class FolderTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "FolderTest#Project";
     private static final String WIKITEST_NAME = "WikiTestFolderCreate";
-    private static final File FOLDER_CREATION_FILE = new File(getLabKeyRoot(), "server/test/data/api/folderTest.html");
+    private static final File FOLDER_CREATION_FILE = new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/folderTest.html");
     private static final String PROJECT_FOLDER_XPATH = "//li[@class='x-tree-node' and ./div/a/span[text()='"+PROJECT_NAME+"']]";
 
     @Override
@@ -76,7 +77,7 @@ public class FolderTest extends BaseWebDriverTest
         wikiHelper.createNewWikiPage();
         setFormElement(Locator.id("wiki-input-name"), WIKITEST_NAME);
         setFormElement(Locator.id("wiki-input-title"), WIKITEST_NAME);
-        wikiHelper.setWikiBody(getFileContents(FOLDER_CREATION_FILE));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(FOLDER_CREATION_FILE));
         wikiHelper.saveWikiPage();
 
         // Run the Test Script

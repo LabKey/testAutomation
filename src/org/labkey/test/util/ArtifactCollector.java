@@ -22,8 +22,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
-import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
@@ -83,7 +83,7 @@ public class ArtifactCollector
         if (file != null && isTestRunningOnTeamCity())
         {
             // relativize path to labkey project root
-            String labkeyRoot = WebTestHelper.getLabKeyRoot();
+            String labkeyRoot = TestFileUtils.getLabKeyRoot();
             labkeyRoot = new File(labkeyRoot).getAbsolutePath();
             String strFile = file.getAbsolutePath();
             if (strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
@@ -103,7 +103,7 @@ public class ArtifactCollector
 
         try
         {
-            File threadDumpRequest = new File(BaseWebDriverTest.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
+            File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
             threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
         }
         catch (Exception e)
@@ -148,7 +148,7 @@ public class ArtifactCollector
             File destDir = ensureDumpDir();
             String dumpMsg = Locator.css("#bodypanel > div").findElement(_test.getDriver()).getText();
             String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
-            File heapDump = new File(BaseWebDriverTest.getLabKeyRoot() + "/build/deploy", filename);
+            File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
             File destFile = new File(destDir, filename);
 
             if ( heapDump.renameTo(destFile) )

@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
@@ -127,7 +128,7 @@ public class SequestImportTest extends BaseWebDriverTest
     private void setupProject()
     {
         _containerHelper.createProject(PROJECT_NAME, "MS2 Extensions");
-        setPipelineRoot(getLabKeyRoot()+ "/sampledata/raftflow");
+        setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/raftflow");
         _containerHelper.enableModule(PROJECT_NAME, "MS2Extensions");
         List<ModulePropertyValue> properties = new ArrayList<>();
         // Clear out any custom queries that might have been set by the user

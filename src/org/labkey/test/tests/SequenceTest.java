@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
@@ -63,8 +64,8 @@ public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String _pipelineRoot = null;
-    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
-    protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/sequenceAnalysis";
+    protected final String _sequencePipelineLoc = TestFileUtils.getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
+    protected final String _illuminaPipelineLoc = TestFileUtils.getLabKeyRoot() + "/sampledata/sequenceAnalysis";
     protected final String _readsetPipelineName = "Import sequence data";
 
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";

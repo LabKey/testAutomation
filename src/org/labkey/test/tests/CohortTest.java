@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
@@ -73,7 +74,7 @@ public class CohortTest extends BaseWebDriverTest
     {
         log("Check advanced cohort features.");
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(new File(getLabKeyRoot(), COHORT_STUDY_ZIP));
+        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), COHORT_STUDY_ZIP));
         clickProject(PROJECT_NAME);
         addWebPart("Specimens");
         // Check all cohorts after initial import.

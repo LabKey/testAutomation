@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
@@ -97,7 +98,7 @@ public class SearchTest extends StudyTest
     {
         clickTab("Overview");
         portalHelper.addWebPart("Lists");
-        _listHelper.importListArchive(FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
+        _listHelper.importListArchive(FOLDER_A, new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
 
         clickAndWait(Locator.linkWithText(listToDelete));
         _listHelper.deleteList();
@@ -239,11 +240,11 @@ public class SearchTest extends StudyTest
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
+        setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");
         assertTextPresent("Female");
         setFormElement(Locator.name("program"), java);
-        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
+        setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
         clickButton("Submit");
         assertTextPresent("Female");
@@ -258,7 +259,7 @@ public class SearchTest extends StudyTest
         
         clickFolder(getFolderName());
         portalHelper.addWebPart("Wiki");
-        _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
+        _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, new File(TestFileUtils.getLabKeyRoot() + "/server/module.template.properties"));
         portalHelper.addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
         _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null, true);
@@ -298,7 +299,7 @@ public class SearchTest extends StudyTest
         setFormElement(Locator.id("comment"), ISSUE_BODY);
         selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER1));
         click(Locator.linkWithText("Attach a file"));
-        File file = new File(getLabKeyRoot() + "/common.properties");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Save");
 
@@ -318,7 +319,7 @@ public class SearchTest extends StudyTest
         setFormElement(Locator.name("title"), MESSAGE_TITLE);
         setFormElement(Locator.id("body"), MESSAGE_BODY);
         click(Locator.linkWithText("Attach a file"));
-        File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
         setFormElement(Locator.name("formFiles[0]"), file);
         clickButton("Submit");
 
@@ -331,9 +332,9 @@ public class SearchTest extends StudyTest
     {
         clickFolder(getFolderName());
         goToModule("FileContent");
-        File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         _fileBrowserHelper.uploadFile(file);
-        File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
+        File MLfile = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
         _fileBrowserHelper.uploadFile(MLfile);
 
         _searchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));

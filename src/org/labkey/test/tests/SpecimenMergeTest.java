@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
@@ -65,8 +66,8 @@ public class SpecimenMergeTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
-        File tempDir = new File(getLabKeyRoot() + SPECIMEN_TEMP_DIR);
+        _studyDataRoot = TestFileUtils.getLabKeyRoot() + "/sampledata/study";
+        File tempDir = new File(TestFileUtils.getLabKeyRoot() + SPECIMEN_TEMP_DIR);
         if (tempDir.exists())
         {
             for (File file : tempDir.listFiles())
@@ -87,11 +88,11 @@ public class SpecimenMergeTest extends BaseWebDriverTest
     protected void importFirstFileSet()
     {
         File[] archives = new File[] {
-                new File(getLabKeyRoot(), LAB19_SPECIMENS),
-                new File(getLabKeyRoot(), LAB20_SPECIMENS),
-                new File(getLabKeyRoot(), LAB21_SPECIMENS)
+                new File(TestFileUtils.getLabKeyRoot(), LAB19_SPECIMENS),
+                new File(TestFileUtils.getLabKeyRoot(), LAB20_SPECIMENS),
+                new File(TestFileUtils.getLabKeyRoot(), LAB21_SPECIMENS)
         };
-        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), archives, new File(getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, pipelineJobCount);
+        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), archives, new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, pipelineJobCount);
         importer.setExpectError(true);
         importer.importAndWaitForComplete();
 
@@ -104,7 +105,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
 
     protected void setUpSteps()
     {
-        _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
+        _studyDataRoot = TestFileUtils.getLabKeyRoot() + "/sampledata/study";
 
         _containerHelper.createProject(PROJECT_NAME, null);
 

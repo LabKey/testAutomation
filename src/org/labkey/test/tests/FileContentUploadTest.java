@@ -16,12 +16,12 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
@@ -106,7 +106,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         goToProjectHome();
 
         String filename = "InlineFile.html";
-        String sampleRoot = getLabKeyRoot() + "/sampledata/security";
+        String sampleRoot = TestFileUtils.getLabKeyRoot() + "/sampledata/security";
         File f = new File(sampleRoot, filename);
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));

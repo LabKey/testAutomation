@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.RowMap;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.External;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.Locator;
@@ -275,7 +276,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
 
     public static String getSampledataPath()
     {
-        File path = new File(getLabKeyRoot(), "externalModules/scharp/peptide/test/sampledata");
+        File path = new File(TestFileUtils.getLabKeyRoot(), "externalModules/scharp/peptide/test/sampledata");
         return path.toString();
     }
 }

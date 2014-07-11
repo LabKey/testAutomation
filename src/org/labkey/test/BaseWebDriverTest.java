@@ -86,13 +86,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -264,75 +261,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return false;
     }
 
-    public static String getLabKeyRoot()
-    {
-        return WebTestHelper.getLabKeyRoot();
-    }
-
-    public static File getDefaultFileRoot(String containerPath)
-    {
-        return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");
-    }
-
-    public static String getDefaultWebAppRoot()
-    {
-        File path = new File(getLabKeyRoot(), "build/deploy/labkeyWebapp");
-        return path.toString();
-    }
-
-    public static File getSampleData(String relativePath)
-    {
-        String path;
-        File sampledataDirsFile = new File(getLabKeyRoot(), "server/test/build/sampledata.dirs");
-
-        if (sampledataDirsFile.exists())
-        {
-            path = getFileContents(sampledataDirsFile);
-        }
-        else
-        {
-            path = getSampledataPath();
-        }
-
-        List<String> splitPath = Arrays.asList(path.split(";"));
-
-        File foundFile = null;
-        for (String sampledataDir : splitPath)
-        {
-            File checkFile = new File(sampledataDir, relativePath);
-            if (checkFile.exists())
-            {
-                if (foundFile != null)
-                    throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
-                            "Found:\n" +
-                            foundFile + "\n" +
-                            checkFile);
-                else
-                    foundFile = checkFile;
-            }
-        }
-
-        assertNotNull("Sample data not found: " + relativePath + "\n" +
-                "In: " + path, foundFile);
-        return foundFile;
-    }
-
-    public static String getSampledataPath()
-    {
-        File path = new File(getLabKeyRoot(), "sampledata");
-        return path.toString();
-    }
-
-    public static String getContextPath()
-    {
-        return WebTestHelper.getContextPath();
-    }
-
-    public static File getApiScriptFolder()
-    {
-        return new File(getLabKeyRoot(), "server/test/data/api");
-    }
-
     protected abstract @Nullable String getProjectName();
 
     public void setUp() throws Exception
@@ -401,7 +329,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                     if (isScriptCheckEnabled())
                     {
-                        File jsErrorCheckerExtension = new File(getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker");
+                        File jsErrorCheckerExtension = new File(TestFileUtils.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker");
                         options.addArguments("load-extension=" + jsErrorCheckerExtension.toString());
                     }
 
@@ -463,8 +391,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     {
                         try
                         {
-                            profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
-                            profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
+                            profile.addExtension(new File(TestFileUtils.getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
+                            profile.addExtension(new File(TestFileUtils.getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
                             profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
                             profile.setPreference("extensions.firebug.allPagesActivation", "on");
                             profile.setPreference("extensions.firebug.previousPlacement", 3);
@@ -656,21 +584,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         catch (InterruptedException ignore)
         {
         }
-    }
-
-    public static String getStreamContentsAsString(InputStream is) throws IOException
-    {
-        StringBuilder contents = new StringBuilder();
-        try(BufferedReader input = new BufferedReader(new InputStreamReader(is)))
-        {
-            String line;
-            while ((line = input.readLine()) != null)
-            {
-                contents.append(line);
-                contents.append("\n");
-            }
-        }
-        return contents.toString();
     }
 
     public void copyFile(String original, String copy)
@@ -1928,8 +1841,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             getArtifactCollector().dumpPageSnapshot(testName, null);
             if (isTestRunningOnTeamCity())
             {
-                getArtifactCollector().addArtifactLocation(new File(getLabKeyRoot(), "sampledata"));
-                getArtifactCollector().addArtifactLocation(new File(getLabKeyRoot(), "build/deploy/files"), new FileFilter()
+                getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
+                getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"), new FileFilter()
                 {
                     @Override
                     public boolean accept(File pathname)
@@ -2556,7 +2469,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)
     {
         // TODO: Create static class for managing teamcity-info.xml file.
-        File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
+        File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
         try (FileWriter writer = new FileWriter(xmlFile))
         {
             xmlFile.createNewFile();
@@ -2604,18 +2517,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public String getProjectUrl()
     {
         return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
-    }
-
-    public static String stripContextPath(String url)
-    {
-        String root = WebTestHelper.getContextPath() + "/";
-        int rootLoc = url.indexOf(root);
-        int endOfAction = url.indexOf("?");
-        if ((rootLoc != -1) && (endOfAction == -1 || rootLoc < endOfAction))
-            url = url.substring(rootLoc + root.length());
-        else if (url.indexOf("/") == 0)
-            url = url.substring(1);
-        return url;
     }
 
     public long beginAt(String relativeURL)
@@ -3573,7 +3474,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected File getTestTempDir()
     {
-        File buildDir = new File(getLabKeyRoot(), "build");
+        File buildDir = new File(TestFileUtils.getLabKeyRoot(), "build");
         return new File(buildDir, "testTemp");
     }
 
@@ -4800,7 +4701,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (location < localAddress.length() - 1)
                 localAddress = localAddress.substring(location + 1);
         }
-        return (getContextPath() + "/" + controller + folderPath + "/" + localAddress);
+        return (WebTestHelper.getContextPath() + "/" + controller + folderPath + "/" + localAddress);
     }
 
 
@@ -5913,26 +5814,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             uncheckCheckbox(Locator.name("validateQueries"));
         clickButton("Start Import");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
-    }
-
-    public String getFileContents(String rootRelativePath)
-    {
-        if (rootRelativePath.charAt(0) != '/')
-            rootRelativePath = "/" + rootRelativePath;
-        File file = new File(getLabKeyRoot() + rootRelativePath);
-        return getFileContents(file);
-    }
-
-    public static String getFileContents(final File file)
-    {
-        try
-        {
-            return new String(Files.readAllBytes(Paths.get(file.toURI())));
-        }
-        catch (IOException fail)
-        {
-            throw new RuntimeException(fail);
-        }
     }
 
     @LogMethod

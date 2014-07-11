@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
@@ -82,11 +83,11 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickProject(PROJECT_NAME);
         _containerHelper.enableModules(Arrays.asList("Query", "Flow"));
 
-        createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
-        createQuery(PROJECT_NAME, "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
+        createQuery(PROJECT_NAME, "PassFailDetails", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
+        createQuery(PROJECT_NAME, "PassFail", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
         //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
-        createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
-        createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
+        createQuery(PROJECT_NAME, "COMP", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
+        createQuery(PROJECT_NAME, "Comparison", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));

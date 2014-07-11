@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
@@ -80,7 +81,7 @@ public abstract class TimeChartTest extends ReportTest
             _containerHelper.createProject(getProjectName(), null);
 
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
-        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
     }
 
     @LogMethod protected void configureVisitStudy()

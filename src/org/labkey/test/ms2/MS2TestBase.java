@@ -18,7 +18,9 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 
@@ -44,7 +46,7 @@ abstract public class MS2TestBase extends BaseWebDriverTest
             "  <note label=\"pipeline quantitation, algorithm\" type=\"input\">xpress</note> \n" +
         "</bioml>";
 
-    public final static String PIPELINE_PATH = getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
+    public final static String PIPELINE_PATH = TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
 
     public String getAssociatedModuleDirectory()
     {
@@ -89,9 +91,9 @@ abstract public class MS2TestBase extends BaseWebDriverTest
     {
         clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
-        if (isElementPresent(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif")))
+        if (isElementPresent(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif")))
         {
-            clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
+            clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif"));
             clickButton("Manage Views");
             for (String viewName : viewNames)
             {

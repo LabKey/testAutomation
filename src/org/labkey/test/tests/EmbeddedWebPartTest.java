@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
@@ -78,7 +79,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         click(Locator.linkContainingText("Source", 0));
         setFormElement(Locator.name("name"), TRICKY_CHARACTERS + "wiki page");
 
-        wikiHelper.setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
 
         clickButton("Save & Close");
         waitForText("Display Name");

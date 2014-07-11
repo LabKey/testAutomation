@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -119,7 +120,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         if (isElementPresent(Locator.linkWithText("configure a valid pipeline root for this folder")))
         {
-            setPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
+            setPipelineRoot(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH);
         }
 
         clickFolder(FOLDER_NAME);
@@ -314,13 +315,14 @@ public class SampleSetTest extends BaseWebDriverTest
             "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
     }
 
-    final File experimentFilePath =  new File(getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
+    final File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
+
     private void fileAttachmentTest()
     {
         enableFileInput();
 
         setFileAttachment(0, experimentFilePath);
-        setFileAttachment(1, new File(getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
+        setFileAttachment(1, new File(TestFileUtils.getLabKeyRoot() +  "/sampledata/sampleset/RawAndSummary~!@#$%^&()_+-[]{};',..xlsx"));
         inserNewWithFileAttachmentTest();
     }
 

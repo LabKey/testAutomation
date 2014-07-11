@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
@@ -248,7 +249,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void uploadBatch(String batchName, String... uploadedFiles)
     {
-        File dataRoot = new File(getLabKeyRoot(), "/sampledata/miniassay/data");
+        File dataRoot = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/miniassay/data");
         assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);

@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -96,7 +97,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected String getPipelinePath()
     {
-        return getLabKeyRoot() + getStudySampleDataPath();
+        return TestFileUtils.getLabKeyRoot() + getStudySampleDataPath();
     }
 
     protected String getProjectName()
@@ -119,7 +120,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         hoverProjectBar();
         int response = -1;
         try{
-            response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));
+            response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + WebTestHelper.stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));
         }
         catch(Exception e){/*No link or bad response*/}
 
@@ -139,7 +140,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     }
     protected void startSpecimenImport(int completeJobsExpected, String specimenArchivePath)
     {
-        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), specimenArchivePath), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
+        _specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), specimenArchivePath), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), completeJobsExpected);
         _specimenImporter.startImport();
     }
 
@@ -174,7 +175,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         deleteLogFiles("datasets");
         deleteDir(new File(getPipelinePath(), "assaydata"));
         deleteDir(new File(getPipelinePath(), "reports_temp"));
-        deleteDir(new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR));
+        deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 
     private void deleteLogFiles(String directoryName)

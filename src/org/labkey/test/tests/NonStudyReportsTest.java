@@ -17,7 +17,9 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
@@ -37,14 +39,16 @@ public class NonStudyReportsTest extends ReportTest
 
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
     private static final String ATTACHMENT_REPORT_DESCRIPTION = "This attachment report uploads a file";
-    private static final File ATTACHMENT_REPORT_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
+
 
     private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
     private static final String ATTACHMENT_REPORT3_NAME = "Attachment Report3";
     private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
 
     private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
-    private static final File ATTACHMENT_REPORT2_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+    private static final File ATTACHMENT_REPORT2_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
+
 
     private static final String DISCUSSED_REPORT = "Blank R Report";
     private static final String DISCUSSION_BODY_1 = "Starting a discussion";
@@ -309,7 +313,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement("linkUrl", "mailto:kevink@example.com");
         waitForElementToDisappear(Locator.tag("li").containing("This field is required"));
         assertElementPresent(Locator.tag("li").containing("URL must be absolute"));
-        setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
+        setFormElement("linkUrl", WebTestHelper.getContextPath() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
         assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
         _ext4Helper.uncheckCheckbox("Open link report in new window?");

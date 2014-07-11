@@ -19,6 +19,7 @@ import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
@@ -41,7 +42,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends ReportTest
 {
-    private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
+    private static final Path scriptpadReports = Paths.get(TestFileUtils.getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
     private static final Path rmdDependenciesReport = scriptpadReports.resolve("kable.rmd");
@@ -151,8 +152,8 @@ public class KnitrReportTest extends ReportTest
         // copy over a lib to the webapp path that includes the required dependencies and ensure
         // the report loads by referencing those dependencies
         //
-        Path source = Paths.get(getSampledataPath(), "knitr/knitr.lib.xml");
-        Path destDir = Paths.get(getDefaultWebAppRoot());
+        Path source = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
+        Path destDir = Paths.get(TestFileUtils.getDefaultWebAppRoot());
 
         try
         {

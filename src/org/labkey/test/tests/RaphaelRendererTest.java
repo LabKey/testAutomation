@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
@@ -51,7 +52,7 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
     {
         RaphaelRendererTest initTest = (RaphaelRendererTest)getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-        initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest.importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), MULTI_FOLDER_ZIP));
         initTest.populateTimeChartConfigs();
     }
     private void populateTimeChartConfigs()

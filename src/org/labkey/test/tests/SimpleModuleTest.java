@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -792,7 +793,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToModule("Wiki");
         wikiHelper.createNewWikiPage();
         setFormElement(Locator.id("wiki-input-name"), "Parameterized QWP");
-        wikiHelper.setWikiBody(getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
@@ -923,7 +924,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
         clickFolder(NEW_FOLDER_NAME);
-        importFolderFromZip(new File(getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
+        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
                 "Folder type 'Folder With Restricted Module' not set because it requires a restricted module for which you do not have permission.",

@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.DataRegionTable;
@@ -814,7 +815,7 @@ public class MS2Test extends AbstractMS2ImportTest
     {
         log("Test creating run groups");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickAndWait(Locator.linkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif"));
+        clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/Experiment/images/graphIcon.gif"));
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickButton("Create new group");
         setFormElement(Locator.name("name"), RUN_GROUP1_NAME1);

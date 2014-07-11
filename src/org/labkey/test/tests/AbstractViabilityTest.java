@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -77,7 +78,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("Specimen Data"));
         waitAndClickAndWait(Locator.linkWithText("Import Specimens"));
         waitForElement(Locator.id("tsv"));
-        setFormElement(Locator.id("tsv"), getFileContents(specimensPath));
+        setFormElement(Locator.id("tsv"), TestFileUtils.getFileContents(specimensPath));
         submit();
         assertTextPresent("Specimens uploaded successfully");
     }
@@ -150,7 +151,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     private void uploadAssayFile(String path)
     {
-        File guavaFile = new File(getLabKeyRoot() + path);
+        File guavaFile = new File(TestFileUtils.getLabKeyRoot() + path);
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement(Locator.name("__primaryFile__"), guavaFile);
         clickButton("Next", 8000);

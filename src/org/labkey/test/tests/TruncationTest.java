@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.Ext4Helper;
@@ -27,7 +28,7 @@ import java.io.File;
 @Category({Study.class, Specimen.class})
 public class TruncationTest extends StudyBaseTest
 {
-    private final File LIST_ARCHIVE =  new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
+    private final File LIST_ARCHIVE = new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
     private final String STUDY_NAME = "Study 001";
 
     @Override

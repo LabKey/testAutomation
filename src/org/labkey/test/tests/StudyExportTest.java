@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
@@ -35,7 +36,7 @@ public class StudyExportTest extends StudyManualTest
     private static final String DEMOGRAPHICS_DATASET = "DEM-1: Demographics";
     private static final String TEST_ADD_ENTRY = "999000000";
 
-    private final String DATASET_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
+    private final String DATASET_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/dataLoading/excel/dataset_data.xls";
     private static final String HIDDEN_DATASET = "URS-1: Screening Urinalysis";
     private static final String MODIFIED_DATASET = "Quality Control Report"; // Empty dataset.
     private static final String REORDERED_DATASET1 = "LLS-1: Screening Local Lab Results (Page 1)";
@@ -56,7 +57,7 @@ public class StudyExportTest extends StudyManualTest
         createStudyManually();
 
         // import the specimens and wait for both datasets & specimens to load
-        SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
+        SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
         specimenImporter.importAndWaitForComplete();
 
         // export manually created study to individual files using "legacy" formats
@@ -90,7 +91,7 @@ public class StudyExportTest extends StudyManualTest
         hideDataset(HIDDEN_DATASET);
         modifyDatasetColumn(MODIFIED_DATASET);
 
-        _listHelper.importListArchive(getFolderName(), new File(getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
+        _listHelper.importListArchive(getFolderName(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
         exportStudy(true, true);
@@ -360,7 +361,7 @@ public class StudyExportTest extends StudyManualTest
         _extHelper.clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 5);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 5);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load

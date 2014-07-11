@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -33,13 +34,13 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
     protected static final String TEST_ASSAY_NAME = "TestAssayDrugSensitivity";
     protected static final String TEST_ASSAY_DESC = "Description for Drug Sensitivity assay";
 
-    protected final String TEST_ASSAY_FILE1 = getLabKeyRoot() + "/sampledata/DrugSensitivity/1.txt";
-    protected final String TEST_ASSAY_FILE2 = getLabKeyRoot() + "/sampledata/DrugSensitivity/2.txt";
-    protected final String TEST_ASSAY_FILE3 = getLabKeyRoot() + "/sampledata/DrugSensitivity/3.txt";
+    protected final String TEST_ASSAY_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/1.txt";
+    protected final String TEST_ASSAY_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/2.txt";
+    protected final String TEST_ASSAY_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/3.txt";
 
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE1 = getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition1.xlsx";
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE2 = getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition2.xlsx";
-    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE3 = getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition3.xlsx";
+    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition1.xlsx";
+    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition2.xlsx";
+    protected final String TEST_ASSAY_DATA_ACQUISITION_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition3.xlsx";
 
     @Override @LogMethod
     protected void runUITests() throws Exception
