@@ -53,6 +53,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
@@ -5443,16 +5444,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
-    public void createUser(String userName, @Nullable String cloneUserName)
+    public CreateUserResponse createUser(String userName, @Nullable String cloneUserName)
     {
-        createUser(userName, cloneUserName, true);
+        return createUser(userName, cloneUserName, true);
     }
 
-    public void createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
+    public CreateUserResponse createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
     {
         if(cloneUserName == null)
         {
-            _userHelper.createUser(userName, verifySuccess);
+            return _userHelper.createUser(userName, verifySuccess);
         }
         else
         {

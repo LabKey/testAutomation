@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
 
 public abstract class AbstractUserHelper extends AbstractHelper
@@ -25,10 +26,10 @@ public abstract class AbstractUserHelper extends AbstractHelper
     }
 
 
-    public void createUser(String userName)
+    public CreateUserResponse createUser(String userName)
     {
-        createUser(userName, true);
+        return createUser(userName, true);
     }
 
-    public abstract void createUser(String userName, boolean verifySuccess);
+    public abstract CreateUserResponse createUser(String userName, boolean verifySuccess);
 }

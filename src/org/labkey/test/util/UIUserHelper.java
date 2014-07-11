@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
@@ -28,7 +29,7 @@ public class UIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public void createUser(String userName, boolean verifySuccess)
+    public CreateUserResponse createUser(String userName, boolean verifySuccess)
     {
             _test.goToHome();
             _test.ensureAdminMode();
@@ -47,5 +48,7 @@ public class UIUserHelper extends AbstractUserHelper
             if (verifySuccess)
                 assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
 
+            // there is no Response object creating via the ui
+            return null;
     }
 }

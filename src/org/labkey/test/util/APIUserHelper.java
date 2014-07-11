@@ -29,8 +29,8 @@ public class APIUserHelper extends AbstractUserHelper
         super(test);
     }
 
-
-    public void createUser(String userName, boolean verifySuccess)
+    @Override
+    public CreateUserResponse createUser(String userName, boolean verifySuccess)
     {
 
             CreateUserCommand command = new CreateUserCommand(userName);
@@ -44,11 +44,13 @@ public class APIUserHelper extends AbstractUserHelper
                     assertEquals(userName, response.getEmail());
                     assertTrue("Invalid userId", response.getUserId() != null);
                 }
+                return response;
             }
             catch (Exception e)
             {
                 if(verifySuccess)
                     fail("Error while creating user: " + e.getMessage());
+                return null;
             }
     }
 }

@@ -27,6 +27,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -43,7 +44,6 @@ public class MessagesLongTest extends BaseWebDriverTest
 {
     PortalHelper portalHelper = new PortalHelper(this);
 
-    // TODO: This test and/or MessagesLongTest are misnamed
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
     private static final String MSG1_BODY = "this is a test message to Banana";
@@ -67,6 +67,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     String user = "message_user@gmail.com";
     String group = "Message group";
+    String messageUserId;
 
     public String getAssociatedModuleDirectory()
     {
@@ -139,22 +140,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByName("expires"));
         clickButton("Save");
 
-        log("Check email admin works");
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Administration");
-
-        assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
-        click(Locator.lkButton("Update Settings"));
-        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(Locator.id("Users")));
-        _extHelper.clickSideTab("messages");
-        Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");
-
-        waitForElement(Locator.xpath("//input[@name='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Update Folder Default", 0);
-
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("All conversations");
-
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        verifyAdmin();
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
@@ -325,6 +311,49 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(MSG2_TITLE));
     }
 
+    private void verifyAdmin()
+    {
+        log("Check email admin works");
+
+        // Folder default settings
+        final String fileDefaultCombo = "Default Setting For Files:";
+        final String fileDefaultExistingSetting = "No Email";
+        final String fileDefaultNewSetting = "Daily digest";
+
+        log("Check folder default settings");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Administration");
+
+        assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
+
+        _ext4Helper.selectComboBoxItem(fileDefaultCombo, fileDefaultNewSetting);
+        clickButton("Update", 0);
+        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        assertTextPresent(fileDefaultNewSetting);
+
+        // User settings
+        log("Check user settings");
+        final String usersDataRegion = "Users";
+        final String usersUpdateButton = "Update User Settings";
+        final String messageMenuItem = "For Messages";
+        final String userSettingNew = "Daily digest of all conversations";
+        final String newSettingLabel = "New Setting:";
+        final String popupUpdateButton = "Update Settings For 1 User";
+        final String messageColumn = "Message Settings";
+
+        waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
+        checkDataRegionCheckbox(usersDataRegion, messageUserId);
+        shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(usersUpdateButton)));
+        click(Locator.lkButton(usersUpdateButton));
+        waitAndClick(Locator.menuItem(messageMenuItem));
+        _ext4Helper.selectComboBoxItem(newSettingLabel, userSettingNew);
+        clickButton(popupUpdateButton, 0);
+        waitForText("Are you sure");
+        clickButton("Yes");
+
+        DataRegionTable dr = new DataRegionTable(usersDataRegion, this);
+        assertEquals(dr.getDataAsText(messageUserId, messageColumn), userSettingNew);
+     }
+
     private void testMemberLists()
     {
         clickProject(PROJECT_NAME);
@@ -465,7 +494,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Add search to project");
         addWebPart("Search");
 
-        createUser(user, null);
+
+        messageUserId = createUser(user, null).getUserId().toString();
         goToHome();
         goToProjectHome();
         _permissionsHelper.createPermissionsGroup(group);
