@@ -761,7 +761,7 @@ public class Crawler
             }
             catch (UnhandledAlertException ex)
             {
-                if (test.getAlert().startsWith(alertText))
+                if (ex.getAlertText().startsWith(alertText))
                     msg = " malicious script executed";
 
                 String html = test.getHtmlSource();
