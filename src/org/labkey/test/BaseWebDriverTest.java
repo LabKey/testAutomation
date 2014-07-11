@@ -3617,7 +3617,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount;
+                final File[] files = downloadDir.listFiles(newFileFilter);
+                return files != null && files.length >= expectedFileCount;
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
@@ -3626,7 +3627,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(tempFilesFilter).length == 0;
+                final File[] files = downloadDir.listFiles(tempFilesFilter);
+                return files != null && files.length == 0;
             }
         }, "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
 
