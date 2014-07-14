@@ -194,6 +194,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             _listHelper.addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
             _listHelper.addField("Batch Fields", 7, "LabTransformVersion", "Lab Transform Script Version", ListColumnType.String);
             _listHelper.addField("Batch Fields", 8, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 9, "RVersion", "R Version", ListColumnType.String);
 
             // add run properties for designation of which field to use for curve fit calc in transform
             _listHelper.addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
