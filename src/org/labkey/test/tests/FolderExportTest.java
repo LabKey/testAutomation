@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.UIContainerHelper;
@@ -33,7 +34,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
@@ -214,12 +217,15 @@ public class FolderExportTest extends BaseWebDriverTest
 
         log("verify notification default settings as expected");
         clickAndWait(Locator.linkWithText("Notifications"));
-        waitForText("Email Notification Settings");
-        click(Locator.lkButton("Update Settings"));
-        waitForElement(Locator.xpath("//li/a[text()='files']"), WAIT_FOR_JAVASCRIPT);
-        isElementPresent(Locator.xpath("//div[text()='Daily digest' and contains(@class, 'x-combo-selected')]"));
-        click(Locator.css("#dataregion_Users li > a").withText("messages"));
-        isElementPresent(Locator.xpath("//div[text()='All conversations' and contains(@class, 'x-combo-selected')]"));
+        waitForText("Default Settings");
+
+        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.FILES_DEFAULT_COMBO));
+        isElementPresent(Locator.xpath("//li[text()='Daily digest' and contains(@class, 'x4-boundlist-selected')]"));
+        click(Locator.tagWithText("span", "Default Settings"));
+
+        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO));
+        isElementPresent(Locator.xpath("//li[text()='All conversations' and contains(@class, 'x4-boundlist-selected')]"));
+        click(Locator.tagWithText("span", "Default Settings"));
 
         verifySubfolderImport(subfolderIndex, false);
     }

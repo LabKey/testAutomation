@@ -68,6 +68,13 @@ public class MessagesLongTest extends BaseWebDriverTest
     String user = "message_user@gmail.com";
     String group = "Message group";
     String messageUserId;
+    public static final String FILES_DEFAULT_COMBO = "Default Setting For Files:";
+    public static final String MESSAGES_DEFAULT_COMBO = "Default Setting For Messages:";
+    public static final String USERS_UPDATE_BUTTON = "Update User Settings";
+    public static final String NEW_SETTING_LABEL = "New Setting:";
+    public static final String POPUP_UPDATE_BUTTON = "Update Settings For 1 User";
+    public static final String FILES_MENU_ITEM = "For Files";
+    public static final String MESSAGES_MENU_ITEM = "For Messages";
 
     public String getAssociatedModuleDirectory()
     {
@@ -316,7 +323,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check email admin works");
 
         // Folder default settings
-        final String fileDefaultCombo = "Default Setting For Files:";
         final String fileDefaultExistingSetting = "No Email";
         final String fileDefaultNewSetting = "Daily digest";
 
@@ -325,7 +331,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
 
-        _ext4Helper.selectComboBoxItem(fileDefaultCombo, fileDefaultNewSetting);
+        _ext4Helper.selectComboBoxItem(FILES_DEFAULT_COMBO, fileDefaultNewSetting);
         clickButton("Update", 0);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresent(fileDefaultNewSetting);
@@ -333,20 +339,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         // User settings
         log("Check user settings");
         final String usersDataRegion = "Users";
-        final String usersUpdateButton = "Update User Settings";
-        final String messageMenuItem = "For Messages";
         final String userSettingNew = "Daily digest of all conversations";
-        final String newSettingLabel = "New Setting:";
-        final String popupUpdateButton = "Update Settings For 1 User";
         final String messageColumn = "Message Settings";
 
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
         checkDataRegionCheckbox(usersDataRegion, messageUserId);
-        shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(usersUpdateButton)));
-        click(Locator.lkButton(usersUpdateButton));
-        waitAndClick(Locator.menuItem(messageMenuItem));
-        _ext4Helper.selectComboBoxItem(newSettingLabel, userSettingNew);
-        clickButton(popupUpdateButton, 0);
+        shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
+        click(Locator.lkButton(USERS_UPDATE_BUTTON));
+        waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
+        _ext4Helper.selectComboBoxItem(NEW_SETTING_LABEL, userSettingNew);
+        clickButton(POPUP_UPDATE_BUTTON, 0);
         waitForText("Are you sure");
         clickButton("Yes");
 

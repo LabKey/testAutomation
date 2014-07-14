@@ -38,8 +38,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
-import static org.junit.Assert.*;
 
 @Category({BVT.class, FileBrowser.class})
 public class FileContentUploadTest extends BaseWebDriverTest
@@ -174,20 +174,25 @@ public class FileContentUploadTest extends BaseWebDriverTest
         // as they are now digest based.
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Notifications"));
-        click(Locator.lkButton("Update Settings"));
-        shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
-        // Set folder default
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
-        click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
-        _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+
+        _ext4Helper.selectComboBoxItem(MessagesLongTest.FILES_DEFAULT_COMBO, "15 minute digest");
+        clickButton("Update", 0);
+        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
+
+
         // Change user setting TEST_USER -> No Email
         DataRegionTable table = new DataRegionTable("Users", this);
         checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
-        click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
-        _extHelper.waitForExtDialog("Update selected users");
-        _extHelper.clickExtButton("Update selected users", "Yes");
+        shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON)));
+        click(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON));
+        waitAndClick(Locator.menuItem(MessagesLongTest.FILES_MENU_ITEM));
+        _ext4Helper.selectComboBoxItem(MessagesLongTest.NEW_SETTING_LABEL, "No Email");
+        clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
+        waitForText("Are you sure");
+        clickButton("Yes");
+
         assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
         enableEmailRecorder();
