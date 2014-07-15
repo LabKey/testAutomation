@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -125,7 +126,8 @@ public class BoxPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
-        _extHelper.clickMenuButton("Charts", "Create Box Plot");
+        DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.clickHeaderButton("Charts", "Create Box Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);

@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.ms2.MS2TestBase;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -56,6 +57,11 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
     protected static final String SEARCH_NAME3 = "X! Tandem";
     protected static final String ENZYME = "trypsin";
     protected static final String MASS_SPEC = "ThermoFinnigan";
+
+    protected static final String REGION_NAME_PEPTIDES = "MS2Peptides";
+    protected static final String REGION_NAME_PROTEINS = "MS2Proteins";
+    protected static final String REGION_NAME_PROTEINGROUPS = "ProteinGroups";
+    protected static final String REGION_NAME_QUANTITATION = "ProteinGroupsWithQuantitation";
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -101,18 +107,20 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         selectOptionByText(Locator.name("grouping"), "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         addUrlParameter("exportAsWebPage=true");
-        setFilter("MS2Peptides", "Scan", "Is Greater Than", "6", "Is Less Than or Equal To", "100");
-        setSort("MS2Peptides", "Scan", SortDirection.DESC);
+        DataRegionTable peptidesTable = new DataRegionTable(REGION_NAME_PEPTIDES, this);
+        setFilter(REGION_NAME_PEPTIDES, "Scan", "Is Greater Than", "6", "Is Less Than or Equal To", "100");
+        peptidesTable.setSort("Scan", SortDirection.DESC);
         clickButton("Save View");
         setFormElement(Locator.name("name"), LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME);
         clickButton("Save View");
 
         log("Make saved view for Protein for Comparison");
         selectOptionByText(Locator.name("viewParams"), "<Standard View>"); // Make sure we're not using a custom default view for the current user
-        setFilter("MS2Peptides", "DeltaMass", "Is Greater Than", "0");
+        peptidesTable.setFilter("DeltaMass", "Is Greater Than", "0");
         selectOptionByText(Locator.name("grouping"), "Protein (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        setFilter("MS2Proteins", "SequenceMass", "Is Greater Than", "20000");
+        DataRegionTable proteinsTable = new DataRegionTable(REGION_NAME_PROTEINS, this);
+        proteinsTable.setFilter("SequenceMass", "Is Greater Than", "20000");
         addUrlParameter("exportAsWebPage=true");
         clickButton("Save View");
         setFormElement(Locator.name("name"), LEGACY_PROTEIN_VIEW_NAME);
@@ -122,7 +130,8 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         clickButton("Go");
         selectOptionByText(Locator.name("grouping"), "ProteinProphet (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than", "0.7");
+        DataRegionTable quantitationTable = new DataRegionTable(REGION_NAME_QUANTITATION, this);
+        quantitationTable.setFilter("GroupProbability", "Is Greater Than", "0.7");
         clickButton("Save View");
         setFormElement(Locator.name("name"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
         clickButton("Save View");
@@ -139,7 +148,8 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         clickButton("Go");
         selectOptionByText(Locator.name("grouping"), "Protein Groups");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        setFilter("ProteinGroups", "Group", "Is Less Than", "6");
+        DataRegionTable proteinGroupsTable = new DataRegionTable(REGION_NAME_PROTEINGROUPS, this);
+        proteinGroupsTable.setFilter("Group", "Is Less Than", "6");
         clickButton("Save View");
         setFormElement(Locator.name("name"), QUERY_PROTEIN_GROUP_VIEW_NAME);
         clickButton("Save View");
@@ -148,8 +158,8 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         clickButton("Go");
         selectOptionByText(Locator.name("grouping"), "Standard");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        _extHelper.clickMenuButton("Views", "ProteinProphet");
-        setFilter("MS2Peptides", "ProteinProphetData/ProteinGroupId/GroupProbability", "Is Greater Than", "0.7");
+        peptidesTable.clickHeaderButton("Views", "ProteinProphet");
+        peptidesTable.setFilter("ProteinProphetData/ProteinGroupId/GroupProbability", "Is Greater Than", "0.7");
         clickButton("Save View");
         setFormElement(Locator.name("name"), QUERY_PROTEINPROPHET_VIEW_NAME);
         clickButton("Save View");

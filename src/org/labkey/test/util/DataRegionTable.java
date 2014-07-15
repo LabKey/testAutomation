@@ -493,6 +493,11 @@ public class DataRegionTable
         _test.setSort(_tableName, columnName, direction);
     }
 
+    public void clearSort(String columnName)
+    {
+        _test.clearSort(_tableName, columnName, _test.defaultWaitForPage);
+    }
+
     public void openFilterDialog(String columnName)
     {
         _test.click(Locator.id(_tableName).append(Locator.tagWithClass("td", "labkey-column-header")).append(Locator.tagWithText("div", columnName)));
@@ -636,11 +641,7 @@ public class DataRegionTable
     @LogMethod
     public void createQuickChart(String columnName)
     {
-        Locator header = Locator.id(EscapeUtil.filter(getTableName() + ":" + columnName + ":header"));
-        Locator quickChart = Locator.id(EscapeUtil.filter(getTableName() + ":" + columnName + ":quick-chart"));
-
-        _test.click(header);
-        _test.waitAndClick(quickChart);
+        _test._ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(_tableName, columnName), false, "Quick Chart");
         _test.waitForElement(Locator.css("svg"));
     }
 
@@ -683,11 +684,26 @@ public class DataRegionTable
         _test.waitAndClick(Locators.headerButton(_tableName, buttonText));
     }
 
+    public void clickHeaderButton(String buttonText, String ... subMenuLabels)
+    {
+        clickHeaderButton(buttonText, true, subMenuLabels);
+    }
+
+    public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
+    {
+        _test._ext4Helper.clickExt4MenuButton(wait, DataRegionTable.Locators.headerMenuButton(_tableName, buttonText), false, subMenuLabels);
+    }
+
     public static class Locators
     {
         public static Locator.XPathLocator headerButton(String tableName, String text)
         {
-            return Locator.xpath("id('dataregion_header_" + tableName + "')//a").withClass("labkey-button").withText(text);
+            return Locator.xpath("id('dataregion_header_row_" + tableName + "')//a").withClass("labkey-button").withText(text);
+        }
+
+        public static Locator.XPathLocator headerMenuButton(String tableName, String text)
+        {
+            return Locator.xpath("id('dataregion_header_row_" + tableName + "')//a").withClass("labkey-menu-button").withText(text);
         }
 
         public static Locator.IdLocator facetPanel(String tableName)
@@ -713,6 +729,11 @@ public class DataRegionTable
         public static Locator.XPathLocator facetRow(String category, String group)
         {
             return facetRow(category).withPredicate(Locator.xpath("//span").withClass("lk-filter-panel-label").withText(group));
+        }
+
+        public static Locator.XPathLocator columnHeader(String regionName, String columnName)
+        {
+            return Locator.tagWithAttribute("td", "column-name", regionName + ":" + columnName);
         }
     }
 }

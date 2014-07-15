@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -121,14 +122,13 @@ public abstract class GenericChartsTest extends ReportTest
         _extHelper.waitForExtDialogToDisappear("Saved");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#createQuickChart(String)}
+     */
     @LogMethod
     protected void createQuickChart(String regionName, String columnName)
     {
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        Locator quickChart = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":quick-chart"));
-
-        click(header);
-        waitAndClickAndWait(quickChart);
+        _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(regionName, columnName), false, "Quick Chart");
     }
 
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)

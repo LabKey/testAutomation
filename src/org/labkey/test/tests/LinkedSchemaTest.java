@@ -715,7 +715,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         for (String name : columnNames)
         {
-            waitForElement(Locator.xpath("//td[@id='query:" + name + ":header']"));
+            waitForElement(DataRegionTable.Locators.columnHeader("query", name));
         }
 
         click(Locator.xpath("//a[text()='TargetFolder']"));
@@ -732,7 +732,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         for (String name : columnNames)
         {
-            assertElementNotPresent(Locator.xpath("//td[@id='query:" + name + ":header']"));
+            assertElementNotPresent(DataRegionTable.Locators.columnHeader("query", name));
         }
     }
 

@@ -857,13 +857,14 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
-        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        Locator dataregionLoc = Locator.xpath("//form[starts-with(@id, 'Runs')]");
+        String dataregionId = dataregionLoc.findElement(getDriver()).getAttribute("id");
+        DataRegionTable assayRuns = new DataRegionTable(dataregionId, this);
+        assayRuns.clickHeaderButton("Views", "Folder Filter", "Current folder and subfolders");
 
         assertTextPresent("FirstRun", "SecondRun");
 
         log("Setting the customized view to include subfolders");
-        Locator dataregionLoc = Locator.xpath("//form[starts-with(@id, 'Runs')]");
-        String dataregionId = dataregionLoc.findElement(getDriver()).getAttribute("id");
         CustomizeViewsHelper customizeViewsHelper = new CustomizeViewsHelper(this, Locator.id(dataregionId));
         customizeViewsHelper.openCustomizeViewPanel();
 
@@ -873,7 +874,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("FirstRun", "SecondRun");
 
         log("Testing select all data and view");
-        checkAllOnPage("Runs2");
+        checkAllOnPage(dataregionId);
         clickButton("Show Results", defaultWaitForPage);
         verifySpecimensPresent(3, 2, 3);
 

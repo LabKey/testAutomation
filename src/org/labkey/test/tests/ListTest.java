@@ -689,8 +689,7 @@ public class ListTest extends BaseWebDriverTest
         portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
 
         log("Test that the right filters are present for each type");
-        runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
-        _extHelper.waitForExtDialog("Show Rows Where " + _listCol4.getLabel());
+        openFilter("qwp3", _listCol4.getName());
         _extHelper.clickExtTab("Choose Filters");
         click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 

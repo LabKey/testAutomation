@@ -844,8 +844,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertSignOutAndMyAccountPresent()
     {
         click(Locator.id("userMenuPopupLink"));
-        assertElementPresent(Locator.id("userMenu").append(Locator.linkWithText("My Account")));
-        assertElementPresent(Locator.id("userMenu").append(Locator.linkWithText("Sign Out")));
+        assertElementPresent(Ext4Helper.ext4MenuItem("My Account"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Sign Out"));
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -4835,7 +4835,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         setSort(regionName, columnName, direction, defaultWaitForPage);
     }
 
-    //clear sort from a column
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearSort(String)}
+     */
+    @Deprecated
     public void clearSort(String regionName, String columnName)
     {
         clearSort(regionName, columnName, defaultWaitForPage);
@@ -4844,11 +4847,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clearSort(String regionName, String columnName, int wait)
     {
         log("Clearing sort in " + regionName + " for " + columnName);
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
+        Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
+        waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
         prepForPageLoad();
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
+        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Clear Sort");
         waitForPageToLoad(wait);
     }
 
@@ -4859,11 +4861,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
+        Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
+        waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
         prepForPageLoad();
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
+        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
         waitForPageToLoad(wait);
     }
 
@@ -4913,19 +4914,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void setUpFilter(String regionName, String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable String filter2)
     {
-        String log =    "Setting filter in " + regionName + " for " + columnName+" to " + filter1Type.toLowerCase() + (filter1!=null?" " + filter1:"");
-        if(filter2Type!=null)
+        String log = "Setting filter in " + regionName + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
+        if (filter2Type != null)
         {
-            log+= " and " + filter2Type.toLowerCase() + (filter2!=null?" " + filter2:"");
+            log += " and " + filter2Type.toLowerCase() + (filter2 != null ? " " + filter2 : "");
         }
-        log( log );
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String columnLabel = getText(header);
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
-        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        log(log);
+
+        openFilter(regionName, columnName);
 
         if (isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
         {
@@ -4967,12 +4963,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         log(log);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String columnLabel = getText(header);
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
-        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
+
+        openFilter(regionName, columnName);
+        String columnLabel = getText(DataRegionTable.Locators.columnHeader(regionName, columnName));
 
         sleep(500);
 
@@ -5003,6 +4996,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("OK");
     }
 
+    public void openFilter(String regionName, String columnName)
+    {
+        Locator.XPathLocator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
+        String columnLabel = getText(menuLoc);
+        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Filter...");
+        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+    }
+
     public void clearFilter(String regionName, String columnName)
     {
         clearFilter(regionName, columnName, WAIT_FOR_PAGE);
@@ -5011,12 +5013,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clearFilter(String regionName, String columnName, int waitForPageLoad)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear-filter");
         if(waitForPageLoad > 0)
             prepForPageLoad();
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
+        _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.columnHeader(regionName, columnName), false, "Clear Filter");
         if(waitForPageLoad > 0)
             waitForPageToLoad(waitForPageLoad);
     }
@@ -5027,10 +5026,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
-        waitForElement(header, WAIT_FOR_JAVASCRIPT);
-        String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        _extHelper.clickExtComponent(EscapeUtil.filter(id));
+        openFilter(regionName, columnName);
         clickButton("CLEAR ALL FILTERS");
     }
 

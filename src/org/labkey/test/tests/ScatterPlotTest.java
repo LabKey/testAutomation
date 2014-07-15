@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -149,7 +150,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         setFilter("Dataset", "APXpulse", "Is Less Than", "100");
-        _extHelper.clickMenuButton("Charts", "Create Scatter Plot");
+        DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.clickHeaderButton("Charts", "Create Scatter Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);

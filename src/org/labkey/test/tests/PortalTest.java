@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
@@ -150,10 +151,10 @@ public class PortalTest extends BaseWebDriverMultipleTest
             if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
             {
                 click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Locator.menuItem("Permissions").notHidden());
-                assertElementNotPresent(Locator.menuItem("Remove From Page").notHidden());
+                waitForElement(Ext4Helper.ext4MenuItem("Permissions").notHidden());
+                assertElementNotPresent(Ext4Helper.ext4MenuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
-                waitForElementToDisappear(Locator.menuItem("Permissions").notHidden());
+//                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }
             else
                 assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]").withPredicate("not(.//a/img[@title='Remove From Page'])"));
@@ -166,10 +167,10 @@ public class PortalTest extends BaseWebDriverMultipleTest
             if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
             {
                 click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Locator.menuItem("Permissions").notHidden());
-                assertElementPresent(Locator.menuItem("Remove From Page").notHidden());
+                waitForElement(Ext4Helper.ext4MenuItem("Permissions").notHidden());
+                assertElementPresent(Ext4Helper.ext4MenuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
-                waitForElementToDisappear(Locator.menuItem("Permissions").notHidden());
+//                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }
             else
                 assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]//a/img[@title='Remove From Page']"));

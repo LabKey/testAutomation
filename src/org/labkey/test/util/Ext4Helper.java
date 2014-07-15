@@ -574,11 +574,11 @@ public class Ext4Helper extends AbstractHelper
         _test.waitAndClick(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            Locator parentLocator = ext4MenuItem(subMenuLabels[i]);
+            Locator parentLocator = ext4MenuItem(subMenuLabels[i]).notHidden();
             _test.waitForElement(parentLocator, 1000);
             _test.mouseOver(parentLocator);
         }
-        Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]);
+        Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden();
         if (onlyOpen)
         {
             _test.waitForElement(itemLocator, 1000);
@@ -597,8 +597,7 @@ public class Ext4Helper extends AbstractHelper
 
     public static Locator.XPathLocator ext4MenuItem(String text)
     {
-        // For now, menu lookup is no longer Ext 4 specific due to Ext 4 menus not escpaing properly
-        return Locator.xpath("//span[contains(@class, 'menu-item-text') and text() = '" + text + "']");
+        return Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text() = " + Locator.xq(text) +  "]");
     }
 
     public static Locator.XPathLocator ext4Window(String title)

@@ -185,19 +185,11 @@ public class FilterTest extends BaseWebDriverTest
 
     }
 
-    protected void startFilter(String column)
-    {
-        click(Locator.tagWithText("div", column));
-        waitAndClick(Locator.tagWithText("span", "Filter...").notHidden());
-        _extHelper.waitForExtDialog("Show Rows Where " + column + "...");
-        waitForElement(Locator.tag("div").withClass("labkey-filter-dialog").append("//tr").withClass("x-grid3-row-table").withPredicate(Locator.tag("a").withText("[All]")).append("//div").withClass("x-grid3-hd-checker-on"));
-    }
-
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void facetedFilterTest()
     {
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
-        startFilter("Color");
+        openFilter("query", "Color");
 
         log("Verifying expected faceted filter elements present");
         verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
@@ -249,7 +241,7 @@ public class FilterTest extends BaseWebDriverTest
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         log("Verifying faceted filter on non-lookup column");
-        startFilter("year");
+        openFilter("query", "year");
 
         verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "1980", "1990", "1970");
 
@@ -284,14 +276,14 @@ public class FilterTest extends BaseWebDriverTest
     private void maskedFacetTest()
     {
         setFacetedFilter("query", "year", "1980", "1990");
-        verifyFacetOptions("Car", "1", "3");
+        verifyFacetOptions("query", "Car", "1", "3");
 
         setFacetedFilter("query", "Car", "1");
-        verifyFacetOptions("Color", "Light");
+        verifyFacetOptions("query", "Color", "Light");
 
         clearAllFilters("query", "Car");
         setFilter("query", "year", "Is Greater Than", "1980");
-        verifyFacetOptions("Car", "3");
+        verifyFacetOptions("query", "Car", "3");
     }
 
     @LogMethod
@@ -354,13 +346,13 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        verifyFacetOptions("Type",
+        verifyFacetOptions("Issues", "Type",
                 projectIssue.get("type"),
                 projectIssue2.get("type"),
                 subfolderIssue.get("type"),
                 subfolderIssue2.get("type"));
 
-        verifyFacetOptions("Pri",
+        verifyFacetOptions("Issues", "Priority",
                 projectIssue.get("priority"),
                 projectIssue2.get("priority"),
                 subfolderIssue.get("priority"),
@@ -372,14 +364,14 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        verifyFacetOptions("Type",
+        verifyFacetOptions("Issues", "Type",
                 projectIssue2.get("type"),
                 subfolderIssue.get("type"));
     }
 
-    private void verifyFacetOptions(String column, String... options)
+    private void verifyFacetOptions(String regionName, String column, String... options)
     {
-        startFilter(column);
+        openFilter(regionName, column);
         verifyOptionsInFilterDialog(options);
         _extHelper.clickExtButton("CANCEL", 0);}
 
@@ -435,16 +427,13 @@ public class FilterTest extends BaseWebDriverTest
                         String filterValue, String expectedError)
     {
         log("attempt to set filter column: " + columnName + ". With filter type: " + filterType + ".  And fitler value: " + filterValue);
-        if(filterType==null)
+        if (filterType == null)
             setFilter(regionName, columnName, filterType);
         else
-            setUpFilter(regionName, columnName, filterType,
-                filterValue);
+            setUpFilter(regionName, columnName, filterType, filterValue);
         sleep(300);
-        //pressEnter("//input[@id='value_1']");
         clickButton("OK",0);
         assert(isElementPresent(Locator.extButton("OK")));
-//        assert(!isElementPresent(Locator.extButtonEnabled("OK")));
         assertTextPresent(expectedError);
 
         clickButton("CANCEL", 0);
@@ -606,12 +595,9 @@ public class FilterTest extends BaseWebDriverTest
     //Issue 12787: Canceling filter dialog requires two clicks
     private void filterCancelButtonWorksTest()
     {
-        String id = EscapeUtil.filter(TABLE_NAME + ":" + _listCol4.getName() + ":filter");
-        runMenuItemHandler(id);
-
+        openFilter(TABLE_NAME, _listCol4.getName());
         clickButton("CANCEL", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-
         assertTextNotPresent("Show Rows Where");
     }
 
@@ -640,34 +626,20 @@ public class FilterTest extends BaseWebDriverTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            _extHelper.clickMenuButton("Views", R_VIEW);
+            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Views"), false, R_VIEW);
         }
         else
             beginAt(url);
 
-
         _ext4Helper.waitForMaskToDisappear();
         checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
-        if(url==null)
+        if (url == null)
         {
+            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Views"), false, "default");
 
-            _extHelper.clickMenuButton("Views", "default");
-
-            //open filter
             log("** Checking filter values in filter dialog");
-            runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
-            _extHelper.waitForExtDialog("Show Rows Where ");
-            waitFor(new Checker()
-            {
-                @Override
-                public boolean check()
-                {
-                    return isElementPresent(Locator.linkWithText("[All]")) ||
-                           isElementPresent(Locator.xpath("//li").withClass("x-tab-strip-active").containing("Choose Filters"));
-                }
-            }, "Filter dialog loading failed", WAIT_FOR_JAVASCRIPT);
-
+            openFilter(TABLE_NAME, fieldKey);
             _extHelper.clickExtTab("Choose Filters");
             shortWait().until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(getDriver())));
 
@@ -720,9 +692,8 @@ public class FilterTest extends BaseWebDriverTest
         clickButtonContainingText("CANCEL", 0);
         }
 
-        executeScript("LABKEY.DataRegions['query'].clearAllFilters();");
+        executeScript("LABKEY.DataRegions['" + TABLE_NAME + "'].clearAllFilters();");
         waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
-        //clickButton("Clear All"); // Can't trigger :hover pseudo-class with webdriver
     }
 
     @LogMethod

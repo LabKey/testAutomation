@@ -54,7 +54,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     {
         if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
-            _test._extHelper.clickExtMenuButton(false, Locator.lkButton("Views"), "Customize View");
+            _test._ext4Helper.clickExt4MenuButton(false, Locator.lkButton("Views"), false, "Customize View");
             _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(_dataRegion));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

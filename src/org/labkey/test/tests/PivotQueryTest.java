@@ -23,6 +23,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
+import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
 
@@ -64,7 +65,8 @@ public class PivotQueryTest extends BaseWebDriverTest
     private void verifyPivotQuery()
     {
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=LuminexPivot");
-        setSort("query", "ParticipantId", SortDirection.ASC);
+        DataRegionTable pivotTable = new DataRegionTable("query", this);
+        pivotTable.setSort("ParticipantId", SortDirection.ASC);
 
         log("** Verifing pivot table headers");
         Locator AnalyteName_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[2]/td[2]");
