@@ -41,45 +41,45 @@ public class DilutionAssayHelper
             case ParticipantDate:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Participant ID / Visit"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
-                _test.click(Locator.extMenuItemEnabled("Participant ID / Date"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Participant ID / Date"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.click(Ext4Helper.ext4MenuItem("Participant ID / Date"));
                 verifyDataIdentifierText(type, ptidSuffix);
                 break;
             case ParticipantVisit:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
-                _test.click(Locator.extMenuItemEnabled("Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Participant ID / Date"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.click(Ext4Helper.ext4MenuItem("Participant ID / Visit"));
                 verifyDataIdentifierText(type, ptidSuffix);
                 break;
             case ParticipantVisitDate:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Participant ID / Date"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Specimen ID / Participant ID / Visit"));
 
                 // click and verify the identifiers on the page
-                _test.click(Locator.extMenuItemEnabled("Participant ID / Date"));
+                _test.click(Ext4Helper.ext4MenuItem("Participant ID / Date"));
                 verifyDataIdentifierText(AssayImportOptions.VisitResolverType.ParticipantDate, ptidSuffix);
                 break;
             case SpecimenIDParticipantVisit:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Locator.extMenuItemEnabled("Specimen ID"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                _test.waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
-                _test.waitForElement(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Specimen ID"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Participant ID / Visit"));
+                _test.waitForElement(Ext4Helper.ext4MenuItemDisabled("Participant ID / Date"));
+                _test.waitForElement(Ext4Helper.ext4MenuItem("Specimen ID / Participant ID / Visit"));
 
                 // click and verify the identifiers on the page
-                _test.click(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
+                _test.click(Ext4Helper.ext4MenuItem("Specimen ID / Participant ID / Visit"));
                 verifyDataIdentifierText(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, ptidSuffix);
                 break;
         }

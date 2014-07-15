@@ -75,7 +75,7 @@ public class PivotQueryTest extends BaseWebDriverTest
         Locator IL_10_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[3]/td[1]");
         assertElementContains(IL_10_header, "IL-10 (23)");
 
-        Locator ConcInRange_MIN_header = Locator.xpath("//*[@id=\"query:IL-10 (23)::ConcInRange_MIN:header\"]");
+        Locator ConcInRange_MIN_header = DataRegionTable.Locators.columnHeader("query", "IL-10 (23)::ConcInRange_MIN");
         assertElementContains(ConcInRange_MIN_header, "Conc In Range MIN");
 
         log("** Verifing pivot table contents");

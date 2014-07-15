@@ -23,6 +23,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DilutionAssayHelper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -115,7 +116,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         click(Locator.linkWithText("manage assay design"));
         mouseOver(Locator.linkWithText("set default values"));
         prepForPageLoad();
-        waitAndClick(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        waitAndClick(Ext4Helper.ext4MenuItem(TEST_ASSAY_NAB + " Batch Fields"));
 
         // Are we seeing the default set in the parent project?
         assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
