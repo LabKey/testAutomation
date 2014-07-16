@@ -16,6 +16,12 @@
 
 package org.labkey.test;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
@@ -67,7 +73,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -110,7 +115,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -264,6 +268,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected abstract @Nullable String getProjectName();
 
+    @LogMethod
     public void setUp() throws Exception
     {
         Boolean reusingDriver = false;
@@ -1461,7 +1466,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 //                        return redirectRequest;
 //                }
             };
-            try (CloseableHttpClient redirectClient = (CloseableHttpClient)getHttpClientBuilder().setRedirectStrategy(redirectStrategy).build();)
+            try (CloseableHttpClient redirectClient = getHttpClientBuilder().setRedirectStrategy(redirectStrategy).build())
             {
                 method = new HttpPost(getBaseURL() + "/login/logout.view");
                 List<NameValuePair> args = new ArrayList<>();
@@ -1615,52 +1620,39 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public String getBodyText()
     {
-        RunnableGetText getText = new RunnableGetText();
-        final Thread t = new Thread(getText);
-        t.start();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        CallableGetText getText = new CallableGetText();
+        Future<String> future = executor.submit(getText);
 
-        waitFor(new Checker()
+        try
         {
-            @Override
-            public boolean check()
-            {
-                return !t.isAlive();
-            }
-        }, "Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", 60000);
-
-        return getText.getResult();
+            return future.get(60, TimeUnit.SECONDS);
+        }
+        catch (java.util.concurrent.TimeoutException | InterruptedException | ExecutionException e)
+        {
+            throw new TestTimeoutException("Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", e);
+        }
+        finally
+        {
+            executor.shutdownNow();
+        }
     }
 
     /**
      * Get page text using a separate thread to avoid test timeouts when complex pages choke WebDriver
      */
-    private class RunnableGetText implements Runnable
+    private class CallableGetText implements Callable<String>
     {
-        private String _text;
-
-        public String getResult()
-        {
-            return this._text;
-        }
-
         @Override
-        public void run()
+        public String call()
         {
             try
             {
-                _text = getDriver().findElement(By.cssSelector("body")).getText();
+                return shortWait().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
             }
-            catch (StaleElementReferenceException|NoSuchElementException ex)
+            catch (TimeoutException|NoSuchElementException tex)
             {
-                try
-                {
-                    _text =  shortWait().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
-                }
-                catch (TimeoutException tex)
-                {
-                    _text =  getDriver().getPageSource(); // probably viewing a tsv or text file
-                }
-
+                return getDriver().getPageSource(); // probably viewing a tsv or text file
             }
         }
     }
@@ -2017,26 +2009,38 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    private static void killHungDriverOnTeamCity() throws Exception
+    @LogMethod
+    private static void killHungDriverOnTeamCity()
     {
         if (isTestRunningOnTeamCity() && _driver != null)
         {
             final WebDriver tempDriver = _driver;
             _driver = null;
 
-            Runnable killDriver = new Runnable(){
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Callable killDriver = new Callable(){
                 @Override
-                public void run()
+                public Void call()
                 {
                     tempDriver.quit();
+                    return null;
                 }
             };
-            final Thread t = new Thread(killDriver);
-            t.start();
 
-            long startTime = System.currentTimeMillis();
-            while (t.isAlive() && System.currentTimeMillis() - startTime < 10000){/*wait*/}
-            t.interrupt();
+            Future future = executor.submit(killDriver);
+
+            try
+            {
+                future.get(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+            }
+            catch (java.util.concurrent.TimeoutException | InterruptedException | ExecutionException ignore)
+            {
+                TestLogger.log("Failed to kill WebDriver");
+            }
+            finally
+            {
+                executor.shutdownNow();
+            }
         }
     }
 
