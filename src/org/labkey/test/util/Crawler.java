@@ -102,6 +102,7 @@ public class Crawler
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("assay", "assayDetailRedirect"),
+            new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("flow-editscript", "download"),
@@ -113,6 +114,7 @@ public class Crawler
             new ControllerActionId("login", "enable"),      // TODO: These should be post actions (product issue)
             new ControllerActionId("login", "disable"),      // TODO: These should be post actions (product issue)
             new ControllerActionId("login", "setPassword"),
+            new ControllerActionId("microarray", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
