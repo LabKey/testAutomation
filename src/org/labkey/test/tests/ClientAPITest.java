@@ -79,16 +79,14 @@ public class ClientAPITest extends BaseWebDriverTest
 
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
 
-    private static final String CLIENTAPI_HEADER =
-        "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n";
-
     private static final String TEST_DIV_NAME = "testDiv";
 
     private static final String GRIDTEST_GRIDTITLE = "ClientAPITest Grid Title";
 
     private static final int PAGE_SIZE = 4;
 
-    public static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
+    public static final String SRC_PREFIX = "<script type=\"text/javascript\">\n" +
+            "    LABKEY.requiresClientAPI(true, function() {\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
             "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
             "        return {\n" +
@@ -100,6 +98,7 @@ public class ClientAPITest extends BaseWebDriverTest
             "    }();\n" +
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
             "    Ext.onReady(demoNamespace.myModule.init, demoNamespace.myModule, true);\n" +
+            "    });\n" +
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\"></div>";
 
