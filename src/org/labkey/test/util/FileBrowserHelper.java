@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -104,7 +105,11 @@ public class FileBrowserHelper
                 _test.waitForElement(folderTreeNode);
                 _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
                 // select/expand tree node
-                _test.scrollIntoView(folderTreeNode);
+                try{
+                    _test.scrollIntoView(folderTreeNode);
+                }
+                catch (StaleElementReferenceException ignore) {}
+
                 _test.clickAt(folderTreeNode, 1, 1, 0);
                 _test.waitForElement(folderTreeNode.withClass("x4-grid-row-selected"));
                 _test._ext4Helper.waitForMaskToDisappear();
