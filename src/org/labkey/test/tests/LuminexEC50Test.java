@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -29,7 +30,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, MiniTest.class, Assays.class, Luminex.class})
 public class LuminexEC50Test extends LuminexRTransformTest
 {
     private final String EC50_RUN_NAME = "EC50";

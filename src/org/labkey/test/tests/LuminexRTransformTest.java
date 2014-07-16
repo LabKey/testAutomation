@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -28,7 +29,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, MiniTest.class, Assays.class, Luminex.class})
 public class LuminexRTransformTest extends LuminexTest
 {
     private static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
@@ -167,7 +168,7 @@ public class LuminexRTransformTest extends LuminexTest
     {
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
-        assertEquals("Unexpected Transform Script Version number", "8.1.20140612", table.getDataAsText(0, "Transform Script Version"));
+        assertEquals("Unexpected Transform Script Version number", "9.0.20140716", table.getDataAsText(0, "Transform Script Version"));
         assertEquals("Unexpected Lab Transform Script Version number", "1.2.20140612", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
     }

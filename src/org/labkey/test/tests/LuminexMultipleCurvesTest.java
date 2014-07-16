@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.LogMethod;
 
@@ -29,7 +30,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, MiniTest.class, Assays.class, Luminex.class})
 public class LuminexMultipleCurvesTest extends LuminexTest
 {
     @Override
