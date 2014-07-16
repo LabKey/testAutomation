@@ -26,8 +26,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 @Aspect
 public class StaleElementRetryAspect
 {
-    private static int depth = 0;
-    private static boolean retried = false;
+    private static boolean retried;
 
     @Pointcut(value = "execution(* org.labkey.test..*(org.labkey.test.Locator, ..))")
     void locatorMethod(){}
@@ -35,12 +34,9 @@ public class StaleElementRetryAspect
     @Around(value = "locatorMethod()", argNames = "joinPoint")
     public Object beforeLoggedMethod(ProceedingJoinPoint joinPoint) throws Throwable
     {
-        MethodSignature signature = (MethodSignature) joinPoint.getStaticPart().getSignature();
-
-        depth++;
-
         try
         {
+            retried = false;
             return joinPoint.proceed();
         }
         catch (StaleElementReferenceException staleElementException)
@@ -48,17 +44,12 @@ public class StaleElementRetryAspect
             if (!retried)
             {
                 retried = true;
+                MethodSignature signature = (MethodSignature) joinPoint.getStaticPart().getSignature();
                 TestLogger.log("Stale Element - Retry " + signature.getMethod().getName());
                 return joinPoint.proceed();
             }
             else
                 throw staleElementException;
-        }
-        finally
-        {
-            depth--;
-            if (depth == 0)
-                retried = false;
         }
     }
 }
