@@ -133,7 +133,7 @@ public class LabKeyExpectedConditions
                     return null;
                 }
 
-                if (el.isEnabled())
+                if (el.isEnabled() && !el.getAttribute("class").contains("disabled"))
                     return el;
                 else
                     return null;
