@@ -4454,14 +4454,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return values;
     }
 
-    public void showNumberInTable(String shareValue)
-    {
-        clickButton("Page Size", 0);
-        waitForText("100 per page");
-        Locator l = Locator.id("Page Size:" + shareValue);
-        clickAndWait(l);
-    }
-
     /**get values for all specifed columns for all pages of the table
      * preconditions:  must be on start page of table
      * postconditions:  at start of table
@@ -4469,22 +4461,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     protected  List<List<String>> getColumnValues(String tableName, String... columnNames)
     {
         boolean moreThanOnePage = isTextPresent("Next");
-        if(moreThanOnePage)
+        DataRegionTable table = new DataRegionTable(tableName, this);
+
+        if (moreThanOnePage)
         {
-            showNumberInTable("All");
+            table.clickHeaderButton("Page Size", "Show All");
         }
 
         List<List<String>> columns = new ArrayList<>();
-        DataRegionTable table = new DataRegionTable(tableName, this);
         for (String columnName : columnNames)
         {
             columns.add(table.getColumnDataAsText(columnName));
         }
 
-        if(moreThanOnePage)
+        if (moreThanOnePage)
         {
-            showNumberInTable("100");
+            table.clickHeaderButton("Page Size", "100 per page");
         }
+
         return columns;
     }
 
