@@ -151,9 +151,13 @@ public class FileBrowserHelper
         String currentLastItemText = lastFileGridItem.findElement(_test.getDriver()).getAttribute("data-recordid");
         while (!_test.isElementPresent(targetFile) && !currentLastItemText.equals(previousLastItemText))
         {
-            _test.scrollIntoView(lastFileGridItem);
-            previousLastItemText = currentLastItemText;
-            currentLastItemText = lastFileGridItem.findElement(_test.getDriver()).getAttribute("data-recordid");
+            try
+            {
+                _test.scrollIntoView(lastFileGridItem);
+                previousLastItemText = currentLastItemText;
+                currentLastItemText = lastFileGridItem.findElement(_test.getDriver()).getAttribute("data-recordid");
+            }
+            catch (StaleElementReferenceException ignore) {}
         }
     }
 
