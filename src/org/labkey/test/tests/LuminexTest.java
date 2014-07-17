@@ -197,7 +197,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             _listHelper.addField("Batch Fields", 9, "RVersion", "R Version", ListColumnType.String);
 
             // add run properties for designation of which field to use for curve fit calc in transform
-            _listHelper.addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 8, "SubtNegativeFromAll", "Subtract Negative Bead from All Wells", ListColumnType.Boolean);
             _listHelper.addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
             _listHelper.addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
             _listHelper.addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
@@ -218,7 +218,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             _listHelper.addField("Analyte Properties", 7, "NegativeControl", "Negative Control", ListColumnType.Boolean);
 
             // add the data properties for the calculated columns
-            _listHelper.addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 0, "FIBackgroundNegative", "FI-Bkgd-Neg", ListColumnType.Double);
             _listHelper.addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
             _listHelper.addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
             _listHelper.addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);

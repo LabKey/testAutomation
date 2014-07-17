@@ -34,7 +34,7 @@ public class LuminexRTransformTest extends LuminexTest
 {
     private static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
 
-    private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
+    private static final String[] RTRANS_FIBKGDNEG_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
             "-208.0", "-4.0", "-4.0", "194.2", "198.8", "-261.2", "-265.2", "-211.5", "-213.0"};
     private static final String[] RTRANS_ESTLOGCONC_VALUES_5PL = {"-6.9", "-6.9", "4.3", "4.3", "0.4", "0.4", "-0.0", "-0.0", "-6.9", "-6.9",
@@ -96,23 +96,23 @@ public class LuminexRTransformTest extends LuminexTest
     {
         DataRegionTable table;
         table = new DataRegionTable("Data", this);
-        table.setFilter("fiBackgroundBlank", "Is Not Blank", null);
+        table.setFilter("FIBackgroundNegative", "Is Not Blank", null);
         waitForElement(Locator.paginationText(1, 80, 80));
         table.setFilter("Type", "Equals", "C9"); // issue 20457
         assertEquals(4, table.getDataRowCount());
         for(int i = 0; i < table.getDataRowCount(); i++)
         {
-            assertEquals(table.getDataAsText(i, "FI-Bkgd"), table.getDataAsText(i, "FI-Bkgd-Blank"));
+            assertEquals(table.getDataAsText(i, "FI-Bkgd"), table.getDataAsText(i, "FI-Bkgd-Neg"));
         }
         table.clearFilter("Type");
         table.setFilter("Type", "Starts With", "X"); // filter to just the unknowns
         waitForElement(Locator.paginationText(1, 32, 32));
-        // check values in the fi-bkgd-blank column
-        for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
+        // check values in the fi-bkgd-neg column
+        for(int i = 0; i < RTRANS_FIBKGDNEG_VALUES.length; i++)
         {
-            assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
+            assertEquals(RTRANS_FIBKGDNEG_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Neg"));
         }
-        table.clearFilter("fiBackgroundBlank");
+        table.clearFilter("FIBackgroundNegative");
 
         table.setFilter("EstLogConc_5pl", "Is Not Blank", null);
         if (!hasRumiCalcData)
@@ -168,7 +168,7 @@ public class LuminexRTransformTest extends LuminexTest
     {
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
-        assertEquals("Unexpected Transform Script Version number", "9.0.20140716", table.getDataAsText(0, "Transform Script Version"));
+        assertEquals("Unexpected Transform Script Version number", "9.1.20140718", table.getDataAsText(0, "Transform Script Version"));
         assertEquals("Unexpected Lab Transform Script Version number", "1.2.20140612", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
     }
@@ -194,9 +194,9 @@ public class LuminexRTransformTest extends LuminexTest
         clickButton("Next");
 
         setFormElement(Locator.name("name"), "r script transformed assayId");
-        checkCheckbox(Locator.name("subtBlankFromAll"));
+        checkCheckbox(Locator.name("subtNegativeFromAll"));
         setFormElement(Locator.name("stndCurveFitInput"), "FI");
-        setFormElement(Locator.name("unkCurveFitInput"), "FI-Bkgd-Blank");
+        setFormElement(Locator.name("unkCurveFitInput"), "FI-Bkgd-Neg");
         checkCheckbox(Locator.name("curveFitLogTransform"));
         checkCheckbox(Locator.name("skipRumiCalculation"));
         setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE4);

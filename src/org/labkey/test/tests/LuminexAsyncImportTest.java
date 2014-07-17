@@ -174,7 +174,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         //Check for Run Properties
         assertTextPresentInThisOrder("----- Start Run Properties -----", "----- End Run Properties -----");
         assertTextPresent("Uploaded Files", "Assay ID", "Isotype", "Conjugate", "Test Date", "Replaces Previous File", "Date file was modified",
-                "Specimen Type", "Additive", "Derivative", "Subtract Blank Bead", "Calc of Standards", "Calc of Unknown",
+                "Specimen Type", "Additive", "Derivative", "Subtract Negative Bead", "Calc of Standards", "Calc of Unknown",
                 "Curve Fit Log", "Notebook Number", "Assay Type", "Experiment Performer", "Calculate Positivity",
                 "Baseline Visit", "Positivity Fold Change");
 
