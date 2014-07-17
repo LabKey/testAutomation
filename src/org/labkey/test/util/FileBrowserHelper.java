@@ -148,8 +148,8 @@ public class FileBrowserHelper
         _test.waitForElement(lastFileGridItem);
 
         String previousLastItemText = null;
-        String currentLastItemText = lastFileGridItem.findElement(_test.getDriver()).getAttribute("data-recordid");
-        while (!_test.isElementPresent(targetFile) && !currentLastItemText.equals(previousLastItemText))
+        String currentLastItemText = null;
+        while (!_test.isElementPresent(targetFile) && (currentLastItemText == null || !currentLastItemText.equals(previousLastItemText)))
         {
             try
             {
