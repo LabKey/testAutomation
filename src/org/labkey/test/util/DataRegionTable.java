@@ -547,7 +547,7 @@ public class DataRegionTable
 
     public void checkAll()
     {
-        WebElement toggleAll = Locator.id(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
+        WebElement toggleAll = Locators.dataRegion(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
         _test.uncheckCheckbox(toggleAll);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
         _test.checkCheckbox(toggleAll);
@@ -556,7 +556,7 @@ public class DataRegionTable
 
     public void uncheckAll()
     {
-        WebElement toggleAll = Locator.id(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
+        WebElement toggleAll = Locators.dataRegion(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
         _test.checkCheckbox(toggleAll);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
         _test.uncheckCheckbox(toggleAll);
@@ -696,6 +696,11 @@ public class DataRegionTable
 
     public static class Locators
     {
+        public static Locator.XPathLocator dataRegion(String tableName)
+        {
+            return Locator.tagWithId("table", "dataregion_" + tableName);
+        }
+
         public static Locator.XPathLocator headerButton(String tableName, String text)
         {
             return Locator.xpath("id('dataregion_header_row_" + tableName + "')//a").withClass("labkey-button").withText(text);

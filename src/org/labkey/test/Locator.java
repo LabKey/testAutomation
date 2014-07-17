@@ -874,7 +874,7 @@ public abstract class Locator
 
         public IdLocator(String loc)
         {
-            super(loc.length() > 0 ? "//*[@id = '" + loc + "']" : "");
+            super(loc.length() > 0 ? "//*[@id = " + xq(loc) + "]" : "");
             _id = loc;
         }
 
