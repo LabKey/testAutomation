@@ -3295,22 +3295,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertTextPresent(String text, int amount)
     {
-        assertTextPresent(text, amount, false);
-    }
-
-    public void assertTextPresent(String text, int amount, boolean browserDependent)
-    {
-        int count = countText(text);
-
-        if (browserDependent)
-        {
-            if (count == 0)
-                log("Your browser is probably out of date");
-            else
-                assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
-        }
-        else
-            assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+        assertEquals("Text '" + text + "' was not present the correct number of times", amount, countText(text));
     }
 
     public int countText(String text)
@@ -5108,52 +5093,70 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * Executes an Ext.menu.Item's handler.
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickExtComponent(String)}
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#pageFirst()}
+     * @param dataRegionName
      */
-    @Deprecated public boolean runMenuItemHandler(String id)
-    {
-        log("Invoking Ext menu item handler '" + id + "'");
-        return _extHelper.clickExtComponent(EscapeUtil.filter(id));
-    }
-
+    @Deprecated
     public void dataRegionPageFirst(String dataRegionName)
     {
         log("Clicking page first on data region '" + dataRegionName + "'");
         clickDataRegionPageLink(dataRegionName, "First Page");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#pageLast()}
+     */
+    @Deprecated
     public void dataRegionPageLast(String dataRegionName)
     {
         log("Clicking page last on data region '" + dataRegionName + "'");
         clickDataRegionPageLink(dataRegionName, "Last Page");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#pageNext()}
+     */
+    @Deprecated
     public void dataRegionPageNext(String dataRegionName)
     {
         log("Clicking page next on data region '" + dataRegionName + "'");
         clickDataRegionPageLink(dataRegionName, "Next Page");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#pagePrev()}
+     */
+    @Deprecated
     public void dataRegionPagePrev(String dataRegionName)
     {
         log("Clicking page previous on data region '" + dataRegionName + "'");
         clickDataRegionPageLink(dataRegionName, "Previous Page");
     }
 
+    /**
+     * @deprecated Move to {@link org.labkey.test.util.DataRegionTable}
+     */
+    @Deprecated
     private void clickDataRegionPageLink(String dataRegionName, String title)
     {
         String id = Locator.xq("dataregion_header_" + dataRegionName);
         clickAndWait(Locator.xpath("//table[@id=" + id + "]//div/a[@title='" + title + "']"));
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#getDataRowCount()}
+     */
+    @Deprecated
     public int getDataRegionRowCount(String dataRegionName)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);
         return Locator.xpath("//table[@id=" + id + "]/tbody/tr[contains(@class, 'labkey-row') or contains(@class, 'labkey-alternate-row')]").findElements(getDriver()).size();
     }
 
-    /** Sets selection state for rows of the data region on the current page. */
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#checkAll()}
+     */
+    @Deprecated
     public void checkAllOnPage(String dataRegionName)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);
@@ -5161,7 +5164,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         checkCheckbox(toggle);
     }
 
-    /** Clears selection state for rows of the data region on the current page. */
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#uncheckAll()}
+     */
+    @Deprecated
     public void uncheckAllOnPage(String dataRegionName)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);
@@ -5170,14 +5176,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         uncheckCheckbox(toggle);
     }
 
-    /** Sets selection state for single rows of the data region. */
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#checkCheckbox(String)}
+     */
+    @Deprecated
     public void checkDataRegionCheckbox(String dataRegionName, String value)
     {
         String id = Locator.xq(dataRegionName);
         checkCheckbox(Locator.xpath("//form[@id=" + id + "]//input[@name='.select' and @value='" + value + "']"));
     }
 
-    /** Sets selection state for single rows of the data region. */
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#checkCheckbox(int)}
+     */
+    @Deprecated
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);
@@ -5185,7 +5197,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         checkCheckbox(selects.get(index));
     }
 
-    /** Sets selection state for single rows of the data region. */
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#uncheckCheckbox(int)}
+     */
+    @Deprecated
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
         String id = Locator.xq("dataregion_" + dataRegionName);

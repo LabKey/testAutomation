@@ -58,7 +58,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
                 assertTextPresent("Scan", "Protein", "gi|5002198|AF143203_1_interle", "1386.6970", "gi|6049221|AF144467_1_nonstru");
                 assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
                 assertTextBefore("R.EADKVLVQMPSGK.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
-                assertTextPresent("\n", 86, true);
+                assertTextPresent("\n", 86);
             }
         };
         validateExport("TSV", LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME, tsvPeptideValidator);
@@ -72,7 +72,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
                 assertTextPresent("Run", "Peptide", "-.MELFSNELLYK.T", "1386.6970");
                 assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
                 assertTextBefore("R.EADKVLVQMPSGK.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
-                assertTextPresent("\n", 89, true);
+                assertTextPresent("\n", 89);
             }
         };
         validateExport("AMT", LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME, amtPeptideValidator);
@@ -85,7 +85,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
             {
                 assertTextPresent("515.9 1684.0");
                 assertTextNotPresent("717.4 4043.0");
-                assertTextPresent("\n", 4271, true);
+                assertTextPresent("\n", 4271);
             }
         };
         validateExport("PKL", LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME, pklPeptideValidator);
@@ -97,7 +97,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
             public void run()
             {
                 assertTextPresent("gi|16078254|similar_to_riboso", "20925.0", "gi|13470573|30S_ribosomal_pro, gi|16125519|ribosomal_protein");
-                assertTextPresent("\n", 7, true);
+                assertTextPresent("\n", 7);
             }
         };
         validateExport("TSV", QUERY_PROTEINPROPHET_VIEW_NAME, tsvProteinProphetValidator);
@@ -109,7 +109,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
             public void run()
             {
                 assertTextPresent("426.9465 1 3", "174.8 2400.0");
-                assertTextPresent("\n", 245, true);
+                assertTextPresent("\n", 245);
             }
         };
         validateExport("PKL", QUERY_PROTEINPROPHET_VIEW_NAME, pklProteinProphetValidator);

@@ -137,7 +137,7 @@ public class MS2Test extends AbstractMS2ImportTest
         pushLocation();
         peptidesTable.checkAllOnPage();
         peptidesTable.clickHeaderButton("Export Selected", "AMT");
-        assertTextPresent("\n", 60, true);
+        assertTextPresent("\n", 60);
         assertTextPresent(
                 "Run",
                 "CalcMHPlus",
@@ -178,12 +178,12 @@ public class MS2Test extends AbstractMS2ImportTest
                 "1373.4690");
         assertTextBefore("R.Q^YALHVDGVGTK.A", "K.LLASMLAK.A");
         assertTextBefore("R.SLADVARR.R", "-.MELFSNELLYK.T");
-        assertTextPresent("\n", 58, true);
+        assertTextPresent("\n", 58);
         popLocation();
         peptidesTable.clickHeaderButton("Export All", "AMT");
         assertTextBefore("R.Q^YALHVDGVGTK.A", "K.LLASMLAK.A");
         assertTextPresent("Run", "Peptide");
-        assertTextPresent("\n", 60, true);
+        assertTextPresent("\n", 60);
         popLocation();
 
         log("Test Scan, Z, Hyper, Next, B, Y, and Expect filters");
@@ -252,7 +252,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 "SeqId",
                 "56",
                 "gi|442754|A_Chain_A,_Superoxi");
-        assertTextPresent("\n", 3, true);
+        assertTextPresent("\n", 3);
         assertTextBefore("R.LSSMRDSR.S", "R.GGNEESTK.T");
         assertTextNotPresent("K.FVKKSNDVR.L");
         goBack();
@@ -260,7 +260,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("Run", "Peptide");
         assertTextBefore("R.LSSMRDSR.S", "R.GGNEESTK.T");
         assertTextNotPresent("K.FVKKSNDVR.L");
-        assertTextPresent("\n", 5, true);
+        assertTextPresent("\n", 5);
         popLocation();
 
         log("Test using saved view");
@@ -323,7 +323,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 "ribosomal protein S19 [Thermoplasma volcanium]",
                 "gi|29650192|ribosomal_protein",
                 "ribosomal protein S6 [Anopheles stephensi]");
-        assertTextPresent("\n", 18, true);
+        assertTextPresent("\n", 18);
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
         goBack();
 
@@ -339,13 +339,13 @@ public class MS2Test extends AbstractMS2ImportTest
                 "R.KVTTGR.A",
                 "gi|29650192|ribosomal_protein",
                 "R.E^PVSPWGTPAKGYR.T");
-        assertTextPresent("\n", 18, true);
+        assertTextPresent("\n", 18);
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
         goBack();
         proteinsTable.clickHeaderButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
-        assertTextPresent("\n", 20, true);
+        assertTextPresent("\n", 20);
         assertTextBefore("K.TKDYEGMQVPVK.V", "R.RDYLHYLPKYNR.F");
         assertTextNotPresent("K.LLASMLAK.A",
                 "R.KKVAIVPEPLR.K");
@@ -469,7 +469,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 "Next AA",
                 "Protein",
                 "gi|27805893|guanine_nucleotid");
-        assertTextPresent("\n", 24, true);
+        assertTextPresent("\n", 24);
         assertTextBefore(PEPTIDE1, PEPTIDE2);
         assertTextBefore(PEPTIDE3, PEPTIDE4);
         assertTextNotPresent("K.LLASMLAK.A",
@@ -483,7 +483,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("Run",
                 "Peptide",
                 "RetTime");
-        assertTextPresent("\n", 26, true);
+        assertTextPresent("\n", 26);
         assertTextBefore(PEPTIDE1, PEPTIDE2);
         assertTextBefore(PEPTIDE3, PEPTIDE4);
         assertTextNotPresent("K.LLASMLAK.A",
@@ -493,13 +493,13 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test exporting selected in TSV");
         pushLocation();
-        peptidesTable.uncheckAllOnPage();
+        peptidesTable.uncheckAll();
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
         _extHelper.clickMenuButton("Export Selected", "TSV");
         assertTextPresent("Next AA",
                 "gi|25027045|putative_50S_ribo");
-        assertTextPresent("\n", 3, true);
+        assertTextPresent("\n", 3);
         assertTextBefore("K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
         assertTextNotPresent("Expect",
                 "SeqHits");
@@ -507,12 +507,12 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test exporting selected in AMT");
         pushLocation();
-        peptidesTable.uncheckAllOnPage();
+        peptidesTable.uncheckAll();
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
         _extHelper.clickMenuButton("Export Selected", "AMT");
         assertTextPresent("Peptide");
-        assertTextPresent("\n", 5, true);
+        assertTextPresent("\n", 5);
         assertTextBefore("K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
         assertTextNotPresent("Next AA");
         popLocation();
@@ -608,7 +608,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 "PepProphet",
                 "Scan",
                 "K.MLNMAKSKMHK.M");
-        assertTextPresent("\n", 6, true);
+        assertTextPresent("\n", 6);
         assertTextBefore("gi|16078254|ref|NP_389071.1|", "gi|18311790|ref|NP_558457.1|");
         assertTextNotPresent("CalcMH+",
                 "K.EIRQRQGDDLDGLSFAELR.G",
@@ -620,7 +620,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("Run",
                 "Peptide",
                 "RetTime");
-        assertTextPresent("\n", 8, true);
+        assertTextPresent("\n", 8);
         assertTextBefore("R.KKVAIVPEPLR.K", "R.Q^YALHVDGVGTK.A");
         assertTextNotPresent("Best Name",
                 "K.EIRQRQGDDLDGLSFAELR.G",
@@ -669,7 +669,7 @@ public class MS2Test extends AbstractMS2ImportTest
         uncheckCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
-        proteinGroupsTable.uncheckAllOnPage();
+        proteinGroupsTable.uncheckAll();
         proteinGroupsTable.checkCheckbox(0);
         proteinGroupsTable.checkCheckbox(1);
         proteinGroupsTable.clickHeaderButton("Export Selected", "TSV");
@@ -690,7 +690,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 "Peptide",
                 "1318.6790",
                 "1435.6810");
-        assertTextPresent("\n", 5, true);
+        assertTextPresent("\n", 5);
         assertTextBefore("K.MLNMAKSKMHK.M", "R.E^VNAEDLAPGEPGR.L");
         assertTextNotPresent("gi|27684893|similar_to_60S_RI");
 
@@ -722,13 +722,13 @@ public class MS2Test extends AbstractMS2ImportTest
                 "gi|548772|RL4_HALHA_50S_RIBOS",
                 "EVNAEDLAPGEPGR");
         assertTextNotPresent("gi|23619029|60S_ribosomal_pro");
-        assertTextPresent("\n", 2, true);
+        assertTextPresent("\n", 2);
         popLocation();
 
         log("Make sure sort is exported correctly too");
         quantitationTable.clickHeaderButton("Export All", "TSV");
         assertTextPresent("MLNMAKSKMHK");
-        assertTextPresent("\n", 3, true);
+        assertTextPresent("\n", 3);
         assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
         popLocation();
     }
@@ -817,10 +817,10 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickButton("Create new group");
         setFormElement(Locator.name("name"), RUN_GROUP1_NAME1);
-        setFormElement("contactId", RUN_GROUP1_CONTACT);
-        setFormElement("experimentDescriptionURL", RUN_GROUP1_DESCRIPTION);
-        setFormElement("hypothesis", RUN_GROUP1_HYPOTHESIS);
-        setFormElement("comments", RUN_GROUP1_COMMENTS);
+        setFormElement(Locator.name("contactId"), RUN_GROUP1_CONTACT);
+        setFormElement(Locator.name("experimentDescriptionURL"), RUN_GROUP1_DESCRIPTION);
+        setFormElement(Locator.name("hypothesis"), RUN_GROUP1_HYPOTHESIS);
+        setFormElement(Locator.name("comments"), RUN_GROUP1_COMMENTS);
         clickButton("Submit");
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         assertTextPresent(RUN_GROUP1_NAME1,
@@ -1134,8 +1134,9 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test Compare Runs using Query Peptides");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        click(Locator.name(".toggle"));
-        _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton("MS2SearchRuns", "Compare"), false, "Peptide");
+        DataRegionTable ms2Runs = new DataRegionTable("MS2SearchRuns", this);
+        ms2Runs.checkAll();
+        ms2Runs.clickHeaderButton("Compare", "Peptide");
         checkRadioButton(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         setFormElement(Locator.name("targetProtein"), "");
         clickButton("Compare");
