@@ -2466,9 +2466,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             pauseJsErrorChecker();
             Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
+            crawler.addExcludedActions(getUncrawlableActions());
             crawler.crawlAllLinks(isInjectCheckEnabled());
             resumeJsErrorChecker();
         }
+    }
+
+    protected List<Crawler.ControllerActionId> getUncrawlableActions()
+    {
+        return Collections.emptyList();
     }
 
     private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)

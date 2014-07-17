@@ -159,6 +159,11 @@ public class Crawler
         return list;
     }
 
+    public void addExcludedActions(Collection<ControllerActionId> action)
+    {
+        _excludedActions.addAll(action);
+    }
+
     protected List<String> getAdminControllers()
     {
         return Arrays.asList("login", "admin", "security", "user");
@@ -277,7 +282,7 @@ public class Crawler
     }
 
 
-    protected static class ControllerActionId
+    public static class ControllerActionId
     {
         private String _controller;
         private String _action = "";
