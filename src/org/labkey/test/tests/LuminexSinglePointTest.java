@@ -21,7 +21,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.MiniTest;
+import org.labkey.test.categories.LuminexAll;
 import org.labkey.test.util.DataRegionTable;
 import org.testng.Assert;
 
@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, LuminexAll.class, Assays.class})
 public class LuminexSinglePointTest extends LuminexGuideSetTest
 {
     private final String file1 = "01-11A12-IgA-Biotin.xls";

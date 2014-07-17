@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.MiniTest;
+import org.labkey.test.categories.LuminexAll;
 
 import java.io.File;
 import java.util.Map;
@@ -31,7 +31,7 @@ import java.util.TreeMap;
  *
  * This test is meant to mimic the LuminexGuideSetTest but use value-based guide sets instead of run-based guide sets.
  */
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, LuminexAll.class, Assays.class})
 public class LuminexValueBasedGuideSetTest extends LuminexGuideSetTest
 {
     private final String[] UPDATED_EXPECTED_FLAGS = {"AUC, EC50-5, PCV", "", "", "", "PCV"};

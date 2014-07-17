@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.MiniTest;
+import org.labkey.test.categories.LuminexAll;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -28,7 +28,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, LuminexAll.class, Assays.class})
 public class LuminexJavaTransformTest extends LuminexTest
 {
     protected void runUITests()

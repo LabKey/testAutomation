@@ -15,6 +15,6 @@
  */
 package org.labkey.test.categories;
 
-public abstract class MiniTest extends Test
+public abstract class LuminexAll extends Test
 {
 }

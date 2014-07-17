@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.MiniTest;
+import org.labkey.test.categories.LuminexAll;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -33,7 +33,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, MiniTest.class, Assays.class})
+@Category({DailyA.class, LuminexAll.class, Assays.class})
 public class LuminexExcludableWellsTest extends LuminexTest
 {
     private static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
