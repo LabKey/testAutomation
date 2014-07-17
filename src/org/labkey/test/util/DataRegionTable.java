@@ -537,12 +537,12 @@ public class DataRegionTable
 
     public void checkAllOnPage()
     {
-        _test.checkAllOnPage(_tableName);
+        checkAll();
     }
 
     public void uncheckAllOnPage()
     {
-        _test.uncheckAllOnPage(_tableName);
+        uncheckAll();
     }
 
     public void checkAll()
