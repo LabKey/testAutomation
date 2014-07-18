@@ -56,6 +56,7 @@ public class LuminexPositivityTest extends LuminexTest
         String assayName = "Positivity";
         _analyteNames.add("MyAnalyte (1)");
         _analyteNames.add("Blank (3)");
+        _negControlAnalyte = _analyteNames.get(1);
 
         addTransformScriptsToAssayDesign();
 
@@ -139,7 +140,6 @@ public class LuminexPositivityTest extends LuminexTest
 
         // now we actual test the case of getting baseline visit data from a previously uploaded run
         setPositivityThresholdParams(99, 98);
-        _negControlAnalyte = _analyteNames.get(1);
         uploadPositivityFile(assayName + " Baseline Visit Previous Run 2", TEST_ASSAY_LUM_FILE12, "1", "3", false, true);
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9", "A10", "B10"};
         checkPositivityValues("positive", posWells.length, posWells);
@@ -234,16 +234,21 @@ public class LuminexPositivityTest extends LuminexTest
             setFormElement(l, Integer.toString(_newThresholdValue));
 
             String inputName = "_analyte_" + analyteName + "_NegativeControl";
-            l = Locator.xpath("//input[@type='checkbox' and @name='" + inputName + "'][1]");
-            waitForElement(l);
+            Locator negControlLoc = Locator.xpath("//input[@type='checkbox' and @name='" + inputName + "'][1]");
+            waitForElement(negControlLoc);
             if (!_expectedNegativeControlValue && _newNegativeControlValue)
-                checkCheckbox(l);
+                checkCheckbox(negControlLoc);
             else if (_expectedNegativeControlValue && !_newNegativeControlValue)
-                uncheckCheckbox(l);
+                uncheckCheckbox(negControlLoc);
+
+            setFormElement(Locator.name("_analyte_" + analyteName + "_NegativeBead"), _newNegativeControlValue ? "" : "Blank (3)");
 
             // special case for analyte that should always be considered negative control
             if (analyteName.equals(_negControlAnalyte))
-                checkCheckbox(l);
+            {
+                checkCheckbox(negControlLoc);
+                setFormElement(Locator.name("_analyte_" + analyteName + "_NegativeBead"), "");
+            }
         }
 
         if (_expectedThresholdValue != _newThresholdValue)

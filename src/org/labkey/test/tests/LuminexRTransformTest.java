@@ -28,11 +28,15 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
 public class LuminexRTransformTest extends LuminexTest
 {
     private static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
+    private static final String ANALYTE1 = "MyAnalyte (1)";
+    private static final String ANALYTE2 = "MyAnalyte (2)";
+    private static final String ANALYTE3 = "Blank (3)";
 
     private static final String[] RTRANS_FIBKGDNEG_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
@@ -169,8 +173,9 @@ public class LuminexRTransformTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
         assertEquals("Unexpected Transform Script Version number", "9.1.20140718", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Lab Transform Script Version number", "1.2.20140612", table.getDataAsText(0, "Lab Transform Script Version"));
+        assertEquals("Unexpected Lab Transform Script Version number", "2.0.20140718", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
+        assertNotNull(table.getDataAsText(0, "R Version"));
     }
 
     private void verifyPDFsGenerated(boolean hasStandardPDFs)
@@ -204,13 +209,17 @@ public class LuminexRTransformTest extends LuminexTest
 
         // make sure the Standard checkboxes are checked
         checkCheckbox(Locator.name("_titrationRole_standard_Standard1"));
-        checkCheckbox(Locator.name("titration_MyAnalyte (1)_Standard1"));
-        checkCheckbox(Locator.name("titration_MyAnalyte (2)_Standard1"));
-        checkCheckbox(Locator.name("titration_Blank (3)_Standard1"));
+        checkCheckbox(Locator.name("titration_" + ANALYTE1 + "_Standard1"));
+        checkCheckbox(Locator.name("titration_" + ANALYTE2 + "_Standard1"));
+        checkCheckbox(Locator.name("titration_" + ANALYTE3 + "_Standard1"));
         // make sure that that QC Control checkbox is checked
         checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         // set LotNumber for the first analyte
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
+        // set negative control and negative bead values
+        setFormElement(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), "Blank (3)");
+        setFormElement(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), "Blank (3)");
+        checkCheckbox(Locator.name("_analyte_" + ANALYTE3 + "_NegativeControl"));
         clickButton("Save and Finish");
     }
 
