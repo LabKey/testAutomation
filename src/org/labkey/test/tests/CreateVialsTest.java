@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -35,9 +36,9 @@ public class CreateVialsTest extends AbstractViabilityTest
     private static final String ASSAY_NAME = "Guava Assay";
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "customModules/letvin";
+        return Arrays.asList("letvin");
     }
 
     @Override

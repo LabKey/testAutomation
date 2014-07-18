@@ -36,6 +36,7 @@ import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -58,9 +59,9 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private static final String LOOKUP_VALUE_1 = "Hydrogen";
     private static final String LOOKUP_VALUE_2 = "Helium";
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/filecontent";
+        return Arrays.asList("filecontent");
     }
 
     @Override

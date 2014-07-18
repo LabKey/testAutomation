@@ -192,9 +192,9 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     @Override

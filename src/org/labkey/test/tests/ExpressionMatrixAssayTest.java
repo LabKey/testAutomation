@@ -212,9 +212,9 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/microarray";
+        return Arrays.asList("microarray");
     }
 
     @Override

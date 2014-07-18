@@ -972,9 +972,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "simpletest";
+        return Arrays.asList("simpletest");
     }
 
     @Override

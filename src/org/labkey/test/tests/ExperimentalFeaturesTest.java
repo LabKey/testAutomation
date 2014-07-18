@@ -47,7 +47,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

@@ -26,6 +26,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.util.Arrays;
+
 @Category({BVT.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
@@ -279,8 +281,8 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/list";
+        return Arrays.asList("list");
     }
 }

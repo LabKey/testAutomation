@@ -30,6 +30,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Category({BVT.class, Wiki.class})
 public class WikiTest extends BaseWebDriverTest
@@ -50,9 +51,9 @@ public class WikiTest extends BaseWebDriverTest
         setContainerHelper(new UIContainerHelper(this));
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/wiki";
+        return Arrays.asList("wiki");
     }
 
     @Override

@@ -22,6 +22,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RemoteConnectionHelper;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({DailyB.class})
@@ -46,9 +48,9 @@ public class RemoteConnectionTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/dataintegration";
+        return Arrays.asList("dataintegration");
     }
 
     /**

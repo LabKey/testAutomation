@@ -281,7 +281,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

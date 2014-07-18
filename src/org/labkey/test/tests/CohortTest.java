@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -698,9 +699,9 @@ public class CohortTest extends BaseWebDriverTest
         return getText(loc);
     }
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

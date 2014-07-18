@@ -1407,7 +1407,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

@@ -30,6 +30,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -85,9 +86,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickButton("Done");
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     protected static String getStudySampleDataPath()

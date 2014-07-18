@@ -23,15 +23,16 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 {
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/viability";
+        return Arrays.asList("viability");
     }
 
     @Override

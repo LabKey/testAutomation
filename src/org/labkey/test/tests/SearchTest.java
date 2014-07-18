@@ -25,6 +25,7 @@ import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -57,9 +58,9 @@ public class SearchTest extends StudyTest
     private PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/search";
+        return Arrays.asList("search");
     }
 
     @Override

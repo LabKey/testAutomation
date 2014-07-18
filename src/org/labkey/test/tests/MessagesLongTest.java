@@ -76,9 +76,9 @@ public class MessagesLongTest extends BaseWebDriverTest
     public static final String FILES_MENU_ITEM = "For Files";
     public static final String MESSAGES_MENU_ITEM = "For Messages";
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/announcements";
+        return Arrays.asList("announcements");
     }
 
     @Override

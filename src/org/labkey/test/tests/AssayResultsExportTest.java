@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Category({DailyB.class})
 public class AssayResultsExportTest extends AbstractExportTest
@@ -102,9 +103,9 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/list";
+        return Arrays.asList("list");
     }
 }
 

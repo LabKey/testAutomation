@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
 import java.io.*;
+import java.util.Arrays;
 
 @Category({DailyA.class})
 public class ProgrammaticQCTest extends AbstractQCAssayTest
@@ -233,9 +234,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         assertTextPresent("Programmatic QC was run and 1 errors were found");
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     @Override

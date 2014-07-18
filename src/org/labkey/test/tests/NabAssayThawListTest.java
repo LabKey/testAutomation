@@ -27,6 +27,8 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.Arrays;
+
 @Category({DailyA.class, Assays.class})
 public class NabAssayThawListTest extends AbstractQCAssayTest
 {
@@ -51,9 +53,9 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     private final String THAW_LIST_BAD_DATATYPES = THAW_LIST_NAME + "BadDataTypes";
     private final String THAW_LIST_ARCHIVE_BAD_DATATYPES = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_BAD_DATATYPES.zip";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/nab";
+        return Arrays.asList("nab");
     }
 
     @Override

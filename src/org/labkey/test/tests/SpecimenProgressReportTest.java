@@ -57,7 +57,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

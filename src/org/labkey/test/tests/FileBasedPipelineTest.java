@@ -264,9 +264,9 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/pipeline";
+        return Arrays.asList("pipeline");
     }
 
     @Override

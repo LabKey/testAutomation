@@ -21,6 +21,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.Arrays;
+
 @Category({DailyB.class})
 public class DatasetExportTest extends AssayResultsExportTest
 {
@@ -102,8 +104,8 @@ public class DatasetExportTest extends AssayResultsExportTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 }

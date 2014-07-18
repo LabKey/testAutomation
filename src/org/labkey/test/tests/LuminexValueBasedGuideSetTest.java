@@ -57,7 +57,7 @@ public class LuminexValueBasedGuideSetTest extends LuminexGuideSetTest
 
     private void finishAssayDesignConfigure()
     {
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
         saveAssay();
     }
 

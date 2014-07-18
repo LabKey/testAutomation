@@ -70,9 +70,9 @@ public class LuminexPositivityTest extends LuminexTest
 
     private void addTransformScriptsToAssayDesign()
     {
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 1);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 2);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + "/resources/transformscripts/description_parsing_example.pl"), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LABKEY), 1);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LAB), 2);
         saveAssay();
     }
 

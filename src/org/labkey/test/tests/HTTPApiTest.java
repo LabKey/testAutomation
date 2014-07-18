@@ -24,6 +24,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Category({DailyA.class})
 public class HTTPApiTest extends SimpleApiTest
@@ -62,9 +63,9 @@ public class HTTPApiTest extends SimpleApiTest
         return BrowserType.CHROME;
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

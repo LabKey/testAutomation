@@ -27,6 +27,7 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -41,9 +42,9 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     private static final String FILE = "SampleMindedExport.xlsx";
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
@@ -57,9 +58,9 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/pipeline";
+        return Arrays.asList("pipeline");
     }
 
     @Override public BrowserType bestBrowser()

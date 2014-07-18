@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -174,9 +173,9 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
         return testCase;
     }
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException

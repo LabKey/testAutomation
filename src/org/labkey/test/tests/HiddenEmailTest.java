@@ -53,7 +53,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

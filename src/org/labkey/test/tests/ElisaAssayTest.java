@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -45,9 +46,9 @@ public class ElisaAssayTest extends ElispotAssayTest
 
     private static final String PLATE_TEMPLATE_NAME = "ELISAAssayTest Template";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/assay";
+        return Arrays.asList("assay");
     }
 
     @Override

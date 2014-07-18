@@ -202,9 +202,9 @@ public class PortalTest extends BaseWebDriverMultipleTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/core";
+        return Arrays.asList("core");
     }
 
     @Override

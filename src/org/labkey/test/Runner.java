@@ -52,6 +52,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
@@ -71,7 +72,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
@@ -879,12 +879,19 @@ public class Runner extends TestSuite
 
     private static void frontLoadTestsOfModifiedModules(TestSet set, String changedFilesFile)
     {
-        List<String> moduleDirs = getModifiedModuleDirectories(changedFilesFile);
+        Collection<String> moduleDirs = getModifiedModules(changedFilesFile);
 
         // If changedFilesFile exists where TeamCity indicates then order the tests starting from most recently modified
-        if (null != moduleDirs)
+        if (moduleDirs.size() > 0)
         {
-            TestMap tm = new TestMap(); // Stores Tests, keyed by associated module directory.
+            System.out.println("Prioritizing tests for modified modules:");
+            for (String module : moduleDirs)
+            {
+                System.out.println("\t" + module);
+            }
+
+            List<String> installedModules = getInstalledModules();
+            TestMap tm = new TestMap(); // Stores Tests, keyed by associated module.
 
             // Record the associated module directories for all selected tests.
             for (Class testClass : set.getTestList())
@@ -894,23 +901,19 @@ public class Runner extends TestSuite
                 try
                 {
                     Constructor<WebTest> c = testClass.getConstructor();
-                    WebTest test = null;
-                    String directory = null;
+                    WebTest test = c.newInstance();
+                    List<String> modules = test.getAssociatedModules();
 
-                    test = c.newInstance();
-                    directory = test.getAssociatedModuleDirectory();
-
-                    if (directory == null || directory.length() == 0)
+                    if (modules == null || modules.size() == 0)
                         continue;
 
-                    File testDir = new File(TestFileUtils.getLabKeyRoot(), directory);
-
-                    if (!testDir.exists())
+                    for (String module : modules)
                     {
-                        throw new RuntimeException("Module directory \"" + directory + "\" specified in " + testClass + " does not exist!");
+                        if (!installedModules.contains(module))
+                            System.out.println("Module \"" + module + "\" specified in " + testClass + " does not exist!");
+                        else
+                            tm.put(module, testClass);
                     }
-
-                    tm.put(directory, testClass);
                 }
                 catch(Exception e)
                 {
@@ -918,7 +921,6 @@ public class Runner extends TestSuite
                 }
             }
 
-            // Reorder tests by associated modules' modification date.
             int movedTests = 0;
             for (String moduleDir : moduleDirs)
             {
@@ -939,49 +941,62 @@ public class Runner extends TestSuite
         }
     }
 
-    // Return a list of modified module directories, ordered starting with most recently modified.
-    private static List<String> getModifiedModuleDirectories(String changedFilesFile)
+    private static List<String> getInstalledModules()
     {
-        String labkeyRoot = TestFileUtils.getLabKeyRoot();
-        File changedFiles = new File(changedFilesFile);
-        Map<String, Long> moduleDirs = new HashMap<>(10);
-        String modulePrefix = "server/modules/";
+        File modulesDir = new File(TestFileUtils.getDefaultDeployDir(), "modules");
 
-        if (changedFiles.exists())
+        if (!modulesDir.exists())
+            return Collections.emptyList();
+
+        String[] moduleNames = modulesDir.list(new FilenameFilter()
         {
-            try(BufferedReader reader = new BufferedReader(new FileReader(changedFiles)))
+            @Override
+            public boolean accept(File dir, String name)
+            {
+                return (new File(dir, name)).isDirectory();
+            }
+        });
+
+        return Arrays.asList(moduleNames);
+    }
+
+    // http://confluence.jetbrains.com/display/TCD8/Risk+Tests+Reordering+in+Custom+Test+Runner
+    private static Collection<String> getModifiedModules(String changedFilesFile)
+    {
+        File changelistFile = new File(changedFilesFile);
+        Collection<String> modifiedModules = new HashSet<>();
+
+        if (changelistFile.exists())
+        {
+            try(BufferedReader reader = new BufferedReader(new FileReader(changelistFile)))
             {
                 String line;
 
                 while ((line = reader.readLine()) != null)
                 {
-                    if (line.length() > 0 && line.charAt(0) != '?' && line.charAt(0) != '-' && line.charAt(0) != ':')
+                    String [] splitLine = line.split(":");
+                    if (splitLine.length != 3)
                     {
-                        String path = line.substring(0, line.indexOf(':') - 1);
-
-                        // If path starts with "server/modules/" then find the end index of module name.  If path doesn't
-                        //  start with module prefix or the next separator is missing, set index to -1
-                        int i = (path.startsWith(modulePrefix) ? path.indexOf("/", modulePrefix.length()) : -1);
-
-                        // Anything outside "server/modules/" is labeled "none"
-                        String moduleDir = (-1 == i ? "none" : path.substring(modulePrefix.length(), i));
-
-                        // Note: We don't have a modification date for deleted or renamed files.  They end up with lastModified == 0 and are treated as the oldest modifications.
-                        long lastModified = new File(labkeyRoot, path).lastModified();
-                        Long mostRecent = moduleDirs.get(moduleDir);
-
-                        if (null == mostRecent || lastModified > mostRecent)
-                            moduleDirs.put(moduleDir, lastModified);
+                        System.err.println("Unexpected changelist format: " + line);
+                        continue;
                     }
+
+                    String relativeFilePath = splitLine[0];
+                    String changeType = splitLine[1];
+
+                    if ("NOT_CHANGED".equals(changeType))
+                    {
+                        System.out.println("File in changelist NOT_CHANGED: " + relativeFilePath);
+                        continue;
+                    }
+
+                    String moduleName = getModuleNameFromPath(line);
+
+                    if (moduleName != null)
+                        modifiedModules.add(moduleName);
                 }
 
-                // Now sort modules by most recent file modification date
-                Map<Long, String> orderedModuleDirs = new TreeMap<>();
-
-                for (String moduleDir : moduleDirs.keySet())
-                    orderedModuleDirs.put(-moduleDirs.get(moduleDir), moduleDir);  // Start with most recent change
-
-                return new ArrayList<>(orderedModuleDirs.values());
+                return modifiedModules;
             }
             catch(IOException e)
             {
@@ -990,6 +1005,12 @@ public class Runner extends TestSuite
         }
 
         return Collections.emptyList();
+    }
+
+    private static String getModuleNameFromPath(String path)
+    {
+        System.out.println("Unable to determine module for: " + path);
+        return null;
     }
 
     private static Class getTestClass(Test test)

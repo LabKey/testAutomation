@@ -23,6 +23,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
+import java.util.Arrays;
+
 @Category({DailyA.class})
 public class FieldValidatorTest extends BaseWebDriverTest
 {
@@ -126,9 +128,9 @@ public class FieldValidatorTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/experiment";
+        return Arrays.asList("experiment");
     }
 
     @Override

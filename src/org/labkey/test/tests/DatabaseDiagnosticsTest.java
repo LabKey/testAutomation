@@ -60,7 +60,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverMultipleTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

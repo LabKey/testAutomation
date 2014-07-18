@@ -29,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -115,9 +116,9 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String HEADER_CONTENT =
             "Yo! This is the header!";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/wiki";
+        return Arrays.asList("wiki");
     }
 
     @Override

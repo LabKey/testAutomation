@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -507,9 +508,9 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/dataintegration";
+        return Arrays.asList("dataintegration");
     }
 
     protected void verifyErrorLog(String transformName, List<String> errors)

@@ -27,6 +27,7 @@ import org.labkey.test.util.LoggedParam;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
@@ -145,9 +146,9 @@ public class DatasetPublishTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

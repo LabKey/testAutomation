@@ -102,7 +102,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementNotPresent(ribbonLink);
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

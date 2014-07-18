@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 abstract public class MS2TestBase extends BaseWebDriverTest
 {
@@ -48,9 +49,9 @@ abstract public class MS2TestBase extends BaseWebDriverTest
 
     public final static String PIPELINE_PATH = TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/ms2";
+        return Arrays.asList("ms2");
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -252,9 +253,9 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "filecontent";
+        return Arrays.asList("filecontent");
     }
 
     @Override

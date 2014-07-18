@@ -131,9 +131,9 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/fruits.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
-    public String getAssociatedModuleDirectory()
+    public List<java.lang.String> getAssociatedModules()
     {
-        return "server/modules/list";
+        return Arrays.asList("list");
     }
 
     @Override

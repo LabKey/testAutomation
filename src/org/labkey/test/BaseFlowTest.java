@@ -41,9 +41,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected static final String PIPELINE_PATH = "/sampledata/flow";
     private final FileBrowserHelper flowFileBrowserHelper = new FileBrowserHelper(this);
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/flow";
+        return Arrays.asList("flow");
     }
 
     @Override

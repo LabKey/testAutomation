@@ -1147,7 +1147,7 @@ public class SequenceTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

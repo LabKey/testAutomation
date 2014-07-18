@@ -25,6 +25,7 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -93,9 +94,9 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
         clickProject(PROJECT_NAME);
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

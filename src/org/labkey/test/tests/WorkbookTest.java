@@ -25,6 +25,8 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({DailyB.class})
@@ -43,9 +45,9 @@ public class WorkbookTest extends BaseWebDriverTest
 
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/workbook";
+        return Arrays.asList("workbook");
     }
 
     @Override

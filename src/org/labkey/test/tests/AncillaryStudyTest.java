@@ -26,6 +26,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,9 +60,9 @@ public class AncillaryStudyTest extends StudyBaseTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

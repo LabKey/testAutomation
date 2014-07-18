@@ -77,8 +77,8 @@ public class LuminexRTransformTest extends LuminexTest
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
         clickButton("Save & Close");
 
         uploadRunWithoutRumiCalc();

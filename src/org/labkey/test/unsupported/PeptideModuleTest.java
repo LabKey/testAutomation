@@ -267,11 +267,9 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         }
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        //return "null" to skip verification of module directory
-        //as it won't exist until after the test starts running the first time
-        return null;
+        return Arrays.asList("peptide");
     }
 
     public static String getSampledataPath()

@@ -30,6 +30,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -95,9 +96,9 @@ public class AssayTest extends AbstractAssayTest
     private static final String GRANT = "SPECTRE";
     private static final String DESCRIPTION = "World Domination.";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

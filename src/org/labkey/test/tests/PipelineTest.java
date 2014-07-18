@@ -35,6 +35,8 @@ import org.labkey.test.ms1.params.PepMatchTestParams;
 import org.labkey.test.ms1.params.FeaturesTestParams;
 import org.labkey.test.util.PipelineToolsHelper;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({BVT.class, FileBrowser.class})
@@ -87,9 +89,9 @@ public class PipelineTest extends PipelineWebTestBase
         return params;
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/pipeline";  // + ms2 and ms1
+        return Arrays.asList("pipeline", "ms1", "ms2");
     }
 
     @Override

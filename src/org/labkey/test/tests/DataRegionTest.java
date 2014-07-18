@@ -94,7 +94,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
     DataRegionTable table;
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

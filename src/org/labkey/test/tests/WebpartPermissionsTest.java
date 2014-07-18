@@ -25,6 +25,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -177,8 +178,8 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/core";
+        return Arrays.asList("core");
     }
 }

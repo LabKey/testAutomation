@@ -71,9 +71,9 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     @Override

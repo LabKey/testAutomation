@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -43,9 +44,9 @@ public class ModuleAssayTest extends AbstractAssayTest
             "Third\t\n" +
             "Fourth\t\n";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @Override

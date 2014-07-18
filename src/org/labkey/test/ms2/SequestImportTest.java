@@ -29,6 +29,7 @@ import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyB.class, MS2.class, FileBrowser.class})
@@ -141,9 +142,9 @@ public class SequestImportTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/ms2";
+        return Arrays.asList("ms2");
     }
 
     @Override

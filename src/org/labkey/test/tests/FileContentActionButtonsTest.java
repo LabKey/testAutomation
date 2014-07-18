@@ -215,9 +215,9 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "filecontent";
+        return Arrays.asList("filecontent");
     }
 
     @Override

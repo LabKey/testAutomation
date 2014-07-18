@@ -37,6 +37,7 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -70,9 +71,9 @@ public class IssuesTest extends BaseWebDriverTest
 
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/issues";
+        return Arrays.asList("issues");
     }
 
     @Override

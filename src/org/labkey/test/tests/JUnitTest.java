@@ -18,11 +18,9 @@ package org.labkey.test.tests;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -33,7 +31,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Runner;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
@@ -74,7 +71,7 @@ public class JUnitTest extends TestSuite
         protected String getProjectName() {return null;}
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
-        public String getAssociatedModuleDirectory() { return null; }
+        public List<String> getAssociatedModules() { return null; }
 
         @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
     }

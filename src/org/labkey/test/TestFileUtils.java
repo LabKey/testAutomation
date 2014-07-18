@@ -78,6 +78,11 @@ public abstract class TestFileUtils
         return _labkeyRootCache;
     }
 
+    public static File getDefaultDeployDir()
+    {
+        return new File(getLabKeyRoot(), "build/deploy");
+    }
+
     public static File getDefaultFileRoot(String containerPath)
     {
         return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");

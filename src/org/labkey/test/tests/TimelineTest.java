@@ -27,6 +27,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Wiki.class})
@@ -96,9 +98,9 @@ public class TimelineTest extends BaseWebDriverTest
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/timeline";
+        return Arrays.asList("timeline");
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.labkey.test.util.RReportHelper;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -86,9 +87,9 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     protected String conjugate = "PE ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
 
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/luminex";
+        return Arrays.asList("luminex");
     }
 
     public void setUseXarImport(boolean useXarImport)

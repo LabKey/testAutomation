@@ -24,6 +24,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.ms2.MS2TestBase;
 
+import java.util.Arrays;
+
 @Category({DailyB.class, MS2.class})
 public class LibraTest extends MS2TestBase
 {
@@ -237,8 +239,8 @@ public class LibraTest extends MS2TestBase
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/ms2";
+        return Arrays.asList("ms2");
     }
 }

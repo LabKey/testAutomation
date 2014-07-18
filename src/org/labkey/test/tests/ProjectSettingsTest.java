@@ -23,6 +23,8 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({DailyB.class})
@@ -119,9 +121,9 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/core";
+        return Arrays.asList("core");
     }
 
     @Override

@@ -23,6 +23,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
+import java.util.Arrays;
+
 @Category({DailyA.class})
 public class SchemaBrowserTest extends BaseWebDriverTest
 {
@@ -34,9 +36,9 @@ public class SchemaBrowserTest extends BaseWebDriverTest
     public static final String PUBLISHERS_LIST = "Publishers" + TRICKY_CHARACTERS_NO_QUOTES;
     public static final String BOOKS_LIST = "Books" + TRICKY_CHARACTERS_NO_QUOTES;
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/query";
+        return Arrays.asList("query");
     }
 
     @Override

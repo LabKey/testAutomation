@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 public class JUnitFooter extends BaseWebDriverTest
 {
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

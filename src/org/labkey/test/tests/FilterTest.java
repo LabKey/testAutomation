@@ -711,8 +711,8 @@ public class FilterTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "list";
+        return Arrays.asList("list");
     }
 }

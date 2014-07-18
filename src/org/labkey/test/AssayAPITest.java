@@ -23,6 +23,7 @@ import org.labkey.test.util.APIAssayHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Category({DailyA.class})
@@ -75,8 +76,8 @@ public class AssayAPITest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/assay";
+        return Arrays.asList("assay");
     }
 }

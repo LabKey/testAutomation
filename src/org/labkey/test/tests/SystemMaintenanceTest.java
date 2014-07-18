@@ -23,7 +23,7 @@ import org.labkey.test.TestTimeoutException;
 public class SystemMaintenanceTest extends BaseWebDriverTest
 {
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

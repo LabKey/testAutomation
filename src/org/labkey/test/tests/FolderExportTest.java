@@ -29,6 +29,7 @@ import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -274,9 +275,9 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/core";
+        return Arrays.asList("core");
     }
 
     @Override

@@ -145,7 +145,7 @@ public class RlabkeyTest extends SimpleApiTest
         deleteProject(PROJECT_NAME_2, afterTest);
     }
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

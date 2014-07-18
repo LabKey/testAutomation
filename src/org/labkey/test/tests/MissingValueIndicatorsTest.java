@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
@@ -509,9 +510,9 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/experiment";
+        return Arrays.asList("experiment");
     }
 
     @Override

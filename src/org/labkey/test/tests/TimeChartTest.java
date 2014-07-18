@@ -23,6 +23,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -52,9 +53,9 @@ public abstract class TimeChartTest extends ReportTest
 
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     public TimeChartTest()

@@ -27,6 +27,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -509,9 +510,9 @@ public class MS1Test extends BaseWebDriverTest
         }
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/ms1";
+        return Arrays.asList("ms1");
     }
 
     @Override

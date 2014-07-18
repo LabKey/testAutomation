@@ -32,5 +32,5 @@ public interface WebTest
     long beginAt(String url);
     URL getURL() throws MalformedURLException;
     String[] getLinkAddresses();
-    String getAssociatedModuleDirectory();
+    java.util.List<String> getAssociatedModules();
 }

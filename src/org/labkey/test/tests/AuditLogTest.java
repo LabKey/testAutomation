@@ -26,6 +26,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
@@ -45,9 +47,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static final String COMMENT_COLUMN = "Comment";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/audit";
+        return Arrays.asList("audit");
     }
 
     public enum Visibility

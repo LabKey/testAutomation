@@ -29,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.*;
@@ -43,9 +44,9 @@ public class ExpTest extends BaseWebDriverTest
     private static final String RUN_NAME_IMAGEMAP = "Example 5 Run (XTandem peptide search)";
     private static final String DATA_OBJECT_TITLE = "Data: CAexample_mini.mzXML";
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/experiment";
+        return Arrays.asList("experiment");
     }
 
     @Override

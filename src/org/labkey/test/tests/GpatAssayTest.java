@@ -24,6 +24,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
 
+import java.util.Arrays;
+
 @Category({DailyB.class})
 public class GpatAssayTest extends BaseWebDriverTest
 {
@@ -44,9 +46,9 @@ public class GpatAssayTest extends BaseWebDriverTest
 
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/assay";
+        return Arrays.asList("assay");
     }
 
     @Override

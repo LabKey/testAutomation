@@ -28,6 +28,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -155,9 +156,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/study";
+        return Arrays.asList("study");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)

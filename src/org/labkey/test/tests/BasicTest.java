@@ -27,6 +27,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
 
+import java.util.Arrays;
+
 @Category({DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
 {
@@ -115,8 +117,8 @@ public class BasicTest extends BaseWebDriverTest
         }
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/core";
+        return Arrays.asList("core");
     }
 }

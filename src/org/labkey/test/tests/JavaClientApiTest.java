@@ -28,6 +28,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -304,9 +305,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/experiment";
+        return Arrays.asList("experiment");
     }
 
     @Override

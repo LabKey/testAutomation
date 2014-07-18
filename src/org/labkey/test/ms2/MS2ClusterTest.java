@@ -68,9 +68,9 @@ public class MS2ClusterTest extends PipelineWebTestBase
     }
 
     // Return the directory of the module whose functionality this class tests, or "none" if multiple/all modules are tested
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/ms2";
+        return Arrays.asList("ms2");
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

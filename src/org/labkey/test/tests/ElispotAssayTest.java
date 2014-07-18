@@ -52,9 +52,9 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
-        return "server/modules/nab";
+        return Arrays.asList("nab");
     }
 
     @Override

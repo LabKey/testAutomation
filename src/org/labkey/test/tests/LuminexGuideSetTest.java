@@ -72,7 +72,7 @@ public class LuminexGuideSetTest  extends LuminexTest
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
+        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getAssociatedModules() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
         _listHelper.addField(TEST_ASSAY_LUM + " Batch Fields", 9, "CustomProtocol", "Protocol", ListHelper.ListColumnType.String);
         // save changes to assay design
         clickButton("Save & Close");

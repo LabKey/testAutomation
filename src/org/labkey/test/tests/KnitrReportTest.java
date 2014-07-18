@@ -338,7 +338,7 @@ public class KnitrReportTest extends ReportTest
     }
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

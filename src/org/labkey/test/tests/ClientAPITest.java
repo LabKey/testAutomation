@@ -127,7 +127,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
     }
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

@@ -23,7 +23,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
 public class JUnitHeader extends BaseWebDriverTest
 {
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

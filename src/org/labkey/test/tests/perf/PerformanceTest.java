@@ -27,7 +27,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
     long elapsedTime = -1;
 
     @Override
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
         return null;
     }

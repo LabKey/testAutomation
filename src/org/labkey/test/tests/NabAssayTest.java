@@ -31,6 +31,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -181,9 +182,9 @@ public class NabAssayTest extends AbstractQCAssayTest
     }
     // End TODO
 
-    public String getAssociatedModuleDirectory()
+    public java.util.List<String> getAssociatedModules()
     {
-        return "server/modules/nab";
+        return Arrays.asList("nab");
     }
 
     @Override
