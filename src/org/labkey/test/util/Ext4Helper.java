@@ -576,7 +576,7 @@ public class Ext4Helper extends AbstractHelper
         {
             Locator parentLocator = ext4MenuItem(subMenuLabels[i]).notHidden();
             _test.waitForElement(parentLocator, 1000);
-            _test.mouseOver(parentLocator);
+            _test.clickAt(parentLocator, 5, 5, 0);
         }
         Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden();
         if (onlyOpen)

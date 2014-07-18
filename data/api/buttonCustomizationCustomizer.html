@@ -1,0 +1,39 @@
+<div id="queryTestDiv1"></div>
+<script type="text/javascript">
+    LABKEY.requiresExt3ClientAPI(true, function() {
+        var qwp1 = new LABKEY.QueryWebPart({
+            renderTo: 'queryTestDiv1',
+            title: 'My Query Web Part',
+            schemaName: 'lists',
+            queryName: 'Cities',
+            buttonBar: {
+                includeStandardButtons: true,
+                items: [
+                    {text: 'JavaScript Link Button', url: LABKEY.ActionURL.buildURL('announcements', 'begin')},
+                    {text: 'JavaScript OnClick Button', onClick: "alert('JavaScript OnClick Alert'); return false;"},
+                    {text: 'JavaScript Handler Button', handler: onTestHandler},
+                    {text: 'JavaScript Menu Button', items: [
+                        '-', // separator
+                        {text: 'JavaScript Menu1', handler: onItem1Handler},
+                        {text: 'JavaScript Menu2', items: [
+                            {text: 'JavaScript Fly Out', handler: onItem2Handler}
+                        ]}
+                    ]}
+                ]
+            }
+        });
+
+        function onTestHandler(dataRegion) {
+            alert('JavaScript Handler Alert 1');
+            return false;
+        }
+
+        function onItem1Handler(dataRegion) {
+            alert('JavaScript Handler Alert 2');
+        }
+
+        function onItem2Handler(dataRegion) {
+            alert('JavaScript Handler Alert 3');
+        }
+    });
+</script>

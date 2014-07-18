@@ -24,6 +24,8 @@ chromeextensions/jsErrorChecker/manifest.json -text
 data/api/EmbeddedQueryWebPart.html -text
 data/api/LuminexGuideSet.html -text
 data/api/assayTest.js -text
+data/api/buttonCustomizationCustomizer.html -text
+data/api/buttonCustomizationEcho.html -text
 data/api/chartTest.js -text
 data/api/domainTest.js -text
 data/api/extIntegrationTest.html -text
