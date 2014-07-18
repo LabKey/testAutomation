@@ -113,7 +113,7 @@ public class SurveyTest extends BaseWebDriverTest
         log("Create new survey design");
         if (folder != null && !isElementPresent(Locator.id("folderBar").withText(folder)))
             clickFolder(folder);
-        if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab-active')]/a").withText(tabName)))
+        if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'tab-nav-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
         clickButton("Create Survey Design");

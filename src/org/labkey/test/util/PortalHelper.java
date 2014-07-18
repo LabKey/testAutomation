@@ -57,24 +57,28 @@ public class PortalHelper extends AbstractHelper
             throw new IllegalArgumentException("Can't move folder tabs vertically.");
 
         String tabId = tabText.replace(" ", "") + "Tab";
-        int tabCount = _test.getElementCount(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]"));
-        int startIndex = _test.getElementIndex(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')][./a[@id="+Locator.xq(tabId)+"]]"));
-        clickTabMenuItem(tabText, false, "Move", direction.toString());
+        Locator.XPathLocator tabList = Locator.xpath("//ul[contains(@class, 'tab-nav')]//li");
+        Locator.XPathLocator tabLink = Locator.xpath("//a[@id=" + Locator.xq(tabId) + "]");
+
+        int tabCount = _test.getElementCount(tabList) - 1;
+        int startIndex = _test.getElementIndex(tabList.withDescendant(tabLink)); // zero-based
         int expectedEndIndex = startIndex;
 
-            switch (direction)
-            {
-                case LEFT:
-                    if (startIndex > 0)
+        clickTabMenuItem(tabText, false, "Move", direction.toString());
+
+        switch (direction)
+        {
+            case LEFT:
+                if (startIndex > 0)
                     expectedEndIndex = startIndex - 1;
-                    break;
-                case RIGHT:
-                    if (startIndex < (tabCount - 2))
+                break;
+            case RIGHT:
+                if (startIndex < (tabCount - 2)) // offset by 2 due to the '+' and the 'pencil' tabs
                     expectedEndIndex = startIndex + 1;
-                    break;
+                break;
         }
 
-        _test.waitForElement(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]["+(expectedEndIndex+1)+"][./a[@id="+Locator.xq(tabId)+"]]"));
+        _test.waitForElement(tabList.index(expectedEndIndex).withDescendant(tabLink));
     }
 
     @LogMethod(quiet = true)
