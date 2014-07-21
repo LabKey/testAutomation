@@ -22,8 +22,19 @@
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
+<%@ page import="java.util.LinkedHashSet" %>
+<%@ page import="org.labkey.api.view.template.ClientDependency" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
+<%!
+
+    public LinkedHashSet<ClientDependency> getClientDependencies()
+    {
+        LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
+        resources.add(ClientDependency.fromFilePath("Ext4"));
+        return resources;
+    }
+%>
 <%
     JspView<MailPage> me = (JspView<MailPage>) HttpView.currentView();
     MailPage pageInfo = me.getModelBean();
@@ -37,7 +48,7 @@
 <script type="text/javascript">
 function toggleBody(id)
 {
-    var el = Ext.get(id);
+    var el = Ext4.get(id);
     if (el)
         el.setDisplayed(el.isDisplayed() ? "none" : "");
 }
@@ -48,7 +59,7 @@ function toggleRecorder(checkbox)
 
     var showError = function(show, message)
     {
-        var el = Ext.get("emailRecordError");
+        var el = Ext4.get("emailRecordError");
         if (el)
         {
             if (message)
@@ -72,7 +83,7 @@ function toggleRecorder(checkbox)
         var json;
         var contentType = response.getResponseHeader('Content-Type');
         if (contentType && contentType.indexOf('application/json') >= 0)
-            json = Ext.util.JSON.decode(response.responseText);
+            json = Ext4.decode(response.responseText);
         if (json && json.error)
             onUpdateFailure(response, json.error);
         else
@@ -85,12 +96,12 @@ function toggleRecorder(checkbox)
                 var len = t.rows.length;
                 for (var i = len - 2; i > 0; i--)
                     t.deleteRow(i);
-                Ext.get("emailRecordEmpty").setDisplayed("");
+                Ext4.get("emailRecordEmpty").setDisplayed("");
             }
         }
     };
 
-    Ext.Ajax.request({
+    Ext4.Ajax.request({
         url : LABKEY.ActionURL.buildURL('dumbster', 'setRecordEmail') + '?record=' + checked,
         method : 'GET',
         success: onUpdateSuccess,
