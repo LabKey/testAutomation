@@ -332,6 +332,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
+                    options.addArguments("disable-xss-auditor");
 
                     if (isScriptCheckEnabled())
                     {
