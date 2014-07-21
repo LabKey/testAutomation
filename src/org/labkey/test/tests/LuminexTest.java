@@ -92,6 +92,11 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         return Arrays.asList("luminex");
     }
 
+    public String getModuleDirectory()
+    {
+        return "server/modules/luminex";
+    }
+
     public void setUseXarImport(boolean useXarImport)
     {
         _useXarImport = useXarImport;
