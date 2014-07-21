@@ -202,11 +202,11 @@
 
     function updateLog(newHtml, newLine){
         logHtml += (newLine ? "<br/>" : "") + newHtml;
-        Ext.get('log-info').update(logHtml);
+        Ext4.get('log-info').update(logHtml);
     }
 
     function init(){
-        var btn = new Ext.Button({
+        var btn = Ext4.create('Ext.Button', {
             id: 'test-button',
             renderTo: 'start-test',
             text: 'Start Test',
@@ -217,6 +217,8 @@
         });
     }
 
-    Ext.onReady(init);
+    LABKEY.requiresExt4Sandbox(true, function() {
+        Ext4.onReady(init);
+    });
 
 </script>
