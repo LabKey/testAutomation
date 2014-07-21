@@ -126,7 +126,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
     public void addTransformScript(File transformScript, int index)
     {
-        assertTrue("unable to locate the Transform script", transformScript.exists());
+        assertTrue("unable to locate the Transform script: " + transformScript, transformScript.exists());
 
         waitForElement(Locator.lkButton("Add Script"));
         clickButton("Add Script", 0);
