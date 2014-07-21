@@ -27,6 +27,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.io.File;
 import java.util.Arrays;
 
 @Category({BVT.class, Wiki.class})
@@ -146,14 +147,14 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
         setFormElement(Locator.name("title"), "buttonTest");
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getApiScriptFolder() + "/" + CUSTOMIZER_FILE));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), CUSTOMIZER_FILE)));
         clickButton("Save & Close");
 
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "paramEcho");
         setFormElement(Locator.name("title"), "Parameter Echo");
-        wikiHelper.setWikiBody(TestFileUtils.getFileContents(TestFileUtils.getApiScriptFolder() + "/" + PARAM_ECHO_CONTENT_FILE));
+        wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), PARAM_ECHO_CONTENT_FILE)));
         clickButton("Save & Close");
 
         waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));
