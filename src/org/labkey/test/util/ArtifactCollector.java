@@ -64,7 +64,7 @@ public class ArtifactCollector
         {
             currentTestClassName = BaseWebDriverTest.getCurrentTestClass().getSimpleName();
         }
-        catch (NullPointerException | ClassNotFoundException e)
+        catch (NullPointerException e)
         {
             currentTestClassName = "UnknownTest";
         }

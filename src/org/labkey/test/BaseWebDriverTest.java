@@ -54,6 +54,7 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -361,7 +362,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 if (_driver == null)
                 {
                     final FirefoxProfile profile = new FirefoxProfile();
-                    profile.setPreference("webdriver.load.strategy", "unstable");
                     profile.setPreference("app.update.auto", false);
                     profile.setPreference("extensions.update.autoUpdate", false);
                     profile.setPreference("extensions.update.enabled", false);
@@ -386,7 +386,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                                     "text/x-script.perl," +
                                     "text/tab-separated-values," +
                                     "text/csv");
-                    profile.setPreference("browser.download.manager.showWhenStarting",false);
                     if (isScriptCheckEnabled())
                     {
                         try
@@ -1668,16 +1667,31 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static final String BEFORE_CLASS = "BeforeClass";
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
+    private static Class testClass;
 
     @ClassRule
     public static TestWatcher testClassWatcher = new TestWatcher()
     {
-        private String name;
-
         @Override
         public void starting(Description description)
         {
-            name = description.getClassName();
+            testClass = description.getTestClass();
+
+            beforeClassSucceeded = false;
+            _anyTestCaseFailed = false;
+            _startTime = System.currentTimeMillis();
+
+            ArtifactCollector.forgetArtifactDirs();
+            killHungDriverOnTeamCity();
+
+            try
+            {
+                currentTest = (BaseWebDriverTest)testClass.newInstance();
+            }
+            catch (InstantiationException | IllegalAccessException e)
+            {
+                throw new RuntimeException(e);
+            }
 
             super.starting(description);
         }
@@ -1706,32 +1720,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             super.finished(description);
         }
-
-        @Override
-        public String toString()
-        {
-            return name;
-        }
     };
 
-    public static Class getCurrentTestClass() throws ClassNotFoundException
+    public static Class getCurrentTestClass()
     {
-        return Class.forName(testClassWatcher.toString());
+        return testClass;
     }
 
     @LogMethod @BeforeClass
     public static void performInitialChecks() throws Throwable
     {
-        beforeClassSucceeded = false;
-        _anyTestCaseFailed = false;
-        _startTime = System.currentTimeMillis();
-
-        ArtifactCollector.forgetArtifactDirs();
-        killHungDriverOnTeamCity();
-
-        Class testClass = getCurrentTestClass();
-        currentTest = (BaseWebDriverTest)testClass.newInstance();
-
         currentTest.setUp();
         currentTest.preamble();
     }
@@ -1761,8 +1759,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Before
     public final void preClean() throws Exception
     {
-        beforeClassSucceeded = true;
-
         setUp(); // Instantiate new WebDriver if needed
         _testFailed = false;
         simpleSignIn();
@@ -1774,6 +1770,21 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Rule
     public TestWatcher _watcher = new TestWatcher()
     {
+        @Override
+        public Statement apply(Statement base, Description description)
+        {
+            // We know that @BeforeClass methods are done now that we are in a non-static context
+            beforeClassSucceeded = true;
+
+            return super.apply(base, description);
+        }
+
+        @Override
+        protected void starting(Description description)
+        {
+            super.starting(description);
+        }
+
         @Override @LogMethod
         protected void failed(Throwable e, Description description)
         {
