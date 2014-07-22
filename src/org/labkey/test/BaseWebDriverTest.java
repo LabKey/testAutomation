@@ -3506,34 +3506,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Export to Text");
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionExportHelper}
-     * Use UI to export data region
-     * note that Selenium/Firefox currently can't handle the dialogue that will pop up if you choose anything but script
-     * @param tab   Excel, Text, or Script
-     * @param type the specific radiobutton to choose
-     */
-    @Deprecated
-    protected void exportDataRegion(String tab, String type)
-    {
-        clickButton("Export", 0);
-        waitForText("Script");
-        sleep(1500);
-        _extHelper.clickSideTab(tab);
-        if(type!=null)
-        {
-            click(Locator.xpath("//tr[td[contains(text()," +  Locator.xq(type) + ")]]/td/input"));
-        }
-        if(tab.equals("Script"))
-        {
-            clickButtonContainingText("Create Script", 0);
-        }
-        else
-        {
-            clickButtonContainingText("Export to " + tab, 0);
-        }
-    }
-
     protected void exportFolderAsZip()
     {
         goToFolderManagement();
@@ -3635,6 +3607,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             log("File downloaded: " + newFile.getName());
         }
+
+        if (BROWSER_TYPE == BrowserType.FIREFOX)
+            Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
 
         return newFiles;
     }

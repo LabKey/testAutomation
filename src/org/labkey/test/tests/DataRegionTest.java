@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
@@ -123,7 +124,9 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private void exportLoggingTest()
     {
-        exportDataRegion("Text", null);
+        DataRegionTable list = new DataRegionTable("query", this);
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(list);
+        exportHelper.exportText();
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
