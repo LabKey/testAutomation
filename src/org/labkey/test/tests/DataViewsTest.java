@@ -221,7 +221,7 @@ public class DataViewsTest extends ParticipantListTest
             log("Verify dataset view has the watermark class");
             click(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
 
-            waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
             clickAndWait(Locator.linkContainingText("Data & Reports"));
         }
     }
