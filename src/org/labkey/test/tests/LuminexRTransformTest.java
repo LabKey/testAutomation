@@ -217,9 +217,9 @@ public class LuminexRTransformTest extends LuminexTest
         // set LotNumber for the first analyte
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
         // set negative control and negative bead values
-        setFormElement(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), "Blank (3)");
-        setFormElement(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), "Blank (3)");
         checkCheckbox(Locator.name("_analyte_" + ANALYTE3 + "_NegativeControl"));
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), "Blank (3)");
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), "Blank (3)");
         clickButton("Save and Finish");
     }
 

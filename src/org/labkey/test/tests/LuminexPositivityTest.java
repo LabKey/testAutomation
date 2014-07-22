@@ -228,26 +228,29 @@ public class LuminexPositivityTest extends LuminexTest
     @Override
     protected void setAnalytePropertyValues()
     {
+        // special case for analyte that should always be considered negative control
+        if (_negControlAnalyte != null)
+        {
+            Locator negControlLoc = Locator.name("_analyte_" + _negControlAnalyte + "_NegativeControl");
+            waitForElement(negControlLoc);
+            checkCheckbox(negControlLoc);
+        }
+
         for (String analyteName : _analyteNames)
         {
             Locator l = verifyAnalytePosThresholdValue(analyteName, _expectedThresholdValue);
             setFormElement(l, Integer.toString(_newThresholdValue));
 
-            String inputName = "_analyte_" + analyteName + "_NegativeControl";
-            Locator negControlLoc = Locator.xpath("//input[@type='checkbox' and @name='" + inputName + "'][1]");
+            Locator negControlLoc = Locator.name("_analyte_" + analyteName + "_NegativeControl");
             waitForElement(negControlLoc);
             if (!_expectedNegativeControlValue && _newNegativeControlValue)
                 checkCheckbox(negControlLoc);
             else if (_expectedNegativeControlValue && !_newNegativeControlValue)
                 uncheckCheckbox(negControlLoc);
 
-            setFormElement(Locator.name("_analyte_" + analyteName + "_NegativeBead"), _newNegativeControlValue ? "" : "Blank (3)");
-
-            // special case for analyte that should always be considered negative control
-            if (analyteName.equals(_negControlAnalyte))
+            if (!_newNegativeControlValue && !analyteName.equals(_negControlAnalyte) && _negControlAnalyte != null)
             {
-                checkCheckbox(negControlLoc);
-                setFormElement(Locator.name("_analyte_" + analyteName + "_NegativeBead"), "");
+                selectOptionByText(Locator.name("_analyte_" + analyteName + "_NegativeBead"), _negControlAnalyte);
             }
         }
 
