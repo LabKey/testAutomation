@@ -329,14 +329,14 @@ public class UserTest extends SecurityTest
         WebElement errors = Locator.css(".labkey-error").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         String errorText = errors.getText();
 
-        assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for field Display Name, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'First Name'", errorText.contains(String.format("Value is too long for field First Name, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for field Last Name, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for field Phone, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for field Mobile, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for field Pager, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for field IM, a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for field Description, a maximum length of %d is allowed.", maxDescriptionLength)));
+        assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for column 'Display Name', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'First Name'", errorText.contains(String.format("Value is too long for column 'First Name', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for column 'Last Name', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for column 'Phone', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for column 'Mobile', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for column 'Pager', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for column 'IM', a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for column 'Description', a maximum length of %d is allowed.", maxDescriptionLength)));
 
         clickButton("Cancel");
 
