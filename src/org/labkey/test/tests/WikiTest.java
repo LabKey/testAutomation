@@ -189,6 +189,7 @@ public class WikiTest extends BaseWebDriverTest
         waitForElement(inlineEditor);
         setInlineEditorContent(editorId, addedContent);
         clickButton("Cancel", 0);
+        assertAlert("Cancelling will lose all unsaved changes. Are you sure?");
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
         assertTextNotPresent("SHOULD NOT BE SAVED");
