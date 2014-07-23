@@ -124,7 +124,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private void exportLoggingTest()
     {
-        DataRegionTable list = new DataRegionTable("query", this);
+        DataRegionTable list = new DataRegionTable(INJECT_CHARS_2, this);
         DataRegionExportHelper exportHelper = new DataRegionExportHelper(list);
         exportHelper.exportText();
         goToAuditLog();
