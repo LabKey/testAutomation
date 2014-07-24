@@ -186,13 +186,14 @@ public class WikiTest extends BaseWebDriverTest
 
         log("** test cancel on inline wiki webpart editor");
         click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
+        String unsavedContent = "SHOULD NOT BE SAVED";
         waitForElement(inlineEditor);
-        setInlineEditorContent(editorId, addedContent);
+        setInlineEditorContent(editorId, unsavedContent);
         clickButton("Cancel", 0);
         assertAlert("Cancelling will lose all unsaved changes. Are you sure?");
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
-        assertTextNotPresent("SHOULD NOT BE SAVED");
+        assertTextNotPresent(unsavedContent);
 
         // check that the content was actually saved in the previous steps
         log("** check inline wiki webpart edit is persisted");
