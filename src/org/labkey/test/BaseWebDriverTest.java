@@ -3743,6 +3743,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         locator.waitForElementToDisappear(getDriver(), wait);
     }
 
+    public void waitForElementToDisappearWithRefresh(Locator loc, int wait)
+    {
+        long startTime = System.currentTimeMillis();
+
+        do
+        {
+            if(!isElementPresent(loc))
+                return;
+            refresh();
+        }while(System.currentTimeMillis() - startTime < wait);
+
+        waitForElementToDisappear(loc, 1000);
+    }
+
     public void waitForTextToDisappear(final String text)
     {
         waitForTextToDisappear(text, WAIT_FOR_JAVASCRIPT);
