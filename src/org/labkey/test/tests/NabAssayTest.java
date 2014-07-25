@@ -638,6 +638,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent("ptid 3");
         assertTextPresent("ptid 4");
         assertTextPresent("ptid 5");
+/*
         assertTextPresent("Virus ID");
         if (hasCustomView)
         {
@@ -649,6 +650,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent("Virus Name");
             assertTextPresent("Nasty Virus");
         }
+*/
     }
 
     private void assertAUCColumnsHidden()
@@ -836,7 +838,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("ptid + visit + date"));
         clickAndWait(Locator.linkWithText("run details"));
 
-        assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 B, Vst 1.0");
+        //assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 B, Vst 1.0");
         assertTextPresent("&lt; 20", 10);
 
         String nabData = getText(Locator.id("bodypanel"));
