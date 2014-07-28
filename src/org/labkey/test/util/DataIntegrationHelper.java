@@ -117,6 +117,13 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get("Status").toString();
     }
 
+    public String getTransformState(String transformId) throws Exception
+    {
+        // TODO: Proper handling of null transformId
+        String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        return response.getRows().get(0).get("TransformState").toString();
+    }
     private ResetTransformStateResponse resetTransformState(String transformId)
     {
         Connection cn = new Connection(_baseUrl, _username, _password);

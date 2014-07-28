@@ -152,6 +152,7 @@ modules/simpletest/resources/etls/SimpleETLCausesKeyConstraintViolation.xml -tex
 modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/TaskrefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
@@ -314,6 +315,12 @@ src/org/labkey/test/categories/Wiki.java -text
 src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
+src/org/labkey/test/etl/ETLBaseTest.java -text
+src/org/labkey/test/etl/ETLErrorTest.java -text
+src/org/labkey/test/etl/ETLStoredProcedureTest.java -text
+src/org/labkey/test/etl/ETLTaskrefTaskTest.java -text
+src/org/labkey/test/etl/ETLTest.java -text
+src/org/labkey/test/etl/RemoteETLCommandTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
@@ -391,10 +398,6 @@ src/org/labkey/test/tests/DatasetExportTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
 src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
-src/org/labkey/test/tests/ETLBaseTest.java -text
-src/org/labkey/test/tests/ETLErrorTest.java -text
-src/org/labkey/test/tests/ETLStoredProcedureTest.java -text
-src/org/labkey/test/tests/ETLTest.java -text
 src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
@@ -477,7 +480,6 @@ src/org/labkey/test/tests/QueryExportTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
-src/org/labkey/test/tests/RemoteETLCommandTest.java -text
 src/org/labkey/test/tests/ReportAndDatasetNotificationTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text

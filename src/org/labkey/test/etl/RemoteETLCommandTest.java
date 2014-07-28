@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.etl;
 
 import org.json.simple.JSONObject;
 import org.junit.Test;
@@ -29,11 +29,13 @@ import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.etl.ETLTest;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
 public class RemoteETLCommandTest extends ETLTest

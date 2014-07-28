@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests;
+package org.labkey.test.etl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.tests.SimpleModuleTest;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -45,7 +46,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     protected static String PROJECT_NAME = "ETLTestProject";
     protected static int _jobsComplete;
     protected static int _expectedErrors;
-    protected DataIntegrationHelper _diHelper = new DataIntegrationHelper("/" + PROJECT_NAME);
+    protected DataIntegrationHelper _diHelper = new DataIntegrationHelper("/" + getProjectName());
 
 
     //Internal counters
@@ -375,7 +376,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
 
     protected RunTransformResponse runETL_API(String transformId) throws Exception
     {
-        return runETL_API(PROJECT_NAME, transformId);
+        return runETL_API(getProjectName(), transformId);
     }
 
     protected void deleteSourceRow(String... ids)
