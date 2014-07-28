@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.ResetTransformStateCommand;
 import org.labkey.remoteapi.di.ResetTransformStateResponse;
@@ -26,12 +27,15 @@ import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
 
 public class DataIntegrationHelper
 {
@@ -97,6 +101,7 @@ public class DataIntegrationHelper
                 else
                     sleep(500);
             }while(System.currentTimeMillis() - startTime < msTimeout);
+            throw new TestTimeoutException("Timeout for ETL job to complete. Exceeded " + msTimeout + "ms");
         }
         return response;
     }
@@ -193,5 +198,12 @@ public class DataIntegrationHelper
             TestLogger.log("Retrieving job log file failed: " + e.getMessage());
             return null;
         }
+    }
+
+    public void assertInEtlLogFile(String jobId, String logString) throws Exception
+    {
+
+        final String etlLogFile = getEtlLogFile(jobId);
+        assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
     }
 }

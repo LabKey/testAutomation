@@ -463,9 +463,8 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
 
     protected void assertInEtlLogFile(String jobId, String logString) throws Exception
     {
-
-        final String etlLogFile = _diHelper.getEtlLogFile(jobId);
-        assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
+        // Promoted the guts of this method to DataIntegrationHelper
+        _diHelper.assertInEtlLogFile(jobId, logString);
     }
 
     protected void checkRun()

@@ -45,7 +45,7 @@ public class ETLTaskrefTaskTest extends ETLBaseTest
         assertInEtlLogFile(rtr.getJobId(), LOG_MESSAGE);
 
         // "setting1" in the xml has a value of "anything". TaskrefTestTask sets it to "test" to be persisted in TransformState
-        assertTrue(_diHelper.getTransformState(ETL).contains("\"setting1\":\"test\""));
+        assertTrue("Setting1 was not presisted with a value of 'test'.", _diHelper.getTransformState(ETL).contains("\"setting1\":\"test\""));
     }
 
     private void runInitialSetup()
