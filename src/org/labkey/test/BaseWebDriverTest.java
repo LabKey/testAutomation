@@ -1904,6 +1904,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod @AfterClass
     public static void performFinalChecks() throws Throwable
     {
+        Ext4Helper.resetCssPrefix();
         if (beforeClassSucceeded)
             currentTest.postamble();
     }
