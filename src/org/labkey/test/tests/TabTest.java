@@ -168,7 +168,7 @@ public class TabTest extends SimpleModuleTest
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
         _extHelper.waitForExtDialog("Change Folder Type");
-        click(Locator.extButton("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("The Wiki web part displays a single wiki page.");
         // TODO: assert that study tabs are gone
         // change type back to study
@@ -179,7 +179,7 @@ public class TabTest extends SimpleModuleTest
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Study"));
         clickButton("Update Folder", 0);
         _extHelper.waitForExtDialog("Change Folder Type");
-        click(Locator.extButton("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("Study tracks data in");
         // change to collaboration again
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
@@ -189,7 +189,7 @@ public class TabTest extends SimpleModuleTest
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
         _extHelper.waitForExtDialog("Change Folder Type");
-        click(Locator.extButton("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("The Wiki web part displays a single wiki page.");
         // revert type
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
@@ -211,7 +211,7 @@ public class TabTest extends SimpleModuleTest
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
         _extHelper.waitForExtDialog("Change Folder Type");
-        click(Locator.extButton("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("The Wiki web part displays a single wiki page.");
         clickTab("Tab 1");
         goToFolderManagement();
