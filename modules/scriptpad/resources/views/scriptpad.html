@@ -105,8 +105,6 @@
         return htmlOut;
     }
 
-    LABKEY.requiresExt4Sandbox();
-
     // Mask for the plot
     var maskGraph = new Ext4.LoadMask('divForm', {
         msg: "Generating the graphics, please, wait..."
@@ -215,115 +213,117 @@
         renderFinal(htmlOut);
     };
 
-    Ext4.onReady(function(){
-        //
-        // setup to execute the report as a script
-        //
-        var scriptParams = {
-            param1 : 'This is my parameter 1 value',
-            param2 : 42
-        };
+    LABKEY.requiresExt4Sandbox(true, function(){
+        Ext4.onReady(function(){
+            //
+            // setup to execute the report as a script
+            //
+            var scriptParams = {
+                param1 : 'This is my parameter 1 value',
+                param2 : 42
+            };
 
-        var scriptConfig = {
-            success: onSuccess,
-            failure: onFailure,
-            inputParams: scriptParams
-        };
+            var scriptConfig = {
+                success: onSuccess,
+                failure: onFailure,
+                inputParams: scriptParams
+            };
 
-        //
-        // setup to execute the report as a webpart
-        //
-        var webpartReportConfig = {
-            title: 'webpart result'
+            //
+            // setup to execute the report as a webpart
+            //
+            var webpartReportConfig = {
+                title: 'webpart result'
 
-        };
-        webpartReportConfig.param1 = scriptParams.param1;
-        webpartReportConfig.param2 = scriptParams.param2;
+            };
+            webpartReportConfig.param1 = scriptParams.param1;
+            webpartReportConfig.param2 = scriptParams.param2;
 
-        var webpartReport1 = new LABKEY.WebPart({
-            failure: onFailure,
-            success: onSuccess,
-            frame: 'none',
-            partConfig: webpartReportConfig,
-            partName: 'Report',
-            renderTo: 'divOutput1'
-        });
+            var webpartReport1 = new LABKEY.WebPart({
+                failure: onFailure,
+                success: onSuccess,
+                frame: 'none',
+                partConfig: webpartReportConfig,
+                partName: 'Report',
+                renderTo: 'divOutput1'
+            });
 
-        var webpartReport2 = new LABKEY.WebPart({
-            failure: onFailure,
-            success: onSuccess,
-            frame: 'none',
-            partConfig: webpartReportConfig,
-            partName: 'Report',
-            renderTo: 'divOutput2'
-        });
+            var webpartReport2 = new LABKEY.WebPart({
+                failure: onFailure,
+                success: onSuccess,
+                frame: 'none',
+                partConfig: webpartReportConfig,
+                partName: 'Report',
+                renderTo: 'divOutput2'
+            });
 
 
-        //
-        // setup our input form
-        //
-        var textField = Ext4.create('Ext.form.field.Text', {
-               name: "script",
-               fieldLabel: "script name",
-               allowBlank: false
-           });
+            //
+            // setup our input form
+            //
+            var textField = Ext4.create('Ext.form.field.Text', {
+                name: "script",
+                fieldLabel: "script name",
+                allowBlank: false
+            });
 
-        var sessionField = Ext4.create('Ext.form.field.Text', {
-            name: "session",
-            fieldLabel: "report session",
-            allowBlank: true
-        });
+            var sessionField = Ext4.create('Ext.form.field.Text', {
+                name: "session",
+                fieldLabel: "report session",
+                allowBlank: true
+            });
 
-        Ext4.create('Ext.form.Panel', {
-               renderTo: 'divForm',
-               //width: 800,
-               //layout: 'anchor',
-               title:  'Scriptpad',
-               defaults: {
-                 margin: '5 0 5 5'
-               },
-               items: [ textField, sessionField ],
-               buttons: [{
-                   text: 'Execute as Script',
-                   handler: function() {
-                       preparePage();
-                       scriptConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       scriptConfig.reportSessionId = sessionField.value;
-                       LABKEY.Report.execute(scriptConfig);
-                   }},
-                   {
-                   text: 'Execute as Webpart',
-                   handler: function() {
-                       preparePage();
-                       webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       webpartReportConfig.reportSessionId = sessionField.value;
-                       webpartReport1.render();
-//                       webpartReport2.render();
+            Ext4.create('Ext.form.Panel', {
+                renderTo: 'divForm',
+                //width: 800,
+                //layout: 'anchor',
+                title:  'Scriptpad',
+                defaults: {
+                    margin: '5 0 5 5'
+                },
+                items: [ textField, sessionField ],
+                buttons: [{
+                    text: 'Execute as Script',
+                    handler: function() {
+                        preparePage();
+                        scriptConfig.reportId = 'module:/scriptpad/' + textField.value;
+                        scriptConfig.reportSessionId = sessionField.value;
+                        LABKEY.Report.execute(scriptConfig);
                     }},
-                   {
-                   text: 'Create Report Session',
-                   handler: function() {
-                       var myContext = "xyzAAA1";
-                       maskCreateSession.show();
-                       LABKEY.Report.createSession({
-                           clientContext : myContext,
-                           success : onCreateSessionSuccess
-                      });
-                   }},
-                   {
-                   text: 'Delete Report Session',
-                   handler: function() {
-                       maskDeleteSession.show();
-                       LABKEY.Report.deleteSession({
-                           success : onDeleteSessionSuccess,
-                           reportSessionId : sessionField.value
-                       });
-                   }},
-                   {
-                   text: 'List Report Sessions',
-                   handler: getSessions
-                   }
-               ]
-           });
-    });
+                    {
+                        text: 'Execute as Webpart',
+                        handler: function() {
+                            preparePage();
+                            webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
+                            webpartReportConfig.reportSessionId = sessionField.value;
+                            webpartReport1.render();
+//                       webpartReport2.render();
+                        }},
+                    {
+                        text: 'Create Report Session',
+                        handler: function() {
+                            var myContext = "xyzAAA1";
+                            maskCreateSession.show();
+                            LABKEY.Report.createSession({
+                                clientContext : myContext,
+                                success : onCreateSessionSuccess
+                            });
+                        }},
+                    {
+                        text: 'Delete Report Session',
+                        handler: function() {
+                            maskDeleteSession.show();
+                            LABKEY.Report.deleteSession({
+                                success : onDeleteSessionSuccess,
+                                reportSessionId : sessionField.value
+                            });
+                        }},
+                    {
+                        text: 'List Report Sessions',
+                        handler: getSessions
+                    }
+                ]
+            });
+        });
+    }, this);
 </script>

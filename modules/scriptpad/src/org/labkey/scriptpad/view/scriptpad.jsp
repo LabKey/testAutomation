@@ -17,7 +17,17 @@
 %>
 <%@ page import="org.labkey.api.view.HttpView"%>
 <%@ page import="org.labkey.api.view.ViewContext"%>
+<%@ page import="java.util.LinkedHashSet" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
+<%!
+
+    public LinkedHashSet<ClientDependency> getClientDependencies()
+    {
+        LinkedHashSet<ClientDependency> resources = new LinkedHashSet<>();
+        resources.add(ClientDependency.fromFilePath("Ext4"));
+        return resources;
+    }
+%>
 <div id='divForm'>
 </div>
 <p></p>
@@ -85,8 +95,6 @@
         htmlOut += "</th></tr>";
         return htmlOut;
     }
-
-    LABKEY.requiresExt4Sandbox();
 
     // Mask for the plot
     var maskGraph = new Ext4.LoadMask('divForm', {
