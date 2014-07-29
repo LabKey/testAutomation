@@ -4813,6 +4813,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clearSort(regionName, columnName, defaultWaitForPage);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearSort(String)}
+     */
+    @Deprecated
     public void clearSort(String regionName, String columnName, int wait)
     {
         log("Clearing sort in " + regionName + " for " + columnName);
@@ -4881,6 +4885,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("OK", milliSeconds);
     }
 
+    /**
+     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
+     */
     public void setUpFilter(String regionName, String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable String filter2)
     {
         String log = "Setting filter in " + regionName + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
@@ -4908,12 +4915,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    /**
+     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
+     */
     public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
     {
         setUpFilter(regionName, columnName, filter1Type, filter1, filter2Type, filter2);
         clickButton("OK");
     }
 
+    /**
+     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
+     */
     public void setUpFacetedFilter(String regionName, String columnName, String... values)
     {
         String log;
@@ -4959,12 +4972,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    /**
+     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
+     */
     public void setFacetedFilter(String regionName, String columnName, String... values)
     {
         setUpFacetedFilter(regionName, columnName, values);
         clickButton("OK");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#openFilterDialog(String)}
+     */
+    @Deprecated
     public void openFilter(String regionName, String columnName)
     {
         Locator.XPathLocator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
@@ -4974,11 +4994,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearFilter(String)}
+     */
+    @Deprecated
     public void clearFilter(String regionName, String columnName)
     {
         clearFilter(regionName, columnName, WAIT_FOR_PAGE);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearFilter(String, int)}
+     */
+    @Deprecated
     public void clearFilter(String regionName, String columnName, int waitForPageLoad)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
@@ -4990,8 +5018,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * @param columnName only used to find something to click on, as all the filters on all the columns will be cleared
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearAllFilters(String)}
      */
+    @Deprecated
     public void clearAllFilters(String regionName, String columnName)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
