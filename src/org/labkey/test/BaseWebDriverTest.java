@@ -825,7 +825,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         // Sign in if browser isn't already signed in.  Otherwise, we'll be on the home page.
         if (isTitleEqual("Sign In"))
         {
-            assertTitleEquals("Sign In");
             waitForElement(Locator.id("email"), defaultWaitForPage);
             assertElementPresent(Locator.tagWithName("form", "login"));
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
@@ -1959,27 +1958,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod
     public void ensureSignedInAsAdmin()
     {
-        goToHome();
-
-        if(isElementPresent(Locator.tagWithText("span", "Stop Impersonating")))
-            stopImpersonatingRole();
-
-        if(isElementPresent(Locator.id("adminMenuPopupText")))
-            return;
-
-        Locator.IdLocator userMenuPopupLink = Locator.id("userMenuPopupLink");
-        if (isElementPresent(userMenuPopupLink))
-        {
-            click(userMenuPopupLink);
-
-            if(isElementPresent(Locator.tagWithText("span", "Stop Impersonating")))
-                stopImpersonatingRole();
-            else
-                signOut();
-        }
-
-        if(!isElementPresent(Locator.id("adminMenuPopupText")))
-            signIn();
+        signOut();
+        simpleSignIn();
     }
 
     // Standard cleanup: delete the project
