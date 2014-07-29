@@ -375,6 +375,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         addWebPart("Wiki");
         WikiHelper wh = new WikiHelper(this);
         wh.createWikiPage("17021", "17021 Regression", new File(TestFileUtils.getApiScriptFolder(), "filterTest.html"));
+        DataRegionTable regressionTable = new DataRegionTable("test17021", this); // wait for data region
         setUpFacetedFilter("test17021", "PrimaryType", "Blood (Whole)");
         assertElementNotPresent(Locator.linkWithText("Semen"));
         clickButton("CANCEL",0);
