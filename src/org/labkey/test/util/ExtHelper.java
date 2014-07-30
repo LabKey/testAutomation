@@ -467,16 +467,15 @@ public class ExtHelper extends AbstractHelper
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]"));
-        Locator.XPathLocator listItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
-        _test.executeScript("arguments[0].scrollIntoView(true);", listItem.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT));
-        _test.click(listItem);
-        _test.waitForElementToDisappear(Locator.xpath("//div[" + NOT_HIDDEN + "]/div/div[text()='" + selection + "']"), WAIT_FOR_JAVASCRIPT);
+        Locator.XPathLocator comboListItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
+        _test.waitAndClick(comboListItem);
+        _test.waitForElementToDisappear(comboListItem, WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//div[" + NOT_HIDDEN + " and ./label/span[text()='" + label + "']]/div/div"), selection);
+        selectComboBoxItem(Locators.formItemWithLabel(label).notHidden(), selection);
     }
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
@@ -619,6 +618,11 @@ public class ExtHelper extends AbstractHelper
         public static Locator.XPathLocator checkerForGridRowContainingText(String text)
         {
             return Locator.xpath("//tr").withPredicate(Locator.xpath("td/div/a").withText(text)).append("//div").withClass("x-grid3-row-checker");
+        }
+
+        public static Locator.XPathLocator formItemWithLabel(String label)
+        {
+            return Locator.tagWithClass("div", "x-form-item").withPredicate(Locator.xpath("./label").withText(label));
         }
     }
 }
