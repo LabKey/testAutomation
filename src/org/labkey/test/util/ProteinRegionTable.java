@@ -36,8 +36,8 @@ public class ProteinRegionTable extends DataRegionTable
         // Give this a little extra time, since we have timed out here.
         int wait = _test.getDefaultWaitForPage();
         _test.setDefaultWaitForPage(wait * 2);
-        _test.setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than or Equal To", Double.toString(_maxProbability));
-        _test.setSort("ProteinGroupsWithQuantitation", "GroupNumber", SortDirection.ASC);
+        setFilter("GroupProbability", "Is Greater Than or Equal To", Double.toString(_maxProbability));
+        setSort("GroupNumber", SortDirection.ASC);
         _test.setDefaultWaitForPage(wait);
     }
 
@@ -79,7 +79,7 @@ public class ProteinRegionTable extends DataRegionTable
         else
         {
             String group = getDataAsText(getProtRow(getProtCount() - 1), getColumn("Group"));
-            if (group.indexOf("-") != -1)
+            if (group.contains("-"))
             {
                 String[] parts = group.split("-");
                 _maxSubGroup = Integer.parseInt(parts[1]);
@@ -90,22 +90,18 @@ public class ProteinRegionTable extends DataRegionTable
             if (!_test.isTextPresent("Displaying only the first 1000 rows"))
             {
                 return false;
-/*                if (_maxSubGroup == 0)
-                    return false;
-
-                _maxSubGroup = 0; */
             }
         }
 
         if (_maxSubGroup == 0)
         {
-            _test.setFilter(_tableName, "GroupNumber", "Is Greater Than", Integer.toString(_maxGroup));
-            _test.setFilter(_tableName, "IndistinguishableCollectionId", "Is Not Blank");
+            setFilter("GroupNumber", "Is Greater Than", Integer.toString(_maxGroup));
+            setFilter("IndistinguishableCollectionId", "Is Not Blank", null);
         }
         else
         {
-            _test.setFilter(_tableName, "GroupNumber", "Is Equal To", Integer.toString(_maxGroup));
-            _test.setFilter(_tableName, "IndistinguishableCollectionId", "Is Greater Than",
+            setFilter("GroupNumber", "Is Equal To", Integer.toString(_maxGroup));
+            setFilter("IndistinguishableCollectionId", "Is Greater Than",
                     Integer.toString(_maxSubGroup));
         }
         _pages++;

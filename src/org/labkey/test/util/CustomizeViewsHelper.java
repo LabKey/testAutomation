@@ -31,23 +31,28 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class CustomizeViewsHelper extends AbstractHelper
+//TODO: Make separate class for working with a specific DataRegionTable - many methods don't actually care what DRT is specified
+public class CustomizeViewsHelper
 {
-    private final Locator.IdLocator _dataRegion;
-    private RReportHelper _reportHelper;
+    private final BaseWebDriverTest _test;
+    private final DataRegionTable _dataRegion;
+    private final Locator.IdLocator _dataRegionLoc;
+    private final RReportHelper _reportHelper;
 
     public CustomizeViewsHelper(BaseWebDriverTest test)
     {
-        super(test);
-        _dataRegion = Locator.id("");
+        _test = test;
+        _dataRegion = null;
+        _dataRegionLoc = Locator.id("");
         _reportHelper = new RReportHelper(test);
     }
 
-    public CustomizeViewsHelper(BaseWebDriverTest test, Locator.IdLocator dataRegion)
+    public CustomizeViewsHelper(DataRegionTable dataRegion)
     {
-        super(test);
+        _test = dataRegion._test;
         _dataRegion = dataRegion;
-        test.assertElementPresent(dataRegion); // Fail fast if no such dataregion
+        _dataRegionLoc = dataRegion.locator();
+        _reportHelper = new RReportHelper(_test);
     }
 
     public void openCustomizeViewPanel()
@@ -58,13 +63,13 @@ public class CustomizeViewsHelper extends AbstractHelper
             _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(_dataRegion));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegion.toCssLocator().append(".customizeViewPanel")));
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(".customizeViewPanel")));
     }
 
     public void closeCustomizeViewPanel()
     {
-        _test.click(_dataRegion.toCssLocator().append(".x-panel-header > .x-tool-close"));
-        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
+        _test.click(_dataRegionLoc.toCssLocator().append(".x-panel-header > .x-tool-close"));
+        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegionLoc.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
     }
 
     public void applyCustomView()
@@ -201,12 +206,12 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     public void changeTab(ViewItemType tab)
     {
-        if (_test.isElementPresent(_dataRegion.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]") ))
+        if (_test.isElementPresent(_dataRegionLoc.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
             // Tab hasn't rendered yet
-            _test.click(_dataRegion.append(Locator.tag("li").withClass("x-grouptabs-main").containing(tab.toString())));
+            _test.click(_dataRegionLoc.append(Locator.tag("li").withClass("x-grouptabs-main").containing(tab.toString())));
         else
             // Tab has rendered
-            _test.click(_dataRegion.append("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(_dataRegionLoc.append("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
     }
 
     public static enum ViewItemType
@@ -229,16 +234,16 @@ public class CustomizeViewsHelper extends AbstractHelper
         for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
-            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if (_test.isElementPresent(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+            _test.waitForElement(_dataRegionLoc.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            if (_test.isElementPresent(_dataRegionLoc.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
             {
-                _test.click(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+                _test.click(_dataRegionLoc.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
             }
-            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "][img[1][contains(@class, 'minus')]]/following-sibling::ul").notHidden(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
+            _test.waitForElement(_dataRegionLoc.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "][img[1][contains(@class, 'minus')]]/following-sibling::ul").notHidden(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
             nodePath += "/";
         }
 
-        return _dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(fieldKey) + "]");
+        return _dataRegionLoc.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(fieldKey) + "]");
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
@@ -323,7 +328,7 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     private String tabContentXPath(ViewItemType type)
     {
-        return _dataRegion.append("//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
+        return _dataRegionLoc.append("//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, String[] fieldKeyParts)
@@ -333,12 +338,12 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     private String itemXPath(ViewItemType type, String fieldKey)
     {
-        return _dataRegion.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) +"]").toXpath();
+        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) + "]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, int item_index)
     {
-        return _dataRegion.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]").toXpath();
+        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]").toXpath();
     }
 
     private void removeCustomizeViewItem(String fieldKey, ViewItemType type)
@@ -504,7 +509,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     {
         changeTab(ViewItemType.Filter);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
+        if (!_dataRegionLoc.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -514,7 +519,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     {
         changeTab(ViewItemType.Filter);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
+        if (_dataRegionLoc.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -524,7 +529,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     {
         changeTab(ViewItemType.Sort);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
+        if (!_dataRegionLoc.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -534,7 +539,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     {
         changeTab(ViewItemType.Sort);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
+        if (_dataRegionLoc.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -710,30 +715,13 @@ public class CustomizeViewsHelper extends AbstractHelper
     /** Check that a column is present and not hidden. Assumes that the 'show hidden columns' is unchecked. */
     public boolean isColumnVisible(String fieldKey)
     {
-        return isColumnHidden(fieldKey, false);
-    }
-
-    /** Check that a column is present and is hidden. Assumes that the 'show hidden columns' is unchecked. */
-    public boolean isColumnHidden(String fieldKey)
-    {
-        return isColumnHidden(fieldKey, true);
-    }
-
-    private boolean isColumnHidden(String fieldKey, boolean hidden)
-    {
         Locator.XPathLocator columnItem = expandPivots(fieldKey.split("/"));
         if (!_test.isElementPresent(columnItem))
             return false;
 
         // back up the DOM one element to find the <li> node
-        Locator.XPathLocator li = columnItem.append("/..");
-        String liStyle = _test.getAttribute(li, "style");
-        _test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
-
-        if (hidden)
-            return liStyle.contains("display: none");
-        else
-            return !liStyle.contains("display: none");
+        WebElement li = columnItem.append("/..").findElement(_test.getDriver());
+        return li.isDisplayed();
     }
 
     /** Check that a column is present and is a lookup column. */

@@ -21,9 +21,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-/**
- * <code>PipelineStatusTable</code>
-*/
 public class PipelineStatusTable extends DataRegionTable
 {
     private boolean _cache;
@@ -32,7 +29,6 @@ public class PipelineStatusTable extends DataRegionTable
 
     public PipelineStatusTable(BaseWebDriverTest test, boolean selectors, boolean cache)
     {
-        // 13760: PipelineTest fails because status table no longer has floating headers
         super("StatusFiles", test, selectors, false);
 
         _cache = cache;

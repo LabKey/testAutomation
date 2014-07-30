@@ -72,7 +72,7 @@ class MS2QuantParams extends MS2TestParams
         _test.setFormElement("columns", "GroupNumber, GroupProbability, Protein, RatioMean, RatioStandardDev, RatioNumberPeptides, AACoverage, BestName, BestGeneName, Description");
         _test.clickButton("Pick Columns");
         ProteinRegionTable tableProt = new ProteinRegionTable(0.75, _test);
-        _test.setFilter(tableProt.getTableName(), "RatioNumberPeptides", "Is Greater Than", "1");
+        tableProt.setFilter("RatioNumberPeptides", "Is Greater Than", "1");
 
         int colRatio = tableProt.getColumn("Ratio Peps");
         int colProtein = tableProt.getColumn("Protein");

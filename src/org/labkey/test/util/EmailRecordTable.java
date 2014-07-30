@@ -21,9 +21,6 @@ import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
 
-/**
- * <code>EmailRecordTable</code>
-*/
 public class EmailRecordTable extends DataRegionTable
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
@@ -97,7 +94,7 @@ public class EmailRecordTable extends DataRegionTable
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
                 String subjectLine = lines[0];
-                if (subjectLine.indexOf(subjectPart) != -1)
+                if (subjectLine.contains(subjectPart))
                 {
                     EmailMessage em = new EmailMessage();
                     em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));

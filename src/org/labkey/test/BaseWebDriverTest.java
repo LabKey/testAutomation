@@ -4151,7 +4151,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void verifyTabSelected(String caption)
     {
-        assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
+        assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '" + caption + "']")));
     }
 
     public int getImageWithAltTextCount(String altText)
@@ -4175,7 +4175,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Deprecated
     public String getTableCellText(String tableId, int row, int column)
     {
-        return getTableCellText(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]"), row, column);
+        return getTableCellText(Locator.xpath("//table[@id=" + Locator.xq(tableId) + "]"), row, column);
     }
 
     public String getTableCellText(Locator.XPathLocator table, int row, int column)
@@ -4411,6 +4411,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return finsihed;
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#getColumnDataAsText(int)}
+     */
+    @Deprecated
     // Returns the value of all cells in the specified column
     public List<String> getTableColumnValues(String tableName, int column)
     {
@@ -4430,11 +4434,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return values;
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#getFullColumnValues(String...)}
+     */
+    @Deprecated
     /**get values for all specifed columns for all pages of the table
      * preconditions:  must be on start page of table
      * postconditions:  at start of table
      */
-    protected  List<List<String>> getColumnValues(String tableName, String... columnNames)
+    public List<List<String>> getColumnValues(String tableName, String... columnNames)
     {
         boolean moreThanOnePage = isTextPresent("Next");
         DataRegionTable table = new DataRegionTable(tableName, this);

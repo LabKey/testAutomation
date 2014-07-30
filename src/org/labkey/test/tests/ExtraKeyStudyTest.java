@@ -19,6 +19,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 
 import static org.junit.Assert.*;
 
@@ -100,7 +102,8 @@ public class ExtraKeyStudyTest extends StudyBaseTest
         }
     }
 
-    private void verifyColumnVisibility(String datasetName, int visibility)
+    @LogMethod
+    private void verifyColumnVisibility(@LoggedParam String datasetName, int visibility)
     {
         pushLocation();
         log("** Verifying visibility of other datasets from " + datasetName);
@@ -109,13 +112,13 @@ public class ExtraKeyStudyTest extends StudyBaseTest
 
         // Participant columns should be visible, old "Participant/DataSet" lookup should be hidden.
         assertTrue("PandaId/PandaId should be visible", _customizeViewsHelper.isColumnVisible("PandaId/PandaId"));
-        assertTrue("PandaId/DataSet lookup should not be visible", _customizeViewsHelper.isColumnHidden("PandaId/DataSet"));
+        assertFalse("PandaId/DataSet lookup should not be visible", _customizeViewsHelper.isColumnVisible("PandaId/DataSet"));
 
         // ParticipantVisit columns should be visible, old "Paricipant Visit/<dataset>" lookups should be hidden.
         assertTrue("Panda Visit/PandaId should be visible", _customizeViewsHelper.isColumnVisible("PandaVisit/PandaId"));
         assertTrue("Panda Visit/Visit should be visible", _customizeViewsHelper.isColumnVisible("PandaVisit/Visit"));
-        assertTrue("Panda Visit/PV_One should not be visible", _customizeViewsHelper.isColumnHidden("PandaVisit/PV_One"));
-        assertTrue("Panda Visit/PV_Two should not be visible", _customizeViewsHelper.isColumnHidden("PandaVisit/PV_Two"));
+        assertFalse("Panda Visit/PV_One should not be visible", _customizeViewsHelper.isColumnVisible("PandaVisit/PV_One"));
+        assertFalse("Panda Visit/PV_Two should not be visible", _customizeViewsHelper.isColumnVisible("PandaVisit/PV_Two"));
 
         // DataSets auto-join lookups
         for (int j = 0; j < datasets.length; j++)

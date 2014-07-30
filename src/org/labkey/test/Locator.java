@@ -68,9 +68,6 @@ public abstract class Locator
      */
     public abstract Locator index(Integer index);
 
-    /**
-     * For direct use with selenium RC
-     */
     public abstract String toString();
 
     public String getLocatorString()

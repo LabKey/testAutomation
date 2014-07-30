@@ -27,11 +27,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.util.List;
 
-public class LabKeyExpectedConditions
+public abstract class LabKeyExpectedConditions
 {
-    private LabKeyExpectedConditions(){}
-
-
     /**
      * An expectation for checking that an element has stopped moving
      *
@@ -147,9 +144,9 @@ public class LabKeyExpectedConditions
         };
     }
 
-    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(@Nullable Locator.IdLocator dataRegion)
+    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(@Nullable DataRegionTable dataRegion)
     {
-        final Locator.IdLocator _dataRegion = dataRegion == null ? Locator.id("") : dataRegion;
+        final Locator.IdLocator _dataRegion = dataRegion == null ? Locator.id("") : dataRegion.locator();
         return new ExpectedCondition<WebElement>()
         {
             @Override

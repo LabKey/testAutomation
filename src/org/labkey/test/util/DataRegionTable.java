@@ -32,13 +32,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
-/**
- * DataRegionTable class
- * <p/>
- * Created: Feb 19, 2007
- *
- * @author bmaclean
- */
 public class DataRegionTable
 {
     protected final String _tableName;
@@ -47,7 +40,7 @@ public class DataRegionTable
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
-    protected final int _headerRows;
+    protected final boolean _floatingHeaders;
 
     public DataRegionTable(String tableName, BaseWebDriverTest test)
     {
@@ -66,7 +59,12 @@ public class DataRegionTable
         _test = test;
         _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
         _columnCount = _test.getTableColumnCount(getHtmlName());
-        _headerRows = 2 + (floatingHeaders?2:0);
+        _floatingHeaders = floatingHeaders;
+    }
+
+    private int getHeaderRowCount()
+    {
+        return 2 + (_floatingHeaders ? 2 : 0);
     }
 
     public static String getTableNameByTitle(String title, BaseWebDriverTest test)
@@ -99,6 +97,11 @@ public class DataRegionTable
     public String getHtmlName()
     {
         return "dataregion_" + _tableName;
+    }
+
+    public Locator.IdLocator locator()
+    {
+        return Locator.id(getHtmlName());
     }
 
     public int getColumnCount()
@@ -138,7 +141,7 @@ public class DataRegionTable
     public int getDataRowCount()
     {
         int rows = 0;
-        rows = _test.getTableRowCount(getHtmlName()) - (_headerRows + (bottomBarPresent()?1:0));
+        rows = _test.getTableRowCount(getHtmlName()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
         if (hasAggregateRow())
             rows -= 1;
 
@@ -245,7 +248,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator detailsXpath(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + _headerRows + 1) + "]/td[contains(@class, 'labkey-details')]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-details')]");
     }
 
     public Locator.XPathLocator detailsLink(int row)
@@ -256,7 +259,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator updateXpath(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + _headerRows + 1) + "]/td[contains(@class, 'labkey-update')]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-update')]");
     }
 
     public Locator.XPathLocator updateLink(int row)
@@ -267,7 +270,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row+_headerRows+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row+getHeaderRowCount()+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public Locator.XPathLocator link(int row, int col)
@@ -312,7 +315,7 @@ public class DataRegionTable
 
         for (int col = 0; col < _columnCount; col++)
         {
-            String header = getDataAsText(-(_headerRows/2), col);
+            String header = getDataAsText(-(getHeaderRowCount()/2), col);
             columnHeaders.add(header);
             if( header != null )
             {
@@ -349,6 +352,11 @@ public class DataRegionTable
         return getColumnDataAsText(col);
     }
 
+    public List<List<String>> getFullColumnValues(String... columnNames)
+    {
+        return _test.getColumnValues(getTableName(), columnNames);
+    }
+
     /** Find the row number for the given primary key. */
     public int getRow(String pk)
     {
@@ -380,12 +388,12 @@ public class DataRegionTable
 
     private boolean hasNoDataToShow()
     {
-        return "No data to show.".equals(_getDataAsText(_headerRows, 0));
+        return "No data to show.".equals(_getDataAsText(getHeaderRowCount(), 0));
     }
 
     public String getDataAsText(int row, int column)
     {
-        return _getDataAsText(row + _headerRows, column + (_selectors ? 1 : 0));
+        return _getDataAsText(row + getHeaderRowCount(), column + (_selectors ? 1 : 0));
     }
 
     // Doesn't adjust for header rows or selector columns.
