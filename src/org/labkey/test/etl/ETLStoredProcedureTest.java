@@ -76,8 +76,7 @@ public class ETLStoredProcedureTest extends ETLTest
         // test mode 1, Normal operation
         rtr = runETL_API(TRANSFORM_NORMAL_OPERATION_SP);
         assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
-        assertInEtlLogFile(rtr.getJobId(), "Test print statement logging");
-        assertInEtlLogFile(rtr.getJobId(), "Test returnMsg logging");
+        assertInEtlLogFile(rtr.getJobId(), "Test print statement logging", "Test returnMsg logging");
 
         // test mode 2, return code > 0, should be an error
         rtr = runETL_API(TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP);

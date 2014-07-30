@@ -461,10 +461,10 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         assertQueryWebPart("TransformRun", "TransformRun", true, targets);
     }
 
-    protected void assertInEtlLogFile(String jobId, String logString) throws Exception
+    protected void assertInEtlLogFile(String jobId, String... logStrings) throws Exception
     {
         // Promoted the guts of this method to DataIntegrationHelper
-        _diHelper.assertInEtlLogFile(jobId, logString);
+        _diHelper.assertInEtlLogFile(jobId, logStrings);
     }
 
     protected void checkRun()

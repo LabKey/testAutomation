@@ -101,7 +101,7 @@ public class DataIntegrationHelper
                 else
                     sleep(500);
             }while(System.currentTimeMillis() - startTime < msTimeout);
-            throw new TestTimeoutException("Timeout for ETL job to complete. Exceeded " + msTimeout + "ms");
+            throw new TestTimeoutException("Timeout for ETL job to complete. Status = " + status + ". Exceeded " + msTimeout + "ms");
         }
         return response;
     }
@@ -200,10 +200,11 @@ public class DataIntegrationHelper
         }
     }
 
-    public void assertInEtlLogFile(String jobId, String logString) throws Exception
+    public void assertInEtlLogFile(String jobId, String... logStrings) throws Exception
     {
-
         final String etlLogFile = getEtlLogFile(jobId);
-        assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
+
+        for (String logString : logStrings)
+            assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
     }
 }
