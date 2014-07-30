@@ -38,24 +38,26 @@
 var path = null;
 var files = [];
 
-Ext.onReady(function () {
+LABKEY.requiresExt3ClientAPI(true, function() {
+    Ext.onReady(function () {
 
-  path = LABKEY.ActionURL.getParameter("path");
-  if (!path) {
-    alert("Path parameter required.");
-    window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
-    return;
-  }
+        path = LABKEY.ActionURL.getParameter("path");
+        if (!path) {
+            alert("Path parameter required.");
+            window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
+            return;
+        }
 
-  files = LABKEY.ActionURL.getParameterArray("file");
-  if (!files || files.length == 0) {
-    alert("At least one file must be selected.");
-    window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
-    return;
-  }
+        files = LABKEY.ActionURL.getParameterArray("file");
+        if (!files || files.length == 0) {
+            alert("At least one file must be selected.");
+            window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
+            return;
+        }
 
-  fileStatus();
+        fileStatus();
 
+    });
 });
 
 function fileStatus()
