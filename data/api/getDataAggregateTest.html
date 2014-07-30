@@ -1,12 +1,6 @@
 <div id="getData-config-form-div"></div>
 <br/>
 <div id="getData-grid-div"></div>
-
-<script type="text/javascript">
-    LABKEY.requiresExt4ClientAPI(true);
-    LABKEY.requiresVisualization();
-</script>
-
 <script type="text/javascript">
 
 function init() {
@@ -157,10 +151,6 @@ function init() {
     var configCounter = -1;
     var configForm;
 
-    function doError(param) {
-        throw param;
-    }
-
     function formInit() {
 
         configForm = new Ext.FormPanel({
@@ -240,15 +230,13 @@ function init() {
         });
     }
 
-    //Lots of async script loading. Make sure everything is loaded before starting
-    LABKEY.Utils.onTrue({
-        testCallback:function() {return Ext.isReady && LABKEY.vis},
-        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
-        successCallback:function () {formInit.defer(100)},
-        errorCallback:doError
-    });
+    formInit();
 }
 
-Ext.onReady(init);
+LABKEY.requiresExt3ClientAPI(true, function() {
+    LABKEY.requiresVisualization(function() {
+        Ext.onReady(init);
+    });
+});
 
 </script>

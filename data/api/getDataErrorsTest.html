@@ -1,13 +1,11 @@
 <div id="getData-config-form-div"></div>
 <br/>
 <div id="getData-message-div"></div>
-
 <script type="text/javascript">
-    LABKEY.requiresExt4ClientAPI(true);
-    LABKEY.requiresVisualization();
-</script>
 
-<script type="text/javascript">
+LABKEY.requiresExt3(true, function() {
+    LABKEY.requiresExt4Sandbox(true, function() {
+        LABKEY.requiresVisualization(function() {
 
     var measureWithDimension = {
         "time": "date",
@@ -100,18 +98,6 @@
     var configCounter = -1;
     var configForm;
 
-    //Lots of async script loading. Make sure everything is loaded before starting
-    LABKEY.Utils.onTrue({
-        testCallback:function() {return Ext.isReady && LABKEY.vis},
-        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
-        successCallback:function () {init.defer(100)},
-        errorCallback:doError
-    });
-
-    function doError(param) {
-        throw param;
-    }
-
     function init(){
         configForm = new Ext.FormPanel({
             renderTo: 'getData-config-form-div',
@@ -180,4 +166,9 @@
         });
     }
 
+    init();
+
+        });
+    });
+});
 </script>
