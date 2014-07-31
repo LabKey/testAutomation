@@ -31,7 +31,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-//TODO: Make separate class for working with a specific DataRegionTable - many methods don't actually care what DRT is specified
 public class CustomizeViewsHelper
 {
     private final BaseWebDriverTest _test;
@@ -55,12 +54,20 @@ public class CustomizeViewsHelper
         _reportHelper = new RReportHelper(_test);
     }
 
+    public DataRegionTable getDataRegion()
+    {
+        if (_dataRegion != null)
+            return _dataRegion;
+        else
+            return DataRegionTable.findDataRegion(_test);
+    }
+
     public void openCustomizeViewPanel()
     {
         if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
             _test._ext4Helper.clickExt4MenuButton(false, Locator.lkButton("Views"), false, "Customize View");
-            _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(_dataRegion));
+            _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(getDataRegion()));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(".customizeViewPanel")));

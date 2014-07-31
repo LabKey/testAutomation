@@ -72,6 +72,21 @@ public class DataRegionTable
         return Locator.xpath("//th[@title='" + title +"']/../..//table").findElement(test.getDriver()).getAttribute("id").replace("dataregion_", "");
     }
 
+    public static DataRegionTable findDataRegion(BaseWebDriverTest test)
+    {
+        return findDataRegion(test, 0);
+    }
+
+    public static DataRegionTable findDataRegion(BaseWebDriverTest test, int index)
+    {
+        Locator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
+        List<WebElement> dataRegions = dataRegionLoc.findElements(test.getDriver());
+        if (dataRegions.size() > index)
+            return new DataRegionTable(dataRegions.get(index).getAttribute("id").replace("dataregion_", ""), test);
+        else
+            throw new NoSuchElementException(String.format("Not enough data regions on page. Index: %d, Count: %d", index, dataRegions.size()));
+    }
+
     public static String getQueryWebPartName(BaseWebDriverTest test)
     {
         return getQueryWebPartName(0, test);

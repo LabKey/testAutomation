@@ -3493,7 +3493,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     protected void clickExportToText()
     {
         clickButton("Export", 0);
-        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(null));
+        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(DataRegionTable.findDataRegion(this)));
         _extHelper.clickSideTab("Text");
         clickButton("Export to Text");
     }

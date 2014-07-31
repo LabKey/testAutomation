@@ -144,15 +144,15 @@ public abstract class LabKeyExpectedConditions
         };
     }
 
-    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(@Nullable DataRegionTable dataRegion)
+    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(DataRegionTable dataRegion)
     {
-        final Locator.IdLocator _dataRegion = dataRegion == null ? Locator.id("") : dataRegion.locator();
+        final WebElement dataRegionEl = dataRegion.locator().findElement(dataRegion._test.getDriver());
         return new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(WebDriver d)
             {
-                List<WebElement> els = _dataRegion.toCssLocator().append(".labkey-data-region-header td.labkey-ribbon > div:not(.x-hide-display)").findElements(d);
+                List<WebElement> els = dataRegionEl.findElements(By.cssSelector(".labkey-data-region-header td.labkey-ribbon > div:not(.x-hide-display)"));
                 for (WebElement el : els)
                 {
                     try
