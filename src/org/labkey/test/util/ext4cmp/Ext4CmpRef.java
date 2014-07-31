@@ -21,6 +21,7 @@ import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Ext4CmpRef
@@ -100,5 +101,14 @@ public class Ext4CmpRef
                 return (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;");
             }
         }, "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public <Type extends Ext4CmpRef> Type down(String componentSelector, Class<Type> clazz)
+    {
+        componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
+        String id = (String)getEval("down(arguments[0]).id", componentSelector);
+        List<Type> ret = _test._ext4Helper.componentsFromIds(Arrays.asList(id), clazz);
+
+        return ret.isEmpty() ? null : ret.get(0);
     }
 }
