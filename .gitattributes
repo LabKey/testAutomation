@@ -202,12 +202,12 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-13.15
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-13.16-13.17.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-13.20-13.21.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-13.30-13.31.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-13.31-13.32.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-12.30-13.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.10-13.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.20-13.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.30-14.10.sql -text
-modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.31-13.32.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1.00.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-12.10.sql -text
@@ -219,12 +219,12 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-13.15-
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-13.16-13.17.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-13.20-13.21.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-13.30-13.31.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-13.31-13.32.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-12.30-13.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.10-13.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.20-13.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.30-14.10.sql -text
-modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.31-13.32.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
 modules/simpletest/resources/scripts/simpletest/ScriptValidationExports.js -text
