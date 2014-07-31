@@ -75,6 +75,8 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Start Import");
         // wait for study & specimen load to complete
         waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
+        // set the bit to indicate the import format is of the legacy type
+        isLegacyExportFormat = true;
 
         // delete "export" directory
         deleteDir(new File(getPipelinePath() + "export"));
