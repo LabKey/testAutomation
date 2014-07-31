@@ -1162,13 +1162,13 @@ public class MS2Test extends AbstractMS2ImportTest
                 "R.TQMPAASICVNYK.G");
 
         log("Check Ignore/Apply View Filter");
-        _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton("query", "Views"), false, "Apply View Filter");
+        _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton("query", "Views"), false, "Apply View Filter");
         assertTextPresent(
                 "K.EIRQRQGDDLDGLSFAELR.G",
                 "R.TQMPAASICVNYK.G",
                 "Avg XCorr");
 
-        _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton("query", "Views"), false, "Apply View Filter");
+        _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton("query", "Views"), false, "Apply View Filter");
         assertTextPresent(
                 "Avg XCorr",
                 "K.EIRQRQGDDLDGLSFAELR.G");
