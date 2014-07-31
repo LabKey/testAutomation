@@ -137,8 +137,8 @@ public class ETLErrorTest extends ETLBaseTest
         _runETL_NoNav(ETLName, hasWork, hasCheckerError);
         if(!hasCheckerError)
         {
-            waitForElement(Locator.xpath("//a[.='Show full log file']"));
-            click(Locator.xpath("//a[.='Show full log file']"));
+            refresh(); // log webpart may not yet be present
+            waitAndClick(Locator.linkWithText("Show full log file"));
             waitForElement(Locator.linkWithText("Show summary"));
         }
         else
