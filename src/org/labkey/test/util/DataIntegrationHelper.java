@@ -84,7 +84,8 @@ public class DataIntegrationHelper
         return response;
     }
 
-    public RunTransformResponse runTransformAndWait(String transformId, int msTimeout) throws Exception
+    @LogMethod
+    public RunTransformResponse runTransformAndWait(@LoggedParam String transformId, int msTimeout) throws Exception
     {
         RunTransformResponse response;
         response = runTransform(transformId);
