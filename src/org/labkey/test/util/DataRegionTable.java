@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -518,19 +519,30 @@ public class DataRegionTable
 
     public void clearSort(String columnName)
     {
-        _test.clearSort(_tableName, columnName, _test.defaultWaitForPage);
+        _test.clearSort(_tableName, columnName);
     }
 
     public void openFilterDialog(String columnName)
     {
-        _test.click(Locator.id(_tableName).append(Locator.tagWithClass("td", "labkey-column-header")).append(Locator.tagWithText("div", columnName)));
-        _test.waitAndClick(Locator.tagWithText("span", "Filter...").notHidden());
+        Locator.XPathLocator menuLoc = DataRegionTable.Locators.columnHeader(getTableName(), columnName);
+        String columnLabel = _test.getText(menuLoc);
+        _test._ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Filter...");
 
-        Locator.XPathLocator filterDialog = ExtHelper.Locators.extDialog("Show Rows Where " + columnName + "...");
+        Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         _test.waitForElement(filterDialog);
 
-        if (_test.isElementPresent(filterDialog.append(Locator.tagWithClass("span", "x-tab-strip-text").withText("Choose Values"))))
-            _test.waitForElement(Locator.tag("div").withClass("labkey-filter-dialog").append("//tr").withClass("x-grid3-row-table").withPredicate(Locator.tag("a").withText("[All]")).append("//div").withClass("x-grid3-hd-checker-on"));
+        Locator.XPathLocator filterTypeTabStrip = filterDialog.append(Locator.tagWithClass("ul", "x-tab-strip"));
+        Locator.XPathLocator filterActiveTab = filterTypeTabStrip.append(Locator.tagWithClass("li", "x-tab-strip-active"));
+        if (_test.isElementPresent(filterTypeTabStrip) &&
+                filterActiveTab.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).getText().equals("Choose Values"))
+        {
+            _test.shortWait().until(ExpectedConditions.elementToBeClickable(filterDialog.append(Locator.linkWithText("[All]")).toBy()));
+            _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            _test.waitForElement(filterDialog.append(Locator.tagWithId("input", "value_1")));
+        }
     }
 
     public void setFilter(String columnName, String filterType, String filter)
@@ -759,9 +771,14 @@ public class DataRegionTable
             return facetRow(category).withPredicate(Locator.xpath("//span").withClass("lk-filter-panel-label").withText(group));
         }
 
-        public static Locator.XPathLocator columnHeader(String regionName, String columnName)
+        public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
-            return Locator.tagWithAttribute("td", "column-name", regionName + ":" + columnName);
+            return Locator.tagWithAttribute("td", "column-name", regionName + ":" + fieldName);
+        }
+
+        public static Locator.XPathLocator columnHeaderWithLabel(String regionName, String fieldLabel)
+        {
+            return Locator.id(regionName).append(Locator.tagWithClass("td", "labkey-column-header")).withText(fieldLabel);
         }
     }
 }

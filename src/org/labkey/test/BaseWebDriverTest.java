@@ -4996,11 +4996,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Deprecated
     public void openFilter(String regionName, String columnName)
     {
-        Locator.XPathLocator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
-        String columnLabel = getText(menuLoc);
-        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Filter...");
-        _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        (new DataRegionTable(regionName, this)).openFilterDialog(columnName);
     }
 
     /**
