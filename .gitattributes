@@ -467,6 +467,7 @@ src/org/labkey/test/tests/ModuleAssayTest.java -text
 src/org/labkey/test/tests/NabAssayTest.java -text
 src/org/labkey/test/tests/NabAssayThawListTest.java -text
 src/org/labkey/test/tests/NabHighThroughputAssayTest.java -text
+src/org/labkey/test/tests/NabMultiVirusPlateTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
