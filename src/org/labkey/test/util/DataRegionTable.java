@@ -528,21 +528,19 @@ public class DataRegionTable
         String columnLabel = _test.getText(menuLoc);
         _test._ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Filter...");
 
-        Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
+        final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         _test.waitForElement(filterDialog);
 
-        Locator.XPathLocator filterTypeTabStrip = filterDialog.append(Locator.tagWithClass("ul", "x-tab-strip"));
-        Locator.XPathLocator filterActiveTab = filterTypeTabStrip.append(Locator.tagWithClass("li", "x-tab-strip-active"));
-        if (_test.isElementPresent(filterTypeTabStrip) &&
-                filterActiveTab.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).getText().equals("Choose Values"))
+        _test.waitFor(new BaseWebDriverTest.Checker()
         {
-            _test.shortWait().until(ExpectedConditions.elementToBeClickable(filterDialog.append(Locator.linkWithText("[All]")).toBy()));
-            _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        }
-        else
-        {
-            _test.waitForElement(filterDialog.append(Locator.tagWithId("input", "value_1")));
-        }
+            @Override
+            public boolean check()
+            {
+                return _test.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden())||
+                       _test.isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden()));
+            }
+        }, "Filter Dialog", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setFilter(String columnName, String filterType, String filter)
