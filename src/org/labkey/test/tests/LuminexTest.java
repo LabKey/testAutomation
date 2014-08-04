@@ -54,7 +54,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     protected final File TEST_ASSAY_LUM_FILE1 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
     protected final File TEST_ASSAY_LUM_FILE2 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
     protected final File TEST_ASSAY_LUM_FILE3 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
-    protected final File TEST_ASSAY_LUM_FILE4 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithBlankBead.xls");
+    protected final File TEST_ASSAY_LUM_FILE4 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithAltNegativeBead.xls");
     protected final File TEST_ASSAY_LUM_FILE5 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls");
     protected final File TEST_ASSAY_LUM_FILE6 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls");
     protected final File TEST_ASSAY_LUM_FILE7 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls");

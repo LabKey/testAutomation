@@ -61,21 +61,16 @@ public class LuminexEC50Test extends LuminexRTransformTest
 
         //add transform script
         goToSchemaBrowser();
-        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-        assertTextPresent("Four Parameter");
+        viewQueryData("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
+        waitForText("Four Parameter");
 
         waitForText("3.45399");
 
         checkEC50dataAndFailureFlag();
     }
 
-    private void checkEC50dataAndFailureFlag()
+    private void checkRversion()
     {
-        // expect to already be viewing CurveFit query
-        assertTextPresent("CurveFit");
-
         // quick check to see if we are using 32-bit or 64-bit R
         log("Checking R 32-bit vs 64-bit");
         pushLocation();
@@ -85,6 +80,12 @@ public class LuminexEC50Test extends LuminexRTransformTest
         _rReportHelper.saveReport("dummy");
         popLocation();
         waitForText("CurveFit");
+    }
+
+    private void checkEC50dataAndFailureFlag()
+    {
+        // expect to already be viewing CurveFit query
+        assertTextPresent("CurveFit");
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("TitrationId/Name");
@@ -128,12 +129,12 @@ public class LuminexEC50Test extends LuminexRTransformTest
                     assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
             }
         }
-        assertEquals("Unexpected number of Five Parameter EC50 values (expected 9 of 13).", 9, rum5ec50count);
+        assertEquals("Unexpected number of Five Parameter EC50 values (expected 10 of 14).", 10, rum5ec50count);
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
         // NOTE: the first two EC50s will be significantly different on Mac due to machine episolon. The test is adjusted for this, as these are "blanks" and thus provide the noisiest answers.
-        Double[] FiveParameterEC50mins = {107.64, 460.75, 36465.56, 21075.08, 7826.89, 32211.66, 44975.52, 0.4199, 0.03962};
-        Double[] FiveParameterEC50maxs = {112.85, 486.5, 36469.5, 21075.29, 7826.90, 32211.67, 45012.09, 0.43771, 0.03967};
+        Double[] FiveParameterEC50mins = {107.64, 460.75, 36465.56, 21075.08, 7826.89, 32211.66, 44975.52, 107.64, 0.4199,  0.03962};
+        Double[] FiveParameterEC50maxs = {112.85, 486.5,  36469.5,  21075.29, 7826.90, 32211.67, 45012.09, 112.85, 0.43771, 0.03967};
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
         table.setSort("AnalyteId", SortDirection.ASC);

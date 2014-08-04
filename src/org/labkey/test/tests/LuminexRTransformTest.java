@@ -37,6 +37,7 @@ public class LuminexRTransformTest extends LuminexTest
     private static final String ANALYTE1 = "MyAnalyte (1)";
     private static final String ANALYTE2 = "MyAnalyte (2)";
     private static final String ANALYTE3 = "Blank (3)";
+    private static final String ANALYTE4 = "MyNegative (4)";
 
     private static final String[] RTRANS_FIBKGDNEG_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
@@ -58,19 +59,20 @@ public class LuminexRTransformTest extends LuminexTest
 
     protected void runUITests()
     {
-        runRTransformTest();
+        runRTransformTest(true);
+        runNegativeBeadTest();
     }
 
     private boolean R_TRANSFORM_SET = false;
     protected void ensureRTransformPresent()
     {
         if(!R_TRANSFORM_SET)
-            runRTransformTest();
+            runRTransformTest(false);
     }
 
     //requires drc, Ruminex and xtable packages installed in R
     @LogMethod
-    private void runRTransformTest()
+    private void runRTransformTest(boolean doVerification)
     {
         log("Uploading Luminex run with a R transform script");
 
@@ -82,24 +84,42 @@ public class LuminexRTransformTest extends LuminexTest
         clickButton("Save & Close");
 
         uploadRunWithoutRumiCalc();
-        verifyPDFsGenerated(false);
-        verifyScriptVersions();
-        verifyLotNumber();
-        verifyRumiCalculatedValues(false);
+        if (doVerification)
+        {
+            verifyPDFsGenerated(false);
+            verifyScriptVersions();
+            verifyLotNumber();
+            verifyRumiCalculatedValues(false, ANALYTE3);
+            verifyAnalyteProperties(new String[]{ANALYTE3, ANALYTE3, " ", " "});
+        }
 
         reImportRunWithRumiCalc();
-        verifyPDFsGenerated(true);
-        verifyScriptVersions();
-        verifyLotNumber();
-        verifyRumiCalculatedValues(true);
+        if (doVerification)
+        {
+            verifyPDFsGenerated(true);
+            verifyScriptVersions();
+            verifyLotNumber();
+            verifyRumiCalculatedValues(true, ANALYTE4);
+            verifyAnalyteProperties(new String[]{ANALYTE4, ANALYTE4, " ", " "});
+        }
 
         R_TRANSFORM_SET = true;
     }
 
-    private void verifyRumiCalculatedValues(boolean hasRumiCalcData)
+    private void verifyAnalyteProperties(String[] expectedNegBead)
     {
-        DataRegionTable table;
-        table = new DataRegionTable("Data", this);
+        goToSchemaBrowser();
+        viewQueryData("assay.Luminex." + TEST_ASSAY_LUM, "Analyte");
+        DataRegionTable table = new DataRegionTable("query", this);
+        for (int i = 0; i < table.getDataRowCount(); i++)
+        {
+            assertEquals(expectedNegBead[i], table.getDataAsText(i, "Negative Bead"));
+        }
+    }
+
+    private void verifyRumiCalculatedValues(boolean hasRumiCalcData, String negativeBead)
+    {
+        DataRegionTable table = new DataRegionTable("Data", this);
         table.setFilter("FIBackgroundNegative", "Is Not Blank", null);
         waitForElement(Locator.paginationText(1, 80, 80));
         table.setFilter("Type", "Equals", "C9"); // issue 20457
@@ -111,6 +131,7 @@ public class LuminexRTransformTest extends LuminexTest
         table.clearFilter("Type");
         table.setFilter("Type", "Starts With", "X"); // filter to just the unknowns
         waitForElement(Locator.paginationText(1, 32, 32));
+        assertTextPresent(negativeBead, 32);
         // check values in the fi-bkgd-neg column
         for(int i = 0; i < RTRANS_FIBKGDNEG_VALUES.length; i++)
         {
@@ -185,14 +206,14 @@ public class LuminexRTransformTest extends LuminexTest
         assertElementPresent(Locator.linkContainingText(".Standard1_QC_Curves_5PL.pdf"));
         if (hasStandardPDFs)
         {
-            assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_5PL.pdf"));
-            assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_4PL.pdf"));
+            assertElementPresent(Locator.linkWithText("WithAltNegativeBead.Standard1_5PL.pdf"));
+            assertElementPresent(Locator.linkWithText("WithAltNegativeBead.Standard1_4PL.pdf"));
         }
     }
 
     private void uploadRunWithoutRumiCalc()
     {
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickButton("Import Data");
@@ -218,22 +239,78 @@ public class LuminexRTransformTest extends LuminexTest
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
         // set negative control and negative bead values
         checkCheckbox(Locator.name("_analyte_" + ANALYTE3 + "_NegativeControl"));
-        selectOptionByText(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), "Blank (3)");
-        selectOptionByText(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), "Blank (3)");
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), ANALYTE3);
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), ANALYTE3);
         clickButton("Save and Finish");
     }
 
     private void reImportRunWithRumiCalc()
     {
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         // all batch, run, analyte properties should be remembered from the first upload
-        checkDataRegionCheckbox("Runs", 0);
+        DataRegionTable table = new DataRegionTable("Runs", this);
+        table.checkCheckbox(0);
         clickButton("Re-import run");
         clickButton("Next");
         uncheckCheckbox(Locator.name("skipRumiCalculation"));
         clickButton("Next", defaultWaitForPage * 2);
+        // switch to using MyNegative bead for subtraction
+        checkCheckbox(Locator.name("_analyte_" + ANALYTE4 + "_NegativeControl"));
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE1 + "_NegativeBead"), ANALYTE4);
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE2 + "_NegativeBead"), ANALYTE4);
         clickButton("Save and Finish");
+    }
+
+    @LogMethod
+    private void runNegativeBeadTest()
+    {
+        goToProjectHome();                        log("Upload Luminex run for testing Negative Bead UI and calculation");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+
+        clickButton("Import Data");
+        clickButton("Next");
+        String assayId = "negative bead assayId";
+        setFormElement(Locator.name("name"), assayId);
+        uncheckCheckbox(Locator.name("subtNegativeFromAll"));
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE4);
+        waitForText("A file with name '" + TEST_ASSAY_LUM_FILE4.getName() + "' already exists");
+        clickButton("Next", defaultWaitForPage * 2);
+
+        // uncheck all of the titration well role types
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        uncheckCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
+
+        // verify some UI with 2 negative controlls checked
+        assertElementPresent(Locator.tagWithClass("select", "negative-bead-input"), 4);
+        assertElementPresent(Locator.tag("option"), 6);
+        assertElementPresent(Locator.tagWithAttribute("option", "value", ANALYTE3), 2);
+        assertElementPresent(Locator.tagWithAttribute("option", "value", ANALYTE4), 2);
+
+        // change negative control and negative bead selections and verify UI
+        uncheckCheckbox(Locator.name("_analyte_" + ANALYTE3 + "_NegativeControl"));
+        uncheckCheckbox(Locator.name("_analyte_" + ANALYTE4 + "_NegativeControl"));
+        assertElementPresent(Locator.tag("option"), 4); // all analytes have only empty option
+        assertElementNotPresent(Locator.tagWithAttribute("option", "value", ANALYTE3));
+        assertElementNotPresent(Locator.tagWithAttribute("option", "value", ANALYTE4));
+
+        // subtract MyNegative bead from Blank and verify
+        checkCheckbox(Locator.name("_analyte_" + ANALYTE4 + "_NegativeControl"));
+        selectOptionByText(Locator.name("_analyte_" + ANALYTE3 + "_NegativeBead"), ANALYTE4);
+        clickButton("Save and Finish");
+        waitAndClickAndWait(Locator.linkWithText(assayId));
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.setFilter("Analyte/NegativeBead", "Equals", ANALYTE4);
+        table.setFilter("Type", "Does Not Equal", "C9"); // see usage above for issue 20457
+        waitForElement(Locator.paginationText(1, 38, 38));
+        for (int i = 0; i < table.getDataRowCount(); i=i+2)
+        {
+            // since data for Blank bead and MyNegative bead are exact copies, adding the wells of a group together should result in zero
+            double well1value = Double.parseDouble(table.getDataAsText(i, "FI-Bkgd-Neg"));
+            double well2value = Double.parseDouble(table.getDataAsText(i+1, "FI-Bkgd-Neg"));
+            assertEquals(0.0, well1value + well2value, 0);
+        }
+        table.clearAllFilters("Type");
     }
 }
