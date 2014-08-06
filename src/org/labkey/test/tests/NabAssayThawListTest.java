@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -240,10 +241,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        click(Locator.linkWithText("manage assay design"));
-        mouseOver(Locator.linkWithText("set default values"));
-        prepForPageLoad();
-        waitAndClick(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("manage assay design"), false, "set default values", TEST_ASSAY_NAB + " Batch Fields");
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), listName);
         clickButton("Save Defaults");
     }
