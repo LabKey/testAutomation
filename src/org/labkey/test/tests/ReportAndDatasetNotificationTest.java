@@ -105,7 +105,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     };
 
     private static final String[] datasetsContentNotChanging = {
-            R_NAME, PARTICIPANTREPORT_NAME, LINKREPORT_NAME, ATTACHMENT_REPORT_NAME
+            R_NAME, PARTICIPANTREPORT_NAME, LINKREPORT_NAME, ATTACHMENT_REPORT_NAME, TIMECHART_NAME
     };
 
     protected final SimpleDateFormat _formatter = new SimpleDateFormat(DATEFORMAT);
@@ -269,7 +269,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 
-        checkModifiedReports(datasetsContentNotChanging, currentTime, 4, false, "Content should not have been modified for these reports");
+        checkModifiedReports(datasetsContentNotChanging, currentTime, 5, false, "Content should not have been modified for these reports");
     }
 
     private void openCustomizePanel(String title)
