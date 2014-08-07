@@ -149,6 +149,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         // make modifications
         openReport(TIMECHART_NAME);
         clickButton("Edit", "Save As");
+        clickButton("Grouping", "Grouping Options");
+        _ext4Helper.selectRadioButton("Participants");
+        clickButton("OK", 0);
         clickButtonByIndex("Save", 0, 0);
         waitForText("Viewable By");
         saveReport(false);
@@ -162,6 +165,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         openReport(PLOT_NAME);
         clickButton("Edit", "Save As");
+        clickButton("Options", "Plot Options");
+        _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
+        clickButton("OK", 0);
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
@@ -218,6 +224,13 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
 
+        // TODO: uncomment when #21263 is fixed
+/*        openReport(TIMECHART_NAME);
+        clickButton("Edit", "Save As");
+        clickButtonByIndex("Save", 0, 0);
+        waitForText("Viewable By");
+        saveReport(false);
+*/
         openReport(R_NAME);
         _ext4Helper.clickExt4Tab("Source");
         _ext4Helper.checkCheckbox("Show source tab to all users");
