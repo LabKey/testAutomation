@@ -1,14 +1,13 @@
 <div id='queryTestDiv1'></div>
 <script type="text/javascript">
-
-function run()
-{
-    var qwp1 = new LABKEY.QueryWebPart({
-        renderTo: 'queryTestDiv1',
-        title: 'My Query Web Part',
-        schemaName: 'vehicle',
-        queryName: 'ParamParamVehicles'
+    LABKEY.requiresExt3ClientAPI(true, function() {
+        Ext.onReady(function() {
+            var qwp1 = new LABKEY.QueryWebPart({
+                renderTo: 'queryTestDiv1',
+                title: 'My Query Web Part',
+                schemaName: 'vehicle',
+                queryName: 'ParamParamVehicles'
+            });
+        });
     });
-}
-Ext.onReady(run);
 </script>
