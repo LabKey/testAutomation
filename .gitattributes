@@ -152,7 +152,7 @@ modules/simpletest/resources/etls/SimpleETLCausesKeyConstraintViolation.xml -tex
 modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/TaskrefTask.xml -text
+modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
