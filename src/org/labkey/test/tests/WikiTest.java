@@ -165,10 +165,9 @@ public class WikiTest extends BaseWebDriverTest
         goToProjectHome();
         click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         waitForElement(inlineEditor);
-        String editorId = getAttribute(inlineEditor.child("textarea"), "id");
 
         String addedContent = "Inline edited content";
-        setInlineEditorContent(editorId, addedContent);
+        setInlineEditorContent(getAttribute(inlineEditor.child("textarea"), "id"), addedContent);
         clickButton("Save", 0);
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
@@ -179,7 +178,7 @@ public class WikiTest extends BaseWebDriverTest
         click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         waitForElement(inlineEditor);
         addedContent = "Second inline edited content: " + WIKI_CHECK_CONTENT;
-        setInlineEditorContent(editorId, addedContent);
+        setInlineEditorContent(getAttribute(inlineEditor.child("textarea"), "id"), addedContent);
         clickButton("Save", 0);
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
@@ -188,7 +187,7 @@ public class WikiTest extends BaseWebDriverTest
         click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         String unsavedContent = "SHOULD NOT BE SAVED";
         waitForElement(inlineEditor);
-        setInlineEditorContent(editorId, unsavedContent);
+        setInlineEditorContent(getAttribute(inlineEditor.child("textarea"), "id"), unsavedContent);
         clickButton("Cancel", 0);
         assertAlert("Cancelling will lose all unsaved changes. Are you sure?");
         waitForElementToDisappear(inlineEditor);
@@ -203,8 +202,11 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
+        Locator.XPathLocator frameId = Locator.id(editorId + "_ifr");
+        waitForElement(frameId);
+
         // swtich to the tinymce iframe
-        getDriver().switchTo().frame(editorId + "_ifr");
+        getDriver().switchTo().frame(getElement(frameId));
 
         // locate the tinymce body element
         Locator l = Locator.id("tinymce");
