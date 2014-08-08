@@ -32,10 +32,10 @@ import static org.junit.Assert.assertTrue;
  * Date: 7/25/2014
  */
 @Category({DailyB.class, Data.class})
-public class ETLTaskrefTaskTest extends ETLBaseTest
+public class ETLTaskRefTaskTest extends ETLBaseTest
 {
-    private static final String PROJECT_NAME = "ETLTaskrefTaskProject";
-    private static final String ETL = "{simpletest}/TaskrefTask";
+    private static final String PROJECT_NAME = "ETLTaskRefTaskProject";
+    private static final String ETL = "{simpletest}/TaskRefTask";
     public static final String LOG_MESSAGE = "Log from test task";
 
     @Nullable
