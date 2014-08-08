@@ -70,22 +70,20 @@ public class TimelineTest extends BaseWebDriverTest
     private static final String TEST_DIV_NAME = "testDiv";
 
 
-    private static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
-            "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
-            "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
-            "        return {\n" +
-            "            init : function()\n" +
-            "            {";
+    private static final String SRC_PREFIX = CLIENTAPI_HEADER +
+            "\n<script type=\"text/javascript\">\n" +
+            "        var init = function()\n" +
+            "        {";
 
-    private static final String SRC_SUFFIX = "            }\n" +
-            "        }\n" +
-            "    }();\n" +
+    private static final String SRC_SUFFIX =
+            "        };\n" +
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
-            "    Ext.onReady(demoNamespace.myModule.init, demoNamespace.myModule, true);\n" +
+            "    Ext4.onReady(init);\n" +
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\" style='height:400px'></div>";
 
-    private static final String TIMELINE_TEST_SRC = "    var tl = LABKEY.Timeline.create({\n" +
+    private static final String TIMELINE_TEST_SRC =
+            "    LABKEY.Timeline.create({\n" +
             "        renderTo:'testDiv',\n" +
             "        start:'DOB',\n" +
             "        end:function(row){if (row.DOD) return row.DOD; else return new Date();},\n" +
