@@ -318,7 +318,7 @@ src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLBaseTest.java -text
 src/org/labkey/test/etl/ETLErrorTest.java -text
 src/org/labkey/test/etl/ETLStoredProcedureTest.java -text
-src/org/labkey/test/etl/ETLTaskrefTaskTest.java -text
+src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
 src/org/labkey/test/etl/RemoteETLCommandTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
