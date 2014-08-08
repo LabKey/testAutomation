@@ -56,9 +56,6 @@ public class StudyDatasetsTest extends StudyBaseTest
             "a6\t6\tx6\ty6\tz6\n";
     private static final String DATASET_B_MERGE =
             "a4\t4\tx4_merged\ty4_merged\tz4_merged\n";
-    private static final String DATASET_B_DUPE =
-            "a4\t4\tx4_merged\ty4_merged\tz4_merged\n" +
-            "a4\t4\tx4_merged2\ty4_merged2\tz4_merged2\n";
 
     @Override
     protected BrowserType bestBrowser()
@@ -99,12 +96,11 @@ public class StudyDatasetsTest extends StudyBaseTest
         importDatasetData("B", DATASET_HEADER, DATASET_B_DATA, "All data");
         checkDataElementsPresent("B",  DATASET_B_DATA.split("\t|\n"));
 
-        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE, "All data");
-        checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
-        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE, "Only one row is allowed for each Mouse/Visit.  Duplicates were found in the imported data.");
+        // Issue 21234: Dataset import no longer merges rows during import
+        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE, "Duplicate dataset row. All rows must have unique MouseId/SequenceNum values.");
         clickButton("Cancel");
         waitForText("All data");
-        checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
+        checkDataElementsPresent("B", DATASET_B_DATA.split("\t|\n"));
     }
 
     protected void createDataset(String name)
