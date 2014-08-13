@@ -43,18 +43,19 @@ import static org.labkey.test.WebTestHelper.getTargetServer;
 
 public class ArtifactCollector
 {
-    public static final String DEFAULT_TEST_NAME = "testSteps";
     private final BaseWebDriverTest _test;
     private static List<Pair<File, FileFilter>> pipelineDirs = new ArrayList<>();
+    private static long _testStart;
 
     public ArtifactCollector(BaseWebDriverTest test)
     {
         _test = test;
     }
 
-    public static void forgetArtifactDirs()
+    public static void init()
     {
         pipelineDirs = new ArrayList<>();
+        _testStart = System.currentTimeMillis();
     }
 
     public File ensureDumpDir()
@@ -126,8 +127,7 @@ public class ArtifactCollector
 
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
         String baseName = dateFormat.format(new Date()) + _test.getClass().getSimpleName();
-        if (!DEFAULT_TEST_NAME.equals(testName))
-            baseName += "#" + testName;
+        baseName += "#" + testName;
 
         dumpFullScreen(dumpDir, baseName);
         dumpScreen(dumpDir, baseName);
@@ -178,16 +178,6 @@ public class ArtifactCollector
         }
 
         return null;
-    }
-
-    public void dumpPageSnapshot(@Nullable String subdir)
-    {
-        dumpPageSnapshot(DEFAULT_TEST_NAME, subdir);
-    }
-
-    public void dumpPageSnapshot()
-    {
-        dumpPageSnapshot(null);
     }
 
     public File dumpFullScreen(File dir, String baseName)
@@ -285,7 +275,7 @@ public class ArtifactCollector
             public boolean accept(File pathname)
             {
                 return pathname.isDirectory() && !pathname.isHidden() ||
-                       pathname.lastModified() > BaseWebDriverTest.getStartTime() && filter.accept(pathname);
+                       pathname.lastModified() > _testStart && filter.accept(pathname);
             }
         };
 

@@ -29,7 +29,6 @@ import java.util.List;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
-import static org.labkey.test.BaseWebDriverTest.getStartTime;
 
 public class FileBrowserHelper
 {

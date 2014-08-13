@@ -45,16 +45,13 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -144,7 +141,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
-    private static long _startTime;
     private List<JavaScriptError> _jsErrors;
     private static WebDriverWait _shortWait;
     private static WebDriverWait _longWait;
@@ -225,11 +221,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public static long getStartTime()
-    {
-        return _startTime;
-    }
-
     protected static BaseWebDriverTest getCurrentTest()
     {
         return currentTest;
@@ -270,7 +261,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     protected abstract @Nullable String getProjectName();
 
     @LogMethod
-    public void setUp() throws Exception
+    public void setUp()
     {
         Boolean reusingDriver = false;
 
@@ -330,7 +321,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     Dictionary<String, Object> prefs = new Hashtable<>();
 
                     prefs.put("download.prompt_for_download", "false");
-                    prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
+                    prefs.put("download.default_directory", getDownloadDir().getAbsolutePath());
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
@@ -1678,9 +1669,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             beforeClassSucceeded = false;
             _anyTestCaseFailed = false;
-            _startTime = System.currentTimeMillis();
 
-            ArtifactCollector.forgetArtifactDirs();
+            ArtifactCollector.init();
             killHungDriverOnTeamCity();
 
             try
@@ -1692,7 +1682,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 throw new RuntimeException(e);
             }
 
-            super.starting(description);
+            currentTest.setUp();
+            currentTest.preamble();
         }
 
         @Override
@@ -1704,20 +1695,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 currentTest.handleFailure(errorRef, beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
                 e = errorRef.get();
             }
-
-            super.failed(e, description);
         }
 
         @Override
         protected void finished(Description description)
         {
+            Ext4Helper.resetCssPrefix();
             if (currentTest != null)
             {
+                if (beforeClassSucceeded)
+                    currentTest.postamble();
+
                 currentTest.doTearDown();
                 currentTest = null;
             }
-
-            super.finished(description);
         }
     };
 
@@ -1726,14 +1717,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return testClass;
     }
 
-    @LogMethod @BeforeClass
-    public static void performInitialChecks() throws Throwable
-    {
-        currentTest.setUp();
-        currentTest.preamble();
-    }
-
-    private void preamble() throws Exception
+    private void preamble()
     {
         signIn();
         enableEmailRecorder();
@@ -1770,17 +1754,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public TestWatcher _watcher = new TestWatcher()
     {
         @Override
-        public Statement apply(Statement base, Description description)
+        protected void starting(Description description)
         {
             // We know that @BeforeClass methods are done now that we are in a non-static context
             beforeClassSucceeded = true;
 
-            return super.apply(base, description);
-        }
-
-        @Override
-        protected void starting(Description description)
-        {
             super.starting(description);
         }
 
@@ -1901,15 +1879,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         checkJsErrors();
     }
 
-    @LogMethod @AfterClass
-    public static void performFinalChecks() throws Throwable
-    {
-        Ext4Helper.resetCssPrefix();
-        if (beforeClassSucceeded)
-            currentTest.postamble();
-    }
-
-    private void postamble() throws Exception
+    private void postamble()
     {
         if (!_anyTestCaseFailed)
         {
