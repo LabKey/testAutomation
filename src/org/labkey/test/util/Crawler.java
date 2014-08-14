@@ -250,15 +250,15 @@ public class Crawler
         private URL _origin;
         private String _urlText;
         private int _depth;
-		private boolean _testInjection;
+        private boolean _testInjection;
 
-		public UrlToCheck(URL origin, String urlText, int depth, boolean inject)
-		{
-			_origin = origin;
-			_urlText = urlText;
-			_depth = depth;
-			_testInjection = inject;
-		}
+        public UrlToCheck(URL origin, String urlText, int depth, boolean inject)
+        {
+            _origin = origin;
+            _urlText = urlText;
+            _depth = depth;
+            _testInjection = inject;
+        }
 
         public URL getOrigin()
         {
@@ -275,10 +275,10 @@ public class Crawler
             return _depth;
         }
 
-		public boolean testInjection()
-		{
-			return _testInjection;
-		}
+        public boolean testInjection()
+        {
+            return _testInjection;
+        }
     }
 
 
@@ -382,21 +382,21 @@ public class Crawler
                 _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
         }
 
-    	private class ActionProfile
-    	{
-    		private long _invocations;
-    		private long _longestLoad;
-    		private long _totalTime;
-    		private String _urlForLongest;
-    		private ControllerActionId _actionId;
+        private class ActionProfile
+        {
+            private long _invocations;
+            private long _longestLoad;
+            private long _totalTime;
+            private String _urlForLongest;
+            private ControllerActionId _actionId;
 
-    		ActionProfile(String relativeURL, long loadTime)
-    		{
-    			_actionId = new ControllerActionId(relativeURL);
-    			_invocations = 1;
-    			_totalTime = _longestLoad = loadTime;
-    			_urlForLongest = relativeURL;
-    		}
+            ActionProfile(String relativeURL, long loadTime)
+            {
+                _actionId = new ControllerActionId(relativeURL);
+                _invocations = 1;
+                _totalTime = _longestLoad = loadTime;
+                _urlForLongest = relativeURL;
+            }
 
             public void updateActionProfile(String relativeURL, long loadTime)
             {
@@ -537,7 +537,7 @@ public class Crawler
             if (actionId.getController().equalsIgnoreCase(adminController) && !"/home".equals(actionId.getFolder()))
                 return true;
         }
-		
+
         // always visit all links under projects created by the tests:
         return underCreatedProject(rootRelativeURL);
     }
@@ -603,7 +603,7 @@ public class Crawler
         // Breadth first crawl
         long startTime = System.currentTimeMillis();
         int linkCount = 0;
-		
+
         // Initialize list to links present at start page
         URL startPageURL = _test.getURL();
         String[] linkAddresses = _test.getLinkAddresses();
@@ -657,6 +657,7 @@ public class Crawler
     private void crawlLink(UrlToCheck urlToCheck, String relativeURL)
     {
         URL origin = null;
+        URL currentPageUrl;
         // Helps breadth first crawl
         try
         {
@@ -666,10 +667,10 @@ public class Crawler
 
             int depth = urlToCheck.getDepth();
             origin = urlToCheck.getOrigin();
-            URL currentPageUrl = _test.getURL();
+            currentPageUrl = _test.getURL();
 
             // Find all the links at the site
-            if (_test.isElementPresent(Locator.id("folderBar")))_test.hoverFolderBar();
+            if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)_test.hoverFolderBar();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1, urlToCheck.testInjection()));
@@ -684,8 +685,6 @@ public class Crawler
             int code = _test.getResponseCode();
             if (code == 404 || code == 500)
                 fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
-
-			testInjection(urlToCheck, currentPageUrl);
         }
         catch (RuntimeException |
                AssertionError rethrow) {
@@ -706,6 +705,8 @@ public class Crawler
 
             throw rethrow;
         }
+
+        testInjection(urlToCheck, currentPageUrl);
     }
 
     protected void checkForForbiddenWords(String relativeURL)
@@ -729,65 +730,66 @@ public class Crawler
     }
 
 
-	public static final String alertText = "8(";
-	public static final String maliciousScript = "<script>alert(\"" + alertText + "\");</script>";
+	public static final String injectedAlert = "8(";
+	public static final String maliciousScript = "<script>alert(\"" + injectedAlert + "\");</script>";
 	public static final String injectString = "\"'>--></script>" + maliciousScript;
 
     public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
     {
+        String msg = null;
         try
         {
-            String msg = null;
-            try
+            return f.apply(arg);
+        }
+        catch (SeleniumException se)
+        {
+            String html = test.getHtmlSource();
+            if (html.contains(maliciousScript))
+                msg = "page contains injected script";
+
+            while (test.isAlertPresent())
             {
-                return f.apply(arg);
-            }
-            catch (SeleniumException se)
-            {
-                String html = test.getHtmlSource();
-                if (html.contains(maliciousScript))
-                    msg = "page contains injected script";
-
-                while (test.isAlertPresent())
-                {
-                    if (test.getAlert().startsWith(alertText))
-                        msg = " malicious script executed";
-                }
-
-                // see ConnectionWrapper.java
-                if (html.contains("SQL injection test failed"))
-                    msg = "SQL injection detected";
-
-                if (msg != null)
-                {
-                    String url = test.getCurrentRelativeURL();
-                    fail(msg + "\n" + url);
-                }
-
-                throw se;
-            }
-            catch (UnhandledAlertException ex)
-            {
-                if (ex.getAlertText().startsWith(alertText))
+                if (test.getAlert().startsWith(injectedAlert))
                     msg = " malicious script executed";
-
-                String html = test.getHtmlSource();
-
-                if (html.contains(maliciousScript))
-                    msg = "page contains injected script";
-
-                // see ConnectionWrapper.java
-                if (html.contains("SQL injection test failed"))
-                    msg = "SQL injection detected";
-
-                if (msg != null)
-                {
-                    String url = test.getCurrentRelativeURL();
-                    fail(msg + "\n" + url);
-                }
-
-                throw ex;
             }
+
+            // see ConnectionWrapper.java
+            if (html.contains("SQL injection test failed"))
+                msg = "SQL injection detected";
+
+            if (msg != null)
+            {
+                String url = test.getCurrentRelativeURL();
+                fail(msg + "\n" + url);
+            }
+
+            throw se;
+        }
+        catch (UnhandledAlertException ex)
+        {
+            String alertText = ex.getAlertText();
+            if (alertText == null)
+                alertText = test.getAlert();
+
+            if (alertText.startsWith(injectedAlert))
+                msg = " malicious script executed";
+
+            String html = test.getHtmlSource();
+
+            if (html.contains(maliciousScript))
+                msg = "page contains injected script";
+
+            // see ConnectionWrapper.java
+            if (html.contains("SQL injection test failed"))
+                msg = "SQL injection detected";
+
+            if (msg != null)
+            {
+                String url = test.getCurrentRelativeURL();
+                fail(msg + "\n" + url);
+            }
+
+            throw ex;
         }
         catch (RuntimeException re)
         {
@@ -798,44 +800,46 @@ public class Crawler
 
         return null;
     }
-	
-	private void testInjection(UrlToCheck urlToCheck, URL start)
-	{
-		if (!urlToCheck.testInjection())
-			return;
 
-		String base = start.toString();
-		String query = start.getQuery();
-		int q = base.indexOf('?');
-		if (q != -1)
-			base = base.substring(0,q);
+    private void testInjection(UrlToCheck urlToCheck, URL start)
+    {
+        if (!urlToCheck.testInjection())
+            return;
 
-		if (query == null)
-			return;
-		if (query.startsWith("?"))
-			query = query.substring(1);
-		if (query.length() == 0)
-			return;
+        String base = start.toString();
+        String query = start.getQuery();
+        int q = base.indexOf('?');
+        if (q != -1)
+            base = base.substring(0,q);
+
+        if (query == null)
+            return;
+        if (query.startsWith("?"))
+            query = query.substring(1);
+        if (query.length() == 0)
+            return;
 
         Function<String, Void> urlTester = new Function<String, Void>() {
             @Override
             public Void apply(String urlMalicious)
             {
                 _test.beginAt(urlMalicious);
+                if (_test.isAlertPresent())
+                    throw new UnhandledAlertException("", _test.getAlert());
                 return null;
             }
         };
 
-		String[] parts = StringUtils.split(query,'&');
-		for (int i=0 ; i<parts.length ; i++)
-		{
-			String save = parts[i];
-			parts[i] = save + ( save.indexOf('=') == -1 ? "=" : "") + injectString;
-			String queryMalicious = StringUtils.join(parts, '&');
-			parts[i] = save;
+        String[] parts = StringUtils.split(query,'&');
+        for (int i=0 ; i<parts.length ; i++)
+        {
+            String save = parts[i];
+            parts[i] = save + ( save.indexOf('=') == -1 ? "=" : "") + injectString;
+            String queryMalicious = StringUtils.join(parts, '&');
+            parts[i] = save;
 
-			String urlMalicious = base + "?" + queryMalicious;
+            String urlMalicious = base + "?" + queryMalicious;
             tryInject(_test, urlTester, urlMalicious);
-		}
-	}
+        }
+    }
 }

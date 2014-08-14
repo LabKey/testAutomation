@@ -65,25 +65,17 @@ public class FlowTest extends BaseFlowTest
     public void _doTestSteps()
     {
         setupQuery();
-
         importFiles();
-
         analysisFilterTest();
 
         if(!isShortTest())
         {
             configureSampleSetAndMetadata();
-
             sampleSetAndMetadataTest();
-
             customGraphQuery();
-
             positivityReportTest();
-
             copyAnalysisScriptTest();
-
             removeAnalysisFilter();
-            
             verifyDiscoverableFCSFiles();
         }
     }
