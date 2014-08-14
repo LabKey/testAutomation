@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
@@ -28,7 +28,9 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
@@ -39,7 +41,7 @@ import static org.junit.Assert.assertTrue;
  * Date: 4/24/2014
  */
 @Category({DailyA.class, Data.class})
-public class ListImportFieldsTest extends BaseWebDriverMultipleTest
+public class ListImportFieldsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "List Import Fields Test";
     private static final File LIST_FIELD_IMPORT = new File(TestFileUtils.getSampledataPath(), "lists/ListImportFields.txt");
@@ -58,6 +60,12 @@ public class ListImportFieldsTest extends BaseWebDriverMultipleTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("list");
     }
 
     @BeforeClass

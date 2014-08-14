@@ -122,6 +122,24 @@ import static org.junit.Assert.*;
 import static org.labkey.test.TestProperties.*;
 import static org.labkey.test.WebTestHelper.*;
 
+/**
+ * This class should be used as the base for all functional test classes
+ * Test cases should be non-destructive and should not depend on a particular execution order
+ *
+ * Shared setup steps should be in a public static void method annotated with org.junit.BeforeClass
+ * The name of the method is not important. The JUnit runner finds the method solely based on the BeforeClass annotation
+ *
+ * @BeforeClass
+ * public static void doSetup() throws Exception
+ * {
+ *     MyTestClass initTest = (MyTestClass)getCurrentTest();
+ *     initTest.setupProject(); // Perform shared setup steps here
+ * }
+ *
+ * org.junit.AfterClass is also supported, but should not be used to perform any destructive cleanup as it is executed
+ * before the base test class can perform its final checks -- link check, leak check, etc.
+ * The doCleanup method should be overridden for initial and final project cleanup
+ */
 public abstract class BaseWebDriverTest implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;

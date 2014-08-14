@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
@@ -84,7 +84,7 @@ import static org.junit.Assert.*;
  *   (overrides title and URL for P)
  */
 @Category({DailyA.class, Data.class})
-public class LinkedSchemaTest extends BaseWebDriverMultipleTest
+public class LinkedSchemaTest extends BaseWebDriverTest
 {
     private SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";

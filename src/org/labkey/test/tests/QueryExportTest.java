@@ -22,6 +22,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class QueryExportTest extends AbstractExportTest
@@ -92,4 +94,9 @@ public class QueryExportTest extends AbstractExportTest
         navigateToQuery("lists", QUERY_NAME);
     }
 
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("query");
+    }
 }

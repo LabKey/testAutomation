@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
-public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
+public class FileBasedPipelineTest extends BaseWebDriverTest
 {
     private static final String PIPELINETEST_MODULE = "pipelinetest";
     private static final File SAMPLE_FILE = new File(TestFileUtils.getSampledataPath(), "fileTypes/sample.txt");

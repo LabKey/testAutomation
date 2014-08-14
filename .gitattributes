@@ -255,7 +255,6 @@ src/org/labkey/remoteapi/olap/MdxCommand.java -text
 src/org/labkey/remoteapi/olap/MdxResponse.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
-src/org/labkey/test/BaseWebDriverMultipleTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/LabKeyJDBCTest.java -text

@@ -17,14 +17,14 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PipelineHelper;
 
 @Category({DailyA.class, DailyB.class})
-public class DatabaseDiagnosticsTest extends BaseWebDriverMultipleTest
+public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
     @Override
     protected String getProjectName()

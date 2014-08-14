@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -30,9 +30,11 @@ import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyB.class, Reports.class, Charting.class})
-public class RaphaelRendererTest extends BaseWebDriverMultipleTest
+public class RaphaelRendererTest extends BaseWebDriverTest
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/vis/RaphaelRendererTest.folder.zip";
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
@@ -289,4 +291,11 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
         log("Cleaning up");
         deleteProject(getProjectName(), afterTest);
     }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("visualization");
+    }
+
 }

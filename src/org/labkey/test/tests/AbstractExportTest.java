@@ -21,7 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
-import org.labkey.test.BaseWebDriverMultipleTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * goToDataRegionPage will be called before each test and should leave the browser at the test target
  * The DataRegion to be checked should have 5+ rows of data
  */
-public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
+public abstract class AbstractExportTest extends BaseWebDriverTest
 {
     protected DataRegionTable dataRegion;
     protected DataRegionExportHelper exportHelper;
