@@ -34,6 +34,11 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
     abstract protected void basicChecks();
 
+    protected boolean isQuickTest()
+    {
+        return false;
+    }
+
     public void basicMS2Check()
     {
         createProjectAndFolder();
@@ -120,7 +125,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("search");
         popLocation();
 
-        if(isQuickTest)
+        if(isQuickTest())
             return;
 
         log("Analyze again.");

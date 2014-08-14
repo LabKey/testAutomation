@@ -38,7 +38,12 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
     @Test
     public void testSteps()
     {
-        doTestStepsSetDepth(false);
+        log("Verifying that pipeline files were cleaned up properly");
+        File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
+        if (test2.exists())
+            fail("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists");
+
+        basicMS2Check();
     }
 
     @Override
@@ -53,18 +58,6 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
     {
         log("Analyze " + SEARCH_BUTTON + " sample data.");
         _fileBrowserHelper.selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
-    }
-
-    protected void doTestStepsSetDepth(boolean isQuickTest)
-    {
-        setIsQuickTest(isQuickTest);
-
-        log("Verifying that pipeline files were cleaned up properly");
-        File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
-        if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists");
-
-        basicMS2Check();
     }
 
     protected void basicChecks()

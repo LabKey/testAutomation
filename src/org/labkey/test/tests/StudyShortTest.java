@@ -22,14 +22,8 @@ import org.labkey.test.categories.DRT;
 public class StudyShortTest extends StudyTest
 {
     @Override
-    protected void doVerifySteps()
+    protected boolean isQuickTest()
     {
-        doVerifyStepsSetDepth(true);
-    }
-
-    @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
+        return true;
     }
 }

@@ -49,11 +49,16 @@ public class UserTest extends SecurityTest
     protected static final String NORMAL_USER2 = "user2_securitytest@security.test";
     protected static final String NORMAL_USER2_ALTERNATE = "not-user2@security.test";
 
+    @Override
+    protected boolean isQuickTest()
+    {
+        return true;
+    }
 
-    @Test
+    @Test @Override
     public void testSteps()
     {
-        super.doTestStepsSetDepth(true);
+        super.testSteps();
 
         siteUsersTest();
         requiredFieldsTest();

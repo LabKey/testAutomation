@@ -46,13 +46,6 @@ public class XTandemTest extends AbstractXTandemTest
     @Test
     public void testSteps()
     {
-        doTestStepsSetDepth(false);
-    }
-
-    protected void doTestStepsSetDepth(boolean isQuickTest)
-    {
-        setIsQuickTest(isQuickTest);
-
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())

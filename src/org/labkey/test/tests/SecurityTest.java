@@ -69,6 +69,11 @@ public class SecurityTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
+    protected boolean isQuickTest()
+    {
+        return false;
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
@@ -81,18 +86,12 @@ public class SecurityTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        doTestStepsSetDepth(false);
-    }
-
-    @LogMethod protected void doTestStepsSetDepth(boolean isQuickTest)
-    {
-        this.isQuickTest = isQuickTest;
         enableEmailRecorder();
 
         clonePermissionsTest();
         displayNameTest();
         tokenAuthenticationTest();
-        if(!isQuickTest)
+        if(!isQuickTest())
         {
             impersonationTest();
             guestTest();
@@ -105,7 +104,7 @@ public class SecurityTest extends BaseWebDriverTest
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 
-        if(!isQuickTest)
+        if(!isQuickTest())
         {
             cantReachAdminToolFromUserAccount(false);
             passwordStrengthTest();

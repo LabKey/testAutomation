@@ -59,7 +59,6 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 public class StudyTest extends StudyBaseTest
 {
     public String datasetLink = datasetCount + " datasets";
-    protected boolean quickTest = true;
     protected boolean isLegacyExportFormat;
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
@@ -111,6 +110,11 @@ public class StudyTest extends StudyBaseTest
         return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
     }
 
+    protected boolean isQuickTest()
+    {
+        return false;
+    }
+
     protected void doCreateSteps()
     {
         pauseSearchCrawler(); //necessary for the alternate ID testing
@@ -140,18 +144,11 @@ public class StudyTest extends StudyBaseTest
 
     protected void doVerifySteps()
     {
-        doVerifyStepsSetDepth(false);
-    }
-
-    @LogMethod
-    protected void doVerifyStepsSetDepth(boolean quickTest)
-    {
-        this.quickTest = quickTest;
         manageSubjectClassificationTest();
         emptyParticipantPickerList(); // Delete participant lists to avoid interfering with api test.
         verifyStudyAndDatasets();
 
-        if (!quickTest)
+        if (!isQuickTest())
         {
             waitForSpecimenImport();
             verifySpecimens();
@@ -269,7 +266,7 @@ public class StudyTest extends StudyBaseTest
     protected void manageSubjectClassificationTest()
     {
 
-        if(!quickTest)
+        if(!isQuickTest())
         {
             //verify/create the right data
             goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
@@ -312,7 +309,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         // verify warn on no selection
-        if(!isQuickTest)
+        if(!isQuickTest())
         {
             //nav trail check
             clickAndWait(Locator.linkContainingText("999320016"));
@@ -341,7 +338,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.name(LABEL_FIELD), "Participant Group from Grid");
         clickButtonContainingText("Save");
 
-        if(!quickTest)
+        if(!isQuickTest())
         {
             Locator menu = Locator.lkButton(SUBJECT_NOUN + " Groups");
             _extHelper.clickExtMenuButton(menu, "Participant Group from Grid");
@@ -581,7 +578,7 @@ public class StudyTest extends StudyBaseTest
         verifyVisitMapPage();
         verifyManageDatasetsPage();
 
-        if (quickTest)
+        if (isQuickTest())
         {
             verifyParticipantVisitDay();
             verifyAliasReplacement();

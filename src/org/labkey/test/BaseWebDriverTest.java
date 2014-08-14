@@ -2026,18 +2026,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return false;
     }
 
-    protected boolean isQuickTest = false;
-
-    protected boolean isQuickTest()
-    {
-        return isQuickTest;//"DRT".equals(System.getProperty("suite"));
-    }
-
-    protected void setIsQuickTest(boolean isQuickTest)
-    {
-        this.isQuickTest = isQuickTest;
-    }
-
     @LogMethod
     public void checkLeaksAndErrors()
     {

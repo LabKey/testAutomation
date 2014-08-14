@@ -15,16 +15,15 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DRT;
 
-@Category(DRT.class)
+@Category({DRT.class})
 public class SecurityShortTest extends SecurityTest
 {
-    @Test
-    public void testSteps()
+    @Override
+    protected boolean isQuickTest()
     {
-        doTestStepsSetDepth(true);
+        return true;
     }
 }
