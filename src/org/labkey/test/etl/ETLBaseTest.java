@@ -164,7 +164,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     protected void addTransformResult(String transformId, String version, String status, String recordsAffected)
     {
         addTransformSummary(new String[]{transformId, version, null, status, recordsAffected, null});
-        addTransformHistory(transformId, new String[]{version, null, status, recordsAffected, null});
+        addTransformHistory(transformId, new String[]{transformId, version, null, status, recordsAffected, null, "Job Details", "Run Details"});
     }
 
     // The summary table should only have one row per transform sorted by transform id so make sure
@@ -630,11 +630,15 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         TransformHistoryVerifier(ETLBaseTest test, String transformId, String transformDesc, ArrayList<String[]> data)
         {
             super(test, new String[]{
+                    "Name",
                     "Version",
-                    "Run",
+                    "Date Run",
                     "Status",
                     "Records Processed",
-                    "Execution Time"}, data);
+                    "Execution Time",
+                    "Job Info",
+                    "Run Info"
+            }, data);
 
             _transformId = transformId;
             _transformDesc = transformDesc;
@@ -654,7 +658,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
 
             // walk through all the history rows and verify the link to the file log works (just the first one)
-            // and the link to the details page works
+            // and the links work for the transform details page, job details, and run details
             for (int row = 0; row < _data.size(); row ++)
             {
                 String status = drt.getDataAsText(row, "Status");
@@ -662,10 +666,11 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
                 {
                     verifyLogFileLink(status);
                 }
-                String run = drt.getDataAsText(row, "Run");
+                String run = drt.getDataAsText(row, "Name");
                 verifyTransformDetails(run, status);
                 goBack();
-                waitForText(run);
+                // wait for the grid to reload
+                waitForText("Run Details");
             }
         }
 
