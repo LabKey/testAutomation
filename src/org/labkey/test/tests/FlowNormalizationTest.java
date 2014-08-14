@@ -17,6 +17,8 @@
 package org.labkey.test.tests;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -29,17 +31,15 @@ import java.util.Collections;
 @Category({/*DailyA.class,*/ Flow.class})
 public class FlowNormalizationTest extends BaseFlowTest
 {
-    @Override
-    protected void init()
+    @BeforeClass
+    public static void initR()
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelper _rReportHelper = new RReportHelper(getCurrentTest());
         String rVersion = _rReportHelper.ensureRConfig();
 
         Assume.assumeTrue("Wrong version of R: flowNormalization package require 2.15.x", rVersion.startsWith("2.15"));
-
-        super.init();
     }
 
     @Override
@@ -48,8 +48,8 @@ public class FlowNormalizationTest extends BaseFlowTest
         return true;
     }
 
-    @Override
-    protected void _doTestSteps() throws Exception
+    @Test
+    public void _doTestSteps()
     {
         ImportAnalysisOptions options = new ImportAnalysisOptions(
                 getContainerPath(),

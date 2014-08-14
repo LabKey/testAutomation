@@ -18,9 +18,8 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -37,9 +36,7 @@ import static org.junit.Assert.fail;
 
 abstract public class BaseFlowTest extends BaseWebDriverTest
 {
-    protected static final String PROJECT_NAME = "Flow Verify Project";
-    protected static final String PIPELINE_PATH = "/sampledata/flow";
-    private final FileBrowserHelper flowFileBrowserHelper = new FileBrowserHelper(this);
+    protected static final File PIPELINE_PATH = TestFileUtils.getSampleData("flow");
 
     public List<String> getAssociatedModules()
     {
@@ -50,6 +47,60 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @Override
+    protected String getProjectName()
+    {
+        return "Flow Verify Project";
+    }
+
+    protected String getFolderName()
+    {
+        return getClass().getSimpleName();
+    }
+
+    private String _containerPath = null;
+
+    protected String getContainerPath()
+    {
+        if (_containerPath == null)
+            _containerPath = "/" + getProjectName() + "/" + getFolderName();
+        return _containerPath;
+    }
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        BaseFlowTest initTest = (BaseFlowTest)getCurrentTest();
+        initTest.init();
+    }
+
+    private void init()
+    {
+        beginAt("/admin/begin.view");
+        clickAndWait(Locator.linkWithText("flow cytometry"));
+        getPipelineWorkDirectory().mkdir();
+        setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
+
+        boolean normalizationEnabled = requiresNormalization();
+        if (normalizationEnabled)
+            checkCheckbox(Locator.id("normalizationEnabled"));
+        else
+            uncheckCheckbox(Locator.id("normalizationEnabled"));
+
+        clickButton("update");
+        assertTextNotPresent("Path does not exist");
+        if (normalizationEnabled)
+        {
+            assertTextNotPresent("The R script engine is not available.");
+            assertTextNotPresent("Please install the flowWorkspace R library");
+        }
+
+        _containerHelper.createProject(getProjectName(), null);
+        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
+
+        setPipelineRoot(PIPELINE_PATH.getAbsolutePath());
     }
 
     //need not fill all three, but must be the same length.  If you wish to skip a field, set it to an empty string,
@@ -67,32 +118,6 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             setFormElement(Locator.xpath("//input[@name='ff_value']").index(i), values[i]);
         }
         submit();
-    }
-
-    @Override
-    protected String getProjectName()
-    {
-        return PROJECT_NAME;
-    }
-
-    protected String getFolderName()
-    {
-        return getClass().getSimpleName();
-    }
-
-    private String _containerPath = null;
-
-    protected String getContainerPath()
-    {
-        if (_containerPath == null)
-            _containerPath = "/" + getProjectName() + "/" + getFolderName();
-        return _containerPath;
-    }
-
-
-    protected void setFlowPipelineRoot(String rootPath)
-    {
-        setPipelineRoot(rootPath);
     }
 
     protected File getPipelineWorkDirectory()
@@ -130,6 +155,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        deleteAllRuns();
         deleteProject(getProjectName(), afterTest);
         try
         {
@@ -142,60 +168,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         deletePipelineWorkDirectory();
     }
 
-    @Test
-    public void testSteps() throws Exception
-    {
-        init();
-        _doTestSteps();
-        after();
-    }
-
-    protected abstract void _doTestSteps() throws Exception;
-
     protected boolean requiresNormalization()
     {
         return false;
     }
 
-    protected void init()
-    {
-        beginAt("/admin/begin.view");
-        clickAndWait(Locator.linkWithText("flow cytometry"));
-        deletePipelineWorkDirectory();
-        setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
-        clickButton("update");
-        assertTextPresent("Path does not exist");
-        getPipelineWorkDirectory().mkdir();
-        setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
-
-        boolean normalizationEnabled = requiresNormalization();
-        if (normalizationEnabled)
-            checkCheckbox(Locator.id("normalizationEnabled"));
-        else
-            uncheckCheckbox(Locator.id("normalizationEnabled"));
-
-        clickButton("update");
-        assertTextNotPresent("Path does not exist");
-        if (normalizationEnabled)
-        {
-            assertTextNotPresent("The R script engine is not available.");
-            assertTextNotPresent("Please install the flowWorkspace R library");
-        }
-
-        _containerHelper.createProject(getProjectName(), null);
-        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
-
-        setFlowPipelineRoot(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH);
-    }
-
-    protected void after() throws Exception
-    {
-        if (!TestProperties.isTestCleanupSkipped())
-            deleteAllRuns();
-    }
-
     //Issue 12597: Need to delete exp.data objects when deleting a flow run
-    protected void deleteAllRuns() throws Exception
+    protected void deleteAllRuns()
     {
         if (!isElementPresent(Locator.linkWithText(getProjectName())))
             goToHome();
@@ -411,7 +390,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
-        flowFileBrowserHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
@@ -420,7 +399,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         waitForExtReady();
         if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
-            flowFileBrowserHelper.waitForFileGridReady();
+            _fileBrowserHelper.waitForFileGridReady();
 
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)
@@ -440,9 +419,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
             case Browse:
                 checkRadioButton(Locator.radioButtonById("Browse"));
-                flowFileBrowserHelper.waitForFileGridReady();
+                _fileBrowserHelper.waitForFileGridReady();
                 // UNDONE: Currently, only one file path supported
-                flowFileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
+                _fileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
             default:

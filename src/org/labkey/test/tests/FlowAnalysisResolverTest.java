@@ -15,7 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
@@ -23,16 +26,21 @@ import org.labkey.test.categories.Flow;
 import static org.junit.Assert.*;
 
 @Category({DailyB.class, Flow.class})
-public class FlowAnalysisResolverTest extends FlowTest
+public class FlowAnalysisResolverTest extends BaseFlowTest
 {
-
     private final String FCS_FILE = "118795.fcs";
 
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        clickFolder(getFolderName());
+    }
+
+    @Test
     public void _doTestSteps()
     {
-
         //import set 1
-
         click(Locator.linkWithText("FlowAnalysisResolverTest"));
         importFCSFiles();
 
@@ -55,26 +63,23 @@ public class FlowAnalysisResolverTest extends FlowTest
         //set no-resolve file to a file and proceed with import
         selectOptionByText(Locator.name("selectedSamples.rows[no-resolve01].matchedFile"), "118795.fcs (microFCS)");
 
-
         verifyImportedAllFiles();
     }
 
     private void verifyImportedAllFiles()
     {
-
         clickButton("Next");
         clickButton("Next");
 
         assertTextPresent("All 4 selected", "1 FCS files");
         clickButton("Finish");
         waitForText("Experiment Run Graph");
-         assertTextPresent(FCS_FILE, 4);
+        assertTextPresent(FCS_FILE, 4);
     }
 
     private String getMatchedFileForName(String name)
     {
        return getFormElement(Locator.name(name));
-
     }
 
     private void verifyCantChooseUnmatchedSample()
@@ -83,5 +88,4 @@ public class FlowAnalysisResolverTest extends FlowTest
         clickButton("Next");
         assertTextPresent("All selected rows must be matched to a previously imported FCS file.", "Import Analysis: Review Samples");
     }
-
 }

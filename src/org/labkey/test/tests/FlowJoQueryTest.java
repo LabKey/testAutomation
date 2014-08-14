@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -43,7 +44,8 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class})
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    protected void _doTestSteps() throws Exception
+    @Test
+    public void _doTestSteps()
     {
         verifyQueryTest();
 
@@ -52,18 +54,6 @@ public class FlowJoQueryTest extends BaseFlowTest
         verifyWSPImport();
 
         verifyFilterOnImport();
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
-    @Override
-    protected void init()
-    {
-        super.init();
     }
 
     protected void verifyQueryTest()
@@ -80,14 +70,14 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         _customizeViewsHelper.applyCustomView();
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         _containerHelper.enableModules(Arrays.asList("Query", "Flow"));
 
-        createQuery(PROJECT_NAME, "PassFailDetails", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
-        createQuery(PROJECT_NAME, "PassFail", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
-        //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
-        createQuery(PROJECT_NAME, "COMP", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
-        createQuery(PROJECT_NAME, "Comparison", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
+        createQuery(getProjectName(), "PassFailDetails", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
+        createQuery(getProjectName(), "PassFail", TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
+        //createQuery(getProjectName(), "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
+        createQuery(getProjectName(), "COMP", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
+        createQuery(getProjectName(), "Comparison", TestFileUtils.getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), TestFileUtils.getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));

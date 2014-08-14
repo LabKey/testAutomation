@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -42,17 +44,11 @@ public class FlowSpecimenTest extends BaseFlowTest
            "Sample_002\t" + DATE + "\t" + PTID + "\t100\tml\t\t\t\n" +
            "Sample_003\t11/13/12\tP7312\t200\tml\t\t\t";
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    @BeforeClass
+    public static void initFlowFolders()
     {
-        super.doCleanup(afterTest);
-    }
-
-    @Override
-    protected void init()
-    {
-        super.init();
-        initializeStudyFolder();
+        FlowSpecimenTest initTest = (FlowSpecimenTest)getCurrentTest();
+        initTest.initializeStudyFolder();
     }
 
     @LogMethod
@@ -74,8 +70,8 @@ public class FlowSpecimenTest extends BaseFlowTest
         assertTextPresent("Specimens uploaded successfully");
     }
 
-    @Override
-    protected void _doTestSteps() throws Exception
+    @Test
+    public void _doTestSteps()
     {
         importFCSFiles();
 

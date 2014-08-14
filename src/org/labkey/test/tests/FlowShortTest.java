@@ -21,8 +21,8 @@ import org.labkey.test.categories.DRT;
 @Category(DRT.class)
 public class FlowShortTest extends FlowTest
 {
-    protected void _doTestSteps()
+    public boolean isShortTest()
     {
-        _doTestStepsSetDepth(true);
+        return true;
     }
 }

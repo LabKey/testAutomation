@@ -16,11 +16,12 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
@@ -43,51 +44,25 @@ public class FlowTest extends BaseFlowTest
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
-    private static final String JOIN_FIELD_LINK_TEXT = "Define sample description join fields";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
     private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
 
-    private void clickButtonWithText(String text)
-    {
-        click(Locator.xpath("//input[@value = '" + text + "']"));
-    }
-
-    public int countEnabledInputs(String name)
-    {
-        List<WebElement> inputs = Locator.xpath("//input[@name='" + name + "']").findElements(getDriver());
-        int ret = 0;
-        for (WebElement el : inputs)
-        {
-            if (el.isEnabled())
-                ret ++;
-        }
-        return ret;
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
-    @Override
-    protected void init()
+    @BeforeClass
+    public static void initR()
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelper _rReportHelper = new RReportHelper(getCurrentTest());
         _rReportHelper.ensureRConfig();
-
-        super.init();
     }
 
-    protected void _doTestSteps()
+    public boolean isShortTest()
     {
-        _doTestStepsSetDepth(false);
+        return false;
     }
 
-    @LogMethod
-    protected void _doTestStepsSetDepth(boolean quickTest)
+    @Test
+    public void _doTestSteps()
     {
         setupQuery();
 
@@ -95,7 +70,7 @@ public class FlowTest extends BaseFlowTest
 
         analysisFilterTest();
 
-        if(!quickTest)
+        if(!isShortTest())
         {
             configureSampleSetAndMetadata();
 
@@ -110,10 +85,7 @@ public class FlowTest extends BaseFlowTest
             removeAnalysisFilter();
             
             verifyDiscoverableFCSFiles();
-
-
         }
-
     }
 
     @LogMethod
@@ -124,7 +96,6 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkContainingText("Edit FCS Analysis Filter"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "");
         clickButton("Set filter");
-
     }
 
     /**
@@ -136,7 +107,6 @@ public class FlowTest extends BaseFlowTest
     private void verifyDiscoverableFCSFiles()
     {
         clickFolder(getFolderName());
-
 
         importAnalysis_begin( getContainerPath());
         importAnalysis_uploadWorkspace(getContainerPath(), "/8color/workspace.xml");
@@ -301,7 +271,6 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         beginAt(urlAnalysis.getFile());
 
-
         clickAndWait(Locator.linkWithText("details"));
 
         clickAndWait(Locator.linkWithText("91918.fcs"));
@@ -322,7 +291,6 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("details"));
         clickAndWait(Locator.linkWithText("91918.fcs-" + FCS_FILE_1));
         assertTextPresent("91918.fcs-" + FCS_FILE_1);
-
 
         // Now, let's add another run:
          clickAndWait(Locator.linkWithText("Flow Dashboard"));
@@ -450,7 +418,7 @@ public class FlowTest extends BaseFlowTest
                 "FCSAnalyses.Graph.\"(FSC-H:FSC-A)\" AS Singlets,\n" +
                 "FCSAnalyses.Graph.\"(<APC-A>)\"\n" +
                 "FROM FCSAnalyses";
-        createQuery(PROJECT_NAME, "GraphQuery", graphQuery, null, true);
+        createQuery(getProjectName(), "GraphQuery", graphQuery, null, true);
 
         log("** Executing custom query with Graph columns");
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=GraphQuery&query.showGraphs=Inline");
@@ -470,7 +438,6 @@ public class FlowTest extends BaseFlowTest
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
     }
 
-
     @LogMethod
     public void copyAnalysisScriptTest()
     {
@@ -483,7 +450,6 @@ public class FlowTest extends BaseFlowTest
         submit();
         assertTextPresent("There is already a protocol named 'QUV analysis'");
     }
-
 
     @LogMethod
     public void positivityReportTest()
@@ -608,9 +574,25 @@ public class FlowTest extends BaseFlowTest
     @LogMethod(quiet = true)
     private void verifyDeleted(@LoggedParam String reportName)
     {
-
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         waitForText("Ignoring filter/sort on column");
         assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
+    }
+
+    private void clickButtonWithText(String text)
+    {
+        click(Locator.xpath("//input[@value = '" + text + "']"));
+    }
+
+    public int countEnabledInputs(String name)
+    {
+        List<WebElement> inputs = Locator.xpath("//input[@name='" + name + "']").findElements(getDriver());
+        int ret = 0;
+        for (WebElement el : inputs)
+        {
+            if (el.isEnabled())
+                ret ++;
+        }
+        return ret;
     }
 }

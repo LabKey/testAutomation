@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -34,12 +35,8 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class, FileBrowser.class})
 public class FlowImportTest extends BaseFlowTest
 {
-    protected void _doTestSteps() throws Exception
-    {
-        importTest();
-    }
-
-    protected void importTest()
+    @Test
+    public void importTest()
     {
         String workspacePath = "/flowjoquery/microFCS/microFCS.xml";
         List<String> keywordDirs = Arrays.asList("/flowjoquery/microFCS");

@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -49,12 +51,12 @@ public class FlowCBCTest extends BaseFlowTest
     public static final String PTID1 = "P4309";
     public static final String PTID2 = "P2301";
 
-    @Override
-    protected void init()
+    @BeforeClass
+    public static void initFlowFolders()
     {
-        super.init();
-        initializeAssayFolder();
-        initializeStudyFolder();
+        FlowCBCTest initTest = (FlowCBCTest)getCurrentTest();
+        initTest.initializeAssayFolder();
+        initTest.initializeStudyFolder();
     }
 
     @LogMethod
@@ -89,11 +91,11 @@ public class FlowCBCTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
-        importFolderFromZip(new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "/FlowStudy.folder.zip"), false, 1);       //Issue 16697: dataset ignored when importing study archive
+        importFolderFromZip(new File(PIPELINE_PATH, "FlowStudy.folder.zip"), false, 1);       //Issue 16697: dataset ignored when importing study archive
     }
 
-    @Override
-    protected void _doTestSteps() throws Exception
+    @Test
+    public void _doTestSteps()
     {
         copyFlowResultsToStudy();
 
