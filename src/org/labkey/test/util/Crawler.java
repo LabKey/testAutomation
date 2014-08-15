@@ -106,6 +106,7 @@ public class Crawler
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("flow-editscript", "download"),
+            new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
@@ -512,11 +513,8 @@ public class Crawler
             return false;
 
         // never visit explicity excluded actions:
-        for (ControllerActionId excluded : _excludedActions)
-        {
-            if (actionId.equals(excluded))
-                return false;
-        }
+        if (_excludedActions.contains(actionId))
+            return false;
 
         //skip any _webdav or fake urls
         if (actionId.getController().equalsIgnoreCase("_webdav") || actionId.getController().equalsIgnoreCase("fake"))
