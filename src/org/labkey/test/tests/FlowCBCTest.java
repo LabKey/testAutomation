@@ -119,8 +119,8 @@ public class FlowCBCTest extends BaseFlowTest
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
-        setFormElement(Locator.name("date", 0), "2012-03-17");
-        setFormElement(Locator.name("participantId", 1), PTID1);
+        setFormElement(Locator.name("date").index(0), "2012-03-17");
+        setFormElement(Locator.name("participantId").index(1), PTID1);
         clickButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
@@ -173,13 +173,13 @@ public class FlowCBCTest extends BaseFlowTest
         table.checkAllOnPage();
 
         clickButton("Copy to Study");
-        selectOptionByText(Locator.name("targetStudy", 0), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
-        selectOptionByText(Locator.name("targetStudy", 1), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
-        setFormElement(Locator.name("participantId", 0), PTID1);
-        setFormElement(Locator.name("participantId", 1), PTID2);
+        selectOptionByText(Locator.name("targetStudy").index(0), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        selectOptionByText(Locator.name("targetStudy").index(1), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        setFormElement(Locator.name("participantId").index(0), PTID1);
+        setFormElement(Locator.name("participantId").index(1), PTID2);
         // Note that dates are not on the same day, but within the default timespan size
-        setFormElement(Locator.name("date", 0), "2012-06-19");
-        setFormElement(Locator.name("date", 1), "2012-03-18");
+        setFormElement(Locator.name("date").index(0), "2012-06-19");
+        setFormElement(Locator.name("date").index(1), "2012-03-18");
         clickButton("Copy to Study");
     }
 

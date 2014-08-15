@@ -743,7 +743,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
                 measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[i][1]+"')]]";
                 waitForElement(Locator.xpath("("+measureXpath+")[2]"));
-                setFormElement(Locator.name("filterSearch", i), datasetMeasurePairs[i][0]);
+                setFormElement(Locator.name("filterSearch").index(i), datasetMeasurePairs[i][0]);
                 waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
                 waitForElement(Locator.xpath(measureXpath));
                 click(Locator.xpath(measureXpath));

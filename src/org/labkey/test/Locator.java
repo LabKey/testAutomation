@@ -253,18 +253,6 @@ public abstract class Locator
     }
 
     /**
-     * @deprecated Use {@link NameLocator} with {@link #index(Integer)}
-     * Element by name and index within the set of elements with that name
-     * @param name
-     * @param index
-     * @return
-     */
-    @Deprecated public static Locator name(String name, Integer index)
-    {
-        return new NameLocator(name).index(index);
-    }
-
-    /**
      * Find using xpath
      * @param xpathExpr
      * @return

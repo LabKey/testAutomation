@@ -29,6 +29,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
@@ -40,7 +41,6 @@ import static org.junit.Assert.*;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
-
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
@@ -180,11 +180,11 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
-        setFormElement("ff_name", "FlowTest New Name");
-        setFormElement("ff_comment", "FlowTest Comment");
+        setFormElement(Locator.name("ff_name"), "FlowTest New Name");
+        setFormElement(Locator.name("ff_comment"), "FlowTest Comment");
         Locator locPlateName = Locator.xpath("//td/input[@type='hidden' and @value='PLATE NAME']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locPlateName, "FlowTest Keyword Plate Name");
-        submit();
+        clickButton("update");
         popLocation();
         assertElementPresent(Locator.linkWithImage("/flagFCSFile.gif"));
         assertElementNotPresent(Locator.linkWithText("91761.fcs"));
@@ -193,30 +193,30 @@ public class FlowTest extends BaseFlowTest
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("Create a new Analysis script"));
-        setFormElement("ff_name", "FlowTestAnalysis");
-        submit();
+        setFormElement(Locator.id("ff_name"), "FlowTestAnalysis");
+        clickButton("Create Analysis Script");
 
         clickAndWait(Locator.linkWithText("Define compensation calculation from scratch"));
         selectOptionByText(Locator.name("selectedRunId"), FCS_FILE_1);
-        submit();
+        clickButton("Next Step");
 
         selectOptionByText(Locator.name("positiveKeywordName[3]"), "Comp");
         selectOptionByText(Locator.name("positiveKeywordValue[3]"), "FITC CD4");
-        submit();
+        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
         assertTextPresent("Missing data");
         selectOptionByText(Locator.name("negativeKeywordName[0]"), "WELL ID");
         selectOptionByText(Locator.name("negativeKeywordValue[0]"), "H01");
         clickButtonWithText("Universal");
-        submit();
+        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
         assertTextPresent("compensation calculation may be edited in a number");
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("Create a new Analysis script"));
-        setFormElement("ff_name", "QUV analysis");
-        submit();
+        setFormElement(Locator.id("ff_name"), "QUV analysis");
+        clickButton("Create Analysis Script");
         clickAndWait(Locator.linkWithText("View Source"));
-        setFormElement("script", TestFileUtils.getFileContents(QUV_ANALYSIS_SCRIPT));
-        submit();
+        setFormElement(Locator.name("script"), TestFileUtils.getFileContents(QUV_ANALYSIS_SCRIPT));
+        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
     }
 
     @LogMethod
@@ -230,8 +230,8 @@ public class FlowTest extends BaseFlowTest
 
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Analyze selected runs");
-        setFormElement("ff_analysisName", "FlowExperiment2");
-        submit();
+        setFormElement(Locator.name("ff_analysisName"), "FlowExperiment2");
+        clickButton("Analyze runs");
         waitForPipeline(getContainerPath());
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
@@ -277,7 +277,7 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Other settings"));
         clickAndWait(Locator.linkWithText("Change FCS Analyses Names"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_keyword']").index(1), "Keyword/EXPERIMENT NAME");
-        submit();
+        clickButton("Set names");
 
         beginAt(urlAnalysis.getFile());
         clickAndWait(Locator.linkWithText("details"));
@@ -439,7 +439,7 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("QUV analysis"));
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement(Locator.name("name"), "QUV analysis");
-        submit();
+        clickAndWait(Locator.tagWithAttribute("input", "value", "Make Copy"));
         assertTextPresent("There is already a protocol named 'QUV analysis'");
     }
 
@@ -467,19 +467,20 @@ public class FlowTest extends BaseFlowTest
     {
         log("** Creating positivity report '" + reportName + "'");
         goToFlowDashboard();
-        addWebPart("Flow Reports");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Flow Reports");
 
         clickAndWait(Locator.linkWithText("create positivity report"));
 
-        setFormElement("reportName", reportName);
-        setFormElement("reportDescription", description);
+        setFormElement(Locator.name("reportName"), reportName);
+        setFormElement(Locator.name("reportDescription"), description);
 
         Locator l = Locator.name("subset");
         click(l);
         setFormElement(l, "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
 
         // click on TriggerField trigger image
-        click(Locator.xpath("//input[@name='filter[4].property_subset']/../img"));
+        click(Locator.tagWithName("input", "filter[4].property_subset").append("/../img"));
         // Selenium XPath doesn't support attribute namespaces.
         Locator CD4 = Locator.xpath("//div[contains(@class, 'x-tree-node-el') and @*='Singlets/L/Live/3+/4+']");
         waitForElement(CD4, WAIT_FOR_JAVASCRIPT);
@@ -491,7 +492,7 @@ public class FlowTest extends BaseFlowTest
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
 
         // NOTE: this filter is set high so we filter out all of the data and produce an error message.
-        setFormElement("filter[4].value", "5000");
+        setFormElement(Locator.name("filter[4].value"), "5000");
 
         clickButton("Save");
     }
@@ -504,7 +505,7 @@ public class FlowTest extends BaseFlowTest
 
         // Should only be one 'manage' menu since we've only created one flow report.
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
-        setFormElement("filter[4].value", "100");
+        setFormElement(Locator.name("filter[4].value"), "100");
         clickButton("Save");
     }
 

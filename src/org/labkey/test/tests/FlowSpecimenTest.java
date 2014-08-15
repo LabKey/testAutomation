@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
@@ -136,8 +135,8 @@ public class FlowSpecimenTest extends BaseFlowTest
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
-        assertEquals(PTID, getFormElement(Locator.name("participantId", 0)));
-        assertEquals(DATE, getFormElement(Locator.name("date", 0)));
+        assertEquals(PTID, getFormElement(Locator.name("participantId").index(0)));
+        assertEquals(DATE, getFormElement(Locator.name("date").index(0)));
         clickButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");

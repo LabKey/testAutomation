@@ -117,7 +117,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             selectOptionByValue(Locator.xpath("//select[@name='ff_op']").index(i), ops[i]);
             setFormElement(Locator.xpath("//input[@name='ff_value']").index(i), values[i]);
         }
-        submit();
+        clickButton("Set filter");
     }
 
     protected File getPipelineWorkDirectory()
@@ -240,20 +240,20 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("** Uploading sample set");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
-        setFormElement("data", TestFileUtils.getFileContents(sampleFilePath));
+        setFormElement(Locator.name("data"), TestFileUtils.getFileContents(sampleFilePath));
         click(Locator.name("idColumn1")); //need to trigger an event to populate the columns
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("idColumn" + (i+1)), idCols[i]);
-        submit();
+        clickButton("Submit");
 
         log("** Join sample set with FCSFile keywords");
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)
-            selectOptionByText(Locator.name("ff_samplePropertyURI", i), idCols[i]);
+            selectOptionByText(Locator.name("ff_samplePropertyURI").index(i), idCols[i]);
         for (int i = 0; i < keywordCols.length; i++)
-            selectOptionByText(Locator.name("ff_dataField", i), keywordCols[i]);
-        submit();
+            selectOptionByText(Locator.name("ff_dataField").index(i), keywordCols[i]);
+        clickButton("update");
     }
 
     protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
@@ -276,16 +276,16 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (setBackground)
         {
             // specify forground-background match columns
-            assertFormElementEquals(Locator.name("ff_matchColumn", 0), "Run");
-            selectOptionByText(Locator.name("ff_matchColumn", 1), "Sample Sample Order");
+            assertFormElementEquals(Locator.name("ff_matchColumn").index(0), "Run");
+            selectOptionByText(Locator.name("ff_matchColumn").index(1), "Sample Sample Order");
 
             // specify background values
-            selectOptionByText(Locator.name("ff_backgroundFilterField", 0), "Sample Stim");
-            assertFormElementEquals(Locator.name("ff_backgroundFilterOp", 0), "eq");
-            setFormElement(Locator.name("ff_backgroundFilterValue", 0), "Neg Cont");
+            selectOptionByText(Locator.name("ff_backgroundFilterField").index(0), "Sample Stim");
+            assertFormElementEquals(Locator.name("ff_backgroundFilterOp").index(0), "eq");
+            setFormElement(Locator.name("ff_backgroundFilterValue").index(0), "Neg Cont");
         }
 
-        submit();
+        clickButton("Set ICS Metadata");
     }
 
 
@@ -493,10 +493,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 }
 
                 if (rEngineNormalizationSubsets != null)
-                    setFormElement("rEngineNormalizationSubsets", StringUtils.join(rEngineNormalizationSubsets, ImportAnalysisOptions.PARAMETER_SEPARATOR));
+                    setFormElement(Locator.id("rEngineNormalizationSubsets"), StringUtils.join(rEngineNormalizationSubsets, ImportAnalysisOptions.PARAMETER_SEPARATOR));
 
                 if (rEngineNormalizationParameters != null)
-                    setFormElement("rEngineNormalizationParameters", StringUtils.join(rEngineNormalizationParameters, ImportAnalysisOptions.PARAMETER_SEPARATOR));
+                    setFormElement(Locator.id("rEngineNormalizationParameters"), StringUtils.join(rEngineNormalizationParameters, ImportAnalysisOptions.PARAMETER_SEPARATOR));
             }
             else
             {
@@ -518,11 +518,11 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
         if (existing)
         {
-            selectOptionByText(Locator.name("existingAnalysisId"), analysisName);
+            selectOptionByText(Locator.id("existingAnalysisId"), analysisName);
         }
         else
         {
-            setFormElement("newAnalysisName", analysisName);
+            setFormElement(Locator.id("newAnalysisName"), analysisName);
         }
         clickButton("Next");
     }

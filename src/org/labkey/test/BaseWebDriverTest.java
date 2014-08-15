@@ -3450,7 +3450,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         setFormElement(Locator.name("ff_queryName"), query);
         if (viewName != null)
             setFormElement(Locator.name("ff_viewName"), viewName);
-        submit();
+        clickButton("Create");
         StringBuilder strFields = new StringBuilder(fields[0]);
         for (int i = 1; i < fields.length; i ++)
         {
@@ -3458,7 +3458,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             strFields.append(fields[i]);
         }
         setFormElement(Locator.name("ff_columnList"), strFields.toString());
-        submit();
+        clickButton("Save");
         popLocation();
     }
 
@@ -6025,7 +6025,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             beginAt(queryURL);
             editQueryProperties("flow", name);
             selectOptionByValue(Locator.name("inheritable"), "true");
-            submit();
+            clickButton("Save");
         }
     }
 
