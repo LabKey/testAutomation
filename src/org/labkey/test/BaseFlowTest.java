@@ -522,7 +522,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
         else
         {
-            setFormElement(Locator.id("newAnalysisName"), analysisName);
+            setFormElement(Locator.name("newAnalysisName"), analysisName);
         }
         clickButton("Next");
     }
