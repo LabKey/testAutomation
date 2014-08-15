@@ -46,16 +46,6 @@ public abstract class TestProperties
         return "true".equals(System.getProperty("devMode"));
     }
 
-    public static boolean isFirebugPanelsEnabled()
-    {
-        return "true".equals(System.getProperty("enableFirebugPanels"));
-    }
-
-    public static boolean isFirefoxExtensionsEnabled()
-    {
-        return "true".equals(System.getProperty("enableFirefoxExtensions"));
-    }
-
     public static boolean isTestRunningOnTeamCity()
     {
         String buildTypeProperty = "teamcity.buildType.id";

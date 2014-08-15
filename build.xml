@@ -539,8 +539,6 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
-            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
-            <sysproperty key="enableFirefoxExtensions" value="${sysprop.enableFirefoxExtensions}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
@@ -919,16 +917,6 @@
             <isset property="databaseVersion"/>
         </condition>
 
-        <!-- Set property sysprop.enableFirebugPanels. Enables FireBug panels on Firefox. Does nothing for other browsers -->
-        <condition property="sysprop.enableFirebugPanels" value="${enableFirebugPanels}" else="false">
-            <isset property="enableFirebugPanels"/>
-        </condition>
-
-        <!-- Set property sysprop.enableFirefoxExtensions. Enables Firefox extensions. Does nothing for other browsers -->
-        <condition property="sysprop.enableFirefoxExtensions" value="${enableFirefoxExtensions}" else="false">
-            <isset property="enableFirefoxExtensions"/>
-        </condition>
-
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
         <condition property="sysprop.suite" value="${suite}" else="DRT">
             <isset property="suite"/>
@@ -1051,8 +1039,6 @@
             <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
-            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
-            <sysproperty key="enableFirefoxExtensions" value="${sysprop.enableFirefoxExtensions}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>

@@ -402,27 +402,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         catch(IOException e)
                         {throw new RuntimeException("Failed to load JS error checker", e);}
                     }
-                    if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
-                    {
-                        try
-                        {
-                            profile.addExtension(new File(TestFileUtils.getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
-                            profile.addExtension(new File(TestFileUtils.getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
-                            profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
-                            profile.setPreference("extensions.firebug.allPagesActivation", "on");
-                            profile.setPreference("extensions.firebug.previousPlacement", 3);
-                            profile.setPreference("extensions.firebug.net.enabledSites", true);
-
-                            if (isFirebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
-                            {
-                                profile.setPreference("extensions.firebug.net.enableSites", true);
-                                profile.setPreference("extensions.firebug.script.enableSites", true);
-                                profile.setPreference("extensions.firebug.console.enableSites", true);
-                            }
-                        }
-                        catch(IOException e)
-                        {throw new RuntimeException("Failed to load Firebug", e);}
-                    }
 
                     profile.setEnableNativeEvents(useNativeEvents());
 
