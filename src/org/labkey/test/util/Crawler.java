@@ -105,9 +105,16 @@ public class Crawler
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
+            new ControllerActionId("experiment", "showRunGraphDetail"), // TODO: exclude for injection only
+            new ControllerActionId("flow", "query"), // TODO: exclude for injection only
+            new ControllerActionId("flow-attribute", "createAlias"), // TODO: exclude for injection only
+            new ControllerActionId("flow-attribute", "details"), // TODO: exclude for injection only
+            new ControllerActionId("flow-attribute", "edit"), // TODO: exclude for injection only
+            new ControllerActionId("flow-attribute", "summary"), // TODO: exclude for injection only
             new ControllerActionId("flow-editscript", "download"),
             new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
             new ControllerActionId("flow-run", "download"),
+            new ControllerActionId("flow-run", "showRuns"), // TODO: exclude for injection only
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("issues", "download"),
