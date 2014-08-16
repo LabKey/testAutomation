@@ -144,6 +144,7 @@ public class Crawler
             new ControllerActionId("study-samples", "downloadSpecimenList"),
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
+            new ControllerActionId("study-samples", "samples"), // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
