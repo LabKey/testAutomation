@@ -518,7 +518,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
         if (existing)
         {
-            selectOptionByText(Locator.id("existingAnalysisId"), analysisName);
+            selectOptionByText(Locator.name("existingAnalysisId"), analysisName);
         }
         else
         {
