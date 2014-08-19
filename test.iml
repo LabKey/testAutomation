@@ -93,6 +93,7 @@
         </JAVADOC>
         <SOURCES>
           <root url="jar://$MODULE_DIR$/lib/selenium-server-2.42.2-srcs.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.11-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
