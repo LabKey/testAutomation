@@ -149,8 +149,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        setFilter("Dataset", "APXpulse", "Is Less Than", "100");
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.setFilter("APXpulse", "Is Less Than", "100");
         datasetTable.clickHeaderButton("Charts", "Create Scatter Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
@@ -167,7 +167,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
-        clearFilter("Dataset", "APXpulse", 0);
+        datasetTable.clearFilter("APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -188,7 +188,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
-        createQuickChart("Dataset", "dbl");
+        DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.createQuickChart("dbl");
 
         log("Set X Axis");
         goToAxisTab("Cohort");

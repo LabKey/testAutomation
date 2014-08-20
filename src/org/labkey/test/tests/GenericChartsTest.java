@@ -122,15 +122,6 @@ public abstract class GenericChartsTest extends ReportTest
         _extHelper.waitForExtDialogToDisappear("Saved");
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#createQuickChart(String)}
-     */
-    @LogMethod
-    protected void createQuickChart(String regionName, String columnName)
-    {
-        _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(regionName, columnName), false, "Quick Chart");
-    }
-
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)
     {
         click(Ext4Helper.Locators.ext4Button(btnTxt));

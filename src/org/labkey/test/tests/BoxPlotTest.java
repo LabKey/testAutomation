@@ -106,8 +106,8 @@ public class BoxPlotTest extends GenericChartsTest
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        setFormElement("reportName", "TestReportName");
-        setFormElement("reportDescription", "TestReportDescription");
+        setFormElement(Locator.name("reportName"), "TestReportName");
+        setFormElement(Locator.name("reportDescription"), "TestReportDescription");
         clickDialogButtonAndWaitForMaskToDisappear("Save", "Cancel");
         assertTextNotPresent("TestReportName");
 
@@ -125,8 +125,8 @@ public class BoxPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
-        setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
         datasetTable.clickHeaderButton("Charts", "Create Box Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
@@ -139,8 +139,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
-        String tableId = Locator.css(".labkey-data-region").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("id").substring("dataregion_".length());
-        clearFilter(tableId, "RCHtempc", 0);
+        datasetTable.clearFilter("RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);
         assertSVG(BOX_PLOT_DR_2);
@@ -172,7 +171,8 @@ public class BoxPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
-        createQuickChart("Dataset", "dbl");
+        DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
+        datasetTable.createQuickChart("dbl");
 
         //Verify box plot
         assertSVG(BOX_PLOT_QC);
