@@ -26,6 +26,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -46,6 +47,7 @@ public class FlowTest extends BaseFlowTest
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
     private static final String FCS_FILE_2 = "L04-060120-QUV-JS";
+    private static final String QUV_ANALYSIS_NAME = "QUV analysis";
 
     @BeforeClass
     public static void initR()
@@ -70,6 +72,7 @@ public class FlowTest extends BaseFlowTest
 
         if(!isShortTest())
         {
+            testChartMeasurePicker();
             configureSampleSetAndMetadata();
             sampleSetAndMetadataTest();
             customGraphQuery();
@@ -78,48 +81,6 @@ public class FlowTest extends BaseFlowTest
             removeAnalysisFilter();
             verifyDiscoverableFCSFiles();
         }
-    }
-
-    @LogMethod
-    private void removeAnalysisFilter()
-    {
-        clickTab("Flow Dashboard");
-        clickAndWait(Locator.linkContainingText("Other settings"));
-        clickAndWait(Locator.linkContainingText("Edit FCS Analysis Filter"));
-        selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "");
-        clickButton("Set filter");
-    }
-
-    /**
-     * With our new feature, a user doesn't have to individually pick out FCS files, we will
-     * find files that match their workspace and suggest the user include them (final curating
-     * to be done by the user).  This tests that feature
-     */
-    @LogMethod
-    private void verifyDiscoverableFCSFiles()
-    {
-        clickFolder(getFolderName());
-
-        importAnalysis_begin( getContainerPath());
-        importAnalysis_uploadWorkspace(getContainerPath(), "/8color/workspace.xml");
-        click(Locator.radioButtonById("Previous"));
-        clickButton("Next");
-
-        assertTextPresent("Matched 0 of 59 samples.");
-
-        //TODO:  how many to select?
-        selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
-        click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected"));
-        clickButton("Next");
-        waitForText("Import Analysis: Analysis Engine");
-        clickButton("Next");
-        waitForText("Import Analysis: Analysis Folder");
-        clickButton("Next");
-        waitForText("Import Analysis: Confirm");
-        clickButton("Finish", 0);
-        sleep(15000);
-        waitForText("Ignoring filter");
-        assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
@@ -212,7 +173,7 @@ public class FlowTest extends BaseFlowTest
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("Create a new Analysis script"));
-        setFormElement(Locator.id("ff_name"), "QUV analysis");
+        setFormElement(Locator.id("ff_name"), QUV_ANALYSIS_NAME);
         clickButton("Create Analysis Script");
         clickAndWait(Locator.linkWithText("View Source"));
         setFormElement(Locator.name("script"), TestFileUtils.getFileContents(QUV_ANALYSIS_SCRIPT));
@@ -225,7 +186,7 @@ public class FlowTest extends BaseFlowTest
         setFlowFilter(new String[] {"Keyword/Stim"}, new String[] {"isnonblank"}, new String[] {""});
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
-        clickAndWait(Locator.linkWithText("QUV analysis"));
+        clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         clickAndWait(Locator.linkWithText("Analyze some runs"));
 
         checkCheckbox(Locator.checkboxByName(".toggle"));
@@ -298,7 +259,7 @@ public class FlowTest extends BaseFlowTest
         waitForPipeline(getContainerPath());
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
-        clickAndWait(Locator.linkWithText("QUV analysis"));
+        clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         click(Locator.linkWithText("Analyze some runs"));
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
@@ -330,6 +291,27 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent("File Path Root");
         _extHelper.clickMenuButton("Views", "AllColumns");
         assertTextPresent("File Path Root");
+    }
+
+    // Regression test : https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=21160
+    // Should be able to chart flow data when chart columns are restricted
+    @LogMethod
+    private void testChartMeasurePicker()
+    {
+        goToProjectSettings(getProjectName());
+        checkCheckbox(Locator.name("restrictedColumnsEnabled"));
+        clickButton("Save");
+        clickFolder(getFolderName());
+
+        clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
+        clickAndWait(Locator.linkWithText("details"));
+
+        DataRegionTable runTable = new DataRegionTable("query", this);
+        runTable.clickHeaderButton("Charts", "Create Box Plot");
+
+        Locator.XPathLocator measurePicker = Ext4Helper.ext4Window("Y Axis");
+        waitForElement(measurePicker);
+        waitForElements(measurePicker.append(Locator.tag("tr").startsWith("comp:")), 4);
     }
 
     // Test sample set and ICS metadata
@@ -431,19 +413,6 @@ public class FlowTest extends BaseFlowTest
     }
 
     @LogMethod
-    public void copyAnalysisScriptTest()
-    {
-        // bug 4625
-        log("** Check analysis script copy must have unique name");
-        goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("QUV analysis"));
-        clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
-        setFormElement(Locator.name("name"), "QUV analysis");
-        clickAndWait(Locator.tagWithAttribute("input", "value", "Make Copy"));
-        assertTextPresent("There is already a protocol named 'QUV analysis'");
-    }
-
-    @LogMethod
     public void positivityReportTest()
     {
         String reportName = TRICKY_CHARACTERS + " positivity report";
@@ -460,6 +429,61 @@ public class FlowTest extends BaseFlowTest
 
         deleteReport(reportName);
         verifyDeleted(reportName);
+    }
+
+    @LogMethod
+    public void copyAnalysisScriptTest()
+    {
+        // bug 4625
+        log("** Check analysis script copy must have unique name");
+        goToFlowDashboard();
+        clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
+        clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
+        setFormElement(Locator.name("name"), QUV_ANALYSIS_NAME);
+        clickAndWait(Locator.tagWithAttribute("input", "value", "Make Copy"));
+        assertTextPresent("There is already a protocol named 'QUV analysis'");
+    }
+
+    @LogMethod
+    private void removeAnalysisFilter()
+    {
+        clickTab("Flow Dashboard");
+        clickAndWait(Locator.linkContainingText("Other settings"));
+        clickAndWait(Locator.linkContainingText("Edit FCS Analysis Filter"));
+        selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0), "");
+        clickButton("Set filter");
+    }
+
+    /**
+     * With our new feature, a user doesn't have to individually pick out FCS files, we will
+     * find files that match their workspace and suggest the user include them (final curating
+     * to be done by the user).  This tests that feature
+     */
+    @LogMethod
+    private void verifyDiscoverableFCSFiles()
+    {
+        clickFolder(getFolderName());
+
+        importAnalysis_begin( getContainerPath());
+        importAnalysis_uploadWorkspace(getContainerPath(), "/8color/workspace.xml");
+        click(Locator.radioButtonById("Previous"));
+        clickButton("Next");
+
+        assertTextPresent("Matched 0 of 59 samples.");
+
+        //TODO:  how many to select?
+        selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
+        click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected"));
+        clickButton("Next");
+        waitForText("Import Analysis: Analysis Engine");
+        clickButton("Next");
+        waitForText("Import Analysis: Analysis Folder");
+        clickButton("Next");
+        waitForText("Import Analysis: Confirm");
+        clickButton("Finish", 0);
+        sleep(15000);
+        waitForText("Ignoring filter");
+        assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
     }
 
     @LogMethod
