@@ -46,12 +46,13 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
-import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -1660,13 +1661,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static TestWatcher testClassWatcher = new TestWatcher()
     {
         @Override
-        public void starting(Description description)
+        public Statement apply(Statement base, Description description)
         {
             testClass = description.getTestClass();
 
             beforeClassSucceeded = false;
             _anyTestCaseFailed = false;
 
+            return super.apply(base, description);
+        }
+
+        @Override
+        public void starting(Description description)
+        {
             ArtifactCollector.init();
             killHungDriverOnTeamCity();
 
@@ -1678,31 +1685,36 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 throw new RuntimeException(e);
             }
-
-            currentTest.setUp();
-            currentTest.preamble();
         }
 
         @Override
         protected void failed(Throwable e, Description description)
         {
+            String pseudoTestName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
+            AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
+
             if (currentTest != null)
             {
-                AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
-                currentTest.handleFailure(errorRef, beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
-                e = errorRef.get();
+                currentTest.handleFailure(errorRef, pseudoTestName);
             }
+
+            if (!e.equals(errorRef.get()))
+                throw new RuntimeException(errorRef.get()); // Add to list of errors
+        }
+
+        @Override
+        protected void succeeded(Description description)
+        {
+            Ext4Helper.resetCssPrefix();
+
+            currentTest.postamble();
         }
 
         @Override
         protected void finished(Description description)
         {
-            Ext4Helper.resetCssPrefix();
             if (currentTest != null)
             {
-                if (beforeClassSucceeded)
-                    currentTest.postamble();
-
                 currentTest.doTearDown();
                 currentTest = null;
             }
@@ -1712,6 +1724,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static Class getCurrentTestClass()
     {
         return testClass;
+    }
+
+    @BeforeClass
+    public static void beforeBWDT()
+    {
+        currentTest.setUp();
+        currentTest.preamble();
     }
 
     private void preamble()
@@ -1737,10 +1756,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @Before
-    public final void preClean() throws Exception
+    public final void beforeTest() throws Exception
     {
-        setUp(); // Instantiate new WebDriver if needed
-        _testFailed = false;
         simpleSignIn();
     }
 
@@ -1751,12 +1768,25 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public TestWatcher _watcher = new TestWatcher()
     {
         @Override
-        protected void starting(Description description)
+        public Statement apply(Statement base, Description description)
         {
             // We know that @BeforeClass methods are done now that we are in a non-static context
             beforeClassSucceeded = true;
 
-            super.starting(description);
+            return super.apply(base, description);
+        }
+
+        @Override
+        protected void starting(Description description)
+        {
+            setUp(); // Instantiate new WebDriver if needed
+            _testFailed = false;
+        }
+
+        @Override
+        protected void succeeded(Description description)
+        {
+            checkJsErrors();
         }
 
         @Override @LogMethod
@@ -1764,8 +1794,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
             handleFailure(errorRef, description.getMethodName());
-
-            super.failed(errorRef.get(), description);
         }
     };
 
@@ -1870,12 +1898,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    @After
-    public final void tearDown() throws Exception
-    {
-        checkJsErrors();
-    }
-
     private void postamble()
     {
         if (!_anyTestCaseFailed)
@@ -1964,7 +1986,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         finally
         {
-            tearDown();
+            doTearDown();
         }
     }
 
