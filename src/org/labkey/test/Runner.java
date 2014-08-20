@@ -263,7 +263,7 @@ public class Runner extends TestSuite
 
                 testResult.startTest(loggingStub); // This will allow static test methods to be more visible on TeamCity test results
                 super.runTest(test, testResult);
-
+                System.out.flush();
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
 

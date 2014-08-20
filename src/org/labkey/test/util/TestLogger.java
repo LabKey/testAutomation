@@ -62,7 +62,6 @@ public class TestLogger
         {
             String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
             System.out.println(d + " " + getIndentString() + str);
-            System.out.flush();
         }
     }
 }
