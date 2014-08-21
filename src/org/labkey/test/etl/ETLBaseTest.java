@@ -129,6 +129,19 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         verifier.verifyResults();
     }
 
+    protected void waitForTransformLink(String linkText, String goBackText, String ... waitForTexts)
+    {
+        log("clicking link with text " + linkText + "'");
+        click(Locator.xpath("//a[.='" + linkText + "']/../..//a[.='" + linkText + "']"));
+        for (String waitForText : waitForTexts)
+        {
+            log("waiting for text '" + waitForText + "'");
+            waitForText(waitForText);
+        }
+        goBack();
+        waitForText(goBackText);
+    }
+
     protected void waitForTransformPage(String linkText, String title, String status)
     {
         log("clicking link with text " + linkText + " and status " + status);
@@ -671,6 +684,14 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
                 goBack();
                 // wait for the grid to reload
                 waitForText("Run Details");
+
+                // verify job link
+                String job = drt.getDataAsText(row, "Job Info");
+                waitForTransformLink(job, "Run Details", "Pipeline Jobs", status);
+
+                // verify experiment run link
+                String exp = drt.getDataAsText(row, "Run Info");
+                waitForTransformLink(exp, "Run Details", "Run Details", run);
             }
         }
 

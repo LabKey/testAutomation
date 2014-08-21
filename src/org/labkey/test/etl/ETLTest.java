@@ -165,6 +165,11 @@ UNDONE: need to fix the merge case
         portalHelper.addQueryWebPart("TransformRun", "dataintegration", transformRun, null);
         portalHelper.addQueryWebPart("TransformHistory", "dataintegration", "TransformHistory", null);
         portalHelper.addQueryWebPart("TransformSummary", "dataintegration", "TransformSummary", null);
+        portalHelper.addWebPart("Data Transform Jobs");
+        // make sure the webpart has the 'scheduler' button on it
+        clickButton("Scheduler");
+        waitForText("View Processed Jobs");
+        goBack();
 
         //
         // import our study (used by the remote transform tests).  This study is a continuous time point
