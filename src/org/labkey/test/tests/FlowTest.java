@@ -304,7 +304,7 @@ public class FlowTest extends BaseFlowTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
-        clickAndWait(Locator.linkWithText("details"));
+        clickAndWait(Locator.linkWithText(FCS_FILE_1 + " analysis"));
 
         DataRegionTable runTable = new DataRegionTable("query", this);
         runTable.clickHeaderButton("Charts", "Create Box Plot");
