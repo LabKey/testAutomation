@@ -616,19 +616,43 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("unknown QC");
         assertTextPresent("1234_B");
 
-        //Now explicitly replace, using 'mouseid' instead of 'participantid'
+        // Issue 21234: Dataset import no longer merges rows during import
         clickButton("Import Data");
         _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
-        _listHelper.submitTsvData(_tsv);
-        assertTextPresent("5000.0");
-        assertTextPresent("new text");
-        assertTextPresent("QC State");
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("QCState", "QC State");
-        _customizeViewsHelper.applyCustomView();
-        assertTextPresent("unknown QC");
+        setFormElement(Locator.id("tsv3"), _tsv);
+        _listHelper.submitImportTsv_error("Duplicate dataset row");
+
+        // Update a row and check the QC flag is defaulted to the study default 'unknown QC'
+        {
+            // Verify current state
+            clickAndWait(Locator.linkWithText("verifyAssay"));
+            _extHelper.clickMenuButton("QC State", "All data");
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.addCustomizeViewColumn("QCState", "QC State");
+            _customizeViewsHelper.addCustomizeViewSort("SampleId", "Ascending");
+            _customizeViewsHelper.applyCustomView();
+            DataRegionTable table = new DataRegionTable("Dataset", this);
+            assertEquals(Arrays.asList("1234_A", "1234_B"), table.getColumnDataAsText("SampleId"));
+            assertEquals(Arrays.asList(" ", " "), table.getColumnDataAsText("QCState"));
+            List<String> numberField = table.getColumnDataAsText("NumberField");
+            List<String> textField = table.getColumnDataAsText("TextField");
+
+            // Update the first row
+            String newText = "more new text";
+            clickAndWait(Locator.linkWithText("edit", 0));
+            setFormElement(Locator.input("quf_TextField"), newText);
+            clickButton("Submit");
+            List<String> updatedTextField = Arrays.asList(newText, textField.get(0));
+
+            // Verify new state
+            table = new DataRegionTable("Dataset", this);
+            assertEquals(Arrays.asList("1234_A", "1234_B"), table.getColumnDataAsText("SampleId"));
+            assertEquals(Arrays.asList("unknown QC?", " "), table.getColumnDataAsText("QCState"));
+            assertEquals(numberField, table.getColumnDataAsText("NumberField"));
+            assertEquals(updatedTextField, table.getColumnDataAsText("TextField"));
+        }
 
         // Test Bad Field Names -- #13607
         clickButton("Manage Dataset");
