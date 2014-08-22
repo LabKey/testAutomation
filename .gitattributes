@@ -424,6 +424,7 @@ src/org/labkey/test/tests/FlowTest.java -text
 src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
 src/org/labkey/test/tests/GenericChartsTest.java -text
+src/org/labkey/test/tests/GenericMeasurePickerTest.java -text
 src/org/labkey/test/tests/GenotypeAssaysTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
@@ -564,6 +565,7 @@ src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ArtifactCollector.java -text
 src/org/labkey/test/util/AssayImportOptions.java -text
+src/org/labkey/test/util/BoxPlotReportHelper.java -text
 src/org/labkey/test/util/ChartHelper.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
@@ -571,9 +573,11 @@ src/org/labkey/test/util/CustomizeViewsHelper.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
 src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
+src/org/labkey/test/util/DatasetDomainEditorHelper.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text
+src/org/labkey/test/util/DomainEditorHelper.java -text
 src/org/labkey/test/util/EHRClientAPIHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
@@ -584,6 +588,7 @@ src/org/labkey/test/util/Ext4Helper.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/FileBrowserExtendedProperty.java -text
 src/org/labkey/test/util/FileBrowserHelper.java -text
+src/org/labkey/test/util/GenericChartHelper.java -text
 src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
@@ -610,6 +615,7 @@ src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/RelativeUrl.java -text
 src/org/labkey/test/util/RemoteConnectionHelper.java -text
 src/org/labkey/test/util/ResetTracker.java -text
+src/org/labkey/test/util/ScatterPlotReportHelper.java -text
 src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/SecurityHelper.java -text
