@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
@@ -40,7 +41,7 @@ public class LuminexMultipleCurvesTest extends LuminexTest
         super.ensureConfigured();
     }
 
-    protected void runUITests()
+    protected void runUITests() throws InterruptedException
     {
         runMultipleCurveTest();
     }
@@ -50,20 +51,24 @@ public class LuminexMultipleCurvesTest extends LuminexTest
      *
      */
     @LogMethod
-    private void runMultipleCurveTest()
+    private void runMultipleCurveTest() throws InterruptedException
     {
         String name = startCreateMultipleCurveAssayRun();
 
         String[] standardsNames = {"Standard1", "Standard2"};
         checkStandardsCheckBoxesExist(standardsNames);
+        checkQCControlCheckBoxesExist(standardsNames);
+        checkOtherControlCheckboxesExist(standardsNames);
+
+        WellRole[] std1Roles={WellRole.OTHER_CONTROL};
+        //selectRoleCheckboxesForStandard("Standard1", std1Roles);
 
         String[] possibleAnalytes = getListOfAnalytesMultipleCurveData();
         String[] possibleStandards = new String[] {"Standard2", "Standard1"};
+        String[] possibleRoles = new String[] {"Standard","QC Control", "Other Control"};
 
         Map<String, Set<String>> analytesAndStandardsConfig = generateAnalytesAndStandardsConfig(possibleAnalytes, possibleStandards);
         configureStandardsForAnalytes(analytesAndStandardsConfig, possibleStandards);
-
-
 
         clickButton("Save and Finish", 2*WAIT_FOR_PAGE);
         clickAndWait(Locator.linkWithText(name));
@@ -74,7 +79,8 @@ public class LuminexMultipleCurvesTest extends LuminexTest
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/StdCurve");
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/FitProb");
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/ResVar");
-        _customizeViewsHelper.applyCustomView();
+        _customizeViewsHelper.saveCustomView();
+        waitForText("Std Curve");
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
@@ -96,6 +102,30 @@ public class LuminexMultipleCurvesTest extends LuminexTest
         // the same curve fits
         assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("0.465914") || isTextPresent("0.582906"));
         assertTrue("BioPlex curve fit parameter for ENV6 (97) in plate 1, 2, or 3", isTextPresent("7.64039") || isTextPresent("0.1"));
+
+
+        //test with one standard, and one other control
+        Map<String, WellRole[]> testRoles = new HashMap<>();
+        testRoles.put("Standard1", new WellRole[]{WellRole.STANDARD});
+        testRoles.put("Standard2", new WellRole[]{WellRole.OTHER_CONTROL});
+        reImportData(testRoles);
+
+        goToQCAnalysisPage("view titration qc report");
+        //standard role should be present in qc report
+        assertTextPresent("Standard1");
+        //other role should not be present in qc report
+        assertTextNotPresent("Standard2");
+
+        //test with multiple roles, both should show up on QC report since they have role other than 'other'
+        testRoles.clear();
+        testRoles.put("Standard1", new WellRole[]{WellRole.STANDARD, WellRole.OTHER_CONTROL});
+        testRoles.put("Standard2", new WellRole[]{WellRole.QC_CONTROL, WellRole.OTHER_CONTROL});
+        reImportData(testRoles);
+        goToQCAnalysisPage("view titration qc report");
+        //both roles should be present in qc report
+        assertTextPresent("Standard1");
+        assertTextPresent("Standard2");
+
     }
 
     /**
@@ -115,6 +145,76 @@ public class LuminexMultipleCurvesTest extends LuminexTest
         }
     }
 
+    @LogMethod
+    private void reImportData(Map<String, WellRole[]> wellRoleMap)
+    {
+            goToTestRunList();
+            click(Locator.linkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME));
+            clickButtonContainingText("Re-import run");
+            checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
+            clickButtonContainingText("Next");
+            setFormElement(Locator.name(ASSAY_ID_FIELD), MULTIPLE_CURVE_ASSAY_RUN_NAME);
+            clickButtonContainingText("Next");
+        for(String desc : wellRoleMap.keySet())
+        {
+            selectRoleCheckboxesForStandard(desc, wellRoleMap.get(desc));
+        }
+        clickButtonContainingText("Save and Finish");
+    }
+
+    private void checkQCControlCheckBoxesExist(String[] standardsNames)
+    {
+        for(int i=0; i<standardsNames.length; i++)
+        {
+            String s = standardsNames[i];
+            Locator l = Locator.checkboxByName("_titrationRole_qccontrol_"+s);
+            checkCheckbox(l);
+            assertChecked(l);
+            uncheckCheckbox(l);
+        }
+    }
+
+    private void checkOtherControlCheckboxesExist(String[] standardsNames)
+    {
+        for(int i=0; i<standardsNames.length; i++)
+        {
+            String s = standardsNames[i];
+            Locator l = Locator.checkboxByName("_titrationRole_othercontrol_"+s);
+            checkCheckbox(l);
+            assertChecked(l);
+            uncheckCheckbox(l);
+        }
+    }
+
+    private void selectRoleCheckboxesForStandard(String desc, WellRole[] selectedRoles)
+    {
+        WellRole[] unselectedRoles = validRoles;
+        for(WellRole role : selectedRoles)
+        {
+            unselectedRoles = ArrayUtils.removeElement(unselectedRoles, role);
+        }
+        for (WellRole role : validRoles)
+        {
+            Locator loc = getWellRoleCheckboxLoc(desc, role);
+            if(ArrayUtils.contains(unselectedRoles, role))
+            {
+                //unselect if selected, otherwise do nothing
+                if(isCheckboxChecked(loc.findElement(getDriver())))
+                {
+                    uncheckCheckbox(loc);
+                }
+            }
+            else
+            {
+                //is desired role, select if unselected
+                if(!isCheckboxChecked(loc.findElement(getDriver())))
+                {
+                    checkCheckbox(loc);
+                }
+            }
+        }
+    }
+
     /**
      * using the list of analytes and standards, select one or more standards for each analyte.  Expects at least three
      * analytes and exactly two standards, and returns two analytes using different standards and the rest using both.
@@ -129,7 +229,6 @@ public class LuminexMultipleCurvesTest extends LuminexTest
     private Map<String,Set<String>> generateAnalytesAndStandardsConfig(String[] possibleAnalytes, String[] possibleStandards)
     {
         Map<String, Set<String>> analytesAndStandardsConfig =  new HashMap<>();
-
 
         //based on the assumption that there are five analytes and two possible standards:  update this if you need to test for more
         Set<String> firstStandard = new HashSet<>(); firstStandard.add(possibleStandards[0]);
@@ -182,12 +281,66 @@ public class LuminexMultipleCurvesTest extends LuminexTest
      * @param standard
      * @param checked
      */
+    @LogMethod
     private void checkAnalyteAndStandardCheckBox(String analyte, String standard, boolean checked)
     {
         String checkboxName = "titration_" + analyte + "_" + standard;
+
         if(checked)
+        {
             checkCheckbox(Locator.checkboxByName(checkboxName));
+        }
         else
-            uncheckCheckbox(Locator.checkboxByName(checkboxName));
+        {
+            //not all checkboxes are visible for all plates
+            if(getDriver().findElement(Locator.checkboxByName(checkboxName).toBy()).isDisplayed());
+                uncheckCheckbox(Locator.checkboxByName(checkboxName));
+        }
+    }
+
+    private void checkWellAndRoleCheckBox(String well, WellRole role, boolean checked)
+    {
+        Locator checkBoxLocator = getWellRoleCheckboxLoc(well, role);
+        if(checked)
+            checkCheckbox(checkBoxLocator);
+        else
+            uncheckCheckbox(checkBoxLocator);
+    }
+
+    //check to ensure that either an EC50 value exists, or failure flag is set
+    private void sanityCheckEC50Values()
+    {
+
+    }
+
+    private enum WellRole {STANDARD,QC_CONTROL,OTHER_CONTROL}
+
+    private WellRole[] validRoles = {WellRole.STANDARD, WellRole.QC_CONTROL, WellRole.OTHER_CONTROL};
+
+    private Locator getWellRoleCheckboxLoc(String description, WellRole role)
+    {
+        Locator loc = null;
+        switch(role)
+        {
+            case STANDARD:
+                loc = Locator.checkboxByName("_titrationRole_standard_"+ description);
+                break;
+            case QC_CONTROL:
+                loc = Locator.checkboxByName("_titrationRole_qccontrol_"+ description);
+                break;
+            case OTHER_CONTROL:
+                loc = Locator.checkboxByName("_titrationRole_othercontrol_"+description);
+                break;
+        }
+        return loc;
+    }
+
+    private Set<Locator> getAllWellRoleLocForDesc(String description)
+    {
+        Set<Locator> locs = new HashSet<>();
+        locs.add(getWellRoleCheckboxLoc(description, WellRole.OTHER_CONTROL));
+        locs.add(getWellRoleCheckboxLoc(description, WellRole.QC_CONTROL));
+        locs.add(getWellRoleCheckboxLoc(description, WellRole.STANDARD));
+        return locs;
     }
 }

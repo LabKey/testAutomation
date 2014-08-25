@@ -463,7 +463,15 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         setFormElement(Locator.name(ASSAY_ID_FIELD), name);
     }
 
+    protected void goToQCAnalysisPage(String submenuText)
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
+        //clickAndWait(Locator.linkWithText("view results"));
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), submenuText);
+
+    }
 
     /**
      * Cleanup entry point.
