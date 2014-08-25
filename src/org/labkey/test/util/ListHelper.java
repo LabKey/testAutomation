@@ -444,33 +444,52 @@ public class ListHelper extends AbstractHelper
 
     private void selectLookupComboItem(String fieldName, String value)
     {
+        selectLookupComboItem(fieldName, value, 1);
+    }
+
+    private void selectLookupComboItem(String fieldName, String value, int attempt)
+    {
+        _test.log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
         _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
         try
         {
-            _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+            _test.waitAndClick(500*attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
+            // Stop after 4 attempts
+            if (attempt == 4)
+                throw retry;
+
             _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
-            _test.waitAndClick(1000, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+            selectLookupComboItem(fieldName, value, attempt + 1);
         }
+
         _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
     }
 
     private void selectLookupTableComboItem(String table)
     {
+        selectLookupTableComboItem(table, 1);
+    }
+
+    private void selectLookupTableComboItem(String table, int attempt)
+    {
+        _test.log("Select lookup table combo item '" + table + "', attempt=" + attempt);
         String fieldName = "table";
         _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
         try
         {
-            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"));
+            _test.waitAndClick(500*attempt, Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"), 0);
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
+            // Stop after 4 attempts
+            if (attempt == 4)
+                throw retry;
+
             _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
-            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"));
+            selectLookupTableComboItem(table, attempt+1);
         }
         _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
     }
@@ -562,7 +581,7 @@ public class ListHelper extends AbstractHelper
         return newFieldIndex;
     }
 
-    public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
+    public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.lkButton("Add Field").getPath();
