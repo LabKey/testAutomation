@@ -36,8 +36,14 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-// Provides some helpful utilities used in study-related tests.  Subclasses provide all study creation and
-// verification steps.
+/**
+ * @deprecated TODO: Move shared functionality to a Helper class
+ * This class does not leave enough flexibility in test design.
+ *
+ * Provides some helpful utilities used in study-related tests.  Subclasses provide all study creation and
+ * verification steps.
+ */
+@Deprecated
 public abstract class StudyBaseTest extends SimpleApiTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";

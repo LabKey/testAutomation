@@ -43,11 +43,15 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 /**
+ * @deprecated TODO: Move API test parsing and execution to a Helper class
+ * This class does not leave enough flexibility in test design. Do not use except for actual API tests
+ *
  * An abstract class that can be used to test recorded API request/response interactions. A typical usage
  * would be for an extending class to perform whatever project setup was required and call super.testSteps.
  * The class would also implement getTestFiles which returns an array of recorded test files, the schema is
  * apiTest.xsd and a test can be recorded using the API test page: query/apiTest.view
  */
+@Deprecated
 public abstract class SimpleApiTest extends BaseWebDriverTest
 {
     JSONHelper _helper = null;

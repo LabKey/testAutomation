@@ -24,6 +24,11 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
+/**
+ * @deprecated TODO: Move shared functionality to a Helper class
+ * This class does not leave enough flexibility in test design.
+ */
+@Deprecated
 public abstract class AbstractAssayTest extends SimpleApiTest
 {
     //constants added for security tests

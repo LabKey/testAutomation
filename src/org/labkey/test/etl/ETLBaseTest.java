@@ -41,6 +41,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
+/**
+ * @deprecated TODO: Move shared functionality to a Helper class
+ * This class does not leave enough flexibility in test design.
+ */
+@Deprecated
 public abstract class ETLBaseTest extends BaseWebDriverTest
 {
     protected static String PROJECT_NAME = "ETLTestProject";
