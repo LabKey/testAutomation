@@ -111,6 +111,7 @@ public class Crawler
             new ControllerActionId("flow-attribute", "details"), // TODO: exclude for injection only
             new ControllerActionId("flow-attribute", "edit"), // TODO: exclude for injection only
             new ControllerActionId("flow-attribute", "summary"), // TODO: exclude for injection only
+            new ControllerActionId("flow-compensation", "download"),
             new ControllerActionId("flow-editscript", "download"),
             new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
             new ControllerActionId("flow-run", "download"),
