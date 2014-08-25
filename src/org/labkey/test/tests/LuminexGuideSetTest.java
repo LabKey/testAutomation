@@ -570,15 +570,15 @@ public class LuminexGuideSetTest  extends LuminexTest
         assertElementNotPresent(strikeoutAUC);
     }
 
-    private void goToQCAnalysisPage(String submenuText)
-    {
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-
-        clickAndWait(Locator.linkWithText("view results"));
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), submenuText);
-
-    }
+//    private void goToQCAnalysisPage(String submenuText)
+//    {
+//        goToProjectHome();
+//        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+//
+//        clickAndWait(Locator.linkWithText("view results"));
+//        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), submenuText);
+//
+//    }
 
     @LogMethod
     protected void verifyQCReport()
