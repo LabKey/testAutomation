@@ -267,8 +267,7 @@ public class Runner extends TestSuite
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
 
-                if (!failedInStaticPart(currentTestClass, testResult))
-                    testResult.endTest(loggingStub); // This will allow static test methods to be recognized by TeamCity when successful
+                testResult.endTest(loggingStub); // This will allow static test methods to be recognized by TeamCity when successful
 
                 String result = failed || errored ? "Failed " : "Completed ";
                 TestLogger.log("=============== " + result + currentTestName + getProgress() + " =================");
@@ -314,26 +313,6 @@ public class Runner extends TestSuite
                 /* ignore */
             }
         }
-    }
-
-    private boolean failedInStaticPart(Class currentTestClass, TestResult testResult)
-    {
-        String lastFailure = null;
-        String lastError = null;
-
-        if (testResult.failureCount() > 0)
-        {
-            List<TestFailure> failures = EnumerationUtils.toList(testResult.failures());
-            lastFailure = failures.get(failures.size() - 1).failedTest().toString();
-        }
-
-        if (testResult.errorCount() > 0)
-        {
-            List<TestFailure> errors = EnumerationUtils.toList(testResult.errors());
-            lastError = errors.get(errors.size() - 1).failedTest().toString();
-        }
-
-        return currentTestClass.getName().equals(lastFailure) || currentTestClass.getName().equals(lastError);
     }
 
     private void dumpFailures(Enumeration<TestFailure> failures)
