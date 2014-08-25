@@ -98,7 +98,7 @@ public class StudyManualTest extends StudyTest
         // setup cohorts:
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        selectOptionByText(Locator.name("participantCohortDataSetId"), "EVC-1: Enrollment Vaccination");
+        selectOptionByText(Locator.name("participantCohortDatasetId"), "EVC-1: Enrollment Vaccination");
         selectOptionByText(Locator.name("participantCohortProperty"), "2. Enrollment group");
         clickButton("Update Assignments");
 
