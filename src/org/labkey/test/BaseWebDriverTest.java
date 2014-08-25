@@ -514,6 +514,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "setting a property that has only a getter",
                     "records[0].get is not a function",
                     "{file: \"chrome://",
+                    "ext-base-debug.js",
                     "ext-all-sandbox-debug.js",
                     "ext-all-sandbox.js",
                     "ext-all-sandbox-dev.js",
