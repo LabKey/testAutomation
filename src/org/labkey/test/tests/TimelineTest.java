@@ -204,21 +204,7 @@ public class TimelineTest extends BaseWebDriverTest
 
     private String waitForDivPopulation()
     {
-        return waitForDivPopulation(30);
-    }
-
-    private String waitForDivPopulation(int waitSeconds)
-    {
-        while (waitSeconds-- > 0)
-        {
-            log("Waiting for div to render...");
-            String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
-            if (divHtml.length() > 0)
-                return divHtml;
-            sleep(1000);
-        }
-        fail("Div failed to render.");
-        return null;
+        return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
     }
 
     private void createWiki()

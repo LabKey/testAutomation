@@ -144,9 +144,8 @@ public class NabAssayTest extends AbstractQCAssayTest
             "}" +
             "</script>\n";
 
-    // TODO: taken form ClientAPITest; when NabAssayTest is moved to WebDriver, this should be factored into a common place for both tests
     private static final String TEST_DIV_NAME = "testDiv";
-    protected String setSource(String srcFragment, boolean excludeTags)
+    protected String setWikiSource(String srcFragment)
     {
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
@@ -154,33 +153,13 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertElementPresent(Locator.linkWithText(WIKIPAGE_NAME));
         portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
-        String fullSource = srcFragment;
-        if (!excludeTags)
-            fullSource = NABJS_INCLUDE + ClientAPITest.getFullSource(srcFragment);
+        String fullSource = NABJS_INCLUDE + ClientAPITest.getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
         wikiHelper.setWikiBody(fullSource);
         wikiHelper.saveWikiPage();
-        return waitForDivPopulation(30);
+        return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
     }
-
-    private String waitForDivPopulation(int waitSeconds)
-    {
-        while (waitSeconds-- > 0)
-        {
-            log("Waiting for " + TEST_DIV_NAME + " div to render...");
-            if (isElementPresent(Locator.id(TEST_DIV_NAME)))
-            {
-                String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
-                if (divHtml.length() > 0)
-                    return divHtml;
-            }
-            sleep(1000);
-        }
-        fail("Div failed to render.");
-        return null;
-    }
-    // End TODO
 
     public java.util.List<String> getAssociatedModules()
     {
@@ -586,7 +565,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         wikiHelper.setWikiBody("placeholder text");
         wikiHelper.saveWikiPage();
 
-        setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
+        setWikiSource("runNabAssayTest({renderTo : 'testDiv'})");
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
     }

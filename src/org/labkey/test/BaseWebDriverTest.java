@@ -6416,6 +6416,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             waitForElement(loc.index(count - 1));
     }
 
+    public String waitForWikiDivPopulation(String testDivName, int waitSeconds)
+    {
+        while (waitSeconds-- > 0)
+        {
+            log("Waiting for " + testDivName + " div to render...");
+            if (isElementPresent(Locator.id(testDivName)))
+            {
+                String divHtml = (String)executeScript("return document.getElementById('" + testDivName + "').innerHTML;");
+                if (divHtml.length() > 0)
+                    return divHtml;
+            }
+            sleep(1000);
+        }
+        fail("Div failed to render.");
+        return null;
+    }
+
     private String prepareSvgText(String svgText)
     {
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;

@@ -79,7 +79,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     private static final String WIKIPAGE_NAME = "ClientAPITestPage";
 
-    private static final String TEST_DIV_NAME = "testDiv";
+    public static final String TEST_DIV_NAME = "testDiv";
 
     private static final String GRIDTEST_GRIDTITLE = "ClientAPITest Grid Title";
 
@@ -264,24 +264,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected String waitForDivPopulation()
     {
-        return waitForDivPopulation(30);
-    }
-
-    protected String waitForDivPopulation(int waitSeconds)
-    {
-        while (waitSeconds-- > 0)
-        {
-            log("Waiting for " + TEST_DIV_NAME + " div to render...");
-            if (isElementPresent(Locator.id(TEST_DIV_NAME)))
-            {
-                String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
-                if (divHtml.length() > 0)
-                    return divHtml;
-            }
-            sleep(1000);
-        }
-        fail("Div failed to render.");
-        return null;
+        return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
     }
 
     @LogMethod
