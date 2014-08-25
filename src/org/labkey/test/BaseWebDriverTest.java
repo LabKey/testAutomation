@@ -3913,6 +3913,36 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return values;
     }
 
+    public void assertOptionsAvailable(Locator loc, String... expectedOptions)
+    {
+        List<String> availableOptions = getSelectOptions(loc);
+        for(String option : expectedOptions)
+        {
+            assert(availableOptions.contains(option));
+        }
+    }
+
+    public void assertOptionUnavailable(Locator loc, String... unexpectedOptions)
+    {
+        List<String> availableOptions = getSelectOptions(loc);
+        for(String option: unexpectedOptions)
+        {
+            assert(!availableOptions.contains(option));
+        }
+    }
+
+    public List<String> getSelectOptions(Locator loc)
+    {
+        List<String> options = new ArrayList<>();
+        Select select = new Select(loc.findElement(getDriver()));
+        List<WebElement> selectElements = select.getOptions();
+        for(WebElement selectElement : selectElements)
+        {
+            options.add(selectElement.getText());
+        }
+        return options;
+    }
+
     public void assertElementNotPresent(String errorMsg, Locator loc)
     {
         assertFalse(errorMsg, isElementPresent(loc));
@@ -5238,6 +5268,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             el.click();
         }
+    }
+
+    public boolean isCheckboxChecked(WebElement el)
+    {
+        return el.isSelected();
     }
 
     public void assertRadioButtonSelected(Locator radioButtonLocator)
