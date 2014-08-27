@@ -773,12 +773,12 @@ public class StudyTest extends StudyBaseTest
             clickAndWait(Locator.linkWithText("Manage Comments"));
         }
         prepForPageLoad();
-        selectOptionByText(Locator.name("participantCommentDataSetId"), PARTICIPANT_CMT_DATASET);
+        selectOptionByText(Locator.name("participantCommentDatasetId"), PARTICIPANT_CMT_DATASET);
         waitForPageToLoad();
         selectOptionByText(Locator.name("participantCommentProperty"), PARTICIPANT_COMMENT_LABEL);
 
         prepForPageLoad();
-        selectOptionByText(Locator.name("participantVisitCommentDataSetId"), PARTICIPANT_VISIT_CMT_DATASET);
+        selectOptionByText(Locator.name("participantVisitCommentDatasetId"), PARTICIPANT_VISIT_CMT_DATASET);
         waitForPageToLoad();
         selectOptionByText(Locator.name("participantVisitCommentProperty"), PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
