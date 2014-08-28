@@ -15,8 +15,9 @@
  */
 package org.labkey.test;
 
-public class Locators
+public abstract class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
+    public static final Locator.CssLocator labkeyError = Locator.css(".labkey-error");
 }
