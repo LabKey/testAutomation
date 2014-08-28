@@ -176,6 +176,20 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
+    public List<String> getComboBoxOptions(String label)
+    {
+        ArrayList<String> ret = new ArrayList<>();
+        Locator comboBoxLoc = Ext4Helper.Locators.formItemWithLabel(label);
+        WebElement comboBoxEl = comboBoxLoc.findElement(_test.getDriver());
+        List<WebElement> inputEls = comboBoxEl.findElements(Locator.inputByNameContaining("inputEl").toBy());
+        for(WebElement inputEl : inputEls)
+        {
+            ret.add(inputEl.getText());
+        }
+        return ret;
+    }
+
+    @LogMethod(quiet = true)
     public void selectRadioButton(@LoggedParam String label, @LoggedParam String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
