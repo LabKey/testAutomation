@@ -11,10 +11,10 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.pages.DomainEditor;
 import org.labkey.test.util.BoxPlotReportHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DatasetDomainEditorHelper;
-import org.labkey.test.util.DomainEditorHelper;
+import org.labkey.test.util.DatasetDomainEditor;
 import org.labkey.test.util.GenericChartHelper;
 
 import java.io.File;
@@ -62,8 +62,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
         clickButton("Edit Definition");
 
-        DomainEditorHelper domainEditor = new DatasetDomainEditorHelper(this);
-        domainEditor.waitForReady();
+        DomainEditor domainEditor = new DatasetDomainEditor(this);
         domainEditor.selectField(5); // HIVRapidTest
         domainEditor.clickTab("Reporting");
         checkCheckbox(Locator.checkboxByName("dimension"));

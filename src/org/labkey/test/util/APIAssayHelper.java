@@ -53,10 +53,6 @@ public class APIAssayHelper extends AbstractAssayHelper
         irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
 
     }
-    public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
-    {
-        importAssay(assayID, file, projectPath, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
-    }
 
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {

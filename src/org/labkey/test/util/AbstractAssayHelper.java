@@ -15,9 +15,12 @@
  */
 package org.labkey.test.util;
 
+import com.google.common.base.Function;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.AssayDomainEditor;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +35,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         super(test);
     }
 
-//    public abstract void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException;
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
-
-
 
     public void uploadXarFileAsAssayDesign(String path, int pipelineCount)
     {
@@ -102,7 +102,6 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         return Integer.parseInt(name.substring(7));
     }
 
-
     public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
     @LogMethod
@@ -115,8 +114,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.id("AssayDesignerName"), name);
         _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
-        _test.clickButton("Save", 0); // GWT compensation
-        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        saveAssayDesign();
         _test.clickButton("Save & Close");
 
         _test.waitForElement(Locator.id("AssayList"));
@@ -134,8 +132,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.id("AssayDesignerName"), name);
         _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
-        _test.clickButton("Save", 0); // GWT compensation
-        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        saveAssayDesign();
         _test.clickButton("Save & Close");
 
         _test.waitForElement(Locator.id("AssayList"));
@@ -143,8 +140,44 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
     public void clickEditAssayDesign()
     {
-        _test.click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
-        _test.waitAndClickAndWait(Locator.linkWithText("edit assay design"));
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
+        _test.waitForElement(Locator.id("AssayDesignerDescription"));
+    }
+
+    public AssayDomainEditor copyAssayDesign()
+    {
+        return copyAssayDesign(null);
+    }
+
+    public AssayDomainEditor copyAssayDesign(@Nullable String destinationFolder)
+    {
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "copy assay design");
+
+        if (destinationFolder == null)
+            _test.clickButton("Copy to Current Folder");
+        else
+            _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
+
+        return new AssayDomainEditor(_test);
+    }
+
+    public void deleteAssayDesign()
+    {
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "delete assay design");
+        _test.clickButton("Confirm Delete");
+    }
+
+    public File exportAssayDesign()
+    {
+        return _test.applyAndWaitForDownload(new Function()
+        {
+            @Override
+            public Object apply(Object o)
+            {
+                _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "export assay design");
+                return null;
+            }
+        });
     }
 
     public void addTransformScript(File transformScript)
@@ -179,7 +212,13 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
     public void saveAssayDesign()
     {
+        _test.clickButton("Save", 0);
+        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void saveAndCloseAssayDesign()
+    {
         _test.clickButton("Save & Close");
-        _test.waitForElement(Locator.id("dataregion_Runs"));
+        _test.waitForElement(Locator.css("table.labkey-data-region")); // 'Runs' or 'AssayList'
     }
 }

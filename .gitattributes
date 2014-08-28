@@ -349,7 +349,9 @@ src/org/labkey/test/ms2/params/MS2Tests_20070101__3_0_2a.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_0_2.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_0.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_1.java -text
+src/org/labkey/test/pages/AssayDomainEditor.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
+src/org/labkey/test/pages/DomainEditor.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text
@@ -565,6 +567,7 @@ src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ArtifactCollector.java -text
 src/org/labkey/test/util/AssayImportOptions.java -text
+src/org/labkey/test/util/AssayImporter.java -text
 src/org/labkey/test/util/BoxPlotReportHelper.java -text
 src/org/labkey/test/util/ChartHelper.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
@@ -573,11 +576,10 @@ src/org/labkey/test/util/CustomizeViewsHelper.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
 src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
-src/org/labkey/test/util/DatasetDomainEditorHelper.java -text
+src/org/labkey/test/util/DatasetDomainEditor.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text
-src/org/labkey/test/util/DomainEditorHelper.java -text
 src/org/labkey/test/util/EHRClientAPIHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text

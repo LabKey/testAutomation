@@ -1,23 +1,30 @@
-package org.labkey.test.util;
+package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PortalHelper;
 
 // TODO: Tons of missing functionality
 // TODO: Much ListHelper functionality belongs here
 // TODO: Create subclasses for particular domain editors (e.g. Metadata)
-public abstract class DomainEditorHelper
+public abstract class DomainEditor
 {
-    BaseWebDriverTest _test;
+    protected BaseWebDriverTest _test;
 
-    private static final String ROW_HIGHLIGHT = "238";
+    private static final String ROW_HIGHLIGHT = "238"; // rgb(238,238,238)
 
-    public DomainEditorHelper(BaseWebDriverTest test)
+    public DomainEditor(BaseWebDriverTest test)
     {
         _test = test;
+        waitForReady();
     }
 
-    public abstract void waitForReady();
+    public void waitForReady()
+    {
+        _test.waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
 
     public void selectField(int index)
     {

@@ -15,9 +15,9 @@
  */
 package org.labkey.test.util;
 
-/**
- * Created by klum on 2/28/14.
- */
+import java.io.File;
+
+// TODO: Make this more generic -- fewer hard-coded assay properties
 public class AssayImportOptions
 {
     public enum VisitResolverType
@@ -38,7 +38,8 @@ public class AssayImportOptions
     private String virusName;
     private String virusId;
     private String curveFitMethod;
-    private String filePath;
+    private File metadataFile;
+    private File runFile;
     private String[] ptids;
     private String[] visits;
     private String[] initialDilutions;
@@ -59,7 +60,8 @@ public class AssayImportOptions
         this.virusName = builder.virusName;
         this.virusId = builder.virusId;
         this.curveFitMethod = builder.curveFitMethod;
-        this.filePath = builder.filePath;
+        this.metadataFile = builder.metadataFile;
+        this.runFile = builder.runFile;
         this.ptids = builder.ptids;
         this.visits = builder.visits;
         this.initialDilutions = builder.initialDilutions;
@@ -107,9 +109,14 @@ public class AssayImportOptions
         return curveFitMethod;
     }
 
-    public String getFilePath()
+    public File getMetadataFile()
     {
-        return filePath;
+        return metadataFile;
+    }
+
+    public File getRunFile()
+    {
+        return runFile;
     }
 
     public String[] getPtids()
@@ -159,6 +166,7 @@ public class AssayImportOptions
 
     public boolean isResetDefaults() { return resetDefaults; }
 
+    // TODO: Create separate builders for each assay type -- this works for most assay types, but many fields aren't relevant
     public static class ImportOptionsBuilder
     {
         private String assayId;
@@ -168,7 +176,8 @@ public class AssayImportOptions
         private String virusName;
         private String virusId;
         private String curveFitMethod;
-        private String filePath;
+        private File metadataFile;
+        private File runFile;
         private String[] ptids = new String[0];
         private String[] visits = new String[0];
         private String[] initialDilutions = new String[0];
@@ -222,9 +231,15 @@ public class AssayImportOptions
             return this;
         }
 
-        public ImportOptionsBuilder filePath(String filePath)
+        public ImportOptionsBuilder metadataFile(File metadataFile)
         {
-            this.filePath = filePath;
+            this.metadataFile = metadataFile;
+            return this;
+        }
+
+        public ImportOptionsBuilder runFile(File runFile)
+        {
+            this.runFile = runFile;
             return this;
         }
 

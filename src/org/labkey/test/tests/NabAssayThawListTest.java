@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -28,6 +27,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.Arrays;
 
 @Category({DailyA.class, Assays.class})
@@ -41,7 +41,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     public static final String THAW_LIST_ASSAY_ID = "thaw list ptid + visit";
 
     private final String SAMPLE_DATA_ROOT = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/";
-    protected final String TEST_ASSAY_NAB_FILE1 = SAMPLE_DATA_ROOT + "m0902051;3997.xls";
+    protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
     private final String THAW_LIST_NAME = "NabThawList";
     private final String THAW_LIST_ARCHIVE = SAMPLE_DATA_ROOT + THAW_LIST_NAME + ".zip";
 
@@ -156,7 +156,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
                 initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                 dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                 methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                filePath(TEST_ASSAY_NAB_FILE1);
+                runFile(TEST_ASSAY_NAB_FILE1);
 
 
         importData(iob.build());

@@ -49,11 +49,11 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
-    protected final String TEST_ASSAY_NAB_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902051;3997.xls";
-    protected final String TEST_ASSAY_NAB_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902053;3999.xls";
-    protected final String TEST_ASSAY_NAB_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902055;4001.xlsx";
-    protected final String TEST_ASSAY_NAB_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902057;4003.xls";
-    protected final String TEST_ASSAY_NAB_FILE5 = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/m0902059;4005.xls";
+    protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
+    protected final File TEST_ASSAY_NAB_FILE2 = TestFileUtils.getSampleData("Nab/m0902053;3999.xls");
+    protected final File TEST_ASSAY_NAB_FILE3 = TestFileUtils.getSampleData("Nab/m0902055;4001.xlsx");
+    protected final File TEST_ASSAY_NAB_FILE4 = TestFileUtils.getSampleData("Nab/m0902057;4003.xls");
+    protected final File TEST_ASSAY_NAB_FILE5 = TestFileUtils.getSampleData("Nab/m0902059;4005.xls");
 
     // AUC Column Names.
     private static final String AUC_COL_TITLE = "AUC";
@@ -301,7 +301,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE1).
+                        runFile(TEST_ASSAY_NAB_FILE1).
                         build()
         );
 
@@ -319,7 +319,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE2).
+                        runFile(TEST_ASSAY_NAB_FILE2).
                         build()
         );
 
@@ -338,7 +338,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE3).
+                        runFile(TEST_ASSAY_NAB_FILE3).
                         build()
         );
 
@@ -357,7 +357,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE4).
+                        runFile(TEST_ASSAY_NAB_FILE4).
                         build()
         );
 
@@ -767,7 +767,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE1).
+                        runFile(TEST_ASSAY_NAB_FILE1).
                         build()
         );
 

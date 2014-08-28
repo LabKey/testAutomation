@@ -182,7 +182,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         if(metadataFileName != null)
         {
             File metadata = new File(metadataFileName);
-            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile']"), metadata);
+            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile__']"), metadata);
         }
 
         File data = new File(dataFileName);
