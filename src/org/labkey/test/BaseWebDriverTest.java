@@ -1757,7 +1757,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @AfterClass
-    public static final void postamble() throws Exception
+    public static void postamble() throws Exception
     {
         if (beforeClassSucceeded)
         {
