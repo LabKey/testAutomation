@@ -45,6 +45,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -1686,6 +1687,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 throw new RuntimeException(e);
             }
+
+            currentTest.setUp();
         }
 
         @Override
@@ -1701,14 +1704,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             if (!e.equals(errorRef.get()))
                 throw new RuntimeException(errorRef.get()); // Add to list of errors
-        }
-
-        @Override
-        protected void succeeded(Description description)
-        {
-            Ext4Helper.resetCssPrefix();
-
-            currentTest.postamble();
         }
 
         @Override
@@ -1728,13 +1723,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @BeforeClass
-    public static void beforeBWDT()
+    public static void preamble()
     {
-        currentTest.setUp();
-        currentTest.preamble();
+        currentTest.doPreamble();
     }
 
-    private void preamble()
+    private void doPreamble()
     {
         signIn();
         enableEmailRecorder();
@@ -1760,6 +1754,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public final void beforeTest() throws Exception
     {
         simpleSignIn();
+    }
+
+    @AfterClass
+    public final void postamble() throws Exception
+    {
+        if (beforeClassSucceeded)
+        {
+            getCurrentTest().doPostamble();
+        }
     }
 
     @ClassRule
@@ -1793,8 +1796,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override @LogMethod
         protected void failed(Throwable e, Description description)
         {
-            AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
-            handleFailure(errorRef, description.getMethodName());
+            Ext4Helper.resetCssPrefix();
+            if (getDriver() != null) // Test timeout might put WebDriver in a bad state
+            {
+                AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
+                handleFailure(errorRef, description.getMethodName());
+            }
+        }
+
+        @Override
+        protected void finished(Description description)
+        {
+            Ext4Helper.resetCssPrefix();
         }
     };
 
@@ -1899,7 +1912,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    private void postamble()
+    private void doPostamble()
     {
         if (!_anyTestCaseFailed)
         {
