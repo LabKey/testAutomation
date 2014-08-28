@@ -134,12 +134,12 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         setFormElement(Locator.input("defaultDateFormat"), DATEFORMAT);
         clickButton("Save");
         clickTab("Clinical and Assay Data");
+        waitForElement(Locator.linkWithText("GenericAssay"));
 
         // record current time
         long currentTime = System.currentTimeMillis();
         sleep(1000);        // Make sure we can tell if Content Modified changed
 
-        clickTab("Clinical and Assay Data");
         openCustomizePanel("Data Views");
         _ext4Helper.uncheckCheckbox("datasets");
         _ext4Helper.uncheckCheckbox("queries");
@@ -160,8 +160,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.clickExt4Tab("Source");
         String script = _extHelper.getCodeMirrorValue("script-report-editor");
         setCodeEditorValue("script-report-editor", script + "     #an edit");
-        clickButton("Save", 0);
-        sleep(1000);
+        clickButton("Save");
 
         openReport(PLOT_NAME);
         clickButton("Edit", "Save As");
@@ -172,31 +171,27 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Save");
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Save");
-        sleep(500);
         _ext4Helper.waitForMaskToDisappear();
 
         openReport(PARTICIPANTREPORT_NAME);
         enableEditMode();
-        click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete a column.
+        Locator.XPathLocator deleteButton = Locator.xpath("//img[@data-qtip = 'Delete']");click(deleteButton); // Delete a column.
         clickButton("Save", 0);
-        sleep(1000);
+        waitForElementToDisappear(deleteButton.notHidden());
+        _ext4Helper.waitForMaskToDisappear();
 
         clickTab("Clinical and Assay Data");
         log("edit link report");
-        waitForElement(Locator.linkWithText(LINKREPORT_NAME));
-        scrollIntoView(Locator.linkWithText(LINKREPORT_NAME));
         Locator linkDetails = Locator.xpath("//tr/td/div/a[text()=\"" + LINKREPORT_NAME + "\"]/../../../td/div/a[@data-qtip=\"Click to navigate to the Detail View\"]");
-        clickAndWait(linkDetails);
+        waitAndClickAndWait(linkDetails);
         clickButton("Edit Report", "Update Link Report");
         setFormElement(Locator.name("linkUrl"), "http://www.labkey.org");
         clickButton("Save");
 
         clickTab("Clinical and Assay Data");
         log("edit attachment report");
-        waitForElement(Locator.linkWithText(ATTACHMENT_REPORT_NAME));
-        scrollIntoView(Locator.linkWithText(ATTACHMENT_REPORT_NAME));
         linkDetails = Locator.xpath("//tr/td/div/a[text()=\"" + ATTACHMENT_REPORT_NAME + "\"]/../../../td/div/a[@data-qtip=\"Click to navigate to the Detail View\"]");
-        clickAndWait(linkDetails);
+        waitAndClickAndWait(linkDetails);
         clickButton("Edit Report", "Update Attachment Report");
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT2_FILE);
         Ext4FileFieldRef ref1 = Ext4FileFieldRef.create(this);
@@ -234,14 +229,14 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         openReport(R_NAME);
         _ext4Helper.clickExt4Tab("Source");
         _ext4Helper.checkCheckbox("Show source tab to all users");
-        clickButton("Save", 0);
-        sleep(1000);
+        clickButton("Save");
 
         openReport(PARTICIPANTREPORT_NAME);
         enableEditMode();
         _ext4Helper.selectRadioButton("Only me");
         clickButton("Save", 0);
-        sleep(1000);
+        waitForElementToDisappear(deleteButton.notHidden());
+        _ext4Helper.waitForMaskToDisappear();
 
         clickTab("Clinical and Assay Data");
         log("edit link report");
@@ -280,7 +275,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
     protected void saveReport(boolean expectReload)
     {
-        clickAndWait(getButtonLocator("Save", 1), expectReload ? WAIT_FOR_PAGE : 0);
+        clickAndWait(Ext4Helper.Locators.ext4Button("Save").index(1), expectReload ? WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
             _extHelper.waitForExtDialog("Success");
@@ -306,11 +301,11 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
     protected void openReport(String reportName)
     {
-        clickTab("Clinical and Assay Data");
+        Locator reportLink = Locator.linkWithText(reportName);
+        if (!isElementPresent(reportLink))
+            clickTab("Clinical and Assay Data");
         log("Open report " + reportName);
-        waitForElement(Locator.linkWithText(reportName));
-        scrollIntoView(Locator.linkWithText(reportName));
-        clickAndWait(Locator.linkWithText(reportName));
+        waitAndClickAndWait(reportLink);
     }
 
     private void checkModifiedReports(String[] reports, long currentTime, int expectedCount, boolean modifiedExpected, String errorMessage)
