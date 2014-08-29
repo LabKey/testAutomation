@@ -137,7 +137,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     protected void waitForTransformLink(String linkText, String goBackText, String ... waitForTexts)
     {
         log("clicking link with text " + linkText + "'");
-        click(Locator.xpath("//a[.='" + linkText + "']/../..//a[.='" + linkText + "']"));
+        click(Locator.linkWithText(linkText));
         for (String waitForText : waitForTexts)
         {
             log("waiting for text '" + waitForText + "'");
