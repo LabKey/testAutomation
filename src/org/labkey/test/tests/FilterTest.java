@@ -392,8 +392,10 @@ public class FilterTest extends BaseWebDriverTest
 
     private void verifyOptionsInFilterDialog(String... options)
     {
+        final Locator.CssLocator filterDialogFacetPanel = Locator.css(".labkey-filter-dialog .x-grid3-body");
+        waitForElement(filterDialogFacetPanel.containing(options[0]));
         String expectedOptions = StringUtils.join(options, "\n");
-        String actualOptions = getText(Locator.css(".labkey-filter-dialog .x-grid3-body")).replaceAll(" ", "");
+        String actualOptions = getText(filterDialogFacetPanel).replaceAll(" ", "");
 
         assertEquals("Unexpected filter options", expectedOptions, actualOptions);
     }
