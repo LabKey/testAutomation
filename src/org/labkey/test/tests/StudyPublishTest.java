@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -35,9 +36,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyB.class, Study.class})
 public class StudyPublishTest extends StudyProtectedExportTest
@@ -127,10 +132,26 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String[] SPECIMEN_PROTECTED_FIELDS = {"DerivativeType", "VolumeUnits"};
 
     private int _pipelineJobs = 0;
+    private final String SUB_FOLDER_NAME = "PublishedSubStudy";
+    private static final String PUBLISH_FOLDER_ADMIN = "publish_admin@study.test";
+    private static final String PUBLISH_SUB_FOLDER_ADMIN = "publishsub_admin@study.test";
+
+
+    // enum to help determine the study publish location
+    public enum PublishLocation
+    {
+        root,
+        project,
+        folder
+    }
 
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+
+        deleteUsers(false, PUBLISH_FOLDER_ADMIN);
+        deleteUsers(false, PUBLISH_SUB_FOLDER_ADMIN);
+
         _containerHelper.deleteProject(PUB2_NAME, afterTest, 1000000);
     }
 
@@ -161,7 +182,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
         //Add a module to find later
         _containerHelper.enableModule("List");
 
-
         // Create some views and reports
         createRView(R_VIEW, REPORT_DATASET, true);
         createRView(R_VIEW_UNSHARED, REPORT_DATASET, false);
@@ -182,9 +202,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         // Publish the study in a few different ways
-        publishStudy(PUB1_NAME, PUB1_DESCRIPTION, 2, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
-        publishStudy(PUB2_NAME, PUB2_DESCRIPTION, 0, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
-        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, 1, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false, true);
+        publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
+        publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PublishLocation.root, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
+        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PublishLocation.project, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false, true);
 
         // load specimen set B to test the specimen refresh for the published studies
         startSpecimenImport(++_pipelineJobs, SPECIMEN_ARCHIVE_B);
@@ -203,6 +223,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         verifyPublishedStudy(PUB3_NAME, getProjectName(), group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
 
         verifySpecimenRefresh();
+        setupForStudySnapshotTable();
+        verifyStudySnapshotTable();
     }
 
     /**
@@ -526,6 +548,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToProjectHome();
         clickFolder(PUB1_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
+        waitForElement(Locator.linkWithText("By Individual Vial"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         waitForElement(Locator.paginationText(37)); // updated number of total specimens
         assertTextNotPresent("BAQ00051-10"); // GUID removed via refresh
@@ -539,6 +562,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToProjectHome();
         clickFolder(PUB3_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
+        waitForElement(Locator.linkWithText("By Individual Vial"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this);
         table.setFilter("Clinic", "Is Blank", null); // Clinic column should NOT be empty
@@ -546,15 +570,15 @@ public class StudyPublishTest extends StudyProtectedExportTest
         table.clearFilter("Clinic");
     }
 
-    private void publishStudy(String name, String description, int rootProjectOrFolder, String[] groups, String[] datasets,
+    private void publishStudy(String name, String description, PublishLocation location, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens)
     {
-        publishStudy(name, description, rootProjectOrFolder, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true, false);
+        publishStudy(name, description, location, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true, false);
     }
 
     // Test should be in an existing study.
     @LogMethod
-    private void publishStudy(@LoggedParam String name, String description, int rootProjectOrFolder, String[] groups, String[] datasets,
+    private void publishStudy(@LoggedParam String name, String description, PublishLocation location, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens,
                               boolean removeProtected, boolean shiftDates, boolean alternateIDs, boolean maskClinicNames)
     {
@@ -595,7 +619,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         setFormElement(Locator.name("studyDescription"), description);
         assertTrue(PROTOCOL_DOC.exists());
         setFormElement(Locator.name("protocolDoc"), PROTOCOL_DOC);
-        selectLocation(rootProjectOrFolder);
+        selectLocation(location);
         clickButton("Next", 0);
 
         // Wizard page 2 : Mice
@@ -701,7 +725,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         _pipelineJobs++;
 
-        if (rootProjectOrFolder == 0)
+        if (location == PublishLocation.root)
             _containerHelper.addCreatedProject(name); // Add to list so that it will be deleted during cleanup
 
         // remove this line once the SQLserver deadlock is resolved
@@ -865,19 +889,18 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     /**
      * Selects the destination for study publication
-     * @param rootProjectOrFolder => 0 - root, 1 - project, 2 - folder
      */
-    private void selectLocation(int rootProjectOrFolder)
+    private void selectLocation(PublishLocation location)
     {
         clickButton("Change", 0);
         sleep(1000); // sleep while the tree expands
 
-        if (rootProjectOrFolder == 0)
+        if (location == PublishLocation.root)
         {
             Locator rootTreeNode = Locator.tagWithClass("a", "x-tree-node-anchor").withDescendant(Locator.tagWithText("span", "LabKey Server Projects"));
             doubleClick(rootTreeNode);
         }
-        else if (rootProjectOrFolder == 1)
+        else if (location == PublishLocation.project)
         {
             Locator projectTreeNode = Locator.tagWithClass("a", "x-tree-node-anchor").withDescendant(Locator.tagWithText("span", getProjectName()));
             doubleClick(projectTreeNode);
@@ -946,6 +969,130 @@ public class StudyPublishTest extends StudyProtectedExportTest
             waitForText("edit metadata");
             clickAndWait(Locator.linkContainingText("edit metadata"));
             waitForElement(Locator.xpath("id('org.labkey.query.metadata.MetadataEditor-Root')//td[contains(@class, 'labkey-wp-title-left')]").withText("Metadata Properties"));
+        }
+    }
+
+    private void setupForStudySnapshotTable()
+    {
+        log("setting up for study snapshot table test");
+
+        // create one more sub folder published study
+        clickFolder(PUB1_NAME);
+        _pipelineJobs = 0;
+        publishStudy(SUB_FOLDER_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, new String[0], new String[0], new String[0], false, false, false, false, false, false);
+        clickFolder(getFolderName());
+    }
+
+    /**
+     * verifies that the study snapshot table
+     */
+    private void verifyStudySnapshotTable()
+    {
+        log("verifying study snapshot table");
+
+        // verify top level study
+        clickFolder(getFolderName());
+        goToSchemaBrowser();
+        selectQuery("study", "StudySnapshot");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        Map<String, String[]> colsToCheck = new HashMap<>();
+        colsToCheck.put("Destination", new String[]{"PublishedStudy", "PublishedToProject", "PublishedNonAnon"});
+        colsToCheck.put("Refresh", new String[]{"true", "false", "false"});
+
+        verifyDataRegion(colsToCheck);
+
+        // change the container filter to include subfolders
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        colsToCheck.put("Destination", new String[]{"PublishedStudy", "PublishedToProject", "PublishedNonAnon", "PublishedSubStudy"});
+        colsToCheck.put("Refresh", new String[]{"true", "false", "false", "false"});
+
+        verifyDataRegion(colsToCheck);
+
+        // navigate to the subfolder
+        clickFolder(PUB1_NAME);
+        goToSchemaBrowser();
+        selectQuery("study", "StudySnapshot");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        colsToCheck.put("Destination", new String[]{"PublishedSubStudy"});
+        colsToCheck.put("Refresh", new String[]{"false"});
+
+        verifyDataRegion(colsToCheck);
+
+        // verify users with only partial admin permissions
+        createUser(PUBLISH_FOLDER_ADMIN, null, true);
+        createUser(PUBLISH_SUB_FOLDER_ADMIN, null, true);
+
+        // verify the case where a user has admin access to a folder but not to a subfolder
+        log("verify permissions for a top level folder admin");
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
+        clickButton("Save and Finish", defaultWaitForPage);
+        _permissionsHelper.setUserPermissions(PUBLISH_FOLDER_ADMIN, "Folder Administrator");
+        _permissionsHelper.setUserPermissions(PUBLISH_SUB_FOLDER_ADMIN, "Reader");
+        impersonate(PUBLISH_FOLDER_ADMIN);
+        goToSchemaBrowser();
+        selectQuery("study", "StudySnapshot");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        colsToCheck.put("Destination", new String[]{"PublishedStudy", "PublishedToProject", "PublishedNonAnon"});
+        colsToCheck.put("Refresh", new String[]{"true", "false", "false"});
+
+        verifyDataRegion(colsToCheck);
+
+        // change the container filter to include subfolders the impersonated user should not be able to see the
+        // study published from the sub folder because they don't have admin permissions to the subfolder
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        verifyDataRegion(colsToCheck);
+
+        stopImpersonating();
+
+        // verify the case where a user has read access to a folder and admin access to a subfolder
+        log("verify permissions for a sub level folder admin");
+        clickProject(getProjectName());
+        clickFolder(PUB1_NAME);
+        _permissionsHelper.setUserPermissions(PUBLISH_SUB_FOLDER_ADMIN, "Folder Administrator");
+        clickButton("Save and Finish");
+        clickFolder(getFolderName());
+        goToSchemaBrowser();
+        impersonate(PUBLISH_SUB_FOLDER_ADMIN);
+        selectQuery("study", "StudySnapshot");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+
+        colsToCheck.put("Destination", new String[0]);
+        colsToCheck.put("Refresh", new String[0]);
+        verifyDataRegion(colsToCheck);
+
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        colsToCheck.put("Destination", new String[]{"PublishedSubStudy"});
+        colsToCheck.put("Refresh", new String[]{"false"});
+        verifyDataRegion(colsToCheck);
+
+        stopImpersonating();
+    }
+
+      /**
+     * Helper to assert expected column values are present in a data region
+     * @param columnsToCheck
+     */
+    private void verifyDataRegion(Map<String, String[]> columnsToCheck)
+    {
+        DataRegionTable drtTable = new DataRegionTable("query", this);
+        for (Map.Entry<String, String[]> entry : columnsToCheck.entrySet())
+        {
+            int i=0;
+            Assert.assertTrue(drtTable.getDataRowCount() == entry.getValue().length);
+            for (String value : drtTable.getColumnDataAsText(entry.getKey()))
+            {
+                assertEquals(value, entry.getValue()[i++]);
+            }
         }
     }
 }
