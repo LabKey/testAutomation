@@ -196,7 +196,7 @@ public class SecurityTest extends BaseWebDriverTest
 
     /**
      *
-     * preconditions:  NORAM_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
+     * preconditions:  NORMAL_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
      * post conditions
      */
     @LogMethod public void passwordResetTest()
