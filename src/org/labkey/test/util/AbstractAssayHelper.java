@@ -109,39 +109,37 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     {
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next", 0);
+        _test.clickButton("Next");
 
-        _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.id("AssayDesignerName"), name);
-        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
-        saveAssayDesign();
-        _test.clickButton("Save & Close");
-
-        _test.waitForElement(Locator.id("AssayList"));
-    }
-
-    @LogMethod
-    public void createAssayWithEditableRunFields(String type, String name)
-    {
-        _test.clickButton("New Assay Design");
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
-        _test.clickButton("Next", 0);
-
-        _test.waitForElement(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
-        _test.checkCheckbox(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
-        _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.id("AssayDesignerName"), name);
-        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
-        saveAssayDesign();
-        _test.clickButton("Save & Close");
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(_test);
+        assayDesigner.setName(name);
+        assayDesigner.save();
+        assayDesigner.saveAndClose();
 
         _test.waitForElement(Locator.id("AssayList"));
     }
 
-    public void clickEditAssayDesign()
+    public AssayDomainEditor clickEditAssayDesign()
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
+        return clickEditAssayDesign(false);
+    }
+
+    public AssayDomainEditor clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    {
+        _test.prepForPageLoad();
+        _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
+        if (confirmEditInOtherContainer)
+        {
+            String alertText = _test.getAlert();
+            assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
+                    alertText.contains("This assay is defined in the"));
+            assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
+                    alertText.contains("Would you still like to edit it?"));
+        }
+        _test.waitForPageToLoad(BaseWebDriverTest.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.id("AssayDesignerDescription"));
+
+        return new AssayDomainEditor(_test);
     }
 
     public AssayDomainEditor copyAssayDesign()
@@ -178,47 +176,5 @@ public abstract class AbstractAssayHelper extends AbstractHelper
                 return null;
             }
         });
-    }
-
-    public void addTransformScript(File transformScript)
-    {
-        if (transformScript.exists())
-        {
-            _test.waitForElement(Locator.lkButton("Add Script"));
-            int index = _test.getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
-            _test.clickButton("Add Script", 0);
-            _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
-        }
-        else
-            fail("Unable to locate the Transform script: " + transformScript.toString());
-    }
-
-
-    public void setTransformScript(File transformScript)
-    {
-        setTransformScript(transformScript, 0);
-    }
-
-    public void setTransformScript(File transformScript, int index)
-    {
-        if (transformScript.exists())
-        {
-            _test.waitForElement(Locator.lkButton("Add Script"));
-            _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
-        }
-        else
-            fail("Unable to locate the Transform script: " + transformScript.toString());
-    }
-
-    public void saveAssayDesign()
-    {
-        _test.clickButton("Save", 0);
-        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void saveAndCloseAssayDesign()
-    {
-        _test.clickButton("Save & Close");
-        _test.waitForElement(Locator.css("table.labkey-data-region")); // 'Runs' or 'AssayList'
     }
 }

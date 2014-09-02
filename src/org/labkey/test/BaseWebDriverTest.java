@@ -1079,7 +1079,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void goToAdminConsole()
     {
-        goToHome();
+        ensureAdminMode();
         clickAdminMenuItem("Site", "Admin Console");
     }
 

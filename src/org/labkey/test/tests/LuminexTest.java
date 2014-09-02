@@ -16,11 +16,15 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
@@ -141,30 +145,24 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     protected void configure()
     {
         // setup a scripting engine to run a java transform script
-        prepareProgrammaticQC();
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.ensureEngineConfig();
+        javaEngine.createNetrcFile();
 
         // fail fast if R is not configured
         _rReportHelper.ensureRConfig();
 
-        //revert to the admin user
-        revertToAdmin();
-
         log("Testing Luminex Assay Designer");
         //create a new test project
-        _containerHelper.createProject(getProjectName(), null);
-
-        //setup a pipeline for it
-        setupPipeline(getProjectName());
+        _containerHelper.createProject(getProjectName(), "Study");
+        createDefaultStudy();
 
         //create a study within this project to which we will publish
         goToProjectHome();
-        addWebPart("Study Overview");
-        clickButton("Create Study");
-        clickButton("Create Study");
-        goToProjectHome();
-
+        PortalHelper portalHelper = new PortalHelper(this);
         //add the Assay List web part so we can create a new luminex assay
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
+
 
         if (_useXarImport)
         {
@@ -173,12 +171,11 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             // since we want to test special characters in the assay name, copy the assay design to rename
             goToManageAssays();
             clickAndWait(Locator.linkWithText(TEST_ASSAY_XAR_NAME));
-            _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
-            clickButton("Copy to Current Folder", WAIT_FOR_PAGE);
-            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-            setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_LUM);
-            setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
-            saveAssay();
+            _assayHelper.copyAssayDesign();
+            AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+            assayDesigner.setName(TEST_ASSAY_LUM);
+            assayDesigner.setDescription(TEST_ASSAY_LUM_DESC);
+            assayDesigner.save();
         }
         else
         {
@@ -189,11 +186,11 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "Luminex"));
             clickButton("Next");
 
-            waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
             log("Setting up Luminex assay");
-            setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_LUM);
-            setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
+
+            AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+            assayDesigner.setName(TEST_ASSAY_LUM);
+            assayDesigner.setDescription(TEST_ASSAY_LUM_DESC);
 
             // add batch properties for transform and Ruminex version numbers
             _listHelper.addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
@@ -262,7 +259,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             setFormat("Data Fields", 15, "0.0");
             setFormat("Data Fields", 16, "0.0");
 
-            saveAssay();
+            assayDesigner.save();
 
             // remove the SpecimenID field from the results grid to speed up the test
 //            clickAndWait(Locator.linkWithText("Assay List"));
@@ -420,7 +417,6 @@ public abstract class LuminexTest extends AbstractQCAssayTest
 //        }
     }
 
-
     /**
      * upload the three files used for the multiple curve data test
      * preconditions:  at assay run data import page
@@ -479,13 +475,13 @@ public abstract class LuminexTest extends AbstractQCAssayTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        revertToAdmin();
         deleteProject(getProjectName(), afterTest);
 
-        try{deleteEngine();}
+        try{
+            QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+            javaEngine.deleteEngine();
+        }
         catch(Throwable T) {/* ignore */}
-
-        deleteDir(getTestTempDir());
     } //doCleanup()
 
     //helper function to go to test assay home from anywhere the project link is visible

@@ -219,10 +219,10 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText(MULTI_VIRUS_ASSAY_NAB));
 
-            AssayDomainEditor assay = _assayHelper.copyAssayDesign();
-            assay.setName(fileBasedMetadataAssay);
-            assay.setMetaDataInputFormat(AssayDomainEditor.MetadataInputFormat.FILE_BASED);
-            _assayHelper.saveAndCloseAssayDesign();
+            AssayDomainEditor assayDesigner = _assayHelper.copyAssayDesign();
+            assayDesigner.setName(fileBasedMetadataAssay);
+            assayDesigner.setMetaDataInputFormat(AssayDomainEditor.MetadataInputFormat.FILE_BASED);
+            assayDesigner.saveAndClose();
         }
 
         return fileBasedMetadataAssay;

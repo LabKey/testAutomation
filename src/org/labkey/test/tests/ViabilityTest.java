@@ -22,6 +22,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
@@ -233,10 +234,11 @@ public class ViabilityTest extends AbstractViabilityTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
-        clickEditAssayDesign(true);
+        _assayHelper.clickEditAssayDesign(true);
 
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickButton("Save & Close");
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.saveAndClose();
 
         final String runName = "transformed assayId";
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
@@ -292,7 +294,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
-        clickEditAssayDesign(true);
+        _assayHelper.clickEditAssayDesign(true);
         waitForElement(Locator.lkButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.

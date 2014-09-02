@@ -22,6 +22,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PerlHelper;
 
@@ -70,10 +71,11 @@ public class LuminexPositivityTest extends LuminexTest
 
     private void addTransformScriptsToAssayDesign()
     {
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 1);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 2);
-        saveAssay();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"));
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
+        assayDesigner.save();
     }
 
     private void testDefaultAnalyteProperties(String assayName)
@@ -98,7 +100,8 @@ public class LuminexPositivityTest extends LuminexTest
 
     private void verifyThresholdForReImportRun(int runIndex, int expectedThresholdValue)
     {
-        checkDataRegionCheckbox("Runs", runIndex);
+        DataRegionTable runs = new DataRegionTable("Runs", this);
+        runs.checkCheckbox(runIndex);
         clickButton("Re-import run");
         clickButton("Next"); // batch
         clickButton("Next"); // run
@@ -118,10 +121,11 @@ public class LuminexPositivityTest extends LuminexTest
         clickButton("Cancel");
 
         // delete all but one run of data so we have the expected number of previous baseline visits rows
-        checkDataRegionCheckbox("Runs", 0);
-        checkDataRegionCheckbox("Runs", 1);
-        checkDataRegionCheckbox("Runs", 2);
-        checkDataRegionCheckbox("Runs", 3);
+        DataRegionTable runs = new DataRegionTable("Runs", this);
+        runs.checkCheckbox(0);
+        runs.checkCheckbox(1);
+        runs.checkCheckbox(2);
+        runs.checkCheckbox(3);
         clickButton("Delete");
         assertEquals(4, getElementCount(Locator.linkContainingText("Positivity ")));
         assertTextNotPresent("Positivity 3x Fold Change");

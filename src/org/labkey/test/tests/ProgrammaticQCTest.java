@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.ListHelper;
 
 import java.io.*;
@@ -98,9 +99,10 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
-        clickEditAssayDesign(false);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
-        clickButton("Save & Close");
+        _assayHelper.clickEditAssayDesign();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+        assayDesigner.saveAndClose();
         goToProjectHome();
         _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
     }
@@ -121,9 +123,12 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         if (addQCScript)
-            addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 1);
+        {
+            assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+        }
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {

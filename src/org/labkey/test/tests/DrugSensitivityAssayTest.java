@@ -50,7 +50,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         log("Starting Drug Sensitivity Assay BVT Test");
 
         //revert to the admin user
-        revertToAdmin();
+        ensureSignedInAsAdmin();
 
         log("Testing Drug Sensitivity Assay Designer");
 

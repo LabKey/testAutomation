@@ -246,18 +246,6 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         selectOptionByText(Locator.name("defaultAssayQCState"), "Pending Review");
         clickButton("Save");
     }
-    /**
-     * Reverts to the admin account after impersonating a different user.
-     * This will also work if the current user happens to be the admin,
-     * though it will go through a sign out and sign in, requiring re-selection
-     * of the project
-     */
-    protected void revertToAdmin()
-    {
-        log("reverting to admin");
-        signOut();
-        signIn();
-    } //revertToAdmin();
 
     protected File[] getTestFiles()
     {
@@ -270,22 +258,6 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
-    }
-
-    protected void clickEditAssayDesign(Boolean confirmEditInOtherContainer)
-    {
-        prepForPageLoad();
-        click(Locator.linkWithText("manage assay design"));
-        waitAndClick(Locator.linkWithText("edit assay design"));
-        if (confirmEditInOtherContainer)
-        {
-            String alertText = getAlert();
-            assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
-                    alertText.contains("This assay is defined in the"));
-            assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
-                    alertText.contains("Would you still like to edit it?"));
-        }
-        waitForPageToLoad(WAIT_FOR_PAGE);
     }
 
     protected void enterStudySecurity()

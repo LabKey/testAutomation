@@ -21,6 +21,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 
 import java.io.File;
 import java.util.Map;
@@ -57,8 +58,9 @@ public class LuminexValueBasedGuideSetTest extends LuminexGuideSetTest
 
     private void finishAssayDesignConfigure()
     {
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
-        saveAssay();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
+        assayDesigner.save();
     }
 
     private void createInitialGuideSets()

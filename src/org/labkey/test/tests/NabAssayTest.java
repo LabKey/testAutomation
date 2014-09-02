@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -185,7 +186,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Starting Assay BVT Test");
         //revert to the admin user
-        revertToAdmin();
+        ensureSignedInAsAdmin();
 
         log("Testing NAb Assay Designer");
 
@@ -259,7 +260,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
         waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
@@ -733,7 +734,7 @@ public class NabAssayTest extends AbstractQCAssayTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        revertToAdmin();
+        ensureSignedInAsAdmin();
         deleteProject(getProjectName(), afterTest);
         try{deleteEngine();}
         catch(Throwable T) {}
@@ -748,10 +749,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Uploading NAb Runs with a transform script");
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
 
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickButton("Save & Close");
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.saveAndClose();
 
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));

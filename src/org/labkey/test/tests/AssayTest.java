@@ -210,7 +210,7 @@ public class AssayTest extends AbstractAssayTest
         assertButtonNotPresent("Delete");
 
         // Edit the design to make them editable
-        clickEditAssayDesign(true);
+        _assayHelper.clickEditAssayDesign(true);
         waitForElement(Locator.xpath("//span[@id='id_editable_results_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_results_properties']/input"));
         clickButton("Save & Close");
@@ -824,7 +824,7 @@ public class AssayTest extends AbstractAssayTest
         clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
         waitForElement(Locator.xpath(getPropertyXPathContains("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(getPropertyXPathContains("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         _listHelper.setColumnLabel(getPropertyXPathContains("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");

@@ -22,6 +22,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -40,9 +41,10 @@ public class LuminexAsyncImportTest extends LuminexTest
     protected void runUITests()
     {
         click(Locator.name("backgroundUpload"));
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
-        saveAssay();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
+        assayDesigner.saveAndClose();
 
         importFirstRun();
         importSecondRun(1, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);

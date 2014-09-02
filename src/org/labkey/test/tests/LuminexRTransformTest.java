@@ -22,6 +22,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -78,9 +79,10 @@ public class LuminexRTransformTest extends LuminexTest
 
         // add the R transform script to the assay
         goToTestAssayHome();
-        clickEditAssayDesign(false);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
+        _assayHelper.clickEditAssayDesign();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
         clickButton("Save & Close");
 
         uploadRunWithoutRumiCalc();

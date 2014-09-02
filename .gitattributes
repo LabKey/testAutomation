@@ -614,6 +614,7 @@ src/org/labkey/test/util/PipelineToolsHelper.java -text
 src/org/labkey/test/util/PortalHelper.java -text
 src/org/labkey/test/util/PostgresOnlyTest.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
+src/org/labkey/test/util/QCAssayScriptHelper.java -text
 src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/RelativeUrl.java -text
 src/org/labkey/test/util/RemoteConnectionHelper.java -text

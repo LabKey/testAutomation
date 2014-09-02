@@ -25,7 +25,6 @@ public abstract class DomainEditor
         _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-
     public void selectField(int index)
     {
         selectField(Locator.tagWithClass("tr", "editor-field-row").withDescendant(Locator.xpath("td/img").withAttribute("id", "partstatus_" + index)));
@@ -42,6 +41,17 @@ public abstract class DomainEditor
     {
         _test.click(Locator.tagWithAttribute("ul", "role", "tablist").append("/li").withText(tab));
         _test.waitForElement(Locator.tagWithClass("li", "x-tab-strip-active").withText(tab));
+    }
+
+    public void save()
+    {
+        _test.clickButton("Save", 0);
+        _test.waitForText("Save successful.", 20000);
+    }
+
+    public void saveAndClose()
+    {
+        _test.clickButton("Save & Close");
     }
 
     public static class Locators

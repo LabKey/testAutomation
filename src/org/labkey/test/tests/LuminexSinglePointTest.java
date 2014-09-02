@@ -22,6 +22,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.testng.Assert;
 
@@ -45,8 +46,9 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
 
     private void runSinglePointTest()
     {
-        click(Locator.name("backgroundUpload"));
-        saveAssay();
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.setBackgroundImport(true);
+        assayDesigner.saveAndClose();
 
         importRun(file1, 1);
         importRun(file2, 2);

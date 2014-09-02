@@ -770,6 +770,11 @@ public abstract class Locator
             return strippedXPath;
         }
 
+        public XPathLocator last()
+        {
+            return new XPathLocator("("+_loc+")[last()]");
+        }
+
         public XPathLocator append(String clause)
         {
             return new XPathLocator(getPath() + clause);

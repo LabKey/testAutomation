@@ -21,6 +21,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -47,9 +48,10 @@ public class LuminexJavaTransformTest extends LuminexTest
         //TODO:  goToTestRunList
         clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
 
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         clickButton("Save & Close");
 
         goToTestAssayHome();

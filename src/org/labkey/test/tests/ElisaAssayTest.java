@@ -63,7 +63,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         log("Starting ELISA Assay BVT Test");
 
         //revert to the admin user
-        revertToAdmin();
+        ensureSignedInAsAdmin();
 
         log("Testing ELISA Assay Designer");
 

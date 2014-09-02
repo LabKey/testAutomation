@@ -24,6 +24,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -72,7 +73,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         log("Starting Elispot Assay BVT Test");
 
         //revert to the admin user
-        revertToAdmin();
+        ensureSignedInAsAdmin();
 
         log("Testing Elispot Assay Designer");
 
@@ -355,7 +356,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        revertToAdmin();
+        ensureSignedInAsAdmin();
         super.doCleanup(afterTest);
 
         try
@@ -374,10 +375,11 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
 
-        addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickButton("Save & Close");
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
+        assayDesigner.saveAndClose();
         waitForElement(Locator.id("dataregion_Runs"));
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -408,7 +410,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickEditAssayDesign(false);
+        _assayHelper.clickEditAssayDesign();
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         click(Locator.css("#partdelete_removeTransformScript0 img"));
         clickButton("Save & Close");
