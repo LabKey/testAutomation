@@ -390,7 +390,7 @@
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
             <arg id="username" value="cruisecontrol@labkey.com"/>
-            <arg id="password" value="cruisecontrol"/>
+            <arg id="password" value="cruisecontrol1!"/>
         </java>
     </target>
 
