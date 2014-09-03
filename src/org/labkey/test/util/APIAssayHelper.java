@@ -91,40 +91,13 @@ public class APIAssayHelper extends AbstractAssayHelper
 
         Batch batch = new Batch();
         List<Run> runs = new ArrayList<>();
-        MyRun run = new MyRun();
-        run._resultData = resultRows;
+        Run run = new Run();
         run.setName(runName);
+        run.setResultData(resultRows);
         runs.add(run);
         batch.setRuns(runs);
 
         saveBatch(assayId, batch, projectName);
-    }
-
-    // TODO: The current saveBatch API doesn't support setting run.dataRows
-    public static class MyRun extends Run
-    {
-        protected List<Map<String, Object>> _resultData;
-
-        @Override
-        public JSONObject toJSONObject()
-        {
-            JSONObject result = super.toJSONObject();
-            if (!_resultData.isEmpty())
-            {
-                JSONArray dataRows = new JSONArray();
-                for (Map<String, Object> row : _resultData)
-                {
-                    JSONObject o = new JSONObject();
-                    for (Map.Entry<String, Object> entry : row.entrySet())
-                    {
-                        o.put(entry.getKey(), entry.getValue());
-                    }
-                    dataRows.add(o);
-                }
-                result.put("dataRows", dataRows);
-            }
-            return result;
-        }
     }
 
     public void saveBatch(int assayId, Batch batch, String projectPath) throws IOException, CommandException
