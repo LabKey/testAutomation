@@ -395,16 +395,11 @@ public abstract class LuminexTest extends AbstractQCAssayTest
      */
     private void assertStandardsMatchExpected(String column1Val, String column2Val, Map<String, Set<String>> colum1toColumn2Map)
     {
-//        if(analyte.equals("Analyte"))//header
-//            assertEquals(actualStandards, "Exclusion Comment");
-//        else
-//        {
-            String[] splitCol2Val = column2Val.split(",");
-            Set<String> expectedCol2Vals = colum1toColumn2Map.get(column1Val);
-            log("Column1: " + column1Val);
-            log("Expected Column2: " + expectedCol2Vals);
-            log("Column2: " + column2Val);
-            if(expectedCol2Vals!=null)
+        String[] splitCol2Val = column2Val.split(",");
+        Set<String> expectedCol2Vals = colum1toColumn2Map.get(column1Val);
+        if(expectedCol2Vals!=null)
+        {
+            try
             {
                 assertEquals(splitCol2Val.length, expectedCol2Vals.size());
 
@@ -414,7 +409,15 @@ public abstract class LuminexTest extends AbstractQCAssayTest
                     assertTrue("Expected " + expectedCol2Vals + " to contain" + s, expectedCol2Vals.contains(s));
                 }
             }
-//        }
+            catch (Exception rethrow)
+            {
+                log("Column1: " + column1Val);
+                log("Expected Column2: " + expectedCol2Vals);
+                log("Column2: " + column2Val);
+
+                throw rethrow;
+            }
+        }
     }
 
     /**
@@ -464,9 +467,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
-        //clickAndWait(Locator.linkWithText("view results"));
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), submenuText);
-
     }
 
     /**

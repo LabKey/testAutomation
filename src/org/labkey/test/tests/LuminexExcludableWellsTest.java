@@ -185,25 +185,33 @@ public class LuminexExcludableWellsTest extends LuminexTest
             for(int i=0; i<wells.size(); i++)
             {
                 well = wells.get(i);
-                log("well: " + well);
-                description= descriptions.get(i);
-                log("description: " + description);
+                description = descriptions.get(i);
                 type = types.get(i);
-                log("type: " + type);
                 comment = comments.get(i);
-                log("Comment: "+ comment);
                 String analyteVal = analytesPresent.get(i);
-                log("Analyte: " + analyteVal);
 
-                if(matchesWell(description, type, well) && analytes.contains(analyteVal))
+                try
                 {
-                    assertEquals(expectedComment,comment);
+                    if(matchesWell(description, type, well) && analytes.contains(analyteVal))
+                    {
+                        assertEquals(expectedComment,comment);
+                    }
+
+                    if(expectedComment.equals(comment))
+                    {
+                        assertTrue(matchesWell(description, type, well));
+                        assertTrue(analytes.contains(analyteVal));
+                    }
                 }
-
-                if(expectedComment.equals(comment))
+                catch (Exception rethrow)
                 {
-                    assertTrue(matchesWell(description, type, well));
-                    assertTrue(analytes.contains(analyteVal));
+                    log("well: " + well);
+                    log("description: " + description);
+                    log("type: " + type);
+                    log("Comment: "+ comment);
+                    log("Analyte: " + analyteVal);
+
+                    throw rethrow;
                 }
             }
         }
