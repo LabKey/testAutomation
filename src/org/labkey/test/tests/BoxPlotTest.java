@@ -51,15 +51,11 @@ public class BoxPlotTest extends GenericChartsTest
         clickAddReport("Box Plot");
 
         //TODO: weird timing with these combo boxes.
-        //Try once bug fixed: 15520: Box Plot - Allows selection of invalid schema/Query combination
-        //_extHelper.selectExt4ComboBoxItem("Schema", "assay");
-        //_extHelper.selectExt4ComboBoxItem("Query", "AssayList");
-        //_extHelper.selectExt4ComboBoxItem("Schema", "study");
         _ext4Helper.selectComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
 
         // Todo: put better wait here
         sleep(5000);
-        _ext4Helper.clickWindowButton("Select Chart Query", "Save", 0, 0);
+        _ext4Helper.clickWindowButton("Select Query", "Ok", 0, 0);
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("4c.Induration 1st measure", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
