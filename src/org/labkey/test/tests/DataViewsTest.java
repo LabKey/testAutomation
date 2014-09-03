@@ -412,7 +412,7 @@ public class DataViewsTest extends ParticipantListTest
     private void exportImportTest()
     {
         log("Verify roundtripping of study redesign features");
-        exportStudy(true, false);
+        exportStudy(false);
         deleteStudy();
 
         clickButton("Import Study");

@@ -60,34 +60,12 @@ public class StudyExportTest extends StudyManualTest
         SpecimenImporter specimenImporter = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_ARCHIVE_A), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 2);
         specimenImporter.importAndWaitForComplete();
 
-        // export manually created study to individual files using "legacy" formats
-        exportStudy(false, false);
-
-        // delete manually created study
-        clickFolder(getFolderName());
-        deleteStudy();
-
-        log("Importing exported study (legacy formats)");
-        clickButton("Import Study");
-        clickButton("Import Study Using Pipeline");
-        _fileBrowserHelper.importFile("export/study/study.xml", "Import Study");
-        waitForText("Import Study from Pipeline");
-        clickButton("Start Import");
-        // wait for study & specimen load to complete
-        waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
-        // set the bit to indicate the import format is of the legacy type
-        isLegacyExportFormat = true;
-
-        // delete "export" directory
-        deleteDir(new File(getPipelinePath() + "export"));
-
-        // change settings that aren't roundtripped using "legacy" formats
+        // TODO: Call afterManualCreate()?
         setDemographicsDescription();
         createCustomAssays();
         setFormatStrings();
         doCohortCreateSteps();
         modifyVisits();
-        importCustomVisitMapping();
         changeDatasetOrder("16");
         setDatasetCategory(MODIFIED_DATASET, CATEGORY);
         hideDataset(HIDDEN_DATASET);
@@ -96,7 +74,7 @@ public class StudyExportTest extends StudyManualTest
         _listHelper.importListArchive(getFolderName(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
-        exportStudy(true, true);
+        exportStudy(true);
 
         // delete the study
         clickFolder(getFolderName());
@@ -115,9 +93,9 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Start Import");
 
         // wait for study & specimen load
-        waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)", false);
+        waitForPipelineJobsToComplete(3, "study and specimen archive import", false);
 
-        // TODO: Move this earlier (after legacy format import) once issue 10074 is resolved. 
+        // TODO: Move this earlier once issue 10074 is resolved... or remove, since this is done in afterManualCreate()
         setDemographicsBit();
     }
 
@@ -363,7 +341,7 @@ public class StudyExportTest extends StudyManualTest
         _extHelper.clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 5);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(TestFileUtils.getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 4);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
@@ -558,7 +536,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
-        waitAndClick(Locator.name("ff_label1"));
+        waitAndClick(Locator.name("ff_label0"));
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.name("mvEnabled"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.checkboxByName("mvEnabled"));

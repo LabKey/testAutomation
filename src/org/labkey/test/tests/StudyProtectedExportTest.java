@@ -44,7 +44,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         setParticipantIdPreface(idPreface, idLength);
         
         setUpTrickyExport();
-        exportStudy(true, true, false, true, true, false, null);
+        exportStudy(true, false, true, true, false, null);
     }
 
     protected void setParticipantIdPreface(String idPreface, int idLength)
@@ -161,7 +161,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
         startSpecimenImport(4, SPECIMEN_ARCHIVE_A);
         waitForPipelineJobsToComplete(4, "Specimen import", false);
-        exportStudy(true, true, false, true, true, true, null);
+        exportStudy(true, false, true, true, true, null);
 
         clickFolder(getFolderName());
         deleteStudy();

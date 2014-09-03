@@ -215,19 +215,19 @@ public abstract class StudyBaseTest extends SimpleApiTest
         importFolderFromPipeline("AltIdStudy.folder.zip");
     }
 
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile)
+    protected void exportStudy(boolean zipFile)
     {
-        exportStudy(useXmlFormat, zipFile, true);
+        exportStudy(zipFile, true);
     }
 
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
+    protected void exportStudy(boolean zipFile, boolean exportProtected)
     {
-        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, false, Collections.<String>emptySet());
+        exportStudy(zipFile, exportProtected, false, false, false, Collections.<String>emptySet());
     }
 
-    @LogMethod protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
-                               boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
-                               @Nullable Set<String> uncheckObjects)
+    @LogMethod protected void exportStudy(boolean zipFile, boolean exportProtected,
+                                          boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
+                                          @Nullable Set<String> uncheckObjects)
     {
         clickTab("Manage");
         clickButton("Export Study");
@@ -239,7 +239,6 @@ public abstract class StudyBaseTest extends SimpleApiTest
             for (String uncheckObject : uncheckObjects)
                 uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
         }
-        checkRadioButton(Locator.radioButtonByNameAndValue("format", useXmlFormat ? "new" : "old"));
         checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         if(!exportProtected)
             checkCheckbox(Locator.name("removeProtected"));

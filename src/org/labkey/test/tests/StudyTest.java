@@ -58,8 +58,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 @Category({Study.class, Specimen.class, DailyB.class})
 public class StudyTest extends StudyBaseTest
 {
-    public String datasetLink = datasetCount + " datasets";
-    protected boolean isLegacyExportFormat;
+    private String datasetLink = datasetCount + " datasets";
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
 
@@ -206,20 +205,8 @@ public class StudyTest extends StudyBaseTest
         Locator measureRow = Locator.tagWithText("div", textToFilter);
         waitForElement(measureRow, WAIT_FOR_JAVASCRIPT * 2);
 
-        // The legacy study export format results in the date column showing up in the default views, this is largely
-        // due to the rangeURI versus propertyURI export metadata, when we import the legacy format we can't determine
-        // if it is a VisitDate column or just a date field. The longer term fix is to stop exporting in the legacy
-        // format (but continue to import).
-        if (isLegacyExportFormat)
-        {
-            assertElementPresent(measureRow, 28);
-            assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 81);
-        }
-        else
-        {
-            assertElementPresent(measureRow, 27);
-            assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 79);
-        }
+        assertElementPresent(measureRow, 27);
+        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 79);
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
         setFormElement(filterSearchText, "a");
@@ -227,10 +214,8 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
         fireEvent(filterSearchText, SeleniumEvent.change);
         sleep(1000);
-        if (isLegacyExportFormat)
-            assertTextPresent("Abbrevi", 81);
-        else
-            assertTextPresent("Abbrevi", 79);
+
+        assertTextPresent("Abbrevi", 79);
         assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
