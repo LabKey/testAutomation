@@ -181,6 +181,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         clickButton("Update", 0);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
+        waitForElementToDisappear(Ext4Helper.Locators.mask());
 
 
         // Change user setting TEST_USER -> No Email

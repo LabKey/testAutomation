@@ -264,6 +264,22 @@ public class FileBrowserHelper
         _test.clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
     }
 
+    /** If the upload panel isn't visible, click the "Upload Files" button in the toolbar. */
+    public void openUploadPanel()
+    {
+        Locator.XPathLocator uploadPanel = Locator.tagWithClass("div", "upload-files-panel").notHidden();
+        if (_test.isElementPresent(uploadPanel))
+        {
+            _test.log("Upload panel visible");
+        }
+        else
+        {
+            _test.log("Opening upload panel...");
+            _test.click(BrowserAction.UPLOAD.button());
+            _test.waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
     public void uploadFile(File file)
     {
         uploadFile(file, null, null, false);
@@ -272,6 +288,8 @@ public class FileBrowserHelper
     @LogMethod
     public void uploadFile(@LoggedParam final File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
+        openUploadPanel();
+
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
             public boolean check()
@@ -287,7 +305,7 @@ public class FileBrowserHelper
             {
                 return _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName());
             }
-        }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+        }, "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
 
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);
