@@ -181,21 +181,15 @@ public class FilterTest extends BaseWebDriverTest
             log("Loop count: " + count++);
             validFilterGeneratesCorrectResultsTest(a);
         }
-
-
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void facetedFilterTest()
     {
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
-        openFilter("query", "Color");
 
         log("Verifying expected faceted filter elements present");
-        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
-
-        _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
+        verifyFacetOptions("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         setFacetedFilter("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
         verifyColumnValues("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
@@ -241,12 +235,9 @@ public class FilterTest extends BaseWebDriverTest
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         log("Verifying faceted filter on non-lookup column");
-        openFilter("query", "year");
 
-        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "1980", "1990", "1970");
-
-        _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "year", "1980", "1970", "1990");
+        verifyFacetOptions("query", "year", "1970", "1980", "1990");
 
         setFacetedFilter("query", "year", "1980");
         verifyColumnValues("query", "year", "1980");
@@ -381,23 +372,13 @@ public class FilterTest extends BaseWebDriverTest
         assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
     }
 
-    private void verifyTextPresentInFilterDialog(String... texts)
-    {
-        Locator loc = Locator.xpath("//div[contains(@class, 'labkey-filter-dialog')]");
-        String filterDialogText = getText(loc);
-
-        for (String text : texts)
-            assertEquals("'" + text + "' not found", 1, StringUtils.countMatches(filterDialogText, text));
-    }
-
-    private void verifyOptionsInFilterDialog(String... options)
+    private void verifyOptionsInFilterDialog(String... expectedOptions)
     {
         final Locator.CssLocator filterDialogFacetPanel = Locator.css(".labkey-filter-dialog .x-grid3-body");
-        waitForElement(filterDialogFacetPanel.containing(options[0]));
-        String expectedOptions = StringUtils.join(options, "\n");
-        String actualOptions = getText(filterDialogFacetPanel).replaceAll(" ", "");
+        waitForElement(filterDialogFacetPanel.containing(expectedOptions[0]));
+        List<String> actualOptions = Arrays.asList(getText(filterDialogFacetPanel).replaceAll(" ", "").split("\n"));
 
-        assertEquals("Unexpected filter options", expectedOptions, actualOptions);
+        assertEquals("Unexpected filter options", Arrays.asList(expectedOptions), actualOptions);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
