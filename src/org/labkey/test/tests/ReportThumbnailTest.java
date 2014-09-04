@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.httpclient.util.URIUtil;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -45,6 +46,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private static final String R_PARTICIPANT_VIEWS = "R Participant Views: Physical Exam";
     private static final String R_REGRESSION_BP_ALL = "R Regression: Blood Pressure: All";
     private static final String R_REGRESSION_BP_MEANS = "R Regression: Blood Pressure: Means";
+    private static final String CROSSTAB_REPORT = "Crosstab: Gender and Group Counts";
 
     private String THUMBNAIL_DATA;
     private String ICON_DATA;
@@ -62,11 +64,18 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private String THUMBNAIL_CUSTOM_DATA; // custom thumbnail same across all views
     private String THUMBNAIL_R_NONE_DATA; // stock thumbnails differ per report type
     private String _currentProject = PROJECT_NAME;
+    private int CORE_REV_NUM;
 
     @Override
     protected String getProjectName()
     {
         return _currentProject;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
@@ -99,14 +108,14 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         setThumbnailSRC(BOX_PLOT);
         toggleThumbnailType(BOX_PLOT, true);
         assertNewThumbnail(BOX_PLOT);
-        assignCustomThumbnail(BOX_PLOT, TEST_THUMBNAIL);
+        assignCustomThumbnail(BOX_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(BOX_PLOT);
 
         goToDataViews();
         setThumbnailSRC(SCATTER_PLOT);
         toggleThumbnailType(SCATTER_PLOT, true);
         assertNewThumbnail(SCATTER_PLOT);
-        assignCustomThumbnail(SCATTER_PLOT, TEST_THUMBNAIL);
+        assignCustomThumbnail(SCATTER_PLOT, TEST_THUMBNAIL, 1, 2);
         assertNewThumbnail(SCATTER_PLOT);
         THUMBNAIL_CUSTOM_DATA = THUMBNAIL_DATA;
     }
@@ -125,8 +134,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         THUMBNAIL_R_AUTO_DATA = THUMBNAIL_DATA;
 
         goToDataViews();
-        assignCustomThumbnail(R_REGRESSION_BP_MEANS, TEST_THUMBNAIL);
+        assignCustomThumbnail(R_REGRESSION_BP_MEANS, TEST_THUMBNAIL, CORE_REV_NUM, 1);
         verifyThumbnail(R_REGRESSION_BP_MEANS, THUMBNAIL_CUSTOM_DATA);
+
+        goToDataViews();
+        assignCustomThumbnail(CROSSTAB_REPORT, TEST_THUMBNAIL, CORE_REV_NUM, 1);
+        verifyThumbnail(CROSSTAB_REPORT, THUMBNAIL_CUSTOM_DATA);
 
         // setup icons
         goToDataViews();
@@ -134,11 +147,11 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         ICON_R_NONE_DATA = ICON_DATA;
 
         goToDataViews();
-        assignCustomIcon(R_REGRESSION_BP_ALL, TEST_ICON);
+        assignCustomIcon(R_REGRESSION_BP_ALL, TEST_ICON, CORE_REV_NUM, 1);
         verifyIcon(R_REGRESSION_BP_ALL, ICON_CUSTOM_DATA);
 
         goToDataViews();
-        assignCustomIcon(R_REGRESSION_BP_MEANS, TEST_ICON);
+        assignCustomIcon(R_REGRESSION_BP_MEANS, TEST_ICON, CORE_REV_NUM, 1);
         verifyIcon(R_REGRESSION_BP_MEANS, ICON_CUSTOM_DATA);
     }
 
@@ -146,7 +159,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         setIconSRC(BOX_PLOT);
-        assignCustomIcon(BOX_PLOT, TEST_ICON);
+        assignCustomIcon(BOX_PLOT, TEST_ICON, CORE_REV_NUM, 1);
         assertNewIcon(BOX_PLOT);
         ICON_CUSTOM_DATA = ICON_DATA;
 
@@ -164,10 +177,18 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doSetup()
     {
+        getCurrentCoreRevNumber();
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(TEST_STUDY);
         goToDataViews();
+    }
+
+    protected void getCurrentCoreRevNumber()
+    {
+        String imgSrc = Locator.xpath("//td[contains(@class, 'labkey-main-icon')]//a//img").findElement(getDriver()).getAttribute("src");
+        String rev = imgSrc.substring(imgSrc.lastIndexOf("&")+1);
+        CORE_REV_NUM = Integer.parseInt(rev.split("=")[1]);
     }
 
     protected void goToDataViews()
@@ -261,17 +282,50 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void assignCustomThumbnail(String chart, File thumbnail)
+    protected void assignCustomThumbnail(String chart, File thumbnail, int currentRevNum, int nextRevNum)
     {
+        // NOTE: the checkRevisionNumber here makes an assumption about this being a new thumbnail with no previous thumbnails.
         goToDataViews();
         waitAndClick(Locator.xpath("//img[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
+        assertTrue("Thumbnail Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img"), currentRevNum));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
+        // go back and check revision number real quick
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("customThumbnail"));
+        assertTrue("Thumbnail Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'thumbnail')]//img"), nextRevNum));
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+    }
+
+    // NOTE: avoid 'assert' name
+    protected boolean checkRevisionNumber(Locator loc, int num)
+    {
+        waitForElement(loc);
+        String uri = loc.findElement(getDriver()).getAttribute("src");
+        String query = URIUtil.getQuery(uri);
+        //if (query.contains("&"))
+        //{
+        for (String param : query.split("&"))
+        {
+            String[] data = param.split("=");
+            if(data[0].equals("revision"))
+                return (num == Integer.parseInt(data[1]));
+        }
+        //}
+        /*else {
+            String[] data = query.split("=");
+            if(data[0].equals("revision"))
+                return (num == Integer.parseInt(data[1]));
+        }*/
+        return false;
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -292,6 +346,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             throw new RuntimeException(e);
         }
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -327,10 +383,12 @@ public class ReportThumbnailTest extends BaseWebDriverTest
             assertTrue("Unexpected icon", expected.equals(iconData));
 
         ICON_DATA = iconData;
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void assignCustomIcon(String chart, File icon)
+    protected void assignCustomIcon(String chart, File icon, int currentRevNum, int nextRevNum)
     {
         goToDataViews();
         waitAndClick(Locator.xpath("//img[@title='Edit']"));
@@ -338,12 +396,21 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
+        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), currentRevNum));
         setFormElement(Locator.xpath("//input[@id='customIcon-button-fileInputEl']"), icon);
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+        // go back and check revision number real quick
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("customIcon"));
+        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), nextRevNum));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    /*@LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected File getExportFolderZip()
     {
         goToProjectHome();
@@ -362,7 +429,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
         File[] exportFiles = getDownloadDir().listFiles();
         return exportFiles[0];
-    }
+    }*/
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void importFolder(File importZip)
@@ -376,7 +443,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void testThumbnailRoundtrip()
     {
         // export
-        File exportZip = getExportFolderZip();
+        File exportZip = exportFolderToBrowserAsZip();
         importFolder(exportZip);
 
         // BOX_PLOT has a custom icon and custom thumbnail
