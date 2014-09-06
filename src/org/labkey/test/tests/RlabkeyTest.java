@@ -83,7 +83,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickButton("Save");
 
         clickProject(PROJECT_NAME_2);
-        addWebPart("Issues List");
+        portalHelper.addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
         clickButton("Update");
@@ -161,5 +161,4 @@ public class RlabkeyTest extends SimpleApiTest
     {
         return PROJECT_NAME;
     }
-
 }

@@ -15,6 +15,10 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -53,17 +57,7 @@ public abstract class TestFileUtils
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
     {
-        StringBuilder contents = new StringBuilder();
-        try(BufferedReader input = new BufferedReader(new InputStreamReader(is)))
-        {
-            String line;
-            while ((line = input.readLine()) != null)
-            {
-                contents.append(line);
-                contents.append("\n");
-            }
-        }
-        return contents.toString();
+        return StringUtils.join(IOUtils.readLines(is).toArray(), System.lineSeparator());
     }
 
     public static String getLabKeyRoot()
@@ -155,5 +149,16 @@ public abstract class TestFileUtils
     public static File getApiScriptFolder()
     {
         return new File(getLabKeyRoot(), "server/test/data/api");
+    }
+
+    public static String getProcessOutput(File executable, String... args) throws IOException
+    {
+        Runtime rt = Runtime.getRuntime();
+        Process p = rt.exec(ArrayUtils.addAll(new String[]{executable.getCanonicalPath()}, args));
+
+        // Different platforms output version info differently; just combine all std/err output
+        return StringUtils.trim(
+                getStreamContentsAsString(p.getInputStream()) + System.lineSeparator() +
+                getStreamContentsAsString(p.getErrorStream()));
     }
 }

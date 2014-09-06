@@ -57,6 +57,9 @@ public class RReportHelper extends AbstractHelper
         super(test);
     }
 
+    private static File rExecutable = null;
+    private static File rScriptExecutable = null;
+
     private static final String INSTALL_RLABKEY = "install.packages(\"Rlabkey\", repos=\"http://cran.r-project.org\")";
     private static final String INSTALL_LOCAL_RLABKEY = "install.packages(\"%s\", repos=NULL)";
 
@@ -74,7 +77,7 @@ public class RReportHelper extends AbstractHelper
      * @return - true if the test result was present
      */
     @LogMethod
-    public boolean executeScript(String script, String verify, boolean failOnError)
+    public boolean executeScript(String script, String expectedLines, boolean failOnError)
     {
         _test.log("execute script");
 
@@ -90,31 +93,58 @@ public class RReportHelper extends AbstractHelper
         _test.waitForElement(l);
         String html = _test.getText(l).replaceAll(" +", " ");
 
-        if (failOnError)
-        {
-            if (html.contains("javax.script.ScriptException"))
-            {
-                _test.log("Error: the script failed with an error:\n" + html);
-                return false;
-            }
-        }
+        return checkScriptOutput(html, expectedLines, failOnError);
+    }
 
-        if (!StringUtils.isEmpty(verify))
+    public boolean executeScriptDirectly(String script, String expectedLines) throws IOException
+    {
+        return executeScriptDirectly(script, expectedLines, false);
+    }
+
+    public boolean executeScriptDirectly(String script, String expectedLines, boolean failOnError) throws IOException
+    {
+        String scriptOutput = getRScriptOutput(script);
+
+        return checkScriptOutput(scriptOutput, expectedLines, failOnError);
+    }
+
+    private boolean checkScriptOutput(String scriptOutput, String expectedLines, boolean failOnError)
+    {
+        if (failOnError && doesScriptProduceError(scriptOutput))
+            return false;
+
+        return doesScriptProduceOutput(expectedLines, scriptOutput);
+    }
+
+    private boolean doesScriptProduceOutput(String expectedLines, String scriptOutput)
+    {
+        if (!StringUtils.isEmpty(expectedLines))
         {
             // split string on newlines to make the comparison more reliable
-            String [] parts = verify.split("\n");
+            String[] parts = expectedLines.split("\n");
 
             for (String part : parts)
             {
-                if (!html.contains(part.trim()))
+                if (!scriptOutput.contains(part.trim()))
                 {
-                    _test.log("Error: could not find expected text: " + part + ".\nfrom value:\n" + html);
+                    _test.log("Error: could not find expected text: " + part + ".\nfrom value:\n" + scriptOutput);
                     return false;
                 }
             }
         }
 
         return true;
+    }
+
+    private boolean doesScriptProduceError(String scriptOutput)
+    {
+        if (scriptOutput.contains("javax.script.ScriptException"))
+        {
+            _test.log("Error: the script failed with an error:\n" + scriptOutput);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -162,13 +192,28 @@ public class RReportHelper extends AbstractHelper
             if (!TestProperties.isTestRunningOnTeamCity())
             {
                 scripts.editEngine(defaultScriptName);
-                return getRVersion(new File(_test.getFormElement(Locator.id("editEngine_exePath"))));
+                rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
+                return getRVersion(rExecutable);
             }
             else // Reset R scripting engine on TeamCity
                 scripts.deleteEngine(defaultScriptName);
         }
 
         _test.log("Try configuring R");
+        String rVersion = getRVersion(getRExecutable());
+
+        ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(getRExecutable());
+        config.setVersion(rVersion);
+        scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.R, config);
+
+        return rVersion;
+    }
+
+    private File getRExecutable()
+    {
+        if (rExecutable != null)
+            return rExecutable;
+
         String rHome = System.getenv("R_HOME");
         if (rHome != null)
         {
@@ -192,13 +237,8 @@ public class RReportHelper extends AbstractHelper
             {
                 if (files.length == 1)
                 {
-                    String rVersion = getRVersion(files[0]);
-
-                    ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(files[0]);
-                    config.setVersion(rVersion);
-                    scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.R, config);
-
-                    return rVersion;
+                    rExecutable = files[0];
+                    return rExecutable;
                 }
                 else if (files.length > 1)
                 {
@@ -219,7 +259,15 @@ public class RReportHelper extends AbstractHelper
             _test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
         fail("R is not configured on this system. Failed R tests.");
-        return null; // unreachable
+
+        return null; // Unreachable
+    }
+
+    private File getRScriptExecutable()
+    {
+        if (rScriptExecutable == null)
+            rScriptExecutable = new File(getRExecutable().getParentFile(), "rscript");
+        return rScriptExecutable;
     }
 
     private String getRVersion(File r)
@@ -227,12 +275,7 @@ public class RReportHelper extends AbstractHelper
         String versionOutput = "";
         try
         {
-            Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec(new String[]{r.getCanonicalPath(), "--version"});
-
-            // Different platforms output version info differently; just combine all std/err output
-            versionOutput = TestFileUtils.getStreamContentsAsString(p.getInputStream());
-            versionOutput += TestFileUtils.getStreamContentsAsString(p.getErrorStream());
+            versionOutput = TestFileUtils.getProcessOutput(r, "--version");
 
             Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
@@ -251,6 +294,16 @@ public class RReportHelper extends AbstractHelper
         }
     }
 
+    public String getRScriptOutput(String scriptContents) throws IOException
+    {
+        return TestFileUtils.getProcessOutput(getRScriptExecutable(), "-e", scriptContents);
+    }
+
+    public String getRScriptOutput(File script) throws IOException
+    {
+        return TestFileUtils.getProcessOutput(getRScriptExecutable(), script.getCanonicalPath());
+    }
+
     public void saveReport(String name)
     {
         _test.clickButton("Save", 0);
@@ -261,7 +314,7 @@ public class RReportHelper extends AbstractHelper
             if (_test.isElementPresent(locator))
             {
                 _test.setFormElement(locator, name);
-                _test._ext4Helper.clickWindowButton("Save View", "OK", _test.WAIT_FOR_JAVASCRIPT, 0);
+                _test._ext4Helper.clickWindowButton("Save View", "OK", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, 0);
             }
         }
     }
