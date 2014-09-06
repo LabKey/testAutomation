@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -30,7 +31,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
-public class LuminexUploadAndCopyTest extends LuminexTest
+public final class LuminexUploadAndCopyTest extends LuminexTest
 {
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_SET_PROP_SPECIES2 = "testSpecies2";
@@ -39,13 +40,14 @@ public class LuminexUploadAndCopyTest extends LuminexTest
     private static final String TEST_ASSAY_LUM_RUN_NAME3 = "WithIndices.xls";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
-    protected void runUITests()
+    @Override
+    protected boolean useXarImport()
     {
-        runUploadAndCopyTest();
+        return false;
     }
 
-    @LogMethod
-    private void runUploadAndCopyTest()
+    @Test
+    public void testUploadAndCopy()
     {
         _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
 

@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -24,6 +26,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
 import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LuminexGuideSetHelper;
+import org.labkey.test.util.PerlHelper;
 import org.testng.Assert;
 
 import java.io.File;
@@ -32,24 +36,28 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class})
-public class LuminexSinglePointTest extends LuminexGuideSetTest
+public class LuminexSinglePointTest extends LuminexTest
 {
+    private final LuminexGuideSetHelper _guideSetHelper = new LuminexGuideSetHelper(this);
+
     private final String file1 = "01-11A12-IgA-Biotin.xls";
     private final String file2 = "02-14A22-IgA-Biotin.xls";
     private final String file3 = "03-31A82-IgA-Biotin.xls";
     private final String file4 = "04-17A32-IgA-Biotin.xls";
 
-    protected void runUITests()
+    @BeforeClass
+    public static void configurePerl()
     {
-        runSinglePointTest();
-    }
-
-    private void runSinglePointTest()
-    {
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        LuminexTest init = (LuminexTest)getCurrentTest();
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
         assayDesigner.setBackgroundImport(true);
         assayDesigner.saveAndClose();
+    }
 
+    @Test
+    public void testSinglePoint()
+    {
         importRun(file1, 1);
         importRun(file2, 2);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
@@ -67,8 +75,8 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
         clickAndWait(Locator.linkContainingText("graph"));
         assertTextNotPresent("ERROR");
 
-        createGuideSet(true);
-        editRunBasedGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide Set 1", true);
+        _guideSetHelper.createGuideSet(true);
+        _guideSetHelper.editRunBasedGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide Set 1", true);
 
         importRun(file3, 3);
         waitForPipelineJobsToFinish(4);
@@ -94,24 +102,24 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
         Map<String, Double> metricInputs = new TreeMap<>();
         metricInputs.put("MaxFIAverage", 33.0);
         metricInputs.put("MaxFIStdDev", 1.25);
-        createGuideSet(false);
-        editValueBasedGuideSet(metricInputs, guideSetComment, true);
+        _guideSetHelper.createGuideSet(false);
+        _guideSetHelper.editValueBasedGuideSet(metricInputs, guideSetComment, true);
 
-        applyGuideSetToRun("NETWORK3", guideSetComment, true);
+        _guideSetHelper.applyGuideSetToRun("NETWORK3", guideSetComment, true);
         waitForElementToDisappear(ctrlFlag);
 
         metricInputs.put("MaxFIStdDev", 0.25);
         clickButtonContainingText("Edit", 0);
-        editValueBasedGuideSet(metricInputs, guideSetComment, false);
+        _guideSetHelper.editValueBasedGuideSet(metricInputs, guideSetComment, false);
         waitForElement(ctrlFlag);
 
         metricInputs.put("MaxFIAverage", 35.0);
         metricInputs.put("MaxFIStdDev", null);
         clickButtonContainingText("Edit", 0);
-        editValueBasedGuideSet(metricInputs, guideSetComment, false);
+        _guideSetHelper.editValueBasedGuideSet(metricInputs, guideSetComment, false);
         waitForElementToDisappear(ctrlFlag);
 
-        applyGuideSetToRun("NETWORK3", "Single Point Control Guide Set 1", false);
+        _guideSetHelper.applyGuideSetToRun("NETWORK3", "Single Point Control Guide Set 1", false);
         waitForElement(ctrlFlag);
     }
 

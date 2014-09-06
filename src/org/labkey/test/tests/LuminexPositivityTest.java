@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -33,7 +35,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
-public class LuminexPositivityTest extends LuminexTest
+public final class LuminexPositivityTest extends LuminexTest
 {
     List<String> _analyteNames = new ArrayList<>();
     private int _expectedThresholdValue = 100;
@@ -41,25 +43,31 @@ public class LuminexPositivityTest extends LuminexTest
     private Boolean _expectedNegativeControlValue = false;
     private Boolean _newNegativeControlValue = false;
     private String _negControlAnalyte = null;
+    protected static final File POSITIVITY_RTRANSFORM_SCRIPT_FILE =  new File(TestFileUtils.getLabKeyRoot(), "server/modules/luminex/resources/transformscripts/description_parsing_example.pl");
 
-    protected void ensureConfigured()
+    @BeforeClass
+    public static void updateAssayDesign()
     {
-        PerlHelper perlHelper = new PerlHelper(this);
-        perlHelper.ensurePerlConfig();
+        LuminexTest init = (LuminexTest)getCurrentTest();
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
 
-        setUseXarImport(true);
-        super.ensureConfigured();
+        assayDesigner.addTransformScript(POSITIVITY_RTRANSFORM_SCRIPT_FILE);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LABKEY);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LAB);
+        assayDesigner.saveAndClose();
+
+        PerlHelper perlHelper = new PerlHelper(getCurrentTest());
+        perlHelper.ensurePerlConfig();
     }
 
-
-    protected void runUITests()
+    @Test
+    public void testPositivity()
     {
         String assayName = "Positivity";
         _analyteNames.add("MyAnalyte (1)");
         _analyteNames.add("Blank (3)");
         _negControlAnalyte = _analyteNames.get(1);
-
-        addTransformScriptsToAssayDesign();
 
         test3xFoldChange(assayName);
         test5xFoldChange(assayName);
@@ -67,15 +75,6 @@ public class LuminexPositivityTest extends LuminexTest
         testWithNegativeControls(assayName);
         testBaselineVisitDataFromPreviousRun(assayName);
         testDefaultAnalyteProperties(assayName);
-    }
-
-    private void addTransformScriptsToAssayDesign()
-    {
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"));
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
-        assayDesigner.save();
     }
 
     private void testDefaultAnalyteProperties(String assayName)
@@ -102,7 +101,7 @@ public class LuminexPositivityTest extends LuminexTest
     {
         DataRegionTable runs = new DataRegionTable("Runs", this);
         runs.checkCheckbox(runIndex);
-        clickButton("Re-import run");
+        runs.clickHeaderButtonByText("Re-import run");
         clickButton("Next"); // batch
         clickButton("Next"); // run
         for (String analyteName : _analyteNames)

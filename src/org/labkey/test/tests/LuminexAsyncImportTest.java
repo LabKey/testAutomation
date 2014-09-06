@@ -16,6 +16,8 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -29,23 +31,24 @@ import java.io.File;
 import java.util.Calendar;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class})
-public class LuminexAsyncImportTest extends LuminexTest
+public final class LuminexAsyncImportTest extends LuminexTest
 {
-    @Override
-    protected void ensureConfigured()
+    @BeforeClass
+    public static void updateAssayDefinition()
     {
-        setUseXarImport(true);
-        super.ensureConfigured();
+        LuminexTest init = (LuminexTest)getCurrentTest();
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
+
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LABKEY);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LAB);
+        assayDesigner.setBackgroundImport(true);
+        assayDesigner.saveAndClose();
     }
 
-    protected void runUITests()
+    @Test
+    public void testAsyncImport()
     {
-        click(Locator.name("backgroundUpload"));
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
-        assayDesigner.saveAndClose();
-
         importFirstRun();
         importSecondRun(1, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
         reimportFirstRun(0, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);

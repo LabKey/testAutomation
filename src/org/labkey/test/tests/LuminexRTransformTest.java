@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -32,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
-public class LuminexRTransformTest extends LuminexTest
+public final class LuminexRTransformTest extends LuminexTest
 {
     private static final String TEST_ANALYTE_LOT_NUMBER = "ABC 123";
     private static final String ANALYTE1 = "MyAnalyte (1)";
@@ -51,61 +53,39 @@ public class LuminexRTransformTest extends LuminexTest
             "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "5.5", "5.5", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9", "-6.9",
             "-0.8", "-0.8", "-6.9", "-6.9", "-6.9", "-6.9"};
 
-    @Override
-    protected void ensureConfigured()
+    @BeforeClass
+    public static void updateAssayDefinition()
     {
-        setUseXarImport(true);
-        super.ensureConfigured();
-    }
+        LuminexRTransformTest init = (LuminexRTransformTest)getCurrentTest();
 
-    protected void runUITests()
-    {
-        runRTransformTest(true);
-        runNegativeBeadTest();
-    }
+        // add the R transform script to the assay
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
 
-    private boolean R_TRANSFORM_SET = false;
-    protected void ensureRTransformPresent()
-    {
-        if(!R_TRANSFORM_SET)
-            runRTransformTest(false);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LABKEY);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LAB);
+        assayDesigner.saveAndClose();
     }
 
     //requires drc, Ruminex and xtable packages installed in R
-    @LogMethod
-    private void runRTransformTest(boolean doVerification)
+    @Test
+    public void testRTransform()
     {
         log("Uploading Luminex run with a R transform script");
 
-        // add the R transform script to the assay
-        goToTestAssayHome();
-        _assayHelper.clickEditAssayDesign();
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY));
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), getModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB));
-        clickButton("Save & Close");
-
         uploadRunWithoutRumiCalc();
-        if (doVerification)
-        {
-            verifyPDFsGenerated(false);
-            verifyScriptVersions();
-            verifyLotNumber();
-            verifyRumiCalculatedValues(false, ANALYTE3);
-            verifyAnalyteProperties(new String[]{ANALYTE3, ANALYTE3, " ", " "});
-        }
+        verifyPDFsGenerated(false);
+        verifyScriptVersions();
+        verifyLotNumber();
+        verifyRumiCalculatedValues(false, ANALYTE3);
+        verifyAnalyteProperties(new String[]{ANALYTE3, ANALYTE3, " ", " "});
 
         reImportRunWithRumiCalc();
-        if (doVerification)
-        {
-            verifyPDFsGenerated(true);
-            verifyScriptVersions();
-            verifyLotNumber();
-            verifyRumiCalculatedValues(true, ANALYTE4);
-            verifyAnalyteProperties(new String[]{ANALYTE4, ANALYTE4, " ", " "});
-        }
-
-        R_TRANSFORM_SET = true;
+        verifyPDFsGenerated(true);
+        verifyScriptVersions();
+        verifyLotNumber();
+        verifyRumiCalculatedValues(true, ANALYTE4);
+        verifyAnalyteProperties(new String[]{ANALYTE4, ANALYTE4, " ", " "});
     }
 
     private void verifyAnalyteProperties(String[] expectedNegBead)
@@ -213,7 +193,8 @@ public class LuminexRTransformTest extends LuminexTest
         }
     }
 
-    private void uploadRunWithoutRumiCalc()
+    @LogMethod
+    public void uploadRunWithoutRumiCalc()
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
@@ -246,7 +227,8 @@ public class LuminexRTransformTest extends LuminexTest
         clickButton("Save and Finish");
     }
 
-    private void reImportRunWithRumiCalc()
+    @LogMethod
+    public void reImportRunWithRumiCalc()
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
@@ -265,10 +247,11 @@ public class LuminexRTransformTest extends LuminexTest
         clickButton("Save and Finish");
     }
 
-    @LogMethod
-    private void runNegativeBeadTest()
+    @Test
+    public void testNegativeBead()
     {
-        goToProjectHome();                        log("Upload Luminex run for testing Negative Bead UI and calculation");
+        goToProjectHome();
+        log("Upload Luminex run for testing Negative Bead UI and calculation");
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickButton("Import Data");

@@ -16,13 +16,16 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.QCAssayScriptHelper;
 import org.labkey.test.util.RReportHelper;
@@ -40,41 +43,37 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
-public abstract class LuminexTest extends AbstractQCAssayTest
+public abstract class LuminexTest extends BaseWebDriverTest
 {
-    RReportHelper _rReportHelper = new RReportHelper(this);
-
-    private boolean _useXarImport = false;
-
     protected final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
-    protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
+    public static final String TEST_ASSAY_LUM =  "&TestAssayLuminex></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
 
     protected static final String TEST_ASSAY_XAR_NAME = "TestLuminexAssay";
-    protected final File TEST_ASSAY_XAR_FILE = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
+    public static final File TEST_ASSAY_XAR_FILE = TestFileUtils.getSampleData("Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
 
     protected static final String TEST_ASSAY_LUM_SET_PROP_SPECIES = "testSpecies1";
-    protected final File TEST_ASSAY_LUM_FILE1 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/10JAN07_plate_1.xls");
-    protected final File TEST_ASSAY_LUM_FILE2 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/pnLINCO20070302A.xlsx");
-    protected final File TEST_ASSAY_LUM_FILE3 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithIndices.xls");
-    protected final File TEST_ASSAY_LUM_FILE4 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/WithAltNegativeBead.xls");
-    protected final File TEST_ASSAY_LUM_FILE5 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 1.xls");
-    protected final File TEST_ASSAY_LUM_FILE6 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 2.xls");
-    protected final File TEST_ASSAY_LUM_FILE7 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 3.xls");
-    protected final File TEST_ASSAY_LUM_FILE8 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls");
-    protected final File TEST_ASSAY_LUM_FILE9 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
-    protected final File TEST_ASSAY_LUM_FILE10 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
-    protected final File TEST_ASSAY_LUM_FILE11 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityWithBaseline.xls");
-    protected final File TEST_ASSAY_LUM_FILE12 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityWithoutBaseline.xls");
-    protected final File TEST_ASSAY_LUM_FILE13 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/PositivityThreshold.xls");
+    public static final File TEST_ASSAY_LUM_FILE1 = TestFileUtils.getSampleData("Luminex/10JAN07_plate_1.xls");
+    public static final File TEST_ASSAY_LUM_FILE2 = TestFileUtils.getSampleData("Luminex/pnLINCO20070302A.xlsx");
+    public static final File TEST_ASSAY_LUM_FILE3 = TestFileUtils.getSampleData("Luminex/WithIndices.xls");
+    public static final File TEST_ASSAY_LUM_FILE4 = TestFileUtils.getSampleData("Luminex/WithAltNegativeBead.xls");
+    public static final File TEST_ASSAY_LUM_FILE5 = TestFileUtils.getSampleData("Luminex/Guide Set plate 1.xls");
+    public static final File TEST_ASSAY_LUM_FILE6 = TestFileUtils.getSampleData("Luminex/Guide Set plate 2.xls");
+    public static final File TEST_ASSAY_LUM_FILE7 = TestFileUtils.getSampleData("Luminex/Guide Set plate 3.xls");
+    public static final File TEST_ASSAY_LUM_FILE8 = TestFileUtils.getSampleData("Luminex/Guide Set plate 4.xls");
+    public static final File TEST_ASSAY_LUM_FILE9 = TestFileUtils.getSampleData("Luminex/Guide Set plate 5.xls");
+    public static final File TEST_ASSAY_LUM_FILE10 = TestFileUtils.getSampleData("Luminex/RawAndSummary.xlsx");
+    public static final File TEST_ASSAY_LUM_FILE11 = TestFileUtils.getSampleData("Luminex/PositivityWithBaseline.xls");
+    public static final File TEST_ASSAY_LUM_FILE12 = TestFileUtils.getSampleData("Luminex/PositivityWithoutBaseline.xls");
+    public static final File TEST_ASSAY_LUM_FILE13 = TestFileUtils.getSampleData("Luminex/PositivityThreshold.xls");
 
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
-    protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
+    public static final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = TestFileUtils.getSampleData("Luminex/plate 1_IgA-Biot (Standard2).xls");
+    public static final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = TestFileUtils.getSampleData("Luminex/plate 2_IgA-Biot (Standard2).xls");
+    public static final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = TestFileUtils.getSampleData("Luminex/plate 3_IgA-Biot (Standard1).xls");
 
-    protected static final String RTRANSFORM_SCRIPT_FILE_LABKEY = "/resources/transformscripts/labkey_luminex_transform.R";
-    protected static final String RTRANSFORM_SCRIPT_FILE_LAB = "/resources/transformscripts/tomaras_luminex_transform.R";
+    public static final File RTRANSFORM_SCRIPT_FILE_LABKEY = new File(TestFileUtils.getLabKeyRoot(), "server/modules/luminex/resources/transformscripts/labkey_luminex_transform.R");
+    public static final File RTRANSFORM_SCRIPT_FILE_LAB =  new File(TestFileUtils.getLabKeyRoot(), "server/modules/luminex/resources/transformscripts/tomaras_luminex_transform.R");
 
     public static final String ASSAY_ID_FIELD  = "name";
     public static final String ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD = "__primaryFile__";
@@ -84,26 +83,15 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     protected static final String MULTIPLE_CURVE_ASSAY_RUN_NAME = "multipleCurvesTestRun";
     protected static final String SAVE_CHANGES_BUTTON = "Save";
 
-    protected DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    protected String today = null;
+    public static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
-    protected String isotype = "IgG ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
-    protected String conjugate = "PE ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
+    public static final String isotype = "IgG ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
+    public static final String conjugate = "PE ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
 
 
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("luminex");
-    }
-
-    public String getModuleDirectory()
-    {
-        return "server/modules/luminex";
-    }
-
-    public void setUseXarImport(boolean useXarImport)
-    {
-        _useXarImport = useXarImport;
     }
 
     @Override
@@ -118,31 +106,21 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         return TEST_ASSAY_PRJ_LUMINEX;
     }
 
-    //potentially third "dirty" status
-    protected enum  Configured {CONFIGURED, UNCONFIGURED}
-
-    protected Configured configStatus = Configured.UNCONFIGURED;
-
-    protected Configured getConfigStatus()
+    protected boolean useXarImport()
     {
-        return configStatus;
+        return true;
     }
 
-    protected void ensureConfigured()
+    @BeforeClass
+    public static void initTest()
     {
-        if(getConfigStatus()!=Configured.CONFIGURED)
-        {
-            log("luminex assay not configured, configuring now");
-            configure();
-        }
-        else
-        {
-            log("luminex assay already configured, skipping configuration step");
-        }
+        LuminexTest init = (LuminexTest)getCurrentTest();
+
+        init.doInit();
     }
 
     @LogMethod
-    protected void configure()
+    private void doInit()
     {
         // setup a scripting engine to run a java transform script
         QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
@@ -150,6 +128,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         javaEngine.createNetrcFile();
 
         // fail fast if R is not configured
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         log("Testing Luminex Assay Designer");
@@ -164,7 +143,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         portalHelper.addWebPart("Assay List");
 
 
-        if (_useXarImport)
+        if (useXarImport())
         {
             // import the assay design from the XAR file
             _assayHelper.uploadXarFileAsAssayDesign(TEST_ASSAY_XAR_FILE, 1);
@@ -175,7 +154,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
             assayDesigner.setName(TEST_ASSAY_LUM);
             assayDesigner.setDescription(TEST_ASSAY_LUM_DESC);
-            assayDesigner.save();
+            assayDesigner.saveAndClose();
         }
         else
         {
@@ -259,7 +238,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             setFormat("Data Fields", 15, "0.0");
             setFormat("Data Fields", 16, "0.0");
 
-            assayDesigner.save();
+            assayDesigner.saveAndClose();
 
             // remove the SpecimenID field from the results grid to speed up the test
 //            clickAndWait(Locator.linkWithText("Assay List"));
@@ -269,23 +248,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
 //            _customizeViewsHelper.removeCustomizeViewColumn("SpecimenID");
 //            _customizeViewsHelper.saveDefaultView();
         }
-
-        // Clear the success message by reopening the designer, in case downstream the test wants to do further changes
-        // of the assay design and needs to be able to detect when the save is complete.
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "edit assay design");
-        waitForElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), WAIT_FOR_JAVASCRIPT);
-
-        configStatus = Configured.CONFIGURED;
     }
-
-    protected void saveAssay()
-    {
-        clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
-    }
-
 
     public void excludeAnalyteForRun(String analyte, boolean exclude, String comment)
     {
@@ -336,15 +299,6 @@ public abstract class LuminexTest extends AbstractQCAssayTest
                         "ENV5 (58)", "Blank (53)"};
     }
 
-
-    /**
-     * Goes to test run list for the common list used by all the tests
-     */
-    protected void goToTestRunList()
-    {
-        goToProjectHome();
-        clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
-    }
 
     protected String startCreateMultipleCurveAssayRun()
     {
@@ -431,6 +385,24 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         clickButton("Next");
     }
 
+    /**several tests use this data.  Rather that clean and import for each
+     * or take an unnecessary dependency of one to the other, this function
+     * checks if the data is already present and, if it is not, adds it
+     * preconditions:  Project TEST_ASSAY_PRJ_LUMINEX with Assay  TEST_ASSAY_LUM exists
+     * postconditions:  assay run
+     */
+    protected void ensureMultipleCurveDataPresent()
+    {
+        goToTestAssayHome();
+
+        if(!isTextPresent(MULTIPLE_CURVE_ASSAY_RUN_NAME)) //right now this is a good enough check.  May have to be
+        // more rigorous if tests start substantially altering data
+        {
+            log("multiple curve data not present, adding now");
+            startCreateMultipleCurveAssayRun();
+            clickButton("Save and Finish");
+        }
+    }
 
     protected void addFilesToAssayRun(File firstFile, File... additionalFiles)
     {
@@ -455,14 +427,14 @@ public abstract class LuminexTest extends AbstractQCAssayTest
      */
     protected void createNewAssayRun(String name)
     {
-        goToTestRunList();
+        goToTestAssayHome();
         clickButtonContainingText("Import Data");
         checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
         clickButtonContainingText("Next");
         setFormElement(Locator.name(ASSAY_ID_FIELD), name);
     }
 
-    protected void goToQCAnalysisPage(String submenuText)
+    public void goToQCAnalysisPage(String submenuText)
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
@@ -478,15 +450,12 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     {
         deleteProject(getProjectName(), afterTest);
 
-        try{
-            QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-            javaEngine.deleteEngine();
-        }
-        catch(Throwable T) {/* ignore */}
+        QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
+        javaEngine.deleteEngine();
     } //doCleanup()
 
     //helper function to go to test assay home from anywhere the project link is visible
-    protected void goToTestAssayHome()
+    public void goToTestAssayHome()
     {
         if (!isTextPresent(TEST_ASSAY_LUM + " Runs"))
         {
@@ -503,7 +472,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         setFormElement(Locator.id("propertyFormat"), formatStr);
     }
 
-    protected void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
+    public void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
                                            String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
                                            String testDate, File file, int i)
     {
@@ -543,8 +512,8 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     }
 
 
-    @LogMethod
-    public void uploadPositivityFile(String assayName, File file, String baseVisit, String foldChange, boolean isBackgroundUpload, boolean expectDuplicateFile)
+    @LogMethod(quiet = true)
+    public void uploadPositivityFile(@LoggedParam String assayName, @LoggedParam File file, String baseVisit, String foldChange, boolean isBackgroundUpload, boolean expectDuplicateFile)
     {
         preUploadPositivityFile(assayName);
         checkCheckbox(Locator.name("calculatePositivity"));
@@ -584,4 +553,98 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         // no op, currently used by LuminexPositivityTest
     }
 
+    protected void verifyQCFlags(String analyteName, String[] expectedFlags)
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+
+        //add QC flag colum
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
+        _customizeViewsHelper.saveCustomView();
+
+        //verify expected values in column
+        List<String> var = getColumnValues("Runs", "QC Flags").get(0);
+        String[] flags = var.toArray(new String[var.size()]);
+        for(int i=0; i<flags.length; i++)
+        {
+            assertEquals(expectedFlags[i], flags[i].trim());
+        }
+
+        verifyQCFlagLink(analyteName, expectedFlags[0]);
+    }
+
+    @LogMethod
+    private void verifyQCFlagLink(String analyteName, String expectedFlag)
+    {
+        click(Locator.linkContainingText(expectedFlag, 0));
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
+        sleep(1500);
+        assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
+
+        //verify text is in expected form
+        waitForText("Standard1 " + analyteName + " - " + isotype + " " + conjugate + " under threshold for AUC");
+
+        //verify unchecking a box  removes the flag
+        Locator aucCheckBox = Locator.xpath("//div[text()='AUC']/../../td/div/div[contains(@class, 'check')]");
+        click(aucCheckBox);
+        clickButton("Save", 0);
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+        Locator strikeoutAUC = Locator.xpath("//span[contains(@style, 'line-through') and  text()='AUC']");
+        waitForElement(strikeoutAUC);
+
+        //verify rechecking a box adds the flag back
+        click(strikeoutAUC);
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
+        waitAndClick(aucCheckBox);
+        clickButton("Save", 0);
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForText(expectedFlag);
+        assertElementNotPresent(strikeoutAUC);
+    }
+
+    @LogMethod
+    protected void verifyQCReport()
+    {
+        goToQCAnalysisPage("view titration qc report");
+
+        //make sure all the columns we want are viable
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addCustomizeViewColumn("Five ParameterCurveFit/FailureFlag");
+        _customizeViewsHelper.addCustomizeViewColumn("Four ParameterCurveFit/FailureFlag");
+        _customizeViewsHelper.addCustomizeViewColumn("Five ParameterCurveFit/EC50");
+        _customizeViewsHelper.saveCustomView();
+
+        assertTextPresent("Titration QC Report");
+        DataRegionTable drt = new DataRegionTable("AnalyteTitration", this);
+        String isotype = drt.getDataAsText(0, "Isotype");
+        if(isotype.length()==0)
+            isotype = "[None]";
+        String conjugate = drt.getDataAsText(0, "Conjugate");
+        if(conjugate.length()==0)
+            conjugate =  "[None]";
+
+        log("verify the calculation failure flag");
+        List<String> fourParamFlag = drt.getColumnDataAsText("Four Parameter Curve Fit Failure Flag");
+        for(String flag: fourParamFlag)
+        {
+            assertEquals(" ", flag);
+        }
+
+        List<String> fiveParamFlag = drt.getColumnDataAsText("Five Parameter Curve Fit Failure Flag");
+        List<String> fiveParamData = drt.getColumnDataAsText("Five Parameter Curve Fit EC50");
+
+        for(int i=0; i<fiveParamData.size(); i++)
+        {
+            assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).equals(" ")) ^ (fiveParamData.get(i).equals(" "))));
+        }
+
+
+        //verify link to Levey-Jennings plot
+        clickAndWait(Locator.linkWithText("graph", 0));
+        waitForText(" - " + isotype + " " + conjugate);
+        assertTextPresent("Levey-Jennings Report", "Standard1");
+    }
 }

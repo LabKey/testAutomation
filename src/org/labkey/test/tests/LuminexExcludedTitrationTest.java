@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
@@ -27,24 +28,10 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class})
-public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
+public final class LuminexExcludedTitrationTest extends LuminexTest
 {
     private static final Locator AVAILABLE_ANALYTES_CHECKBOX = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");
     private static final Locator COMMENT_LOCATOR = Locator.xpath("//input[@id='comment']") ;
-
-
-    protected void ensureConfigured()
-    {
-
-        setUseXarImport(true);
-        super.ensureConfigured();
-    }
-
-    @LogMethod @Override
-    protected void runUITests()
-    {
-        runTitrationExclusionTest();
-    }
 
     /**
      * test of titration exclusion- the ability to exclude certain titrations and add a comment as to why
@@ -52,8 +39,8 @@ public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
      * but is not required
      * postconditions:  multiple curve data will be present, wells for the given titration will be marked excluded
      */
-    @LogMethod
-    private void runTitrationExclusionTest()
+    @Test
+    public void testTitrationExclusion()
     {
         ensureMultipleCurveDataPresent();
 

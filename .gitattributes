@@ -601,6 +601,7 @@ src/org/labkey/test/util/LabModuleHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
+src/org/labkey/test/util/LuminexGuideSetHelper.java -text
 src/org/labkey/test/util/Maps.java -text
 src/org/labkey/test/util/MetadataEditorHelper.java -text
 src/org/labkey/test/util/OlapHelper.java -text

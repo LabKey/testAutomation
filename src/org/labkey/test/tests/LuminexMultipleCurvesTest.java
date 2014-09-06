@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
@@ -32,26 +33,14 @@ import java.util.Set;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
-public class LuminexMultipleCurvesTest extends LuminexTest
+public final class LuminexMultipleCurvesTest extends LuminexTest
 {
-    @Override
-    protected void ensureConfigured()
-    {
-        setUseXarImport(true);
-        super.ensureConfigured();
-    }
-
-    protected void runUITests() throws InterruptedException
-    {
-        runMultipleCurveTest();
-    }
-
     /**
      * Test our ability to upload multiple files and set multiple standards
      *
      */
-    @LogMethod
-    private void runMultipleCurveTest() throws InterruptedException
+    @Test
+    public void testMultipleCurve() throws InterruptedException
     {
         String name = startCreateMultipleCurveAssayRun();
 
@@ -148,8 +137,8 @@ public class LuminexMultipleCurvesTest extends LuminexTest
     @LogMethod
     private void reImportData(Map<String, WellRole[]> wellRoleMap)
     {
-            goToTestRunList();
-            click(Locator.linkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME));
+        goToTestAssayHome();
+        click(Locator.linkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME));
             clickButtonContainingText("Re-import run");
             checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
             clickButtonContainingText("Next");

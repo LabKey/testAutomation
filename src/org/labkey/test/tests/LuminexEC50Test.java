@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -22,38 +24,44 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Luminex;
 import org.labkey.test.categories.LuminexAll;
+import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.RReportHelper;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class, Luminex.class})
-public class LuminexEC50Test extends LuminexRTransformTest
+public class LuminexEC50Test extends LuminexTest
 {
     private final String EC50_RUN_NAME = "EC50";
     private final String rum4 = "Four Parameter";
     private final String rum5 = "Five Parameter";
     private final String trapezoidal = "Trapezoidal";
 
-    @Override
-    protected void ensureConfigured()
+    @BeforeClass
+    public static void updateAssayDefinition()
     {
-        setUseXarImport(true);
-        super.ensureConfigured();
+        LuminexEC50Test init = (LuminexEC50Test)getCurrentTest();
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
+
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LABKEY);
+        assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LAB);
+        assayDesigner.saveAndClose();
     }
 
-    protected void runUITests()
+    @Test
+    public void testEC50()
     {
-        runEC50Test();
-    }
+        LuminexRTransformTest rTransformTest = new LuminexRTransformTest();
+        rTransformTest.uploadRunWithoutRumiCalc();
+        rTransformTest.reImportRunWithRumiCalc();
 
-    @LogMethod
-    private void runEC50Test()
-    {
-        ensureRTransformPresent();
         createNewAssayRun(EC50_RUN_NAME);
         checkCheckbox(Locator.name("curveFitLogTransform"));
         uploadMultipleCurveData();
@@ -62,24 +70,16 @@ public class LuminexEC50Test extends LuminexRTransformTest
         //add transform script
         goToSchemaBrowser();
         viewQueryData("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
-        waitForText("Four Parameter");
-
-        waitForText("3.45399");
 
         checkEC50dataAndFailureFlag();
     }
 
-    private void checkRversion()
+    private boolean checkRversion() throws IOException
     {
         // quick check to see if we are using 32-bit or 64-bit R
         log("Checking R 32-bit vs 64-bit");
-        pushLocation();
-        _extHelper.clickMenuButton("Views", "Create", "R View");
-        boolean is64bit = _rReportHelper.executeScript("print(.Machine$sizeof.pointer)", "[1] 8", true);
-        _rReportHelper.clickSourceTab();
-        _rReportHelper.saveReport("dummy");
-        popLocation();
-        waitForText("CurveFit");
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        return _rReportHelper.getRScriptOutput(".Machine$sizeof.pointer").contains("[1] 8");
     }
 
     private void checkEC50dataAndFailureFlag()

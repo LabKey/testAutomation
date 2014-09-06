@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -30,29 +32,29 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class})
-public class LuminexJavaTransformTest extends LuminexTest
+public final class LuminexJavaTransformTest extends LuminexTest
 {
-    protected void runUITests()
+    @Override
+    protected boolean useXarImport()
     {
-        runJavaTransformTest();
-        runFileUploadTest();
+        return false;
     }
 
-    @LogMethod
-    private void runJavaTransformTest()
+    @BeforeClass
+    public static void updateAssayDefinition()
     {
-        // add the transform script to the assay
+        LuminexJavaTransformTest init = (LuminexJavaTransformTest)getCurrentTest();
+        init.goToTestAssayHome();
+        AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
+
+        assayDesigner.addTransformScript(TestFileUtils.getSampleData("qc/transform.jar"));
+        assayDesigner.saveAndClose();
+    }
+
+    @Test
+    public void testJavaTransform()
+    {
         log("Uploading Luminex Runs with a transform script");
-
-
-        //TODO:  goToTestRunList
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        _assayHelper.clickEditAssayDesign();
-
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
-        clickButton("Save & Close");
 
         goToTestAssayHome();
         clickButton("Import Data");
@@ -72,13 +74,15 @@ public class LuminexJavaTransformTest extends LuminexTest
         }
     }
 
-    @LogMethod
-    private void runFileUploadTest()
+    @Test
+    public void testFileUpload()
     {
         String[] assayNames = {"Test Assay 1", "Test Assay 2", "Test Assay 3"};
         String ERROR_TEXT = "already exists.";
 
         log("Testing file upload conflict error messages and archive on delete");
+
+        goToTestAssayHome();
 
         // Create a run that imports 1 file
         createNewAssayRun(assayNames[0]);

@@ -15,13 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.LuminexAll;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, LuminexAll.class, Assays.class})
-public class LuminexExcludableWellsTest extends LuminexTest
+public final class LuminexExcludableWellsTest extends LuminexTest
 {
     private static final String EXCLUDE_SELECTED_BUTTON = "excludeselected";
 
@@ -42,26 +42,14 @@ public class LuminexExcludableWellsTest extends LuminexTest
     private final String excludedWellType = "X25";
     private final Set<String> excludedWells = new HashSet<>(Arrays.asList("E1", "F1"));
 
-    @Override
-    protected void ensureConfigured()
-    {
-        setUseXarImport(true);
-        super.ensureConfigured();
-    }
-    
-    protected void runUITests()
-    {
-        runWellExclusionTest();
-    }
-
     /**
      * test of well exclusion- the ability to exclude certain wells or analytes and add ac oment as to why
      * preconditions: LUMINEX project and assay list exist.  Having the Multiple Curve data will speed up execution
      * but is not required
      * postconditions:  multiple curve data will be present, certain wells will be marked excluded
      */
-    @LogMethod
-    private void runWellExclusionTest()
+    @Test
+    public void testWellExclusion()
     {
         ensureMultipleCurveDataPresent();
 
@@ -90,25 +78,6 @@ public class LuminexExcludableWellsTest extends LuminexTest
         clickAndWait(Locator.linkWithText("view excluded data"));
         assertTextPresent("Changed for all analytes", "exclude single analyte for single well", "ENV7 (93)", "ENV6 (97)");
         assertTextPresent("multipleCurvesTestRun", 2);
-    }
-
-    /**several tests use this data.  Rather that clean and import for each
-     * or take an unnecessary dependency of one to the other, this function
-     * checks if the data is already present and, if it is not, adds it
-     * preconditions:  Project TEST_ASSAY_PRJ_LUMINEX with Assay  TEST_ASSAY_LUM exists
-     * postconditions:  assay run
-     */
-    protected void ensureMultipleCurveDataPresent()
-    {
-        goToTestRunList();
-
-        if(!isTextPresent(MULTIPLE_CURVE_ASSAY_RUN_NAME)) //right now this is a good enough check.  May have to be
-        // more rigorous if tests start substantially altering data
-        {
-            log("multiple curve data not present, adding now");
-            startCreateMultipleCurveAssayRun();
-            clickButton("Save and Finish");
-        }
     }
 
     /**

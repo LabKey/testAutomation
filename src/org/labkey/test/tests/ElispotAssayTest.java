@@ -375,9 +375,9 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        _assayHelper.clickEditAssayDesign();
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+
+        AssayDomainEditor assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
         waitForElement(Locator.id("dataregion_Runs"));
