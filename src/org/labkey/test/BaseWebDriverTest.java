@@ -16,12 +16,6 @@
 
 package org.labkey.test;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
@@ -115,14 +109,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import static org.junit.Assert.*;
-import static org.labkey.test.TestProperties.*;
-import static org.labkey.test.WebTestHelper.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.ensureChromedriverExeProperty;
+import static org.labkey.test.TestProperties.isDevModeEnabled;
+import static org.labkey.test.TestProperties.isInjectCheckEnabled;
+import static org.labkey.test.TestProperties.isLeakCheckSkipped;
+import static org.labkey.test.TestProperties.isLinkCheckEnabled;
+import static org.labkey.test.TestProperties.isQueryCheckSkipped;
+import static org.labkey.test.TestProperties.isScriptCheckEnabled;
+import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
+import static org.labkey.test.TestProperties.isTestCleanupSkipped;
+import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
+import static org.labkey.test.TestProperties.isViewCheckSkipped;
+import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
+import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
+import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
+import static org.labkey.test.WebTestHelper.getHttpGetResponse;
+import static org.labkey.test.WebTestHelper.getTargetServer;
+import static org.labkey.test.WebTestHelper.leakCRC;
+import static org.labkey.test.WebTestHelper.stripContextPath;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -5081,18 +5104,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         String xpath = "//div[div[text()='" + feature + "']]/a";
         if (!isElementPresent(Locator.xpath(xpath)))
-            fail("No such feature found");
+            fail("No such feature found: " + feature);
         else
         {
             Locator link = Locator.xpath(xpath + "[text()='Enable']");
             if(isElementPresent(link))
             {
                 click(link);
-                log("Enable link found, enabling");
+                log("Enable link found, enabling " + feature);
             }
             else
             {
-                log("Link not found, presumed enabled");
+                log("Link not found, presumed enabled: " + feature);
             }
         }
     }
