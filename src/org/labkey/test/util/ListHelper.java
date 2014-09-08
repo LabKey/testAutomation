@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -251,7 +252,7 @@ public class ListHelper extends AbstractHelper
         {
             _test.clickFolder(folderName);
         }
-        catch (NoSuchElementException ex)
+        catch (WebDriverException ex)
         {
             _test.clickProject(folderName);
         }
@@ -380,7 +381,7 @@ public class ListHelper extends AbstractHelper
 
     public void setColumnLabel(int index, String label)
     {
-        setColumnLabel(null,index,label);
+        setColumnLabel(null, index, label);
     }
 
     public void setColumnLabel(@Nullable String prefix, int index, String label)
@@ -450,7 +451,7 @@ public class ListHelper extends AbstractHelper
     private void selectLookupComboItem(String fieldName, String value, int attempt)
     {
         _test.log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
-        _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
+        _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
         try
         {
             _test.waitAndClick(500*attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);

@@ -106,8 +106,8 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForText("Edit Design");
         clickButton("Done", 0);
-        waitForElement(Locator.linkWithText("View Data"));
-        clickAndWait(Locator.linkWithText("View Data"));
+        waitForElement(Locator.linkWithText("Details"));
+        clickAndWait(Locator.linkWithText("Details"));
         waitForText("Insert New");
 
         Map<String, String> dataRow = new HashMap<>();
@@ -126,6 +126,8 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForText("Edit Design");
         clickButton("Done", 0);
+        waitForElement(Locator.linkWithText("Details"));
+        clickAndWait(Locator.linkWithText("Details"));
         waitForText("No data to show.");
         assertTextPresent(REPLACEMENT_COL);
     }
