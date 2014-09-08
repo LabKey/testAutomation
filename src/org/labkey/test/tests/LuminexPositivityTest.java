@@ -48,6 +48,9 @@ public final class LuminexPositivityTest extends LuminexTest
     @BeforeClass
     public static void updateAssayDesign()
     {
+        PerlHelper perlHelper = new PerlHelper(getCurrentTest());
+        perlHelper.ensurePerlConfig();
+
         LuminexTest init = (LuminexTest)getCurrentTest();
         init.goToTestAssayHome();
         AssayDomainEditor assayDesigner = init._assayHelper.clickEditAssayDesign();
@@ -56,9 +59,6 @@ public final class LuminexPositivityTest extends LuminexTest
         assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LABKEY);
         assayDesigner.addTransformScript(RTRANSFORM_SCRIPT_FILE_LAB);
         assayDesigner.saveAndClose();
-
-        PerlHelper perlHelper = new PerlHelper(getCurrentTest());
-        perlHelper.ensurePerlConfig();
     }
 
     @Test
