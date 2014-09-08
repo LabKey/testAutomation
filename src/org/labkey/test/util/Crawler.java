@@ -103,6 +103,7 @@ public class Crawler
             new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
+            new ControllerActionId("assay", "template"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("experiment", "showRunGraphDetail"), // TODO: exclude for injection only
