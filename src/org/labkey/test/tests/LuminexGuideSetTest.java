@@ -448,7 +448,7 @@ public final class LuminexGuideSetTest extends LuminexTest
     {
         importPlateFiveAgain();
 
-        //add QC flag colum
+        //add QC flag column
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("QCFlags");

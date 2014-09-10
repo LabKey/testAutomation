@@ -558,7 +558,7 @@ public abstract class LuminexTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
-        //add QC flag colum
+        //add QC flag column
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
         _customizeViewsHelper.saveCustomView();

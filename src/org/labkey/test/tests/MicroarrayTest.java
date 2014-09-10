@@ -180,7 +180,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickButton("Next");
         assertTextPresent(RUN_INTEGER_FIELD + " must be of type Integer");
 
-        // Try with the wrong sample colum names
+        // Try with the wrong sample column names
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3a\tProbeID_Cy5a\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\t" + SAMPLE_SET + ".First\t" + SAMPLE_SET + ".Second\tFirstString\t11\n" +
                 "251379110137_A01\t" + SAMPLE_SET + ".Third\t" + SAMPLE_SET + ".Fourth\tSecondString\t22\n");
