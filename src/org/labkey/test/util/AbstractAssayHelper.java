@@ -177,4 +177,30 @@ public abstract class AbstractAssayHelper extends AbstractHelper
             }
         });
     }
+
+    public void setDefaultValues(final String assayName, final AssayDefaultAreas defaults)
+    {
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "set default values", defaults.getMenuText(assayName));
+    }
+
+    public static enum AssayDefaultAreas
+    {
+        BATCH_FIELDS("Batch Fields"),
+        DATA_FIELDS("Data Fields"),
+        ANALYTE_PROPERTIES("Analyte Properties"),
+        RUN_FIELDS("Run Fields"),
+        EXCEL_FILE_RUN_PROPERTIES("Excel File Run Properties");
+
+        private String menuSuffix;
+
+        private AssayDefaultAreas(String menuSuffix)
+        {
+            this.menuSuffix = menuSuffix;
+        }
+
+        private String getMenuText(String assayName)
+        {
+            return assayName + " " + menuSuffix;
+        }
+    }
 }

@@ -394,9 +394,11 @@ public class PortalHelper extends AbstractHelper
 
     public static class Locators
     {
+        public static Locator.XPathLocator webPartTitle = Locator.xpath("//span").withClass("labkey-wp-title-text");
+
         public static Locator.XPathLocator webPartTitle(String title)
         {
-            return Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title);
+            return webPartTitle.withText(title);
         }
 
         public static Locator.XPathLocator webPartTitleMenu(String title)
