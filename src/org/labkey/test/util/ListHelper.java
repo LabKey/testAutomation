@@ -454,7 +454,8 @@ public class ListHelper extends AbstractHelper
         _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
         try
         {
-            _test.waitAndClick(500*attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+            _test.waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+            _test.log(".. selected");
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
@@ -466,7 +467,15 @@ public class ListHelper extends AbstractHelper
             selectLookupComboItem(fieldName, value, attempt + 1);
         }
 
-        _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
+        try
+        {
+            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
+            _test.log(".. test-marker updated");
+        }
+        catch (NoSuchElementException ignore)
+        {
+            _test.log(".. failed to update test-marker, soldier on anyway");
+        }
     }
 
     private void selectLookupTableComboItem(String table)
@@ -490,7 +499,7 @@ public class ListHelper extends AbstractHelper
                 throw retry;
 
             _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            selectLookupTableComboItem(table, attempt+1);
+            selectLookupTableComboItem(table, attempt + 1);
         }
         _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
     }

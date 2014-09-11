@@ -3728,6 +3728,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(locator, wait, true);
     }
 
+    public void waitForElementText(final Locator locator, final String text)
+    {
+        waitForElementText(locator, text, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void waitForElementText(final Locator locator, final String text, int wait)
+    {
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                String elemText = getText(locator);
+                return elemText.equals(text);
+            }
+        }, "Expected '" + text + "' in element '" + locator + "'", wait);
+    }
+
     public void waitForElementToDisappear(final Locator locator)
     {
         waitForElementToDisappear(locator, WAIT_FOR_JAVASCRIPT);
