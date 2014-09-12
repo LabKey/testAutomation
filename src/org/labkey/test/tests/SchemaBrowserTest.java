@@ -77,14 +77,14 @@ public class SchemaBrowserTest extends BaseWebDriverTest
         click(Locator.lookupLink("lists", AUTHORS_LIST, "AuthorId"));
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        _extHelper.closeExtTab("lists." + AUTHORS_LIST);
+        _ext4Helper.closeExtTab("lists." + AUTHORS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
         click(Locator.lookupLink("lists", PUBLISHERS_LIST, "PublisherId"));
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
-        _extHelper.closeExtTab("lists." + PUBLISHERS_LIST);
+        _ext4Helper.closeExtTab("lists." + PUBLISHERS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_PUBLISHERS);
 

@@ -567,13 +567,13 @@ public abstract class Locator
 
     public static XPathLocator schemaTreeNode(String schemaName)
     {
-        return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + schemaName + "']");
+        return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
     }
 
-    public static XPathLocator queryTreeNode(String schemaName, String queryName)
+    public static XPathLocator queryTreeNode(String queryName)
     {
-        String[] schemaParts = schemaName.split("\\.");
-        return xpath("//li[@class='x-tree-node']/div/a/span[text()='" + schemaParts[schemaParts.length - 1] + "']/../../..//span[text()='" + queryName + "']");
+        // NOTE: this may mis-fire (hit the wrong node... watch for this)
+        return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div/span").withText(queryName);
     }
 
     public static XPathLocator permissionsTreeNode(String folderName)

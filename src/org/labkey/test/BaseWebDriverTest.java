@@ -6041,7 +6041,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             waitForElement(loc, 30000);
             shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath(loc.toXpath())));
             click(loc);
-            waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
+            waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 1000);
             waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"), 30000);
         }
     }
@@ -6051,9 +6051,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         // wait for tool tip to disappear, in case it is covering the element we want to click on
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x-tip-body')]"));
-        waitAndClick(Locator.queryTreeNode(schemaName, queryName));
-        waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
+        shortWait().until(ExpectedConditions.elementToBeClickable(Locator.queryTreeNode(queryName).toBy()));
+        click(Locator.queryTreeNode(queryName));
+        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[text()='"+ schemaName + "." + queryName + "']/.."), 1000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
@@ -6090,7 +6091,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void createNewQuery(String schemaName)
     {
         selectSchema(schemaName);
-        clickButton("Create New Query");
+        click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Create New Query']"));
     }
 
 
@@ -6122,9 +6123,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void validateQueries(boolean validateSubfolders)
     {
-        _extHelper.clickExtButton("Validate Queries", 0);
+        click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Validate Queries']"));
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
-        waitForElement(Locator.id("lk-sb-details__lk-vq-panel"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("lk-vq-panel"), WAIT_FOR_JAVASCRIPT);
         if (validateSubfolders)
         {
             shortWait().until(ExpectedConditions.elementToBeClickable(By.id("lk-vq-subfolders")));
