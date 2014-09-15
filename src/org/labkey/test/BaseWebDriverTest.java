@@ -6053,8 +6053,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         // wait for tool tip to disappear, in case it is covering the element we want to click on
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
         shortWait().until(ExpectedConditions.elementToBeClickable(Locator.queryTreeNode(queryName).toBy()));
-        click(Locator.queryTreeNode(queryName));
-        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[text()='"+ schemaName + "." + queryName + "']/.."), 1000);
+        clickAt(Locator.queryTreeNode(queryName), 1, 1, 0);
+        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '"+ schemaName + "." + queryName + "')]/.."), 30000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)

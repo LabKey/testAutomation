@@ -770,7 +770,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         goToSchemaBrowserTable(schemaName, tableName);
 
-        clickButton("Create New Query");
+        createNewQuery(schemaName);
 
         waitForElement(Locator.xpath("//input[@name='ff_newQueryName']"));
         setFormElement(Locator.xpath("//input[@name='ff_newQueryName']"), queryName);

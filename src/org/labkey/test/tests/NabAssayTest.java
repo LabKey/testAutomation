@@ -513,7 +513,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
-        clickButton("Create New Query");
+        createNewQuery("assay.NAb.TestAssayNab");
         setFormElement(Locator.name("ff_newQueryName"), "New NabQuery");
         clickAndWait(Locator.linkWithText("Create and Edit Source"));
         setCodeEditorValue("queryText",
