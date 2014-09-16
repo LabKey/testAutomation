@@ -67,6 +67,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -6039,9 +6040,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             //first load of schemas might a few seconds
             waitForElement(loc, 30000);
-            shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath(loc.toXpath())));
+            shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
+            waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
+            // select/expand tree node
+            try{
+                scrollIntoView(loc);
+            }
+            catch (StaleElementReferenceException ignore) {}
             click(loc);
-            waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 1000);
+            waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 30000);
             waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"), 30000);
         }
     }
