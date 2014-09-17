@@ -6286,9 +6286,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
 
+    public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError)
+    {
+        waitForPipelineJobsToComplete(completeJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
+    }
+
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     @LogMethod
-    public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError)
+    public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError, int wait)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
 
@@ -6311,7 +6316,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 return true;
             }
-        }, "Pipeline jobs did not complete.", MAX_WAIT_SECONDS * 1000);
+        }, "Pipeline jobs did not complete.", wait);
 
         assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
     }

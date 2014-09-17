@@ -150,6 +150,8 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.waitForDataRegion("query");
 
         //verify CSV file creation
+        _extHelper.clickMenuButton(true, "Views", "default");
+        _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickMenuButton("More Actions", "Create Illumina Sample Sheet");
@@ -362,7 +364,7 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRef.getForLabel(this, "File Prefix").setValue(fileName);
         String url = window.getEval("getURL()").toString();
         assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
-        assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
+        assertTrue("Improper URL to download sequences", url.contains("exportSequenceFiles.view?"));
         assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
         _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
@@ -379,6 +381,8 @@ public class SequenceTest extends BaseWebDriverTest
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View FASTQC Report");
+        waitForElement(Ext4Helper.ext4Window("FastQC"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
         waitForText("File Summary");
         assertTextPresent("Per base sequence quality");
@@ -566,15 +570,15 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Testing whether sections are disabled when alignment unchecked");
         Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(false);
-        assertEquals("Field should be hidden", false, Ext4FieldRef.isFieldPresent(this, "Reference Library Type"));
+        assertEquals("Field should be hidden", false, Ext4FieldRef.isFieldPresent(this, "Reference Genome Type"));
         assertEquals("Field should be hidden", false, Ext4FieldRef.isFieldPresent(this, "Choose Aligner"));
 
         Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(true);
-        waitForText("Reference Library Type");
+        waitForText("Reference Genome Type");
         sleep(500);
 
         log("Testing aligner field and descriptions");
-        Ext4ComboRef refLibraryField = Ext4ComboRef.getForLabel(this, "Reference Library Type");
+        Ext4ComboRef refLibraryField = Ext4ComboRef.getForLabel(this, "Reference Genome Type");
         Ext4ComboRef alignerField = Ext4ComboRef.getForLabel(this, "Choose Aligner");
 
         refLibraryField.setComboByDisplayValue("Custom Library");
@@ -673,12 +677,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTrue("Unable to find file: " + output.getPath(), output.exists());
         log("File size: " + FileUtils.sizeOf(output));
 
-        try (
-                InputStream fileStream = new FileInputStream(output);
-                InputStream gzipStream = new GZIPInputStream(fileStream);
-                Reader decoder = new InputStreamReader(gzipStream);
-                BufferedReader br = new BufferedReader(decoder);
-        )
+        try (InputStream fileStream = new FileInputStream(output);BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream))))
         {
             int count = 0;
             int totalChars = 0;
@@ -702,8 +701,9 @@ public class SequenceTest extends BaseWebDriverTest
     {
         goToProjectHome();
         waitForText("Upload Files");
-        waitAndClickAndWait(Locator.linkContainingText("Upload Files / Start Analysis"));
 
+        //avoid entering a workbook
+        beginAt(getBaseURL() + "/pipeline/" + getProjectName() + "/browse.view");
         waitForText("fileset");
         _fileBrowserHelper.expandFileBrowserRootNode();
         for (String f : files)
@@ -726,8 +726,8 @@ public class SequenceTest extends BaseWebDriverTest
         goToProjectHome();
         setPipelineRoot(_sequencePipelineLoc);
 
-        String filename1 = "sample454_SIV.sff";
-        String filename2 = "dualBarcodes_SIV.fastq.gz";
+        String filename2 = "sample454_SIV.sff";
+        String filename1 = "dualBarcodes_SIV.fastq.gz";
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
 
@@ -795,16 +795,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
         click(Ext4Helper.Locators.ext4Button("OK"));
 
-        grid.setGridCell(1, "readsetname", "Readset1");
-        grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCell(1, "inputmaterial", "InputMaterial");
-        grid.setGridCell(1, "subjectid", "Subject1");
-
-        grid.setGridCell(2, "readsetname", "Readset2");
-        grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCell(2, "inputmaterial", "InputMaterial2");
-        grid.setGridCell(2, "subjectid", "Subject2");
-        grid.setGridCell(2, "sampledate", "2010-10-20");
+        setBasicSampleDetails(grid);
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
@@ -815,12 +806,13 @@ public class SequenceTest extends BaseWebDriverTest
         pairedField.setChecked(true);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
-        assertTextPresent("Either choose a file or unchecked paired-end.");
+        assertTextPresent("For each file, you must provide either");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         pairedField.setChecked(false);
 
         //try duplicate barcodes
         barcodeField.setChecked(true);
+        setBasicSampleDetails(grid);
         String barcode = "FLD0376";
         grid.setGridCellJS(1, "mid5", barcode);
         grid.setGridCellJS(2, "mid3", barcode);
@@ -868,7 +860,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
         assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        assertEquals("Unexpected value for param", "gDNA", sample0.get("inputmaterial"));
         assertFalse("param shold not be present", sample0.containsKey("mid5"));
         assertFalse("param shold not be present", sample0.containsKey("mid3"));
 
@@ -879,7 +871,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
         assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
-        assertEquals("Unexpected value for param", "InputMaterial2", sample1.get("inputmaterial"));
+        assertEquals("Unexpected value for param", "gDNA", sample1.get("inputmaterial"));
         assertFalse("param shold not be present", sample1.containsKey("mid5"));
         assertFalse("param shold not be present", sample1.containsKey("mid3"));
 
@@ -918,7 +910,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
         assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        assertEquals("Unexpected value for param", "gDNA", sample0.get("inputmaterial"));
         assertFalse("param shold not be present", sample0.containsKey("mid5"));
         assertFalse("param shold not be present", sample0.containsKey("mid3"));
 
@@ -928,6 +920,11 @@ public class SequenceTest extends BaseWebDriverTest
         pairedField.setValue(true);
         grid.setGridCell(1, "fileName", filename1);
         grid.setGridCellJS(1, "fileName2", filename2);
+        grid.setGridCell(1, "readsetname", "Readset1");
+        grid.setGridCellJS(1, "platform", "ILLUMINA");
+        grid.setGridCellJS(1, "inputmaterial", "gDNA");
+        grid.setGridCell(1, "subjectid", "Subject1");
+
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
         sample0 = (Map)fieldsJson.get("sample_0");
@@ -935,6 +932,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
 
         pairedField.setValue(false);
+        setBasicSampleDetails(grid);
         barcodeField.setValue(true);
         waitAndClick(Ext4Helper.Locators.ext4Button("Add"));
         waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
@@ -951,6 +949,19 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(1, "mid3", barcode2);
         grid.setGridCellJS(2, "mid3", barcode);
         grid.setGridCellJS(2, "mid5", barcode2);
+        grid.setGridCellJS(3, "mid3", barcode);
+        grid.setGridCellJS(3, "mid5", barcode2);
+
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertTextPresent("Duplicate Sample: " + filename2);
+        click(Ext4Helper.Locators.ext4Button("OK"));
+
+        click(grid.getRow(3));
+        grid.cancelEdit();
+        waitAndClick(Ext4Helper.Locators.ext4Button("Remove"));
+        grid.waitForRowCount(2);
+
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
         sample0 = (Map)fieldsJson.get("sample_0");
@@ -966,6 +977,20 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample1.get("fileName2")));
         assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
         assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
+    }
+
+    private void setBasicSampleDetails(Ext4GridRef grid)
+    {
+        grid.setGridCell(1, "readsetname", "Readset1");
+        grid.setGridCellJS(1, "platform", "ILLUMINA");
+        grid.setGridCellJS(1, "inputmaterial", "gDNA");
+        grid.setGridCell(1, "subjectid", "Subject1");
+
+        grid.setGridCell(2, "readsetname", "Readset2");
+        grid.setGridCellJS(2, "platform", "LS454");
+        grid.setGridCellJS(2, "inputmaterial", "gDNA");
+        grid.setGridCell(2, "subjectid", "Subject2");
+        grid.setGridCell(2, "sampledate", "2010-10-20");
     }
 
     private void readsetImportTest()
@@ -993,13 +1018,13 @@ public class SequenceTest extends BaseWebDriverTest
 
         grid.setGridCell(1, "readsetname", readset1);
         grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCell(1, "inputmaterial", "InputMaterial");
+        grid.setGridCellJS(1, "inputmaterial", "gDNA");
         grid.setGridCell(1, "subjectid", "Subject1");
         grid.setGridCell(1, "sampledate", "2011-02-03");
 
         grid.setGridCell(2, "readsetname", readset2);
         grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCell(2, "inputmaterial", "InputMaterial2");
+        grid.setGridCellJS(2, "inputmaterial", "gDNA");
         grid.setGridCell(2, "subjectid", "Subject2");
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
@@ -1011,7 +1036,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
         assertTextPresent("COMPLETE");
 
-        //verify readsets created
+        log("verify readsets created");
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         SelectRowsCommand sr = new SelectRowsCommand("sequenceanalysis", "sequence_readsets");
         sr.addFilter(new Filter("name", readset1 + ";" + readset2, Filter.Operator.IN));
