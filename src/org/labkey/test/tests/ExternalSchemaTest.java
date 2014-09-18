@@ -161,7 +161,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
-        _extHelper.clickExtButton("Schema Administration");
+        _ext4Helper.clickExtButton("Schema Administration");
 
         if (!isTextPresent("reload"))
         {

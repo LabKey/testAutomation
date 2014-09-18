@@ -741,4 +741,9 @@ public class Ext4Helper extends AbstractHelper
         _test.log("Closing Ext tab " + tabName);
         _test.click(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]"));
     }
+
+    public void clickExtButton(String text)
+    {
+        _test.click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='" + text + "']"));
+    }
 }

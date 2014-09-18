@@ -24,7 +24,7 @@ import java.util.List;
 
 public class RemoteConnectionHelper extends AbstractHelper
 {
-    private ExtHelper _extHelper;
+    private Ext4Helper _ext4Helper;
 
     // If true then this helper won't navigate back and forth between the
     // remote connection management page and the project folder.  Right now
@@ -34,7 +34,7 @@ public class RemoteConnectionHelper extends AbstractHelper
     public RemoteConnectionHelper(BaseWebDriverTest test)
     {
         super(test);
-        _extHelper = new ExtHelper(test);
+        _ext4Helper = new Ext4Helper(test);
         if (test instanceof RemoteConnectionTest)
             _navToProjectFolder = false;
     }
@@ -109,7 +109,7 @@ public class RemoteConnectionHelper extends AbstractHelper
     public void goToManageRemoteConnections()
     {
         _test.goToSchemaBrowser();
-        _test.clickButton("Manage Remote Connections");
+        _ext4Helper.clickExtButton("Manage Remote Connections");
     }
 
     public int getNumConnections()

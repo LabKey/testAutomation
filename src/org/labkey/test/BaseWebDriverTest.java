@@ -6059,8 +6059,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         selectSchema(schemaName);
         // wait for tool tip to disappear, in case it is covering the element we want to click on
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
-        shortWait().until(ExpectedConditions.elementToBeClickable(Locator.queryTreeNode(queryName).toBy()));
-        clickAt(Locator.queryTreeNode(queryName), 1, 1, 0);
+        Locator loc = Locator.queryTreeNode(queryName);
+        shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
+
+        // NOTE: consider abstracting this.
+        waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
+        // select/expand tree node
+        try{
+            scrollIntoView(loc);
+        }
+        catch (StaleElementReferenceException ignore) {}
+        clickAt(loc, 1, 1, 0);
+
         waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '"+ schemaName + "." + queryName + "')]/.."), 30000);
     }
 
