@@ -102,7 +102,9 @@ public class SequenceTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Sequence Analysis");
 
         //populate initial data.  these rows should already be present.
+        _containerHelper.enableModule("Shared", "SequenceAnalysis");
         beginAt(getBaseURL() + "/sequenceanalysis/Shared/populateSequences.view");
+
         waitAndClick(Ext4Helper.Locators.ext4Button("Populate Viral Sequences"));
         waitForElement(Locator.tagContainingText("div", "Populate Complete"), 200000);
 
