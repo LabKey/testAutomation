@@ -83,13 +83,15 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
         clickAndWait(Locator.linkContainingText("Manage Locations"));
-        setFormElement(Locator.name("newId"), "100");
-        setFormElement(Locator.name("newLabel"), "Alice Lab");
-        clickButton("Save");
+        clickAndWait(Locator.linkContainingText("Insert New"));
+        setFormElement(Locator.name("quf_LdmsLabCode"), "100");
+        setFormElement(Locator.name("quf_Label"), "Alice Lab");
+        clickButton("Submit");
 
-        setFormElement(Locator.name("newId"), "200");
-        setFormElement(Locator.name("newLabel"), "Bob's Lab");
-        clickButton("Save");
+        clickAndWait(Locator.linkContainingText("Insert New"));
+        setFormElement(Locator.name("quf_LdmsLabCode"), "200");
+        setFormElement(Locator.name("quf_Label"), "Bob's Lab");
+        clickButton("Submit");
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
         DataRegionTable table = new DataRegionTable("query", this, false);

@@ -218,37 +218,40 @@ public class StudyProtectedExportTest extends StudyExportTest
             {
                 foundClinics++;
                 assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
-                assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(" "));
+                assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
             }
             else // non-clinic
             {
                 assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                nonClinics.add(query.getDataAsText(i, labelCol));
             }
         }
         assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Locations"));
-        foundClinics = 0;
-        rowCount = getElementCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
-        for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
-        {
-            Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
-            String locId = getText(rowLoc.append("/td[2]"));
-            String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
-            String locTypes = getText(rowLoc.append("/td[5]"));
-            if (locTypes.contains("Clinic"))
-            {
-                assertTrue("Clinic Location name not masked: " + locId, locName.equals("Clinic"));
-                foundClinics++;
-            }
-            else
-            {
-                assertFalse("Non-Clinic Location name masked. Types: " + locId, locName.equals("Clinic"));
-                nonClinics.add(locName);
-            }
-        }
-        assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
+// Redundent because schema browser "view data" of study/locations and "manage Locations" link to the same table.
+//
+//        clickTab("Manage");
+//        clickAndWait(Locator.linkWithText("Manage Locations"));
+//        foundClinics = 0;
+//        rowCount = getElementCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
+//        for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
+//        {
+//            Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
+//            String locId = getText(rowLoc.append("/td[2]"));
+//            String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
+//            String locTypes = getText(rowLoc.append("/td[5]"));
+//            if (locTypes.contains("Clinic"))
+//            {
+//                assertTrue("Clinic Location name not masked: " + locId, locName.equals("Clinic"));
+//                foundClinics++;
+//            }
+//            else
+//            {
+//                assertFalse("Non-Clinic Location name masked. Types: " + locId, locName.equals("Clinic"));
+//                nonClinics.add(locName);
+//            }
+//        }
+//        assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
         clickTab("Specimen Data");
         waitAndClickAndWait(Locator.linkWithText("Blood (Whole)"));
