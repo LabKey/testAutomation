@@ -141,6 +141,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("query", this);
         _customizeViewsHelper.openCustomizeViewPanel();
         //TODO: why can't we get the value from the RowId column when it is first in the data region?
+        _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.removeCustomizeViewColumn("RowId");
         _customizeViewsHelper.addCustomizeViewColumn("RowId");
         _customizeViewsHelper.applyCustomView();
