@@ -278,6 +278,7 @@ src/org/labkey/test/aspects/StaleElementRetryAspect.java -text
 src/org/labkey/test/aspects/TestLoggingAspect.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
+src/org/labkey/test/categories/Base.java -text
 src/org/labkey/test/categories/Charting.java -text
 src/org/labkey/test/categories/Cluster.java -text
 src/org/labkey/test/categories/Continue.java -text

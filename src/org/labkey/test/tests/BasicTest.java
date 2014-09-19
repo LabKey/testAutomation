@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
@@ -29,7 +30,7 @@ import org.labkey.test.util.UIContainerHelper;
 
 import java.util.Arrays;
 
-@Category({DRT.class, BVT.class, DailyA.class})
+@Category({Base.class, DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";
@@ -70,7 +71,7 @@ public class BasicTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
         _permissionsHelper.setPermissions("testers", "Editor");
         clickButton("Save and Finish");
-        createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "MS2"});
+        createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Search");
