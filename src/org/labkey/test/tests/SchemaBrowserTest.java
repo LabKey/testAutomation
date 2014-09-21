@@ -64,6 +64,11 @@ public class SchemaBrowserTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         createLists();
         goToSchemaBrowser();
+
+        // test home page links
+        waitAndClick(Locator.tagWithClass("span", "labkey-link").withText("core"));
+        waitForElement(Locator.tagWithClass("div", "lk-qd-name").withText("core Schema"));
+
         selectQuery("lists", BOOKS_LIST);
 
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_BOOKS + "')]"), WAIT_FOR_JAVASCRIPT);
