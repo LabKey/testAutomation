@@ -6048,8 +6048,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             catch (StaleElementReferenceException ignore) {}
             click(loc);
-            //waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 60000);
-            waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"), 60000);
+            waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 60000);
         }
     }
 
