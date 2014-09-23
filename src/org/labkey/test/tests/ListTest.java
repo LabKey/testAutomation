@@ -482,10 +482,10 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("modified", 10);
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
-        assertTextPresent("created", 1);
-        assertEquals("details Links", 8, getElementCount(Locator.linkWithText("DETAILS")));
-        assertEquals("Project Links", 17 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
-        assertEquals("List Links", 17 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
+        assertTextPresent("created", 2); // Once for the list, once for the domain
+        assertEquals("details Links", 9, getElementCount(Locator.linkWithText("DETAILS"))); // List events should each have a link
+        assertEquals("Project Links", 18 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
+        assertEquals("List Links", 18 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
