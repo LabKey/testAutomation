@@ -221,11 +221,11 @@ public class StudyHelper extends AbstractHelper
 
     public void exportStudy(String folder)
     {
-        exportStudy(folder, true, false);
+        exportStudy(folder, false);
     }
 
     @LogMethod
-    public void exportStudy(String folder, boolean useXmlFormat, boolean zipFile)
+    public void exportStudy(String folder, boolean zipFile)
     {
         _test.clickFolder(folder);
         _test.clickTab("Manage");
@@ -234,7 +234,6 @@ public class StudyHelper extends AbstractHelper
         _test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
 
-        _test.checkRadioButton(Locator.radioButtonByNameAndValue("format", useXmlFormat ? "new" : "old"));
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         _test.clickButton("Export");
     }
