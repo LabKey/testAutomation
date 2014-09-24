@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -262,6 +263,28 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
+    }
+
+    public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, List<String> columns, List<String> msgs, int rowsToSearch)
+    {
+        if (!instance.isTextPresent("Audit Log"))
+        {
+            instance.ensureAdminMode();
+
+            instance.goToAdminConsole();
+            instance.clickAndWait(Locator.linkWithText("audit log"));
+        }
+
+        if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
+        {
+            instance.prepForPageLoad();
+            instance.selectOptionByText(Locator.name("view"), eventType);
+            instance.waitForPageToLoad();
+        }
+
+        assertTrue(columns.size() == msgs.size());
+        for (int i = 0; i < columns.size(); i += 1)
+            verifyAuditQueryEvent(instance, columns.get(i), msgs.get(i), rowsToSearch);
     }
 
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch)
