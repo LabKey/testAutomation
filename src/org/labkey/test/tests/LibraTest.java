@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -158,6 +159,7 @@ public class LibraTest extends MS2TestBase
     {
         click(Locator.linkContainingText(linkToClick));
         Object[] windows = getDriver().getWindowHandles().toArray();
+        Assert.assertTrue("Didn't find newly opened window", windows.length > 1);
         getDriver().switchTo().window((String)windows[1]);
         waitForText(verificationString);
 

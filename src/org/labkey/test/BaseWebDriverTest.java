@@ -2152,7 +2152,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return;
         beginAt("/admin/showErrorsSinceMark.view");
 
-        assertTrue("There were errors during the test run", isPageEmpty());
+        assertTrue("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.", isPageEmpty());
         log("No new errors found.");
         goToHome();         // Don't leave on an empty page
     }
