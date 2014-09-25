@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -81,6 +82,12 @@ public class SecurityTest extends BaseWebDriverTest
         deleteUsers(afterTest, ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,SITE_ADMIN_USER);
         if (!afterTest)
             deleteUsers(false, TO_BE_DELETED_USER); // Only needed for pre-clean. Should be deleted during test
+    }
+
+    @After
+    public void cleanUp()
+    {
+        resetDbLoginConfig();
     }
 
     @Test
@@ -388,6 +395,7 @@ public class SecurityTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         clickButton("Update Group Membership", 0);
         assertAlert("Permanently remove selected users from this group?");
+        sleep(1000);
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         goToProjectHome();
     }
