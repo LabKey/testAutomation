@@ -87,7 +87,7 @@ public class SecurityTest extends BaseWebDriverTest
     @After
     public void cleanUp()
     {
-        resetDbLoginConfig();
+        setDbLoginConfig(PasswordRule.Weak, PasswordExpiration.Never);
     }
 
     @Test
