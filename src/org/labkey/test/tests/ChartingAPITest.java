@@ -60,7 +60,8 @@ public class ChartingAPITest extends ClientAPITest
             "Discrete X Scale Scatter, Log Y",
             "Boxplot no Geom Config",
             "Boxplot No Outliers",
-            "Boxplot No Outliers, All Points"
+            "Boxplot No Outliers, All Points",
+            "Barplot With Cumulative Totals"
     };
 
     @Override

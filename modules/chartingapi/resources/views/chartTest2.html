@@ -84,7 +84,12 @@
                                 Ext4.get('chartArea').update('');
                                 this.plot = null;
                             }
-                            plot = new LABKEY.vis.Plot(config);
+
+                            if (config.asBarPlot)
+                                plot = new LABKEY.vis.BarPlot(config);
+                            else
+                                plot = new LABKEY.vis.Plot(config);
+
                             plot.render();
 
                         };
@@ -406,6 +411,23 @@
                                         trans: 'log'
                                     }
                                 }
+                            }, {
+                                renderTo: 'chartArea',
+                                asBarPlot: true,
+                                width: 600,
+                                height: 300,
+                                labels: {
+                                    main: {value: 'Barplot With Cumulative Totals'},
+                                    yLeft: {value: 'Count'},
+                                    x: {value: 'Value'}
+                                },
+                                options: {
+                                    color: 'maroon',
+                                    fill: 'maroon',
+                                    showCumulativeTotals: true
+                                },
+                                xAes: function(row){return row['consumedCoffee']},
+                                data: coffeeData
                             }
                         ];
 
@@ -427,7 +449,7 @@
 
                         var testNumberField = Ext4.create('Ext.form.field.Number', {
                             fieldLabel: 'Current Config',
-                            width: 125,
+                            width: 150,
                             hideTrigger: true,
                             value: 1
                         });
@@ -437,7 +459,7 @@
                             inputId: 'configCount',
                             labelWidth: 25,
                             margin: '0 0 0 10',
-                            width: 50,
+                            width: 75,
                             hideTrigger: true,
                             value: configs.length
                         });
