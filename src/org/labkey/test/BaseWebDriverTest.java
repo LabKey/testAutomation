@@ -6108,7 +6108,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void createNewQuery(String schemaName)
     {
-        selectSchema(schemaName);
+        createNewQuery(schemaName, null);
+    }
+
+    // Careful: If baseQueryName isn't provided, the first table in the schema will be used as the base query.
+    public void createNewQuery(@NotNull String schemaName, @Nullable String baseQueryName)
+    {
+        if (baseQueryName != null)
+            selectQuery(schemaName, baseQueryName);
+        else
+            selectSchema(schemaName);
         click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Create New Query']"));
     }
 
