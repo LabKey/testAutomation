@@ -456,11 +456,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             goToModule("List");
             assertTextPresent(lists);
-            assertEquals("Unexpected number of lists", lists.length, getElementCount(Locator.xpath("id('lists')//tr")));
+            DataRegionTable dr = new DataRegionTable("query", this);
+            assertEquals("Unexpected number of lists", lists.length, dr.getDataRowCount());
             for (String list : lists)
             {
                 pushLocation();
-                clickAndWait(Locator.xpath("id('lists')//tr[./td[normalize-space() = '"+list+"']]/td[2]/a"));
+                clickAndWait(Locator.linkWithText(list));
                 assertTitleContains(list);
                 popLocation();
             }
