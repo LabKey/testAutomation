@@ -604,7 +604,7 @@ public class SecurityTest extends BaseWebDriverTest
         {
             log("Failure attempting to retrieve " + relativeUrl);
             log(e.getMessage());
-            fail();
+            fail("Failure attempting to retrieve " + relativeUrl);
             return null;
         }
     }
