@@ -4085,9 +4085,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clickAndWait(Locator l, int pageTimeoutMs)
     {
         WebElement el;
-        el = l.findElement(getDriver());
-
-        clickAndWait(el, pageTimeoutMs);
+        try
+        {
+            el = l.findElement(getDriver());
+            clickAndWait(el, pageTimeoutMs);
+        }
+        catch (StaleElementReferenceException e)
+        {
+            // Locator.findElement likely didn't return the element we wanted due to timing problem. Wait and try again.
+            // Ideally we'd decorate WebElement to know its locator and encapsulate the retry.
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException ignored) {}
+            el = l.findElement(getDriver());
+            clickAndWait(el, pageTimeoutMs);
+        }
     }
 
     public void clickAndWait(WebElement el, int pageTimeoutMs)
@@ -4732,7 +4746,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
         WebElement el = l.waitForElement(getDriver(), waitFor);
-        clickAndWait(el, waitForPageToLoad);
+        try
+        {
+            clickAndWait(el, waitForPageToLoad);
+        }
+        catch (StaleElementReferenceException e)
+        {
+            // Locator.findElement likely didn't return the element we wanted due to timing problem. Wait and try again.
+            // Ideally we'd decorate WebElement to know its locator and encapsulate the retry.
+            try
+            {
+                Thread.sleep(500);
+            }
+            catch (InterruptedException ignored) {}
+            el = l.findElement(getDriver());
+            clickAndWait(el, waitForPageToLoad);
+        }
     }
 
     /** @return target of link */
