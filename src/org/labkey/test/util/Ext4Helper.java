@@ -264,10 +264,15 @@ public class Ext4Helper extends AbstractHelper
         _test.executeScript(script, markerCls);
     }
 
-    public void selectGridItem(String columnVal, String markerCls)
+    public Locator getGridRow(String columnVal, String markerCls)
     {
         String gridSelector = "." + markerCls;
-        WebElement gridRow = Locator.css(gridSelector).append("." + _cssPrefix + "grid-data-row").withText(columnVal).findElement(_test.getDriver());
+        return Locator.css(gridSelector).append("." + _cssPrefix + "grid-data-row").withText(columnVal);
+    }
+
+    public void selectGridItem(String columnVal, String markerCls)
+    {
+        WebElement gridRow = getGridRow(columnVal, markerCls).findElement(_test.getDriver());
         if (!gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
         {
             WebElement gridRowChecker = gridRow.findElement(By.cssSelector("." + _cssPrefix + "grid-cell-row-checker"));
