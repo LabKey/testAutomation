@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -48,7 +47,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class EHRClientAPIHelper
 {
@@ -77,8 +76,13 @@ public class EHRClientAPIHelper
 
     public boolean doesRowExist(String schema, String query, Map<String, Object> row, String pkCol) throws Exception
     {
+        return doesRowExist(schema, query, new Filter(pkCol, row.get(pkCol), Filter.Operator.EQUAL));
+    }
+
+    public boolean doesRowExist(String schema, String query, Filter filter) throws Exception
+    {
         SelectRowsCommand select = new SelectRowsCommand(schema, query);
-        select.addFilter(new Filter(pkCol, row.get(pkCol), Filter.Operator.EQUAL));
+        select.addFilter(filter);
         SelectRowsResponse resp = select.execute(getConnection(), _containerPath);
 
         return resp.getRowCount().intValue() > 0;
@@ -284,6 +288,26 @@ public class EHRClientAPIHelper
         }
     }
 
+    public Map<String, Object> createHashMap(List<String> fieldNames, Object[] rowValues)
+    {
+        Map<String, Object> values = new HashMap<>();
+        int position = 0;
+        for (String name : fieldNames)
+        {
+            Object v = rowValues[position];
+
+            //allow mechanism to use current time,
+            if (DATE_SUBSTITUTION.equals(v))
+                v = (new Date()).toString();
+
+            values.put(name, v);
+
+            position++;
+        }
+
+        return values;
+    }
+
     private void logResponse(HttpResponse response)
     {
         String responseBody = WebTestHelper.getHttpResponseBody(response);
@@ -376,5 +400,29 @@ public class EHRClientAPIHelper
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public int deleteAllRecords(String schemaName, String queryName, Filter filter) throws Exception
+    {
+        SelectRowsCommand sr = new SelectRowsCommand(schemaName, queryName);
+        sr.addFilter(filter);
+        SelectRowsResponse selectRowsResponse = sr.execute(getConnection(), _containerPath);
+        String pk = selectRowsResponse.getIdColumn();
+
+        DeleteRowsCommand dr = new DeleteRowsCommand(schemaName, queryName);
+        for (Map<String, Object> row : selectRowsResponse.getRows())
+        {
+            Map<String, Object> r = new HashMap<>();
+            r.put(pk, row.get(pk));
+            dr.addRow(r);
+        }
+
+        if (!dr.getRows().isEmpty())
+        {
+            SaveRowsResponse resp = dr.execute(getConnection(), _containerPath);
+            return resp.getRowsAffected().intValue();
+        }
+
+        return 0;
     }
 }
