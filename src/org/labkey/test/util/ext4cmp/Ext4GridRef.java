@@ -59,6 +59,12 @@ public class Ext4GridRef extends Ext4CmpRef
         return Ext4GridRef.locateExt4GridRow(rowIndex, _id);
     }
 
+    public Locator getCell(int rowIndex, String colName)
+    {
+        int cellIdx = getIndexOfColumn(colName, true);  //NOTE: Ext 4.2.1 seems to not render hidden columns, unlike previous ext versions
+        return Ext4GridRef.locateExt4GridCell(rowIndex, cellIdx, _id);
+    }
+
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
         Locator row = Ext4GridRef.locateExt4GridRow(rowIdx, parentId);
