@@ -606,6 +606,7 @@ public class DataRegionTable
         _test.waitForElementToDisappear(Locator.css("#" + getHtmlName() + " input:checked[name='.select']"));
     }
 
+    // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
     public void checkCheckbox(String value)
     {
         _test.checkDataRegionCheckbox(_tableName, value);
