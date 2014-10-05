@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.text.ParseException;
@@ -269,7 +270,31 @@ public class Ext4GridRef extends Ext4CmpRef
         if (el == null)
         {
             Locator cell = Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id);
-            _test.waitForElement(cell);
+            // NOTE: this should ultimately get improved or removed.  there are intermittent
+            // failures involving the cell not being found.  whenever i put breakpoints below,
+            // the element does exist.  for now, just try twice, but this should get replaced with
+            // something more reliable
+            try
+            {
+                _test.waitForElement(cell);
+            }
+            catch (NoSuchElementException e)
+            {
+                _test.log("grid present: " + _test.isElementPresent(Locator.id(_id)));
+                _test.log("row present: " + _test.isElementPresent(Ext4GridRef.locateExt4GridRow(rowIdx, _id)));
+                _test.log("cell present: " + _test.isElementPresent(Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id)));
+                _test.sleep(200);
+
+                if (_test.isElementPresent(Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id)))
+                {
+                    _test.log("cell was present on second try");
+                    //_test.waitForElement(cell);
+                }
+                else
+                {
+                    throw e;
+                }
+            }
 
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);

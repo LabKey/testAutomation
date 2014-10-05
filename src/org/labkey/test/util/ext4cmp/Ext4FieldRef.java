@@ -16,6 +16,7 @@
 package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
@@ -115,6 +116,11 @@ public class Ext4FieldRef extends Ext4CmpRef
     {
         WebElement el = _test.getDriver().findElement(By.id(_id));
         return el.isDisplayed();
+    }
+
+    public void clickTrigger()
+    {
+        _test.click(Locator.id(_id).append(Locator.tagWithClass("div", "x4-form-trigger")));
     }
 
     public Boolean isDisabled()
