@@ -69,7 +69,7 @@ public class Ext4GridRef extends Ext4CmpRef
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
         Locator row = Ext4GridRef.locateExt4GridRow(rowIdx, parentId);
-        return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]").append(Locator.tag("div")).notHidden();
+        return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]").append(Locator.tagWithClass("div", "x4-grid-cell-inner")).notHidden();
     }
 
     //1-based rowIdx
