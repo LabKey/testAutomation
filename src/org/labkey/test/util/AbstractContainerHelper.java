@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public abstract class AbstractContainerHelper extends AbstractHelper
 {
     private List<String> _createdProjects = new ArrayList<>();
@@ -96,11 +98,20 @@ public abstract class AbstractContainerHelper extends AbstractHelper
 
     public void enableModules(List<String> moduleNames)
     {
+        enableModules(moduleNames, false);
+    }
+
+    // NOTE: consider using this pathway all the time (e.g. drop the the checkFirst flag).
+    public void enableModules(List<String> moduleNames, boolean checkFirst)
+    {
         _test.goToFolderManagement();
         _test.clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
-            _test.checkCheckbox(Locator.checkboxByTitle(moduleName));
+            Locator loc = Locator.checkboxByTitle(moduleName);
+            if(checkFirst)
+                assertTrue(moduleName + " module was not detected. Check that the module is installed and you are on the supported backend.", _test.isElementPresent(loc));
+            _test.checkCheckbox(loc);
         }
         _test.clickButton("Update Folder");
     }
