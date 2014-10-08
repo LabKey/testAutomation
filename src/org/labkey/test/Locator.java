@@ -292,6 +292,11 @@ public abstract class Locator
         return Locator.tag(tag).withClass(cssClass);
     }
 
+    public static XPathLocator tagWithClassContaining(String tag, String partialCssClass)
+    {
+        return Locator.tag(tag).withAttributeContaining("class", partialCssClass);
+    }
+
     public static XPathLocator tagWithText(String tag, String text)
     {
         return Locator.tag(tag).withText(text);
@@ -422,16 +427,6 @@ public abstract class Locator
         return xpath("//td[@id='bodypanel']//a[contains(text(), " + xq(text) + ")]");
     }
 
-    public static XPathLocator buttonWithImgSrc(String imgSrc)
-    {
-        return xpath("//input[@type='image' and contains(@src, " + xq(imgSrc) + ")]");
-    }
-
-    public static XPathLocator buttonWithImgSrc(String imgSrc, Integer index)
-    {
-        return xpath("(//input[@type='image' and contains(@src, " + xq(imgSrc) + ")])[" + (index + 1) + "]");
-    }
-
     public static XPathLocator input(String name)
     {
         return tagWithName("input", name);
@@ -442,9 +437,14 @@ public abstract class Locator
         return xpath("//input[@type='text' and contains(@name,'" + partialName + "')]");
     }
 
-    public static XPathLocator radioButtonByTitle(String title)
+    public static XPathLocator inputById(String id)
     {
-        return xpath("//input[@type='radio' and @title=" + xq(title) + "]");
+        return tagWithId("input", id);
+    }
+
+    public static XPathLocator textarea(String name)
+    {
+        return tagWithName("textarea", name);
     }
 
     public static XPathLocator checkboxByTitle(String title)
@@ -605,6 +605,17 @@ public abstract class Locator
     {
         return xpath("//div[contains(@id, '" + partialId + "')]");
     }
+
+    public static XPathLocator divByClassContaining(String partialClass)
+    {
+        return xpath("//div[contains(@class, '" + partialClass + "')]");
+    }
+
+    public static XPathLocator divByInnerText(String text)
+    {
+        return xpath("//div[.='" + text + "']");
+    }
+
 
     public static IdLocator folderTab(String text)
     {
