@@ -263,7 +263,7 @@ public class CustomizeViewsHelper
         // Expand all nodes necessary to reveal the desired node.
         Locator.XPathLocator columnItem = expandPivots(fieldKeyParts);
         Locator checkbox = columnItem.append("/input[@type='checkbox']");
-
+        _test.waitForElement(checkbox);
         _test.checkCheckbox(checkbox);
     }
 
