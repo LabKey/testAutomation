@@ -178,10 +178,15 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public List<String> getComboBoxOptions(String label)
     {
+        return getComboBoxOptions(Ext4Helper.Locators.formItemWithLabel(label));
+    }
+
+    @LogMethod(quiet=true)
+    public List<String> getComboBoxOptions(Locator loc)
+    {
         ArrayList<String> ret = new ArrayList<>();
-        Locator comboBoxLoc = Ext4Helper.Locators.formItemWithLabel(label);
-        WebElement comboBoxEl = comboBoxLoc.findElement(_test.getDriver());
-        List<WebElement> inputEls = comboBoxEl.findElements(Locator.inputByNameContaining("inputEl").toBy());
+        WebElement comboBoxEl = loc.findElement(_test.getDriver());
+        List<WebElement> inputEls = comboBoxEl.findElements(Locator.divByClassContaining("list-item").toBy());
         for(WebElement inputEl : inputEls)
         {
             ret.add(inputEl.getText());
