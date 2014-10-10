@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
@@ -41,13 +42,17 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class EHRClientAPIHelper
 {
@@ -424,5 +429,77 @@ public class EHRClientAPIHelper
         }
 
         return 0;
+    }
+
+    public void testValidationMessage(String email, String schemaName, String queryName, String[] fields, Object[][] data, Map<String, List<String>> expectedErrors)
+    {
+        testValidationMessage(email, schemaName, queryName, fields, data, expectedErrors, null);
+    }
+
+    public void testValidationMessage(String email, String schemaName, String queryName, String[] fields, Object[][] data, Map<String, List<String>> expectedErrors, Map<String, Object> additionalExtraContext)
+    {
+        expectedErrors = new HashMap<>(expectedErrors);
+        expectedErrors.put("_validateOnly", Collections.singletonList("ERROR: Ignore this error"));
+        try
+        {
+            _test.log("Testing validation for table: " + schemaName + "." + queryName);
+
+            JSONObject extraContext = getExtraContext();
+            extraContext.put("errorThreshold", "INFO");
+            extraContext.put("validateOnly", true); //a flag to force failure
+            extraContext.put("targetQC", "In Progress");
+            if (additionalExtraContext != null)
+            {
+                for (String key : additionalExtraContext.keySet())
+                {
+                    extraContext.put(key, additionalExtraContext.get(key));
+                }
+            }
+
+            JSONObject insertCommand = prepareInsertCommand(schemaName, queryName, "lsid", fields, data);
+            String response = doSaveRows(email, Collections.singletonList(insertCommand), extraContext, false);
+            Map<String, List<String>> errors = processResponse(response);
+
+            //JSONHelper.compareMap()
+            assertEquals("Incorrect number of fields have errors", expectedErrors.keySet().size(), errors.keySet().size());
+            for (String field : expectedErrors.keySet())
+            {
+                assertEquals("No errors found for field: " + field, true, errors.containsKey(field));
+                List<String> expectedErrs = expectedErrors.get(field);
+                Set<String> errs = new HashSet<>(errors.get(field));
+
+                _test.log("Expected " + expectedErrs.size() + " errors for field " + field);
+                assertEquals("Wrong number of errors found for field: " + field + "; " + StringUtils.join(errs, "; "), expectedErrs.size(), errs.size());
+                for (String e : expectedErrs)
+                {
+                    boolean success = errs.remove(e);
+                    assertTrue("Error not found for field: " + field + ".  Missing error is: " + e + ".  The errors found were: [" + StringUtils.join(errs, "];[") + "]", success);
+                }
+                assertEquals("Unexpected error found for field: " + field + ".  They are: " + StringUtils.join(errs, "; "), 0, errs.size());
+            }
+
+        }
+        catch (JSONException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JSONObject getExtraContext()
+    {
+        try
+        {
+            JSONObject extraContext = new JSONObject();
+            extraContext.put("errorThreshold", "ERROR");
+            extraContext.put("skipIdFormatCheck", true);
+            extraContext.put("allowAnyId", true);
+            extraContext.put("targetQC", "Completed");
+            extraContext.put("isLegacyFormat", true);
+            return extraContext;
+        }
+        catch (JSONException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -23,6 +23,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Ext4FieldRef extends Ext4CmpRef
 {
     public Ext4FieldRef(String id, BaseWebDriverTest test)
@@ -110,6 +114,20 @@ public class Ext4FieldRef extends Ext4CmpRef
         }
 
         throw new IllegalArgumentException("Unknown type: " + val.getClass().getName());
+    }
+
+    public Date getDateValue()
+    {
+        try
+        {
+            String val = (String)getFnEval("return this.getValue() ? this.getValue().format('c') : null");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+            return val == null ? null : dateFormat.parse(val);
+        }
+        catch (ParseException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isVisible()

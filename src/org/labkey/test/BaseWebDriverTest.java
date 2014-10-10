@@ -547,6 +547,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
                     "Image corrupt or truncated:",
+                    "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3, issue: 21717
                     "SyntaxError: Using //@ to indicate"); // jQuery
         }
     }
