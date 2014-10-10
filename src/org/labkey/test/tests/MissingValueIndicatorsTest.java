@@ -207,7 +207,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         _listHelper.clickImportData();
         setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST);
         _listHelper.submitImportTsv_success();
@@ -221,7 +221,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_sex"), "male");
         selectOptionByValue(Locator.name("quf_ageMVIndicator"), "Z");
         clickButton("Submit");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
         assertTextPresent("N");
@@ -232,7 +232,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Import Data");
         setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST);
         _listHelper.submitImportTsv_success();
@@ -267,7 +267,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("typeIdColumn"), "datasetId");
         setFormElementJS(Locator.name("tsv"), TestFileUtils.getFileContents(DATASET_SCHEMA_FILE));
         clickButton("Submit", 180000);
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertTextPresent("MV Dataset");
 
         log("Import dataset data");
@@ -291,7 +291,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         selectOptionByValue(Locator.name("quf_AgeMVIndicator"), "Z");
         setFormElement(Locator.name("quf_Sex"), "male");
         clickButton("Submit");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertTextPresent("Sid");
         assertTextPresent("male");
         assertTextPresent("N");
@@ -310,7 +310,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void validateSingleColumnData()
     {
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertMvIndicatorPresent();
         assertTextPresent("Ted");
         assertTextPresent("Alice");
@@ -324,7 +324,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void validateTwoColumnData(String dataRegionName, String columnName)
     {
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertMvIndicatorPresent();
         assertTextPresent("Franny");
         assertTextPresent("Zoe");
@@ -361,12 +361,12 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
 
@@ -382,12 +382,12 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_TWO_COLUMN_ASSAY_BAD);
         clickButton("Save and Finish");
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_TWO_COLUMN_ASSAY);
         clickButton("Save and Finish");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_RUN_TWO_COLUMN));
         validateTwoColumnData("Data", "ParticipantID");
 
@@ -417,13 +417,13 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
 
@@ -439,13 +439,13 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
-        assertLabkeyErrorPresent();
+        assertLabKeyErrorPresent();
 
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
         validateTwoColumnData("Data", "ParticipantID");
     }
@@ -491,7 +491,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         _listHelper.clickMvEnabled(getPropertyXPath("Data Fields"));
 
         clickButton("Save & Close");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
 
     }
 

@@ -418,7 +418,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Save and Finish");
 
         log("Check out the data for one of the runs");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         assertTextPresent(
                 TEST_ASSAY + " Runs",
                 TEST_ASSAY_RUN_PROP1,

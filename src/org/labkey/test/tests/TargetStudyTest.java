@@ -168,7 +168,7 @@ public class TargetStudyTest extends AbstractAssayTest
         String data2 = data1.replace("StudyNotExist", "");
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), data2);
         clickButton("Save and Finish");
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
 
         log("** Test the TargetStudy renderer resolved all studies");
         clickAndWait(Locator.linkWithText(TEST_RUN1));

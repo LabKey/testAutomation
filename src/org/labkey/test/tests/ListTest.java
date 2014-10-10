@@ -737,7 +737,7 @@ public class ListTest extends BaseWebDriverTest
         log("Infer from excel file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", EXCEL_DATA_FILE);
         waitForElement(Locator.linkWithText("pomegranate"));
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
 
         //Cancel test disabled because teamcity is too slow to run it successfully
         /*log("Infer from tsv file, but cancel before completion");
@@ -759,7 +759,7 @@ public class ListTest extends BaseWebDriverTest
         log("Infer from a tsv file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, TSV_DATA_FILE);
         waitForElement(Locator.linkWithText("pomegranate"));
-        assertNoLabkeyErrors();
+        assertNoLabKeyErrors();
         log("Verify correct types are inferred from file");
         clickButton("View Design");
         waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);

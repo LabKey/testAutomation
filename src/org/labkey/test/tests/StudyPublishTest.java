@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
@@ -56,14 +57,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String STUDY_DESCRIPTION = "This is the study we start with.";
 
     private final String GROUP0_NAME = "Unshared Group";
-    private final String[] GROUP0_PTIDS = {"1234"};
+    private final String[] GROUP0_PTIDS = {"999321234"};
     private final String GROUP1_NAME = "Group 1";
     private final String[] GROUP1_PTIDS = {"999320016", "999321029", "999320485", "999320518", "999320529", "999320533"};
     private final String GROUP2_NAME = "Group 2";
     private final String[] GROUP2_PTIDS = {"999320016", "999320719", "999320565", "999320576", "999320582", "999320590"};
     private final String GROUP3_NAME = "Group 3";
     private final String[] GROUP3_PTIDS = {"999321033", "999320613", "999320624", "999320638", "999320646", "999320652"};
-    private final String[] PTIDS_WITHOUT_SPECIMENS = {"1234", "999320016", "999320485", "999320518", "999320529", "999320533",
+    private final String[] PTIDS_WITHOUT_SPECIMENS = {"999321234", "999320016", "999320485", "999320518", "999320529", "999320533",
             "999320541", "999320557", "999320565", "999320576", "999320582", "999320590", "999320609", "999320613", "999320624",
             "999320638", "999320646", "999320652", "999320660", "999320671", "999320687", "999320695", "999320703", "999320719",
             "999321029", "999321033"};
@@ -87,6 +88,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String[] TIME_CHART_MEASURE1 = {DATASETS[2], "2.Body temperature"};
     private final String[] TIME_CHART_MEASURE2 = {DATASETS[3], "2.Body temperature"};
     private final String CUSTOM_VIEW = "Shared Custom View";
+    private final String[] MODULE_VIEWS = {"open", "NameOnly", "NameOnly", "mine", "resolved"};
     private final String[] CUSTOM_VIEW_PTIDS = {"999320016", "999321029", "999320518"};
     private final String CUSTOM_VIEW2 = "Private Custom View";
     private final String[] CUSTOM_VIEW_PTIDS2 = {};
@@ -214,8 +216,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doVerifySteps()
     {
         verifyPipelineJobLinks(PUB3_NAME, PUB2_NAME, PUB1_NAME);
-        verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
-        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
+        verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, ArrayUtils.addAll(PUB1_VIEWS, MODULE_VIEWS), PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
+        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, ArrayUtils.addAll(PUB2_VIEWS, MODULE_VIEWS), PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
         // concat group 2 and group 3 ptids for the last publisehd study ptid list
         ArrayList<String> group2and3ptids = new ArrayList<>();
         group2and3ptids.addAll(Arrays.asList(GROUP2_PTIDS));

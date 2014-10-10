@@ -375,7 +375,7 @@ public class IssuesTest extends BaseWebDriverTest
         for (String value : values)
         {
             addKeyword(test, fieldName, caption, value);
-            test.assertNoLabkeyErrors();
+            test.assertNoLabKeyErrors();
             test.assertTextPresent(value);
         }
     }

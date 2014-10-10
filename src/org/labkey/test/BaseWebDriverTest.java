@@ -3081,38 +3081,69 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertTitleContains(String match)
     {
         String title = getDriver().getTitle();
-        assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
+        assertTrue("Page title: '" + title + "' doesn't contain '" + match + "'", title.contains(match));
     }
 
-    public void assertNoLabkeyErrors()
+    public void assertNoLabKeyErrors()
     {
         assertElementNotPresent(Locator.xpath("//div[@class='labkey-error']"));
         assertElementNotPresent(Locator.xpath("//font[@class='labkey-error']"));
     }
 
-    public void assertLabkeyErrorPresent()
+    public void assertLabKeyErrorPresent()
     {
         assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
                 isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
-
     }
 
     public boolean isTextPresent(String... texts)
     {
-        if(texts==null || texts.length == 0)
+        if (texts == null || texts.length == 0)
             return true;
 
         String source = getHtmlSource();
 
         for (String text : texts)
         {
-            text = text.replace("&", "&amp;");
-            text = text.replace("<", "&lt;");
-            text = text.replace(">", "&gt;");
-            if (!source.contains(text))
+            if (-1 == findText(source, text))
                 return false;
         }
         return true;
+    }
+
+    static interface TextHandler
+    {
+        String transform(String text);
+        boolean handle(String htmlSource, String text, int position);
+    }
+
+    public void findTexts(String[] texts, TextHandler handler)
+    {
+        if (null == texts || 0 == texts.length)
+            return;
+
+        String source = getHtmlSource();
+
+        for (String text : texts)
+        {
+            String transformedText = handler.transform(text);
+            if (!handler.handle(source, transformedText, source.indexOf(transformedText)))
+                return;
+        }
+    }
+
+    private String encodeText(String unencodedText)
+    {
+        return unencodedText
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+    }
+
+    // Escapes unencodedText and return its location within htmlSource. -1 means not found.
+    private int findText(String htmlSource, String unencodedText)
+    {
+        return htmlSource.indexOf(encodeText(unencodedText));
     }
 
     public List<String> getMissingTexts(String... texts)
@@ -3125,6 +3156,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         for (String text : texts)
         {
+            // TODO: Use findText()
             String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
@@ -3145,6 +3177,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         for (String text : texts)
         {
+            // TODO: Use findText()
             String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
@@ -3223,6 +3256,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         for (String text : texts)
         {
+            // TODO: Use findText()
             String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
@@ -3327,16 +3361,37 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return count;
     }
 
+    // Number of characters on either side of found text to include in error message
+    private final static int RANGE = 20;
+
     public void assertTextNotPresent(String... texts)
     {
-        if(texts==null)
+        if (texts == null)
             return;
 
-        for(String text : texts)
-        {
-            text = text.replace("&nbsp;", " ");
-            assertFalse("Text '" + text + "' was present", isTextPresent(text));
-        }
+        findTexts(texts, new TextHandler(){
+            @Override
+            public String transform(String text)
+            {
+                return encodeText(text).replace("&nbsp;", " ");
+            }
+
+            @Override
+            public boolean handle(String htmlSource, String text, int position)
+            {
+                if (position > -1)
+                {
+                    int prefixStart = Math.max(0, position - RANGE);
+                    int suffixEnd = Math.min(htmlSource.length() - 1, position + text.length() + RANGE);
+                    String prefix = htmlSource.substring(prefixStart, position);
+                    String suffix = htmlSource.substring(position + text.length(), suffixEnd);
+
+                    fail("Text '" + text + "' was present: " + prefix + "[" + text + "]" + suffix);
+                }
+
+                return true;
+            }
+        });
     }
 
     public String getTextInTable(String dataRegion, int row, int column)
