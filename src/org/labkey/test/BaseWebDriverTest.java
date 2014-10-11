@@ -22,6 +22,7 @@ import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -3097,28 +3098,27 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
     }
 
-    public boolean isTextPresent(String... texts)
+    static interface TextTransformer
     {
-        if (texts == null || texts.length == 0)
-            return true;
-
-        String source = getHtmlSource();
-
-        for (String text : texts)
-        {
-            if (-1 == findText(source, text))
-                return false;
-        }
-        return true;
+        String transform(String text);
     }
+
+    private static final TextTransformer ENCODER = new TextTransformer() {
+        @Override
+        public String transform(String text)
+        {
+            return encodeText(text);
+        }
+    };
 
     static interface TextHandler
     {
-        String transform(String text);
         boolean handle(String htmlSource, String text, int position);
     }
 
-    public void findTexts(String[] texts, TextHandler handler)
+    // General-purpose method that transforms passed in strings and searches for each in the current HTML source. Callers pass
+    // in a TextTransformer to dictate the transformation and TextHandler to dictate the action to take on each text.
+    public void findTexts(String[] texts, TextTransformer transformer, TextHandler handler)
     {
         if (null == texts || 0 == texts.length)
             return;
@@ -3127,13 +3127,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         for (String text : texts)
         {
-            String transformedText = handler.transform(text);
+            String transformedText = transformer.transform(text);
             if (!handler.handle(source, transformedText, source.indexOf(transformedText)))
                 return;
         }
     }
 
-    private String encodeText(String unencodedText)
+    private static String encodeText(String unencodedText)
     {
         return unencodedText
                 .replace("&", "&amp;")
@@ -3141,51 +3141,41 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 .replace(">", "&gt;");
     }
 
-    // Escapes unencodedText and return its location within htmlSource. -1 means not found.
-    private int findText(String htmlSource, String unencodedText)
+    public boolean isTextPresent(String... texts)
     {
-        return htmlSource.indexOf(encodeText(unencodedText));
+        final MutableBoolean present = new MutableBoolean(true);
+
+        findTexts(texts, ENCODER, new TextHandler()
+        {
+            @Override
+            public boolean handle(String htmlSource, String text, int position)
+            {
+                // Not found... stop enumerating and return false
+                if (position == -1)
+                    present.setFalse();
+
+                return present.getValue();
+            }
+        });
+
+        return present.getValue();
     }
 
-    public List<String> getMissingTexts(String... texts)
+    public List<String> getMissingTexts(TextTransformer transformer, String... texts)
     {
-        List<String> missingTexts = new ArrayList<>();
-        if(texts==null || texts.length == 0)
-            return missingTexts;
+        final List<String> missingTexts = new ArrayList<>();
 
-        String source = getHtmlSource();
+        findTexts(texts, transformer, new TextHandler(){
+            @Override
+            public boolean handle(String htmlSource, String text, int position)
+            {
+                if (-1 == position)
+                    missingTexts.add(text);
 
-        for (String text : texts)
-        {
-            // TODO: Use findText()
-            String escapedText = text
-                    .replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;");
-            if (!source.contains(escapedText))
-                missingTexts.add(text);
-        }
-        return missingTexts;
-    }
+                return true;
+            }
+        });
 
-    public List<String> getMissingTextsCaseInsensitive(String... texts)
-    {
-        List<String> missingTexts = new ArrayList<>();
-        if(texts==null || texts.length == 0)
-            return missingTexts;
-
-        String source = getHtmlSource().toLowerCase();
-
-        for (String text : texts)
-        {
-            // TODO: Use findText()
-            String escapedText = text
-                    .replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;");
-            if (!source.contains(escapedText.toLowerCase()))
-                missingTexts.add(text);
-        }
         return missingTexts;
     }
 
@@ -3205,12 +3195,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void assertTextPresent(String... texts)
     {
-        if(texts==null)
-            return;
+        assertTextPresent(ENCODER, texts);
+    }
 
-        List<String> missingTexts = getMissingTexts(texts);
+    public void assertTextPresent(TextTransformer transformer, String... texts)
+    {
+        List<String> missingTexts = getMissingTexts(transformer, texts);
 
-        if (missingTexts.size() > 0)
+        if (!missingTexts.isEmpty())
         {
             String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + missingTexts.get(0) + "'";
             for (int i = 1; i < missingTexts.size(); i++)
@@ -3227,47 +3219,36 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void assertTextPresentCaseInsensitive(String... texts)
     {
-        if(texts==null)
-            return;
-
-        List<String> missingTexts = getMissingTextsCaseInsensitive(texts);
-
-        if (missingTexts.size() > 0)
+        assertTextPresent(new TextTransformer()
         {
-            String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + missingTexts.get(0) + "'";
-            for (int i = 1; i < missingTexts.size(); i++)
+            @Override
+            public String transform(String text)
             {
-                failMsg += ", '" + missingTexts.get(i) + "'";
+                return encodeText(text).toLowerCase();
             }
-            failMsg += missingTexts.size() == 1 ? " was not present" : "] were not present";
-            fail(failMsg);
-        }
+        }, texts);
     }
 
     /**
-     * Verifies that one of the strings is present in the page html source
+     * Verifies that at least one of the strings is present in the page html source
      */
     public void assertOneOfTheseTextsPresent(String... texts)
     {
-        if(null==texts)
-            return;
+        final MutableBoolean found = new MutableBoolean(false);
 
-        String source = getHtmlSource();
-        String targets = "";
-
-        for (String text : texts)
-        {
-            // TODO: Use findText()
-            String escapedText = text
-                    .replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;");
-            if(source.contains(escapedText))
+        findTexts(texts, ENCODER, new TextHandler(){
+            @Override
+            public boolean handle(String htmlSource, String text, int position)
             {
-                return;
+                if (position > -1)
+                    found.setTrue();
+
+                return !found.getValue();
             }
-        }
-        fail("Did not find any of the following values on page " + targets);
+        });
+
+        if (!found.getValue())
+            fail("Did not find any of the following values on current page " + Arrays.toString(texts));
     }
 
     /**
@@ -3370,13 +3351,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if (texts == null)
             return;
 
-        findTexts(texts, new TextHandler(){
+        findTexts(texts, new TextTransformer()
+        {
             @Override
             public String transform(String text)
             {
                 return encodeText(text).replace("&nbsp;", " ");
             }
-
+        }, new TextHandler()
+        {
             @Override
             public boolean handle(String htmlSource, String text, int position)
             {
@@ -3403,7 +3386,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
-        assertEquals(textToCheck+" is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
+        assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
     }
 
     /**
