@@ -3348,9 +3348,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertTextNotPresent(String... texts)
     {
-        if (texts == null)
-            return;
-
         findTexts(texts, new TextTransformer()
         {
             @Override

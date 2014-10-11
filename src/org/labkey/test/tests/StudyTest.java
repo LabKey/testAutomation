@@ -63,8 +63,8 @@ public class StudyTest extends StudyBaseTest
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
 
     protected String _tsv = "participantid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\taliasedColumn\n" +
-        "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
-        "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\taliasedData\n";
+        "999321234\t1\t1/1/2006\t1234_A\t2/1/2006\t1.2\ttext\t\taliasedData\n" +
+        "999321234\t1\t1/1/2006\t1234_B\t2/1/2006\t1.2\ttext\t\taliasedData\n";
 
     // specimen comment constants
     private static final String PARTICIPANT_CMT_DATASET = "Mouse Comments";
@@ -604,8 +604,8 @@ public class StudyTest extends StudyBaseTest
         // Issue 21234: Dataset import no longer merges rows during import
         clickButton("Import Data");
         _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
-                "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
-                "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
+                "999321234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
+                "999321234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
         setFormElement(Locator.id("tsv3"), _tsv);
         _listHelper.submitImportTsv_error("Duplicate dataset row");
 
