@@ -3055,10 +3055,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod (quiet = true)
     public void enableEmailRecorder()
     {
-        try {
-            getHttpGetResponse(WebTestHelper.getBaseURL() + "/dumbster/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
-        catch (IOException e) {
-            throw new RuntimeException("Failed to enable email recorder", e);}
+        try
+        {
+            assertEquals("Failed to enable email recording", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/dumbster/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to enable email recorder", e);
+        }
     }
 
     /**
