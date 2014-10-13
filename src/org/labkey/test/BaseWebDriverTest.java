@@ -5536,6 +5536,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void stopImpersonating()
     {
+        if (_impersonationStack.isEmpty())
+        {
+            throw new IllegalStateException("No impersonations are thought to be in progress, based on those that have been started within the test harness");
+        }
         String fakeUser = _impersonationStack.pop();
         assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");

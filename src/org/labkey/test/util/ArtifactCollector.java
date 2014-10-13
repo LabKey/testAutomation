@@ -36,6 +36,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
@@ -44,7 +45,8 @@ import static org.labkey.test.WebTestHelper.getTargetServer;
 public class ArtifactCollector
 {
     private final BaseWebDriverTest _test;
-    private static List<Pair<File, FileFilter>> pipelineDirs = new ArrayList<>();
+    // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
+    private static List<Pair<File, FileFilter>> pipelineDirs = new CopyOnWriteArrayList<>();
     private static long _testStart;
 
     public ArtifactCollector(BaseWebDriverTest test)
