@@ -48,3 +48,11 @@ if (skipLines > lineCount) {
     close(con=f)
 }
 
+# write output properties as a tab-separated name/value file
+# containing the number of lines in the input file
+outProps = file(description="${pipeline, taskOutputParams}", open="w")
+cat(file=outProps, sep="", "name\tvalue\n")
+cat(file=outProps, sep="", "lineCount\t", lineCount, "\n")
+flush(con=outProps)
+close(con=outProps)
+
