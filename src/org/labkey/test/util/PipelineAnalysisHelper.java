@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -95,12 +96,26 @@ public class PipelineAnalysisHelper
     }
 
     @LogMethod
-    public void verifyPipelineAnalysis(@LoggedParam String pipelineName, String protocolName, File fileRoot, Map<String, Set<String>> expectedFilesAndContents)
+    public void verifyPipelineAnalysis(@LoggedParam String pipelineName, String protocolName, @Nullable String runName, @Nullable String description, File fileRoot, Map<String, Set<String>> expectedFilesAndContents)
     {
         String analysisPath = "/" + pipelineName + "/" + protocolName + "/";
 
         _test.goToModule("Pipeline");
         _test.waitForPipelineJobsToComplete(expectedJobCount, jobDescription(pipelineName, protocolName), false);
+
+        // Go to the run details graph page
+        PipelineStatusTable jobStatus = new PipelineStatusTable(_test, true, true);
+        jobStatus.clickStatusLink(0);
+        _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
+
+        if (runName != null)
+        {
+            _test.click(Locator.linkWithText("Run"));
+
+            _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Name')]/../td[2]"), runName);
+            if (description != null)
+                _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Comments')]/../td[2]"), description);
+        }
 
         _test.goToModule("FileContent");
 

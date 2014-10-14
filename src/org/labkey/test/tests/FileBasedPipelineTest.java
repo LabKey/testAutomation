@@ -81,10 +81,11 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final String pipelineName = "r-copy";
         final String importAction = "Use R to duplicate a file";
         final String protocolName = "RCopy";
+        final String description = "testRCopyPipeline";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
             "protocolName", protocolName,
-            "protocolDescription", "");
+            "protocolDescription", description);
 
         final Map<String, Set<String>> outputFiles = Maps.of(
             "r-copy.xml", Collections.<String>emptySet(),
@@ -97,7 +98,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, null, fileRoot, outputFiles);
     }
 
     @Test
@@ -125,8 +126,10 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
+        final String jobDescription = "@files/sample (InlineRCopy)";
+
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, jobDescription, null, fileRoot, outputFiles);
 
         // Running same protocol again is an error
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
@@ -135,7 +138,6 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         clickButton("OK", 0);
 
         // Delete the job, including any refernced runs
-        String jobDescription = "@files/sample (InlineRCopy)";
         deletePipelineJob(jobDescription, true);
 
         // Verify the analysis dir was deleted
@@ -143,7 +145,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         // Running the same protocol again should now be a-ok.
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, jobDescription, null, fileRoot, outputFiles);
     }
 
     @Test
@@ -176,7 +178,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, null, fileRoot, outputFiles);
         verifyAssayImport("myassay");
     }
 

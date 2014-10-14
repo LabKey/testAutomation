@@ -15,6 +15,16 @@
 # Generate a dummy matrix tsv output file with two samples and two features.
 df <- data.frame(ID_REF=c("78495_at", "78383_at"), SampleA=c(10, 20), SampleB=c(30, 40))
 write.table(df, file="${output.tsv}", sep="\t", qmethod="double", col.names=TRUE, row.names=FALSE)
+
+if (nzchar("${myFeatureSet}") && substr("${myFeatureSet}", 1, 2) != "${") {
+    # write output properties as a tab-separated name/value file
+    # containing the feature annotation set name to import
+    outProps = file(description="${pipeline, taskOutputParams}", open="w")
+    cat(file=outProps, sep="", "name\tvalue\n")
+    cat(file=outProps, sep="", "assay run property, featureSet\t", "${myFeatureSet}", "\n")
+    flush(con=outProps)
+    close(con=outProps)
+}
               ]]>
             </script>
         </task>

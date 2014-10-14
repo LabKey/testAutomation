@@ -37,6 +37,7 @@ import org.labkey.test.util.RReportHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -119,10 +120,13 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     {
         final String importAction = "Use R to generate a dummy matrix tsv output file with two samples and two features.";
         final String protocolName = "CreateMatrix";
+        final String description = "Execute create-matrix R pipeline, import values. Also protocolDescription comment field.";
         final String[] targetFiles = {CEL_FILE1.getName(), CEL_FILE2.getName()};
-        final String parameterXml = getParameterXml(ASSAY_NAME, protocolName, featureSetId, true);
+        final String runName = "myrun";
+        final String parameterXml = getParameterXml(runName, protocolName, null, String.valueOf(featureSetId), true, null);
         final Map<String, String> protocolProperties = Maps.of(
                 "protocolName", protocolName,
+                "protocolDescription", description,
                 "xmlParameters", parameterXml,
                 "saveProtocol", "false");
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
@@ -135,12 +139,12 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 protocolName + ".log", Collections.<String>emptySet(),
                 protocolName + ".tsv", Collections.<String>emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertElementPresent(Locator.linkWithText(FEATURE_SET_NAME));
-        clickAndWait(Locator.linkWithText(protocolName));
+        clickAndWait(Locator.linkWithText(runName));
 
         DataRegionTable resultTable = new DataRegionTable("Data", this);
         resultTable.setSort("Value", SortDirection.ASC);
@@ -150,7 +154,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 resultTable.getColumnDataAsText("Probe Id"));
         assertEquals(Arrays.asList("SampleA", "SampleA", "SampleB", "SampleB"),
                 resultTable.getColumnDataAsText("Sample Id"));
-        assertEquals(Arrays.asList(protocolName, protocolName, protocolName, protocolName),
+        assertEquals(Arrays.asList(runName, runName, runName, runName),
                 resultTable.getColumnDataAsText("Run"));
 
         goToSchemaBrowser();
@@ -162,8 +166,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     {
         final String importAction = "Use R to generate a dummy matrix tsv output file with two samples and two features.";
         final String protocolName = "CreateMatrixNoValues";
+        final String description = "Execute create-matrix R pipeline, import values. Also 'assay comment' xml property.";
+        final String runName = "awesome";
         final String[] targetFiles = {CEL_FILE1.getName(), CEL_FILE2.getName()};
-        final String parameterXml = getParameterXml(ASSAY_NAME, protocolName, featureSetId, false);
+        final String parameterXml = getParameterXml(runName, protocolName, description, String.valueOf(featureSetId), false, null);
         final Map<String, String> protocolProperties = Maps.of(
                 "protocolName", protocolName,
                 "xmlParameters", parameterXml,
@@ -178,12 +184,12 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 protocolName + ".log", Collections.<String>emptySet(),
                 protocolName + ".tsv", Collections.<String>emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
 
         goToProjectHome();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertElementPresent(Locator.linkWithText(FEATURE_SET_NAME));
-        clickAndWait(Locator.linkWithText(protocolName));
+        clickAndWait(Locator.linkWithText(runName));
 
         DataRegionTable resultTable = new DataRegionTable("Data", this);
         assertEquals(0, resultTable.getDataRowCount());
@@ -192,16 +198,82 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         selectQuery("assay.ExpressionMatrix." + ASSAY_NAME, "FeatureDataBySample");
     }
 
-    private String getParameterXml(String assayName, String protocolName, int featureSetId, boolean importValues)
+    @Test
+    public void testReferenceFeatureAnnotationSetByName()
     {
-        return String.format("<?xml version='1.0' encoding='UTF-8'?>\n" +
-                "<bioml>\n" +
-                "  <note label='protocolName' type='input'>%s</note>\n" +
-                "  <note label='assay name' type='input'>%s</note>\n" +
-                "  <note label='assay run property, featureSet' type='input'>%d</note>\n" +
-                "  <note label='assay run property, importValues' type='input'>%s</note>\n" +
-                "</bioml>", assayName, protocolName, featureSetId, importValues);
+        final String importAction = "Use R to generate a dummy matrix tsv output file with two samples and two features.";
+        final String protocolName = "ReferenceFeatureAnnotationSetByName";
+        final String description = "Reference desired feature annotation set by name";
+        final String runName = "wakka-wakka";
+        final String[] targetFiles = {CEL_FILE1.getName(), CEL_FILE2.getName()};
+        final String parameterXml = getParameterXml(runName, protocolName, description, FEATURE_SET_NAME, false, null);
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName,
+                "xmlParameters", parameterXml,
+                "saveProtocol", "false");
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
 
+        final String pipelineName = PIPELINE_NAME;
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+        final Map<String, Set<String>> outputFiles = Maps.of(
+                pipelineName + ".xml", Collections.<String>emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
+                protocolName + ".log", Collections.<String>emptySet(),
+                protocolName + ".tsv", Collections.<String>emptySet());
+        PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
+    }
+
+    @Test
+    public void testFeatureAnnotationSetOutputProperty()
+    {
+        final String importAction = "Use R to generate a dummy matrix tsv output file with two samples and two features.";
+        final String protocolName = "FeatureAnnotationSetOutputProperty";
+        final String description = "Use a task output property to reference desired feature annotation set by name";
+        final String runName = "everything is awesome";
+        final String[] targetFiles = {CEL_FILE1.getName(), CEL_FILE2.getName()};
+        final String parameterXml = getParameterXml(runName, protocolName, null, null, false, Collections.singletonMap("myFeatureSet", FEATURE_SET_NAME));
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName,
+                "protocolDescription", description,
+                "xmlParameters", parameterXml,
+                "saveProtocol", "false");
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+
+        final String pipelineName = PIPELINE_NAME;
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+        final Map<String, Set<String>> outputFiles = Maps.of(
+                pipelineName + ".xml", Collections.<String>emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
+                protocolName + ".log", Collections.<String>emptySet(),
+                protocolName + ".tsv", Collections.<String>emptySet());
+        PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
+    }
+
+
+    private String getParameterXml(String assayRunName, String protocolName, String description, String featureSet, boolean importValues, Map<String, String> otherParameters)
+    {
+        Map<String, String> parameters = new LinkedHashMap<>();
+        parameters.put("protocolName", protocolName);
+        parameters.put("assay name", assayRunName);
+        if (description != null)
+            parameters.put("assay comments", description);
+        if (featureSet != null)
+            parameters.put("assay run property, featureSet", featureSet);
+        parameters.put("assay run property, importValues", String.valueOf(importValues));
+
+        if (otherParameters != null)
+            parameters.putAll(otherParameters);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version='1.0' encoding='UTF-8'?>\n");
+        sb.append("<bioml>\n");
+        for (Map.Entry<String, String> entry : parameters.entrySet())
+            sb.append(String.format("  <note label='%s' type='input'>%s</note>\n", entry.getKey(), entry.getValue()));
+        sb.append("</bioml>\n");
+
+        return sb.toString();
     }
 
     @Nullable
