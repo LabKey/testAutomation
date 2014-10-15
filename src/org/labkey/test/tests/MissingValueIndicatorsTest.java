@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -187,6 +189,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     @Test
     public void testDatasetMV()
     {
+        final String datasetName = "MV Dataset";
         final String DATASET_SCHEMA_FILE = "/sampledata/mvIndicators/dataset_schema.tsv";
         final String TEST_DATA_SINGLE_COLUMN_DATASET =
                 "participantid\tSequenceNum\tAge\tSex\n" +
@@ -225,10 +228,10 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElementJS(Locator.name("tsv"), TestFileUtils.getFileContents(DATASET_SCHEMA_FILE));
         clickButton("Submit", 180000);
         assertNoLabKeyErrors();
-        assertTextPresent("MV Dataset");
+        assertTextPresent(datasetName);
 
         log("Import dataset data");
-        clickAndWait(Locator.linkWithText("MV Dataset"));
+        clickAndWait(Locator.linkWithText(datasetName));
         clickButton("View Data");
         clickButton("Import Data");
 
@@ -263,6 +266,15 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         _listHelper.submitTsvData(TEST_DATA_TWO_COLUMN_DATASET);
         validateTwoColumnData("Dataset", "ParticipantId");
+
+        log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
+        clickButton("Insert New");
+        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
+        Assert.assertEquals("There should not be a devault missing value indicator selection", "", getSelectedOptionText(mvSeletor));
+        String mvSelection = "Z";
+        selectOptionByValue(mvSeletor, mvSelection);
+        clickButton("Submit");
+        Assert.assertEquals("Form should remember MVI selection after error", mvSelection, getSelectedOptionText(mvSeletor));
     }
 
     private void validateSingleColumnData()
@@ -292,13 +304,15 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertTextPresent("female");
         assertTextPresent("50");
         assertTextNotPresent("'25'");
-        setFilter(dataRegionName, columnName, "Equals", "Zoe");
+        DataRegionTable dataRegion = new DataRegionTable(dataRegionName, this);
+        dataRegion.setFilter(columnName, "Equals", "Zoe");
         assertTextNotPresent("'25'");
         assertTextPresent("Zoe");
         assertTextPresent("female");
         assertMvIndicatorPresent();
         click(Locator.xpath("//img[@class='labkey-mv-indicator']/../../a"));
         assertTextPresent("'25'");
+        dataRegion.clearAllFilters(columnName);
     }
 
     @Test
@@ -455,7 +469,6 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         setFormElement(Locator.id("AssayDesignerName"), assayName);
 
-        int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
         _listHelper.addField("Data Fields", "age", "Age", ListHelper.ListColumnType.Integer);
         _listHelper.addField("Data Fields", "sex", "Sex", ListHelper.ListColumnType.String);
         sleep(1000);
