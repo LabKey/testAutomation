@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,6 +26,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -31,124 +35,30 @@ import java.util.Arrays;
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "MVIVerifyProject";
-    private static final String LIST_NAME = "MVList";
-    private static final String ASSAY_NAME = "MVAssay";
-    private static final String ASSAY_RUN_SINGLE_COLUMN = "MVAssayRunSingleColumn";
-    private static final String ASSAY_RUN_TWO_COLUMN = "MVAssayRunTwoColumn";
-    private static final String ASSAY_EXCEL_RUN_SINGLE_COLUMN = "MVAssayExcelRunSingleColumn";
-    private static final String ASSAY_EXCEL_RUN_TWO_COLUMN = "MVAssayExcelRunTwoColumn";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_LIST =
-            "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
-            "Ted" + "\t" + "N" + "\t" + "male" + "\n" +
-            "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
-            "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
-
-    private static final String TEST_DATA_TWO_COLUMN_LIST =
-            "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
-            "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
-            "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
-            "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  "Q" + "\n";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_LIST_BAD =
-            "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
-            "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
-            "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
-            "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
-
-    private static final String TEST_DATA_TWO_COLUMN_LIST_BAD =
-            "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
-            "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
-            "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
-            "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_DATASET =
-            "participantid\tSequenceNum\tAge\tSex\n" +
-            "Ted\t1\tN\tmale\n" +
-            "Alice\t1\t17\tfemale\n" +
-            "Bob\t1\tQ\tN";
-
-    private static final String TEST_DATA_TWO_COLUMN_DATASET =
-            "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
-            "Franny\t1\t\tN\tmale\t\n" +
-            "Zoe\t1\t25\tQ\tfemale\t\n" +
-            "J.D.\t1\t50\t\tmale\tQ";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_DATASET_BAD =
-            "participantid\tSequenceNum\tAge\tSex\n" +
-            "Ted\t1\t.N\tmale\n" +
-            "Alice\t1\t17\tfemale\n" +
-            "Bob\t1\tQ\tN";
-
-    private static final String TEST_DATA_TWO_COLUMN_DATASET_BAD =
-            "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
-            "Franny\t1\t\tN\tmale\t\n" +
-            "Zoe\t1\t25\tQ\tfemale\t\n" +
-            "J.D.\t1\t50\t\tmale\t.Q";
-
-    private static final String DATASET_SCHEMA_FILE = "/sampledata/mvIndicators/dataset_schema.tsv";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_ASSAY =
-            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                    "1\tTed\t1\t01-Jan-09\tN\tmale\n" +
-                    "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                    "3\tBob\t1\t01-Jan-09\tQ\tN";
-
-    private static final String TEST_DATA_TWO_COLUMN_ASSAY =
-            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
-                    "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
-                    "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
-                    "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\tQ";
-
-    private static final String TEST_DATA_SINGLE_COLUMN_ASSAY_BAD =
-            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
-                    "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
-                    "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
-                    "3\tBob\t1\t01-Jan-09\tQ\tN";
-
-    private static final String TEST_DATA_TWO_COLUMN_ASSAY_BAD =
-            "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
-                    "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
-                    "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
-                    "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
-
-    private final String ASSAY_SINGLE_COLUMN_EXCEL_FILE = getSampleRoot() + "assay_single_column.xls";
-    private final String ASSAY_TWO_COLUMN_EXCEL_FILE = getSampleRoot() + "assay_two_column.xls";
-    private final String ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD = getSampleRoot() + "assay_single_column_bad.xls";
-    private final String ASSAY_TWO_COLUMN_EXCEL_FILE_BAD = getSampleRoot() + "assay_two_column_bad.xls";
-
-    private String getSampleRoot()
+    @BeforeClass
+    public static void beforeTestClass()
     {
-        return TestFileUtils.getLabKeyRoot() + "/sampledata/mvIndicators/";
+        MissingValueIndicatorsTest init = (MissingValueIndicatorsTest)getCurrentTest();
+
+        init.setupProject();
+        init.setupMVIndicators();
     }
 
-    @Test
-    public void testSteps()
+    @LogMethod
+    private void setupProject()
     {
-        log("Create MV project");
-        _containerHelper.createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(getProjectName(), "Study");
         clickButton("Create Study");
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         clickButton("Create Study");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
-        setPipelineRoot(getSampleRoot());
-        clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
-
-        setupIndicators();
-
-        checkList();
-        checkDataset();
-        checkAssay();
     }
 
-    private void setupIndicators()
+    @LogMethod
+    private void setupMVIndicators()
     {
-        log("Setting MV indicators");
-        
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Missing Values"));
-        click(Locator.checkboxById("inherit"));
+        uncheckCheckbox(Locator.checkboxById("inherit"));
 
         // Delete all site-level settings
         while(isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
@@ -180,13 +90,39 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         }
 
         clickButton("Save");
-
-        log("Set MV indicators.");
     }
 
-    private void checkList()
+    @Before
+    public void preTest()
     {
-        log("Create list");
+        goToProjectHome();
+    }
+
+    @Test
+    public void testListMV()
+    {
+        final String LIST_NAME = "MVList";
+        final String TEST_DATA_SINGLE_COLUMN_LIST =
+                "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
+                        "Ted" + "\t" + "N" + "\t" + "male" + "\n" +
+                        "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
+                        "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
+        final String TEST_DATA_TWO_COLUMN_LIST =
+                "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
+                        "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
+                        "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
+                        "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  "Q" + "\n";
+        final String TEST_DATA_SINGLE_COLUMN_LIST_BAD =
+                "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
+                        "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
+                        "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
+                        "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
+        final String TEST_DATA_TWO_COLUMN_LIST_BAD =
+                "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
+                        "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
+                        "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
+                        "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
+
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
 
@@ -201,7 +137,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.clickImportData();
@@ -248,10 +184,31 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         waitForPageToLoad();
     }
 
-    private void checkDataset()
+    @Test
+    public void testDatasetMV()
     {
-        log("Create dataset");
-        clickProject(PROJECT_NAME);
+        final String DATASET_SCHEMA_FILE = "/sampledata/mvIndicators/dataset_schema.tsv";
+        final String TEST_DATA_SINGLE_COLUMN_DATASET =
+                "participantid\tSequenceNum\tAge\tSex\n" +
+                        "Ted\t1\tN\tmale\n" +
+                        "Alice\t1\t17\tfemale\n" +
+                        "Bob\t1\tQ\tN";
+        final String TEST_DATA_TWO_COLUMN_DATASET =
+                "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                        "Franny\t1\t\tN\tmale\t\n" +
+                        "Zoe\t1\t25\tQ\tfemale\t\n" +
+                        "J.D.\t1\t50\t\tmale\tQ";
+        final String TEST_DATA_SINGLE_COLUMN_DATASET_BAD =
+                "participantid\tSequenceNum\tAge\tSex\n" +
+                        "Ted\t1\t.N\tmale\n" +
+                        "Alice\t1\t17\tfemale\n" +
+                        "Bob\t1\tQ\tN";
+        final String TEST_DATA_TWO_COLUMN_DATASET_BAD =
+                "participantid\tSequenceNum\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                        "Franny\t1\t\tN\tmale\t\n" +
+                        "Zoe\t1\t25\tQ\tfemale\t\n" +
+                        "J.D.\t1\t50\t\tmale\t.Q";
+
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
@@ -344,15 +301,45 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertTextPresent("'25'");
     }
 
-    private void checkAssay()
+    @Test
+    public void testAssayMV()
     {
-        log("Create assay");
-        defineAssay();
+        final String ASSAY_NAME = "MVAssay";
+        final String ASSAY_RUN_SINGLE_COLUMN = "MVAssayRunSingleColumn";
+        final String ASSAY_RUN_TWO_COLUMN = "MVAssayRunTwoColumn";
+        final String ASSAY_EXCEL_RUN_SINGLE_COLUMN = "MVAssayExcelRunSingleColumn";
+        final String ASSAY_EXCEL_RUN_TWO_COLUMN = "MVAssayExcelRunTwoColumn";
+        final String TEST_DATA_SINGLE_COLUMN_ASSAY =
+                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
+                        "1\tTed\t1\t01-Jan-09\tN\tmale\n" +
+                        "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
+                        "3\tBob\t1\t01-Jan-09\tQ\tN";
+        final String TEST_DATA_TWO_COLUMN_ASSAY =
+                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
+                        "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
+                        "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
+                        "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\tQ";
+        final String TEST_DATA_SINGLE_COLUMN_ASSAY_BAD =
+                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tsex\n" +
+                        "1\tTed\t1\t01-Jan-09\t.N\tmale\n" +
+                        "2\tAlice\t1\t01-Jan-09\t17\tfemale\n" +
+                        "3\tBob\t1\t01-Jan-09\tQ\tN";
+        final String TEST_DATA_TWO_COLUMN_ASSAY_BAD =
+                "SpecimenID\tParticipantID\tVisitID\tDate\tage\tageMVIndicator\tsex\tsexMVIndicator\n" +
+                        "1\tFranny\t1\t01-Jan-09\t\tN\tmale\t\n" +
+                        "2\tZoe\t1\t01-Jan-09\t25\tQ\tfemale\t\n" +
+                        "3\tJ.D.\t1\t01-Jan-09\t50\t\tmale\t.Q";
+        final File ASSAY_SINGLE_COLUMN_EXCEL_FILE = TestFileUtils.getSampleData("mvIndicators/assay_single_column.xls");
+        final File ASSAY_TWO_COLUMN_EXCEL_FILE = TestFileUtils.getSampleData("mvIndicators/assay_two_column.xls");
+        final File ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD = TestFileUtils.getSampleData("mvIndicators/assay_single_column_bad.xls");
+        final File ASSAY_TWO_COLUMN_EXCEL_FILE_BAD = TestFileUtils.getSampleData("mvIndicators/assay_two_column_bad.xls");
+
+        defineAssay(ASSAY_NAME);
 
         log("Import single column MV data");
         waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
-        String targetStudyValue = "/" + PROJECT_NAME + " (" + PROJECT_NAME + " Study)";
+        String targetStudyValue = "/" + getProjectName() + " (" + getProjectName() + " Study)";
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
         clickButton("Next");
@@ -371,7 +358,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateSingleColumnData();
 
         log("Import two column MV data");
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -392,7 +379,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("Data", "ParticipantID");
 
         log("Copy to study");
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
@@ -405,7 +392,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateSingleColumnData();
 
         log("Import from Excel in single-column format");
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -414,21 +401,19 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_SINGLE_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
-        File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
-        setFormElement(Locator.name("__primaryFile__"), file);
+        setFormElement(Locator.name("__primaryFile__"), ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
-        file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
-        setFormElement(Locator.name("__primaryFile__"), file);
+        setFormElement(Locator.name("__primaryFile__"), ASSAY_SINGLE_COLUMN_EXCEL_FILE);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
 
         log("Import from Excel in two-column format");
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -436,14 +421,12 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Next");
         setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_TWO_COLUMN);
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
-        file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
-        setFormElement(Locator.name("__primaryFile__"), file);
+        setFormElement(Locator.name("__primaryFile__"), ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
         clickButton("Save and Finish");
         assertLabKeyErrorPresent();
 
         checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
-        file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
-        setFormElement(Locator.name("__primaryFile__"), file);
+        setFormElement(Locator.name("__primaryFile__"), ASSAY_TWO_COLUMN_EXCEL_FILE);
         clickButton("Save and Finish");
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
@@ -456,17 +439,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//img[@class='labkey-mv-indicator']"));
     }
 
-    /**
-     * Defines an test assay at the project level for the security-related tests
-     */
-    @SuppressWarnings({"UnusedAssignment"})
-    private void defineAssay()
+    @LogMethod
+    private void defineAssay(String assayName)
     {
-        log("Defining a test assay at the project level");
-        //define a new assay at the project level
-        //the pipeline must already be setup
-        clickProject(PROJECT_NAME);
-        addWebPart("Assay List");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Assay List");
 
         //copied from old test
         clickButton("Manage Assays");
@@ -476,11 +453,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
 
-        setFormElement(Locator.id("AssayDesignerName"), ASSAY_NAME);
+        setFormElement(Locator.id("AssayDesignerName"), assayName);
 
         int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
-        _listHelper.addField("Data Fields", index++, "age", "Age", ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Data Fields", index++, "sex", "Sex", ListHelper.ListColumnType.String);
+        _listHelper.addField("Data Fields", "age", "Age", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", "sex", "Sex", ListHelper.ListColumnType.String);
         sleep(1000);
 
         log("setting fields to enable missing values");
@@ -492,7 +469,6 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         clickButton("Save & Close");
         assertNoLabKeyErrors();
-
     }
 
     private void deleteDatasetData(int rowCount)
@@ -506,7 +482,6 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteDir(new File(getSampleRoot(), "assaydata"));
         deleteProject(getProjectName(), afterTest);
     }
 
@@ -518,6 +493,6 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return getClass().getSimpleName() + " Project";
     }
 }
