@@ -80,7 +80,7 @@ public class FlowCBCTest extends BaseFlowTest
         _listHelper.deleteField("Batch Fields", 0);
 
         // Add TargetStudy to the end of the default list of Results domain
-        _listHelper.addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+        _listHelper.addField("Result Fields", "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
 
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);

@@ -263,7 +263,7 @@ public class StudyManualTest extends StudyTest
 
         click(Locator.radioButtonById("button_dataField"));
 
-        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", "otherData", "Other Data", ListHelper.ListColumnType.String);
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");

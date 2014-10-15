@@ -391,8 +391,8 @@ public class UserTest extends SecurityTest
 
         waitForText("Add Field");
         int firstIdx = findLastUserCustomField();
-        _listHelper.addField("Field Properties", firstIdx++, PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
-        _listHelper.addField("Field Properties", firstIdx, PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Field Properties", PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
+        _listHelper.addField("Field Properties", PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
 
         try {
             clickButton("Save");

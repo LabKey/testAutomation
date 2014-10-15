@@ -232,8 +232,8 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         _listHelper.deleteField("Data Fields", 0); // ParticipantID
         _listHelper.deleteField("Data Fields", 0); // VisitID
         _listHelper.deleteField("Data Fields", 0); // Date
-        _listHelper.addField("Data Fields", 0, "Name", "Name", ListHelper.ListColumnType.String);
-        _listHelper.addField("Data Fields", 1, "Age", "Age", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", "Name", "Name", ListHelper.ListColumnType.String);
+        _listHelper.addField("Data Fields", "Age", "Age", ListHelper.ListColumnType.Integer);
 
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);

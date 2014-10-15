@@ -95,7 +95,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         Locator nameLocator = Locator.xpath("//input[@id='AssayDesignerName']");
         waitForElement(nameLocator);
         setFormElement(nameLocator, ASSAY_NAME);
-        _listHelper.addField("Data Fields", 3, EXTRA_RUN_DATA_FIELD_NAME, EXTRA_RUN_DATA_FIELD_LABEL, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", EXTRA_RUN_DATA_FIELD_NAME, EXTRA_RUN_DATA_FIELD_LABEL, ListHelper.ListColumnType.Integer);
         clickButton("Save & Close");
 
         PortalHelper portalHelper = new PortalHelper(this);

@@ -645,7 +645,7 @@ public class StudyTest extends StudyBaseTest
         Locator.XPathLocator nameField = Locator.xpath("//input[starts-with(@name, 'ff_name')]");
         waitForElement(nameField);
         int newFieldIndex = getElementCount(nameField);
-        _listHelper.addField("Dataset Fields", newFieldIndex, "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
         clickButton("Save");
         clickButton("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -1124,7 +1124,7 @@ public class StudyTest extends StudyBaseTest
         clickButton("Edit Definition");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
         int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]"));
-        _listHelper.addField("Dataset Fields", lastFieldIndex, "VisitDay", "VisitDay", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Dataset Fields", "VisitDay", "VisitDay", ListHelper.ListColumnType.Integer);
         Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
         selectOptionByValue(element3, "DEMdt");
         clickButton("Save");

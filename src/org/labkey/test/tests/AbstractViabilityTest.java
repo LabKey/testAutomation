@@ -100,8 +100,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), getAssayName());
 
         // Add 'Unreliable' field to Results domain
-        _listHelper.addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
-        _listHelper.addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Result Fields", "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
+        _listHelper.addField("Result Fields", "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
 
         sleep(1000);
         clickButton("Save", 0);

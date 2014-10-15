@@ -299,7 +299,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         _listHelper.deleteField("Batch Fields", 0);
-        _listHelper.addField("Guava Assay Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+        _listHelper.addField("Guava Assay Result Fields", "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickButton("Save & Close");
 
         clickProject(getProjectName());

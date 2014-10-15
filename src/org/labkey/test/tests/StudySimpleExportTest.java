@@ -127,8 +127,8 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Next");
         waitForElement(Locator.name("ff_name0"));
         _listHelper.deleteField("Dataset Fields", 0);
-        _listHelper.addField("Dataset Fields", 0, "TestInt", "TestInt", ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Dataset Fields", 1, "TestDate", "TestDate", ListHelper.ListColumnType.DateTime);
+        _listHelper.addField("Dataset Fields", "TestInt", "TestInt", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Dataset Fields", "TestDate", "TestDate", ListHelper.ListColumnType.DateTime);
         clickButton("Save");
         clickButton("View Data");
         clickButton("Import Data");

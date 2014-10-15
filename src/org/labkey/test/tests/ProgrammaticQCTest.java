@@ -132,11 +132,11 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
         {
-            _listHelper.addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
+            _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
         // add an 'animal' field which will be populated by the transform script
-        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", ListHelper.ListColumnType.String);
+        _listHelper.addField("Data Fields", "Animal", "Animal", ListHelper.ListColumnType.String);
 
         sleep(1000);
         clickButton("Save", 0);

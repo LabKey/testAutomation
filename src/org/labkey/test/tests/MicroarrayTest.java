@@ -80,11 +80,11 @@ public class MicroarrayTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.xpath("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        _listHelper.addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
-        _listHelper.addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
+        _listHelper.addField("Batch Fields", BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
+        _listHelper.addField("Run Fields", RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
         setFormElement(Locator.xpath("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']"), XPATH_TEST);
-        _listHelper.addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
+        _listHelper.addField("Run Fields", RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Properties", DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
         clickButton("Save & Close");

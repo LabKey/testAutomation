@@ -530,11 +530,6 @@ public class ListHelper extends AbstractHelper
         _test.checkCheckbox(l);
     }
 
-    public void addField(String areaTitle, int index, String name, String label, ListColumnType type)
-    {
-        addField(areaTitle, name, label, type);
-    }
-
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
