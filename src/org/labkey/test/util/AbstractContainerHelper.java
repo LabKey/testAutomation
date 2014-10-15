@@ -66,7 +66,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         deleteProject(projectName, true, 90000);
     }
 
-    @LogMethod(quiet = true)
+    @LogMethod
     public final void deleteProject(@LoggedParam String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         doDeleteProject(projectName, failIfNotFound, wait);
