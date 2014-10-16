@@ -58,7 +58,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         enterDemoMode();
         clickFolder(getFolderName());
         DemoModeCrawler crawler = new DemoModeCrawler(this);
-        crawler.crawlAllLinks(false);
+        crawler.crawlAllLinks();
         log("No participant IDs found");
         goToHome(); // Crawler endpoint in not deterministic
         leaveDemoMode();
@@ -127,9 +127,9 @@ public class StudyDemoModeTest extends StudyBaseTest
         }
 
         @Override
-        protected List<ControllerActionId> getExcludedActions()
+        protected List<ControllerActionId> getDefaultExcludedActions()
         {
-            List<ControllerActionId> list = super.getExcludedActions();
+            List<ControllerActionId> list = super.getDefaultExcludedActions();
             list.add(new ControllerActionId("search", "search"));    // Search results page displays PTIDs
             list.add(new ControllerActionId("study", "datasetReport")); // Reports aren't expected to hide ptids
             list.add(new ControllerActionId("reports", "runReport")); // Reports aren't expected to hide ptids

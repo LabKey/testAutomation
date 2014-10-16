@@ -131,7 +131,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.ensureChromedriverExeProperty;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
-import static org.labkey.test.TestProperties.isInjectCheckEnabled;
+import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
 import static org.labkey.test.TestProperties.isQueryCheckSkipped;
@@ -2478,7 +2478,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             pauseJsErrorChecker();
             Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
             crawler.addExcludedActions(getUncrawlableActions());
-            crawler.crawlAllLinks(isInjectCheckEnabled());
+            crawler.setInjectionCheckEnabled(isInjectionCheckEnabled());
+            crawler.crawlAllLinks();
             resumeJsErrorChecker();
         }
     }

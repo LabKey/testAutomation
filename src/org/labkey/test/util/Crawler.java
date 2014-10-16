@@ -42,6 +42,7 @@ import static org.junit.Assert.*;
 public class Crawler
 {
     private final List<ControllerActionId> _excludedActions;
+    private final List<ControllerActionId> _actionsExcludedFromInjection;
     private final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
@@ -66,6 +67,7 @@ public class Crawler
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
+    private boolean _injectionCheckEnabled = false;
 
     public Crawler(BaseWebDriverTest test)
     {
@@ -77,7 +79,8 @@ public class Crawler
         _test = test;
         _maxCrawlTime = crawlTime;
         _forbiddenWords = getForbiddenWords();
-        _excludedActions = getExcludedActions();
+        _excludedActions = getDefaultExcludedActions();
+        _actionsExcludedFromInjection = getExcludedActionsFromInjection();
     }
 
     protected Set<String> getForbiddenWords()
@@ -85,7 +88,7 @@ public class Crawler
         return new HashSet<>();
     }
 
-    protected List<ControllerActionId> getExcludedActions()
+    protected List<ControllerActionId> getDefaultExcludedActions()
     {
         List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list, new ControllerActionId("admin", "resetErrorMark"),
@@ -106,17 +109,9 @@ public class Crawler
             new ControllerActionId("assay", "template"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
-            new ControllerActionId("experiment", "showRunGraphDetail"), // TODO: exclude for injection only
-            new ControllerActionId("flow", "query"), // TODO: exclude for injection only
-            new ControllerActionId("flow-attribute", "createAlias"), // TODO: exclude for injection only
-            new ControllerActionId("flow-attribute", "details"), // TODO: exclude for injection only
-            new ControllerActionId("flow-attribute", "edit"), // TODO: exclude for injection only
-            new ControllerActionId("flow-attribute", "summary"), // TODO: exclude for injection only
             new ControllerActionId("flow-compensation", "download"),
             new ControllerActionId("flow-editscript", "download"),
-            new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
             new ControllerActionId("flow-run", "download"),
-            new ControllerActionId("flow-run", "showRuns"), // TODO: exclude for injection only
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("issues", "download"),
@@ -153,7 +148,6 @@ public class Crawler
             new ControllerActionId("study-samples", "downloadSpecimenList"),
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
-            new ControllerActionId("study-samples", "samples"), // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
@@ -161,11 +155,28 @@ public class Crawler
             new ControllerActionId("wiki", "download"),
 
             // Actions from external modules
-            new ControllerActionId("targetedms", "downloadDocument"),
+            new ControllerActionId("targetedms", "downloadDocument")
+        );
 
-            // Script injection exclusions
-            new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
-            new ControllerActionId("study-designer", "designer")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
+        return list;
+    }
+
+    protected List<ControllerActionId> getExcludedActionsFromInjection()
+    {
+        List<ControllerActionId> list = new ArrayList<>();
+        Collections.addAll(list,
+                new ControllerActionId("experiment", "showRunGraphDetail"),
+                new ControllerActionId("flow", "query"),
+                new ControllerActionId("flow-attribute", "createAlias"),
+                new ControllerActionId("flow-attribute", "details"),
+                new ControllerActionId("flow-attribute", "edit"),
+                new ControllerActionId("flow-attribute", "summary"),
+                new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
+                new ControllerActionId("flow-run", "showRuns"),
+                new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
+                new ControllerActionId("study-designer", "designer"), // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
+                new ControllerActionId("study-samples", "samples") // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
+        );
 
         return list;
     }
@@ -173,6 +184,11 @@ public class Crawler
     public void addExcludedActions(Collection<ControllerActionId> action)
     {
         _excludedActions.addAll(action);
+    }
+
+    public void setInjectionCheckEnabled(boolean enabled)
+    {
+        _injectionCheckEnabled = enabled;
     }
 
     protected List<String> getAdminControllers()
@@ -261,14 +277,12 @@ public class Crawler
         private URL _origin;
         private String _urlText;
         private int _depth;
-        private boolean _testInjection;
 
-        public UrlToCheck(URL origin, String urlText, int depth, boolean inject)
+        public UrlToCheck(URL origin, String urlText, int depth)
         {
             _origin = origin;
             _urlText = urlText;
             _depth = depth;
-            _testInjection = inject;
         }
 
         public URL getOrigin()
@@ -284,11 +298,6 @@ public class Crawler
         public int getDepth()
         {
             return _depth;
-        }
-
-        public boolean testInjection()
-        {
-            return _testInjection;
         }
     }
 
@@ -382,7 +391,7 @@ public class Crawler
 
     public static class ActionProfiler
     {
-    	private Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
+        private Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
 
         public void updateActionProfile(String relativeUrl, long loadTime)
         {
@@ -441,7 +450,7 @@ public class Crawler
 
             public long getTotalTime()
             {return _totalTime;}
-    	}
+        }
 
         public String toHtml()
         {
@@ -550,6 +559,12 @@ public class Crawler
         return underCreatedProject(rootRelativeURL);
     }
 
+    private boolean isInjectableURL(String rootRelativeURL)
+    {
+        ControllerActionId actionId = new ControllerActionId(rootRelativeURL);
+
+        return !_actionsExcludedFromInjection.contains(actionId);
+    }
 
     private boolean underCreatedProject(String relativeURL)
     {
@@ -575,7 +590,7 @@ public class Crawler
 
 
     @LogMethod
-    public void crawlAllLinks(boolean inject)
+    public void crawlAllLinks()
     {
         // quick unit-test
         {
@@ -599,14 +614,14 @@ public class Crawler
         _test.beginAt(_test.getProjectUrl());
 
         // Breadth first search
-        int newPages = crawl(inject);
+        int newPages = crawl();
         saveCrawlStats(_test, _urlToCheck.getDepth(), newPages, _actionsVisited.size(), _crawlTime);
 
         _test.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
     }
 
 
-    private int crawl(boolean inject)
+    private int crawl()
     {
         // Breadth first crawl
         long startTime = System.currentTimeMillis();
@@ -616,7 +631,7 @@ public class Crawler
         URL startPageURL = _test.getURL();
         String[] linkAddresses = _test.getLinkAddresses();
         for (String url : linkAddresses)
-            _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1, inject));
+            _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1));
 
         // Loop through links in list until its empty or time runs out
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
@@ -653,7 +668,7 @@ public class Crawler
             int depth = _urlToCheck.getDepth();
             if (isVisitableURL(relativeURL, depth))
             {
-                crawlLink(_urlToCheck, relativeURL);
+                crawlLink(_urlToCheck, relativeURL, _injectionCheckEnabled && isInjectableURL(relativeURL));
                 linkCount++;
             }
         }
@@ -662,7 +677,7 @@ public class Crawler
         return linkCount;
     }
 
-    private void crawlLink(UrlToCheck urlToCheck, String relativeURL)
+    private void crawlLink(UrlToCheck urlToCheck, String relativeURL, boolean testInjection)
     {
         URL origin = null;
         URL currentPageUrl;
@@ -681,7 +696,7 @@ public class Crawler
             if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)_test.hoverFolderBar();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
-                _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1, urlToCheck.testInjection()));
+                _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
 
             // Keep track of where crawler has been
             _actionsVisited.add(new ControllerActionId(relativeURL));
@@ -714,7 +729,8 @@ public class Crawler
             throw rethrow;
         }
 
-        testInjection(urlToCheck, currentPageUrl);
+        if (testInjection)
+            testInjection(currentPageUrl);
     }
 
     protected void checkForForbiddenWords(String relativeURL)
@@ -738,9 +754,9 @@ public class Crawler
     }
 
 
-	public static final String injectedAlert = "8(";
-	public static final String maliciousScript = "<script>alert(\"" + injectedAlert + "\");</script>";
-	public static final String injectString = "\"'>--></script>" + maliciousScript;
+    public static final String injectedAlert = "8(";
+    public static final String maliciousScript = "<script>alert(\"" + injectedAlert + "\");</script>";
+    public static final String injectString = "\"'>--></script>" + maliciousScript;
 
     public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
     {
@@ -809,11 +825,8 @@ public class Crawler
         return null;
     }
 
-    private void testInjection(UrlToCheck urlToCheck, URL start)
+    private void testInjection(URL start)
     {
-        if (!urlToCheck.testInjection())
-            return;
-
         String base = start.toString();
         String query = start.getQuery();
         int q = base.indexOf('?');

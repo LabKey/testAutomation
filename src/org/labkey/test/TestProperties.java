@@ -28,10 +28,10 @@ public abstract class TestProperties
 
     public static boolean isLinkCheckEnabled()
     {
-        return "true".equals(System.getProperty("linkCheck")) || isInjectCheckEnabled();
+        return "true".equals(System.getProperty("linkCheck")) || isInjectionCheckEnabled();
     }
 
-    public static boolean isInjectCheckEnabled()
+    public static boolean isInjectionCheckEnabled()
     {
         return "true".equals(System.getProperty("injectCheck"));
     }
