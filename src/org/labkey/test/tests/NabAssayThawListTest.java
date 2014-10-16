@@ -130,7 +130,8 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         // 20583 We now hide the option to paste in a tsv for the default value
         assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
 
-        click(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+        // 20998 as part of that fix, the List option should already be checked
+        // click(Locator.radioButtonByNameAndValue("ThawListType", "List"));
 
         waitForElement(Locator.css(".schema-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
