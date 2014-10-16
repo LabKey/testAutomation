@@ -545,7 +545,7 @@ public class Runner extends TestSuite
             }
             else isServerSideTest = true;
 
-            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")) && !"CONTINUE".equals(System.getProperty("suite")))
+            if (isServerSideTest && !"CONTINUE".equals(System.getProperty("suite")))
             {
                 // Clear errors and enable dumbster before JUnitTest runs.
                 suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
@@ -553,7 +553,7 @@ public class Runner extends TestSuite
             if(!illegalTest)
                 suite.addTest(test);
 
-            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")) && !"CONTINUE".equals(System.getProperty("suite")))
+            if (isServerSideTest && !"CONTINUE".equals(System.getProperty("suite")))
             {
                 // Check for leaks and errors after JUnitTest runs
                 suite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
