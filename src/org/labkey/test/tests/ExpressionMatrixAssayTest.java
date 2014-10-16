@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +52,8 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     private static final String ASSAY_NAME = "Test Expression Matrix";
     private static final String FEATURE_SET_NAME = "Expression Matrix Test Feature Set";
     private static final String FEATURE_SET_VENDOR = "Vendor";
-    private static final File FEATURE_SET_DATA = TestFileUtils.getSampleData("Microarray/expressionMatrix/sample-feature-set.txt");
+    private static final String FEATURE_SET_FILENAME = "sample-feature-set.txt";
+    private static final File FEATURE_SET_DATA = TestFileUtils.getSampleData("Microarray/expressionMatrix/" + FEATURE_SET_FILENAME);
     private static final File CEL_FILE1 = TestFileUtils.getSampleData("Affymetrix/CEL_files/sample_file_1.CEL");
     private static final File CEL_FILE2 = TestFileUtils.getSampleData("Affymetrix/CEL_files/sample_file_2.CEL");
     private static final String PROTOCOL_NAME = "Expression Matrix Protocol";
@@ -249,6 +251,43 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 protocolName + ".tsv", Collections.<String>emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
+    }
+
+    @Test
+    public void testImportNewFeatureAnnotationSet()
+    {
+        // Upload new feature annotation set to the pipeline
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(FEATURE_SET_DATA);
+
+        final String importAction = "Use R to generate a dummy matrix tsv output file with two samples and two features.";
+        final String protocolName = "ImportNewFeatureAnnotationSet";
+        final String description = "Use a task output property to import new feature annotation set";
+        final String runName = "now with calcium!";
+        final String[] targetFiles = {CEL_FILE1.getName(), CEL_FILE2.getName()};
+        final String parameterXml = getParameterXml(runName, protocolName, null, null, false, Collections.singletonMap("myFeatureSet", FEATURE_SET_FILENAME));
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName,
+                "protocolDescription", description,
+                "xmlParameters", parameterXml,
+                "saveProtocol", "false");
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+
+        final String pipelineName = PIPELINE_NAME;
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+        final Map<String, Set<String>> outputFiles = Maps.of(
+                pipelineName + ".xml", Collections.<String>emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
+                protocolName + ".log", Collections.<String>emptySet(),
+                protocolName + ".tsv", Collections.<String>emptySet());
+        PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
+
+        goToManageAssays();
+        click(Locator.linkContainingText(ASSAY_NAME));
+        DataRegionTable table = new DataRegionTable("Runs", this);
+        table.setFilter("Name", "Equals", runName);
+        Assert.assertEquals("sample-feature-set", table.getDataAsText(0, "Feature Annotation Set"));
     }
 
 
