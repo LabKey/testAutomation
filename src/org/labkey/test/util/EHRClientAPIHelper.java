@@ -358,16 +358,17 @@ public class EHRClientAPIHelper
                         {
                             JSONObject subError = subErrors.getJSONObject(j);
                             String msg = subError.getString("message");
-                            if(!subError.has("field"))
+                            if (!subError.has("field"))
                                 throw new RuntimeException(msg);
 
                             String field = subError.getString("field");
+                            String severity = subError.optString("severity");
 
                             List<String> list = ret.get(field);
                             if (list == null)
                                 list = new ArrayList<>();
 
-                            list.add(msg);
+                            list.add((StringUtils.trimToNull(severity) == null ? "" : severity + ": ") + msg);
                             ret.put(field, list);
                         }
                     }
@@ -388,12 +389,13 @@ public class EHRClientAPIHelper
                         JSONObject subError = errorArray.getJSONObject(i);
                         String msg = subError.getString("message");
                         String field = subError.getString("field");
+                        String severity = subError.optString("severity");
 
                         List<String> list = ret.get(field);
                         if (list == null)
                             list = new ArrayList<>();
 
-                        list.add(msg);
+                        list.add((StringUtils.trimToNull(severity) == null ? "" : severity + ": ") + msg);
                         ret.put(field, list);
                     }
                 }
