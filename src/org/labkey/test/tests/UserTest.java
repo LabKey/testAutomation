@@ -386,11 +386,12 @@ public class UserTest extends SecurityTest
     @LogMethod
     private void addCustomPropertiesTest()
     {
+        int defaultUserFieldCount = 7;
+
         goToSiteUsers();
         clickButton("Change User Properties");
 
         waitForText("Add Field");
-        int firstIdx = findLastUserCustomField();
         _listHelper.addField("Field Properties", PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
 
@@ -413,29 +414,11 @@ public class UserTest extends SecurityTest
 
             waitForText("Add Field");
 
-            _listHelper.deleteField("Field Properties", firstIdx--);
-            _listHelper.deleteField("Field Properties", firstIdx);
+            _listHelper.deleteField("Field Properties", defaultUserFieldCount);
+            _listHelper.deleteField("Field Properties", defaultUserFieldCount + 1);
 
             clickButton("Save");
         }
-    }
-
-    /**
-     * Helper to find the last custom property in the section, just so we don't stomp on any that were added manually.
-     */
-    private int findLastUserCustomField()
-    {
-        for (int i = 15; i > 6; i--)
-        {
-            String prefix = getPropertyXPath("Field Properties");
-            Locator field = Locator.xpath(prefix + "//input[@name='ff_name" + i + "']");
-
-            if (isElementPresent(field))
-                return i+1;
-        }
-        // there are currently 6 default non-editable fields, without any customizations, the first
-        // field would be 7th.
-        return 7;
     }
 
     @Override
