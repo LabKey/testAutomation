@@ -31,6 +31,7 @@ data/api/domainTest.js -text
 data/api/extIntegrationTest.html -text
 data/api/filterTest.html -text
 data/api/folderTest.html -text
+data/api/folderTest.js -text
 data/api/getDataAggregateTest.html -text
 data/api/getDataDateTest.html -text
 data/api/getDataErrorsTest.html -text
@@ -354,6 +355,7 @@ src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_1.java -text
 src/org/labkey/test/pages/AssayDomainEditor.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
 src/org/labkey/test/pages/DomainEditor.java -text
+src/org/labkey/test/pages/FolderManagementFolderTree.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text

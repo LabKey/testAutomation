@@ -125,63 +125,6 @@ public class ExtHelper extends AbstractHelper
         return elements.get(index).getSize().height;        
     }
 
-    public void selectFolderManagementTreeItem(String path, boolean keepExisting)
-    {
-        selectExtFolderTreeNode(path, "folder-management-tree", keepExisting);
-    }
-
-    private void selectExtFolderTreeNode(String path, String markerCls, boolean keepExisting)
-    {
-        String script =
-                "selectExtFolderTreeNode = function(containerPath, markerCls, keepExisting) {\n" +
-                "    // Get Path Array\n" +
-                "    var pathArray = containerPath.split(\"/\");\n" +
-                "    if (pathArray.length == 0)\n" +
-                "        throw 'Unable to parse path: ' + containerPath;\n" +
-                "    // Remove invalid paths due to parsing\n" +
-                "    if (pathArray[0] == \"\")\n" +
-                "        pathArray = pathArray.slice(1);\n" +
-                "    if (pathArray[pathArray.length-1] == \"\")\n" +
-                "        pathArray = pathArray.slice(0, pathArray.length-1);\n" +
-                "    var el = Ext.DomQuery.selectNode(\"div[class*='\"+markerCls+\"']\");\n" +
-                "    if (el) {\n" +
-                "        var tree = Ext.getCmp(el.id);\n" +
-                "        if (tree) {\n" +
-                "            var root = tree.getRootNode();\n" +
-                "            if (!root) {\n" +
-                "                throw 'Unable to find root node.';\n" +
-                "            }\n" +
-                "            var _path = \"\";\n" +
-                "            var node;\n" +
-                "            for (var i=0; i < pathArray.length; i++) {\n" +
-                "                _path += '/' + pathArray[i];\n" +
-                "                node = root.findChild('containerPath', _path, true);\n" +
-                "                if (node) {\n" +
-                "                    if (i==(pathArray.length-1)) {\n" +
-                "                        var e = {};\n" +
-                "                        if (keepExisting) {\n" +
-                "                            e.ctrlKey = true;\n" +
-                "                        }\n" +
-                "                        tree.getSelectionModel().select(node, e, keepExisting);\n" +
-                "                    }\n" +
-                "                }\n" +
-                "                else {\n" +
-                "                    throw 'Unable to find node: ' + _path;\n" +
-                "                }\n" +
-                "            }\n" +
-                "        }\n" +
-                "        else {\n" +
-                "            throw el.id + ' does not appear to be a valid Ext Component.';\n" +
-                "        }\n" +
-                "    }\n" +
-                "    else {\n" +
-                "        throw 'Unable to locate tree panel: ' + markerCls;\n" +
-                "    }\n" +
-                "};" +
-                "selectExtFolderTreeNode(arguments[0], arguments[1], arguments[2]);";
-        _test.executeScript(script, path, markerCls, keepExisting);
-    }
-
     public void setCodeMirrorValue(String id, String value)
     {
         String script =
