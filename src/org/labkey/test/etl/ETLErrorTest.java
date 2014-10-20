@@ -138,7 +138,7 @@ public class ETLErrorTest extends ETLBaseTest
         if(!hasCheckerError)
         {
             refresh(); // log webpart may not yet be present
-            waitAndClick(Locator.linkWithText("Show full log file"));
+            waitAndClickAndWait(Locator.linkWithText("Show full log file"));
             waitForElement(Locator.linkWithText("Show summary"));
         }
         else
