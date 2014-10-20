@@ -257,10 +257,11 @@ public class SearchTest extends StudyTest
     private void addSearchableWiki()
     {
         WikiHelper _wikiHelper = new WikiHelper(this);
+        File attachedFile = TestFileUtils.getSampleData("fileTypes/sample.txt");
         
         clickFolder(getFolderName());
         portalHelper.addWebPart("Wiki");
-        _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, new File(TestFileUtils.getLabKeyRoot() + "/server/standard.modules"));
+        _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, attachedFile);
         portalHelper.addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
         _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null, true);
@@ -269,7 +270,7 @@ public class SearchTest extends StudyTest
         _searchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");
         _searchHelper.enqueueSearchItem(WIKI_TITLE, Locator.linkWithText(WIKI_TITLE));
         _searchHelper.enqueueSearchItem(WIKI_CONTENT, Locator.linkWithText(WIKI_TITLE));
-        _searchHelper.enqueueSearchItem("moduleDependencies", Locator.linkWithText("\"standard.modules\" attached to page \"" + WIKI_TITLE + "\"")); // some text from attached file
+        _searchHelper.enqueueSearchItem("Sample", Locator.linkWithText(String.format("\"%s\" attached to page \"%s\"", attachedFile.getName(), WIKI_TITLE))); // some text from attached file
     }
 
     private void addSearchableIssues()
