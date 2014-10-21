@@ -154,7 +154,7 @@ public class DataRegionTest extends BaseWebDriverTest
         _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
 
         log("Upload data");
-        _listHelper.uploadData(PROJECT_NAME, LIST_NAME, LIST_DATA);
+        _listHelper.uploadData(LIST_DATA);
     }
 
     private void dataRegionTest(URL url, String dataRegionName)

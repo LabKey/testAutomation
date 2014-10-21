@@ -43,9 +43,9 @@ public class ListHelper extends AbstractHelper
         _test = test;
     }
 
-    public void uploadData(String folderName, String listName, String listData)
+    public void uploadData(String listData)
     {
-        _test.clickButton("Import Data");
+        clickImportData();
         _test.setFormElement(Locator.id("tsv3"), listData);
         submitImportTsv_success();
     }

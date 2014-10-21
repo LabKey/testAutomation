@@ -204,7 +204,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         // Create list for lookup custom file property
         _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
-        _listHelper.uploadData(getProjectName(), LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
+        _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
         // Setup custom file properties
         _fileBrowserHelper.waitForFileGridReady();

@@ -513,14 +513,14 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("<AUTO> (Owner)");
 
         log("Upload data to second list");
-        _listHelper.uploadData(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_DATA);
+        _listHelper.uploadData(LIST3_DATA);
 
         log("Navigate back to first project");
         log("Add list -- " + LIST2_NAME_CARS);
         _listHelper.createList(PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, _list3Col1);
 
         log("Upload data to second list");
-        _listHelper.uploadData(PROJECT_VERIFY, LIST2_NAME_CARS, LIST2_DATA);
+        _listHelper.uploadData(LIST2_DATA);
 
         log("Check that upload worked");
         assertTextPresent(LIST2_KEY);
