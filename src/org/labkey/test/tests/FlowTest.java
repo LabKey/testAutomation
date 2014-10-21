@@ -504,19 +504,19 @@ public class FlowTest extends BaseFlowTest
         setFormElement(l, "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
 
         // click on TriggerField trigger image
-        click(Locator.tagWithName("input", "filter[4].property_subset").append("/../img"));
+        click(Locator.tagWithName("input", "filter[2].property_subset").append("/../img"));
         // Selenium XPath doesn't support attribute namespaces.
         Locator CD4 = Locator.xpath("//div[contains(@class, 'x-tree-node-el') and @*='Singlets/L/Live/3+/4+']");
         waitForElement(CD4, WAIT_FOR_JAVASCRIPT);
         click(CD4);
-        fireEvent(Locator.name("filter[4].property_subset"), SeleniumEvent.blur);
+        fireEvent(Locator.name("filter[2].property_subset"), SeleniumEvent.blur);
 
 //        Issue 12630: add stat/threshold fo TCell filter to positivity report
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].op']]"), "Is Greater Than or Equal To");
+        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[2].property_stat']]"), "Count");
+        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[2].op']]"), "Is Greater Than or Equal To");
 
         // NOTE: this filter is set high so we filter out all of the data and produce an error message.
-        setFormElement(Locator.name("filter[4].value"), "5000");
+        setFormElement(Locator.name("filter[2].value"), "5000");
 
         clickButton("Save");
     }
@@ -529,7 +529,7 @@ public class FlowTest extends BaseFlowTest
 
         // Should only be one 'manage' menu since we've only created one flow report.
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
-        setFormElement(Locator.name("filter[4].value"), "100");
+        setFormElement(Locator.name("filter[2].value"), "100");
         clickButton("Save");
     }
 
