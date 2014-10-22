@@ -109,10 +109,14 @@ public class FileBrowserHelper
                 }
                 catch (StaleElementReferenceException ignore) {}
 
-                _test.clickAt(folderTreeNode, 1, 1, 0);
-                _test.waitForElement(folderTreeNode.withClass("x4-grid-row-selected"));
-                _test._ext4Helper.waitForMaskToDisappear();
-                _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
+                Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
+                if (!_test.isElementPresent(folderTreeNodeSelected))
+                {
+                    _test.clickAt(folderTreeNode, 1, 1, 0);
+                    _test.waitForElement(folderTreeNodeSelected);
+                    _test._ext4Helper.waitForMaskToDisappear();
+                    _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
+                }
             }
         }
     }
