@@ -137,6 +137,10 @@ public class FlowJoQueryTest extends BaseFlowTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
         _extHelper.clickMenuButton("Query", "Comparison");
+        // Custom queries are filtered by analysis folder (Issue 18332)
+        assertTextPresent("No data to show");
+
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Analysis Folder"), false, "All Analysis Folders");
         assertTextNotPresent("No data to show");
         setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
         // UNDONE: sample '118902.fcs' differs by 2.46%
