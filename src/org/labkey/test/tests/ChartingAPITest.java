@@ -336,8 +336,8 @@ public class ChartingAPITest extends ClientAPITest
     }
 
     protected static final String ARROW_COLOR = "#FF33E5";
-    protected static final String CIRCLE_PATH = "M0-6.8c-3.7,0-6.8,3.1-6.8,6.8S-3.7,6.8,0,6.8S6.8,3.7,6.8,0S3.7-6.8,0-6.8z M0,4.9c-2.7,0-4.9-2.3-4.9-4.9S-2.7-4.9,0-4.9S4.9-2.8,4.9,0C4.9,2.7,2.7,4.9,0,4.9z";
-    protected static final String ARROW_PATH = "M5.5,1.1L5.5,1.1L0-6.2l-5.5,7.3l1.8,1.4l2.5-3.4v7.1h2.4v-7.1l2.5,3.4L5.5,1.1z";
+    protected static final String CIRCLE_PATH = "M0-2.6c-1.5,0-2.6,1.1-2.6,2.6S-1.4,2.6,0,2.6 c1.5,0,2.6-1.2,2.6-2.6C2.6-1.5,1.5-2.6,0-2.6z M0,1.9c-1.1,0-1.9-0.8-1.9-1.9S-1-1.9,0-1.9C1.1-1.9,1.9-1,1.9,0 C1.9,1.1,1.1,1.9,0,1.9z";
+    protected static final String ARROW_PATH = "M3,0.6 L3,0.6 L0,-3.4 L-3,0.6 L-2,1.3 L-0.6,-0.5 L-0.6,3.4 L0.6,3.4 L0.6,-0.5 L2,1.3z";
     protected static final String MOUSEOVER_FILL = "#01BFC2";
     protected static final String MOUSEOVER_STROKE = "#00EAFF";
     protected static final String BRUSH_FILL = "#14C9CC";
