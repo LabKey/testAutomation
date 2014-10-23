@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+//TODO: Use java.lang.function.Function once Java 8 migration is complete
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
@@ -3103,42 +3104,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
     }
 
-    static interface TextTransformer
-    {
-        String transform(String text);
-    }
-
-    private static final TextTransformer ENCODER = new TextTransformer() {
-        @Override
-        public String transform(String text)
-        {
-            return encodeText(text);
-        }
-    };
-
-    static interface TextHandler
-    {
-        boolean handle(String htmlSource, String text, int position);
-    }
-
-    // General-purpose method that transforms passed in strings and searches for each in the current HTML source. Callers pass
-    // in a TextTransformer to dictate the transformation and TextHandler to dictate the action to take on each text.
-    public void findTexts(String[] texts, TextTransformer transformer, TextHandler handler)
-    {
-        if (null == texts || 0 == texts.length)
-            return;
-
-        String source = getHtmlSource();
-
-        for (String text : texts)
-        {
-            String transformedText = transformer.transform(text);
-            if (!handler.handle(source, transformedText, source.indexOf(transformedText)))
-                return;
-        }
-    }
-
-    private static String encodeText(String unencodedText)
+    public static String encodeText(String unencodedText)
     {
         return unencodedText
                 .replace("&", "&amp;")
@@ -3150,36 +3116,40 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         final MutableBoolean present = new MutableBoolean(true);
 
-        findTexts(texts, ENCODER, new TextHandler()
+        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
         {
             @Override
-            public boolean handle(String htmlSource, String text, int position)
+            public boolean handle(String htmlSource, String text)
             {
                 // Not found... stop enumerating and return false
-                if (position == -1)
+                if (!htmlSource.contains(text))
                     present.setFalse();
 
                 return present.getValue();
             }
-        });
+        };
+        TextSearcher searcher = new TextSearcher(this);
+        searcher.searchForTexts(handler, texts);
 
         return present.getValue();
     }
 
-    public List<String> getMissingTexts(TextTransformer transformer, String... texts)
+    public List<String> getMissingTexts(TextSearcher searcher, String... texts)
     {
         final List<String> missingTexts = new ArrayList<>();
 
-        findTexts(texts, transformer, new TextHandler(){
+        TextSearcher.TextHandler handler = new TextSearcher.TextHandler(){
             @Override
-            public boolean handle(String htmlSource, String text, int position)
+            public boolean handle(String htmlSource, String text)
             {
-                if (-1 == position)
+                if (!htmlSource.contains(text))
                     missingTexts.add(text);
 
                 return true;
             }
-        });
+        };
+
+        searcher.searchForTexts(handler, texts);
 
         return missingTexts;
     }
@@ -3200,12 +3170,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void assertTextPresent(String... texts)
     {
-        assertTextPresent(ENCODER, texts);
+        assertTextPresent(new TextSearcher(this), texts);
     }
 
-    public void assertTextPresent(TextTransformer transformer, String... texts)
+    public void assertTextPresent(TextSearcher searcher, String... texts)
     {
-        List<String> missingTexts = getMissingTexts(transformer, texts);
+        List<String> missingTexts = getMissingTexts(searcher, texts);
 
         if (!missingTexts.isEmpty())
         {
@@ -3224,14 +3194,27 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void assertTextPresentCaseInsensitive(String... texts)
     {
-        assertTextPresent(new TextTransformer()
+        TextSearcher searcher = new TextSearcher(this);
+
+        searcher.setSearchTransformer(new Function<String, String> ()
         {
             @Override
-            public String transform(String text)
+            public String apply(String text)
             {
                 return encodeText(text).toLowerCase();
             }
-        }, texts);
+        });
+
+        searcher.setSourceTransformer(new Function<String, String> ()
+        {
+            @Override
+            public String apply(String text)
+            {
+                return text.toLowerCase();
+            }
+        });
+
+        assertTextPresent(searcher, texts);
     }
 
     /**
@@ -3241,16 +3224,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         final MutableBoolean found = new MutableBoolean(false);
 
-        findTexts(texts, ENCODER, new TextHandler(){
+        TextSearcher.TextHandler handler = new TextSearcher.TextHandler(){
             @Override
-            public boolean handle(String htmlSource, String text, int position)
+            public boolean handle(String htmlSource, String text)
             {
-                if (position > -1)
+                if (htmlSource.contains(text))
                     found.setTrue();
 
                 return !found.getValue();
             }
-        });
+        };
+        TextSearcher searcher = new TextSearcher(this);
+        searcher.searchForTexts(handler, texts);
 
         if (!found.getValue())
             fail("Did not find any of the following values on current page " + Arrays.toString(texts));
@@ -3348,23 +3333,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return count;
     }
 
-    // Number of characters on either side of found text to include in error message
-    private final static int RANGE = 20;
-
-    public void assertTextNotPresent(String... texts)
+    public void assertTextNotPresent(TextSearcher searcher, String... texts)
     {
-        findTexts(texts, new TextTransformer()
+        // Number of characters on either side of found text to include in error message
+        final int RANGE = 20;
+
+        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
         {
             @Override
-            public String transform(String text)
+            public boolean handle(String htmlSource, String text)
             {
-                return encodeText(text).replace("&nbsp;", " ");
-            }
-        }, new TextHandler()
-        {
-            @Override
-            public boolean handle(String htmlSource, String text, int position)
-            {
+                int position = htmlSource.indexOf(text);
+
                 if (position > -1)
                 {
                     int prefixStart = Math.max(0, position - RANGE);
@@ -3377,7 +3357,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                 return true;
             }
+        };
+
+        searcher.searchForTexts(handler, texts);
+    }
+
+    public void assertTextNotPresent(String... texts)
+    {
+        TextSearcher searcher = new TextSearcher(this);
+        searcher.setSearchTransformer(new Function<String, String> ()
+        {
+            @Override
+            public String apply(String text)
+            {
+                return encodeText(text).replace("&nbsp;", " ");
+            }
         });
+
+        assertTextNotPresent(searcher, texts);
     }
 
     public String getTextInTable(String dataRegion, int row, int column)
