@@ -98,8 +98,9 @@ public class FileBrowserHelper
             }
             else
             {
-                WebElement gridRow = Locators.gridRow().waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
-                Locator.XPathLocator folderTreeNode = Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString());
+                Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+                Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString()));
+                WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
 
                 _test.waitForElement(folderTreeNode);
                 _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
