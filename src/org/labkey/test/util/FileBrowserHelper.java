@@ -42,83 +42,75 @@ public class FileBrowserHelper
     public void expandFileBrowserRootNode()
     {
         expandFileBrowserTree();
-        _test.waitAndClick(Locator.css("div.treenav-panel div.x4-panel-body tr[data-recordindex = '0']"));
-        _test.waitForElement(Locator.css("div.treenav-panel div.x4-panel-body tr.x4-grid-row-selected[data-recordindex = '0']"), WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(Locators.treeRow(0));
+        _test.waitForElement(Locators.selectedTreeRow(0), WAIT_FOR_JAVASCRIPT);
     }
 
     public void expandFileBrowserTree()
     {
-        Locator collapsedTreePanel = Locator.css("div.treenav-panel.x4-collapsed");
-        if (_test.isElementPresent(collapsedTreePanel))
+        if (_test.isElementPresent(Locators.collapsedFolderTree))
         {
-            _test.click(Locator.tagWithAttribute("a", "data-qtip", "Show or hide the folder tree"));
-            _test.waitForElementToDisappear(collapsedTreePanel);
+            clickFileBrowserButton(BrowserAction.FOLDER_TREE);
+            _test.waitForElementToDisappear(Locators.folderTree);
         }
     }
 
     @LogMethod(quiet = true)
     public void selectFileBrowserItem(@LoggedParam String path)
     {
-        boolean startAtRoot = false;
-
-        String[] parts = {};
-        StringBuilder nodeId = new StringBuilder();
-        if (path.startsWith("/"))
-        {
-            startAtRoot = true;
-            path = path.substring(1);
-        }
-        if (!path.equals(""))
-        {
-            parts = path.split("/");
-            nodeId.append('/');
-        }
-        startAtRoot = startAtRoot || parts.length > 1;
-
         waitForFileGridReady();
+        openFolderTree();
 
-        if (startAtRoot)
-        {
-            openFolderTree();
-            expandFileBrowserRootNode();
-        }
+        String[] parts;
+        if (path.equals("/"))
+            parts = new String[]{""}; // select root node
+        else
+            parts = path.split("/");
+
+        StringBuilder nodeId = new StringBuilder();
+        String baseNodeId = Locators.treeRow(0).findElement(_test.getDriver()).getAttribute("data-recordid");
+        nodeId.append(baseNodeId);
 
         for (int i = 0; i < parts.length; i++)
         {
             waitForFileGridReady();
 
             nodeId.append(parts[i]);
-
-            nodeId.append('/');
+            if (!parts[i].equals(""))
+            {
+                nodeId.append('/');
+            }
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
-            {
-                // select last item: click on tree node name
-                clickFileBrowserFileCheckbox(parts[i]);
-            }
+                clickFileBrowserFileCheckbox(parts[i]);// select last item: click on tree node name
             else
-            {
-                Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
-                Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString()));
-                WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+                selectFolderTreeNode(nodeId.toString());
+        }
+    }
 
-                _test.waitForElement(folderTreeNode);
-                _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
-                // select/expand tree node
-                try{
-                    _test.scrollIntoView(folderTreeNode);
-                }
-                catch (StaleElementReferenceException ignore) {}
+    private void selectFolderTreeNode(String nodeId)
+    {
+        Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+        Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
+        WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
 
-                Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
-                if (!_test.isElementPresent(folderTreeNodeSelected))
-                {
-                    _test.clickAt(folderTreeNode, 1, 1, 0);
-                    _test.waitForElement(folderTreeNodeSelected);
-                    _test._ext4Helper.waitForMaskToDisappear();
-                    _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
-                }
-            }
+        _test.waitForElement(folderTreeNode);
+        _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
+        // select/expand tree node
+        try{
+            _test.scrollIntoView(folderTreeNode);
+        }
+        catch (StaleElementReferenceException ignore) {}
+
+        Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
+        if (!_test.isElementPresent(folderTreeNodeSelected))
+        {
+            boolean initialSelectionExists = _test.isElementPresent(fBrowser.withPredicate(Locator.tagWithClass("tr", "x4-grid-row-selected")));
+            _test.click(folderTreeNode);
+            _test.waitForElement(folderTreeNodeSelected);
+            _test._ext4Helper.waitForMaskToDisappear();
+            if (initialSelectionExists)
+                _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
         }
     }
 
@@ -501,10 +493,10 @@ public class FileBrowserHelper
 
     public void openFolderTree()
     {
-        Locator collapsedTreePanel = Locator.css("#treeNav-body.x4-collapsed");
+        Locator collapsedTreePanel = Locator.css("div.fbrowser .treenav-panel.x4-collapsed");
         if (_test.isElementPresent(collapsedTreePanel))
         {
-            WebElement rootNode = Locator.css("#treeNav-body tr[data-recordindex = '0']").findElement(_test.getDriver());
+            WebElement rootNode = Locator.css("div.fbrowser .treenav-panel tr[data-recordindex = '0']").findElement(_test.getDriver());
             clickFileBrowserButton(BrowserAction.FOLDER_TREE);
             _test.waitForElementToDisappear(collapsedTreePanel);
             _test.shortWait().until(ExpectedConditions.stalenessOf(rootNode));
@@ -513,6 +505,10 @@ public class FileBrowserHelper
 
     public static abstract class Locators
     {
+        static Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+        static Locator.XPathLocator folderTree = fBrowser.append(Locator.tagWithClass("div", "treenav-panel").withoutClass("x4-collapsed"));
+        static Locator.XPathLocator collapsedFolderTree = fBrowser.append(Locator.tagWithClass("div", "treenav-panel").withClass("x4-collapsed"));
+
         public static Locator.XPathLocator gridRowCheckbox(String fileName, boolean checkForSelected)
         {
             return Locator.xpath("//tr[contains(@class, '" + (checkForSelected ? "x4-grid-row-selected" : "x4-grid-row") + "') and ./td//span[text()='" + fileName + "']]//div[@class='x4-grid-row-checker']");
@@ -541,6 +537,16 @@ public class FileBrowserHelper
                     .withClass("x4-grid-data-row")
                     .withPredicate("starts-with(@id, 'treeview')")
                     .attributeEndsWith("data-recordid", nodeIdEndsWith);
+        }
+
+        public static Locator.XPathLocator treeRow(Integer recordIndex)
+        {
+            return Locators.folderTree.append(Locator.tagWithAttribute("tr", "data-recordindex", recordIndex.toString()));
+        }
+
+        public static Locator.XPathLocator selectedTreeRow(Integer recordIndex)
+        {
+            return Locators.folderTree.append(Locator.tagWithAttribute("tr", "data-recordindex", recordIndex.toString()).withClass("x4-grid-row-selected"));
         }
     }
 }
