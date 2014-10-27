@@ -352,6 +352,15 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             validateTrue("Message not sent to " + notify, recipients.contains(notify));
         }
 
+        assertTrue("Could not find link in message with Status: '" + status + "' and Description: '" + description + "'", clickLink(message));
+
+        // Make sure we made it to a status page.
+        _test.assertTextPresent("Job Status");
+        _test.assertTextPresent(status);
+    }
+
+    private boolean clickLink(EmailRecordTable.EmailMessage message)
+    {
         // The link in this message uses the IP address.  Avoid clicking it, and
         // possibly changing hostnames.
         for (String line : StringUtils.split(message.getBody(), "\n"))
@@ -359,13 +368,15 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             if (line.startsWith("http://"))
             {
                 _test.beginAt(line.substring(line.indexOf('/', 7)));
-                break;
+                return true;
+            }
+            if (line.startsWith("https://"))
+            {
+                _test.beginAt(line.substring(line.indexOf('/', 8)));
+                return true;
             }
         }
-
-        // Make sure we made it to a status page.
-        _test.assertTextPresent("Job Status");
-        _test.assertTextPresent(status);
+        return false;
     }
 
     public void validateEmailEscalation(int sampleIndex)
