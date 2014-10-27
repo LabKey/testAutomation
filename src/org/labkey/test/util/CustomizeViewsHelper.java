@@ -70,13 +70,13 @@ public class CustomizeViewsHelper
             _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(getDataRegion()));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(".customizeViewPanel")));
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(Locator.css(".customizeViewPanel"))));
     }
 
     public void closeCustomizeViewPanel()
     {
-        _test.click(_dataRegionLoc.toCssLocator().append(".x-panel-header > .x-tool-close"));
-        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegionLoc.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
+        _test.click(_dataRegionLoc.toCssLocator().append(Locator.css(".x-panel-header > .x-tool-close")));
+        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegionLoc.toCssLocator().append(Locator.css(".labkey-data-region-header-container .labkey-ribbon")).toBy()));
     }
 
     public void applyCustomView()

@@ -1011,12 +1011,12 @@ public abstract class Locator
 
         public CssLocator append(String clause)
         {
-            return new CssLocator(_loc + " " + clause);
+            return new CssLocator(_loc + clause);
         }
 
         public CssLocator append(CssLocator clause)
         {
-            return new CssLocator(_loc + " " + clause.getLocatorString());
+            return append(" " + clause.getLocatorString());
         }
 
         @Override

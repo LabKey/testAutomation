@@ -272,7 +272,7 @@ public class Ext4Helper extends AbstractHelper
     public Locator getGridRow(String columnVal, String markerCls)
     {
         String gridSelector = "." + markerCls;
-        return Locator.css(gridSelector).append("." + _cssPrefix + "grid-data-row").withText(columnVal);
+        return Locator.css(gridSelector).append(Locator.css("." + _cssPrefix + "grid-data-row")).withText(columnVal);
     }
 
     public void selectGridItem(String columnVal, String markerCls)
