@@ -16,17 +16,17 @@
 
 package org.labkey.test;
 
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.HttpStatus;
-import org.apache.http.HttpException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.auth.BasicScheme;
@@ -208,7 +208,7 @@ public class WebTestHelper
                 EntityUtils.consumeQuietly(response.getEntity());
         }
         if (responseCode != HttpStatus.SC_OK)
-            throw new Exception("Contacting server failed: " + responseStatusLine);
+            throw new Exception("Contacting server at URL " + encodedUrl + " failed: " + responseStatusLine);
     }
 
     private static String encodeURI(String parameter)

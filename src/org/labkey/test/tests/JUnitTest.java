@@ -227,7 +227,7 @@ public class JUnitTest extends TestSuite
                 else
                 {
                     log(getLogTestString("failed", startTime));
-                    fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody, true));
+                    fail("remote junit failed (HTTP status code " + status + "): " + _remoteClass + "\n" + dump(responseBody, true));
                 }
             }
             catch (IOException ioe)
