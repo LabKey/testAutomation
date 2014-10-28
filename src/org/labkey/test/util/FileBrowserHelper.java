@@ -274,6 +274,7 @@ public class FileBrowserHelper
             _test.log("Opening upload panel...");
             _test.click(BrowserAction.UPLOAD.button());
             _test.waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.fireEvent(BrowserAction.UPLOAD.button(), BaseWebDriverTest.SeleniumEvent.mouseout); // Dismiss qtip
         }
     }
 
