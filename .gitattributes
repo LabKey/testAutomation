@@ -290,7 +290,6 @@ src/org/labkey/test/categories/DailyA.java -text
 src/org/labkey/test/categories/DailyB.java -text
 src/org/labkey/test/categories/Data.java -text
 src/org/labkey/test/categories/Disabled.java -text
-src/org/labkey/test/categories/EHR.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
@@ -572,7 +571,6 @@ src/org/labkey/test/util/DatasetDomainEditor.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text
-src/org/labkey/test/util/EHRClientAPIHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text
