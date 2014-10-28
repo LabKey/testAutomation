@@ -500,6 +500,7 @@ public class FileBrowserHelper
             clickFileBrowserButton(BrowserAction.FOLDER_TREE);
             _test.waitForElementToDisappear(collapsedTreePanel);
             _test.shortWait().until(ExpectedConditions.stalenessOf(rootNode));
+            _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
         }
     }
 

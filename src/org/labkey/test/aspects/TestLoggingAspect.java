@@ -28,7 +28,7 @@ public class TestLoggingAspect
     private String testCaseName;
     private Long testCaseStartTimeStamp;
 
-    @Pointcut()
+    @Pointcut(value = "execution(@org.junit.Test * *(..))")
     void testCaseMethod(){}
 
     @Before(value = "testCaseMethod()", argNames = "joinPoint")
