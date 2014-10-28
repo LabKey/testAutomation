@@ -22,13 +22,14 @@ import org.labkey.test.util.TestLogger;
 
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 @Aspect
 public class TestLoggingAspect
 {
     private String testCaseName;
     private Long testCaseStartTimeStamp;
 
-    @Pointcut(value = "execution(@org.junit.Test * *(..))")
+    @Pointcut()
     void testCaseMethod(){}
 
     @Before(value = "testCaseMethod()", argNames = "joinPoint")

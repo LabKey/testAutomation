@@ -46,6 +46,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.internal.AssumptionViolatedException;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
@@ -1797,21 +1799,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @ClassRule
     public static Timeout globalTimeout = new Timeout(1800000); // 30 minutes
 
-    @Rule
-    public TestWatcher _watcher = new TestWatcher()
+    private TestWatcher _watcher = new TestWatcher()
     {
         @Override
-        public Statement apply(Statement base, Description description)
+        protected void starting(Description description)
         {
             // We know that @BeforeClass methods are done now that we are in a non-static context
             beforeClassSucceeded = true;
 
-            return super.apply(base, description);
-        }
-
-        @Override
-        protected void starting(Description description)
-        {
             setUp(); // Instantiate new WebDriver if needed
             _testFailed = false;
         }
@@ -1839,6 +1834,63 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             Ext4Helper.resetCssPrefix();
         }
     };
+
+    private TestWatcher _logger = new TestWatcher()
+    {
+        private long testCaseStartTimeStamp;
+
+        @Override
+        protected void skipped(AssumptionViolatedException e, Description description)
+        {
+            String testCaseName = description.getMethodName();
+
+            TestLogger.resetLogger();
+            TestLogger.log("<< Test Case Skipped - " + testCaseName + " >>");
+        }
+
+        @Override
+        protected void starting(Description description)
+        {
+            TestLogger.resetLogger();
+            testCaseStartTimeStamp = System.currentTimeMillis();
+            String testCaseName = description.getMethodName();
+
+            TestLogger.log("// Begin Test Case - " + testCaseName + " \\\\");
+            TestLogger.increaseIndent();
+        }
+
+        @Override
+        protected void succeeded(Description description)
+        {
+            Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
+            String testCaseName = description.getMethodName();
+
+            TestLogger.resetLogger();
+            TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+        }
+
+        @Override
+        protected void failed(Throwable e, Description description)
+        {
+            Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
+            String testCaseName = description.getMethodName();
+
+            TestLogger.resetLogger();
+            TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+        }
+
+        private String getElapsedString(Long elapsed)
+        {
+            return String.format("%dm %d.%ds",
+                    TimeUnit.MILLISECONDS.toMinutes(elapsed),
+                    TimeUnit.MILLISECONDS.toSeconds(elapsed) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
+                    elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
+        }
+    };
+
+    @Rule
+    public RuleChain _ruleChain = RuleChain.outerRule(_logger).around(_watcher);
 
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
@@ -3205,7 +3257,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         });
 
-        searcher.setSourceTransformer(new Function<String, String> ()
+        searcher.setSourceTransformer(new Function<String, String>()
         {
             @Override
             public String apply(String text)
@@ -3365,7 +3417,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer(new Function<String, String> ()
+        searcher.setSearchTransformer(new Function<String, String>()
         {
             @Override
             public String apply(String text)
