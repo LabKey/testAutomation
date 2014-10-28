@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
@@ -316,6 +317,18 @@ public class Ext4Helper extends AbstractHelper
         _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
     }
 
+    public void checkCheckbox(Locator.XPathLocator checkboxLocator)
+    {
+        if (!isChecked(checkboxLocator))
+            _test.click(checkboxLocator);
+    }
+
+    public void uncheckCheckbox(Locator.XPathLocator checkboxLocator)
+    {
+        if (isChecked(checkboxLocator))
+            _test.click(checkboxLocator);
+    }
+
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label)
     {
@@ -342,11 +355,13 @@ public class Ext4Helper extends AbstractHelper
         return isChecked(checkbox);
     }
 
-    public boolean isChecked(Locator.XPathLocator checkbox)
+    public boolean isChecked(Locator.XPathLocator checkboxLoc)
     {
-        _test.assertElementPresent(checkbox);
-        Locator l = checkbox.append("[./ancestor-or-self::*[contains(@class, 'checked')]]");
-        return _test.isElementPresent(l);
+        WebElement checkbox = checkboxLoc.findElement(_test.getDriver());
+        Assert.assertTrue("Not a checkbox: " + checkbox.toString(), checkbox.getCssValue("background-image").contains("checkbox"));
+        String atlasPosition = checkbox.getCssValue("background-position");
+        String atlasYOffset = atlasPosition.split(" ")[1];
+        return atlasYOffset.contains("-"); // Probably '-13px' or '-26px'
     }
 
     /**

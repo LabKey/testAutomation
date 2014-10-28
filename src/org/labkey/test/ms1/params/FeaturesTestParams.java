@@ -40,7 +40,7 @@ public class FeaturesTestParams extends AbstractInspectTestParams
             _test._fileBrowserHelper.waitForImportDataEnabled();
             for (String name : names)
             {
-                _test._fileBrowserHelper.clickFileBrowserFileCheckbox(name + ".mzXML");
+                _test._fileBrowserHelper.checkFileBrowserFileCheckbox(name + ".mzXML");
                 getTest().sleep(1000);
             }
         }

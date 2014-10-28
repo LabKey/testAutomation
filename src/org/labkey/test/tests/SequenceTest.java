@@ -40,9 +40,7 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,7 +48,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -710,7 +707,7 @@ public class SequenceTest extends BaseWebDriverTest
         _fileBrowserHelper.expandFileBrowserRootNode();
         for (String f : files)
         {
-            _fileBrowserHelper.clickFileBrowserFileCheckbox(f);
+            _fileBrowserHelper.checkFileBrowserFileCheckbox(f);
         }
 
         _fileBrowserHelper.selectImportDataAction(importAction);

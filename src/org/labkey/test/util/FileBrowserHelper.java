@@ -82,7 +82,7 @@ public class FileBrowserHelper
             }
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
-                clickFileBrowserFileCheckbox(parts[i]);// select last item: click on tree node name
+                checkFileBrowserFileCheckbox(parts[i]);// select last item: click on tree node name
             else
                 selectFolderTreeNode(nodeId.toString());
         }
@@ -114,25 +114,28 @@ public class FileBrowserHelper
         }
     }
 
-    public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
+    @LogMethod
+    public void checkFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
         waitForFileGridReady();
         scrollToGridRow(fileName);
-        Locator rowSelected = Locators.gridRowCheckbox(fileName, true);
-        Boolean wasChecked = _test.isElementPresent(rowSelected);
 
-        _test.click(Locators.gridRowCheckbox(fileName, wasChecked));
-
-        if (wasChecked)
-            _test.waitForElementToDisappear(rowSelected);
-        else
-            _test.waitForElement(rowSelected);
+        _test._ext4Helper.checkCheckbox(Locators.gridRowCheckbox(fileName));
     }
 
-    public void clickFileBrowserFileCheckboxWithPartialText(String partialFileName)
+    @LogMethod
+    public void uncheckFileBrowserFileCheckbox(@LoggedParam String fileName)
+    {
+        waitForFileGridReady();
+        scrollToGridRow(fileName);
+
+        _test._ext4Helper.uncheckCheckbox(Locators.gridRowCheckbox(fileName));
+    }
+
+    public void checkFileBrowserFileCheckboxWithPartialText(String partialFileName)
     {
         String firstMatch = _test.getText(Locator.tagWithAttribute("td", "role", "gridcell").append(Locator.tag("span").containing(partialFileName)));
-        clickFileBrowserFileCheckbox(firstMatch);
+        checkFileBrowserFileCheckbox(firstMatch);
     }
 
     //In case desired element is not present due to infinite scrolling
@@ -514,6 +517,11 @@ public class FileBrowserHelper
         public static Locator.XPathLocator gridRowCheckbox(String fileName, boolean checkForSelected)
         {
             return Locator.xpath("//tr[contains(@class, '" + (checkForSelected ? "x4-grid-row-selected" : "x4-grid-row") + "') and ./td//span[text()='" + fileName + "']]//div[@class='x4-grid-row-checker']");
+        }
+
+        public static Locator.XPathLocator gridRowCheckbox(String fileName)
+        {
+            return gridRowWithNodeId(fileName).append(Locator.tagWithClass("div", "x4-grid-row-checker"));
         }
 
         public static Locator.XPathLocator gridRow()

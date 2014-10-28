@@ -6404,7 +6404,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             _fileBrowserHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                _fileBrowserHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
+                _fileBrowserHelper.checkFileBrowserFileCheckbox(copiedArchive.getName());
             _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }

@@ -111,8 +111,8 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickButton("Process and Import Data");
 
         _fileBrowserHelper.waitForImportDataEnabled();
-        _fileBrowserHelper.clickFileBrowserFileCheckbox(MAGEML_FILE1);
-        _fileBrowserHelper.clickFileBrowserFileCheckbox(MAGEML_FILE2);
+        _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE1);
+        _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE2);
         _fileBrowserHelper.selectImportDataAction("Use " + ASSAY_NAME);
 
         setFormElement(Locator.name("batchStringField"), "SingleRunProperties");
@@ -144,8 +144,8 @@ public class MicroarrayTest extends BaseWebDriverTest
         // Start the upload wizard again
         clickButton("Import Data");
 
-        _fileBrowserHelper.clickFileBrowserFileCheckbox(MAGEML_FILE1);
-        _fileBrowserHelper.clickFileBrowserFileCheckbox(MAGEML_FILE2);
+        _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE1);
+        _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE2);
         _fileBrowserHelper.selectImportDataAction("Use " + ASSAY_NAME);
 
         setFormElement(Locator.name("batchStringField"), "BulkProperties");
