@@ -881,7 +881,7 @@ public abstract class Locator
 
         public By toBy()
         {
-            return By.id(_id);
+            return _id.contains(" ") ? super.toBy() : By.id(_id);
         }
 
         public String toString()
@@ -961,7 +961,7 @@ public abstract class Locator
             unionedLocators.append(locators[0]._loc);
             for (int i = 1; i < locators.length; i++)
             {
-                unionedLocators.append(",");
+                unionedLocators.append(", ");
                 unionedLocators.append(locators[i]._loc);
             }
 
