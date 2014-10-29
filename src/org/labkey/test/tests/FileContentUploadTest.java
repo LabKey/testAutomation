@@ -106,14 +106,13 @@ public class FileContentUploadTest extends BaseWebDriverTest
         setupCustomFileProperties();
         goToProjectHome();
 
-        String filename = "InlineFile.html";
-        String sampleRoot = TestFileUtils.getLabKeyRoot() + "/sampledata/security";
-        File f = new File(sampleRoot, filename);
+        File testFile = TestFileUtils.getSampleData("security/InlineFile.html");
+        String filename = testFile.getName();
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_2, true));
 
-        _fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties, false);
+        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, false);
         assertElementPresent(Locator.linkWithText(LOOKUP_VALUE_2));
         assertElementPresent(Locator.linkWithText(CUSTOM_PROPERTY_VALUE));
         assertAttributeEquals(Locator.linkWithText(CUSTOM_PROPERTY_VALUE), "href", "http://labkey.test/?a=" + CUSTOM_PROPERTY_VALUE + "&b=" + LOOKUP_VALUE_2);
@@ -123,7 +122,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_1, true));
-        _fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties, true);
+        _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, true);
 
         log("move file");
         String folderName = "Test folder";
