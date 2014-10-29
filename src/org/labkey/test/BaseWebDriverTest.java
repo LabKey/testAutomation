@@ -2178,7 +2178,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
-                throw new IllegalStateException("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
+                throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
 
