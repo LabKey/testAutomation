@@ -119,6 +119,7 @@ modules/restrictedModule/resources/views/RestrictedWebPart.webpart.xml -text
 modules/restrictedModule/resources/views/begin.html -text
 modules/restrictedModule/resources/views/webpart.html -text
 modules/scriptpad/module.properties -text
+modules/scriptpad/readme.txt -text
 modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
 modules/scriptpad/resources/reports/schemas/err.r -text
 modules/scriptpad/resources/reports/schemas/errOnly.r -text
@@ -129,13 +130,12 @@ modules/scriptpad/resources/reports/schemas/script3.r -text
 modules/scriptpad/resources/reports/schemas/script_r.r -text
 modules/scriptpad/resources/reports/schemas/script_rhtml.rhtml -text
 modules/scriptpad/resources/reports/schemas/script_rmd.rmd -text
+modules/scriptpad/resources/reports/schemas/script_rserve.r -text
+modules/scriptpad/resources/reports/schemas/script_rserve.report.xml -text
 modules/scriptpad/resources/views/scriptpad.html -text
 modules/scriptpad/resources/views/scriptpad.webpart.xml -text
 modules/scriptpad/resources/web/input_data.tsv -text
 modules/scriptpad/scriptpad.iml -text
-modules/scriptpad/src/org/labkey/scriptpad/scriptpadController.java -text
-modules/scriptpad/src/org/labkey/scriptpad/scriptpadModule.java -text
-modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/module.properties -text
 modules/simpletest/resources/config/module.xml -text
 modules/simpletest/resources/etls/SProcBadMissingTransformRunIdParm.xml -text

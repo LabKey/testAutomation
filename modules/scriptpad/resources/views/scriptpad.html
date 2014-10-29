@@ -298,7 +298,16 @@
                             webpartReportConfig.reportSessionId = sessionField.value;
                             webpartReport1.render();
 //                       webpartReport2.render();
-                        }},
+                    }},
+                    {
+                        text: 'Execute as Function',
+                        handler: function() {
+                            preparePage();
+                            scriptConfig.functionName = textField.value;
+                            scriptConfig.reportSessionId = sessionField.value;
+                            startTime = new Date();
+                            LABKEY.Report.executeFunction(scriptConfig);
+                    }},
                     {
                         text: 'Create Report Session',
                         handler: function() {

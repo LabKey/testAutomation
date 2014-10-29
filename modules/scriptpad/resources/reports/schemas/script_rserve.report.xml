@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor>
+    <description>Rserve Session Sharing</description>
+    <reportType>
+        <R>
+            <scriptEngine remote="true"/>
+            <functions>
+                <function name="helloWorld"/>
+            </functions>
+        </R>
+    </reportType>
+</ReportDescriptor>
