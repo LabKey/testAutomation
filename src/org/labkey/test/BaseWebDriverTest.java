@@ -1691,6 +1691,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
     private static Class testClass;
+    private static int testCount;
+    private static int currentTestNumber;
 
     @ClassRule
     public static TestWatcher testClassWatcher = new TestWatcher()
@@ -1700,7 +1702,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             testClass = description.getTestClass();
             _driver = null;
-
+            testCount = description.getChildren().size();
+            currentTestNumber = 0;
             beforeClassSucceeded = false;
             _anyTestCaseFailed = false;
 
@@ -1710,6 +1713,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override
         public void starting(Description description)
         {
+            TestLogger.resetLogger();
+            TestLogger.log("// BeforeClass \\\\");
+            TestLogger.increaseIndent();
+
             ArtifactCollector.init();
 
             try
@@ -1742,6 +1749,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 currentTest.doTearDown();
             }
+
+            TestLogger.resetLogger();
+            TestLogger.log("\\\\ AfterClass Complete //");
         }
     };
 
@@ -1844,6 +1854,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override
         protected void skipped(AssumptionViolatedException e, Description description)
         {
+            if (currentTestNumber == 0)
+            {
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ BeforeClass Complete //");
+            }
+
+            currentTestNumber++;
+
             String testCaseName = description.getMethodName();
 
             TestLogger.resetLogger();
@@ -1853,10 +1871,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override
         protected void starting(Description description)
         {
-            TestLogger.resetLogger();
+            if (currentTestNumber == 0)
+            {
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ BeforeClass Complete //");
+            }
+
+            currentTestNumber++;
             testCaseStartTimeStamp = System.currentTimeMillis();
             String testCaseName = description.getMethodName();
 
+            TestLogger.resetLogger();
             TestLogger.log("// Begin Test Case - " + testCaseName + " \\\\");
             TestLogger.increaseIndent();
         }
@@ -1879,6 +1904,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             TestLogger.resetLogger();
             TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+        }
+
+        @Override
+        protected void finished(Description description)
+        {
+            if (currentTestNumber == testCount)
+            {
+                TestLogger.resetLogger();
+                TestLogger.log("// AfterClass \\\\");
+                TestLogger.increaseIndent();
+            }
+
         }
 
         private String getElapsedString(Long elapsed)
