@@ -69,7 +69,6 @@ public class StudySimpleExportTest extends StudyBaseTest
     public void testSteps(){}
 
     @Override
-    @Override
     protected void doVerifySteps(){}
 
     @Override
