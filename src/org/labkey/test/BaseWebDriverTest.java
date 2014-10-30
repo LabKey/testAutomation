@@ -86,6 +86,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -1834,10 +1835,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         protected void failed(Throwable e, Description description)
         {
             Ext4Helper.resetCssPrefix();
-            if (getDriver() != null) // Test timeout might put WebDriver in a bad state
-            {
-                handleFailure(e, description.getMethodName());
-            }
+            handleFailure(e, description.getMethodName());
         }
 
         @Override
@@ -1939,6 +1937,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _testFailed = true;
         _anyTestCaseFailed = true;
+
+        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
+        {
+            _driver = null;
+            return;
+        }
 
         if (error instanceof TestTimeoutException)
         {
@@ -2118,41 +2122,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         finally
         {
             doTearDown();
-        }
-    }
-
-    @LogMethod
-    private static void killHungDriverOnTeamCity()
-    {
-        if (isTestRunningOnTeamCity() && _driver != null)
-        {
-            final WebDriver tempDriver = _driver;
-            _driver = null;
-
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            Callable killDriver = new Callable(){
-                @Override
-                public Void call()
-                {
-                    tempDriver.quit();
-                    return null;
-                }
-            };
-
-            Future future = executor.submit(killDriver);
-
-            try
-            {
-                future.get(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-            }
-            catch (java.util.concurrent.TimeoutException | InterruptedException | ExecutionException ignore)
-            {
-                TestLogger.log("Failed to kill WebDriver");
-            }
-            finally
-            {
-                executor.shutdownNow();
-            }
         }
     }
 
