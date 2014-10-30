@@ -358,10 +358,11 @@ public class Ext4Helper extends AbstractHelper
     public boolean isChecked(Locator.XPathLocator checkboxLoc)
     {
         WebElement checkbox = checkboxLoc.findElement(_test.getDriver());
-        Assert.assertTrue("Not a checkbox: " + checkbox.toString(), checkbox.getCssValue("background-image").contains("checkbox"));
+        String backgroundImage = checkbox.getCssValue("background-image");
+        Assert.assertTrue("Not a checkbox or radio button: " + checkbox.toString(), backgroundImage.contains("checkbox") || backgroundImage.contains("radio"));
         String atlasPosition = checkbox.getCssValue("background-position");
         String atlasYOffset = atlasPosition.split(" ")[1];
-        return atlasYOffset.contains("-"); // Probably '-13px' or '-26px'
+        return atlasYOffset.contains("-"); // Probably '-13px' or '-26px'. Unchecked states are all at offset zero
     }
 
     /**
