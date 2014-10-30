@@ -90,7 +90,7 @@ public class JUnitTest extends TestSuite
         }
         catch (Exception | AssertionError e)
         {
-            helper.handleFailure(new AtomicReference<>((Throwable)e), "fetchJUnitTestList");
+            helper.handleFailure(e, "fetchJUnitTestList");
             throw e;
         }
     }

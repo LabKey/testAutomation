@@ -73,7 +73,6 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -120,7 +119,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -317,7 +315,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             // In case the previous test failed so catastrophically that it couldn't clean up after itself
             doTearDown();
-            _driver = null;
         }
 
         switch (BROWSER_TYPE)
@@ -464,10 +461,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
             log("Browser: " + browserName + " " + browserVersion);
-
-            getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
         }
 
+        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
 
@@ -634,10 +630,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void doTearDown()
     {
-        boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
-        if ((!skipTearDown || isTestRunningOnTeamCity()) && getDriver() != null)
+        try
         {
-            getDriver().quit();
+            boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
+            if ((!skipTearDown || isTestRunningOnTeamCity()) && getDriver() != null)
+            {
+                getDriver().quit();
+            }
+        }
+        finally
+        {
             _driver = null;
         }
     }
@@ -1697,6 +1699,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public Statement apply(Statement base, Description description)
         {
             testClass = description.getTestClass();
+            _driver = null;
 
             beforeClassSucceeded = false;
             _anyTestCaseFailed = false;
@@ -1708,7 +1711,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public void starting(Description description)
         {
             ArtifactCollector.init();
-            killHungDriverOnTeamCity();
 
             try
             {
@@ -1726,15 +1728,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         protected void failed(Throwable e, Description description)
         {
             String pseudoTestName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
-            AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
 
             if (currentTest != null)
             {
-                currentTest.handleFailure(errorRef, pseudoTestName);
+                currentTest.handleFailure(e, pseudoTestName);
             }
-
-            if (!e.equals(errorRef.get()))
-                throw new RuntimeException(errorRef.get()); // Add to list of errors
         }
 
         @Override
@@ -1743,7 +1741,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (currentTest != null)
             {
                 currentTest.doTearDown();
-                currentTest = null;
             }
         }
     };
@@ -1797,7 +1794,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @ClassRule
-    public static Timeout globalTimeout = new Timeout(1800000); // 30 minutes
+    public static Timeout globalTimeout = new Timeout(2400000); // 40 minutes
+
+    @Rule
+    public Timeout testTimeout = new Timeout(1800000); // 30 minutes
 
     private TestWatcher _watcher = new TestWatcher()
     {
@@ -1806,6 +1806,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             // We know that @BeforeClass methods are done now that we are in a non-static context
             beforeClassSucceeded = true;
+
+            if (TestProperties.isNewWebDriverForEachTest())
+                doTearDown();
 
             setUp(); // Instantiate new WebDriver if needed
             _testFailed = false;
@@ -1817,14 +1820,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             checkJsErrors();
         }
 
-        @Override @LogMethod
+        @Override
         protected void failed(Throwable e, Description description)
         {
             Ext4Helper.resetCssPrefix();
             if (getDriver() != null) // Test timeout might put WebDriver in a bad state
             {
-                AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
-                handleFailure(errorRef, description.getMethodName());
+                handleFailure(e, description.getMethodName());
             }
         }
 
@@ -1894,20 +1896,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
-     * @param errorRef Reference to the cause of the test failure. Reference allows us to insert alert text into failure
-     * @param testName The method name or short description of the failed test case or setup/teardown method
      */
-    public void handleFailure(AtomicReference<Throwable> errorRef, String testName)
+    @LogMethod
+    public void handleFailure(Throwable error, @LoggedParam String testName)
     {
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
-        {
-            if (isAlertPresent())
-                errorRef.set(new RuntimeException("Unexpected Alert: " + getAlert(), errorRef.get()));
-        }
-        else if (errorRef.get() instanceof TestTimeoutException)
+        if (error instanceof TestTimeoutException)
         {
             _testTimeout = true;
         }
@@ -1915,28 +1911,30 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         try
         {
             populateLastPageInfo();
+
+            if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
+            {
+                try
+                {
+                    // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
+                    String lastPage = _lastPageURL.toString();
+                    URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
+                    log("Re-invoking last action with _debug parameter set: " + url.toString());
+                    url.getContent();
+                }
+                catch (IOException t)
+                {
+                    System.err.println("Unable to re-invoke last page");
+                    t.printStackTrace();
+                }
+            }
         }
-        catch (Throwable t)
+        catch (Exception e)
         {
-            System.out.println("Unable to determine information about the last page: server not started or -Dlabkey.port incorrect?");
+            System.err.println("Unable to determine information about the last page");
+            e.printStackTrace();
         }
 
-        if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
-        {
-            try
-            {
-                // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
-                String lastPage = _lastPageURL.toString();
-                URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
-                log("Re-invoking last action with _debug parameter set: " + url.toString());
-                url.getContent();
-            }
-            catch (Exception t)
-            {
-                System.out.println("Unable to re-invoke last page");
-                t.printStackTrace();
-            }
-        }
         try
         {
             getArtifactCollector().dumpPageSnapshot(testName, null);
@@ -1956,40 +1954,41 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (_testTimeout)
                 getArtifactCollector().dumpThreads(this);
         }
-        catch (Exception t)
+        catch (Exception e)
         {
-            System.out.println("Unable to dump failure information");
-            t.printStackTrace();
+            System.err.println("Unable to dump failure information");
+            e.printStackTrace();
+        }
+
+        try
+        {
+            // Get DB back in a good state after failed pipeline tools test.
+            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+            pipelineToolsHelper.resetPipelineToolsDirectory();
+        }
+        catch (Exception e)
+        {
+            // Assure that this failure is noticed
+            // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
+            log("**************************ERROR*******************************");
+            log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+            log("** Server may be in a bad state.                            **");
+            log("** Set tools directory manually or bootstrap to fix.        **");
+            log("**************************ERROR*******************************");
+        }
+
+        try
+        {
+            resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
+        }
+        catch (Exception e)
+        {
+            log("Failed to reset DB login config after test failure");
+            getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
         }
         finally
         {
-            try
-            {
-                resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
-            }
-            catch(Throwable t){
-                log("Failed to reset DB login config after test failure");
-                getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
-            }
-
-            try
-            {
-                // Get DB back in a good state after failed pipeline tools test.
-                PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-                pipelineToolsHelper.resetPipelineToolsDirectory();
-            }
-            catch(Throwable t){
-                // Assure that this failure is noticed
-                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
-                log("**************************ERROR*******************************");
-                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-                log("** Server may be in a bad state.                            **");
-                log("** Set tools directory manually or bootstrap to fix.        **");
-                log("**************************ERROR*******************************");
-            }
-
             doTearDown();
-            _driver = null;
         }
     }
 
@@ -3551,14 +3550,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
 
-        _testTimeout = true;
         return false;
     }
 
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         if (!doesElementAppear(checker, wait))
+        {
+            _testTimeout = true;
             fail(failMessage + " ["+wait+"ms]");
+        }
     }
 
     public void waitForAlert(String alertText, int wait)

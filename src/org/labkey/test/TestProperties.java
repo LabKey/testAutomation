@@ -63,6 +63,11 @@ public abstract class TestProperties
         return "false".equals(System.getProperty("queryCheck"));
     }
 
+    public static boolean isNewWebDriverForEachTest()
+    {
+        return !"true".equals(System.getProperty("selenium.reuseWebDriver"));
+    }
+
     public static boolean isViewCheckSkipped()
     {
         return "false".equals(System.getProperty("viewCheck"));

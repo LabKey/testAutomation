@@ -138,6 +138,9 @@
         <echo message="Disable javascript error checking (firefox only):"/>
         <echo message="    -DscriptCheck=false"/>
         <echo message=""/>
+        <echo message="Create a new WebDriver instance for each test:"/>
+        <echo message="    -Dselenium.reuseWebDriver=false"/>
+        <echo message=""/>
         <echo message="Disable query validation checking:"/>
         <echo message="    -DqueryCheck=false"/>
         <echo message=""/>
@@ -541,6 +544,7 @@
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
+            <sysproperty key="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
@@ -827,6 +831,11 @@
             <isset property="queryCheck"/>
         </condition>
 
+        <!-- Set property selenium.reuseWebDriver: true or false -->
+        <condition property="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}" else="true">
+            <isset property="selenium.reuseWebDriver"/>
+        </condition>
+
         <!-- Set property sysprop.viewCheck: true or false -->
         <condition property="sysprop.viewCheck" value="${viewCheck}" else="false">
             <isset property="viewCheck"/>
@@ -984,6 +993,7 @@
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
         <echo message="    database: ${sysprop.databaseType} ${sysprop.databaseVersion}" />
         <echo message="    shuffleTests: ${sysprop.shuffleTests}" />
+        <echo message="    reuseWebDriver: ${selenium.reuseWebDriver}" />
         <echo message="    recently failed tests first (TeamCity only): ${sysprop.testRecentlyFailed}" />
         <echo message="    test modified modules first (TeamCity only): ${sysprop.testNewAndModified}" />
     </target>
@@ -1041,6 +1051,7 @@
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
+            <sysproperty key="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
