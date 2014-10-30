@@ -69,6 +69,7 @@ public class StudySimpleExportTest extends StudyBaseTest
     public void testSteps(){}
 
     @Override
+    @Override
     protected void doVerifySteps(){}
 
     @Override
@@ -231,6 +232,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Formats"));
         setFormElement(Locator.name("defaultDateFormat"), "MMM dd, yyyy");
         setFormElement(Locator.name("defaultNumberFormat"), "#.000");
+        checkCheckbox(Locator.name("restrictedColumnsEnabled"));
         clickButton("Save");
 
         log("Default Formats: export study folder to the pipeline as indivisual files");
@@ -248,6 +250,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Formats"));
         assertFormElementEquals(Locator.name("defaultDateFormat"), "MMM dd, yyyy");
         assertFormElementEquals(Locator.name("defaultNumberFormat"), "#.000");
+        assertChecked(Locator.name("restrictedColumnsEnabled"));
 
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
