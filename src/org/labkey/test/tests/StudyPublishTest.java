@@ -543,7 +543,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void verifySpecimenRefresh()
     {
         // trigger the system maintenance task to refresh study snapshot specimen data
-        startSystemMaintenance("Refresh study snapshot specimen data");
+        startSystemMaintenance("RefreshSpecimens");
         waitForSystemMaintenanceCompletion();
 
         // verify specimen refresh for PUB1 study
