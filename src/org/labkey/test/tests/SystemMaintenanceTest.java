@@ -16,10 +16,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.InDevelopment;
 
+@Category({InDevelopment.class})
 public class SystemMaintenanceTest extends BaseWebDriverTest
 {
     @Override
@@ -43,7 +46,6 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)

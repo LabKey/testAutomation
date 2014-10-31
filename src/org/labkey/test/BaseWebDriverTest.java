@@ -1540,24 +1540,25 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Save");
     }
 
-    private long smStart = 0;
+    private static long smStart = 0;
 
     public void startSystemMaintenance()
     {
-        startSystemMaintenance("Run all tasks");
+        startSystemMaintenance("");
     }
 
-    public void startSystemMaintenance(String task)
+    public void startSystemMaintenance(String taskName)
     {
-        goToAdminConsole();
-        WebElement link = Locator.linkWithText("system maintenance").findElement(getDriver());
-        Actions builder = new Actions(getDriver());
-        builder.keyDown(Keys.SHIFT).click(link).keyUp(Keys.SHIFT).build().perform(); // Make sure system maintenance opens in a new window (rather than tab)
-        switchToNewestWindow();
-        waitAndClick(Locator.linkWithText(task));
-        getDriver().close();
+        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemmaintenance", Maps.of("temp", "true", "taskName", taskName));
+        try
+        {
+            assertEquals(HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(maintenanceTriggerUrl));
+        }
+        catch (IOException fail)
+        {
+            throw new RuntimeException(fail);
+        }
         smStart = System.currentTimeMillis();
-        switchToMainWindow();
     }
 
     public void waitForSystemMaintenanceCompletion()
@@ -1565,28 +1566,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
         long elapsed = System.currentTimeMillis() - smStart;
 
-        // Ensure that at least 5 seconds has passed since system maintenance was started
-        if (elapsed < 5000)
-        {
-            log("Sleeping for " + (5000 - elapsed) + " ms");
-            sleep(5000 - elapsed);
-        }
-
-        Object[] windows = getDriver().getWindowHandles().toArray();
-        getDriver().switchTo().window((String) windows[1]);
-        log("Waiting for system maintenance to complete");
+        beginAt(WebTestHelper.buildURL("admin", "systemmaintenance"));
 
         int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
         // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
-        waitFor(new Checker() {
+        waitFor(new Checker()
+        {
             public boolean check()
             {
                 return isTextPresent("System maintenance complete");
             }
         }, "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
-
-        getDriver().close();
-        getDriver().switchTo().window((String) windows[0]);
     }
 
     public void populateLastPageInfo()
@@ -1938,7 +1928,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
+        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || error instanceof TimeoutException || _driver == null)
         {
             _driver = null;
             return;

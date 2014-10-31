@@ -34,7 +34,7 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void afterJUnit()
     {
         log("** This should follow JUnitTest.");
         log("** It will check for any errors or memory leaks caused by server-side tests");
@@ -43,6 +43,8 @@ public class JUnitFooter extends BaseWebDriverTest
         pipelineToolsHelper.resetPipelineToolsDirectory();
 
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
+
+        waitForSystemMaintenanceCompletion();
     }
 
     @Override public BrowserType bestBrowser()

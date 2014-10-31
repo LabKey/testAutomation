@@ -35,7 +35,7 @@ public class JUnitHeader extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps() throws Exception
+    public void beforeJUnit() throws Exception
     {
         log("** This should precede JUnitTest.");
         log("** It will enable the dumbster and clean up any errors caused by the previous test");
@@ -47,6 +47,8 @@ public class JUnitHeader extends BaseWebDriverTest
         pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
 
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
+
+        startSystemMaintenance();
 
         logToServer("=== Starting Server-side JUnit Tests ===");
     }

@@ -47,7 +47,7 @@ public class SearchHelper extends AbstractHelper
         {
             _test.log("Waiting for indexer");
             // Invoke a special server action that waits until all previous indexer tasks are complete
-            int response = WebTestHelper.getHttpGetResponse(_test.getBaseURL() + "/search/waitForIndexer.view");
+            int response = WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("search", "waitForIndexer"));
             assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
         }
         catch (Exception e)

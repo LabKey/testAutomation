@@ -37,6 +37,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
@@ -45,6 +46,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -168,6 +171,51 @@ public class WebTestHelper
             }
             return _contextPath;
         }
+    }
+
+    public static String buildURL(String controller, String action)
+    {
+        return buildURL(controller, null, action, Collections.EMPTY_MAP);
+    }
+
+    public static String buildURL(String controller, String action, @Nullable Map<String, String> params)
+    {
+        return buildURL(controller, null, action, params);
+    }
+
+    public static String buildURL(String controller, @Nullable String containerPath, String action)
+    {
+        return buildURL(controller, containerPath, action, Collections.EMPTY_MAP);
+    }
+
+    public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    {
+        StringBuilder url = new StringBuilder(getBaseURL());
+
+        url.append("/");
+        url.append(controller);
+
+        if (containerPath != null)
+        {
+            url.append("/");
+            url.append(containerPath);
+        }
+
+        url.append("/");
+        url.append(action);
+        url.append(".view");
+
+        boolean firstParam = true;
+        for (Map.Entry param : params.entrySet())
+        {
+            url.append(firstParam ? "?" : "&");
+            url.append(param.getKey());
+            url.append("=");
+            url.append(param.getValue());
+            firstParam = false;
+        }
+
+        return url.toString();
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
