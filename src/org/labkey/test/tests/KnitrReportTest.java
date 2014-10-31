@@ -304,7 +304,7 @@ public class KnitrReportTest extends ReportTest
 
         for (Locator contains : reportContains)
         {
-            assertElementPresent(contains);
+            waitForElement(contains);
         }
 
         for (String text : reportNotContains)
