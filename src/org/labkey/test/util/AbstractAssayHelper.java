@@ -167,10 +167,10 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
     public File exportAssayDesign()
     {
-        return _test.applyAndWaitForDownload(new Function()
+        return _test.applyAndWaitForDownload(new Function<Void, Void>()
         {
             @Override
-            public Object apply(Object o)
+            public Void apply(Void o)
             {
                 _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "export assay design");
                 return null;

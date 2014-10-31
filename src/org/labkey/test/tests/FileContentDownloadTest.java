@@ -154,10 +154,10 @@ public class FileContentDownloadTest extends BaseWebDriverTest
 
         _fileBrowserHelper.uploadFile(file1);
 
-        Function func = new Function()
+        Function<Void, Void> func = new Function<Void, Void>()
         {
             @Override
-            public Object apply(Object o)
+            public Void apply(Void o)
             {
                 doubleClick(FileBrowserHelper.Locators.gridRow(file1.getName()));
                 return null;

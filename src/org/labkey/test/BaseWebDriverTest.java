@@ -465,6 +465,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
 
@@ -790,16 +791,32 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void refresh(int millis)
     {
-        prepForPageLoad();
-        getDriver().navigate().refresh();
-        waitForPageToLoad(millis);
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                getDriver().navigate().refresh();
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, millis);
     }
 
     public void goBack(int millis)
     {
-        prepForPageLoad();
-        getDriver().navigate().back();
-        waitForPageToLoad(millis);
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                getDriver().navigate().back();
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, millis);
     }
 
     public void goBack()
@@ -2614,11 +2631,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             pauseJsErrorChecker();
 
-            long startTime = System.currentTimeMillis();
-            prepForPageLoad();
-            getDriver().navigate().to(getBaseURL() + relativeURL);
-            waitForPageToLoad(millis);
-            long elapsedTime = System.currentTimeMillis() - startTime;
+            final String fullURL = getBaseURL() + relativeURL;
+
+            Function<Void, Void> func = new Function<Void, Void>()
+            {
+                @Override
+                public Void apply(Void o)
+                {
+                    getDriver().navigate().to(fullURL);
+                    return null;
+                }
+            };
+            long elapsedTime = applyAndWaitForPageToLoad(func, millis);
             logMessage += " [" + elapsedTime + " ms]";
 
             resumeJsErrorChecker();
@@ -2631,17 +2655,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public long goToURL(URL url, int milliseconds)
+    public long goToURL(final URL url, int milliseconds)
     {
         String logMessage = "Navigating to " + url.toString();
         try
         {
             pauseJsErrorChecker();
-            long startTime = System.currentTimeMillis();
-            prepForPageLoad();
-            getDriver().navigate().to(url);
-            waitForPageToLoad(milliseconds);
-            long elapsedTime = System.currentTimeMillis() - startTime;
+            Function<Void, Void> func = new Function<Void, Void>()
+            {
+                @Override
+                public Void apply(Void o)
+                {
+                    getDriver().navigate().to(url);
+                    return null;
+                }
+            };
+
+            long elapsedTime = applyAndWaitForPageToLoad(func, milliseconds);
             logMessage += " [" + elapsedTime + " ms]";
 
             resumeJsErrorChecker();
@@ -3482,12 +3512,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     private Boolean _preppedForPageLoad = false;
+
+    /**
+     * @deprecated Use {@link #applyAndWaitForPageToLoad(com.google.common.base.Function)}
+     * To be made private
+     */
+    @Deprecated
     public void prepForPageLoad()
     {
         executeScript("window.preppedForPageLoadMarker = true;");
         _preppedForPageLoad = true;
     }
 
+    /**
+     * @deprecated Use {@link #applyAndWaitForPageToLoad(com.google.common.base.Function, int)}
+     * To be made private
+     */
+    @Deprecated
     public void waitForPageToLoad(int millis)
     {
         if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger the expected page load.");
@@ -3509,26 +3550,50 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForExtOnReady()
     {
-        try
-        {
-            ((JavascriptExecutor) getDriver()).executeAsyncScript(
-                    "var callback = arguments[arguments.length - 1];" +
-                            "if(window['Ext4'])" +
-                            "   Ext4.onReady(callback);" +
-                            "else if(window['Ext'])" +
-                            "   Ext.onReady(callback);" +
-                            "else" +
-                            "   callback();");
-        }
-        catch (TimeoutException to)
-        {
-            throw new TestTimeoutException("Page failed to load", to);
-        }
+        ((JavascriptExecutor) getDriver()).executeAsyncScript(
+                "var callback = arguments[arguments.length - 1];" +
+                        "if(window['Ext4'])" +
+                        "   Ext4.onReady(callback);" +
+                        "else if(window['Ext'])" +
+                        "   Ext.onReady(callback);" +
+                        "else" +
+                        "   callback();");
     }
 
+    /**
+     * @deprecated Use {@link #applyAndWaitForPageToLoad(com.google.common.base.Function)}
+     * To be made private
+     */
+    @Deprecated
     public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
+    }
+
+    public long applyAndWaitForPageToLoad(Function<Void, Void> func)
+    {
+        return applyAndWaitForPageToLoad(func, defaultWaitForPage);
+    }
+
+    public long applyAndWaitForPageToLoad(Function<Void, Void> func, final int msWait)
+    {
+        long startTime = System.currentTimeMillis();
+
+        if (msWait > 0)
+        {
+            getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
+            prepForPageLoad();
+        }
+
+        func.apply(null);
+
+        if (msWait > 0)
+        {
+            waitForPageToLoad(msWait);
+            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+        }
+
+        return System.currentTimeMillis() - startTime;
     }
 
     public void waitForExtReady()
@@ -3626,10 +3691,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public File[] clickAndWaitForDownload(final Locator elementToClick, final int expectedFileCount)
     {
-        Function clicker = new Function()
+        Function<Void, Void> clicker = new Function<Void, Void>()
         {
             @Override
-            public Object apply(Object o)
+            public Void apply(Void o)
             {
                 click(elementToClick);
                 return null;
@@ -3639,12 +3704,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return applyAndWaitForDownload(clicker, expectedFileCount);
     }
 
-    public File applyAndWaitForDownload(Function func)
+    public File applyAndWaitForDownload(Function<Void, Void> func)
     {
         return applyAndWaitForDownload(func, 1)[0];
     }
 
-    public File[] applyAndWaitForDownload(Function func, final int expectedFileCount)
+    public File[] applyAndWaitForDownload(Function<Void, Void> func, final int expectedFileCount)
     {
         final File downloadDir = getDownloadDir();
         File[] existingFilesArray = downloadDir.listFiles();
@@ -3940,11 +4005,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     /**
      * @deprecated Use {@link #clickButton(String)}
      */
-    @Deprecated public void submit(WebElement form)
+    @Deprecated public void submit(final WebElement form)
     {
-        prepForPageLoad();
-        executeScript("arguments[0].submit()", form);
-        waitForPageToLoad();
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                executeScript("arguments[0].submit()", form);
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func);
     }
 
     public Locator findButton(String name)
@@ -4146,19 +4219,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickAt(el, xCoord, yCoord, pageTimeout);
     }
 
-    public void clickAt(WebElement el, int xCoord, int yCoord, int pageTimeout)
+    public void clickAt(final WebElement el, final int xCoord, final int yCoord, int pageTimeout)
     {
-        if (pageTimeout > 0)
-            prepForPageLoad();
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                Actions builder = new Actions(getDriver());
+                builder.moveToElement(el, xCoord, yCoord)
+                        .click()
+                        .build()
+                        .perform();
+                return null;
+            }
+        };
 
-        Actions builder = new Actions(getDriver());
-        builder.moveToElement(el, xCoord, yCoord)
-                .click()
-                .build()
-                .perform();
-
-        if (pageTimeout > 0)
-            waitForPageToLoad(pageTimeout);
+        applyAndWaitForPageToLoad(func, pageTimeout);
     }
 
     public void clickAndWait(Locator l)
@@ -4191,44 +4268,50 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void clickAndWait(WebElement el, int pageTimeoutMs)
+    public void clickAndWait(final WebElement el, int pageTimeoutMs)
     {
-        if (pageTimeoutMs > 0)
-            prepForPageLoad();
-        try
+        Function<Void, Void> func = new Function<Void, Void>()
         {
-            try
-            {
-                el.click();
-            }
-            catch (ElementNotVisibleException tryAgain)
-            {
-                scrollIntoView(el);
-                shortWait().until(ExpectedConditions.elementToBeClickable(el));
-                el.click();
-            }
-
-        }
-        catch (WebDriverException tryAgain)
-        {
-            if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+            @Override
+            public Void apply(Void o)
             {
                 try
                 {
-                    Thread.sleep(2500);
-                }
-                catch (InterruptedException ignored) {}
-                el.click();
-            }
-            else
-            {
-                throw tryAgain;
-            }
-        }
+                    try
+                    {
+                        el.click();
+                    }
+                    catch (ElementNotVisibleException tryAgain)
+                    {
+                        scrollIntoView(el);
+                        shortWait().until(ExpectedConditions.elementToBeClickable(el));
+                        el.click();
+                    }
 
-        if (pageTimeoutMs > 0)
-            waitForPageToLoad(pageTimeoutMs);
-        else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
+                }
+                catch (WebDriverException tryAgain)
+                {
+                    if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+                    {
+                        try
+                        {
+                            Thread.sleep(2500);
+                        }
+                        catch (InterruptedException ignored) {}
+                        el.click();
+                    }
+                    else
+                    {
+                        throw tryAgain;
+                    }
+                }
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, pageTimeoutMs);
+
+        if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
@@ -4239,15 +4322,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         doubleClickAndWait(l, 0);
     }
 
-    public void doubleClickAndWait(Locator l, int millis)
+    public void doubleClickAndWait(final Locator l, int millis)
     {
-        if (millis > 0)
-            prepForPageLoad();
-        Actions action = new Actions(getDriver());
-        action.doubleClick(l.findElement(getDriver())).perform();
-        if (millis > 0)
-            waitForPageToLoad(millis);
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                Actions action = new Actions(getDriver());
+                action.doubleClick(l.findElement(getDriver())).perform();
+                return null;
+            }
+        };
 
+        applyAndWaitForPageToLoad(func, millis);
     }
 
     public void selectFolderTreeItem(String folderName)
@@ -5010,25 +5098,41 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clearSort(String regionName, String columnName, int wait)
     {
         log("Clearing sort in " + regionName + " for " + columnName);
-        Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
+        final Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
         waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-        prepForPageLoad();
-        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Clear Sort");
-        waitForPageToLoad(wait);
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                _ext4Helper.clickExt4MenuButton(true, menuLoc, false, "Clear Sort");
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, wait);
     }
 
     /**
      * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setSort(String, SortDirection)}
      */
     @Deprecated
-    public void setSort(String regionName, String columnName, SortDirection direction, int wait)
+    public void setSort(String regionName, String columnName, final SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
-        Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
+        final Locator menuLoc = DataRegionTable.Locators.columnHeader(regionName, columnName);
         waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-        prepForPageLoad();
-        _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
-        waitForPageToLoad(wait);
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, wait);
     }
 
     /**
@@ -5193,14 +5297,21 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearFilter(String, int)}
      */
     @Deprecated
-    public void clearFilter(String regionName, String columnName, int waitForPageLoad)
+    public void clearFilter(final String regionName, final String columnName, int waitForPageLoad)
     {
         log("Clearing filter in " + regionName + " for " + columnName);
-        if(waitForPageLoad > 0)
-            prepForPageLoad();
-        _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.columnHeader(regionName, columnName), false, "Clear Filter");
-        if(waitForPageLoad > 0)
-            waitForPageToLoad(waitForPageLoad);
+
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.columnHeader(regionName, columnName), false, "Clear Filter");
+                return null;
+            }
+        };
+
+        applyAndWaitForPageToLoad(func, waitForPageLoad);
     }
 
     /**
