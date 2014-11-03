@@ -54,7 +54,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     {
         goToAdmin();
         clickAndWait(Locator.linkWithText("Check Database"));
-        clickAndWait(Locator.linkWithText("Do Database Check"));
+        clickAndWait(Locator.linkWithText("Do Database Check"), 120000);
         waitForText("Database Consistency checker complete", 60000);
         assertTextNotPresent("ERROR");
     }
