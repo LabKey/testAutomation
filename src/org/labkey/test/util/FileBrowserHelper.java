@@ -67,8 +67,17 @@ public class FileBrowserHelper
         else
             parts = path.split("/");
 
+        String baseNodeId;
+        try
+        {
+            baseNodeId = Locators.treeRow(0).findElement(_test.getDriver()).getAttribute("data-recordid");
+        }
+        catch (StaleElementReferenceException retry)
+        {
+            baseNodeId = Locators.treeRow(0).findElement(_test.getDriver()).getAttribute("data-recordid");
+        }
+
         StringBuilder nodeId = new StringBuilder();
-        String baseNodeId = Locators.treeRow(0).findElement(_test.getDriver()).getAttribute("data-recordid");
         nodeId.append(baseNodeId);
 
         for (int i = 0; i < parts.length; i++)
