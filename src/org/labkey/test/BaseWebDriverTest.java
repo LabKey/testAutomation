@@ -1945,7 +1945,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || error instanceof TimeoutException || _driver == null)
+        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
         {
             _driver = null;
             return;
