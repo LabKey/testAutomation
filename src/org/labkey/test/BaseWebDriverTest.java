@@ -5105,7 +5105,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public Void apply(Void o)
             {
-                _ext4Helper.clickExt4MenuButton(true, menuLoc, false, "Clear Sort");
+                _ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Clear Sort");
                 return null;
             }
         };
