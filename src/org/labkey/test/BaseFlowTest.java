@@ -295,7 +295,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
-        clickButton("Import Selected Runs");
+        clickButton("Import Selected Runs", defaultWaitForPage * 2);
         waitForPipeline(getContainerPath());
     }
 
