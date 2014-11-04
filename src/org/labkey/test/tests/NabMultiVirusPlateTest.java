@@ -59,24 +59,24 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
     protected final List<String> VIRUS_NAMES = Arrays.asList("Virus 1", "Virus 2");
 
     protected final List<String> WELLGROUP_NAMES = Arrays.asList(
-        "Specimen 1:Virus 2",
-        "Specimen 1:Virus 1",
-        "Specimen 2:Virus 2",
-        "Specimen 2:Virus 1",
-        "Specimen 3:Virus 2",
-        "Specimen 3:Virus 1",
-        "Specimen 4:Virus 2",
-        "Specimen 4:Virus 1",
-        "Specimen 5:Virus 2",
-        "Specimen 5:Virus 1",
-        "Specimen 6:Virus 2",
-        "Specimen 6:Virus 1",
-        "Specimen 7:Virus 2",
-        "Specimen 7:Virus 1",
-        "Specimen 8:Virus 2",
-        "Specimen 8:Virus 1",
-        "Specimen 9:Virus 2",
-        "Specimen 9:Virus 1",
+        "Specimen 01:Virus 2",
+        "Specimen 01:Virus 1",
+        "Specimen 02:Virus 2",
+        "Specimen 02:Virus 1",
+        "Specimen 03:Virus 2",
+        "Specimen 03:Virus 1",
+        "Specimen 04:Virus 2",
+        "Specimen 04:Virus 1",
+        "Specimen 05:Virus 2",
+        "Specimen 05:Virus 1",
+        "Specimen 06:Virus 2",
+        "Specimen 06:Virus 1",
+        "Specimen 07:Virus 2",
+        "Specimen 07:Virus 1",
+        "Specimen 08:Virus 2",
+        "Specimen 08:Virus 1",
+        "Specimen 09:Virus 2",
+        "Specimen 09:Virus 1",
         "Specimen 10:Virus 2",
         "Specimen 10:Virus 1");
 
@@ -252,12 +252,12 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         setFormElement(Locator.name("cutoff1"), "50");
         setFormElement(Locator.name("cutoff2"), "70");
         selectOptionByText(Locator.name("curveFitMethod"), curveFitMethod);
-        setFormElement(Locator.name("specimen1_InitialDilution"), "5");
-        setFormElement(Locator.name("specimen1_Factor"), "42");
-        selectOptionByText(Locator.name("specimen1_Method"), "Dilution");
-        checkCheckbox(Locator.name("specimen1_InitialDilutionCheckBox"));
-        checkCheckbox(Locator.name("specimen1_FactorCheckBox"));
-        checkCheckbox(Locator.name("specimen1_MethodCheckBox"));
+        setFormElement(Locator.name("specimen01_InitialDilution"), "5");
+        setFormElement(Locator.name("specimen01_Factor"), "42");
+        selectOptionByText(Locator.name("specimen01_Method"), "Dilution");
+        checkCheckbox(Locator.name("specimen01_InitialDilutionCheckBox"));
+        checkCheckbox(Locator.name("specimen01_FactorCheckBox"));
+        checkCheckbox(Locator.name("specimen01_MethodCheckBox"));
 
         setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), dataFile);
 
