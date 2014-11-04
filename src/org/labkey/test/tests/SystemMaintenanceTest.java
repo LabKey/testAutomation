@@ -51,6 +51,8 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
         startSystemMaintenance();
 
+        goToAdmin();
+        clickAndWait(Locator.linkWithText("Site Settings"));
         checkCheckbox(Locator.radioButtonByNameAndValue("usageReportingLevel", "MEDIUM"));
         checkCheckbox(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "HIGH"));
         clickButton("Save");
@@ -62,6 +64,11 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("running threads"));
         assertTextNotPresent("SystemMaintenance");
+    }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

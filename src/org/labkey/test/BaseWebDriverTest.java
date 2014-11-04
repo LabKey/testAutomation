@@ -1566,15 +1566,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void startSystemMaintenance(String taskName)
     {
-        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemmaintenance", Maps.of("temp", "true", "taskName", taskName));
-        try
-        {
-            assertEquals(HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(maintenanceTriggerUrl));
-        }
-        catch (IOException fail)
-        {
-            throw new RuntimeException(fail);
-        }
+        Map<String, String> urlParams = Maps.of("temp", "true");
+        if (!taskName.isEmpty())
+            urlParams.put("taskName", taskName);
+        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
+
+        beginAt(maintenanceTriggerUrl);
         smStart = System.currentTimeMillis();
     }
 

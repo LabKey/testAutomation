@@ -27,6 +27,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.auth.BasicScheme;
@@ -34,7 +35,6 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
@@ -293,7 +293,7 @@ public class WebTestHelper
         }
 
         HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
-        AuthScope authScope = new AuthScope(targetHost.getHostName(), target.getPort(), AuthScope.ANY_REALM);
+        AuthScope authScope = new AuthScope(targetHost.getHostName(), target.getPort());
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
 
         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -317,7 +317,7 @@ public class WebTestHelper
         return clientBuilder;
     }
 
-    public static HttpContext getBasicHttpContext()
+    public static HttpClientContext getBasicHttpContext()
     {
         try
         {
@@ -331,8 +331,8 @@ public class WebTestHelper
             authCache.put(targetHost, basicAuth);
 
             // Add AuthCache to the execution context
-            BasicHttpContext localcontext = new BasicHttpContext();
-            localcontext.setAttribute(HttpClientContext.AUTH_CACHE, authCache);
+            HttpClientContext localcontext = HttpClientContext.create();
+            localcontext.setAuthCache(authCache);
 
             return localcontext;
         }
@@ -373,9 +373,34 @@ public class WebTestHelper
 
         try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
         {
-            HttpGet method = new HttpGet(url);
+            HttpGet get = new HttpGet(url);
 
-            response = client.execute(method);
+            response = client.execute(get, getBasicHttpContext());
+            status = response.getStatusLine().getStatusCode();
+        }
+        finally
+        {
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
+        }
+        return status;
+    }
+
+    public static int getHttpPostResponse(String url) throws IOException
+    {
+        return getHttpPostResponse(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static int getHttpPostResponse(String url, String username, String password) throws IOException
+    {
+        HttpResponse response = null;
+        int status;
+
+        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
+        {
+            HttpPost post = new HttpPost(url);
+            HttpClientContext context = getBasicHttpContext();
+            response = client.execute(post, context);
             status = response.getStatusLine().getStatusCode();
         }
         finally
@@ -400,7 +425,32 @@ public class WebTestHelper
         {
             HttpGet method = new HttpGet(url);
 
-            response = client.execute(method);
+            response = client.execute(method, getBasicHttpContext());
+            responseBody = getHttpResponseBody(response);
+        }
+        finally
+        {
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
+        }
+        return responseBody;
+    }
+
+    public static String getHttpPostResponseBody(String url) throws HttpException, IOException
+    {
+        return getHttpPostResponseBody(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static String getHttpPostResponseBody(String url, String username, String password) throws HttpException, IOException
+    {
+        HttpResponse response = null;
+        String responseBody;
+
+        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
+        {
+            HttpPost post = new HttpPost(url);
+
+            response = client.execute(post, getBasicHttpContext());
             responseBody = getHttpResponseBody(response);
         }
         finally
