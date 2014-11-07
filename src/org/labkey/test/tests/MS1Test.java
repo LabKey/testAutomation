@@ -139,6 +139,7 @@ public class MS1Test extends BaseWebDriverTest
         startSystemMaintenance();
         waitForSystemMaintenanceCompletion();
         log("System maintenance task complete.");
+        goToProjectHome();
     }
 
     protected void importXtandemExps(String project, String xProtocol)

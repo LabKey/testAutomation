@@ -275,7 +275,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextNotPresent("Expires:");
         impersonate(USER1);
         clickProject(PROJECT_NAME);
-        assertTextNotPresent(MSG2_TITLE);
+        // We now show closed messages by default
+        assertTextPresent(MSG2_TITLE);
         stopImpersonating();
 
         testMemberLists();
@@ -296,7 +297,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Messages"));
         assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
         clickProject(PROJECT_NAME);
-        assertTextNotPresent(MSG2_TITLE);
+        // We now show closed messages by default
+        assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
 
         log("Check delete message works fully");
