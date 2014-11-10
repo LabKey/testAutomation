@@ -73,6 +73,11 @@
                             scatterData02.push(point);
                         }
 
+                        var pieChartData = [];
+                        for (var i = 0; i < 10; i++) {
+                            pieChartData.push({label: 'group ' + i, value: parseInt(Math.random()*(100))});
+                        }
+
 
                         //Div for charts to render to.
                         Ext4.DomHelper.insertAfter('testDiv', {tag: 'div', id:'chartArea'});
@@ -85,13 +90,17 @@
                                 this.plot = null;
                             }
 
-                            if (config.asBarPlot)
+                            if (config.asBarPlot) {
                                 plot = new LABKEY.vis.BarPlot(config);
-                            else
+                                plot.render();
+                            }
+                            else if (config.asPieChart) {
+                                plot = new LABKEY.vis.PieChart(config);
+                            }
+                            else {
                                 plot = new LABKEY.vis.Plot(config);
-
-                            plot.render();
-
+                                plot.render();
+                            }
                         };
 
                         var configs = [
@@ -428,6 +437,22 @@
                                 },
                                 xAes: function(row){return row['consumedCoffee']},
                                 data: coffeeData
+                            }, {
+                                renderTo: 'chartArea',
+                                asPieChart: true,
+                                data: pieChartData,
+                                width: 600,
+                                height: 300,
+                                header: {
+                                    title: {
+                                        text: 'Base Pie Chart'
+                                    }
+                                },
+                                effects: {
+                                    load: {
+                                        effect: 'none'
+                                    }
+                                }
                             }
                         ];
 

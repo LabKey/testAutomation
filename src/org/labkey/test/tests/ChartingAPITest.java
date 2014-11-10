@@ -61,7 +61,8 @@ public class ChartingAPITest extends ClientAPITest
             "Boxplot no Geom Config",
             "Boxplot No Outliers",
             "Boxplot No Outliers, All Points",
-            "Barplot With Cumulative Totals"
+            "Barplot With Cumulative Totals",
+            "Base Pie Chart"
     };
 
     @Override
