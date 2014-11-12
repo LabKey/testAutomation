@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class DataIntegrationHelper
 {
@@ -207,5 +208,13 @@ public class DataIntegrationHelper
 
         for (String logString : logStrings)
             assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
+    }
+
+    public void assertNotInEtlLogFile(String jobId, String... logStrings) throws Exception
+    {
+        final String etlLogFile = getEtlLogFile(jobId);
+
+        for (String logString : logStrings)
+            assertFalse("Log file contained : " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
     }
 }
