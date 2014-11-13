@@ -29,7 +29,7 @@ import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.etl.ETLTest;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
@@ -37,7 +37,7 @@ import java.util.Date;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class})
+@Category({DailyB.class, Data.class})
 public class RemoteETLCommandTest extends ETLTest
 {
     private static final String TRANSFORM_NOTFOUND = "{simpletest}/notfound";
