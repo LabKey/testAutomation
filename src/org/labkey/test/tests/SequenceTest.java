@@ -149,7 +149,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.waitForDataRegion("query");
 
         //verify CSV file creation
-        _extHelper.clickMenuButton(true, "Views", "default");
+        _extHelper.clickMenuButton(true, "Views", "All");
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
