@@ -148,6 +148,7 @@ modules/simpletest/resources/etls/SProcModifiedSinceWithSource.xml -text
 modules/simpletest/resources/etls/SProcNormalOperation.xml -text
 modules/simpletest/resources/etls/SProcOverridePersistedParameter.xml -text
 modules/simpletest/resources/etls/SProcPersistedParameter.xml -text
+modules/simpletest/resources/etls/SProcResultSet.xml -text
 modules/simpletest/resources/etls/SProcRunFilter.xml -text
 modules/simpletest/resources/etls/SimpleETLCausesKeyConstraintViolation.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
