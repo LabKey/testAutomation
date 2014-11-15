@@ -20,7 +20,6 @@ package org.labkey.test;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -34,8 +33,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -2457,14 +2459,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 throw new IllegalStateException("No session cookie available to reuse.");
             }
 
-            try
-            {
-                result.getHttpClient().getState().addCookie(new org.apache.commons.httpclient.Cookie(cookie.getDomain(), cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure()));
-            }
-            catch (URIException e)
-            {
-                throw new RuntimeException(e);
-            }
+            HttpClientContext httpClientContext = HttpClientContext.create();
+            if (null == httpClientContext.getCookieStore())
+                httpClientContext.setCookieStore(new BasicCookieStore());
+            BasicClientCookie basicClientCookie = new BasicClientCookie(cookie.getName(), cookie.getValue());
+            basicClientCookie.setDomain(cookie.getDomain());
+            basicClientCookie.setPath(cookie.getPath());
+            basicClientCookie.setExpiryDate(cookie.getExpiry());
+            basicClientCookie.setSecure(cookie.isSecure());
+            httpClientContext.getCookieStore().addCookie(basicClientCookie);
+            result.setHttpClientContext(httpClientContext);
         }
 
         return result;

@@ -793,7 +793,7 @@ public class Runner extends TestSuite
             System.err.print(BaseTestRunner.getFilteredTrace(e.getTargetException()));
             throw e.getTargetException();
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             System.err.print(BaseTestRunner.getFilteredTrace(e));
             throw e;

@@ -125,7 +125,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
         {
             JSONObject json;
             json = (JSONObject) JSONValue.parse(new BufferedReader(new InputStreamReader(new GZIPInputStream(response.getInputStream()))));
-            return createResponse(null, response.statusCode, response.contentType, json);
+            return createResponse(null, response.getStatusCode(), response.getContentType(), json);
         }
     }
 }

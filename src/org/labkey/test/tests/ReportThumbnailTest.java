@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.httpclient.util.URIUtil;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,6 +28,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -310,7 +311,17 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         waitForElement(loc);
         String uri = loc.findElement(getDriver()).getAttribute("src");
-        String query = URIUtil.getQuery(uri);
+
+        String query;
+        try
+        {
+            query = new URL(uri).getQuery();
+        }
+        catch (MalformedURLException e)
+        {
+            throw new RuntimeException(e);
+        }
+
         //if (query.contains("&"))
         //{
         for (String param : query.split("&"))
