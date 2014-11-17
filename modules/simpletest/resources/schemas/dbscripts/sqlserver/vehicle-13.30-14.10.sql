@@ -267,3 +267,5 @@ IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
 RETURN 0
 
 END
+
+GO
