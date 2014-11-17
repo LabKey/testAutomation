@@ -1086,8 +1086,7 @@
         <antcall target="build-qc-validator-if-dirty" />
     </target>
 
-    <!--<target name="build-qc-validator-if-dirty" unless="qc.build.uptodate">-->
-    <target name="build-qc-validator-if-dirty">
+    <target name="build-qc-validator-if-dirty" unless="qc.build.uptodate">
         <delete dir="${project.root}/sampledata/qc/classes"/>
         <mkdir dir="${project.root}/sampledata/qc/classes"/>
         <javac srcdir="${project.root}/sampledata/qc/src"
