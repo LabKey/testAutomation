@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Write to File test</name>
+<description>Write rows from etl_source to a file</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="vehicle" queryName="etl_source" />
+        <destination type="file" filePath="etlOut" fileName="report-#-?.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+    </transform>
+</transforms>
+<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+    <schedule>
+        <poll interval="31s" />
+    </schedule>
+</etl>

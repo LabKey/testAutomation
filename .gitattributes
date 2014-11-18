@@ -162,6 +162,7 @@ modules/simpletest/resources/etls/badTableName.xml -text
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/truncate.xml -text
 modules/simpletest/resources/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
