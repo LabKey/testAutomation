@@ -2450,7 +2450,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public Connection createDefaultConnection(boolean reuseSession)
     {
-        Connection result = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         if (reuseSession)
         {
             Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
@@ -2459,19 +2459,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 throw new IllegalStateException("No session cookie available to reuse.");
             }
 
-            HttpClientContext httpClientContext = HttpClientContext.create();
-            if (null == httpClientContext.getCookieStore())
-                httpClientContext.setCookieStore(new BasicCookieStore());
-            BasicClientCookie basicClientCookie = new BasicClientCookie(cookie.getName(), cookie.getValue());
-            basicClientCookie.setDomain(cookie.getDomain());
-            basicClientCookie.setPath(cookie.getPath());
-            basicClientCookie.setExpiryDate(cookie.getExpiry());
-            basicClientCookie.setSecure(cookie.isSecure());
-            httpClientContext.getCookieStore().addCookie(basicClientCookie);
-            result.setHttpClientContext(httpClientContext);
+            connection.addCookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure());
         }
 
-        return result;
+        return connection;
     }
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName)
