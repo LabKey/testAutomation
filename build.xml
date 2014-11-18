@@ -183,6 +183,7 @@
             <include name="collections-generic-4.01.jar" />
             <include name="junit-4.11.jar"/>
             <include name="tika-app-1.5.jar"/>
+            <include name="log4j-1.2.16.jar"/>
             <include name="xbean.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
