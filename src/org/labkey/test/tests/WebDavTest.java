@@ -19,12 +19,15 @@ package org.labkey.test.tests;
 import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SimpleHttpRequest;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +50,7 @@ public class WebDavTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps() throws Exception
+    public void testWebDav() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
 
@@ -108,6 +111,15 @@ public class WebDavTest extends BaseWebDriverTest
         }
     }
 
+    /**
+     * Regression Test -- 21936: return SC_BAD_REQUEST instead of IllegalArgumentException for bad request
+     */
+    @Test
+    public void testBadUrlResponse()
+    {
+        SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + "/_webdav?uf=%uf");
+        assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, request.getResponse().getResponseCode());
+    }
 
     private List<String> _listNames(Sardine s, String path) throws IOException
     {
