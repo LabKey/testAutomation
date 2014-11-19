@@ -613,6 +613,8 @@ src/org/labkey/test/util/ScatterPlotReportHelper.java -text
 src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/SecurityHelper.java -text
+src/org/labkey/test/util/SimpleHttpRequest.java -text
+src/org/labkey/test/util/SimpleHttpResponse.java -text
 src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyImporter.java -text

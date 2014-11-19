@@ -1574,8 +1574,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             urlParams.put("taskName", taskName);
         String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
 
-        beginAt(maintenanceTriggerUrl);
         smStart = System.currentTimeMillis();
+        SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
+        request.setRequestMethod("POST");
+        request.copySession(getDriver());
+        assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, request.getResponse().getResponseCode());
     }
 
     public void waitForSystemMaintenanceCompletion()
