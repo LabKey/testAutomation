@@ -155,7 +155,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement(Locator.name("studyName"), STUDY_NAME);
         clickButton("Next", 0);
         clickButton("Next", 0);
-        checkCheckbox(Locator.radioButtonByNameAndValue("autoRefresh", "false"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("refreshType", "Manual"));
         clickButton("Finish");
 
         waitForPipelineJobsToFinish(3);

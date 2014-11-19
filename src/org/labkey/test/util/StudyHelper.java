@@ -268,7 +268,7 @@ public class StudyHelper extends AbstractHelper
             _test.assertTextPresent(hiddenDatasetNames);
             _test.click(Locator.css(".studyWizardHiddenDatasetList .x-grid3-hd-checker  div"));
         }
-        _test.click(Locator.xpath("//input[@name='autoRefresh' and @value='false']"));
+        _test.click(Locator.xpath("//input[@name='refreshType' and @value='Manual']"));
         _test.clickButton("Next", 0);
 
         // Wizard page 4 : Visits
