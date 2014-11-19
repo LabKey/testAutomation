@@ -152,17 +152,12 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         beginAt(getBaseURL()+"/filecontent/" + EscapeUtil.encode(getProjectName()) + "/sendShortDigest.view");
         goToModule("Dumbster");
+        addUrlParameter("reverse=true"); // List emails chronologically, in case of multiple notifications
         click(Locator.linkWithText("File Management Notification"));
         // All notifications might not appear in one digest
         if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
-        {
             click(Locator.linkWithText("File Management Notification").index(1));
-            assertTextPresentInThisOrder("File deleted", "File uploaded", "annotations updated"); // Deletion notification in most recent notification; Upload and update in the older notification
-        }
-        else // All notifications in one email
-        {
-            assertTextPresentInThisOrder("File uploaded", "annotations updated", "File deleted");
-        }
+        assertTextPresentInThisOrder("File uploaded", "annotations updated", "File deleted");
 
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
     }
