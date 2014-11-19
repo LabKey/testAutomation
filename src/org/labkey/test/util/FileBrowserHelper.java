@@ -120,6 +120,7 @@ public class FileBrowserHelper
             _test._ext4Helper.waitForMaskToDisappear();
             if (initialSelectionExists)
                 _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
+            fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
         }
     }
 
