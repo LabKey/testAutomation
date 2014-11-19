@@ -24,6 +24,7 @@
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.LinkedHashSet" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
+<%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -40,6 +41,7 @@
     MailPage pageInfo = me.getModelBean();
     Container c = getContainer();
     SmtpMessage[] messages = pageInfo.getMessages();
+    if ("true".equals(request.getParameter("reverse"))) ArrayUtils.reverse(messages);
     boolean recorder = pageInfo.isEnableRecorder();
 
     %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
