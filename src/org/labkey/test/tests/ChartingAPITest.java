@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -49,7 +50,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({BVT.class, Charting.class})
-public class ChartingAPITest extends ClientAPITest
+public class ChartingAPITest extends BaseWebDriverTest
 {
     protected static final String[] CHARTING_API_TITLES = {
             "Line Plot - no y-scale defined",
@@ -99,7 +100,6 @@ public class ChartingAPITest extends ClientAPITest
     public void initProject()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, null);
         createPeopleList();
     }
 
@@ -107,14 +107,23 @@ public class ChartingAPITest extends ClientAPITest
     public void preTest()
     {
         clickProject(getProjectName());
-        clickFolder(FOLDER_NAME);
     }
 
     private String goToChartingTestPage(String linkText)
     {
         goToModule("chartingapi");
         clickAndWait(Locator.linkWithText(linkText));
-        return waitForDivPopulation();
+        return waitForWikiDivPopulation("testDiv", 30);
+    }
+
+    private void createPeopleList()
+    {
+        String data = ClientAPITest.getListData(ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS, ClientAPITest.TEST_DATA);
+
+        _listHelper.createList(getProjectName(), ClientAPITest.LIST_NAME, ClientAPITest.LIST_KEY_TYPE, ClientAPITest.LIST_KEY_NAME, ClientAPITest.LIST_COLUMNS);
+        _listHelper.clickImportData();
+        setFormElement(Locator.name("text"), data);
+        _listHelper.submitImportTsv_success();
     }
 
     @Test
@@ -613,12 +622,5 @@ public class ChartingAPITest extends ClientAPITest
         {
             assertSVG(svgText, svgIndex);
         }
-    }
-
-    @Override @Test @Ignore
-    public final void testSteps()
-    {
-        //Block Base @Test method
-        fail("Test executing incorrectly");
     }
 }

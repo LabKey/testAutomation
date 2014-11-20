@@ -15,8 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -25,6 +29,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
@@ -45,16 +50,16 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
     protected static final String FOLDER_NAME = "api folder";
     private static final String SUBFOLDER_NAME = "subfolder";
-    protected final static String LIST_NAME = "People";
+    public final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
     private final static String TEST_XLS_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
-    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
-    protected final static String LIST_KEY_NAME = "Key";
+    public final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
+    public final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
-    protected final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
+    public final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
     {
         new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
         new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
@@ -66,7 +71,7 @@ public class ClientAPITest extends BaseWebDriverTest
         LIST_COLUMNS[1].setRequired(true);
     }
 
-    protected final static String[][] TEST_DATA =
+    public final static String[][] TEST_DATA =
     {
         { "1", "Bill", "Billson", "34" },
         { "2", "Jane", "Janeson", "42" },
@@ -146,59 +151,53 @@ public class ClientAPITest extends BaseWebDriverTest
         deleteProject(OTHER_PROJECT, afterTest);
     }
 
-    @Test
-    public void testSteps()
+    @BeforeClass
+    public static void setupProject()
     {
-        _containerHelper.createProject(OTHER_PROJECT, null);
-        _containerHelper.createProject(PROJECT_NAME, null);
+        ClientAPITest init = (ClientAPITest)getCurrentTest();
+        init._containerHelper.createProject(OTHER_PROJECT, null);
+        init._containerHelper.createProject(PROJECT_NAME, null);
 
-        enableEmailRecorder();
+        init.enableEmailRecorder();
 
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
 
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 
-        clickFolder(FOLDER_NAME);
+        init.clickFolder(FOLDER_NAME);
 
-        createWiki();
+        init.createWiki();
 
-        createLists();
-
-        gridTest();
-
-        webpartTest();
-
-        clearTestPage("WebPart Test Complete.");
-
-        assayTest();
-
-        queryTest();
-
-        queryRegressionTest();
-
-        domainTest();
-
-        emailApiTest();
-
-        extIntegrationTest();
-
-        webdavAPITest();
-
-        //clear the test page so the crawler doesn't refetch a test and cause errors
-        clearTestPage("Test Complete.");
+        init.createLists();
     }
 
-    @LogMethod
-    private void clearTestPage(String message)
+    private static boolean dirtyList = false;
+
+    @Before
+    public void preTest()
     {
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
+
+        if (dirtyList)
+        {
+            refreshPeopleList();
+            clickFolder(FOLDER_NAME);
+        }
+    }
+
+    @After
+    public void clearWIki()
+    {
+        //clear the test page so the crawler doesn't refetch a test and cause errors
         if (!isTextPresent(WIKIPAGE_NAME))
             clickFolder(FOLDER_NAME);
         portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
-        _wikiHelper.setWikiBody("<p>" + message + "</p>");
+        _wikiHelper.setWikiBody("<p>" + "Test Complete." + "</p>");
         _wikiHelper.saveWikiPage();
     }
 
-    protected String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
+    public static String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
     {
         StringBuilder data = new StringBuilder();
         data.append(listKeyName).append("\t");
@@ -227,7 +226,7 @@ public class ClientAPITest extends BaseWebDriverTest
         createCrossFolderLists();
     }
 
-    protected void createPeopleList()
+    private void createPeopleList()
     {
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
@@ -237,7 +236,33 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.submitImportTsv_success();
     }
 
-    protected void createLargePeopleList()
+    private void refreshPeopleList()
+    {
+        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
+
+        goToModule("List");
+        clickAndWait(Locator.linkWithText(LIST_NAME));
+        final DataRegionTable list = new DataRegionTable("query", this);
+        list.checkAll();
+
+        Function<Void, Void> func = new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void o)
+            {
+                list.clickHeaderButtonByText("Delete");
+                assertAlertContains("Are you sure you want to delete the selected rows?");
+                return null;
+            }
+        };
+        applyAndWaitForPageToLoad(func);
+
+        _listHelper.clickImportData();
+        setFormElement(Locator.name("text"), data);
+        _listHelper.submitImportTsv_success();
+    }
+
+    private void createLargePeopleList()
     {
         // Create Larger list for query test.
         File listFile = new File(TEST_XLS_DATA_FILE);
@@ -245,7 +270,7 @@ public class ClientAPITest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("Norbert"));
     }
 
-    protected void createCrossFolderLists()
+    private void createCrossFolderLists()
     {
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
@@ -270,7 +295,8 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void createWiki()
     {
-        addWebPart("Wiki");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Wiki");
         _wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
@@ -278,8 +304,8 @@ public class ClientAPITest extends BaseWebDriverTest
         _wikiHelper.saveWikiPage();
     }
 
-    @LogMethod
-    private void webpartTest()
+    @Test
+    public void webpartTest()
     {
         setSourceFromFile("webPartTest.js");
 
@@ -289,8 +315,8 @@ public class ClientAPITest extends BaseWebDriverTest
             assertTextPresent(column.getLabel());
     }
 
-    @LogMethod
-    private void gridTest()
+    @Test
+    public void gridTest()
     {
         clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
@@ -406,10 +432,11 @@ public class ClientAPITest extends BaseWebDriverTest
             fail("Insert or update via the Ext grid did not complete!");
     }
 
-    @LogMethod
-    private void assayTest()
+    @Test
+    public void assayTest()
     {
-        addWebPart("Assay List");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Assay List");
 
         //copied from old test
         clickButton("Manage Assays");
@@ -443,10 +470,10 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTextPresent("VisitID - Double");
     }
 
-    @LogMethod
-    private void domainTest()
+    @Test
+    public void domainTest()
     {
-        addWebPart("Study Overview");
+        goToModule("Study");
 
         clickButton("Create Study");
         // next page
@@ -475,16 +502,10 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(Locator.id(TEST_DIV_NAME), "Successfully updated the description");
     }
 
-    protected File getApiFileRoot()
-    {
-        return new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/");
-    }
-
     /**
      * Given a file name sets the page contents to a *wrapped* version of file in server/test/data/api
      * Wrapped version puts everything inside a function and inserts a div id="testDiv" for output to be placed in
      * @param fileName file will be found in server/test/data/api
-     * @return
      */
     protected String setSourceFromFile(String fileName)
     {
@@ -512,36 +533,17 @@ public class ClientAPITest extends BaseWebDriverTest
         if (!excludeTags)
             fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
-        log(fullSource);
+//        log(fullSource);
         _wikiHelper.setWikiBody(fullSource);
         _wikiHelper.saveWikiPage();
         return waitForDivPopulation();
     }
 
-    protected String createAPITestWiki(String wikiName, File testSource, Boolean wrapSource)
+    @Test
+    public void queryTest()
     {
-        if (!isElementPresent(Locator.folderTab("Wiki")))
-            goToModule("Wiki");
+        dirtyList = true;
 
-        portalHelper.clickWebpartMenuItem("Pages", "New");
-
-        String fullSource;
-        String srcFragment = TestFileUtils.getFileContents(testSource);
-
-        if (wrapSource)
-            fullSource = getFullSource(srcFragment);
-        else
-            fullSource = srcFragment;
-
-        setFormElement(Locator.name("name"), wikiName);
-        _wikiHelper.setWikiBody(fullSource);
-        _wikiHelper.saveWikiPage();
-        return waitForDivPopulation();
-    }
-
-    @LogMethod
-    private void queryTest()
-    {
         setSourceFromFile("queryTest.js");
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "SUCCESS: Select 1 returned 7 rows");
@@ -559,11 +561,10 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(loc, "SUCCESS: Created Custom View: 'QueryTestView' for list");
         assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct result set");
         assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct custom view filtered result set");
-        clearTestPage("Query portion of test page complete");
     }
 
-    @LogMethod
-    private void queryRegressionTest()
+    @Test
+    public void queryRegressionTest()
     {
         setSourceFromFile("queryRegressionTest.js");
         Locator loc = Locator.id(TEST_DIV_NAME);
@@ -572,7 +573,6 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(loc, "SUCCESS: executeSql 2 returned 10 rows");
         assertElementContains(loc, "SUCCESS: executeSql 2 returned with requested v9.1");
         assertElementContains(loc, "SUCCESS: selectRows 3 returned 96 rows with mixed sort parameters");
-        clearTestPage("Query Regression portion of test complete");
     }
 
     private static final String EMAIL_SUBJECT = "Testing the email API";
@@ -582,8 +582,8 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String EMAIL_BODY_PLAIN = "This is a test message.";
     private static final String EMAIL_BODY_HTML = "<h2>This is a test message.<\\\\/h2>";
     private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
-    @LogMethod
-    private void emailApiTest()
+    @Test
+    public void emailApiTest()
     {
         // create the users for this test
         for (String user : EMAIL_RECIPIENTS)
@@ -625,9 +625,11 @@ public class ClientAPITest extends BaseWebDriverTest
 
         goToModule("Dumbster");
 
-        assertTextPresent(EMAIL_SUBJECT_1);
-        assertTextPresent(EMAIL_SUBJECT_2);
-        assertTextPresent(EMAIL_SUBJECT_3);
+        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT));
+        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_1));
+        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_2));
+        assertElementPresent(Locator.linkWithText(EMAIL_SUBJECT_3));
+        assertEquals("Number of notification emails", 5, getElementCount(Locator.linkWithText("View headers")));
     }
 
     private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
@@ -669,24 +671,22 @@ public class ClientAPITest extends BaseWebDriverTest
                 contentStr.toString(), String.valueOf(allowUnregisteredUser));
     }
 
-    @LogMethod
-    private void extIntegrationTest()
+    @Test
+    public void extIntegrationTest()
     {
         setSourceFromFile("extIntegrationTest.html", true);
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Month of the Year");
-        clearTestPage("Ext integration Test complete.");
     }
 
-    @LogMethod
-    private void webdavAPITest()
+    @Test
+    public void webdavAPITest()
     {
         setSourceFromFile("webdavTest.html", true);
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
         waitForText("Test Complete");
         assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
-        clearTestPage("WebDav Client API Test complete.");
     }
 
     @Override
