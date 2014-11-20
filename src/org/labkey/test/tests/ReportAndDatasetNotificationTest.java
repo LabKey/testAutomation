@@ -63,6 +63,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         clickAndWait(Locator.linkContainingText("Manage Notifications"));
+        _ext4Helper.selectRadioButton("By category. Your daily digest will list changes and additions to reports and datasets in the selected categories.");
         _ext4Helper.checkGridRowCheckboxAlt("Uncategorized", 0, false);
         _ext4Helper.checkGridRowCheckboxAlt("Cons", 0, false);
         _ext4Helper.checkGridRowCheckboxAlt("Reports", 0, false);
