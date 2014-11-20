@@ -99,7 +99,7 @@ public class FileBrowserHelper
 
     private void selectFolderTreeNode(String nodeId)
     {
-        Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+        final Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
         Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
         WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
 
@@ -120,7 +120,15 @@ public class FileBrowserHelper
             _test._ext4Helper.waitForMaskToDisappear();
             if (initialSelectionExists)
                 _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
-            fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+            _test.waitFor(new BaseWebDriverTest.Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    return _test.isElementPresent(fBrowser.append(Locators.gridRow())) ||
+                           _test.isElementPresent(fBrowser.append(Locator.tagWithClass("div", "x4-grid-empty")));
+                }
+            }, "File grid failed to render", WAIT_FOR_JAVASCRIPT);
         }
     }
 
