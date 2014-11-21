@@ -63,7 +63,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         clickAndWait(Locator.linkContainingText("Manage Notifications"));
-        _ext4Helper.selectRadioButton("By category. Your daily digest will list changes and additions to reports and datasets in the selected categories.");
+
+        assertGridPanel(false);
+        selectNotificationOption("select");
+        assertGridPanel(true);
         _ext4Helper.checkGridRowCheckboxAlt("Uncategorized", 0, false);
         _ext4Helper.checkGridRowCheckboxAlt("Cons", 0, false);
         _ext4Helper.checkGridRowCheckboxAlt("Reports", 0, false);
@@ -87,7 +90,23 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
                 "Status Assessment");
         clickFolder(getFolderName());
 
+        log("Set notification option All before changing content");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        clickAndWait(Locator.linkContainingText("Manage Notifications"));
+        selectNotificationOption("all");
+        assertGridPanel(false);
+        clickButton("Save");
+
         verifyContentModified();
+
+        log("Send notification and check email in dumbster");
+        beginAt("/reports/" + getProjectName() + "/sendDailyDigest.view");
+        clickFolder(getFolderName());
+        goToModule("Dumbster");
+        click(Locator.linkContainingText("Report/Dataset Change Notification"));
+        assertTextPresent(TIMECHART_NAME, R_NAME, LINKREPORT_NAME, PLOT_NAME);
+
     }
 
     private static final String TIMECHART_NAME = "Mean Cohort Lymph Levels";
@@ -174,6 +193,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _extHelper.waitForExtDialogToDisappear("Save");
         _ext4Helper.waitForMaskToDisappear();
 
+        clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         openReport(PARTICIPANTREPORT_NAME);
         enableEditMode();
         Locator.XPathLocator deleteButton = Locator.xpath("//img[@data-qtip = 'Delete']");click(deleteButton); // Delete a column.
@@ -182,6 +204,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
 
         clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         log("edit link report");
         Locator linkDetails = Locator.xpath("//tr/td/div/a[text()=\"" + LINKREPORT_NAME + "\"]/../../../td/div/a[@data-qtip=\"Click to navigate to the Detail View\"]");
         waitAndClickAndWait(linkDetails);
@@ -190,6 +214,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save");
 
         clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         log("edit attachment report");
         linkDetails = Locator.xpath("//tr/td/div/a[text()=\"" + ATTACHMENT_REPORT_NAME + "\"]/../../../td/div/a[@data-qtip=\"Click to navigate to the Detail View\"]");
         waitAndClickAndWait(linkDetails);
@@ -232,6 +258,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.checkCheckbox("Show source tab to all users");
         clickButton("Save");
 
+        clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         openReport(PARTICIPANTREPORT_NAME);
         enableEditMode();
         _ext4Helper.selectRadioButton("Only me");
@@ -240,6 +269,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
 
         clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         log("edit link report");
         waitForElement(Locator.linkWithText(LINKREPORT_NAME));
         scrollIntoView(Locator.linkWithText(LINKREPORT_NAME));
@@ -250,6 +281,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save");
 
         clickTab("Clinical and Assay Data");
+        waitForText("Tests");
+        collapseCategory("Tests");
         log("edit attachment report");
         waitForElement(Locator.linkWithText(ATTACHMENT_REPORT_NAME));
         scrollIntoView(Locator.linkWithText(ATTACHMENT_REPORT_NAME));
@@ -338,4 +371,41 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
             fail("Date parsing error");
         }
     }
+
+    protected void selectNotificationOption(String option)
+    {
+        if ("none".equalsIgnoreCase(option))
+            _ext4Helper.selectRadioButton("None.");
+        else if ("all".equalsIgnoreCase(option))
+            _ext4Helper.selectRadioButton("All. Your daily digest will list changes and additions to all reports and datasets.");
+        else if ("select".equalsIgnoreCase(option))
+            _ext4Helper.selectRadioButton("By category. Your daily digest will list changes and additions to reports and datasets in the selected categories.");
+    }
+
+    protected void assertGridPanel(boolean assertEnabled)
+    {
+        Locator gridPanelDisabled = Locator.xpath("//div[contains(@class, 'x4-grid') and contains(@class, 'x4-item-disabled')]");
+        Locator gridPanelEnabled = Locator.xpath("//div[contains(@class, 'x4-grid')]");
+
+        if (assertEnabled)
+        {
+            assertElementNotPresent(gridPanelDisabled);
+            assertElementPresent(gridPanelEnabled);
+        }
+        else
+        {
+            assertElementPresent(gridPanelDisabled);
+        }
+    }
+
+    protected void collapseCategory(String category)
+    {
+        // TODO: I took this from DataViewsTest, but had to comment out assert because there's a <span> around the text, so I didn't combine uses.
+        Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
+        int dataViewCount = getElementCount(dataViewRow);
+        //       _test.assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
+        click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
+        waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), WAIT_FOR_JAVASCRIPT);
+    }
+
 }
