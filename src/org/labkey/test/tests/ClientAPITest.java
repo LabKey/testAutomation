@@ -169,6 +169,8 @@ public class ClientAPITest extends BaseWebDriverTest
         init.createWiki();
 
         init.createLists();
+
+        init.createUsers();
     }
 
     private static boolean dirtyList = false;
@@ -186,12 +188,21 @@ public class ClientAPITest extends BaseWebDriverTest
         }
     }
 
-    @After
-    public void clearWIki()
+    @Override
+    protected void checkLinks()
+    {
+        clearWiki();
+        super.checkLinks();
+    }
+
+    private void clearWiki()
     {
         //clear the test page so the crawler doesn't refetch a test and cause errors
         if (!isTextPresent(WIKIPAGE_NAME))
+        {
+            goToProjectHome();
             clickFolder(FOLDER_NAME);
+        }
         portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
         _wikiHelper.setWikiBody("<p>" + "Test Complete." + "</p>");
         _wikiHelper.saveWikiPage();
@@ -285,6 +296,13 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
+    }
+
+    private void createUsers()
+    {
+        // create the users for emailApiTest
+        for (String user : EMAIL_RECIPIENTS)
+            createUser(user, null);
     }
 
     protected String waitForDivPopulation()
@@ -585,10 +603,6 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void emailApiTest()
     {
-        // create the users for this test
-        for (String user : EMAIL_RECIPIENTS)
-            createUser(user, null);
-
         clickProject(PROJECT_NAME);
         enableEmailRecorder();
 
