@@ -254,6 +254,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 //        assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
         clickTab("Specimen Data");
+        sleep(2000); // the link moves while the specimen search form finishes layout
         waitAndClickAndWait(Locator.linkWithText("Blood (Whole)"));
         DataRegionTable vialsTable = new DataRegionTable("SpecimenDetail", this);
         List<String> procLocs = vialsTable.getColumnDataAsText("Processing Location");

@@ -469,10 +469,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Verify published specimens
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickTab("Specimen Data");
         if (includeSpecimens)
         {
             waitForText("By Vial Group");
+            sleep(2000); // the link moves while the specimen search form finishes layout
             waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
             waitForElement(Locator.paginationText(expectedSpecimenCount));
 
@@ -508,7 +509,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
             t2.clearFilter("SequenceNum");
 
             // verify that the request related specimen reports are hidden
-            clickAndWait(Locator.linkWithText("Specimen Data"));
+            clickTab("Specimen Data");
+            sleep(2000); // the link moves while the specimen search form finishes layout
             waitAndClick(Locator.tagContainingText("span", "Specimen Reports")); // expand
             waitAndClickAndWait(Locator.linkWithText("View Available Reports"));
             assertTextNotPresent("Requested Vials by Type and Timepoint");
@@ -549,7 +551,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // verify specimen refresh for PUB1 study
         goToProjectHome();
         clickFolder(PUB1_NAME);
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickTab("Specimen Data");
+        sleep(2000); // the link moves while the specimen search form finishes layout
         waitForElement(Locator.linkWithText("By Individual Vial"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         waitForElement(Locator.paginationText(37)); // updated number of total specimens
@@ -563,7 +566,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // verify that specimens were not refreshed for PUB3 study
         goToProjectHome();
         clickFolder(PUB3_NAME);
-        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickTab("Specimen Data");
+        sleep(2000); // the link moves while the specimen search form finishes layout
         waitForElement(Locator.linkWithText("By Individual Vial"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this);

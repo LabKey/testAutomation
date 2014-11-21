@@ -40,6 +40,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         log("here");
         setupSpecimenManagement();
         clickTab("Specimen Data");
+        sleep(2000); // the link moves while the specimen search form finishes layout
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
         
         selectSpecimens();

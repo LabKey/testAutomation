@@ -307,6 +307,12 @@ public class StudyHelper extends AbstractHelper
 
         // Wizard page 11 : Publish Options
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
+        _test.waitForElement(Locator.css(".studyWizardPublishOptionsList"));
+        _test.waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
+        _test._extHelper.selectExtGridItem("name", "Use Alternate Participant IDs", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Shift Participant Dates", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Remove Protected Columns", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         _test.clickButton("Finish");
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
     }
