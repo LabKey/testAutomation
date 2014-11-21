@@ -705,9 +705,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard Page 9 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
         waitForElement(Locator.css(".studyWizardReportList"));
+        waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
         for (String report : reports)
         {
-            waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
             _extHelper.selectExtGridItem("name", report, -1, "studyWizardReportList", true);
         }
         clickButton("Next", 0);
@@ -719,10 +719,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard page 11 : Publish Options
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
-        if (!removeProtected) uncheckCheckbox(Locator.name("removeProtected"));
-        if (!shiftDates) uncheckCheckbox(Locator.name("shiftDates"));
-        if (!alternateIDs) uncheckCheckbox(Locator.name("alternateids"));
-        if (maskClinicNames) checkCheckbox(Locator.name("maskClinic"));
+        waitForElement(Locator.css(".studyWizardPublishOptionsList"));
+        waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
+        _extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         clickButton("Finish");
 
         _pipelineJobs++;
