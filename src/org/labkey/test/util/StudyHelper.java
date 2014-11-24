@@ -239,7 +239,7 @@ public class StudyHelper extends AbstractHelper
     }
 
     @LogMethod
-    public void publishStudy(String studyName, int expectedPipelineJobs, String subjectNounPlural, String visitNounPlural, List<String> hiddenDatasetNames)
+    public void publishStudy(String studyName, int expectedPipelineJobs, String subjectNounSingular, String subjectNounPlural, String visitNounPlural, List<String> hiddenDatasetNames)
     {
         // This method does not include all options for selecting specific datasets, views, etc. but is
         // meant to be a more general "publish study with all options selected"
@@ -309,8 +309,8 @@ public class StudyHelper extends AbstractHelper
         _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
-        _test._extHelper.selectExtGridItem("name", "Use Alternate Participant IDs", -1, "studyWizardPublishOptionsList", true);
-        _test._extHelper.selectExtGridItem("name", "Shift Participant Dates", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Use Alternate " + subjectNounSingular + " IDs", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Shift " + subjectNounSingular + " Dates", -1, "studyWizardPublishOptionsList", true);
         _test._extHelper.selectExtGridItem("name", "Remove Protected Columns", -1, "studyWizardPublishOptionsList", true);
         _test._extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         _test.clickButton("Finish");

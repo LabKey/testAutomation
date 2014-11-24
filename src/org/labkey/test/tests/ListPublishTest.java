@@ -58,7 +58,7 @@ public class ListPublishTest extends BaseWebDriverTest
         goToProjectHome();
         setUpLists();
         setListIds();
-        _studyHelper.publishStudy("PublishedLists", 2, "Participants", "Timepoints", null);
+        _studyHelper.publishStudy("PublishedLists", 2, "Participant", "Participants", "Timepoints", null);
         checkListIds();
         assertPtidsNotPresent();
 

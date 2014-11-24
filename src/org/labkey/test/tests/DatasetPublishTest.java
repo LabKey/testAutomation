@@ -53,7 +53,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
 
         List<String> hiddenDatasetNames = new ArrayList<>();
         hiddenDatasetNames.add("ELISpotAssay");
-        _studyHelper.publishStudy(SUBFOLDER_NAME, 2, "Participants", "Timepoints", hiddenDatasetNames);
+        _studyHelper.publishStudy(SUBFOLDER_NAME, 2, "Participant", "Participants", "Timepoints", hiddenDatasetNames);
 
         modifySourceDataset();
         checkTargetDataset();

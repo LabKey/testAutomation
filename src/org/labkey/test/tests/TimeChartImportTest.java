@@ -294,7 +294,7 @@ public class TimeChartImportTest extends StudyBaseTest
         List<String> origMouseIds = table.getColumnDataAsText("MouseId");
 
         log("Created published study from Visit based study, with masked ptids");
-        _studyHelper.publishStudy(publishFolderName, 1, "Mice", "Visits", null);
+        _studyHelper.publishStudy(publishFolderName, 1, "Mouse", "Mice", "Visits", null);
 
         log("Verify masked ptids in publish study reportInfo");
         clickFolder(publishFolderName);

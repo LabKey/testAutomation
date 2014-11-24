@@ -725,7 +725,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
-        _extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
+        if (removeProtected)
+            _extHelper.selectExtGridItem("name", "Remove Protected Columns", -1, "studyWizardPublishOptionsList", true);
+        if (shiftDates)
+            _extHelper.selectExtGridItem("name", "Shift Mouse Dates", -1, "studyWizardPublishOptionsList", true);
+        if (alternateIDs)
+            _extHelper.selectExtGridItem("name", "Use Alternate Mouse IDs", -1, "studyWizardPublishOptionsList", true);
+        if (maskClinicNames)
+            _extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         clickButton("Finish");
 
         _pipelineJobs++;
