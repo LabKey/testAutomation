@@ -5,6 +5,9 @@
  */
 // TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/resources/scripts/validationTest/queryTest.js
 
+// Designed to be run by JavaScriptExecutor#executeAsyncScript
+var callback = arguments[arguments.length - 1]; // See WebDriver documentation
+
 var schemaName = 'lists';
 var queryName = 'People';
 var viewName = 'QueryTestView';
@@ -201,119 +204,119 @@ var testFunctions = [
         LABKEY.Query.selectDistinctRows({ schemaName: schemaName, queryName: queryName, column: 'Age', viewName: viewName, success: successHandler, failure: failureHandler });
     },
 
-    // last function sets the contents of the results div.
+    // last function returns results.
     function()
     {
         var html = '';
         if (testResults[0].rowCount !== undefined && testResults[0].rowCount == 7)
-            html += '0)SUCCESS: Select 1 returned 7 rows<br>';
+            html += '0)SUCCESS: Select 1 returned 7 rows\n';
         else
-            html += '0)FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '<br>';
+            html += '0)FAILURE: Select 1 returned ' + testResults[0].rowCount + ' rows, expected 7.  Error value = ' + testResults[0].exception + '\n';
 
         if (testResults[1].rowCount !== undefined && testResults[1].rowCount == 1)
-            html += '1)SUCCESS: Select 2 returned 1 rows<br>';
+            html += '1)SUCCESS: Select 2 returned 1 rows\n';
         else
-            html += '1)FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '<br>';
+            html += '1)FAILURE: Select 2 returned ' + testResults[1].rowCount + ' rows, expected 1.  Error value = ' + testResults[1].exception + '\n';
 
         if (testResults[2].exception !== undefined && testResults[2].exception)
-            html += '2)SUCCESS: Bad update generated exception: ' + testResults[2].exception + '<br>';
+            html += '2)SUCCESS: Bad update generated exception: ' + testResults[2].exception + '\n';
         else
-            html += '2)FAILURE: Bad update did not generate expected exception.<br>';
+            html += '2)FAILURE: Bad update did not generate expected exception.\n';
 
         if (testResults[3].rowsAffected !== undefined && testResults[3].rowsAffected == 1)
-            html += '3)SUCCESS: Update affected 1 rows<br>';
+            html += '3)SUCCESS: Update affected 1 rows\n';
         else
-            html += '3)FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '<br>';
+            html += '3)FAILURE: Update affected ' + testResults[2].rowCount + ' rows, expected 1.  Error value = ' + testResults[3].exception + '\n';
 
         if (testResults[4].rowsAffected !== undefined && testResults[4].rowsAffected == 1)
-            html += '4)SUCCESS: Delete affected 1 rows<br>';
+            html += '4)SUCCESS: Delete affected 1 rows\n';
         else
-            html += '4)FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '<br>';
+            html += '4)FAILURE: Delete affected ' + testResults[4].rowCount + ' rows, expected 1.  Error value = ' + testResults[4].exception + '\n';
 
         if (testResults[5].rowsAffected!== undefined && testResults[5].rowsAffected == 1)
-            html += '5)SUCCESS: Insert created 1 rows<br>';
+            html += '5)SUCCESS: Insert created 1 rows\n';
         else
-            html += '5)FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '<br>';
+            html += '5)FAILURE: Insert created ' + testResults[5].rowCount + ' rows, expected 1.  Error value = ' + testResults[5].exception + '\n';
 
         if (testResults[6].exception !== undefined && testResults[6].exception)
-            html += '6)SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '<br>';
+            html += '6)SUCCESS: Bad insert generated exception: ' + testResults[6].exception + '\n';
         else
-            html += '6)FAILURE: Bad insert did not generate expected exception.<br>';
+            html += '6)FAILURE: Bad insert did not generate expected exception.\n';
 
         if (testResults[7].exception !== undefined && testResults[7].exception)
-            html += '7)SUCCESS: Bad query generated exception: ' + testResults[7].exception + '<br>';
+            html += '7)SUCCESS: Bad query generated exception: ' + testResults[7].exception + '\n';
         else
-            html += '7)FAILURE: Bad query did not generate expected exception.<br>';
+            html += '7)FAILURE: Bad query did not generate expected exception.\n';
 
         if (testResults[8].rowCount !== undefined && testResults[8].rowCount == 7)
-            html += '8a)SUCCESS: executeSql returned 7 rows<br>';
+            html += '8a)SUCCESS: executeSql returned 7 rows\n';
         else
-            html += '8a)FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';
+            html += '8a)FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '\n';
 
         if (testResults[8].rows !== undefined && testResults[8].rows.length >= 3 && testResults[8].rows[1].age < testResults[8].rows[2].age)
-            html += '8b)SUCCESS: executeSql returned properly sorted<br>';
+            html += '8b)SUCCESS: executeSql returned properly sorted\n';
         else
-            html += '8b)FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';
+            html += '8b)FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '\n';
 
         if (testResults[8].queryName && testResults[8].queryName.indexOf('lists_temp') > -1)
-            html += '8c)SUCCESS: executeSql returned a session-based query<br>';
+            html += '8c)SUCCESS: executeSql returned a session-based query\n';
         else
             html += '8c)FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';
 
         if (testResults[9].rowCount !== undefined && testResults[9].rowCount == 7)
-            html += '9)SUCCESS: cross-folder executeSql succeeded<br>';
+            html += '9)SUCCESS: cross-folder executeSql succeeded\n';
         else
-            html += '9)FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '<br>';
+            html += '9)FAILURE: executeSql returned ' + testResults[9].rowCount + ' rows, expected 7.  Error value = ' + testResults[9].exception + '\n';
 
         if (testResults[10].rowCount !== undefined && testResults[10].rowCount == 7)
-            html += '10)SUCCESS: cross-project executeSql succeeded<br>';
+            html += '10)SUCCESS: cross-project executeSql succeeded\n';
         else
-            html += '10)FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '<br>';
+            html += '10)FAILURE: executeSql returned ' + testResults[10].rowCount + ' rows, expected 7.  Error value = ' + testResults[10].exception + '\n';
 
         if (testResults[11].exception)
-            html += '11)SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '<br>';
+            html += '11)SUCCESS: Bad saveRows exception: ' + testResults[11].exception + '\n';
         else
-            html += '11)FAILURE: Bad saveRows did not generate an exception.<br>';
+            html += '11)FAILURE: Bad saveRows did not generate an exception.\n';
 
         if (testResults[12].exception)
-            html += '12)SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '<br>';
+            html += '12)SUCCESS: Bad saveRows exception: ' + testResults[12].exception + '\n';
         else
-            html += '12)FAILURE: Bad saveRows did not generate an exception.<br>';
+            html += '12)FAILURE: Bad saveRows did not generate an exception.\n';
 
         if (testResults[13].rowCount !== undefined && testResults[13].rowCount == 3)
-            html += '13)SUCCESS: Non-transacted bad saveRows modified rows.<br>';
+            html += '13)SUCCESS: Non-transacted bad saveRows modified rows.\n';
         else
-            html += '13)FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '<br>';
+            html += '13)FAILURE: Non-transacted bad saveRows returned ' + testResults[13].rowCount + ' rows, expected 3.  Error value = ' + testResults[13].exception + '\n';
 
         if (testResults[14].rowCount !== undefined && testResults[14].rowCount == 0)
-            html += '14)SUCCESS: Transacted bad saveRows did not modify rows rows.<br>';
+            html += '14)SUCCESS: Transacted bad saveRows did not modify rows rows.\n';
         else
-            html += '14)FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '<br>';
+            html += '14)FAILURE: Non-transacted bad saveRows returned ' + testResults[14].rowCount + ' rows, expected 0.  Error value = ' + testResults[14].exception + '\n';
 
         if (testResults[15].exception)
             if (testResults[11].exceptionClass !== undefined && testResults[15].exceptionClass == "org.labkey.api.query.QueryParseException")
-                html += '15)SUCCESS: Bad query exception: ' + testResults[15].exceptionClass + '<br>';
+                html += '15)SUCCESS: Bad query exception: ' + testResults[15].exceptionClass + '\n';
             else
-                html += '15)FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '<br>';
+                html += '15)FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '\n';
         else
-            html += '15)FAILURE: Bad query did not generate an exception.<br>';
+            html += '15)FAILURE: Bad query did not generate an exception.\n';
 
         if (testResults[16].exception)
-            html += '16)FAILURE: Failed to create custom view for list<br>';
+            html += '16)FAILURE: Failed to create custom view for list\n';
         else
-            html += '16)SUCCESS: Created Custom View: \'' + viewName + '\' for list<br>';
+            html += '16)SUCCESS: Created Custom View: \'' + viewName + '\' for list\n';
 
         if (testResults[17].values && testResults[17].values.length == 6)
-            html += '17)SUCCESS: SelectDistinctRows returned correct result set<br>';
+            html += '17)SUCCESS: SelectDistinctRows returned correct result set\n';
         else
-            html += '17)FAILURE: SelectDistinctRows failed to return expected result of 6 values<br>';
+            html += '17)FAILURE: SelectDistinctRows failed to return expected result of 6 values\n';
 
         if (testResults[18].values && testResults[18].values.length == 2)
-            html += '18)SUCCESS: SelectDistinctRows returned correct custom view filtered result set<br>';
+            html += '18)SUCCESS: SelectDistinctRows returned correct custom view filtered result set\n';
         else
-            html += '18)FAILURE: SelectDistinctRows failed to return expected result of 2 values<br>';
+            html += '18)FAILURE: SelectDistinctRows failed to return expected result of 2 values\n';
 
-        document.getElementById('testDiv').innerHTML = html;
+        callback(html);
     }
 ];
 
@@ -324,7 +327,7 @@ function executeNext()
 }
 
 function failureHandler(errorInfo, responseObj, options)
-{		
+{
     testResults[testResults.length] = errorInfo;
     executeNext();
 }

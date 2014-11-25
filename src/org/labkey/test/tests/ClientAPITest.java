@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,14 +26,17 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.JavascriptExecutor;
 
 import java.io.File;
 
@@ -44,7 +46,6 @@ import static org.junit.Assert.*;
 public class ClientAPITest extends BaseWebDriverTest
 {
     public WikiHelper _wikiHelper = new WikiHelper(this);
-    private final PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
@@ -106,26 +107,6 @@ public class ClientAPITest extends BaseWebDriverTest
             "    });\n" +
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\"></div>";
-
-    private static final String EMAIL_SRC_TEMPLATE =
-            "function errorHandler(errorInfo, options, responseObj)\n" +
-            "{\n" +
-            "   document.getElementById('" + TEST_DIV_NAME + "').innerHTML = 'failure';\n" +
-            "}\n" +
-            "\n" +
-            "function onSuccess(result)\n" +
-            "{\n" +
-            "   document.getElementById('" + TEST_DIV_NAME + "').innerHTML = 'success';\n" +
-            "}\n" +
-            "LABKEY.Message.sendMessage({\n" +
-            "   msgFrom: '%s',\n" +
-            "   msgSubject: '%s',\n" +
-            "   msgRecipients: [%s],\n" +
-            "   msgContent: [%s],\n" +
-            "   allowUnregisteredUser: '%s',\n" +
-            "   successCallback: onSuccess,\n" +
-            "   errorCallback: errorHandler,\n" +
-            "});";
 
     public static String getFullSource(String testFragment)
     {
@@ -198,12 +179,8 @@ public class ClientAPITest extends BaseWebDriverTest
     private void clearWiki()
     {
         //clear the test page so the crawler doesn't refetch a test and cause errors
-        if (!isTextPresent(WIKIPAGE_NAME))
-        {
-            goToProjectHome();
-            clickFolder(FOLDER_NAME);
-        }
-        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
+        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit", Maps.of("name", WIKIPAGE_NAME)));
+
         _wikiHelper.setWikiBody("<p>" + "Test Complete." + "</p>");
         _wikiHelper.saveWikiPage();
     }
@@ -313,9 +290,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void createWiki()
     {
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Wiki");
-        _wikiHelper.createNewWikiPage("HTML");
+        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit"));
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         _wikiHelper.setWikiBody("placeholder text");
@@ -327,7 +302,6 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         setSourceFromFile("webPartTest.js");
 
-        waitForDivPopulation();
         assertTextPresent("Webpart Title");
         for (ListHelper.ListColumn column : LIST_COLUMNS)
             assertTextPresent(column.getLabel());
@@ -336,9 +310,6 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void gridTest()
     {
-        clickProject(PROJECT_NAME);
-        clickFolder(FOLDER_NAME);
-
         setSourceFromFile("gridTest.js");
 
         assertTextPresent(GRIDTEST_GRIDTITLE);
@@ -479,13 +450,14 @@ public class ClientAPITest extends BaseWebDriverTest
         
         setSourceFromFile("assayTest.js");
 
-        assertTextPresent(TEST_ASSAY);
-        assertTextPresent(TEST_ASSAY + " Run Fields");
-        assertTextPresent("RunDate - DateTime");
-        assertTextPresent(TEST_ASSAY + " Batch Fields");
-        assertTextPresent("TargetStudy - String");
-        assertTextPresent(TEST_ASSAY + " Data Fields");
-        assertTextPresent("VisitID - Double");
+        assertTextPresent(
+                TEST_ASSAY,
+                TEST_ASSAY + " Run Fields",
+                "RunDate - DateTime",
+                TEST_ASSAY + " Batch Fields",
+                "TargetStudy - String",
+                TEST_ASSAY + " Data Fields",
+                "VisitID - Double");
     }
 
     @Test
@@ -543,9 +515,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     protected String setSource(String srcFragment, boolean excludeTags)
     {
-        if (!isElementPresent(Locator.linkWithText(WIKIPAGE_NAME)))
-            clickFolder(FOLDER_NAME);
-        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
+        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit", Maps.of("name", WIKIPAGE_NAME)));
 
         String fullSource = srcFragment;
         if (!excludeTags)
@@ -561,36 +531,31 @@ public class ClientAPITest extends BaseWebDriverTest
     public void queryTest()
     {
         dirtyList = true;
+        String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/queryTest.js"));
+        String scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);
+        String[] testResults = scriptResult.split("\n");
 
-        setSourceFromFile("queryTest.js");
-        Locator loc = Locator.id(TEST_DIV_NAME);
-        assertElementContains(loc, "SUCCESS: Select 1 returned 7 rows");
-        assertElementContains(loc, "SUCCESS: Select 2 returned 1 rows");
-        assertElementContains(loc, "SUCCESS: Bad update generated exception: The field 'LastName' is required.");
-        assertElementContains(loc, "SUCCESS: Update affected 1 rows");
-        assertElementContains(loc, "SUCCESS: Delete affected 1 rows");
-        assertElementContains(loc, "SUCCESS: Insert created 1 rows");
-        assertElementContains(loc, "SUCCESS: Bad insert generated exception: Data does not contain required field: LastName");
-        assertElementContains(loc, "SUCCESS: Bad query generated exception: Could not find schema: lists-badname");
-        assertElementContains(loc, "SUCCESS: executeSql returned 7 rows");
-        assertElementContains(loc, "SUCCESS: executeSql returned a session-based query");
-        assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
-        assertElementContains(loc, "SUCCESS: cross-project executeSql succeeded");
-        assertElementContains(loc, "SUCCESS: Created Custom View: 'QueryTestView' for list");
-        assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct result set");
-        assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct custom view filtered result set");
+        for (String result : testResults)
+        {
+            log(result);
+        }
+        assertFalse(scriptResult.contains("ERROR"));
+        assertEquals("Wrong number of results", 21, testResults.length);
     }
 
     @Test
     public void queryRegressionTest()
     {
-        setSourceFromFile("queryRegressionTest.js");
-        Locator loc = Locator.id(TEST_DIV_NAME);
-        assertElementContains(loc, "SUCCESS: executeSql 0 returned 125 rows");
-        assertElementContains(loc, "SUCCESS: executeSql 1 returned 93 rows");
-        assertElementContains(loc, "SUCCESS: executeSql 2 returned 10 rows");
-        assertElementContains(loc, "SUCCESS: executeSql 2 returned with requested v9.1");
-        assertElementContains(loc, "SUCCESS: selectRows 3 returned 96 rows with mixed sort parameters");
+        String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/queryRegressionTest.js"));
+        String scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);
+        String[] testResults = scriptResult.split("\n");
+
+        for (String result : testResults)
+        {
+            log(result);
+        }
+        assertFalse(scriptResult.contains("ERROR"));
+        assertEquals("Wrong number of results", 5, testResults.length);
     }
 
     private static final String EMAIL_SUBJECT = "Testing the email API";
@@ -606,36 +571,21 @@ public class ClientAPITest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         enableEmailRecorder();
 
-        // test failure cases: no from email
-        setSource(createEmailSource("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTextPresent("failure");
+        assertFalse("api requires sender", executeEmailScript("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
 
-        // no recipients
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTextPresent("failure");
+        assertFalse("api requires recipients", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
 
-        // no message body
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null, false));
-        assertTextPresent("failure");
+        assertFalse("api requires message body", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null, false));
 
-        // user not in system
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTextPresent("failure");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
-        assertTextPresent("success");
+        assertFalse("api requires user in system unless flag set", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
 
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null, true));
-        assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, false));
-        assertTextPresent("success");
-        setSource(createEmailSource(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
-        assertTextPresent("success");
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null, true));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, false));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
 
-        // verify principalId only allowed from a server side script
-        setSource(createEmailSource(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTextPresent("failure");
+        assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
 
         goToModule("Dumbster");
 
@@ -646,8 +596,29 @@ public class ClientAPITest extends BaseWebDriverTest
         assertEquals("Number of notification emails", 5, getElementCount(Locator.linkWithText("View headers")));
     }
 
-    private String createEmailSource(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
+    private Boolean executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
     {
+        final String emailScriptTemplate =
+                "var callback = arguments[arguments.length - 1];" +
+                "function errorHandler(errorInfo, options, responseObj)\n" +
+                "{\n" +
+                "   callback(false);\n" +
+                "}\n" +
+                "\n" +
+                "function onSuccess(result)\n" +
+                "{\n" +
+                "   callback(true);\n" +
+                "}\n" +
+                "LABKEY.Message.sendMessage({\n" +
+                "   msgFrom: '%s',\n" +
+                "   msgSubject: '%s',\n" +
+                "   msgRecipients: [%s],\n" +
+                "   msgContent: [%s],\n" +
+                "   allowUnregisteredUser: '%s',\n" +
+                "   successCallback: onSuccess,\n" +
+                "   errorCallback: errorHandler,\n" +
+                "});";
+
         StringBuilder recipientStr = new StringBuilder();
         StringBuilder contentStr = new StringBuilder();
 
@@ -681,8 +652,11 @@ public class ClientAPITest extends BaseWebDriverTest
             contentStr.append(htmlTxtBody);
             contentStr.append("'),");
         }
-        return String.format(EMAIL_SRC_TEMPLATE, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
+
+        String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
                 contentStr.toString(), String.valueOf(allowUnregisteredUser));
+
+        return (Boolean)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
 
     @Test

@@ -3,11 +3,15 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
+
+// Designed to be run by JavaScriptExecutor#executeAsyncScript
+var callback = arguments[arguments.length - 1]; // See WebDriver documentation
+
 var success = function(index, msg) {
-    return '' + index + ')SUCCESS: ' + msg + '<br>';
+    return '' + index + ')SUCCESS: ' + msg + '\n';
 };
 var failure = function(index, msg) {
-    return '' + index + ')FAILURE: ' + msg + '<br>';
+    return '' + index + ')FAILURE: ' + msg + '\n';
 };
 
 var testResults = [];
@@ -70,7 +74,7 @@ var testFunctions = [
             });
         },
 
-        // last function sets the contents of the results div.
+        // last function returns results
         function()
         {
             var html = '';
@@ -99,7 +103,7 @@ var testFunctions = [
             else
                 html += failure(3, "selectRows 3 failed with mixed sort parameters. Error value = '" + testResults[3].exception);
 
-            document.getElementById('testDiv').innerHTML = html;
+            callback(html);
         }
 ];
 

@@ -349,6 +349,7 @@
         </pathconvert>
 
         <echo message="${sampledata.dirs}" file="${test.build.home}/sampledata.dirs"/>
+        <echo message=";${project.root}/server/test/data" file="${test.build.home}/sampledata.dirs" append="true"/>
     </target>
 
     <path id="ant.contrib.classpath">
