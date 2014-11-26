@@ -19,9 +19,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
+ */
 public class PortalHelper extends AbstractHelper
 {
     public PortalHelper(BaseWebDriverTest test)
@@ -159,6 +166,21 @@ public class PortalHelper extends AbstractHelper
             _test.waitForElement(Locator.linkWithText(newName));
             _test.assertElementNotPresent(Locator.linkWithText(tabText));
         }
+    }
+
+    public List<String> getWebPartTitles()
+    {
+        List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(_test.getDriver());
+        webparts.addAll(PortalHelper.Locators.sideWebpartTitle.findElements(_test.getDriver()));
+
+        List<String> webpartTitles = new ArrayList<>();
+
+        for (WebElement el : webparts)
+        {
+            webpartTitles.add(el.getText());
+        }
+
+        return webpartTitles;
     }
 
     /**
@@ -395,6 +417,7 @@ public class PortalHelper extends AbstractHelper
     public static class Locators
     {
         public static Locator.XPathLocator webPartTitle = Locator.xpath("//span").withClass("labkey-wp-title-text");
+        public static final Locator.XPathLocator webPart = Locator.tagWithName("table", "webpart");
 
         public static Locator.XPathLocator webPartTitle(String title)
         {
@@ -411,7 +434,7 @@ public class PortalHelper extends AbstractHelper
 
         public static Locator.XPathLocator webPart(String title)
         {
-            return Locator.tagWithName("table", "webpart").withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
+            return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
         }
     }
 }

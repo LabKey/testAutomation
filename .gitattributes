@@ -316,6 +316,7 @@ src/org/labkey/test/categories/UnitTests.java -text
 src/org/labkey/test/categories/Weekly.java -text
 src/org/labkey/test/categories/Wiki.java -text
 src/org/labkey/test/categories/XTandem.java -text
+src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLBaseTest.java -text
@@ -357,6 +358,7 @@ src/org/labkey/test/pages/AssayDomainEditor.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
 src/org/labkey/test/pages/DomainEditor.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
+src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text
