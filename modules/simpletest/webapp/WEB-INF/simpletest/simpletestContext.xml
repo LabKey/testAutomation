@@ -5,7 +5,7 @@
     <bean id="simpletestPipelineRegistry" class="org.labkey.api.pipeline.TaskPipelineRegistrar">
         <property name="factories">
             <list>
-                <ref bean="tailCommand"/>
+                <ref bean="simpleTestTailCommand"/>
             </list>
         </property>
         <property name="pipelines">
@@ -19,7 +19,7 @@
                     <property name="initialInputExt" ref="testInTsvFileType"/>
                     <property name="taskProgressionSpec">
                         <list>
-                            <ref bean="tailCommand"/>
+                            <ref bean="simpleTestTailCommand"/>
                             <ref bean="xarGeneratorId"/>
                         </list>
                     </property>
@@ -33,7 +33,7 @@
                     <property name="initialInputExt" ref="testInTsvFileType"/>
                     <property name="taskProgressionSpec">
                         <list>
-                            <ref bean="tailBadCommand"/>
+                            <ref bean="simpleTestTailBadCommand"/>
                             <ref bean="xarGeneratorId"/>
                         </list>
                     </property>
@@ -47,7 +47,7 @@
         <constructor-arg><value type="java.lang.Class">org.labkey.api.exp.pipeline.XarGeneratorId</value></constructor-arg>
     </bean>
 
-    <bean id="tailCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+    <bean id="simpleTestTailCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
         <constructor-arg value="tailCommand"/>
         <property name="statusName" value="TAIL FILE"/>
         <property name="inputPaths">
@@ -77,7 +77,7 @@
         <constructor-arg value=".testIn.tsv"/>
     </bean>
 
-    <bean id="tailBadCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+    <bean id="simpleTestTailBadCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
         <constructor-arg value="tailCommand"/>
         <property name="statusName" value="TAIL FILE"/>
         <property name="inputPaths">
