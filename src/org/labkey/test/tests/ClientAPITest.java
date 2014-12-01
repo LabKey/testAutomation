@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -37,8 +38,11 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -126,32 +130,32 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, EMAIL_RECIPIENTS);
-
-        deleteProject(PROJECT_NAME, afterTest);
-        deleteProject(OTHER_PROJECT, afterTest);
+//        deleteUsers(afterTest, EMAIL_RECIPIENTS);
+//
+//        deleteProject(PROJECT_NAME, afterTest);
+//        deleteProject(OTHER_PROJECT, afterTest);
     }
 
     @BeforeClass
     public static void setupProject()
     {
-        ClientAPITest init = (ClientAPITest)getCurrentTest();
-        init._containerHelper.createProject(OTHER_PROJECT, null);
-        init._containerHelper.createProject(PROJECT_NAME, null);
-
-        init.enableEmailRecorder();
-
-        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
-
-        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
-
-        init.clickFolder(FOLDER_NAME);
-
-        init.createWiki();
-
-        init.createLists();
-
-        init.createUsers();
+//        ClientAPITest init = (ClientAPITest)getCurrentTest();
+//        init._containerHelper.createProject(OTHER_PROJECT, null);
+//        init._containerHelper.createProject(PROJECT_NAME, null);
+//
+//        init.enableEmailRecorder();
+//
+//        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+//
+//        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+//
+//        init.clickFolder(FOLDER_NAME);
+//
+//        init.createWiki();
+//
+//        init.createLists();
+//
+//        init.createUsers();
     }
 
     private static boolean dirtyList = false;
@@ -668,13 +672,37 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void webdavAPITest()
+    public void webDavAPITest()
     {
         setSourceFromFile("webdavTest.html", true);
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
-        waitForText("Test Complete");
+        waitForElement(loc.containing("Test Complete"));
         assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
+    }
+
+    @Test @Ignore("WebDavFileSystem doesn't fire 'ready' event")
+    public void webDavAPITestJS()
+    {
+        String script = TestFileUtils.getFileContents(TestFileUtils.getSampleData("api/webdavTest.js"));
+        String scriptResult = "";
+        try
+        {
+            scriptResult = (String)((JavascriptExecutor) getDriver()).executeAsyncScript(script);
+        }
+        catch (TimeoutException ex)
+        {
+            scriptResult = (String)(executeScript("return window.result;"));
+        }
+
+        String[] testResults = scriptResult.split("\n");
+
+        for (String result : testResults)
+        {
+            log(result);
+        }
+        assertFalse(scriptResult.contains("ERROR"));
+        assertTrue("WebDav test did not complete", scriptResult.contains("Test Complete"));
     }
 
     @Override

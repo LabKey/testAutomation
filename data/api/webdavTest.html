@@ -1,7 +1,7 @@
 <div id="testDiv"></div>
 <head>
 <script type="text/javascript">
-    Ext.onReady(function(){
+LABKEY.requiresExt3ClientAPI(true, function(){
         var div = Ext.get('testDiv');
 
         function logMsg(msg){
@@ -58,7 +58,7 @@
 
                 //test move
                 case 9:
-                        logMsg('Testing move');
+                    logMsg('Testing move');
                     doMoveFiles('/newFolder/subFolder/fileInSubfolder.txt', '/newFolder/fileInSubfolder.txt', onSuccess);
                     break;
                 case 10:
@@ -70,7 +70,7 @@
 
                 //test rename w/ full path
                 case 12:
-                        logMsg('Testing rename w/ full path');
+                    logMsg('Testing rename w/ full path');
                     doRename('/newFolder/fileInSubfolder.txt', '/newFolder/renamedFile.txt', onSuccess);
                     break;
                 case 13:
@@ -280,7 +280,6 @@
         {
             verifyFile(path, name, false, success)
         }
-
     });
 </script>
 </head>
