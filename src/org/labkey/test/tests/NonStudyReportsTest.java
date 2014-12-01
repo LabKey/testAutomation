@@ -92,8 +92,8 @@ public class NonStudyReportsTest extends ReportTest
         clickButton("Cancel");
 
         clickAddReport("Attachment Report");
-        setFormElement("viewName", ATTACHMENT_REPORT_NAME);
-        setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
+        setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT_NAME);
+        setFormElement(Locator.name("description"), ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
 
         Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
@@ -106,10 +106,10 @@ public class NonStudyReportsTest extends ReportTest
         clickTab("Overview");
         portalHelper.addWebPart("Data Views");
         portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Attachment Report");
-        setFormElement("viewName", ATTACHMENT_REPORT2_NAME);
-        setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
+        setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT2_NAME);
+        setFormElement(Locator.name("description"), ATTACHMENT_REPORT2_DESCRIPTION);
         click(Locator.xpath("//input[../label[string()='Full file path on server']]"));
-        setFormElement("filePath", ATTACHMENT_REPORT2_FILE.toString());
+        setFormElement(Locator.name("filePath"), ATTACHMENT_REPORT2_FILE.toString());
         clickButton("Save");
         // save should return to the Portal
         waitForText("Data Views");
@@ -203,7 +203,7 @@ public class NonStudyReportsTest extends ReportTest
         goToManageViews();
         clickReportDetailsLink(ATTACHMENT_REPORT2_NAME);
         clickAndWait(Locator.linkContainingText("Edit Report"));
-        setFormElement("viewName", ATTACHMENT_REPORT3_NAME);
+        setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT3_NAME);
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
 
@@ -211,7 +211,7 @@ public class NonStudyReportsTest extends ReportTest
         goToManageViews();
         clickReportDetailsLink(ATTACHMENT_REPORT3_NAME);
         clickAndWait(Locator.linkContainingText("Edit Report"));
-        setFormElement("viewName", ATTACHMENT_REPORT3_NAME);
+        setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT3_NAME);
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
 
@@ -221,7 +221,7 @@ public class NonStudyReportsTest extends ReportTest
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
         assertFalse("Locked".equals(getFormElement(statusElement)));
-        setFormElement("status", "Locked");
+        setFormElement(Locator.name("status"), "Locked");
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
 
@@ -240,13 +240,11 @@ public class NonStudyReportsTest extends ReportTest
         DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_NAME, this);
         assertTextPresent("Share this report with all users");
 
-        //set change thumbnail
-//        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
-
         _ext4Helper.clickExt4Tab("Images");
-        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
-        ref.setToFile(ATTACHMENT_REPORT2_FILE);
+        setFormElement(Locator.name("customThumbnail"), ATTACHMENT_REPORT2_FILE);
         clickButton("Save", 0);
+
+        _ext4Helper.waitForMaskToDisappear();
 
         //no way to verify, unfortunately
     }
@@ -267,8 +265,8 @@ public class NonStudyReportsTest extends ReportTest
         _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), "Start new discussion");
 
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("title"), DISCUSSION_TITLE_1);
-        setFormElement("body", DISCUSSION_BODY_1);
+        setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
+        setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
         clickButton("Submit");
 
         _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), DISCUSSION_TITLE_1);
@@ -278,14 +276,14 @@ public class NonStudyReportsTest extends ReportTest
 
         clickButton("Respond");
         waitForElement(Locator.id("body"));
-        setFormElement("body", DISCUSSION_BODY_2);
+        setFormElement(Locator.id("body"), DISCUSSION_BODY_2);
         clickButton("Submit");
 
         assertTextPresent(DISCUSSION_BODY_2);
 
         clickAndWait(Locator.linkContainingText("edit"));
         waitForElement(Locator.id("body"));
-        setFormElement("body", DISCUSSION_BODY_3);
+        setFormElement(Locator.id("body"), DISCUSSION_BODY_3);
         clickButton("Submit");
 
         assertTextPresent(DISCUSSION_BODY_3);
@@ -307,13 +305,13 @@ public class NonStudyReportsTest extends ReportTest
         clickAddReport("Link Report");
         waitForElement(Locator.tag("li").containing("URL must be absolute"));
         assertElementPresent(Locator.tag("li").containing("This field is required"), 2);
-        setFormElement("viewName", LINK_REPORT1_NAME);
+        setFormElement(Locator.name("viewName"), LINK_REPORT1_NAME);
         waitForElementToDisappear(Locator.tag("li").containing("This field is required").index(1));
-        setFormElement("description", LINK_REPORT1_DESCRIPTION);
-        setFormElement("linkUrl", "mailto:kevink@example.com");
+        setFormElement(Locator.name("description"), LINK_REPORT1_DESCRIPTION);
+        setFormElement(Locator.name("linkUrl"), "mailto:kevink@example.com");
         waitForElementToDisappear(Locator.tag("li").containing("This field is required"));
         assertElementPresent(Locator.tag("li").containing("URL must be absolute"));
-        setFormElement("linkUrl", WebTestHelper.getContextPath() + LINK_REPORT1_URL);
+        setFormElement(Locator.name("linkUrl"), WebTestHelper.getContextPath() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
         assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
         _ext4Helper.uncheckCheckbox("Open link report in new window?");
@@ -324,9 +322,9 @@ public class NonStudyReportsTest extends ReportTest
         // test creation from menu option on Data Views webpart
         clickTab("Overview");
         portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
-        setFormElement("viewName", LINK_REPORT2_NAME);
-        setFormElement("description", LINK_REPORT2_DESCRIPTION);
-        setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
+        setFormElement(Locator.name("viewName"), LINK_REPORT2_NAME);
+        setFormElement(Locator.name("description"), LINK_REPORT2_DESCRIPTION);
+        setFormElement(Locator.name("linkUrl"), getBaseURL() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
         assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
         clickButton("Save");
