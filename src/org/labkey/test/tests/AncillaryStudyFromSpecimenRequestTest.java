@@ -25,6 +25,8 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     protected String ANCILLARY_STUDY_DESC = "Study description";
+    protected String REPUBLISH_STUDY_NAME = "Republish Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    protected String REPUBLISH_STUDY_DESC = "Study description (republished)";
 
     @Override
     public void doCreateSteps()
@@ -37,22 +39,19 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     public void doVerifySteps()
     {
-        log("here");
         setupSpecimenManagement();
-        clickTab("Specimen Data");
-        sleep(2000); // the link moves while the specimen search form finishes layout
-        waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
-        
         selectSpecimens();
         createRequest();
         createStudy();
-        verifyAncillaryStudy();
+        verifyStudy(ANCILLARY_STUDY_NAME, ANCILLARY_STUDY_DESC);
+        republishStudy();
+        verifyStudy(REPUBLISH_STUDY_NAME, REPUBLISH_STUDY_DESC);
     }
 
-    private void verifyAncillaryStudy()
+    private void verifyStudy(String name, String description)
     {
-        clickFolder(ANCILLARY_STUDY_NAME);
-        assertTextPresent(ANCILLARY_STUDY_DESC);
+        clickFolder(name);
+        assertTextPresent(description);
         clickTab("Mice");
         waitForText("Found " + specimensToSelect.length + " mice of " + specimensToSelect.length);
         assertTextPresent(specimensToSelect);
@@ -77,6 +76,21 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         waitForPipelineJobsToFinish(3);
     }
 
+    private void republishStudy()
+    {
+        clickFolder(getFolderName());
+        goToSchemaBrowser();
+        viewQueryData("study", "StudySnapshot");
+        waitForText("\"specimenRequestId\"", 1, WAIT_FOR_PAGE);
+        assertElementPresent(Locator.linkWithText("Republish"), 1);
+        clickAndWait(Locator.linkWithText("Republish"), WAIT_FOR_EXT_MASK_TO_APPEAR);
+        setFormElement(Locator.name("studyName"), REPUBLISH_STUDY_NAME);
+        setFormElement(Locator.name("studyDescription"), REPUBLISH_STUDY_DESC);
+        clickButton("Next", WAIT_FOR_EXT_MASK_TO_APPEAR);
+        clickButton("Finish");
+        waitForPipelineJobsToFinish(4);
+    }
+
     private void createRequest()
     {
         _extHelper.clickMenuButton("Request Options", "Create New Request");
@@ -91,6 +105,10 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     protected String[] specimensToSelect = {"999320812", "999320396", "999320885", "999320746", "999320190", "999320466"};
     private void selectSpecimens()
     {
+        clickTab("Specimen Data");
+        sleep(2000); // the link moves while the specimen search form finishes layout
+        waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
+
         for(String specimen : specimensToSelect)
         {
             checkCheckboxByNameInDataRegion(specimen);
