@@ -66,6 +66,7 @@ public class PipelineAnalysisHelper
         }
         _test._fileBrowserHelper.selectImportDataAction(importAction);
 
+        _test.waitForElement(Locator.id("fileStatus").withText(fileString.toString()), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
         assertEquals("Wrong file(s)", fileString.toString(), _test.getText(Locator.id("fileStatus")));
         for (Map.Entry<String, String> property : protocolProperties.entrySet())
         {
