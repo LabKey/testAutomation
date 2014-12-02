@@ -1080,6 +1080,8 @@
             <and>
                 <uptodate targetfile="${project.root}/sampledata/qc/classes">
                     <srcfiles dir="${project.root}/sampledata/qc/src" />
+                    <srcfiles dir="${project.root}/remoteapi/java/lib" />
+                    <srcfiles dir="${project.root}/remoteapi/java/src" />
                 </uptodate>
                 <available file="${project.root}/sampledata/qc/transform.jar"/>
                 <available file="${project.root}/sampledata/qc/validator.jar"/>
