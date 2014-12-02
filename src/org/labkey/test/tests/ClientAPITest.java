@@ -130,32 +130,32 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-//        deleteUsers(afterTest, EMAIL_RECIPIENTS);
-//
-//        deleteProject(PROJECT_NAME, afterTest);
-//        deleteProject(OTHER_PROJECT, afterTest);
+        deleteUsers(afterTest, EMAIL_RECIPIENTS);
+
+        deleteProject(PROJECT_NAME, afterTest);
+        deleteProject(OTHER_PROJECT, afterTest);
     }
 
     @BeforeClass
     public static void setupProject()
     {
-//        ClientAPITest init = (ClientAPITest)getCurrentTest();
-//        init._containerHelper.createProject(OTHER_PROJECT, null);
-//        init._containerHelper.createProject(PROJECT_NAME, null);
-//
-//        init.enableEmailRecorder();
-//
-//        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
-//
-//        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
-//
-//        init.clickFolder(FOLDER_NAME);
-//
-//        init.createWiki();
-//
-//        init.createLists();
-//
-//        init.createUsers();
+        ClientAPITest init = (ClientAPITest)getCurrentTest();
+        init._containerHelper.createProject(OTHER_PROJECT, null);
+        init._containerHelper.createProject(PROJECT_NAME, null);
+
+        init.enableEmailRecorder();
+
+        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+
+        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+
+        init.clickFolder(FOLDER_NAME);
+
+        init.createWiki();
+
+        init.createLists();
+
+        init.createUsers();
     }
 
     private static boolean dirtyList = false;
