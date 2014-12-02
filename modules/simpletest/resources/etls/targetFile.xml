@@ -6,7 +6,7 @@
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
         <source schemaName="vehicle" queryName="etl_source" />
-        <destination type="file" filePath="etlOut" fileBaseName="report-#-?." fileExtension="tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}-${Timestamp}" fileExtension="tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
     </transform>
 </transforms>
 <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
