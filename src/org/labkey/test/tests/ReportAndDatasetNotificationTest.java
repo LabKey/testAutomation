@@ -379,7 +379,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         else if ("all".equalsIgnoreCase(option))
             _ext4Helper.selectRadioButton("All. Your daily digest will list changes and additions to all reports and datasets.");
         else if ("select".equalsIgnoreCase(option))
-            _ext4Helper.selectRadioButton("By category. Your daily digest will list changes and additions to reports and datasets in the selected categories.");
+            _ext4Helper.selectRadioButton("By category. Your daily digest will list changes and additions to reports and datasets in the subscribed categories.");
     }
 
     protected void assertGridPanel(boolean assertEnabled)
