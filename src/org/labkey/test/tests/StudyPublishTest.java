@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
@@ -96,6 +95,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String[] LISTS = {"CustomIndexing", "Indexed as one doc", "List To Delete", "List1", "List2", "MetaDataSet"};
 
     private final String PUB1_NAME = "PublishedStudy";
+    private final String PUB1_REPUBLISH_NAME = "RepublishedStudy";
     private final String PUB1_DESCRIPTION = "";
     private final String[] PUB1_GROUPS = {GROUP1_NAME};
     private final String[] PUB1_DATASETS = DATASETS;
@@ -107,6 +107,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final int PUB1_EXPECTED_SPECIMENS = 38;
 
     private final String PUB2_NAME = "PublishedToProject";
+    private final String PUB2_REPUBLISH_NAME = "RepublishedToProject";
     private final String PUB2_DESCRIPTION = "Publish to new project";
     private final String[] PUB2_GROUPS = {}; // all
     private final String[] PUB2_DATASETS = {}; // all
@@ -118,6 +119,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final int PUB2_EXPECTED_SPECIMENS = 0;
     
     private final String PUB3_NAME = "PublishedNonAnon";
+    private final String PUB3_REPUBLISHED_NAME = "RepublishedNonAnon";
     private final String PUB3_DESCRIPTION = "Non-anonymized published study";
     private final String[] PUB3_GROUPS = {GROUP2_NAME, GROUP3_NAME};
     private final String[] PUB3_DATASETS = {DATASETS[0], DATASETS[1], DATASETS[2], DATASETS[4], DATASETS[5], DATASETS[6]}; // DAY 1 omitted
@@ -202,6 +204,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
+
+        //webpart needed for republish test
+        _portalHelper.addQueryWebPart("snapshot", "study", "StudySnapshot", null);
+
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
         publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PublishLocation.root, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
@@ -226,6 +232,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
         verifySpecimenRefresh();
         setupForStudySnapshotTable();
         verifyStudySnapshotTable();
+
+        //verify study republish
+        rePublishStudy(PUB1_NAME, PUB1_REPUBLISH_NAME);
+        verifyPublishedStudy(PUB1_REPUBLISH_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS-1);
+        rePublishStudy(PUB2_NAME, PUB2_REPUBLISH_NAME);
+        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
+        rePublishStudy(PUB3_NAME, PUB3_REPUBLISHED_NAME);
+        verifyPublishedStudy(PUB3_NAME, getProjectName(), group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
     }
 
     /**
@@ -283,7 +297,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
         assert(getElementCount(Locator.xpath("//table[@name='webpart']")) == 7);
-        assertTextPresent("Test Wiki Title");
+        waitForText("Test Wiki Title");
+        //assertTextPresent("Test Wiki Title");
 
         //assert the added module is present
         waitForElement(Locator.xpath("//span[@id='adminMenuPopupText']"));
@@ -743,6 +758,75 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // remove this line once the SQLserver deadlock is resolved
         waitForPipelineJobsToComplete(_pipelineJobs, "publish study", false);
         popLocation();
+    }
+
+    private void rePublishStudy(String parentName, String newName)
+    {
+        unshiftedDatesByStudy.put(newName, unshiftedDatesByStudy.get(parentName));
+        preshiftedDatesByStudy.put(newName, preshiftedDatesByStudy.get(parentName));
+        goToProjectHome();
+        clickFolder(getFolderName());
+        clickAt(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"), 1, 1, 0);
+        _extHelper.waitForExtDialog("Republish Study");
+        assertTextPresent("**This study is being republished and has preset values based on the previous publish studies values.");
+
+        // Wizard page 1 : General Setup
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
+        setFormElement(Locator.name("studyName"), newName);
+        clickButton("Next", 0);
+
+        // Wizard page 2 : Mice
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Mice']"));
+        waitForElement(Locator.css(".studyWizardParticipantList"));
+        clickButton("Next", 0);
+
+        // Wizard page 3 : Datasets
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
+        waitForElement(Locator.css(".studyWizardDatasetList"));
+        clickButton("Next", 0);
+
+        // Wizard page 4 : Visits
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Visits']"));
+        waitForElement(Locator.css(".studyWizardVisitList"));
+        clickButton("Next", 0);
+
+        // Wizard page 5 : Specimens
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+        clickButton("Next", 0);
+
+        // Wizard Page 6 : Study Objects
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
+        //click(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
+        clickButton("Next", 0);
+
+        // Wizard page 7 : Lists
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
+        waitForElement(Locator.css(".studyWizardListList"));
+        clickButton("Next", 0);
+
+        // Wizard page 8 : Views
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
+        waitForElement(Locator.css(".studyWizardViewList"));
+        clickButton("Next", 0);
+
+        // Wizard Page 9 : Reports
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
+        waitForElement(Locator.css(".studyWizardReportList"));
+        waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
+        clickButton("Next", 0);
+
+        // Wizard page 10 : Folder Objects
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
+        //click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
+        clickButton("Next", 0);
+
+        // Wizard page 11 : Publish Options
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
+        waitForElement(Locator.css(".studyWizardPublishOptionsList"));
+        waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
+        clickButton("Finish");
+
+        _pipelineJobs++;
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
