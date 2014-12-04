@@ -207,7 +207,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         waitAndClick(Ext4Helper.Locators.ext4CheckboxById("importAction"));
 
-        _ext4Helper.clickExtTab("File Properties");
+        waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
         click(Ext4Helper.Locators.ext4Radio("Use Custom File Properties"));
         clickButton("edit properties");
 

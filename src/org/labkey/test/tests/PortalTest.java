@@ -151,8 +151,8 @@ public class PortalTest extends BaseWebDriverTest
             if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
             {
                 click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Ext4Helper.ext4MenuItem("Permissions").notHidden());
-                assertElementNotPresent(Ext4Helper.ext4MenuItem("Remove From Page").notHidden());
+                waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
+                assertElementNotPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
 //                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }
@@ -167,8 +167,8 @@ public class PortalTest extends BaseWebDriverTest
             if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
             {
                 click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Ext4Helper.ext4MenuItem("Permissions").notHidden());
-                assertElementPresent(Ext4Helper.ext4MenuItem("Remove From Page").notHidden());
+                waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
+                assertElementPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
 //                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }

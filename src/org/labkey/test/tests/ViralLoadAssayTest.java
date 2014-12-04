@@ -211,8 +211,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
     {
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        click(Ext4Helper.Locators.menuItem("Prepare Run"));
+        waitForElement(Ext4Helper.Locators.window(IMPORT_DATA_TEXT));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -228,7 +228,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Plate Layout"));
-        waitForElement(Ext4Helper.ext4Window("Configure Plate"));
+        waitForElement(Ext4Helper.Locators.window("Configure Plate"));
         waitForText("Group By Category");
         Ext4FieldRef.getForLabel(this, "Group By Category").setChecked(true);
         waitForText("Below are the sample categories");
@@ -255,7 +255,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         //verify template created
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
 
         log("Reopening saved run plan");
         waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
@@ -273,7 +273,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCell(1, "well", "H11");
         click(Ext4Helper.Locators.ext4Button("Save"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
         grid.setGridCell(1, "well", "A5");  //restore original contents
@@ -281,7 +281,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         //verify neg controls enforced
         grid.setGridCell(70, "category", "Unknown");
         click(Ext4Helper.Locators.ext4Button("Download"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("Must provide at least 2 negative controls per run");
         grid.setGridCell(70, "category", "Neg Control");  //restore original contents
@@ -354,7 +354,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Verifying ABI7500 Import");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
 
         log("Entering results for saved run");
         waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
@@ -378,7 +378,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
         waitAndClick(WAIT_FOR_PAGE, Ext4Helper.Locators.ext4Button("Upload"), 0);
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 9");
@@ -388,7 +388,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         clickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -509,7 +509,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("verifying run plan marked as complete");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
         waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
 
         DataRegionTable dr2 = new DataRegionTable("query", this);
@@ -545,7 +545,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("d56053_2010.04.21_1_JBS", "");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 17");
@@ -553,7 +553,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -635,7 +635,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("de0115_2008.09.08_1_JG\t\t\t0", "");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 23");
@@ -644,7 +644,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 

@@ -243,7 +243,7 @@ public class Ext4Helper extends AbstractHelper
     public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
     {
         _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
-        Locator loc = ext4WindowButton(windowTitle, buttonText);
+        Locator loc = Locators.windowButton(windowTitle, buttonText);
         _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickAndWait(loc, wait);
     }
@@ -270,15 +270,9 @@ public class Ext4Helper extends AbstractHelper
         _test.executeScript(script, markerCls);
     }
 
-    public Locator getGridRow(String columnVal, String markerCls)
-    {
-        String gridSelector = "." + markerCls;
-        return Locator.css(gridSelector).append(Locator.css("." + _cssPrefix + "grid-data-row")).withText(columnVal);
-    }
-
     public void selectGridItem(String columnVal, String markerCls)
     {
-        WebElement gridRow = getGridRow(columnVal, markerCls).findElement(_test.getDriver());
+        WebElement gridRow = Locators.getGridRow(columnVal, markerCls).findElement(_test.getDriver());
         if (!gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
         {
             WebElement gridRowChecker = gridRow.findElement(By.cssSelector("." + _cssPrefix + "grid-cell-row-checker"));
@@ -382,7 +376,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void checkGridRowCheckbox(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         if (!isGridRowChecked(rowLoc))
             _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-row-checker"));
     }
@@ -390,7 +384,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void checkGridRowCheckboxAlt(String cellText, int index, boolean useContainsForCellText)
     {
-        Locator.XPathLocator rowLoc = useContainsForCellText ? getGridRowContains(cellText, index) : getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = useContainsForCellText ? Locators.getGridRowContains(cellText, index) : Locators.getGridRow(cellText, index);
         if (!isGridRowChecked(rowLoc))
             _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-cell-inner-checkcolumn"));
     }
@@ -412,7 +406,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         if (isGridRowChecked(rowLoc))
             _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-row-checker')]"));
     }
@@ -425,7 +419,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void clickGridRowText(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '"+cellText+"']"));
     }
@@ -438,7 +432,7 @@ public class Ext4Helper extends AbstractHelper
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
         _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));
     }
@@ -472,7 +466,7 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Determines if the specified row has a checked checkbox
-     * @param rowLoc Locator provided by {@link #getGridRow(String, int)}
+     * @param rowLoc Locator provided by {@link Locators#getGridRow(String, int)}
      * @return true if the specified row has a checked checkbox
      */
     private boolean isGridRowChecked(Locator.XPathLocator rowLoc)
@@ -489,7 +483,7 @@ public class Ext4Helper extends AbstractHelper
      */
     public boolean isGridRowChecked(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         return isGridRowChecked(rowLoc);
     }
 
@@ -588,37 +582,17 @@ public class Ext4Helper extends AbstractHelper
         _test.waitForElement(Locators.mask(), wait);
     }
 
-    /**
-     * @param cellText Exact text from any cell in the desired row
-     * @param index 0-based index of rows with matching cellText
-     * @return XPathLocator for the desired row
-     */
-    private Locator.XPathLocator getGridRow(String cellText, int index)
-    {
-        return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
-    }
-
-    private Locator.XPathLocator getGridRowContains(String cellText, int index)
-    {
-        return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
-    }
-
-    public static Locator.XPathLocator invalidField()
-    {
-        return Locator.tag("input").withClass(_cssPrefix + "form-field").withClass(_cssPrefix + "form-invalid-field");
-    }
-
     @LogMethod(quiet = true)
     public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
         _test.waitAndClick(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            Locator parentLocator = ext4MenuItem(subMenuLabels[i]).notHidden();
+            Locator parentLocator = Locators.menuItem(subMenuLabels[i]).notHidden();
             _test.waitForElement(parentLocator, 1000);
             _test.clickAt(parentLocator, 5, 5, 0);
         }
-        Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden();
+        Locator itemLocator = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden();
         if (onlyOpen)
         {
             _test.waitForElement(itemLocator, 1000);
@@ -630,32 +604,10 @@ public class Ext4Helper extends AbstractHelper
             _test.waitAndClick(itemLocator);
     }
 
-    public void clickExt4MenuItem(String text)
+    public void closeExtTab(String tabName)
     {
-        _test.click(ext4MenuItem(text));
-    }
-
-    public static Locator.XPathLocator ext4MenuItem(String text)
-    {
-        return Locator.xpath("//span[contains(@class, '" + _cssPrefix + "menu-item-text') and text() = " + Locator.xq(text) +  "]");
-    }
-
-    public static Locator.XPathLocator ext4MenuItemDisabled(String text)
-    {
-        return Locator.tagWithClass("div", _cssPrefix + "menu-item-disabled").withDescendant(ext4MenuItem(text));
-    }
-
-    public static Locator.XPathLocator ext4Window(String title)
-    {
-        return Locators.window(title);
-    }
-
-    public static Locator.XPathLocator ext4WindowButton(String windowTitle, String buttonText)
-    {
-        // TOD0: Check not hidden
-        String windowPath = "//div[contains(@class, '" + _cssPrefix + "window') and ./div/div/div/div/div/span[contains(@class, '" + _cssPrefix + "window-header-text')" +
-                " and contains(string(), '" + windowTitle + "')]]";
-        return Locator.xpath(windowPath + Locators.ext4Button(buttonText).toXpath());
+        _test.log("Closing Ext tab " + tabName);
+        _test.click(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]"));
     }
 
     public static class Locators
@@ -681,6 +633,11 @@ public class Ext4Helper extends AbstractHelper
             return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
         }
 
+        public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
+        {
+            return window(windowTitle).append(ext4Button(buttonText));
+        }
+
         public static Locator.XPathLocator windowBody(String title)
         {
             return window(title).append(Locator.tagWithClass("div", _cssPrefix + "window-body"));
@@ -704,6 +661,16 @@ public class Ext4Helper extends AbstractHelper
         public static Locator.XPathLocator formItemWithInputNamed(String name)
         {
             return formItem().withDescendant(Locator.tag("input").withAttribute("name", name));
+        }
+
+        public static Locator.XPathLocator menuItem(String text)
+        {
+            return Locator.tagWithClass("span", _cssPrefix + "menu-item-text").withText(text);
+        }
+
+        public static Locator.XPathLocator menuItemDisabled(String text)
+        {
+            return Locator.tagWithClass("div", _cssPrefix + "menu-item-disabled").withDescendant(menuItem(text));
         }
 
         public static Locator.XPathLocator mask()
@@ -750,26 +717,35 @@ public class Ext4Helper extends AbstractHelper
         {
             return Locator.xpath("//input[" + Locator.NOT_HIDDEN + " and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
         }
-    }
 
-    public static Locator.XPathLocator ext4Tab(String label)
-    {
-        return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner").notHidden();
-    }
+        public static Locator getGridRow(String columnVal, String markerCls)
+        {
+            return Locator.css("." + markerCls).append(Locator.css("." + _cssPrefix + "grid-data-row")).withText(columnVal);
+        }
 
-    public void clickExtTab(String tabname)
-    {
-        _test.waitAndClick(Locator.xpath("//span[contains(@class, '" + _cssPrefix + "tab-inner') and text() = '" + tabname + "']"));
-    }
+        /**
+         * @param cellText Exact text from any cell in the desired row
+         * @param index 0-based index of rows with matching cellText
+         * @return XPathLocator for the desired row
+         */
+        private static Locator.XPathLocator getGridRow(String cellText, int index)
+        {
+            return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
+        }
 
-    public void closeExtTab(String tabName)
-    {
-        _test.log("Closing Ext tab " + tabName);
-        _test.click(Locator.xpath("//a[contains(@class, 'x4-tab')]//span[contains(@class, 'x4-tab-inner') and text()='" + tabName + "']/../../../span[contains(@class, 'x4-tab-close-btn')]"));
-    }
+        private static Locator.XPathLocator getGridRowContains(String cellText, int index)
+        {
+            return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
+        }
 
-    public void clickExtButton(String text)
-    {
-        _test.click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='" + text + "']"));
+        public static Locator.XPathLocator invalidField()
+        {
+            return Locator.tag("input").withClass(_cssPrefix + "form-field").withClass(_cssPrefix + "form-invalid-field");
+        }
+
+        public static Locator.XPathLocator ext4Tab(String label)
+        {
+            return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner").notHidden();
+        }
     }
 }

@@ -119,7 +119,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         click(Locator.linkWithText("manage assay design"));
         mouseOver(Locator.linkWithText("set default values"));
         prepForPageLoad();
-        waitAndClick(Ext4Helper.ext4MenuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        waitAndClick(Ext4Helper.Locators.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
 
         // Are we seeing the default set in the parent project?
         assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));

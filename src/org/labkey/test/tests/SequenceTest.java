@@ -118,7 +118,7 @@ public class SequenceTest extends BaseWebDriverTest
         //create readset records for illumina run
         goToProjectHome();
         waitAndClick(Locator.linkWithText("Create Readsets"));
-        waitForElement(Ext4Helper.ext4Window("Create Readsets"));
+        waitForElement(Ext4Helper.Locators.window("Create Readsets"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         _helper.waitForField("Sample Id", WAIT_FOR_PAGE);
@@ -128,7 +128,7 @@ public class SequenceTest extends BaseWebDriverTest
         setFormElementJS(Locator.name("text"), getIlluminaNames());
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         _readsetCt += 14;
         assertTextPresent("Success!");
         clickButton("OK");
@@ -356,7 +356,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Download Sequence Files");
-        waitForElement(Ext4Helper.ext4Window("Export Files"));
+        waitForElement(Ext4Helper.Locators.window("Export Files"));
         waitForText("Export Files As");
         Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
         String fileName = "MyFile";
@@ -380,7 +380,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View FASTQC Report");
-        waitForElement(Ext4Helper.ext4Window("FastQC"));
+        waitForElement(Ext4Helper.Locators.window("FastQC"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
         waitForText("File Summary");
@@ -421,7 +421,7 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRef.getForLabel(this, "Name").setValue(newName);
         sleep(250); //wait for value to save
         clickButton("Submit", 0);
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         assertTextPresent("Your upload was successful!");
         clickButton("OK");
 
@@ -452,7 +452,7 @@ public class SequenceTest extends BaseWebDriverTest
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Analyze Selected");
-        waitForElement(Ext4Helper.ext4Window("Import Data"));
+        waitForElement(Ext4Helper.Locators.window("Import Data"));
         waitForText("Description");
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
@@ -540,7 +540,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         waitForText("Adapters");
         clickButton("Common Adapters", 0);
-        waitForElement(Ext4Helper.ext4Window("Choose Adapters"));
+        waitForElement(Ext4Helper.Locators.window("Choose Adapters"));
         waitForText("Choose Adapter Group");
         Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
         waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
@@ -790,21 +790,21 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(1, "fileName", filename1);
         grid.setGridCell(2, "fileName", filename1);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
         click(Ext4Helper.Locators.ext4Button("OK"));
 
         setBasicSampleDetails(grid);
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         waitForElement(Locator.tagContainingText("div", "Duplicate Sample: " + filename1 + ". Please remove or edit rows"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //verify paired end
         pairedField.setChecked(true);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("For each file, you must provide either");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         pairedField.setChecked(false);
@@ -816,7 +816,7 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(1, "mid5", barcode);
         grid.setGridCellJS(2, "mid3", barcode);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
         click(Ext4Helper.Locators.ext4Button("OK"));
         barcodeField.setChecked(false);
@@ -952,7 +952,7 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(3, "mid5", barcode2);
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("Duplicate Sample: " + filename2);
         click(Ext4Helper.Locators.ext4Button("OK"));
 
@@ -1054,7 +1054,7 @@ public class SequenceTest extends BaseWebDriverTest
         goToProjectHome();
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         waitForElement(Locator.tagContainingText("div", "There are errors with the input files"));
         isTextPresent("File is already used in existing readsets')]");
         assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));

@@ -67,7 +67,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         clickButton("Save", "Please enter a view name:");
 
-        Locator locator = Ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        Locator locator = Ext4Helper.Locators.window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
         if (isElementPresent(locator))
         {
             setFormElement(locator, REPORT_NAME);

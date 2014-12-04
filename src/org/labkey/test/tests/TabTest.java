@@ -354,11 +354,11 @@ public class TabTest extends SimpleModuleTest
 
 //        _ext4Helper.clickExt4MenuButton(true, tabMenuXPath, false, "Folder", "Management");       // Tab menu hidden so this doesn't work; do it inline with fireEvent instead
         fireEvent(tabMenuXPath, SeleniumEvent.click);
-        Locator parentLocator = Ext4Helper.ext4MenuItem("Folder");
+        Locator parentLocator = Ext4Helper.Locators.menuItem("Folder");
         waitForElement(parentLocator, 1000);
         mouseOver(parentLocator);
 
-        Locator itemLocator = Ext4Helper.ext4MenuItem("Management");
+        Locator itemLocator = Ext4Helper.Locators.menuItem("Management");
         waitAndClickAndWait(itemLocator);
     }
 }

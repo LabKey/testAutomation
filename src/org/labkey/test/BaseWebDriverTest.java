@@ -33,11 +33,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -892,8 +889,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertSignOutAndMyAccountPresent()
     {
         click(Locator.id("userMenuPopupLink"));
-        assertElementPresent(Ext4Helper.ext4MenuItem("My Account"));
-        assertElementPresent(Ext4Helper.ext4MenuItem("Sign Out"));
+        assertElementPresent(Ext4Helper.Locators.menuItem("My Account"));
+        assertElementPresent(Ext4Helper.Locators.menuItem("Sign Out"));
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -5639,7 +5636,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Group");
         waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
         _ext4Helper.selectComboBoxItem("Group:", Ext4Helper.TextMatchTechnique.STARTS_WITH, (isSiteGroup ? "Site: " : "") + group);
-        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Group", "Impersonate"));
+        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Group", "Impersonate"));
     }
 
     public void impersonateRole(String role)
@@ -5656,7 +5653,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         for (String role : roles)
             waitAndClick(Ext4GridRef.locateExt4GridCell(role));
 
-        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Roles", "Impersonate"));
+        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Roles", "Impersonate"));
     }
 
     public void stopImpersonatingRole()
@@ -5678,7 +5675,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
         _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");
-        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate User", "Impersonate"));
+        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
 
         if (isElementPresent(Locator.lkButton("Home")))

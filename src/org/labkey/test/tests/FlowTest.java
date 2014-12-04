@@ -309,7 +309,7 @@ public class FlowTest extends BaseFlowTest
         DataRegionTable runTable = new DataRegionTable("query", this);
         runTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        Locator.XPathLocator measurePicker = Ext4Helper.ext4Window("Y Axis");
+        Locator.XPathLocator measurePicker = Ext4Helper.Locators.window("Y Axis");
         waitForElement(measurePicker);
         waitForElements(measurePicker.append(Locator.tag("tr").startsWith("comp:")), 4);
     }

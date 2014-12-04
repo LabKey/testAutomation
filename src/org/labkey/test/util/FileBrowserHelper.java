@@ -333,14 +333,14 @@ public class FileBrowserHelper
 
         if (replace)
         {
-            _test.waitForElement(Ext4Helper.ext4Window("File Conflict:"));
+            _test.waitForElement(Ext4Helper.Locators.window("File Conflict:"));
             _test.assertTextPresent("Would you like to replace it?");
             _test.clickButton("Yes", 0);
         }
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
-            _test.waitForElement(Ext4Helper.ext4Window("Extended File Properties"));
+            _test.waitForElement(Ext4Helper.Locators.window("Extended File Properties"));
             _test.waitForText("File (1 of ");
             for (FileBrowserExtendedProperty prop : fileProperties)
             {

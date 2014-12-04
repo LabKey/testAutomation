@@ -299,7 +299,7 @@ public class LabModuleHelper
         goToLabHome();
         clickNavPanelItem(assayName + ":", IMPORT_DATA_TEXT);
         if (supportsTemplates)
-            _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
+            _test.click(Ext4Helper.Locators.menuItem(UPLOAD_RESULTS_TEXT));
 
         _test.waitForElement(Ext4Helper.Locators.window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
         _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
@@ -337,7 +337,7 @@ public class LabModuleHelper
     {
         Ext4CmpRef addBtn = _test._ext4Helper.queryOne("#manageDataSources button[text='Add New']", Ext4CmpRef.class);
         _test.waitAndClick(Locator.id(addBtn.getId()));
-        _test.waitForElement(Ext4Helper.ext4Window("Add Data Source"));
+        _test.waitForElement(Ext4Helper.Locators.window("Add Data Source"));
 
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForField("Item Type");
@@ -361,7 +361,7 @@ public class LabModuleHelper
         queryField.setValue(query);
 
         _test.waitAndClick(Ext4Helper.Locators.ext4Button("Save"));
-        _test.waitForElement(Ext4Helper.ext4Window("Success"));
+        _test.waitForElement(Ext4Helper.Locators.window("Success"));
         _test.click(Ext4Helper.Locators.ext4Button("OK"));
 
         if (containerPath == null)
@@ -374,7 +374,7 @@ public class LabModuleHelper
     {
         Ext4CmpRef addBtn = _test._ext4Helper.queryOne("#manageDemographicsSources button[text='Add New']", Ext4CmpRef.class);
         _test.waitAndClick(Locator.id(addBtn.getId()));
-        _test.waitForElement(Ext4Helper.ext4Window("Add Demographics Source"));
+        _test.waitForElement(Ext4Helper.Locators.window("Add Demographics Source"));
 
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForField("Label");
@@ -400,7 +400,7 @@ public class LabModuleHelper
 
         if (expectSuccess)
         {
-            _test.waitForElement(Ext4Helper.ext4Window("Success"));
+            _test.waitForElement(Ext4Helper.Locators.window("Success"));
             _test.click(Ext4Helper.Locators.ext4Button("OK"));
 
             if (containerPath == null)
@@ -413,13 +413,13 @@ public class LabModuleHelper
             if (!isDuplicate)
             {
                 //this indicates we did not expect this to be successful, so we make sure the right errors are shown
-                _test.waitForElement(Ext4Helper.ext4Window("Error"));
+                _test.waitForElement(Ext4Helper.Locators.window("Error"));
                 _test.click(Ext4Helper.Locators.ext4Button("OK"));
                 _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
             }
             else
             {
-                _test.waitForElement(Ext4Helper.ext4Window("Error"));
+                _test.waitForElement(Ext4Helper.Locators.window("Error"));
                 _test.click(Ext4Helper.Locators.ext4Button("OK"));
                 _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
             }

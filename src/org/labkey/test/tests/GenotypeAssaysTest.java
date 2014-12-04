@@ -193,7 +193,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         button.waitForEnabled();
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -268,7 +268,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer2");
@@ -276,7 +276,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -391,7 +391,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer1");
@@ -401,7 +401,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         errorText = text.replaceAll(originalPrimer, fakePrimer);
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: " + fakePrimer);
@@ -409,7 +409,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -470,7 +470,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("13294", ",");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing subject Id");
@@ -478,7 +478,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 

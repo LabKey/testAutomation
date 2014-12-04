@@ -175,7 +175,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
         _fileBrowserHelper.goToConfigureButtonsTab();
         clickButton("Reset To Default", 0);
-        waitAndClick(Ext4Helper.ext4WindowButton("Confirm Reset", "Yes"));
+        waitAndClick(Ext4Helper.Locators.windowButton("Confirm Reset", "Yes"));
         _ext4Helper.waitForMaskToDisappear();
         refresh(); // TODO: Reset doesn't update buttons in place
         waitForElement(FileBrowserHelper.BrowserAction.UP.getButtonIconLocator());

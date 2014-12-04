@@ -215,7 +215,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         button.waitForEnabled();
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -260,7 +260,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         button.waitForEnabled();
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: FakeTest (ng/ml)");
@@ -268,7 +268,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -306,8 +306,8 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     {
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        click(Ext4Helper.Locators.menuItem("Prepare Run"));
+        waitForElement(Ext4Helper.Locators.window(IMPORT_DATA_TEXT));
         waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -333,7 +333,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Save and Close"));
 
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertElementPresent(Locator.xpath("//div[contains(text(), 'Unknown value for field category: " + category + "')]"));
         click(Ext4Helper.Locators.ext4Button("OK"));
 
@@ -385,7 +385,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("Verifying Roche E411 Import");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
@@ -405,7 +405,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -517,7 +517,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("verifying run plan marked as complete");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
         DataRegionTable dr2 = new DataRegionTable("query", this);
         assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }

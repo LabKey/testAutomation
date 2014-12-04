@@ -37,6 +37,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -161,7 +162,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
         beginAt("/query/" + containerPath + "/begin.view");
-        _ext4Helper.clickExtButton("Schema Administration");
+        click(Ext4Helper.Locators.ext4Button("Schema Administration"));
 
         if (!isTextPresent("reload"))
         {

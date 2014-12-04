@@ -118,7 +118,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         Ext4CmpRef btn = _ext4Helper.queryOne("#upload", Ext4CmpRef.class);
         btn.waitForEnabled();
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -126,7 +126,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -178,7 +178,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.waitForDisabled(uploadBtn, false);
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: NotRealPopulation");
@@ -186,7 +186,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -248,7 +248,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -256,7 +256,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 

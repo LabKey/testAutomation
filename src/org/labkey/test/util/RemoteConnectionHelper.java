@@ -109,7 +109,7 @@ public class RemoteConnectionHelper extends AbstractHelper
     public void goToManageRemoteConnections()
     {
         _test.goToSchemaBrowser();
-        _ext4Helper.clickExtButton("Manage Remote Connections");
+        _test.click(Ext4Helper.Locators.ext4Button("Manage Remote Connections"));
     }
 
     public int getNumConnections()

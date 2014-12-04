@@ -154,8 +154,8 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
     {
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        click(Ext4Helper.Locators.menuItem("Prepare Run"));
+        waitForElement(Ext4Helper.Locators.window(IMPORT_DATA_TEXT));
         waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -184,7 +184,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         //the data are missing an ID
         click(Ext4Helper.Locators.ext4Button("Save"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("One or more required fields are missing from the sample records");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
@@ -193,7 +193,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         grid.setGridCell(1, "subjectId", "FakeId");
 
         click(Ext4Helper.Locators.ext4Button("Save"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent("Must provide at least 2 negative controls for each subjectId/date.");
         assertTextPresent("Missing for: FakeId / 2012-02-09");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
@@ -211,7 +211,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         log("Verifying AID Plate Reader Import");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
@@ -231,7 +231,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4Helper.Locators.window("Success"));
         click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -240,7 +240,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         log("verifying run plan marked as complete");
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
-        _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        click(Ext4Helper.Locators.menuItem("View Planned Runs"));
         DataRegionTable dr2 = new DataRegionTable("query", this);
         assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
