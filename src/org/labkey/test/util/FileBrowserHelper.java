@@ -100,7 +100,7 @@ public class FileBrowserHelper
     private void selectFolderTreeNode(String nodeId)
     {
         final Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
-        Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
+        final Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
         WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
 
         _test.waitForElement(folderTreeNode);
@@ -111,12 +111,19 @@ public class FileBrowserHelper
         }
         catch (StaleElementReferenceException ignore) {}
 
-        Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
+        final Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
         if (!_test.isElementPresent(folderTreeNodeSelected))
         {
             boolean initialSelectionExists = _test.isElementPresent(fBrowser.withPredicate(Locator.tagWithClass("tr", "x4-grid-row-selected")));
-            _test.click(folderTreeNode);
-            _test.waitForElement(folderTreeNodeSelected);
+            _test.waitFor(new BaseWebDriverTest.Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    _test.click(folderTreeNode);
+                    return _test.isElementPresent(folderTreeNodeSelected);
+                }
+            }, "Failed to select tree node", WAIT_FOR_JAVASCRIPT);
             _test._ext4Helper.waitForMaskToDisappear();
             if (initialSelectionExists)
                 _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));

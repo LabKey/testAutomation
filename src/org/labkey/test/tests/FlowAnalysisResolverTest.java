@@ -47,7 +47,7 @@ public class FlowAnalysisResolverTest extends BaseFlowTest
         //import set 2
 
         //import analsysis
-        String analysisZipPath = "resolve-test/statistics.tsv";
+        String analysisZipPath = "/resolve-test/statistics.tsv";
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
