@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<etl xmlns="http://labkey.org/etl/xml">
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
 <name>Write to File test</name>
 <description>Write rows from etl_source to a file</description>
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
         <source schemaName="vehicle" queryName="etl_source" />
-        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}-${Timestamp}" fileExtension="tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+        <destination type="file" dir="etlOut" fileBaseName="report" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
     </transform>
+    <transform id="TestETLPipeline" type="ExternalPipelineTask" externalTaskId="org.labkey.api.pipeline.cmd.CommandTask:simpleTestTailCommand"/>
 </transforms>
-<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+<!--<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />-->
     <schedule>
         <poll interval="31s" />
     </schedule>
