@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 
@@ -206,7 +207,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickFolder(getFolderName());
 
         //webpart needed for republish test
-        _portalHelper.addQueryWebPart("snapshot", "study", "StudySnapshot", null);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("snapshot", "study", "StudySnapshot", null);
 
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
