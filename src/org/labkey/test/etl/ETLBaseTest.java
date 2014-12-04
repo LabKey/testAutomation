@@ -421,6 +421,11 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         assertQueryWebPart("etl_target", "Target1", true, targets);
     }
 
+    protected void assertInTarget2(String... targets)
+    {
+        assertQueryWebPart("etl_target2", "Target2", true, targets);
+    }
+
     protected void gotoQueryWebPart(String webpartName)
     {
         gotoQueryWebPart(webpartName, webpartName);
