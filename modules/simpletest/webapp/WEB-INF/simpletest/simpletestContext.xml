@@ -48,7 +48,7 @@
     </bean>
 
     <bean id="simpleTestTailCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
-        <constructor-arg value="tailCommand"/>
+        <constructor-arg value="simpleTestTailCommand"/>
         <property name="statusName" value="TAIL FILE"/>
         <property name="inputPaths">
             <map>
@@ -78,7 +78,7 @@
     </bean>
 
     <bean id="simpleTestTailBadCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
-        <constructor-arg value="tailCommand"/>
+        <constructor-arg value="simpleTestTailBadCommand"/>
         <property name="statusName" value="TAIL FILE"/>
         <property name="inputPaths">
             <map>
