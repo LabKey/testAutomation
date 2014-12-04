@@ -15,14 +15,16 @@
  */
 package org.labkey.test.etl;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelper;
-import org.labkey.test.categories.Data;
+
 import java.io.File;
 import java.util.Arrays;
 
@@ -44,6 +46,8 @@ public class ETLTest extends ETLBaseTest
     private static final File TransformXMLdest = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/simpletest/ETLs");
     private static final File TransformXMLsrc = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/ETLtest/ETLs");
     private static final String PROJECT_NAME = "ETLTestProject";
+    private final String ETL_OUT_FILE = "/etlOut/report.testIn.tsv";
+    private final String ETL_OUT_FILE2 = "/etlOut/report.testOut.tsv";
 
     @Override
     protected String getProjectName()
@@ -133,6 +137,28 @@ UNDONE: need to fix the merge case
         // run tests over remote transform types
         verifyRemoteTransform();
         log("XML Dest: " + TransformXMLdest);
+
+        //Stored proc result set ETL
+        runETL("SProcResultSet");
+        assertInTarget2("Subject 2", "Subject 3");
+
+        //file ETL output and external pipeline test
+        File dir = getTestTempDir();
+        dir.mkdirs();
+        setPipelineRoot(dir.getAbsolutePath());
+        runETL("targetFile");
+        File etlFile = new File(dir.getAbsolutePath() + ETL_OUT_FILE);
+        String fileContents = TestFileUtils.getFileContents(etlFile);
+        String[] rows = fileContents.split("\r");
+        Assert.assertEquals("ETL output file did not contain header",rows[0], "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified");
+        assert(rows[1].contains("Subject 2"));
+        assert(rows[2].contains("Subject 3"));
+        //file created by external pipeline
+        File etlFile2 = new File(dir.getAbsolutePath() + ETL_OUT_FILE2);
+        fileContents = TestFileUtils.getFileContents(etlFile2);
+        rows = fileContents.split("\r");
+        assert(rows[1].contains("Subject 2"));
+        assert(rows[2].contains("Subject 3"));
         // be sure to check for all expected errors here so that the test won't fail on exit
         checkExpectedErrors(_expectedErrors);
     }
@@ -152,6 +178,7 @@ UNDONE: need to fix the merge case
 
         portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
         portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);
+        portalHelper.addQueryWebPart("Target2", "vehicle", "etl_target2", null);
 
         if (remoteOnly)
             return;
