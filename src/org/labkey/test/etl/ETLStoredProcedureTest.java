@@ -87,14 +87,8 @@ public class ETLStoredProcedureTest extends ETLTest
         // try to run a non-existent proc
         rtr = runETL_API(TRANSFORM_BAD_PROCEDURE_NAME_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount();
-        // Error on missing procedure or @transformRunId; over api that didn't create a job
-
-        // try to run a proc missing the required transformRunId param
-        rtr = runETL_API(TRANSFORM_BAD_MISSING_TRANSFORM_RUN_ID_PARM_SP);
-        assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount();
-        // Error on missing procedure or @transformRunId
+        incrementExpectedErrorCount(false);
+        // Error on missing procedure; over api that didn't create a job
 
         // test mode 3, raise an error inside the sproc
         rtr = runETL_API(TRANSFORM_BAD_THROW_ERROR_SP);
