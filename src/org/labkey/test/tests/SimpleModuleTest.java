@@ -309,7 +309,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
+            assertEquals(403, ex.getStatusCode());
     //            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
 
@@ -392,7 +392,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
+            assertEquals(403, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
         }
     }

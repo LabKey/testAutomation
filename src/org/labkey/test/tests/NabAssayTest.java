@@ -468,7 +468,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // no permission to details page for "ptid 1 C"; it wasn't copied to the study
         beginAt(ptid1c_detailsURL);
-        assertEquals(getResponseCode(), 401);
+        assertEquals(getResponseCode(), 403);
 
         beginAt("/login/logout.view");  // stop impersonating
 

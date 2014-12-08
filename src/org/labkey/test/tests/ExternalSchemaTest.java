@@ -161,8 +161,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void ensureExternalSchema(String containerPath)
     {
         log("** Create ExternalSchema: " + USER_SCHEMA_NAME);
-        beginAt("/query/" + containerPath + "/begin.view");
-        click(Ext4Helper.Locators.ext4Button("Schema Administration"));
+        beginAt("/query/" + containerPath + "/admin.view");
 
         if (!isTextPresent("reload"))
         {
@@ -258,7 +257,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(401,ex.getStatusCode());
+            assertEquals(403, ex.getStatusCode());
         }
         catch (IOException fail)
         {
@@ -321,7 +320,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
+            assertEquals(403, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }
@@ -334,7 +333,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         catch (CommandException ex)
         {
-            assertEquals(401, ex.getStatusCode());
+            assertEquals(403, ex.getStatusCode());
 //            assertEquals("The row is from the wrong container.", ex.getMessage());
 //            assertEquals("org.labkey.api.view.UnauthorizedException", ex.getProperties().get("exceptionClass"));
         }

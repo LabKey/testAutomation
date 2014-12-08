@@ -4177,7 +4177,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertAtUserUserLacksPermissionPage()
     {
         assertTextPresent(PERMISSION_ERROR);
-        assertTitleEquals("401: Error Page -- User does not have permission to perform this operation");
+        assertTitleEquals("403: Error Page -- User does not have permission to perform this operation");
     }
 
     public void assertNavTrail(String... links)
