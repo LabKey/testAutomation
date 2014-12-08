@@ -33,10 +33,9 @@ import java.util.Set;
 @Category({Study.class, Disabled.class})
 public class StudyManualTest extends StudyTest
 {
-
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
-    protected final File VISIT_MAP = new File(TestFileUtils.getLabKeyRoot(), getStudySampleDataPath() + "v068_visit_map.txt");
+    protected final File VISIT_MAP = new File(TestFileUtils.getLabKeyRoot(), getStudySampleDataPath() + "v068_visit_map.xml");
 
     protected final StudyHelper _studyHelper = new StudyHelper(this);
 
