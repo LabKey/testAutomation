@@ -2182,7 +2182,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
 
                 // If another thread (e.g., SearchService) is doing work then give it 10 seconds before trying again
-                if (isTextPresent("Warning: active thread"))
+                if (isElementPresent(Locators.labkeyError.containing("Active thread(s) may have objects in use:")))
                 {
                     log("Pausing 10 seconds to wait for active thread");
                     sleep(10000);
