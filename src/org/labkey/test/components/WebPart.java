@@ -63,14 +63,20 @@ public class WebPart
 
     public void delete()
     {
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.removeWebPart(getTitle());
     }
 
     public void moveUp()
     {
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.UP);
     }
 
     public void moveDown()
     {
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.DOWN);
     }
 
     public void goToPermissions()
