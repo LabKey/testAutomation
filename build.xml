@@ -244,7 +244,7 @@
              </present>
         </selector>
 
-        <!-- This selector detects all modules with tests -->
+        <!-- This selector detects all modules without a skipBuild.txt file in the module root -->
         <selector id="skip.module.selector">
             <not>
                 <present targetdir="${project.root}">
@@ -1111,6 +1111,7 @@
         <jar destfile="${project.root}/sampledata/qc/validator.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.6.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/httpcore-4.3.2.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/httpclient-4.3.5.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging-1.1.3.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
@@ -1124,6 +1125,7 @@
         <jar destfile="${project.root}/sampledata/qc/transform.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.6.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/httpcore-4.3.2.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/httpclient-4.3.5.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging-1.1.3.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
