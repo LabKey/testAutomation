@@ -30,6 +30,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -141,6 +142,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private static final String PUBLISH_SUB_FOLDER_ADMIN = "publishsub_admin@study.test";
 
 
+
     // enum to help determine the study publish location
     public enum PublishLocation
     {
@@ -224,6 +226,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         verifyPipelineJobLinks(PUB3_NAME, PUB2_NAME, PUB1_NAME);
         verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
+        //rePublishStudy(PUB1_NAME, PUB1_REPUBLISH_NAME);
+        //verifyPublishedStudy(PUB1_REPUBLISH_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS-1);
+        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
+        //rePublishStudy(PUB2_NAME, PUB2_REPUBLISH_NAME);
         verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
         // concat group 2 and group 3 ptids for the last publisehd study ptid list
         ArrayList<String> group2and3ptids = new ArrayList<>();
@@ -237,11 +243,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //verify study republish
         rePublishStudy(PUB1_NAME, PUB1_REPUBLISH_NAME);
-        verifyPublishedStudy(PUB1_REPUBLISH_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS-1);
-        rePublishStudy(PUB2_NAME, PUB2_REPUBLISH_NAME);
-        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
-        rePublishStudy(PUB3_NAME, PUB3_REPUBLISHED_NAME);
-        verifyPublishedStudy(PUB3_NAME, getProjectName(), group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
     }
 
     /**
@@ -768,6 +769,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         preshiftedDatesByStudy.put(newName, preshiftedDatesByStudy.get(parentName));
         goToProjectHome();
         clickFolder(getFolderName());
+        waitForElement(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"));
         clickAt(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"), 1, 1, 0);
         _extHelper.waitForExtDialog("Republish Study");
         assertTextPresent("**This study is being republished and has preset values based on the previous publish studies values.");
@@ -780,52 +782,60 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard page 2 : Mice
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Mice']"));
         waitForElement(Locator.css(".studyWizardParticipantList"));
+        verifyPublishWizardSelectedCheckboxes("studyWizardParticipantList", "Group 1");
         clickButton("Next", 0);
 
         // Wizard page 3 : Datasets
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
         waitForElement(Locator.css(".studyWizardDatasetList"));
+        verifyPublishWizardSelectedCheckboxes("studyWizardDatasetList", DATASETS);
         clickButton("Next", 0);
 
         // Wizard page 4 : Visits
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Visits']"));
         waitForElement(Locator.css(".studyWizardVisitList"));
+        verifyPublishWizardSelectedCheckboxes("studyWizardVisitList", "Screening", "Grp1:F/U/Grp2:V#2", "G1: V#2/G2: V#3");
         clickButton("Next", 0);
 
         // Wizard page 5 : Specimens
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+        assert(isCheckboxChecked(Locator.checkboxByName("includeSpecimens").findElement(getDriver())));
         clickButton("Next", 0);
 
         // Wizard Page 6 : Study Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
-        //click(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
+        verifyPublishWizardSelectedCheckboxes("studyObjects", "Assay Schedule", "Cohort Settings", "Custom Participant View", "Participant Comment Settings", "Protocol Documents", "Specimen Settings", "Treatment Data");
         clickButton("Next", 0);
 
         // Wizard page 7 : Lists
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
         waitForElement(Locator.css(".studyWizardListList"));
+        verifyPublishWizardSelectedCheckboxes("studyWizardListList", "CustomIndexing", "Indexed as one doc", "List To Delete", "List1");
         clickButton("Next", 0);
 
         // Wizard page 8 : Views
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
         waitForElement(Locator.css(".studyWizardViewList"));
+        verifyPublishWizardSelectedCheckboxes("studyWizardViewList", "Shared Custom View");
         clickButton("Next", 0);
 
         // Wizard Page 9 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
         waitForElement(Locator.css(".studyWizardReportList"));
         waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
+        verifyPublishWizardSelectedCheckboxes("studyWizardReportList", "Shared Mouse Report", "Shared Time Chart");
         clickButton("Next", 0);
 
         // Wizard page 10 : Folder Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        //click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
+        verifyPublishWizardSelectedCheckboxes("folderObjects", "Container specific module properties", "Experiments and runs", "External schema definitions", "Folder type and active modules", "Full-text search settings", "Missing value indicators", "Notification settings", "Webpart properties and layout", "Wikis and their attachments");
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
+        verifyPublishWizardSelectedCheckboxes("studyWizardPublishOptionsList", "Use Alternate Mouse IDs", "Shift Mouse Dates", "Remove Protected Columns");
         clickButton("Finish");
 
         _pipelineJobs++;
@@ -1192,5 +1202,17 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 assertEquals(value, entry.getValue()[i++]);
             }
         }
+    }
+
+    private void verifyPublishWizardSelectedCheckboxes(String marker, String... expectedCheckboxes)
+    {
+        Locator checkedCheckboxLocator = Locator.xpath("//div[contains(@class,'" + marker + "')]//div[contains(@class,'x-grid3-row-selected')]//span[@class='labkey-link']");
+        List<WebElement> checkboxes = checkedCheckboxLocator.findElements(getDriver());
+        List<String> checkboxLabels = new ArrayList<>();
+        for(WebElement checkbox : checkboxes)
+        {
+            checkboxLabels.add(checkbox.getText());
+        }
+        assert(checkboxLabels.equals(expectedCheckboxes));
     }
 }
