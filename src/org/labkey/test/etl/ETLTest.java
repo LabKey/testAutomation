@@ -15,7 +15,7 @@
  */
 package org.labkey.test.etl;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
