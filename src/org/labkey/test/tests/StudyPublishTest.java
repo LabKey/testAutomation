@@ -799,7 +799,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard page 5 : Specimens
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        assert(isCheckboxChecked(Locator.checkboxByName("includeSpecimens").findElement(getDriver())));
+        Assert.assertTrue(isCheckboxChecked(Locator.checkboxByName("includeSpecimens").findElement(getDriver())));
         clickButton("Next", 0);
 
         // Wizard Page 6 : Study Objects
@@ -836,9 +836,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
         verifyPublishWizardSelectedCheckboxes("studyWizardPublishOptionsList", "Use Alternate Mouse IDs", "Shift Mouse Dates", "Remove Protected Columns");
-        clickButton("Finish");
-
-        _pipelineJobs++;
+        //goToProjectHome();
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
