@@ -148,6 +148,7 @@ modules/simpletest/resources/etls/SProcModifiedSinceNoSource.xml -text
 modules/simpletest/resources/etls/SProcModifiedSinceWithSource.xml -text
 modules/simpletest/resources/etls/SProcNormalOperation.xml -text
 modules/simpletest/resources/etls/SProcOverridePersistedParameter.xml -text
+modules/simpletest/resources/etls/SProcPersistedGlobalParameter.xml -text
 modules/simpletest/resources/etls/SProcPersistedParameter.xml -text
 modules/simpletest/resources/etls/SProcResultSet.xml -text
 modules/simpletest/resources/etls/SProcRunFilter.xml -text
