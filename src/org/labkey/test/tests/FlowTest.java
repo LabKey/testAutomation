@@ -32,6 +32,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -80,6 +81,7 @@ public class FlowTest extends BaseFlowTest
             copyAnalysisScriptTest();
             removeAnalysisFilter();
             verifyDiscoverableFCSFiles();
+            verifyExperimentRunGraphLinks();
         }
     }
 
@@ -484,6 +486,28 @@ public class FlowTest extends BaseFlowTest
         sleep(15000);
         waitForText("Ignoring filter");
         assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
+    }
+
+    @LogMethod
+    private void verifyExperimentRunGraphLinks()
+    {
+        clickFolder(getFolderName());
+        goToSchemaBrowser();
+        selectQuery("exp", "Runs");
+        waitForText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
+        List<WebElement> links = getDriver().findElements(By.xpath("//a[@title='Experiment run graph']"));
+        int linkCount = links.size();
+        for (int i = 0; i < linkCount; i++)
+        {
+            pushLocation();
+            links = getDriver().findElements(By.xpath("//a[@title='Experiment run graph']"));
+            WebElement link = links.get(i);
+            link.click();
+            assertTextNotPresent("Error");
+            assertTextPresent("Click on a node in the graph below for details.");
+            popLocation();
+        }
     }
 
     @LogMethod
