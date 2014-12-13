@@ -493,7 +493,11 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
-        setFormElement(Locator.name("content"), "301-302|X|Test Visit");
+        setFormElement(Locator.name("content"),
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<visitMap xmlns=\"http://labkey.org/study/xml\">\n" +
+            "  <visit label=\"Test Visit\" typeCode=\"X\" sequenceNum=\"301.0\" maxSequenceNum=\"302.0\"/>\n" +
+            "</visitMap>");
         clickButton("Import");
 
         log("Publishing the data as the PI");
@@ -719,9 +723,12 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
         setFormElement(Locator.name("content"),
-            "6-13|X|Test Visit1\n" +
-            "50-70|X|Test Visit2\n" +
-            "302-303|X|Test Visit3\n"
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<visitMap xmlns=\"http://labkey.org/study/xml\">\n" +
+            "  <visit label=\"Test Visit1\" typeCode=\"X\" sequenceNum=\"6.0\" maxSequenceNum=\"13.0\"/>\n" +
+            "  <visit label=\"Test Visit2\" typeCode=\"X\" sequenceNum=\"50.0\" maxSequenceNum=\"70.0\"/>\n" +
+            "  <visit label=\"Test Visit3\" typeCode=\"X\" sequenceNum=\"302.0\" maxSequenceNum=\"303.0\"/>\n" +
+            "</visitMap>"
         );
         clickButton("Import");
 
