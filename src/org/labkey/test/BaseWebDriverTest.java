@@ -6153,6 +6153,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(signInButtonOrLink);
     }
 
+    public void signOutHTTP()
+    {
+        String logOutUrl = WebTestHelper.buildURL("login", "logout");
+        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
+        logOutRequest.copySession(getDriver());
+
+        SimpleHttpResponse response = logOutRequest.getResponse();
+        assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+    }
+
     /*
      * This assumes that you have added the "search" webpart to your project
      */
