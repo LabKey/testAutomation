@@ -967,7 +967,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         assertTableCellTextEquals("details", 4, 1, "true");
-        assertTableCellTextEquals("details", 3, 3, DEMOGRAPHICS_DESCRIPTION);
+        assertTableCellTextEquals("details", 4, 3, DEMOGRAPHICS_DESCRIPTION);
 
         // "Demographics Data" bit needs to be false for the rest of the test
         setDemographicsBit("DEM-1: Demographics", false);
