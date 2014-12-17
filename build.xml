@@ -1092,6 +1092,9 @@
 
     <target name="build-qc-validator-if-dirty" unless="qc.build.uptodate">
         <delete dir="${project.root}/sampledata/qc/classes"/>
+        <delete file="${project.root}/sampledata/qc/validator.jar"/>
+        <delete file="${project.root}/sampledata/qc/transform.jar"/>
+
         <mkdir dir="${project.root}/sampledata/qc/classes"/>
         <javac srcdir="${project.root}/sampledata/qc/src"
             destdir="${project.root}/sampledata/qc/classes"
