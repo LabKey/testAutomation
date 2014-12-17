@@ -772,7 +772,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"));
         clickAt(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"), 1, 1, 0);
         _extHelper.waitForExtDialog("Republish Study");
-        assertTextPresent("**This study is being republished and has preset values based on the previous publish studies values.");
+
 
         // Wizard page 1 : General Setup
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
