@@ -29,7 +29,7 @@ import java.util.*;
 */
 public class AssayValidator extends AbstractAssayValidator
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         if (args.length < 4)
             throw new IllegalArgumentException("Input data file not passed in");
@@ -45,49 +45,43 @@ public class AssayValidator extends AbstractAssayValidator
             throw new IllegalArgumentException("Input data file does not exist");
     }
 
-    public void runQC(File inputFile, String username, String password, String host)
+    public void runQC(File inputFile, String username, String password, String host) throws Exception
     {
-        try {
-            setEmail(username);
-            setPassword(password);
-            setHost(host);
-            parseRunProperties(inputFile);
+        setEmail(username);
+        setPassword(password);
+        setHost(host);
+        parseRunProperties(inputFile);
 
-            if (getRunProperties().containsKey(Props.runDataFile.name()))
-            {
-                List<Map<String, String>> dataMap = parseRunData(new File(getRunProperties().get(Props.runDataFile.name())));
-                Map<String, String> ptidMap = new HashMap<String, String>();
-                Map<String, String> animalMap = new HashMap<String, String>();
-
-                for (Map<String, String> row : dataMap)
-                {
-                    // check for ptid duplicates
-                    String ptid = row.get("participantid");
-                    if (!ptidMap.containsKey(ptid))
-                        ptidMap.put(ptid, ptid);
-                    else
-                        writeError("A duplicate PTID was discovered : " + ptid, "runDataFile");
-
-                    // if the data contains a transformed column, make sure it contains a required value
-                    if (row.containsKey("animal"))
-                        animalMap.put(row.get("animal"), row.get("animal"));
-                }
-
-                if (!animalMap.isEmpty())
-                {
-                    if (!animalMap.containsKey("goat"))
-                        writeError("The animal column must contain a goat", "runDataFile");
-                }
-                // add a log entry for this run
-                //setCredentials(HOST);
-                insertLog("Programmatic QC was run and " + getErrors().size() + " errors were found");
-            }
-            else
-                writeError("Unable to locate the runDataFile", "runDataFile");
-        }
-        catch (Exception e)
+        if (getRunProperties().containsKey(Props.runDataFile.name()))
         {
-            throw new RuntimeException(e);
+            List<Map<String, String>> dataMap = parseRunData(new File(getRunProperties().get(Props.runDataFile.name())));
+            Map<String, String> ptidMap = new HashMap<String, String>();
+            Map<String, String> animalMap = new HashMap<String, String>();
+
+            for (Map<String, String> row : dataMap)
+            {
+                // check for ptid duplicates
+                String ptid = row.get("participantid");
+                if (!ptidMap.containsKey(ptid))
+                    ptidMap.put(ptid, ptid);
+                else
+                    writeError("A duplicate PTID was discovered : " + ptid, "runDataFile");
+
+                // if the data contains a transformed column, make sure it contains a required value
+                if (row.containsKey("animal"))
+                    animalMap.put(row.get("animal"), row.get("animal"));
+            }
+
+            if (!animalMap.isEmpty())
+            {
+                if (!animalMap.containsKey("goat"))
+                    writeError("The animal column must contain a goat", "runDataFile");
+            }
+            // add a log entry for this run
+            //setCredentials(HOST);
+            insertLog("Programmatic QC was run and " + getErrors().size() + " errors were found");
         }
+        else
+            writeError("Unable to locate the runDataFile", "runDataFile");
     }
 }
