@@ -61,8 +61,8 @@ public class BasicTest extends BaseWebDriverTest
         setSystemMaintenance(false);
 
         goToSiteSettings();
-        checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "MEDIUM"));     // Force devs to report full usage info
-        checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "HIGH"));   // Force devs to report full exception info
+        checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "NONE"));     // Don't report usage to labkey.org
+        checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "NONE"));   // Don't report exceptions to labkey.org - we leave the self-report setting unchanged
         clickButton("Save");
 
         _containerHelper.createProject(PROJECT_NAME, null);
