@@ -100,7 +100,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
         // Check there was an error in the specimen merge.
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("lab20");
-        assertTextPresent("fConflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
+        assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
         checkExpectedErrors(2);
     }
 
