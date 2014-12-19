@@ -50,6 +50,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected final String TEST_ASSAY_ELISPOT_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/Zeiss_datafile.txt";
     protected final String TEST_ASSAY_ELISPOT_FILE4 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W5.txt";
     protected final String TEST_ASSAY_ELISPOT_FILE5 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_0161456 W8.txt";
+    protected final String TEST_ASSAY_ELISPOT_FILE6 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/AID_TNTC.txt";
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
@@ -140,6 +141,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         assertElispotData();
         runTransformTest();
         doBackgroundSubtractionTest();
+        testTNTCdata();
     }
 
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
@@ -322,6 +324,11 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         Locator.css(".gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
 
+        //Saving once here avoids when templates are not completely saved because of the test refreshing the page.
+        setFormElement(nameField, PLATE_TEMPLATE_NAME);
+        pressTab(nameField);
+        clickButton("Save", 0);
+
         click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
         Locator.css(".x-combo-list-item").withText("Background Wells").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
         clickButton("Create", 0);
@@ -342,8 +349,6 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         Locator groupField = Locator.xpath("//input[../div[contains(@class, 'x-form-trigger-arrow')]]");
         setFormElement(groupField, "other control group");
 
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);
-        pressTab(nameField);
         clickButton("Create", 0);
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
@@ -546,5 +551,106 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
             //select no group in order to clear area
         }
         dragAndDrop(start, end);
+    }
+    private void testTNTCdata()
+    {
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
+
+        log("Uploading Elispot Runs");
+        clickButton("Import Data");
+        clickButton("Next");
+
+        selectOptionByText(Locator.name("plateReader"), "AID");
+        uploadFile(TEST_ASSAY_ELISPOT_FILE6, "F", "Save and Finish", false);
+
+        testMeanAndMedian();
+    }
+    public void testMeanAndMedian()
+    {
+        clickAndWait(Locator.linkWithText("AID_TNTC.txt"));
+
+//        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+//        assertEquals("TNTC", table.getDataAsText());
+
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("NormalizedSpotCount");
+        _customizeViewsHelper.applyCustomView();
+
+        DataRegionTable dataTable = new DataRegionTable("Data", this);
+        List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
+        List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
+        List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
+        for (int i=0; i < cellWell.size(); i++)
+        {
+            if(!"TNTC".equals(spotCount.get(i)))
+            {
+                int cpw = NumberUtils.toInt(cellWell.get(i), 0);
+                Float sc = NumberUtils.toFloat(spotCount.get(i));
+                Float nsc = NumberUtils.toFloat(normalizedSpotCount.get(i));
+                Float computed = sc;
+
+                if (cpw != 0)
+                    computed = sc / cpw * 1000000;
+
+                assertEquals(computed.intValue(), nsc.intValue());
+            }
+            else
+            {
+                normalizedSpotCount.get(i).equals("");
+            }
+        }
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.revertUnsavedView();
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkContainingText("details"));
+
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("atg_2F_Mean");
+        _customizeViewsHelper.addCustomizeViewColumn("atg_2F_Median");
+        _customizeViewsHelper.addCustomizeViewColumn("atg_4F_Mean");
+        _customizeViewsHelper.addCustomizeViewColumn("atg_4F_Median");
+        _customizeViewsHelper.addCustomizeViewColumn("atg_6F_Mean");
+        _customizeViewsHelper.addCustomizeViewColumn("atg_6F_Median");
+        _customizeViewsHelper.applyCustomView();
+
+        // test the mean and median values of columns that had a TNTC spot count
+        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+        String[] expectedMeans = new String[]{"6666.7", "0.0", "2222.2", "2222.2"};
+//        String[] expectedMeans = new String[]{"4000.0", "0.0", "2222.2", "2222.2"};
+        String[] expectedMedians = new String[]{"6666.7", "0.0", "0.0", "0.0"};
+
+        int row = 0;
+        for (String mean : expectedMeans)
+            assertEquals(mean, table.getDataAsText(row++, "Atg2FMean"));
+
+        row = 0;
+        for (String median : expectedMedians)
+            assertEquals(median, table.getDataAsText(row++, "Atg2FMedian"));
+
+        expectedMeans = new String[]{"0.0", "0.0", "444444.4", "628888.9"};
+        expectedMedians = new String[]{"0.0", "0.0", "6666.7", "0.0"};
+
+        row = 0;
+        for (String mean : expectedMeans)
+            assertEquals(mean, table.getDataAsText(row++, "Atg4FMean"));
+
+        row = 0;
+        for (String median : expectedMedians)
+            assertEquals(median, table.getDataAsText(row++, "Atg4FMedian"));
+
+        expectedMeans = new String[]{"0.0", "0.0", "0.0", "0.0"};
+        expectedMedians = new String[]{"0.0", "0.0", "0.0", "0.0"};
+
+        row = 0;
+        for (String mean : expectedMeans)
+            assertEquals(mean, table.getDataAsText(row++, "Atg6FMean"));
+
+        row = 0;
+        for (String median : expectedMedians)
+            assertEquals(median, table.getDataAsText(row++, "Atg6FMedian"));
+
+
     }
 }
