@@ -101,7 +101,7 @@ public class FileBrowserHelper
     {
         final Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
         final Locator.XPathLocator folderTreeNode = fBrowser.append(Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId));
-        WebElement gridRow = fBrowser.append(Locators.gridRow()).waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement fileGrid = waitForGrid();
 
         _test.waitForElement(folderTreeNode);
         _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
@@ -125,18 +125,19 @@ public class FileBrowserHelper
                 }
             }, "Failed to select tree node", WAIT_FOR_JAVASCRIPT);
             _test._ext4Helper.waitForMaskToDisappear();
-            if (initialSelectionExists)
-                _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
-            _test.waitFor(new BaseWebDriverTest.Checker()
-            {
-                @Override
-                public boolean check()
-                {
-                    return _test.isElementPresent(fBrowser.append(Locators.gridRow())) ||
-                           _test.isElementPresent(fBrowser.append(Locator.tagWithClass("div", "x4-grid-empty")));
-                }
-            }, "File grid failed to render", WAIT_FOR_JAVASCRIPT);
+            if (initialSelectionExists) // Current selection might not change
+                _test.shortWait().until(ExpectedConditions.stalenessOf(fileGrid));
+            waitForGrid();
         }
+    }
+
+    private WebElement waitForGrid()
+    {
+        final Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
+        final Locator.XPathLocator emptyGrid = fBrowser.append(Locator.tagWithClass("div", "x4-grid-empty"));
+        final Locator.XPathLocator gridRow = fBrowser.append(Locators.gridRow());
+
+        return Locator.waitForAnyElement(_test.shortWait(), gridRow, emptyGrid);
     }
 
     @LogMethod

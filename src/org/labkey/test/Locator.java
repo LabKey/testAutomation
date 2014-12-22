@@ -57,6 +57,56 @@ public abstract class Locator
         _text = text == null ? null : text.trim();
     }
 
+    /**
+     * Uses the provided WebDriverWait to wait for an element located by any one of the provided Locators
+     * @return The first element found
+     */
+    public static WebElement waitForAnyElement(WebDriverWait wait, final Locator... locators)
+    {
+        return wait.until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver driver)
+            {
+                for (Locator loc : locators)
+                {
+                    List<WebElement> els;
+                    els = loc.findElements(driver);
+                    if (els.size() > 0)
+                        return els.get(0);
+                }
+                return null;
+            }
+        });
+
+    }
+
+    /**
+     * Uses the provided WebDriverWait to wait for elements located by any one of the provided Locators
+     * @return All elements matching any of the provided Locators
+     */
+    public static List<WebElement> waitForAnyElements(WebDriverWait wait, final Locator... locators)
+    {
+        return wait.until(new ExpectedCondition<List<WebElement>>()
+        {
+            @Override
+            public List<WebElement> apply(WebDriver driver)
+            {
+                List<WebElement> els = new ArrayList<>();
+                for (Locator loc : locators)
+                {
+                    els.addAll(loc.findElements(driver));
+                }
+
+                if (els.size() > 0)
+                    return els;
+                else
+                    return null;
+            }
+        });
+
+    }
+
     public abstract Locator containing(String contains);
 
     public abstract Locator withText(String text);
