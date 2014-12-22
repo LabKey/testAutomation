@@ -320,6 +320,7 @@ src/org/labkey/test/categories/UnitTests.java -text
 src/org/labkey/test/categories/Weekly.java -text
 src/org/labkey/test/categories/Wiki.java -text
 src/org/labkey/test/categories/XTandem.java -text
+src/org/labkey/test/components/D3PieChart.java -text
 src/org/labkey/test/components/InsertPage.java -text
 src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
