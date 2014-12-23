@@ -65,6 +65,12 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         return TEST_ASSAY_PRJ_ELISPOT;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     /**
      * Performs Luminex designer/upload/publish.
      */
@@ -102,23 +108,21 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickButton("Next");
 
         log("Setting up Elispot assay");
-        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_ELISPOT);
 
-        selectOptionByValue(Locator.id("plateTemplate"), PLATE_TEMPLATE_NAME);
-        setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_ELISPOT_DESC);
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.setName(TEST_ASSAY_ELISPOT);
+        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
+        assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
 
 
         // set the specimenId field default value to be : last entered
+/*
         Locator specimenField = Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//div[@id='name1']");
         click(specimenField);
         click(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//span[text()='Advanced']"));
         selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
-
-        sleep(2000);
-        clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
-
+*/
+        assayDesigner.saveAndClose();
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
@@ -128,7 +132,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickButton("Next");
 
         selectOptionByText(Locator.name("plateReader"), "Cellular Technology Ltd. (CTL)");
-        uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", true);
+        uploadFile(TEST_ASSAY_ELISPOT_FILE1, "A", "Save and Import Another Run", false);
         assertTextPresent("Upload successful.");
 
         selectOptionByText(Locator.name("plateReader"), "AID");
@@ -567,6 +571,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         testMeanAndMedian();
     }
+
     public void testMeanAndMedian()
     {
         clickAndWait(Locator.linkWithText("AID_TNTC.txt"));
@@ -617,8 +622,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         // test the mean and median values of columns that had a TNTC spot count
         DataRegionTable table = new DataRegionTable("AntigenStats", this);
-        String[] expectedMeans = new String[]{"6666.7", "0.0", "2222.2", "2222.2"};
-//        String[] expectedMeans = new String[]{"4000.0", "0.0", "2222.2", "2222.2"};
+        String[] expectedMeans = new String[]{"4000.0", "0.0", "2222.2", "2222.2"};
         String[] expectedMedians = new String[]{"6666.7", "0.0", "0.0", "0.0"};
 
         int row = 0;
