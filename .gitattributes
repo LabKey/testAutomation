@@ -159,6 +159,7 @@ modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=un
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
+modules/simpletest/resources/etls/appendMultiXact.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
