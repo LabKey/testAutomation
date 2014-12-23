@@ -31,8 +31,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class UserTest extends SecurityTest
 {
-    private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile", "Pager",
-                "IM", "Description"};
+    private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
     private static final String TEST_PASSWORD = "testPassword";
 
     /**copied from LoginController.EMAIL_PASSWORDMISMATCH_ERROR, but needs to be broken into multiple separate sentences,
@@ -325,9 +324,6 @@ public class UserTest extends SecurityTest
         setFormElement(Locator.name("quf_LastName"), illegalLongProperty.toString());
         setFormElement(Locator.name("quf_Phone"), illegalLongProperty.toString());
         setFormElement(Locator.name("quf_Mobile"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_Pager"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_IM"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_Description"), illegalLongDescription.toString());
 
         log("Check error messages");
         clickButton("Submit");
@@ -339,9 +335,6 @@ public class UserTest extends SecurityTest
         assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for column 'LastName', a maximum length of %d is allowed.", maxFieldLength)));
         assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for column 'Phone', a maximum length of %d is allowed.", maxFieldLength)));
         assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for column 'Mobile', a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for column 'Pager', a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for column 'IM', a maximum length of %d is allowed.", maxFieldLength)));
-        assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for column 'Description', a maximum length of %d is allowed.", maxDescriptionLength)));
 
         clickButton("Cancel");
 
@@ -358,7 +351,7 @@ public class UserTest extends SecurityTest
         clickButton("Edit");
 
         setFormElement(Locator.name("quf_FirstName"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
-        setFormElement(Locator.name("quf_Description"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
+        setFormElement(Locator.name("quf_LastName"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
 
         clickButton("Submit");
 
@@ -373,7 +366,7 @@ public class UserTest extends SecurityTest
         clickButton("Edit");
 
         setFormElement(Locator.name("quf_FirstName"), INJECT_CHARS_1);
-        setFormElement(Locator.name("quf_Description"), INJECT_CHARS_1);
+        setFormElement(Locator.name("quf_LastName"), INJECT_CHARS_1);
 
         clickButton("Submit");
 
