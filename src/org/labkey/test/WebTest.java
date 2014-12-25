@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 public interface WebTest
 {
@@ -32,5 +33,5 @@ public interface WebTest
     long beginAt(String url);
     URL getURL() throws MalformedURLException;
     String[] getLinkAddresses();
-    java.util.List<String> getAssociatedModules();
+    List<String> getAssociatedModules();
 }

@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -92,7 +93,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickButton("Done");
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }

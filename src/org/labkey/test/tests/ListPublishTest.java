@@ -31,6 +31,7 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -144,7 +145,7 @@ public class ListPublishTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }

@@ -29,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class, Assays.class})
 public class NabAssayThawListTest extends AbstractQCAssayTest
@@ -54,7 +55,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     private final String THAW_LIST_BAD_DATATYPES = THAW_LIST_NAME + "BadDataTypes";
     private final String THAW_LIST_ARCHIVE_BAD_DATATYPES = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_BAD_DATATYPES.zip";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");
     }

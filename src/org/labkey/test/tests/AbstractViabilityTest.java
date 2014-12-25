@@ -24,13 +24,14 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 {
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("viability");
     }

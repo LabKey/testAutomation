@@ -21,13 +21,14 @@ import org.labkey.test.TestFileUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public abstract class PerformanceTest extends BaseWebDriverTest
 {
     long elapsedTime = -1;
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

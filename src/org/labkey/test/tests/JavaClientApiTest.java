@@ -31,6 +31,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -300,12 +301,14 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Completed test of maxrows=0");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
     }

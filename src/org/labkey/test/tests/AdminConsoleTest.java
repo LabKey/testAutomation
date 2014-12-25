@@ -23,6 +23,8 @@ import org.labkey.test.categories.DailyA;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
@@ -102,7 +104,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementNotPresent(ribbonLink);
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

@@ -19,10 +19,12 @@ package org.labkey.test.util;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 
+import java.util.List;
+
 public class JUnitFooter extends BaseWebDriverTest
 {
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

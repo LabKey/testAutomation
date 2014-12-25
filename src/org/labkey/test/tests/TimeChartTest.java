@@ -24,6 +24,7 @@ import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -53,7 +54,7 @@ public abstract class TimeChartTest extends ReportTest
 
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }

@@ -25,6 +25,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyB.class})
 public class GpatAssayTest extends BaseWebDriverTest
@@ -46,7 +47,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("assay");
     }

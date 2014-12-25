@@ -27,6 +27,7 @@ import org.labkey.test.categories.Study;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * CreateVialsTest also uses the specimen merge feature.
@@ -47,7 +48,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
     protected String _studyDataRoot = null;
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }

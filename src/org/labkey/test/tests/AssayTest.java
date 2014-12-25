@@ -31,6 +31,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.labkey.test.util.ListHelper.ListColumnType;
 
@@ -96,7 +97,7 @@ public class AssayTest extends AbstractAssayTest
     private static final String GRANT = "SPECTRE";
     private static final String DESCRIPTION = "World Domination.";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }

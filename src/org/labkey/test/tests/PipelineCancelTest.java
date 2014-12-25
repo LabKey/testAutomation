@@ -24,6 +24,7 @@ import org.labkey.test.categories.DailyB;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
@@ -58,7 +59,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("pipeline");
     }

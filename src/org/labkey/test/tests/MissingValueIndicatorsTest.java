@@ -33,6 +33,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
@@ -500,12 +501,14 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         waitForPageToLoad();
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
     }

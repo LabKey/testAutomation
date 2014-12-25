@@ -29,6 +29,8 @@ import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Wiki.class})
@@ -104,7 +106,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

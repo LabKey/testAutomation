@@ -27,6 +27,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
@@ -54,7 +55,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
 //    protected static final String GAMMA_RESTRICTED_READER_USER = "gammarestricted@security.test";
 //    protected static final String GAMMA_SUBMITTER_USER = "gammasubmitter@security.test";
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");
     }

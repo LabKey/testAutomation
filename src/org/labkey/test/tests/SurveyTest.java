@@ -30,6 +30,7 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -412,7 +413,7 @@ public class SurveyTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("survey");
     }

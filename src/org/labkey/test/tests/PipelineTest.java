@@ -36,6 +36,7 @@ import org.labkey.test.ms1.params.FeaturesTestParams;
 import org.labkey.test.util.PipelineToolsHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -89,7 +90,7 @@ public class PipelineTest extends PipelineWebTestBase
         return params;
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("pipeline", "ms1", "ms2");
     }

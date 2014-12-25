@@ -28,6 +28,7 @@ import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -511,7 +512,8 @@ public class MS1Test extends BaseWebDriverTest
         }
     }
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("ms1");
     }

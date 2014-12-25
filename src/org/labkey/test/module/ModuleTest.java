@@ -23,6 +23,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.NoSuite;
 
+import java.util.List;
+
 @Category({NoSuite.class})
 public class ModuleTest extends BaseWebDriverTest
 {
@@ -48,7 +50,7 @@ public class ModuleTest extends BaseWebDriverTest
         assertTextPresent("Hello, and welcome to the " + TEST_MODULE_TEMPLATE_FOLDER_NAME + " module.");
     }
     
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

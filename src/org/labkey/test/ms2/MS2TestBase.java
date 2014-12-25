@@ -24,6 +24,7 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 abstract public class MS2TestBase extends BaseWebDriverTest
 {
@@ -49,7 +50,7 @@ abstract public class MS2TestBase extends BaseWebDriverTest
 
     public final static String PIPELINE_PATH = TestFileUtils.getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("ms2");
     }

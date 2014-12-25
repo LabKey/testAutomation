@@ -24,6 +24,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class FieldValidatorTest extends BaseWebDriverTest
@@ -128,7 +129,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
     }

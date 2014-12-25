@@ -27,6 +27,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category(BVT.class)
 public class MicroarrayTest extends BaseWebDriverTest
@@ -50,7 +51,7 @@ public class MicroarrayTest extends BaseWebDriverTest
             "Third\t\n" +
             "Fourth\t\n";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("microarray");
     }

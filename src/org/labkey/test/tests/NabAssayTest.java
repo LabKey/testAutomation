@@ -33,6 +33,7 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -162,7 +163,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
     }
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");
     }

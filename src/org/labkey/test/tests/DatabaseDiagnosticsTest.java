@@ -23,6 +23,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PipelineHelper;
 
+import java.util.List;
+
 @Category({DailyA.class, DailyB.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
@@ -60,7 +62,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

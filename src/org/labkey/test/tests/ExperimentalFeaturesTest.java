@@ -24,6 +24,7 @@ import org.labkey.test.categories.NoSuite;
 import org.labkey.test.util.DevModeOnlyTest;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Category(NoSuite.class)
 public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevModeOnlyTest
@@ -47,7 +48,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

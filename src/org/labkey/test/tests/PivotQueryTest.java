@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -35,7 +36,8 @@ public class PivotQueryTest extends BaseWebDriverTest
 {
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");
     }

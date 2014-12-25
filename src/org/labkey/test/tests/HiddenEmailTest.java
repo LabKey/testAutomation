@@ -26,6 +26,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.List;
+
 @Category({DailyB.class})
 public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
@@ -53,7 +55,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

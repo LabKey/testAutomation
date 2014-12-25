@@ -35,6 +35,7 @@ import org.labkey.test.util.UIAssayHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -57,7 +58,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

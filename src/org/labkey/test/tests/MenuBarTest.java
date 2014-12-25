@@ -27,6 +27,7 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class MenuBarTest extends BaseWebDriverTest
@@ -40,7 +41,7 @@ public class MenuBarTest extends BaseWebDriverTest
     private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
     private static final String STUDY_FOLDER = "StudyFolder";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");
     }

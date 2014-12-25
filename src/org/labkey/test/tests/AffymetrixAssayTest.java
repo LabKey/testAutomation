@@ -30,6 +30,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class, Assays.class, FileBrowser.class})
 public class AffymetrixAssayTest extends BaseWebDriverTest
@@ -51,7 +52,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("microarray");
     }

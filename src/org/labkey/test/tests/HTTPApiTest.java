@@ -25,6 +25,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class HTTPApiTest extends SimpleApiTest
@@ -63,7 +64,7 @@ public class HTTPApiTest extends SimpleApiTest
         return BrowserType.CHROME;
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("query");
     }

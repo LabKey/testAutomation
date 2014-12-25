@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Category({DailyA.class})
 public class UniprotAnnotationTest extends BaseWebDriverTest
@@ -32,11 +33,13 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
     private static final String UNIPROT_FILENAME = "tinyuniprot.xml";
     private static final String PROJECT_NAME = "ProteinAnnotationVerifier";
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("ms2");
     }
 
+    @Override
     protected String getProjectName()
     {
         return PROJECT_NAME;

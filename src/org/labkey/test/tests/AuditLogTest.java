@@ -48,7 +48,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static final String COMMENT_COLUMN = "Comment";
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("audit");
     }

@@ -22,11 +22,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 
+import java.util.List;
+
 @Category({InDevelopment.class})
 public class SystemMaintenanceTest extends BaseWebDriverTest
 {
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

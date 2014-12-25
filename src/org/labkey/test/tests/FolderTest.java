@@ -30,6 +30,7 @@ import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.JavascriptExecutor;
 
 import java.io.File;
+import java.util.List;
 
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
@@ -38,7 +39,7 @@ public class FolderTest extends BaseWebDriverTest
     public final FolderManagementFolderTree folderManagement = new FolderManagementFolderTree(this, getProjectName());
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

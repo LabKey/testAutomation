@@ -27,6 +27,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +45,8 @@ public class ModuleAssayTest extends AbstractAssayTest
             "Third\t\n" +
             "Fourth\t\n";
 
-    public java.util.List<String> getAssociatedModules()
+    @Override
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("study");
     }
@@ -61,12 +63,14 @@ public class ModuleAssayTest extends AbstractAssayTest
         return BrowserType.CHROME;
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteDir(getTestTempDir());
         deleteProject(getProjectName(), afterTest);
     }
 
+    @Override
     protected void runUITests() throws Exception
     {
         log("Starting ModuleAssayTest");

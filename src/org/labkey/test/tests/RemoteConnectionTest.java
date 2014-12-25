@@ -23,6 +23,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -48,7 +49,7 @@ public class RemoteConnectionTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("dataintegration");
     }

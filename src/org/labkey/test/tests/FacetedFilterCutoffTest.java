@@ -27,6 +27,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.List;
+
 @Category(DailyA.class)
 public class FacetedFilterCutoffTest extends BaseWebDriverTest
 {
@@ -130,7 +132,7 @@ public class FacetedFilterCutoffTest extends BaseWebDriverTest
     }
 
     @Override
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return null;
     }

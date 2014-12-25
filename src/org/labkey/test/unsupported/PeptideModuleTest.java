@@ -40,6 +40,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -267,7 +268,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         }
     }
 
-    public java.util.List<String> getAssociatedModules()
+    public List<String> getAssociatedModules()
     {
         return Arrays.asList("peptide");
     }
