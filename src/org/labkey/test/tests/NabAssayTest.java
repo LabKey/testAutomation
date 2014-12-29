@@ -426,7 +426,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
-        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
+        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A");
         assertTextPresent("ptid 1 B");
         assertTextNotPresent("ptid 1 C");

@@ -169,7 +169,7 @@ public class FlowCBCTest extends BaseFlowTest
         // filter to rows we'd like to copy
         clickAndWait(Locator.linkWithText("run01"));
         DataRegionTable table = new DataRegionTable("Data", this);
-        table.setFilter("SampleId", "Equals One Of (e.g. \"a;b;c\")", "241-03A;317-03A");
+        table.setFilter("SampleId", "Equals One Of (example usage: a;b;c)", "241-03A;317-03A");
         table.checkAllOnPage();
 
         clickButton("Copy to Study");

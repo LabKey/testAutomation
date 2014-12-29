@@ -173,8 +173,6 @@ public class FilterTest extends BaseWebDriverTest
     private void directUrlTest()
     {
         List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
-//        FilterArgs  a = args.get(0);
-//        beginAt(listUrl + "&query.Good~in=7%3B8");
         int count = 0;
         for(FilterArgs a : args)
         {
@@ -484,21 +482,6 @@ public class FilterTest extends BaseWebDriverTest
         public String[] present;
         public String[] notPresent;
 
-//        public FilterArgs(String columnName,
-//                          String filter1Type, @Nullable String filter1Value,
-//                          @Nullable String filter2Type, @Nullable String filter2Value,
-//                          String[] present, String[] notPresent)
-//        {
-//            this(columnName, filter1Type, filter1Value, filter2Value, filter2Value, present, notPresent, null);
-//            this.columnName = columnName;
-//            this.filter1Type = filter1Type;
-//            this.filter1Value = filter1Value;
-//            this.filter2Type = filter2Type;
-//            this.filter2Value = filter2Value;
-//            this.present = present;
-//            this.notPresent = notPresent;
-//        }
-
         public FilterArgs(String columnName,
                           String filter1Type, @Nullable String filter1Value,
                           @Nullable String filter2Type, @Nullable String filter2Value,
@@ -515,19 +498,19 @@ public class FilterTest extends BaseWebDriverTest
         }
     }
 
-    public static FilterArgs FilterArgs(String columnName,
-                             String filter1Type, @Nullable String filter1Value,
-                             @Nullable String filter2Type, @Nullable String filter2Value,
-                             String[] present, String[] notPresent)
+    public static FilterArgs createFilterArgs(String columnName,
+                                              String filter1Type, @Nullable String filter1Value,
+                                              @Nullable String filter2Type, @Nullable String filter2Value,
+                                              String[] present, String[] notPresent)
     {
         return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, null);
     }
 
 
-    public static FilterArgs FilterArgs(String columnName,
-                             String filter1Type, @Nullable String filter1Value,
-                             @Nullable String filter2Type, @Nullable String filter2Value,
-                             String[] present, String[] notPresent, String url)
+    public static FilterArgs createFilterArgs(String columnName,
+                                              String filter1Type, @Nullable String filter1Value,
+                                              @Nullable String filter2Type, @Nullable String filter2Value,
+                                              String[] present, String[] notPresent, String url)
     {
         return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, url);
     }
@@ -543,7 +526,7 @@ public class FilterTest extends BaseWebDriverTest
                     new FilterArgs(_listCol6.getName(), "IS NOT ANY OF ", "(BLANK)",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~notin=%3B"),
                     new FilterArgs(_listCol6.getName(), "IS ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0]}, listUrl + "&query.Aliased%24CColumn~isblank"),
                     new FilterArgs(_listCol4.getName(), "IS NOT ", "NULL",  null, null, new String[] {}, TEST_DATA[1], listUrl + "&query.HiddenColumn~isnonblank"),
-                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
+                    createFilterArgs(_listCol4.getName(), "Equals One Of (example usage: a;b;c)", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
             );
     }
 
@@ -552,26 +535,26 @@ public class FilterTest extends BaseWebDriverTest
             return Arrays.asList(
                     //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
                     //Issue 12197
-                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}),
-                    FilterArgs(_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}),
-                    FilterArgs(_listCol1.getName(), "Starts With", "Z", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][2]}),
-                    FilterArgs(_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol4.getName(), "Equals One Of (example usage: a;b;c)", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}),
+                    createFilterArgs(_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol1.getName(), "Starts With", "Z", null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}),
+                    createFilterArgs(_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]}),
                     //can't check for the absence of thing you're excluding, since it will be present in the filter text
-                    FilterArgs(_listCol1.getName(), "Does Not Equal", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0]}),
-                    FilterArgs(_listCol1.getName(), "Does Not Equal Any Of (e.g. \"a;b;c\")", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0], TEST_DATA[5][1]}),
-                    FilterArgs(_listCol3.getName(), "Equals", "true", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
-                    FilterArgs(_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol1.getName(), "Does Not Equal", TEST_DATA[1][0], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][1], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0]}),
+                    createFilterArgs(_listCol1.getName(), "Does Not Equal Any Of (example usage: a;b;c)", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[5][0], TEST_DATA[5][1]}),
+                    createFilterArgs(_listCol3.getName(), "Equals", "true", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol3.getName(), "Does Not Equal", "false", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
                     //filter is case insensitive
-                    FilterArgs(_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {TEST_DATA[5][2],TEST_DATA[5][0], TEST_DATA[5][1]}, new String[] {TEST_DATA[1][3]}),
-    //                FilterArgs(_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}),
-                    FilterArgs(_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}),
-                    FilterArgs(_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1]}),
-                    FilterArgs(_listCol4.getName(), "Is Blank", null, null, null, new String[] {}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1], TEST_DATA[1][0]}),
+                    createFilterArgs(_listCol6.getName(), "Contains", "e", "Contains", "r", new String[]{TEST_DATA[5][2], TEST_DATA[5][0], TEST_DATA[5][1]}, new String[]{TEST_DATA[1][3]}),
+    //                createFilterArgs(_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}),
+                    createFilterArgs(_listCol4.getName(), "Is Greater Than", "9", null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1]}),
+                    createFilterArgs(_listCol4.getName(), "Is Blank", null, null, null, new String[]{}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1], TEST_DATA[1][0]}),
                     //new filters for faceted filtering
-                    FilterArgs(_listCol6.getName(),  "Contains One Of (e.g. \"a;b;c\")", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[] {TEST_DATA[5][1]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}),
-                    FilterArgs(_listCol1.getName(), "Does Not Contain Any Of (e.g. \"a;b;c\")", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}, new String[] {TEST_DATA[0][1] , TEST_DATA[0][3]}),
-                    FilterArgs(_listCol6.getName(), "Is Blank", null, null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}),
-                    FilterArgs(_listCol6.getName(), "Is Not Blank", null, null, null, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]})
+                    createFilterArgs(_listCol6.getName(), "Contains One Of (example usage: a;b;c)", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[]{TEST_DATA[5][1]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}),
+                    createFilterArgs(_listCol1.getName(), "Does Not Contain Any Of (example usage: a;b;c)", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[0][1], TEST_DATA[0][3]}),
+                    createFilterArgs(_listCol6.getName(), "Is Blank", null, null, null, new String[]{TEST_DATA[1][3]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}),
+                    createFilterArgs(_listCol6.getName(), "Is Not Blank", null, null, null, new String[]{TEST_DATA[1][1], TEST_DATA[1][2], TEST_DATA[1][0]}, new String[]{TEST_DATA[1][3]})
             );
         }
 
@@ -640,10 +623,9 @@ public class FilterTest extends BaseWebDriverTest
                 // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
                 // When switching tabs, the number of selected values (1) is less than half of the available values (4),
                 // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
-                //waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equals Any Of (e.g. \"a;b;c\")");
                 waitForFormElementToEqual(Locator.name("value_1"), "Light");
             }
-            else if (filter1Type.equals("Does Not Equal Any Of (e.g. \"a;b;c\")") && "Light;Mellow".equals(filter1))
+            else if (filter1Type.equals("Does Not Equal Any Of (example usage: a;b;c)") && "Light;Mellow".equals(filter1))
             {
                 // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
                 // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
