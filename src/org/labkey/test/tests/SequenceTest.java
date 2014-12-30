@@ -737,7 +737,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         Ext4FieldRef barcodeField = Ext4FieldRef.getForLabel(this, "Use Barcodes");
         Ext4FieldRef treatmentField = Ext4FieldRef.getForLabel(this, "Treatment of Input Files");
-        Ext4FieldRef mergeField = Ext4FieldRef.getForLabel(this, "Merge Files");
         Ext4FieldRef pairedField = Ext4FieldRef.getForLabel(this, "Data Is Paired End");
         Ext4GridRef grid = getSampleGrid();
 
@@ -754,25 +753,6 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", treatmentField.getValue());
         assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
         assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
-
-        mergeField.setChecked(true);
-        sleep(100);
-        assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", treatmentField.getValue());
-        assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
-
-        Ext4FieldRef mergenameField = Ext4FieldRef.getForLabel(this, "Name For Merged File");
-
-        assertTrue("Merge name field should be visible", mergenameField.isVisible());
-        assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getFieldValue(1, "fileName"));
-        mergenameField.setValue("MergeFile2");
-        sleep(100);
-        assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getFieldValue(1, "fileName"));
-
-        mergeField.setChecked(false);
-        sleep(100);
-        assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", treatmentField.getValue());
-        assertFalse("Merge name field should be hidden", mergenameField.isVisible());
-        assertFalse("Paired end field should be enable when merge is unchecked", pairedField.isDisabled());
 
         pairedField.setChecked(true);
         assertFalse("Paired file column should not be hidden", (Boolean) grid.getEval("columns[1].hidden"));
@@ -841,8 +821,6 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
         assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.barcodeGroups")));
-        assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.merge"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.merge.basename")));
         assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
         assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
         assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeDeletions"));
@@ -875,17 +853,13 @@ public class SequenceTest extends BaseWebDriverTest
         assertFalse("param shold not be present", sample1.containsKey("mid3"));
 
         barcodeField.setValue(true);
-        Ext4FieldRef.getForLabel(this, "Additional Barcodes").setValue("GSMIDs");
+        Ext4FieldRef.getForLabel(this, "Additional Barcodes To Test").setValue("GSMIDs");
         Ext4FieldRef.getForLabel(this, "Mismatches Tolerated").setValue(9);
         Ext4FieldRef.getForLabel(this, "Deletions Tolerated").setValue(9);
         Ext4FieldRef.getForLabel(this, "Allowed Distance From Read End").setValue(9);
 
         Ext4FieldRef.getForLabel(this, "Delete Intermediate Files").setValue(false);
         treatmentField.setValue("compress");
-
-        mergeField.setValue(true);
-        String mergedName = "MergedFile99";
-        mergenameField.setValue(mergedName);
 
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
@@ -896,14 +870,10 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
         assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
 
-        assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.merge"));
-        assertEquals("Unexpected value for param", mergedName, fieldsJson.get("inputfile.merge.basename"));
-
         assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
         assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
 
         sample0 = (Map)fieldsJson.get("sample_0");
-        assertEquals("Unexpected value for param", mergedName, sample0.get("fileName"));
         assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
         assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
@@ -913,7 +883,6 @@ public class SequenceTest extends BaseWebDriverTest
         assertFalse("param shold not be present", sample0.containsKey("mid5"));
         assertFalse("param shold not be present", sample0.containsKey("mid3"));
 
-        mergeField.setValue(false);
         barcodeField.setValue(false);
 
         pairedField.setValue(true);
