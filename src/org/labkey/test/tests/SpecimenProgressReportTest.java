@@ -253,7 +253,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         waitForText("48 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
-        clickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
+        waitAndClickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
         assertTextPresent("Result reported with no corresponding specimen collected", 8);
         assertTextPresent("2 results found for this participant and visit combination", 4);
         assertTextPresent("This specimen type is not expected for this visit", 20);
