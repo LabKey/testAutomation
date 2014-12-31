@@ -33,7 +33,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
 public class ReportThumbnailTest extends BaseWebDriverTest
@@ -49,6 +50,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private static final String R_REGRESSION_BP_ALL = "R Regression: Blood Pressure: All";
     private static final String R_REGRESSION_BP_MEANS = "R Regression: Blood Pressure: Means";
     private static final String CROSSTAB_REPORT = "Crosstab: Gender and Group Counts";
+    private static final String ATTACHMENT_REPORT_1 = "Attachment Report 1";
+    private static final String ATTACHMENT_REPORT_2 = "Attachment Report 2";
+    private static final String ATTACHMENT_REPORT_3 = "Attachment Report 3";
 
     private String THUMBNAIL_DATA;
     private String ICON_DATA;
@@ -102,6 +106,77 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         testCustomIcon();
         testRThumbnails();
         testThumbnailRoundtrip();
+        testOfficeXmlThumbnails();
+    }
+
+    private void testOfficeXmlThumbnails()
+    {
+        final String ADD_REPORT_MENU = "Add Report";
+        final String ATTACH_REPORT_OPTION = "Attachment Report";
+        final String ATTACH_REPORT_NAME_ELMNT = "viewName";
+        final String ATTACH_FILE_NAME_ELMNT = "filePath";
+        final String ATTACH_TYPE_LABEL = "Attachment Type:";
+        final String ATTACH_TYPE_SERVER_PATH = "Full file path on server";
+        final String CLINIC_ASSAY_TAB = "Clinical and Assay Data";
+        final String GENERATED_THUMBNAIL_NAME = "thumbnail.view";
+
+        final String ATTACH_SAMPLE_DATA_PATH = TestFileUtils.getSampledataPath() + "/query/attachments/";
+
+        goToDataViews();
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+
+        // Create pptx attachment report
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_1);
+        _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "PowerPoint_JPEG_Thumbnail.pptx");
+        clickButton("Save", defaultWaitForPage);
+
+        // Create xlsx attachment report
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_2);
+        _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "Excel_Document_JPEG_Thumbnail.xlsx");
+        clickButton("Save", defaultWaitForPage);
+
+        // Create docx attachment report
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_3);
+        _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "Word_Document_JPEG_Thumbnail.docx");
+        clickButton("Save", defaultWaitForPage);
+
+        // Verify generated thumbnail images exist and not stock pptx, xlsx and docx images
+        clickTab(CLINIC_ASSAY_TAB);
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_1, this);
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.xpath("//div[@class='thumbnail']"));
+        assertElementPresent(Locator.xpath("//img[contains(@src,'" + GENERATED_THUMBNAIL_NAME + "')]"));
+        assertElementNotPresent(Locator.xpath("//img[contains(@src,'presentation.png')]"));
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+
+        clickTab(CLINIC_ASSAY_TAB);
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_2, this);
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.xpath("//div[@class='thumbnail']"));
+        assertElementPresent(Locator.xpath("//img[contains(@src,'" + GENERATED_THUMBNAIL_NAME + "')]"));
+        assertElementNotPresent(Locator.xpath("//img[contains(@src,'spreadsheet.png')]"));
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+
+        clickTab(CLINIC_ASSAY_TAB);
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_3, this);
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.xpath("//div[@class='thumbnail']"));
+        assertElementPresent(Locator.xpath("//img[contains(@src,'" + GENERATED_THUMBNAIL_NAME + "')]"));
+        assertElementNotPresent(Locator.xpath("//img[contains(@src,'wordprocessing.png')]"));
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void testGenericChartThumbnails()
