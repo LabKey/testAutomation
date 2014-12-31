@@ -4617,6 +4617,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         setFormElement(Locator.id("pipeProjectRootPath"), rootPath);
 
         clickButton("Save");
+
+        getArtifactCollector().addArtifactLocation(new File(rootPath), new FileFilter()
+        {
+            @Override
+            public boolean accept(File pathname)
+            {
+                return pathname.getName().endsWith(".log");
+            }
+        });
+
         log("Finished setting pipeline to: " + rootPath);
     }
 
