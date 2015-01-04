@@ -110,10 +110,7 @@ public class DataIntegrationHelper
 
     public String getTransformStatus(String jobId) throws Exception
     {
-        // TODO: Proper handling of null jobId
-        String query = "SELECT Status FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
-        return response.getRows().get(0).get("Status").toString();
+        return getTransformRunFieldByJobId(jobId, "Status");
     }
 
     public String getTransformStatusByTransformId(String transformId) throws Exception
@@ -124,6 +121,19 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get("Status").toString();
     }
 
+    public String getExperimentRunId(String jobId) throws Exception
+    {
+        return getTransformRunFieldByJobId(jobId, "ExpRunId");
+    }
+
+    public String getTransformRunFieldByJobId(String jobId, String fieldName) throws Exception
+    {
+        // TODO: Proper handling of null jobId
+        String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        return response.getRows().get(0).get(fieldName).toString();
+    }
+
     public String getTransformState(String transformId) throws Exception
     {
         // TODO: Proper handling of null transformId
@@ -131,7 +141,7 @@ public class DataIntegrationHelper
         SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
         return response.getRows().get(0).get("TransformState").toString();
     }
-    private ResetTransformStateResponse resetTransformState(String transformId)
+    public ResetTransformStateResponse resetTransformState(String transformId)
     {
         Connection cn = new Connection(_baseUrl, _username, _password);
         ResetTransformStateResponse response = null;
