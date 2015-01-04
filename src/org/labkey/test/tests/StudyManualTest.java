@@ -122,6 +122,7 @@ public class StudyManualTest extends StudyTest
 
 
     // Using old visit map format, which does not support default visibility, etc. (so we need to set these manually).
+    // TODO: We're no longer using the old visit map format... move these settings into visit_map.xml?
     protected void afterManualCreate()
     {
         hideSceeningVisit();

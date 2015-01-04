@@ -24,7 +24,6 @@ import junit.framework.TestFailure;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;
 import junit.runner.BaseTestRunner;
-import org.apache.commons.collections.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -33,6 +32,7 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.labkey.test.aspects.MethodPerfAspect;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
@@ -42,10 +42,8 @@ import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.aspects.MethodPerfAspect;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
-import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
 
@@ -68,7 +66,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -242,7 +239,7 @@ public class Runner extends TestSuite
         else
         {
             boolean failed = false;
-            boolean errored = false;
+            boolean errored;
             
             int _maxTestFailures;
             _maxTestFailures = Integer.getInteger("maxTestFailures", DEFAULT_MAX_TEST_FAILURES); // 0 is unlimited
@@ -457,15 +454,6 @@ public class Runner extends TestSuite
                         }
                         break;
                     }
-                    if (i.equals(AdvancedSqlTest.class))
-                    {
-                        if(databaseType != null && "2005".equals(databaseVersion))
-                        {
-                            illegalTest = true;
-                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
-                        }
-                        break;
-                    }
                     if (i.equals(WindowsOnlyTest.class))
                     {
                         if(osName != null && !osName.toLowerCase().contains("windows"))
@@ -641,11 +629,8 @@ public class Runner extends TestSuite
 
             System.out.println(getFixedWidthString(testName, durationAndPercent, width));
 
-            HashMap<LogMethod.MethodType, Long> perfStats = MethodPerfAspect.getPerfStats(testName);
-            Iterator it = perfStats.entrySet().iterator();
-            while (it.hasNext())
+            for (Map.Entry<LogMethod.MethodType, Long> stats : MethodPerfAspect.getPerfStats(testName).entrySet())
             {
-                Map.Entry<LogMethod.MethodType, Long> stats = (Map.Entry)it.next();
                 System.out.println("\t" + stats.getKey() + "\t" + formatDuration(stats.getValue()));
             }
 
