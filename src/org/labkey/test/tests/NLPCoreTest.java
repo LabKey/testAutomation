@@ -6,7 +6,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SqlserverOnlyTest;
 
@@ -24,8 +24,8 @@ import static org.junit.Assert.fail;
  * NOTE: The Linux TeamCity agents don't yet have the necessary python support for the nlp engine, so
  * for now this test is SqlserverOnly
  */
-@Category({InDevelopment.class})
-public class NLPCoreTest extends BaseWebDriverTest implements SqlserverOnlyTest
+@Category({DailyB.class})
+public class NLPCoreTest extends BaseWebDriverTest
 {
     private static final String SAMPLE_INPUT_FILE_NAME = "sample1.nlp.tsv";
     private static final File SAMPLE_INPUT_FILE = new File(TestFileUtils.getSampleData("nlp"), SAMPLE_INPUT_FILE_NAME);
