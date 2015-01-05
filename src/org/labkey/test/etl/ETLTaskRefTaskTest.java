@@ -65,6 +65,7 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
 
     private void runInitialSetup()
     {
+        doCleanup(false);
         log("running setup");
         _containerHelper.createProject(getProjectName(), null);
         _expectedErrors = 0;
