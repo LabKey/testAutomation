@@ -293,6 +293,7 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         _extHelper.clickMenuButton(false, "Mouse Groups", "Create Mouse Group", "From All Mice");
         _extHelper.waitForExtDialog("Define Mouse Group");
+        waitForElement(Locator.id("groupLabel-inputEl"));
         setFormElement(Locator.id("groupLabel-inputEl"), EXTRA_GROUP);
         _ext4Helper.clickWindowButton("Define Mouse Group", "Save", 0, 0);
         waitForElement(DataRegionTable.Locators.facetRow(EXTRA_GROUP, EXTRA_GROUP));
