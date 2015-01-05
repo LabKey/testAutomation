@@ -18,6 +18,7 @@ package org.labkey.test.etl;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.PortalHelper;
@@ -55,9 +56,21 @@ public class ETLMultipleTransactionsTest extends ETLBaseTest
     {
         String jobId = runETL_API(ETL).getJobId();
         incrementExpectedErrorCount();
-        goToProjectHome();
-        assertInTarget2("xact1 1", "xact1 2");
-        assertInEtlLogFile(jobId, "Target transactions will be committed every 2 rows", "Could not convert 'uhoh' for field rowid");
+
+        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
+        {
+            // See issue 22213; we don't support specifying a transaction size on Postgres when source
+            // and target are the same datasource. Make sure the error message happens.
+            // Note: it will actually work for small datasets like that used in this test, but larger datasets will give
+            // errors from pg and leave the target in a bad state.
+            assertInEtlLogFile(jobId, "not supported on Postgres");
+        }
+        else
+        {
+            assertInEtlLogFile(jobId, "Target transactions will be committed every 2 rows", "Could not convert 'uhoh' for field rowid");
+            goToProjectHome();
+            assertInTarget2("xact1 1", "xact1 2");
+        }
     }
 
     private void runInitialSetup()
