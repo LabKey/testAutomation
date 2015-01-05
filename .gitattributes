@@ -159,9 +159,9 @@ modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=un
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
-modules/simpletest/resources/etls/appendMultiXact.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
+modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
@@ -183,6 +183,7 @@ modules/simpletest/resources/queries/study/verifyAssay.js -text
 modules/simpletest/resources/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/Toyotas.sql -text
+modules/simpletest/resources/queries/vehicle/TransactionTest.sql -text
 modules/simpletest/resources/queries/vehicle/Vehicles/.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/Filter[!!-~]On[!!-~]Letter[!!-~]P.qview.xml -text
@@ -328,6 +329,7 @@ src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLBaseTest.java -text
 src/org/labkey/test/etl/ETLErrorTest.java -text
+src/org/labkey/test/etl/ETLMultipleTransactionsTest.java -text
 src/org/labkey/test/etl/ETLStoredProcedureTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
