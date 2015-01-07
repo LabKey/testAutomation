@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -292,9 +293,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertEquals("Wrong number of rows after filter", 24, dataset.getDataRowCount());
 
         _extHelper.clickMenuButton(false, "Mouse Groups", "Create Mouse Group", "From All Mice");
-        _extHelper.waitForExtDialog("Define Mouse Group");
-        waitForElement(Locator.id("groupLabel-inputEl"));
-        setFormElement(Locator.id("groupLabel-inputEl"), EXTRA_GROUP);
+        final Locator.XPathLocator window = Ext4Helper.Locators.window("Define Mouse Group");
+        final Locator.XPathLocator groupLabelInput = window.append(Locator.id("groupLabel-inputEl").notHidden());
+        waitForElement(groupLabelInput);
+        setFormElement(groupLabelInput, EXTRA_GROUP);
         _ext4Helper.clickWindowButton("Define Mouse Group", "Save", 0, 0);
         waitForElement(DataRegionTable.Locators.facetRow(EXTRA_GROUP, EXTRA_GROUP));
     }
