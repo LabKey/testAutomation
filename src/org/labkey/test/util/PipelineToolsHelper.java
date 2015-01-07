@@ -70,9 +70,8 @@ public class PipelineToolsHelper
         _test.popLocation();
     }
 
-    //TODO: enable or remove when we figure out if we can change pipelineToolsDirectory can use a path
     @LogMethod
-    private void addToPipelineToolsPath(@LoggedParam String... directories)
+    public void addToPipelineToolsPath(@LoggedParam String... directories)
     {
         List<String> directoriesToAppend = Arrays.asList(directories);
 
