@@ -16,9 +16,11 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -80,12 +82,24 @@ public class DataRegionTable
 
     public static DataRegionTable findDataRegion(BaseWebDriverTest test, int index)
     {
-        Locator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
-        List<WebElement> dataRegions = dataRegionLoc.findElements(test.getDriver());
+        return findDataRegionWithin(test, null, index);
+    }
+
+    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, WebElement parent)
+    {
+        return findDataRegionWithin(test, parent, 0);
+    }
+
+    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, @Nullable WebElement parent, int index)
+    {
+        Locator.CssLocator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
+        List<WebElement> dataRegions = parent == null ?
+                dataRegionLoc.findElements(test.getDriver()):
+                parent.findElements(By.cssSelector(dataRegionLoc.getLocatorString()));
         if (dataRegions.size() > index)
             return new DataRegionTable(dataRegions.get(index).getAttribute("id").replace("dataregion_", ""), test);
         else
-            throw new NoSuchElementException(String.format("Not enough data regions on page. Index: %d, Count: %d", index, dataRegions.size()));
+            throw new NoSuchElementException(String.format("Not enough data regions. Index: %d, Count: %d", index, dataRegions.size()));
     }
 
     public static String getQueryWebPartName(BaseWebDriverTest test)
