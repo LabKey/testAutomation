@@ -549,7 +549,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
                     "Image corrupt or truncated:",
                     "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3, issue: 21717
-                    "Using //@ to indicate"); // jQuery
+                    "Using //@ to indicate", // jQuery
+                    "NS_ERROR_FAILURE" // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
+            );
         }
     }
 
