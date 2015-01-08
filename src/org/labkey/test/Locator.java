@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -145,17 +146,17 @@ public abstract class Locator
         driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     }
 
-    public WebElement findElement(WebDriver driver)
+    public WebElement findElement(SearchContext context)
     {
-        List<WebElement> elements = findElements(driver);
+        List<WebElement> elements = findElements(context);
         if (elements.size() < 1)
             throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
         return elements.get(0);
     }
 
-    public List<WebElement> findElements(WebDriver driver)
+    public List<WebElement> findElements(SearchContext context)
     {
-        List<WebElement> elements = driver.findElements(this.toBy());
+        List<WebElement> elements = context.findElements(this.toBy());
         if (_text != null)
         {
             Iterator<WebElement> it = elements.iterator();
@@ -1094,11 +1095,11 @@ public abstract class Locator
         }
 
         @Override
-        public List<WebElement> findElements(WebDriver driver)
+        public List<WebElement> findElements(SearchContext context)
         {
-            List<WebElement> elements = super.findElements(driver);
+            List<WebElement> elements = super.findElements(context);
             if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
-                return (new LinkLocator(_linkText.toUpperCase())).findElements(driver);
+                return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;
         }
