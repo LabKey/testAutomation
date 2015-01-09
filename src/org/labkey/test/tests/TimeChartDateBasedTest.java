@@ -25,6 +25,8 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.Assert.*;
 
@@ -155,10 +157,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
 
         log("Test measure search.");
+        Locator.XPathLocator gridRow = Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr");
+        WebElement presortRow = gridRow.findElement(getDriver());
         _extHelper.setExtFormElementByType(ADD_MEASURE_DIALOG, "text", "nab");
-        sleep(500);
+        shortWait().until(ExpectedConditions.stalenessOf(presortRow));
         // Count search results (11 in study's NAb assay)
-        assertEquals("", 11, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr")));
+        assertEquals("Wrong number of measures after filter", 11, getElementCount(gridRow));
 
         log("Check for appropriate message for measure with no data.");
         _ext4Helper.clickGridRowText("Cutoff Percentage (3)", 0);
