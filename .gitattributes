@@ -367,6 +367,7 @@ src/org/labkey/test/pages/AssayDomainEditor.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
 src/org/labkey/test/pages/DomainEditor.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
+src/org/labkey/test/pages/LabKeyPage.java -text
 src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text

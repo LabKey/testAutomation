@@ -215,6 +215,12 @@ public abstract class Locator
         secTimeout = secTimeout > 0 ? secTimeout : 1;
         WebDriverWait wait = new WebDriverWait(driver, secTimeout);
 
+        return waitForElement(driver, wait);
+    }
+
+    public WebElement waitForElement(final SearchContext context, WebDriverWait wait)
+    {
+
         try
         {
             return wait.until(new ExpectedCondition<WebElement>()
@@ -222,7 +228,7 @@ public abstract class Locator
                 @Override
                 public WebElement apply(WebDriver d)
                 {
-                    return findElement(driver);
+                    return findElement(context);
                 }
 
                 @Override
@@ -243,6 +249,12 @@ public abstract class Locator
         long secTimeout = msTimeout / 1000;
         secTimeout = secTimeout > 0 ? secTimeout : 1;
         WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+
+        waitForElementToDisappear(driver, wait);
+    }
+
+    public void waitForElementToDisappear(final SearchContext context, WebDriverWait wait)
+    {
         try
         {
             wait.until(new ExpectedCondition<Boolean>()
@@ -250,13 +262,13 @@ public abstract class Locator
                 @Override
                 public Boolean apply(WebDriver d)
                 {
-                    return findElements(driver).size() == 0;
+                    return findElements(context).size() == 0;
                 }
             });
         }
         catch (TimeoutException ex)
         {
-            fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
+            throw new RuntimeException("Timeout waiting for element to disappear: " + getLoggableDescription(), ex);
         }
     }
 
