@@ -48,8 +48,13 @@ public class StudyReloadTest extends StudyBaseTest
         assertTextPresent("id006", "additional_column", "1234566");
         //text that was present in original but removed in the update
         assertTextNotPresent("original_column_numeric");
-
         verifyProtectedColumn();
+
+        //verify skipping query validation during reload
+        reloadStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/studyreload/edited.zip"), false, 3);
+        click(Locator.xpath("//a[.='COMPLETE']"));
+        assertTextPresent("Skipping query validation.");
+        assertTextNotPresent("Validating all queries in all schemas...");
     }
 
     private void verifyProtectedColumn()

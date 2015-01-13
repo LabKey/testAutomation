@@ -204,6 +204,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
+    public PortalHelper _portalHelper = new PortalHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -6651,11 +6652,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void reloadStudyFromZip(File studyFile)
     {
+//        goToManageStudy();
+//        clickButton("Reload Study");
+//        setFormElement(Locator.name("folderZip"), studyFile);
+//        clickButton("Reload Study From Local Zip Archive");
+//        waitForPipelineJobsToComplete(2, "Study Reload", false);
+        reloadStudyFromZip(studyFile, true, 2);
+    }
+
+    protected void reloadStudyFromZip(File studyFile, boolean validateQueries, int pipelineJobs)
+    {
         goToManageStudy();
         clickButton("Reload Study");
         setFormElement(Locator.name("folderZip"), studyFile);
+        if(! validateQueries) {uncheckCheckbox(Locator.checkboxByName("validateQueries"));}
         clickButton("Reload Study From Local Zip Archive");
-        waitForPipelineJobsToComplete(2, "Study Reload", false);
+        waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", false);
     }
 
     public AbstractContainerHelper getContainerHelper()
