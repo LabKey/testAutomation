@@ -863,6 +863,11 @@ public abstract class Locator
             return this.withPredicate(NOT_HIDDEN);
         }
 
+        public XPathLocator enabled()
+        {
+            return this.withPredicate(ENABLED);
+        }
+
         public XPathLocator withDescendant(XPathLocator descendant)
         {
             return this.withPredicate(descendant.getPath());
