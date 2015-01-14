@@ -220,7 +220,6 @@ public abstract class Locator
 
     public WebElement waitForElement(final SearchContext context, WebDriverWait wait)
     {
-
         try
         {
             return wait.until(new ExpectedCondition<WebElement>()
