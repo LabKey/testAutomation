@@ -42,6 +42,11 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         reloadStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/studyreload/edited.zip"));
+        pushLocation();
+        //query validation should have been run by default
+        click(Locator.xpath("//a[.='COMPLETE']"));
+        checkQueryValidationInLog(true);
+        popLocation();
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText("update_test"));
@@ -53,8 +58,7 @@ public class StudyReloadTest extends StudyBaseTest
         //verify skipping query validation during reload
         reloadStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/studyreload/edited.zip"), false, 3);
         click(Locator.xpath("//a[.='COMPLETE']"));
-        assertTextPresent("Skipping query validation.");
-        assertTextNotPresent("Validating all queries in all schemas...");
+        checkQueryValidationInLog(false);
     }
 
     private void verifyProtectedColumn()
@@ -66,6 +70,20 @@ public class StudyReloadTest extends StudyBaseTest
         click(ff_name1);
         click(Locator.linkContainingText("Advanced"));
         assertEquals("on", getAttribute(Locator.name("protected"), "value"));
+    }
+
+    private void checkQueryValidationInLog(boolean expectQueryValidation)
+    {
+        if(expectQueryValidation)
+        {
+            assertTextNotPresent("Skipping query validation.");
+            assertTextPresent("Validating all queries in all schemas...");
+        }
+        if(!expectQueryValidation)
+        {
+            assertTextPresent("Skipping query validation.");
+            assertTextNotPresent("Validating all queries in all schemas...");
+        }
     }
 
     @Override
