@@ -1,0 +1,58 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="with-output-location" version="0.0">
+    <description>Test output location attribute</description>
+    <tasks>
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.txt" />
+            </inputs>
+            <outputs>
+                <file name="output.xxx" outputDir="/relative-to-root"/>
+            </outputs>
+            <script interpreter="r">
+                <![CDATA[
+f = file(description="${output.xxx}", open="w")
+cat(file=f, sep="", "Hello world!")
+flush(con=f)
+close(con=f)
+              ]]>
+            </script>
+        </task>
+
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.txt" />
+            </inputs>
+            <outputs>
+                <file name="output.xxx" outputDir="relative-to-analysis"/>
+            </outputs>
+            <script interpreter="r">
+                <![CDATA[
+f = file(description="${output.xxx}", open="w")
+cat(file=f, sep="", "Hello world!")
+flush(con=f)
+close(con=f)
+              ]]>
+            </script>
+        </task>
+
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.txt" />
+            </inputs>
+            <outputs>
+                <file name="output.xxx" outputLocation="data"/>
+            </outputs>
+            <script interpreter="r">
+                <![CDATA[
+f = file(description="${output.xxx}", open="w")
+cat(file=f, sep="", "Hello world!")
+flush(con=f)
+close(con=f)
+              ]]>
+            </script>
+        </task>
+
+    </tasks>
+</pipeline>
