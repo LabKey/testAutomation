@@ -19,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.SideWebPart;
+import org.labkey.test.components.WebPart;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -170,17 +173,44 @@ public class PortalHelper extends AbstractHelper
 
     public List<String> getWebPartTitles()
     {
-        List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(_test.getDriver());
-        webparts.addAll(PortalHelper.Locators.sideWebpartTitle.findElements(_test.getDriver()));
+        List<WebPart> webparts = new ArrayList<>();
+        webparts.addAll(getBodyWebParts());
+        webparts.addAll(getSideWebParts());
 
         List<String> webpartTitles = new ArrayList<>();
 
-        for (WebElement el : webparts)
+        for (WebPart wp : webparts)
         {
-            webpartTitles.add(el.getText());
+            webpartTitles.add(wp.getTitle());
         }
 
         return webpartTitles;
+    }
+
+    public List<BodyWebPart> getBodyWebParts()
+    {
+        List<WebElement> webPartElements = Locator.css("#bodypanel > table[name=webpart]").findElements(_test.getDriver());
+        List<BodyWebPart> bodyWebParts = new ArrayList<>();
+        
+        for (WebElement el : webPartElements)
+        {
+            bodyWebParts.add(new BodyWebPart(_test, el));
+        }
+        
+        return bodyWebParts;
+    }
+
+    public List<SideWebPart> getSideWebParts()
+    {
+        List<WebElement> webPartElements = Locator.css(".labkey-side-panel > table[name=webpart]").findElements(_test.getDriver());
+        List<SideWebPart> sideWebParts = new ArrayList<>();
+
+        for (WebElement el : webPartElements)
+        {
+            sideWebParts.add(new SideWebPart(_test, el));
+        }
+
+        return sideWebParts;
     }
 
     /**
