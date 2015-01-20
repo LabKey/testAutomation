@@ -30,8 +30,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Category({Study.class, Disabled.class})
-public class StudyManualTest extends StudyTest
+public abstract class StudyManualTest extends StudyTest
 {
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
