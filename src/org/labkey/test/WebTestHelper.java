@@ -41,13 +41,17 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -119,7 +123,7 @@ public class WebTestHelper
 
     public static DatabaseType getDatabaseType()
     {
-        String databaseType = System.getProperty("databaseType");
+        String databaseType = getServerProperty("databaseType");
 
         if (null == databaseType)
             throw new IllegalStateException("Can't determine database type: databaseType property is not set");
@@ -133,9 +137,32 @@ public class WebTestHelper
         throw new IllegalStateException("Unknown database type: " + databaseType);
     }
 
+    private static String getServerProperty(String property)
+    {
+        String val = System.getProperty(property);
+
+        if (val == null)
+        {
+            File propertiesFile = new File(TestFileUtils.getLabKeyRoot(), "server/config.properties");
+
+            try (InputStream in = new FileInputStream(propertiesFile))
+            {
+                Properties prop = new Properties();
+
+                prop.load(in);
+
+                val = prop.getProperty(property);
+            }
+            catch (IOException ignore)
+            {
+            }
+        }
+        return val;
+    }
+
     public static String getDatabaseVersion()
     {
-        return System.getProperty("databaseVersion");
+        return getServerProperty("databaseVersion");
     }
 
     public static boolean isGroupConcatSupported()
