@@ -6000,7 +6000,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         int row = getCohortRow(cohortTable, cohort);
         // if the row does not exist then most likely the cohort passed in is incorrect
-        cohortTable.clickLink(row, 0);
+        clickAndWait(cohortTable.link(row, 0));
 
         if (!enroll)
         {

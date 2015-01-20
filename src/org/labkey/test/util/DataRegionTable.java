@@ -300,7 +300,7 @@ public class DataRegionTable
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row+getHeaderRowCount()+1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public Locator.XPathLocator link(int row, int col)
@@ -309,17 +309,12 @@ public class DataRegionTable
         return cell.child("a[1]");
     }
 
-    public void clickLink(int row, int col)
-    {
-        _test.clickAndWait(link(row, col));
-    }
-
-    public void clickLink(int row, String columnName)
+    public Locator.XPathLocator link(int row, String columnName)
     {
         int col = getColumn(columnName);
         if (col == -1)
             fail("Couldn't find column '" + columnName + "'");
-        clickLink(row, col);
+        return link(row, col);
     }
 
     public int getColumn(String name)

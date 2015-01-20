@@ -1256,7 +1256,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //Test DetailsPanel:
         log("Testing details panel");
-        dr.clickLink(1, 1);
+        clickAndWait(dr.link(1, 1));
         waitForText("Whole Blood");
         assertTextPresent("Sample1", "DNA", "Whole Blood", "Freezer");
 

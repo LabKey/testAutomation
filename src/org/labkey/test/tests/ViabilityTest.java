@@ -197,7 +197,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals(2, runsTable.getDataRowCount());
         String runGroupName = runsTable.getDataAsText(0, "Run Groups");
         assertEquals(runGroupName, runsTable.getDataAsText(1, "Run Groups"));
-        runsTable.clickLink(0, "Run Groups");
+        clickAndWait(runsTable.link(0, "Run Groups"));
 
         // Run Group name should be "Assay Name-XXX" where XXX is the run group rowid
         String runGroupRowId = getUrlParam("rowId", true);

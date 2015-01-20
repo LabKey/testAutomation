@@ -316,7 +316,7 @@ public class SequenceTest extends BaseWebDriverTest
         }
 
         log("Verifying instrument run and details page");
-        dr.clickLink(2, "Instrument Run");
+        clickAndWait(dr.link(2, "Instrument Run"));
 
         waitForText("Instrument Run Details");
         waitForText("Run Id"); //crude proxy for loading of the details panel
@@ -335,7 +335,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
-        dr.clickLink(1, 1);
+        clickAndWait(dr.link(1, 1));
 
         waitForText("Readset Details");
         waitForText("Readset Id:"); //crude proxy for details panel
@@ -413,7 +413,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
 
         waitForText("Instrument Run"); //proxy for dataRegion loading
-        dr.clickLink(1, 0);
+        clickAndWait(dr.link(1, 0));
 
         waitForText("3-Barcode:");
         waitForText("Run:");

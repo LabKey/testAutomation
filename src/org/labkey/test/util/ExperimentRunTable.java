@@ -111,7 +111,7 @@ public class ExperimentRunTable extends DataRegionTable
     public void clickGraphLink(int row)
     {
         // todo: not hardcoded!
-        clickLink(row, 2);
+        _test.clickAndWait(link(row, 2));
     }
 
     private int getExpectedRunRow(String name)

@@ -215,7 +215,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
-        templates.clickLink(0, 1);
+        clickAndWait(templates.link(0, 1));
 
         //use the same data included with this assay
         Locator btn = Locator.linkContainingText("Download Example Data");

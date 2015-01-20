@@ -428,12 +428,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         // click the details link
         pushLocation();
-        table.clickLink(1,0);
+        clickAndWait(table.link(1, 0));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         //assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
 
         popLocation();
-        table.clickLink(5,0);
+        clickAndWait(table.link(5, 0));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         assertElementPresent(Locator.xpath("//i[text() = 'A row was inserted.']"));
 
@@ -445,7 +445,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("view data"));
 
         table = new DataRegionTable("query", this, true, true);
-        table.clickLink(0,1);
+        clickAndWait(table.link(0, 1));
 
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
         table = new DataRegionTable("query", this, false, true);
@@ -453,7 +453,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
-        table.clickLink(0,0);
+        clickAndWait(table.link(0, 0));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         assertElementPresent(Locator.xpath("//td[contains(text(), 'Prius C') and contains(text(), 'Prius')]"));
 
