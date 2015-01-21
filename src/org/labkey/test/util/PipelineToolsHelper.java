@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,8 +74,7 @@ public class PipelineToolsHelper
     @LogMethod
     public void addToPipelineToolsPath(@LoggedParam String... directories)
     {
-        List<String> directoriesToAppend = Arrays.asList(directories);
-
+        List<String> directoriesToAppend= new ArrayList(Arrays.asList(directories));
         _test.pushLocation();
         goToSiteSettings();
         String previousToolsDir = _test.getFormElement(Locator.name("pipelineToolsDirectory"));

@@ -4038,7 +4038,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertElementPresent(Locator loc, int amount)
     {
-        assertEquals("Element '" + loc + "' is not present " + amount + " times", amount, getElementCount(loc));
+        assertElementPresent("Element '" + loc + "' is not present " + amount + " times", loc, amount);
+    }
+
+    public void assertElementPresent(String message, Locator loc, int amount)
+    {
+        assertEquals(message, amount, getElementCount(loc));
     }
 
     public void assertElementContains(Locator loc, String text)
