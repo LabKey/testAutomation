@@ -332,6 +332,10 @@ public class Ext4GridRef extends Ext4CmpRef
     {
         getFnEval("this.editingPlugin.completeEdit();");
         waitForGridEditorToDisappear();
+
+        // note: after we completeEdit(), the grid may refresh itself.  this is generally a non-issue for people clicking,
+        // but the tests sometimes run into problems.  this should allow time between editing cells
+        _test.sleep(200);
     }
 
     public Ext4FieldRef getActiveEditor(int rowIdx, String colName)
