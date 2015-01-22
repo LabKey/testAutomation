@@ -1031,25 +1031,29 @@ public class StudyTest extends StudyBaseTest
         log("Verifying sequence numbers and visit names imported correctly");
 
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
-        List<String> sequenceNums = table.getColumnDataAsText("Sequence Num");
-        assertEquals("Incorrect number of rows in Types dataset", 48, sequenceNums.size());
+        List<String> visits = table.getColumnDataAsText("Visit");
 
-        int sn101 = 0;
-        int sn201 = 0;
+        int enrollmentCount = 0;
+        int screeningCount = 0;
 
-        for (String seqNum : sequenceNums)
+        for (String visit : visits)
         {
-            // Use startsWith because StudyTest and StudyExportTest have different default format strings
-            if (seqNum.startsWith("101.0"))
-                sn101++;
-            else if (seqNum.startsWith("201.0"))
-                sn201++;
-            else
-                fail("Unexpected sequence number: " + seqNum);
+            switch (visit)
+            {
+                case "Enroll/Vacc #1":
+                    enrollmentCount++;
+                    break;
+                case "Screening":
+                    screeningCount++;
+                    break;
+                default:
+                    fail("Unexpected sequence number: " + visit);
+                    break;
+            }
         }
 
-        assertEquals("Incorrect count for sequence number 101.0", 24, sn101);
-        assertEquals("Incorrect count for sequence number 201.0", 24, sn201);
+        assertEquals("Incorrect count for visit: 'Enroll/Vacc #1'", 24, enrollmentCount);
+        assertEquals("Incorrect count for visit: 'Screening'", 24, screeningCount);
     }
 
     // Either param can be null
