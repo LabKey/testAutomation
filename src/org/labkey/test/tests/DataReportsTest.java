@@ -236,7 +236,7 @@ public class DataReportsTest extends ReportTest
         _extHelper.clickMenuButton("Views", "Create", "Crosstab View");
         selectOptionByValue(Locator.name("rowField"), "DEMsex");
         selectOptionByValue(Locator.name("colField"), "DEMsexor");
-        selectOptionByValue(Locator.name("statField"), "SequenceNum");
+        selectOptionByValue(Locator.name("statField"), "Visit");
         clickButton("Submit");
 
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
