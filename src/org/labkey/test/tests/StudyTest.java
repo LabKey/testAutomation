@@ -1047,7 +1047,7 @@ public class StudyTest extends StudyBaseTest
                     screeningCount++;
                     break;
                 default:
-                    fail("Unexpected sequence number: " + visit);
+                    fail("Unexpected visit: " + visit);
                     break;
             }
         }
