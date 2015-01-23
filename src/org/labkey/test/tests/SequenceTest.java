@@ -27,6 +27,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
@@ -39,6 +40,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.Keys;
 
@@ -48,6 +50,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -92,6 +95,14 @@ public class SequenceTest extends BaseWebDriverTest
         analysisPanelTest();
         readsetPanelTest();
         readsetImportTest();
+
+        //will also verify UI + pipeline jobs
+        createReferenceGenome(this, _startedPipelineJobs);
+        _startedPipelineJobs++;
+        addReferenceGenomeTracks(this, TEST_GENOME_NAME);
+
+        File testBam = new File(TestFileUtils.getLabKeyRoot(), "/externalModules/labModules/SequenceAnalysis/resources/sampleData/test.bam");
+        SequenceTest.addOutputFile(this, testBam, SequenceTest.TEST_GENOME_NAME, "TestBAM", "This is an output file");
     }
 
     protected void setUpTest()
@@ -202,7 +213,7 @@ public class SequenceTest extends BaseWebDriverTest
         String prop_value = "NewValue";
         Ext4FieldRef textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRef.class);
         String newValue = prop_name + "," + prop_value;
-        String val = (String)textarea.getValue();
+        String val = (String) textarea.getValue();
         val += "\n" + newValue;
         textarea.setValue(val);
         clickButton("Done Editing", 0);
@@ -215,7 +226,7 @@ public class SequenceTest extends BaseWebDriverTest
         _ext4Helper.clickTabContainingText("Preview Samples");
         waitForText("Sample_ID");
 
-        int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
+        int expectRows = (11 * (14 + 1));  //11 cols, 14 rows, plus header
         assertEquals(expectRows, getElementCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
@@ -259,7 +270,7 @@ public class SequenceTest extends BaseWebDriverTest
         int i = 0;
         while (i < barcodes5.length)
         {
-            sb.append("Illumina" + (i+1) + "\tILLUMINA\t" + barcodes5[i] + "\t" + barcodes3[i] + "\n");
+            sb.append("Illumina" + (i + 1) + "\tILLUMINA\t" + barcodes5[i] + "\t" + barcodes3[i] + "\n");
             i++;
         }
         return sb.toString();
@@ -292,6 +303,7 @@ public class SequenceTest extends BaseWebDriverTest
      * This method has several puposes.  It will verify that the records from illuminaImportTest() were
      * created properly.  It also exercises various features associated with the readset grid, including
      * the FASTQC report and downloading of results
+     *
      * @throws Exception
      */
     private void readsetFeaturesTest() throws IOException
@@ -610,7 +622,7 @@ public class SequenceTest extends BaseWebDriverTest
 //        Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
 
         Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
-        Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
+        Map<String, Object> params = (Map) panel.getEval("getJsonParams()");
 
         assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
         assertEquals("Incorect param in form JSON", analysisDescription, params.get("protocolDescription"));
@@ -632,8 +644,8 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorect param in form JSON", "Virus", params.get("referenceLibraryCreation.Virus.category"));
         assertEquals("Incorect param in form JSON", strain, params.get("referenceLibraryCreation.Virus.subset"));
 
-        List<Object> adapters = (List)params.get("fastqProcessing.AdapterTrimming.adapters");
-        List<Object> adapter1 = (List)adapters.get(0);
+        List<Object> adapters = (List) params.get("fastqProcessing.AdapterTrimming.adapters");
+        List<Object> adapter1 = (List) adapters.get(0);
         assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter1.get(0).toString());
         assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter1.get(1).toString());
         assertEquals("Incorect param in form JSON", true, adapter1.get(2));
@@ -645,8 +657,8 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorect param in form JSON", 0.02, params.get("alignment.Mosaik.max_mismatch_pct"));
         assertEquals("Incorect param in form JSON", true, params.get("alignment.Mosaik.output_multiple"));
 
-        Map sample = (Map)params.get("sample_0");
-        Long readset = (Long)sample.get("readset");
+        Map sample = (Map) params.get("sample_0");
+        Long readset = (Long) sample.get("readset");
         assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
         assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
         assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
@@ -655,8 +667,8 @@ public class SequenceTest extends BaseWebDriverTest
         assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
         assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
-        sample = (Map)params.get("sample_1");
-        readset = (Long)sample.get("readset");
+        sample = (Map) params.get("sample_1");
+        readset = (Long) sample.get("readset");
         assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
         assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
         assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
@@ -676,7 +688,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTrue("Unable to find file: " + output.getPath(), output.exists());
         log("File size: " + FileUtils.sizeOf(output));
 
-        try (InputStream fileStream = new FileInputStream(output);BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream))))
+        try (InputStream fileStream = new FileInputStream(output); BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream), StandardCharsets.UTF_8)))
         {
             int count = 0;
             int totalChars = 0;
@@ -685,7 +697,7 @@ public class SequenceTest extends BaseWebDriverTest
             while ((thisLine = br.readLine()) != null)
             {
                 count++;
-                totalChars+= thisLine.length();
+                totalChars += thisLine.length();
                 lines.add(thisLine);
             }
 
@@ -745,8 +757,8 @@ public class SequenceTest extends BaseWebDriverTest
         barcodeField.setChecked(true);
         sleep(100);
         assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
-        assertFalse("MID5 column should not be hidden", (Boolean)grid.getEval("columns[2].hidden"));
-        assertFalse("MID3 column should not be hidden", (Boolean)grid.getEval("columns[3].hidden"));
+        assertFalse("MID5 column should not be hidden", (Boolean) grid.getEval("columns[2].hidden"));
+        assertFalse("MID3 column should not be hidden", (Boolean) grid.getEval("columns[3].hidden"));
 
         barcodeField.setChecked(false);
         sleep(100);
@@ -803,17 +815,17 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(2, "fileName", filename2);
 
         Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
-        Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
-        Map<String, Object> fieldsJson = (Map)params.get("json");
+        Map<String, Object> params = (Map) panel.getEval("getJsonParams()");
+        Map<String, Object> fieldsJson = (Map) params.get("json");
         //List<Long> fileIds = (List)params.get("distinctIds");
         //List<String> fieldsNames = (List)params.get("distinctNames");
 
-        String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
+        String container = (String) executeScript("return LABKEY.Security.currentContainer.id");
         assertEquals("Incorect param for containerId", container, fieldsJson.get("containerId"));
         assertEquals("Incorect param for baseURL", getBaseURL() + "/", fieldsJson.get("baseUrl"));
 
-        Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
-        Long id2 = (Long)fieldsJson.get("userId");
+        Long id1 = (Long) executeScript("return LABKEY.Security.currentUser.id");
+        Long id2 = (Long) fieldsJson.get("userId");
         assertEquals("Incorect param for userId", id1, id2);
         String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
         assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
@@ -828,8 +840,8 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", "delete", fieldsJson.get("inputfile.inputTreatment"));
         assertEquals("Unexpected value for param", true, fieldsJson.get("deleteIntermediateFiles"));
 
-        Map<String, Object> sample0 = (Map)fieldsJson.get("sample_0");
-        Map<String, Object> sample1 = (Map)fieldsJson.get("sample_1");
+        Map<String, Object> sample0 = (Map) fieldsJson.get("sample_0");
+        Map<String, Object> sample1 = (Map) fieldsJson.get("sample_1");
 
         assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
         assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
@@ -861,8 +873,8 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRef.getForLabel(this, "Delete Intermediate Files").setValue(false);
         treatmentField.setValue("compress");
 
-        params = (Map)panel.getEval("getJsonParams()");
-        fieldsJson = (Map)params.get("json");
+        params = (Map) panel.getEval("getJsonParams()");
+        fieldsJson = (Map) params.get("json");
 
         assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
         assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
@@ -873,7 +885,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
         assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
 
-        sample0 = (Map)fieldsJson.get("sample_0");
+        sample0 = (Map) fieldsJson.get("sample_0");
         assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
         assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
@@ -893,9 +905,9 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(1, "inputmaterial", "gDNA");
         grid.setGridCell(1, "subjectid", "Subject1");
 
-        params = (Map)panel.getEval("getJsonParams()");
-        fieldsJson = (Map)params.get("json");
-        sample0 = (Map)fieldsJson.get("sample_0");
+        params = (Map) panel.getEval("getJsonParams()");
+        fieldsJson = (Map) params.get("json");
+        sample0 = (Map) fieldsJson.get("sample_0");
         assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
         assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
 
@@ -930,9 +942,9 @@ public class SequenceTest extends BaseWebDriverTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Remove"));
         grid.waitForRowCount(2);
 
-        params = (Map)panel.getEval("getJsonParams()");
-        fieldsJson = (Map)params.get("json");
-        sample0 = (Map)fieldsJson.get("sample_0");
+        params = (Map) panel.getEval("getJsonParams()");
+        fieldsJson = (Map) params.get("json");
+        sample0 = (Map) fieldsJson.get("sample_0");
         assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileName2")));
         assertEquals("Unexpected value for param", barcode, sample0.get("mid5"));
@@ -940,9 +952,9 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", "SANGER", sample0.get("platform"));
         assertEquals("Unexpected value for param", readsetNew, sample0.get("readsetname"));
 
-        sample1 = (Map)fieldsJson.get("sample_1");
+        sample1 = (Map) fieldsJson.get("sample_1");
         assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample1.get("fileName2")));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileName2")));
         assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
         assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
     }
@@ -1047,12 +1059,12 @@ public class SequenceTest extends BaseWebDriverTest
     {
         File dir = new File(path);
         File[] files = dir.listFiles();
-        for(File file: files)
+        for (File file : files)
         {
-            if(file.isDirectory() &&
+            if (file.isDirectory() &&
                     (file.getName().startsWith("sequenceAnalysis_") || file.getName().equals("illuminaImport") || file.getName().equals(".labkey")))
                 deleteDir(file);
-            if(file.getName().startsWith("SequenceImport"))
+            if (file.getName().startsWith("SequenceImport"))
                 file.delete();
         }
     }
@@ -1071,5 +1083,76 @@ public class SequenceTest extends BaseWebDriverTest
     public List<String> getAssociatedModules()
     {
         return null;
+    }
+
+    public static String TEST_GENOME_NAME = "TestGenome1";
+
+    public static void createReferenceGenome(BaseWebDriverTest test, int previouslyStartedPipelineJobs) throws Exception
+    {
+        test.log("creating SIVmac239 reference genome");
+        test.beginAt("/sequenceanalysis/" + test.getContainerId() + "/begin.view");
+
+        test.waitAndClickAndWait(Locator.linkContainingText("Reference Sequences"));
+        DataRegionTable dr = new DataRegionTable("query", test);
+        dr.setFilter("name", "Equals", "SIVmac239");
+        dr.checkCheckbox(0);
+        test._extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Create Reference Genome");
+        test.waitForElement(Ext4Helper.Locators.window("Create Reference Genome"));
+        Ext4FieldRef.getForLabel(test, "Name").setValue(TEST_GENOME_NAME);
+        Ext4FieldRef.getForLabel(test, "Description").setValue("This is a reference genome description");
+        test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Submit"));
+        test.waitForElement(Ext4Helper.Locators.window("Success"));
+        test.waitAndClickAndWait(Ext4Helper.Locators.ext4ButtonEnabled("OK"));
+        test.waitForPipelineJobsToComplete(previouslyStartedPipelineJobs + 1, "Create Reference Genome", false);
+        test.goToProjectHome();
+    }
+
+    public static void addReferenceGenomeTracks(BaseWebDriverTest test, String genomeName) throws Exception
+    {
+        test.log("adding resources to genome: " + genomeName);
+        test.beginAt("/sequenceanalysis/" + test.getContainerId() + "/begin.view");
+
+        test.waitAndClickAndWait(Locator.linkContainingText("Reference Genomes"));
+        DataRegionTable dr = new DataRegionTable("query", test);
+        dr.setFilter("name", "Equals", genomeName);
+
+        test.clickAndWait(dr.link(0, "Genome Name"));
+        test.waitForElement(Locator.tagContainingText("span", "Aliases for External Browsers or Databases"));
+
+        File dataDir = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/sequenceAnalysis/genomeAnnotations");
+        for (File f : dataDir.listFiles())
+        {
+            test.log("adding track: " + f.getName());
+            test.clickButton("Add Annotation", 0);
+            test.waitForElement(Ext4Helper.Locators.window("Import Annotations/Tracks"));
+            Ext4FieldRef.getForLabel(test, "Track Name").setValue(LabModuleHelper.getBaseName(f.getName()));
+            Ext4FieldRef.getForLabel(test, "Description").setValue("This is the track description");
+            Ext4FileFieldRef fileField = test._ext4Helper.queryOne("field[fieldLabel=File]", Ext4FileFieldRef.class);
+            fileField.setToFile(f);
+
+            test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Submit"));
+            test.waitForElement(Ext4Helper.Locators.window("Success"));
+            test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("OK"));
+            test.waitForElement(Locator.tagContainingText("a", f.getName())); //proxy for DR reload
+        }
+    }
+
+    public static void addOutputFile(BaseWebDriverTest test, File toAdd, String genomeName, String name, String description) throws Exception
+    {
+        test.log("adding output file: " + toAdd.getName());
+        test.beginAt("/query/" + test.getContainerId() + "/executeQuery.view?query.queryName=outputfiles&schemaName=sequenceanalysis");
+
+        test.clickButton("Import Files", 0);
+        test.waitForElement(Ext4Helper.Locators.window("Import Output File"));
+        Ext4FieldRef.getForLabel(test, "Name").setValue(name);
+        Ext4FieldRef.getForLabel(test, "Description").setValue(description);
+        Ext4ComboRef.getForLabel(test, "Reference Genome").setComboByDisplayValue(genomeName);
+
+        Ext4FileFieldRef fileField = test._ext4Helper.queryOne("field[fieldLabel=File]", Ext4FileFieldRef.class);
+        fileField.setToFile(toAdd);
+
+        test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Submit"));
+        test.waitForElement(Ext4Helper.Locators.window("Success"));
+        test.waitAndClickAndWait(Ext4Helper.Locators.ext4ButtonEnabled("OK"));
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import com.drew.lang.annotations.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -81,10 +82,10 @@ public class LabModuleHelper
         _test.assertTextNotPresent("Unknown");
     }
 
-    public static Locator getNavPanelItem(String label, String itemText)
+    public static Locator getNavPanelItem(String label, @Nullable String itemText)
     {
         //NOTE: this should return only visible items
-        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append(Locator.linkWithText(itemText)).notHidden();
+        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append(itemText == null ? Locator.tag("a") : Locator.linkWithText(itemText)).notHidden();
     }
 
     //NOTE: uses 1-based index
@@ -465,5 +466,18 @@ public class LabModuleHelper
                 return file.exists();
             }
         }, "Unable to find file: " + file.getPath(), WAIT_FOR_PAGE);
+    }
+
+    public static String getBaseName(String fileName)
+    {
+        return getBaseName(fileName, 1);
+    }
+
+    public static String getBaseName(String fileName, int dots)
+    {
+        String baseName = fileName;
+        while (dots-- > 0 && baseName.indexOf('.') != -1)
+            baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+        return baseName;
     }
 }
