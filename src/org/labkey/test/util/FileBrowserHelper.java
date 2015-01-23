@@ -123,7 +123,7 @@ public class FileBrowserHelper
                     _test.click(folderTreeNode);
                     return _test.isElementPresent(folderTreeNodeSelected);
                 }
-            }, "Failed to select tree node", WAIT_FOR_JAVASCRIPT);
+            }, "Failed to select tree node: " + nodeId, WAIT_FOR_JAVASCRIPT);
             _test._ext4Helper.waitForMaskToDisappear();
             if (initialSelectionExists) // Current selection might not change
                 _test.shortWait().until(ExpectedConditions.stalenessOf(fileGrid));
