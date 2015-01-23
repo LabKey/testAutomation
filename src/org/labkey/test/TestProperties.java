@@ -28,22 +28,22 @@ public abstract class TestProperties
 
     public static boolean isLinkCheckEnabled()
     {
-        return "true".equals(System.getProperty("linkCheck")) || isInjectionCheckEnabled();
+        return "true".equals(System.getProperty("linkCheck", "false")) || isInjectionCheckEnabled();
     }
 
     public static boolean isInjectionCheckEnabled()
     {
-        return "true".equals(System.getProperty("injectCheck"));
+        return "true".equals(System.getProperty("injectCheck", "false"));
     }
 
     public static boolean isScriptCheckEnabled()
     {
-        return "true".equals(System.getProperty("scriptCheck"));
+        return "true".equals(System.getProperty("scriptCheck", "true"));
     }
 
     public static boolean isDevModeEnabled()
     {
-        return "true".equals(System.getProperty("devMode"));
+        return "true".equals(System.getProperty("devMode", "true"));
     }
 
     public static boolean isTestRunningOnTeamCity()
@@ -55,22 +55,22 @@ public abstract class TestProperties
 
     public static boolean isLeakCheckSkipped()
     {
-        return "false".equals(System.getProperty("memCheck"));
+        return "false".equals(System.getProperty("memCheck", "true"));
     }
 
     public static boolean isQueryCheckSkipped()
     {
-        return "false".equals(System.getProperty("queryCheck"));
+        return "false".equals(System.getProperty("queryCheck", "true"));
     }
 
     public static boolean isNewWebDriverForEachTest()
     {
-        return !"true".equals(System.getProperty("selenium.reuseWebDriver"));
+        return !"true".equals(System.getProperty("selenium.reuseWebDriver", "false"));
     }
 
     public static boolean isViewCheckSkipped()
     {
-        return "false".equals(System.getProperty("viewCheck"));
+        return "false".equals(System.getProperty("viewCheck", "true"));
     }
 
     public static boolean isSystemMaintenanceDisabled()

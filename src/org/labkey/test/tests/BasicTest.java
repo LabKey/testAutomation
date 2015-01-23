@@ -16,17 +16,21 @@
 
 package org.labkey.test.tests;
 
+import com.google.common.base.Function;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,67 +60,96 @@ public class BasicTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testSystemSettings()
     {
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
+
+        goToAdminConsole();
+
+        WebElement modeElement = Locator.tagWithClass("td", "labkey-form-label").withText("Mode").append("/../td[2]").findElement(getDriver());
+        String mode = modeElement.getText();
+        if (TestProperties.isDevModeEnabled())
+            Assert.assertEquals("Development", mode); // Verify that we're running in dev mode
+        else
+            Assert.assertEquals("Production", mode); // Unless we're not supposed to be.
 
         goToSiteSettings();
         checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "NONE"));     // Don't report usage to labkey.org
         checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "NONE"));   // Don't report exceptions to labkey.org - we leave the self-report setting unchanged
         clickButton("Save");
 
+        // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
+        if (TestProperties.isDevModeEnabled())
+        {
+            goToAdminConsole();
+            clickAndWait(Locator.linkWithText("running threads"));
+            assertTextNotPresent("SystemMaintenance");
+        }
+    }
+
+    @Test
+    public void testSearch()
+    {
+        final Locator.IdLocator headerSearch = Locator.id("search-input");
+        setFormElement(headerSearch, "labkey");
+        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                pressEnter(headerSearch);
+                return null;
+            }
+        });
+        assertElementPresent(Locator.id("searchResults")); // just make sure we get the results page
+    }
+
+    @Test
+    public void testFolderAndRole()
+    {
         _containerHelper.createProject(PROJECT_NAME, null);
+        createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
         _permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
         _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
         _permissionsHelper.setPermissions("testers", "Editor");
+
         clickButton("Save and Finish");
-        createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
-
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Search");
-        setFormElement(Locator.id("query"), "labkey");
-        clickButton("Search");
-        assertTextPresent("Found", "results");  // just make sure we get the results page
-
-        goToAdminConsole();
-
-        if (TestProperties.isDevModeEnabled())
-            assertTextNotPresent("Production"); // Verify that we're running in dev mode
-        else
-            assertTextNotPresent("Development"); // Unless we're not supposed to be.
-
-        // Navigate to the credits page and verify that all external components are documented
-        waitAndClick(Locator.linkWithText("credits"));
-        assertTextNotPresent("WARNING:");
-
-        // Check for unrecognized scripts on the orphaned scripts page (only available in dev mode)
-        if (TestProperties.isDevModeEnabled())
-        {
-            goToAdminConsole();
-            clickAndWait(Locator.linkWithText("sql scripts"));
-            clickAndWait(Locator.linkWithText("orphaned scripts"));
-            assertTextNotPresent("WARNING:");
-        }
-
-        ensureAdminMode();
-        clickProject(PROJECT_NAME);
-        clickFolder(FOLDER_NAME);
-
         log("Test folder aliasing");
         pushLocation();
         renameFolder(PROJECT_NAME, FOLDER_NAME, FOLDER_RENAME, true);
         popLocation();
         assertTextPresent(FOLDER_RENAME);
 
-        // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
-        if (TestProperties.isDevModeEnabled())
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.assertPermissionSetting("testers", "Editor");
+    }
+
+    @Test
+    public void testCredits()
+    {
+        // Navigate to the credits page and verify that all external components are documented
+        beginAt(WebTestHelper.buildURL("admin", "credits"));
+        List<WebElement> creditsWarnings = Locator.css("p.paragraph").containing("WARNING:").findElements(getDriver());
+        if (creditsWarnings.size() > 0)
         {
-            goToAdminConsole();
-            waitAndClick(Locator.linkWithText("running threads"));
-            assertTextNotPresent("SystemMaintenance");
+            for (WebElement warning : creditsWarnings)
+            {
+                log(warning.getText());
+            }
+            Assert.fail("Credits page is not up-to-date. See log for more details");
         }
+        assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
+    }
+
+    @Test
+    public void testScripts()
+    {
+        Assume.assumeTrue(TestProperties.isDevModeEnabled());
+        // Check for unrecognized scripts on the orphaned scripts page (only available in dev mode)
+        beginAt(WebTestHelper.buildURL("admin-sql", "orphanedScripts"));
+        assertTextNotPresent("WARNING:");
     }
 
     public List<String> getAssociatedModules()
