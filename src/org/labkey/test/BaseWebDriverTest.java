@@ -141,12 +141,12 @@ import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.TestProperties.isViewCheckSkipped;
-import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
-import static org.labkey.test.WebTestHelper.getTargetServer;
+import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.stripContextPath;
 
@@ -737,7 +737,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         URL url = getURL();
         String urlString = getDriver().getCurrentUrl();
-        if ("80".equals(WebTestHelper.getWebPort()) && url.getAuthority().endsWith(":-1"))
+        if (80 == WebTestHelper.getWebPort() && url.getAuthority().endsWith(":-1"))
         {
             int portIdx = urlString.indexOf(":-1");
             urlString = urlString.substring(0, portIdx) + urlString.substring(portIdx + (":-1".length()));
@@ -1258,9 +1258,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             try
             {
-                beginAt("/login/logout.view");
+                getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+                getDriver().get(buildURL("login", "logout"));
 
-                if (getResponseCode() != 404)
+                if (isElementPresent(Locator.id("permalink")))
                 {
                     hitFirstPage = true;
                 }
@@ -1271,7 +1272,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                             (elapsedMs / 1000)) + " more seconds...");
                 }
             }
-            catch (SeleniumException e)
+            catch (SeleniumException | TimeoutException e)
             {
                 // ignore timeouts that occur during startup; a poorly timed request
                 // as the webapp is loading may hang forever, causing a timeout.
@@ -1291,6 +1292,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
+        WebTestHelper.saveHostSettings(getDriver().getCurrentUrl());
     }
 
     @LogMethod
@@ -1694,7 +1696,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if ( isGuestModeTest() )
             return;
-        if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        if (isLocalServer())
             beginAt("/admin/resetErrorMark.view");
     }
 
@@ -2167,7 +2169,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void checkLeaks()
     {
-        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        if (!isLocalServer())
             return;
         if (isLeakCheckSkipped())
             return;
@@ -2218,7 +2220,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void checkErrors()
     {
-        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        if (!isLocalServer())
             return;
         if ( isGuestModeTest() )
             return;

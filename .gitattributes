@@ -598,6 +598,7 @@ src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/FileBrowserExtendedProperty.java -text
 src/org/labkey/test/util/FileBrowserHelper.java -text
 src/org/labkey/test/util/GenericChartHelper.java -text
+src/org/labkey/test/util/InstallCert.java -text
 src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text

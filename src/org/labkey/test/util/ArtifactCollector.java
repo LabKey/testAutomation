@@ -39,8 +39,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
-import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
-import static org.labkey.test.WebTestHelper.getTargetServer;
+import static org.labkey.test.WebTestHelper.isLocalServer;
 
 public class ArtifactCollector
 {
@@ -101,7 +100,7 @@ public class ArtifactCollector
 
     public void dumpThreads(BaseWebDriverTest baseWebDriverTest)
     {
-        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        if (!isLocalServer())
             return;
 
         try
@@ -138,7 +137,7 @@ public class ArtifactCollector
 
     public void dumpHeap()
     {
-        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+        if (!isLocalServer())
             return;
         if ( _test.isGuestModeTest() )
             return;

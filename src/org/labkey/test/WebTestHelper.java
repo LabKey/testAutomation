@@ -30,6 +30,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -38,6 +41,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
@@ -48,7 +52,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
@@ -58,30 +66,64 @@ import java.util.Properties;
  */
 public class WebTestHelper
 {
-    public static final String DEFAULT_CONTEXT_PATH = "/labkey"; //TODO: Make private
-    public static final String DEFAULT_WEB_PORT = "8080"; //TODO: Make private
-    public static final String DEFAULT_TARGET_SERVER = "http://localhost"; //TODO: Make private and add method to check if testing on localhost
-    private static String _webPort = null;
+    private static final String DEFAULT_CONTEXT_PATH = "/labkey";
+    private static final Integer DEFAULT_WEB_PORT = 8080;
+    private static final String DEFAULT_TARGET_SERVER = "http://localhost";
+    private static String _targetServer = null;
+    private static Integer _webPort = null;
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     public static long leakCRC = 0;
 
-    public static String getWebPort()
+    public static void saveHostSettings(String urlString)
+    {
+        try
+        {
+            URL url = new URL(urlString);
+            _targetServer = url.getProtocol() + "://" + url.getHost();
+            _webPort = url.getPort();
+
+            if ("https".equals(url.getProtocol()) && isLocalServer())
+            {
+                acceptLocalhostCert();
+            }
+        }
+        catch (Exception fail)
+        {
+            throw new RuntimeException(fail);
+        }
+    }
+
+    private static void acceptLocalhostCert() throws Exception
+    {
+        String keystorePassword = System.getProperty("keystore.password", "changeit");
+        InstallCert.install("localhost", _webPort, keystorePassword.toCharArray());
+    }
+
+    public static Boolean isLocalServer()
+    {
+        return getTargetServer().contains("localhost") || getTargetServer().contains("127.0.0.1");
+    }
+
+    public static Integer getWebPort()
     {
         synchronized (DEFAULT_WEB_PORT)
         {
             if (_webPort == null)
             {
-                _webPort = System.getProperty("labkey.port");
-                if (_webPort == null || _webPort.length() == 0)
+                String webPortStr = System.getProperty("labkey.port");
+                if (webPortStr == null || webPortStr.length() == 0)
                 {
                     System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
                                         ").\nThis can be changed by passing VM arg '-Dlabkey.port=[yourport]'.");
                     _webPort = DEFAULT_WEB_PORT;
                 }
                 else
+                {
+                    _webPort = Integer.parseInt(webPortStr);
                     System.out.println("Using labkey port '" + _webPort + "', as provided by system property 'labkey.port'.");
+                }
             }
             return _webPort;
         }
@@ -171,11 +213,9 @@ public class WebTestHelper
                 getDatabaseType() == DatabaseType.MicrosoftSQLServer && !"2005".equals(getDatabaseVersion());
     }
 
-    private static String _targetServer = null;
-
     public static String getBaseURL()
     {
-        String portPortion = "80".equals(getWebPort()) ? "" : ":" + getWebPort();
+        String portPortion = 80 == getWebPort() ? "" : ":" + getWebPort();
 
         return getTargetServer() + portPortion + getContextPath();
     }
@@ -336,10 +376,23 @@ public class WebTestHelper
                 .setCharset(Charset.forName("UTF-8"))
                 .build();
 
+        SSLConnectionSocketFactory socketFactory;
+        try
+        {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            socketFactory = new SSLConnectionSocketFactory(builder.build());
+        }
+        catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+
         HttpClientBuilder clientBuilder = HttpClientBuilder.create()
                 .setDefaultCredentialsProvider(credentialsProvider)
                 .setDefaultRequestConfig(requestConfig)
-                .setDefaultConnectionConfig(connectionConfig);
+                .setDefaultConnectionConfig(connectionConfig)
+                .setSSLSocketFactory(socketFactory);
 
         return clientBuilder;
     }
