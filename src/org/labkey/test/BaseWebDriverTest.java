@@ -1261,7 +1261,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
 
-                if (isElementPresent(Locator.id("permalink")))
+                if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {
                     hitFirstPage = true;
                 }
