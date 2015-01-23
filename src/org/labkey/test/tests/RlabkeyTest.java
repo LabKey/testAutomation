@@ -119,7 +119,10 @@ public class RlabkeyTest extends SimpleApiTest
                     StringBuilder sb = new StringBuilder(pathCmd);
 
                     sb.append('\n');
-                    sb.append(test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL()));
+                    String testScript = test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL());
+                    if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
+                        testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.setCurlOptions(ssl.verifypeer=FALSE)");
+                    sb.append(testScript);
                     String verify = test.getReponse().trim();
 
                     log("exceute test: " + test.getName());
