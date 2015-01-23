@@ -70,6 +70,7 @@ public class StudyExportTest extends StudyManualTest
         setDatasetCategory(MODIFIED_DATASET, CATEGORY);
         hideDataset(HIDDEN_DATASET);
         modifyDatasetColumn(MODIFIED_DATASET);
+        setDemographicsBit();
 
         _listHelper.importListArchive(getFolderName(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
 
@@ -94,9 +95,6 @@ public class StudyExportTest extends StudyManualTest
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(3, "study and specimen archive import", false);
-
-        // TODO: Move this earlier once issue 10074 is resolved... or remove, since this is done in afterManualCreate()
-        setDemographicsBit();
     }
 
     protected void doCohortCreateSteps()
