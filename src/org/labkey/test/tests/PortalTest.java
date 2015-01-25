@@ -154,7 +154,6 @@ public class PortalTest extends BaseWebDriverTest
                 waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
                 assertElementNotPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
-//                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }
             else
                 assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]").withPredicate("not(.//a/img[@title='Remove From Page'])"));
@@ -170,7 +169,6 @@ public class PortalTest extends BaseWebDriverTest
                 waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
                 assertElementPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
                 click(Locator.id("search-input")); // dismiss menu
-//                waitForElementToDisappear(Ext4Helper.ext4MenuItem("Permissions").notHidden());
             }
             else
                 assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]//a/img[@title='Remove From Page']"));

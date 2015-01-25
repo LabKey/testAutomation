@@ -137,9 +137,9 @@ public class MenuBarTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         hoverMenu("Wiki Render Types");
-        waitForElement(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("HTML"));
-        assertElementPresent(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("RADEOX"));
-        assertElementPresent(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("TEXT_WITH_LINKS"));
+        waitForElement(Locator.xpath("//div[@id='CustomMenu7-Header_menu']").containing("HTML"));
+        assertElementPresent(Locator.xpath("//div[@id='CustomMenu7-Header_menu']").containing("RADEOX"));
+        assertElementPresent(Locator.xpath("//div[@id='CustomMenu7-Header_menu']").containing("TEXT_WITH_LINKS"));
 
         // Another custom menu with links to Participant Report
         createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
@@ -189,7 +189,7 @@ public class MenuBarTest extends BaseWebDriverTest
     {
         Locator menuItem = Locator.css("#menubar .labkey-main-menu-item").withText(menuText);
         String menuId = menuItem.findElement(getDriver()).getAttribute("id");
-        String hoverNavigationPart = "_" + menuId.split("\\$")[0];
+        String hoverNavigationPart = "_" + menuId.split("-Header")[0];
         executeScript("HoverNavigation.Parts[\"" +hoverNavigationPart + "\"].show();");
     }
 
