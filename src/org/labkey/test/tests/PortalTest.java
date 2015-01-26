@@ -23,6 +23,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.WebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -79,10 +81,8 @@ public class PortalTest extends BaseWebDriverTest
         // Verify that the asynchronous save worked by refreshing:
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
-        // remove wiki by clicking the first delete link:
-        click(Locator.xpath("//tr[th[@title='Wiki']]//a/img[@title='Remove From Page']"));
-        _ext4Helper.waitForMaskToDisappear(30000);
-        assertTextNotPresent(WIKI_WEBPART_TEXT);
+        WebPart wikiWebPart = new BodyWebPart(this, "Wiki");
+        wikiWebPart.delete();
 
         refresh();
         // verify that the web part removal was correctly saved:
