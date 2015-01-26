@@ -202,6 +202,33 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
     }
 
+    @Test
+    public void testWithOutputLocation()
+    {
+        final String folderName = "withOutputLocation";
+        final String containerPath = getProjectName() + "/" + folderName;
+        final File fileRoot = TestFileUtils.getDefaultFileRoot(containerPath);
+        final String pipelineName = "with-output-location";
+        final String importAction = "Test output location attribute";
+        final String protocolName = "with_output_location";
+        final String[] targetFiles = {SAMPLE_FILE.getName()};
+        final Map<String, String> protocolProperties = Maps.of(
+                "protocolName", protocolName);
+        final Map<String, Set<String>> outputFiles = new HashMap<>();
+        outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
+        outputFiles.put("sample.log", Collections.<String>emptySet());
+        outputFiles.put("with-output-location.xml", Collections.<String>emptySet());
+        outputFiles.put("relative-to-analysis/sample.xxx", Collections.<String>emptySet());
+        outputFiles.put("/relative-to-root/sample.xxx", Collections.<String>emptySet());
+
+        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(SAMPLE_FILE);
+
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, null, fileRoot, outputFiles);
+    }
+
     @LogMethod
     private void verifyPipelineAnalysisDeleted(@LoggedParam String pipelineName, String protocolName)
     {

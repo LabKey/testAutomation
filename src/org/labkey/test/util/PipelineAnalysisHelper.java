@@ -123,12 +123,13 @@ public class PipelineAnalysisHelper
         _test._fileBrowserHelper.selectFileBrowserItem(analysisPath);
         _test.assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(".work"));
 
-        for (Map.Entry fileAndContents : expectedFilesAndContents.entrySet())
+        for (Map.Entry<String, Set<String>> fileAndContents : expectedFilesAndContents.entrySet())
         {
-            String filePath = analysisPath + fileAndContents.getKey();
-            Set<String> fileContents = (Set<String>)fileAndContents.getValue();
+            boolean absolutePath = fileAndContents.getKey().startsWith("/");
+            String filePath = (absolutePath ? "" : analysisPath) + fileAndContents.getKey();
             _test.log("Verify " + filePath);
-            _test._fileBrowserHelper.selectFileBrowserItem(analysisPath + fileAndContents.getKey());
+            Set<String> fileContents = fileAndContents.getValue();
+            _test._fileBrowserHelper.selectFileBrowserItem(filePath);
             File actualFile = new File(fileRoot, filePath);
             if (!fileContents.isEmpty())
             {
@@ -137,6 +138,10 @@ public class PipelineAnalysisHelper
                 {
                     assertTrue("File didn't contain expected text:" + fileContent, actualFileContents.contains(fileContent));
                 }
+            }
+            else
+            {
+                assertTrue(actualFile.exists());
             }
         }
     }
