@@ -133,8 +133,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         // Running same protocol again is an error
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
-        waitForElement(Ext4Helper.Locators.window("Error"));
-        assertEquals("Cannot redefine an existing protocol", getText(Ext4Helper.Locators.windowBody("Error")));
+        waitForElement(Locator.labkeyAlert("Error", "Cannot redefine an existing protocol"));
         clickButton("OK", 0);
 
         // Delete the job, including any refernced runs

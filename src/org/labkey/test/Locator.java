@@ -579,6 +579,17 @@ public abstract class Locator
             return xpath("//img[@alt=" + xq(altText) + "]");
     }
 
+    public static XPathLocator labkeyAlert(String title)
+    {
+        return Locator.tagWithClass("div", "showSweetAlert").withDescendant(Locator.tagContainingText("h2", title));
+    }
+
+    public static XPathLocator labkeyAlert(String title, String message)
+    {
+        Locator.XPathLocator alert = labkeyAlert(title);
+        return alert.append(Locator.tag("p").withText(message));
+    }
+
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
