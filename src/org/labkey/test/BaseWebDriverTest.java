@@ -551,6 +551,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "Image corrupt or truncated:",
                     "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3, issue: 21717
                     "Using //@ to indicate", // jQuery
+                    "CodeMirror is not defined", // There will be more severe errors than this if CodeMirror is actually broken
                     "NS_ERROR_FAILURE" // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
             );
         }
