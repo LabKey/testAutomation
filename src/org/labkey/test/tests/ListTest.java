@@ -479,10 +479,11 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("manage lists"));
         clickAndWait(Locator.linkWithText("view history"));
         assertTextPresent(":History");
-        assertTextPresent("modified", 10);
+        assertTextPresent("record was modified", 2);    // An existing list record was modified
+        assertTextPresent("were modified", 8);          // The column(s) of domain ></% 1äöüColors were modified
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
-        assertTextPresent("created", 2); // Once for the list, once for the domain
+        assertTextPresent("was created", 2);                // Once for the list, once for the domain
         assertEquals("details Links", 9, getElementCount(Locator.linkWithText("DETAILS"))); // List events should each have a link
         assertEquals("Project Links", 18 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
         assertEquals("List Links", 18 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
