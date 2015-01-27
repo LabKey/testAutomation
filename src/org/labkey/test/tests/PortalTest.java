@@ -68,7 +68,7 @@ public class PortalTest extends BaseWebDriverTest
         portalHelper.addWebPart("Messages");
         assertElementPresent(Locator.linkWithText("Messages"));
         portalHelper.addWebPart("Wiki");
-        assertTextPresent("Wiki");
+        assertElementPresent(Locator.linkWithText("Wiki"));
         assertElementPresent(Locator.linkWithText("Create a new wiki page"));
         portalHelper.addWebPart("Wiki Table of Contents");
 

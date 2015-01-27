@@ -4360,6 +4360,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return getElementCount(l.child("preceding-sibling::*"));
     }
 
+    public int getElementIndex(WebElement el)
+    {
+        return Locator.xpath("preceding-sibling::*").findElements(el).size();
+    }
+
     public void dragAndDrop(Locator from, Locator to)
     {
         dragAndDrop(from, to, Position.top);

@@ -22,7 +22,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -330,15 +333,16 @@ public class PortalHelper extends AbstractHelper
         if (direction.isHorizontal())
             throw new IllegalArgumentException("Can't move webpart horizontally.");
 
-        Locator.XPathLocator webPart = Locator.xpath("//table[@name='webpart'][.//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
+        Locator.XPathLocator webPartLoc = Locator.xpath("//table[@name='webpart']").withPredicate(Locator.tagWithClass("span", "labkey-wp-title-text").withText(webPartTitle));
+        final WebElement webPart = webPartLoc.findElement(_test.getDriver());
 
-        int initialIndex = (_test.getElementIndex(webPart) / 2);
+        int initialIndex = (_test.getElementIndex(webPart) / 2); // Each webpart has an adjacent <br>
 
         Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
-        String panelClass = portalPanel.findElement(((BaseWebDriverTest)_test).getDriver()).getAttribute("class");
+        String panelClass = portalPanel.findElement(_test.getDriver()).getAttribute("class");
         if (panelClass.contains("labkey-body-panel"))
         {
-            _test.click(webPart.append("//img[@title='Move "+direction+"']"));
+            Locator.xpath("//img[@title='Move "+direction+"']").findElement(webPart).click();
         }
         else if (panelClass.contains("labkey-side-panel"))
         {
@@ -349,9 +353,15 @@ public class PortalHelper extends AbstractHelper
             fail("Unable to analyze webpart type. PortalHelper.java needs updating.");
         }
 
-        // TODO: Check final webpart index
-
-        _test._ext4Helper.waitForMaskToDisappear();
+        final int expectedIndex = initialIndex + (direction == Direction.DOWN ? 1 : -1);
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (_test.getElementIndex(webPart) / 2) == expectedIndex;
+            }
+        }, "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void openWebpartPermissionWindow(String webpart)
