@@ -890,7 +890,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("First");
         clickButton("Save");
         clickButton("View Data");
-        assertTextPresent("My Custom View", "Hello Dataset", "Sequence Number");
+        assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
     }
 
