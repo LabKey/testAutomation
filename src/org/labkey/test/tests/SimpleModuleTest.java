@@ -803,7 +803,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Submit", 0);
         waitForText("Manufacturer");
         assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("search-input")));
-        assertTextPresent("Pinto");
+        waitForText("Pinto", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent("Prius");
     }
 
