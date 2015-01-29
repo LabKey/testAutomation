@@ -17,7 +17,10 @@ package org.labkey.test.tests;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
@@ -30,6 +33,7 @@ import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +45,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Reports.class})
-public class KnitrReportTest extends ReportTest
+public class KnitrReportTest extends BaseWebDriverTest
 {
     private static final Path scriptpadReports = Paths.get(TestFileUtils.getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
@@ -56,20 +60,11 @@ public class KnitrReportTest extends ReportTest
         return "KnitrReportProject";
     }
 
-    @Override
-    protected void doCreateSteps()
+    @BeforeClass
+    public static void initProject()
     {
-        setupProject();
-    }
-
-    @Override
-    protected void doVerifySteps()
-    {
-        verifyKnitrHTMLFormat();
-        verifyKnitrMarkupFormat();
-        verifyModuleReportDependencies();
-        verifyAdhocReportDependenciesString();
-        verifyAdhocReportDependenciesLib();
+        KnitrReportTest init = (KnitrReportTest)getCurrentTest();
+        init.setupProject();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -83,12 +78,12 @@ public class KnitrReportTest extends ReportTest
 
         PortalHelper portalHelper = new PortalHelper(this);
 
-        portalHelper.addReportWebPart("script_rmd");
+//        portalHelper.addReportWebPart("script_rmd");
         portalHelper.addWebPart("Data Views");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void verifyKnitrHTMLFormat()
+    @Test
+    public void testKnitrHTMLFormat()
     {
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
                                     Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
@@ -106,8 +101,8 @@ public class KnitrReportTest extends ReportTest
         createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void verifyKnitrMarkupFormat()
+    @Test
+    public void testKnitrMarkupFormat()
     {
         Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
                                     Locator.css("h2").withText("R code chunks"),
@@ -123,7 +118,8 @@ public class KnitrReportTest extends ReportTest
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
     }
 
-    private void verifyModuleReportDependencies()
+    @Test
+    public void testModuleReportDependencies()
     {
         //
         // Checks that the dependencies can be loaded from the included kable report's metadata file.
@@ -131,14 +127,14 @@ public class KnitrReportTest extends ReportTest
         // UnhandledAlertException when trying to view this report in the report designer
         //
         clickProject(getProjectName());
-        Locator link = getReportGridLink("kable", false);
-        waitForElement(link);
-        scrollIntoView(link);
-        clickAndWait(link);
         _ext4Helper.waitForMaskToDisappear();
+        waitAndClickAndWait(Locator.linkWithText("kable"));
+        _ext4Helper.waitForMaskToDisappear();
+        waitForElement(Locator.id("mtcars_table_wrapper"));
     }
 
-    private void verifyAdhocReportDependenciesString()
+    @Test
+    public void testAdhocReportDependenciesString()
     {
         verifyAdhocReportDependencies("Strings",
                 "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
@@ -147,7 +143,8 @@ public class KnitrReportTest extends ReportTest
         );
     }
 
-    private void verifyAdhocReportDependenciesLib()
+    @Test
+    public void testAdhocReportDependenciesLib()
     {
         //
         // copy over a lib to the webapp path that includes the required dependencies and ensure
@@ -256,7 +253,7 @@ public class KnitrReportTest extends ReportTest
         clickProject(getProjectName());
         goToManageViews();
 
-        clickAddReport("R View");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
         return reportSource;
@@ -274,18 +271,21 @@ public class KnitrReportTest extends ReportTest
 
         _rReportHelper.clickSourceTab();
 
-        List<WebElement> lines;
-        WebElement prevLastLine, lastLine = null;
-        long startTime = System.currentTimeMillis();
-        do
-        {
-            prevLastLine = lastLine;
-            lines = Locator.css(".CodeMirror-linenumber").findElements(getDriver());
-            lastLine = lines.get(lines.size() - 1);
-            scrollIntoView(lastLine);
-        }while(!lastLine.equals(prevLastLine) && System.currentTimeMillis() - startTime < 1000);
+        int expectedLineCount = reportSource.split("\n").length;
+        Locator lastLineLoc = Locator.css(".CodeMirror-code > div:last-of-type .CodeMirror-linenumber");
+        WebElement lastLine = lastLineLoc.findElement(getDriver());
+        int lineCount = Integer.parseInt(lastLine.getText());
 
-        assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, Integer.parseInt(lastLine.getText()));
+        if (lineCount < expectedLineCount)
+        {
+            WebElement codeEditorDiv = Locator.css(".CodeMirror-scroll").findElement(getDriver());
+            executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", codeEditorDiv);
+            shortWait().until(ExpectedConditions.stalenessOf(lastLine));
+            lastLine = lastLineLoc.findElement(getDriver());
+            lineCount = Integer.parseInt(lastLine.getText());
+        }
+
+        assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, lineCount);
 
         saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
@@ -293,7 +293,7 @@ public class KnitrReportTest extends ReportTest
     private void saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
     {
         _rReportHelper.saveReport(reportName);
-        openView(reportName);
+        waitAndClickAndWait(Locator.linkContainingText(reportName));
         assertReportContents(reportContains, reportNotContains);
     }
 
@@ -330,12 +330,6 @@ public class KnitrReportTest extends ReportTest
         assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
 
         return reportSource;
-    }
-
-    private void openView(String viewName)
-    {
-        clickReportDetailsLink(viewName);
-        clickAndWait(Locator.linkContainingText("View Report"));
     }
 
     @Override
