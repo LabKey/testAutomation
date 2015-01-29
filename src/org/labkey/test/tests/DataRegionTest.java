@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -244,7 +245,18 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show Selected");
         table.checkAllOnPage();
-        waitForText("Selected 5 of 15 rows.");
+        waitForElements(Locator.css(".labkey-dataregion-msg"), 3);
+        boolean found = false;
+        for (WebElement msg : Locator.css(".labkey-dataregion-msg").findElements(getDriver()))
+        {
+            if (msg.getText().contains("Selected 5 of 15 rows."))
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            fail("Didn't find 'Selected 5 of 15 rows.' message");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
         assertEquals(5, table.getDataRowCount());
