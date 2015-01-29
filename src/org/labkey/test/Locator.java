@@ -394,6 +394,11 @@ public abstract class Locator
         return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')").withText(text);
     }
 
+    public static XPathLocator lkLabel(String text)
+    {
+        return tag("td").notHidden().withPredicate("contains(@class, 'labkey-form-label')").withText(text);
+    }
+
     public static XPathLocator navTreeExpander(String nodeText)
     {
         return Locator.xpath("//tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node").append("/a");

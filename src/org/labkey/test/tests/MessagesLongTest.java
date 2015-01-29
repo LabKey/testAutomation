@@ -513,10 +513,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("New");
 
         // Check defaults for uncustomized message board
-        assertTextNotPresent("Status");
-        assertTextNotPresent("Assigned To");
-        assertTextNotPresent("Members");
-        assertTextNotPresent("Expires");
+        assertElementNotPresent(Locator.lkLabel("Status"));
+        assertElementNotPresent(Locator.lkLabel("Assigned To"));
+        assertElementNotPresent(Locator.lkLabel("Members"));
+        assertElementNotPresent(Locator.lkLabel("Expires"));
 
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.id("body"), MSG1_BODY_FIRST);
