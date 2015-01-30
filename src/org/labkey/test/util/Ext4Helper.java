@@ -158,6 +158,42 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
+    public void clearComboBox(@LoggedParam String label)
+    {
+        clearComboBox(Ext4Helper.Locators.formItemWithLabel(label));
+    }
+
+    public void clearComboBox(Locator.XPathLocator comboBox)
+    {
+        openComboList(comboBox);
+
+        try
+        {
+            WebElement comboBoxEl = comboBox.findElement(_test.getDriver());
+
+            for (WebElement element : comboBoxEl.findElements(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().toBy()))
+            {
+                boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
+                if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
+                    element.click();
+            }
+        }
+        catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
+        {
+            WebElement comboBoxEl = comboBox.findElement(_test.getDriver());
+
+            for (WebElement element : comboBoxEl.findElements(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().toBy()))
+            {
+                boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
+                if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
+                    element.click();
+            }
+        }
+
+        closeComboList(comboBox);
+    }
+
+    @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String... selections)
     {
         selectComboBoxItem(label, TextMatchTechnique.EXACT, selections);
@@ -228,7 +264,7 @@ public class Ext4Helper extends AbstractHelper
             @Override
             public boolean check()
             {
-                return !(Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
+                return !(Boolean) _test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
             }
         }, "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
@@ -421,7 +457,7 @@ public class Ext4Helper extends AbstractHelper
     {
         Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '"+cellText+"']"));
+        _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '" + cellText + "']"));
     }
 
     /**
@@ -434,7 +470,7 @@ public class Ext4Helper extends AbstractHelper
         _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
         Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));
+        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '" + cellText + "']"));
     }
 
     /**
