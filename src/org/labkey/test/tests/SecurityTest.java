@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.reader.UTF8Reader;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -592,7 +593,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         try (InputStream is = url.openStream())
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            BufferedReader reader = new BufferedReader(new UTF8Reader(is));
 
             String line;
             while ((line = reader.readLine()) != null)

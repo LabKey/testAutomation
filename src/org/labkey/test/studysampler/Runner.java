@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
+import org.labkey.api.reader.UTF8Reader;
+import org.labkey.api.writer.UTF8PrintWriter;
 
 
 /**
@@ -138,7 +140,7 @@ public class Runner
 
         FillerFactory() throws IOException
         {
-            BufferedReader reader = new BufferedReader(new FileReader("words.txt"));
+            BufferedReader reader = new BufferedReader(new UTF8Reader(new File("words.txt")));
             words = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null)
@@ -224,8 +226,8 @@ public class Runner
         {
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
-            CSVReader reader = new CSVReader(new FileReader(inFile.getAbsolutePath()), '\t');
-            CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t');
+            CSVReader reader = new CSVReader(new UTF8Reader(inFile), '\t');
+            CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t');
 
             // read (and write) the field names.
             String[] row = reader.readNext();
@@ -294,8 +296,8 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            CSVReader reader = new CSVReader(new FileReader(inFile.getAbsolutePath()), '\t');
-            CSVWriter writer = new CSVWriter(new FileWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
+            CSVReader reader = new CSVReader(new UTF8Reader(inFile), '\t');
+            CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
 
             // read (and write) the field names.
             String[] row = reader.readNext();
@@ -343,7 +345,8 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            try (BufferedReader input = new BufferedReader(new FileReader(inFile)); BufferedWriter output = new BufferedWriter(new FileWriter(outFile)))
+            try (BufferedReader input = new BufferedReader(new UTF8Reader(inFile));
+                 BufferedWriter output = new BufferedWriter(new UTF8PrintWriter(outFile)))
             {
                 //Copy column headers only.
                 String line = input.readLine();
@@ -377,7 +380,7 @@ public class Runner
         String line;
         subjectIds = newStringSet();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(subjectListFile)))
+        try (BufferedReader reader = new BufferedReader(new UTF8Reader(subjectListFile)))
         {
             random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
 

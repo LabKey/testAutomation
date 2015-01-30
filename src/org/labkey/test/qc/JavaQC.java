@@ -15,6 +15,8 @@
  */
 package org.labkey.test.qc;
 
+import org.labkey.api.reader.UTF8Reader;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +74,7 @@ public class JavaQC
     {
         Map<String, String> props = new HashMap<>();
 
-        try(BufferedReader br = new BufferedReader(new FileReader(inputData)))
+        try(BufferedReader br = new BufferedReader(new UTF8Reader(inputData)))
         {
             String l;
             while ((l = br.readLine()) != null)

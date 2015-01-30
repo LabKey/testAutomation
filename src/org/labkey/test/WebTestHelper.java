@@ -41,6 +41,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.reader.UTF8Reader;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
 
@@ -427,7 +428,7 @@ public class WebTestHelper
         StringBuilder builder = new StringBuilder();
         try
         {
-            BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            BufferedReader br = new BufferedReader(new UTF8Reader(response.getEntity().getContent()));
 
             String thisLine;
             while ((thisLine = br.readLine()) != null)

@@ -24,6 +24,7 @@ import org.labkey.remoteapi.PostCommand;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -124,7 +125,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
         try (Response response = _execute(connection, folderPath))
         {
             JSONObject json;
-            json = (JSONObject) JSONValue.parse(new BufferedReader(new InputStreamReader(new GZIPInputStream(response.getInputStream()))));
+            json = (JSONObject) JSONValue.parse(new BufferedReader(new InputStreamReader(new GZIPInputStream(response.getInputStream()), StandardCharsets.UTF_8)));
             return createResponse(null, response.getStatusCode(), response.getContentType(), json);
         }
     }

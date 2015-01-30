@@ -167,12 +167,6 @@
         <mkdir dir="${test.log.output.dir}" />
     </target>
 
-    <path id="test.lib.selenium.classpath">
-        <fileset dir="${test.lib.home}">
-            <include name="*.jar"/>
-        </fileset>
-    </path>
-
     <path id="test.lib.classpath">
         <fileset dir="${test.lib.home}">
             <include name="*.jar"/>
@@ -194,6 +188,7 @@
         </fileset>
         <fileset dir="${deploy.webapp.dir}/WEB-INF/lib">
             <include name="schemas.jar"/>
+            <include name="api.jar"/>
         </fileset>
     </path>
 

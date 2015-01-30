@@ -51,6 +51,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -95,9 +96,11 @@ import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -2204,7 +2207,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             String leaks = Locator.name("leaks").findElement(getDriver()).getText();
             CRC32 crc = new CRC32();
-            crc.update(leaks.getBytes());
+            crc.update(leaks.getBytes(StandardCharsets.UTF_8));
 
             if (leakCRC != crc.getValue())
             {
@@ -2557,7 +2560,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         // TODO: Create static class for managing teamcity-info.xml file.
         File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
-        try (FileWriter writer = new FileWriter(xmlFile))
+        try (Writer writer = new UTF8PrintWriter(xmlFile))
         {
             xmlFile.createNewFile();
 
@@ -2584,7 +2587,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         File tsvFile = new File(dir, fileName);
 
-        try(FileWriter writer = new FileWriter(tsvFile))
+        try(Writer writer = new UTF8PrintWriter(tsvFile))
         {
             writer.write(contents);
             return tsvFile;
@@ -6754,7 +6757,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             getArtifactCollector().dumpScreen(svgDir, baseName);
 
-            try(FileWriter writer = new FileWriter(svgFile))
+            try(Writer writer = new UTF8PrintWriter(svgFile))
             {
                 writer.write("Expected:\n");
                 writer.write(expectedSvgText.replace("\\", "\\\\").replace("\n", "\\n"));

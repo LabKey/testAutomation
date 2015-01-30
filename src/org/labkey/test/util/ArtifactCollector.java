@@ -20,6 +20,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -34,6 +35,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -211,7 +213,7 @@ public class ArtifactCollector
             return null;
 
         File htmlFile = new File(dir, baseName + ".html");
-        try(FileWriter writer = new FileWriter(htmlFile))
+        try(Writer writer = new UTF8PrintWriter(htmlFile))
         {
             writer.write(_test.getLastPageText());
             return htmlFile;

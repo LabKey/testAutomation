@@ -40,6 +40,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -318,14 +319,7 @@ public class KnitrReportTest extends BaseWebDriverTest
     {
         String reportSource = null;
 
-        try
-        {
-            reportSource = new String(Files.readAllBytes(reportFile));
-        }
-        catch (IOException fail)
-        {
-            fail("Failed to read report file [" + reportFile.getFileName() + "]: " + fail.getMessage());
-        }
+        reportSource = TestFileUtils.getFileContents(reportFile);
 
         assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
 
@@ -335,7 +329,7 @@ public class KnitrReportTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return null;
+        return Arrays.asList("reports");
     }
 
     @Override

@@ -32,6 +32,8 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.labkey.api.reader.UTF8Reader;
+import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.test.aspects.MethodPerfAspect;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
@@ -118,7 +120,7 @@ public class Runner extends TestSuite
 
     private static void writeClasses(List<String> tests, File file)
     {
-        try(PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file))))
+        try(PrintWriter pw = new PrintWriter(new BufferedWriter(new UTF8PrintWriter(file))))
         {
             for (String test : tests)
                 pw.println(test);
@@ -137,7 +139,7 @@ public class Runner extends TestSuite
         {
             String line = null;
 
-            try(BufferedReader reader = new BufferedReader(new FileReader(file)))
+            try(BufferedReader reader = new BufferedReader(new UTF8Reader(file)))
             {
                 while ((line = reader.readLine()) != null)
                     if (null != StringUtils.trimToNull(line))
@@ -962,7 +964,7 @@ public class Runner extends TestSuite
 
         if (changelistFile.exists())
         {
-            try(BufferedReader reader = new BufferedReader(new FileReader(changelistFile)))
+            try(BufferedReader reader = new BufferedReader(new UTF8Reader(changelistFile)))
             {
                 String line;
 

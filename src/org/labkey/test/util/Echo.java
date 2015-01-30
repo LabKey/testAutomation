@@ -17,6 +17,7 @@
 package org.labkey.test.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class Echo
 {
@@ -31,7 +32,7 @@ public class Echo
         try (
                 InputStream in = args.length == 0 ? System.in : new FileInputStream(new File(args[0]));
                 PrintStream out = args.length == 1 ? System.out : new PrintStream(new FileOutputStream(new File(args[1])));
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)))
         {
             String s;
             while (null != (s = reader.readLine()))

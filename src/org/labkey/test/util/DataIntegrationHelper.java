@@ -31,6 +31,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -203,7 +204,7 @@ public class DataIntegrationHelper
 
         try
         {
-            return new String(Files.readAllBytes(Paths.get(filePath)));
+            return new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8);
         }
         catch (IOException e)
         {

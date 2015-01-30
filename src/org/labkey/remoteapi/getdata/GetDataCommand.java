@@ -23,6 +23,7 @@ import org.labkey.remoteapi.PostCommand;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Minimal wrapper for VisualizationController.GetDataAction usage. Grabs pre-defined JSON to send as the POST body.
@@ -38,7 +39,7 @@ public class GetDataCommand extends PostCommand<GetDataResponse>
     {
         super("visualization", "getData");
         JSONParser parser = new JSONParser();
-        _payload = (JSONObject)parser.parse(new InputStreamReader(inputJSON));
+        _payload = (JSONObject)parser.parse(new InputStreamReader(inputJSON, StandardCharsets.UTF_8));
         inputJSON.close();
     }
 

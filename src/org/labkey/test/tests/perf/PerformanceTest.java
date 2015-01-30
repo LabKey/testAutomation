@@ -15,12 +15,14 @@
  */
 package org.labkey.test.tests.perf;
 
+import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 public abstract class PerformanceTest extends BaseWebDriverTest
@@ -42,7 +44,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
     {
         File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
 
-        try (FileWriter writer = new FileWriter(xmlFile);)
+        try (Writer writer = new UTF8PrintWriter(xmlFile))
         {
             xmlFile.createNewFile();
 

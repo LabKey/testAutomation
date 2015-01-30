@@ -30,6 +30,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class WebDavTest extends BaseWebDriverTest
         assertEquals(1, names.size());
         assertFalse(names.contains("testfile1"));
 
-        sardine.put(testURL + "testfile1.txt", TEXT.getBytes());
+        sardine.put(testURL + "testfile1.txt", TEXT.getBytes(StandardCharsets.UTF_8));
         refresh();
         assertTextPresent("testfile1.txt");
         names = _listNames(sardine,testURL);

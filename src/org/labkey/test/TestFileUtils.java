@@ -18,13 +18,14 @@ package org.labkey.test;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.api.util.FileUtil;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -36,18 +37,25 @@ import static org.junit.Assert.assertNotNull;
  */
 public abstract class TestFileUtils
 {
-    private static String _labkeyRootCache = null;
+    private static File _labkeyRoot = null;
 
     public static String getFileContents(String rootRelativePath)
     {
-        return getFileContents(new File(getLabKeyRoot(), rootRelativePath));
+        return getFileContents(Paths.get(getLabKeyRoot(), rootRelativePath));
     }
 
     public static String getFileContents(final File file)
     {
+        Path path = Paths.get(file.toURI());
+
+        return getFileContents(path);
+    }
+
+    public static String getFileContents(Path path)
+    {
         try
         {
-            return new String(Files.readAllBytes(Paths.get(file.toURI())));
+            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         }
         catch (IOException fail)
         {
@@ -62,29 +70,20 @@ public abstract class TestFileUtils
 
     public static String getLabKeyRoot()
     {
-        if (_labkeyRootCache == null)
+        if (_labkeyRoot == null)
         {
-            _labkeyRootCache = System.getProperty("labkey.root", "..");
+            _labkeyRoot = new File(System.getProperty("labkey.root", ".."));
 
-            File labkeyRoot = new File(_labkeyRootCache);
-
-            if (!labkeyRoot.exists())
+            if (!_labkeyRoot.exists())
             {
-                throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRootCache + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
+                throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
             }
 
-            try
-            {
-                _labkeyRootCache = labkeyRoot.getCanonicalPath();
-            }
-            catch (IOException badPath)
-            {
-                throw new IllegalStateException("Unable to canonicalize specified LabKey root [" + _labkeyRootCache + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
-            }
+            _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(_labkeyRoot);
 
-            System.out.println("Using labkey root '" + _labkeyRootCache + "', as provided by system property 'labkey.root'.");
+            System.out.println("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
         }
-        return _labkeyRootCache;
+        return _labkeyRoot.toString();
     }
 
     public static File getDefaultDeployDir()
@@ -103,6 +102,11 @@ public abstract class TestFileUtils
         return path.toString();
     }
 
+    /**
+     * Searches all sampledata directories for the specified file
+     * @param relativePath e.g. "lists/ListDemo.lists.zip" or "OConnor_Test.folder.zip"
+     * @return File object with the full path to the specified file
+     */
     public static File getSampleData(String relativePath)
     {
         String path;
@@ -153,8 +157,9 @@ public abstract class TestFileUtils
 
     public static String getProcessOutput(File executable, String... args) throws IOException
     {
+        executable = FileUtil.getAbsoluteCaseSensitiveFile(executable);
         Runtime rt = Runtime.getRuntime();
-        Process p = rt.exec(ArrayUtils.addAll(new String[]{executable.getCanonicalPath()}, args));
+        Process p = rt.exec(ArrayUtils.addAll(new String[]{executable.getAbsolutePath()}, args));
 
         // Different platforms output version info differently; just combine all std/err output
         return StringUtils.trim(

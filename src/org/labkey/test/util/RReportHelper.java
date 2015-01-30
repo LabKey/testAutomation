@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -301,7 +302,7 @@ public class RReportHelper extends AbstractHelper
 
     public String getRScriptOutput(File script) throws IOException
     {
-        return TestFileUtils.getProcessOutput(getRScriptExecutable(), script.getCanonicalPath());
+        return TestFileUtils.getProcessOutput(getRScriptExecutable(), FileUtil.getAbsoluteCaseSensitiveFile(script).getAbsolutePath());
     }
 
     public void saveReport(String name)

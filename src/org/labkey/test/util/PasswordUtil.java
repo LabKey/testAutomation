@@ -17,6 +17,7 @@
 package org.labkey.test.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class PasswordUtil
 {
@@ -135,7 +136,7 @@ public class PasswordUtil
         StringBuilder credentials = new StringBuilder();
         credentials.append(username).append("\n").append(password);
 
-        byte[] bytes = credentials.toString().getBytes();
+        byte[] bytes = credentials.toString().getBytes(StandardCharsets.UTF_8);
         byte[] inverted = invertBytes(bytes, bytes.length);
 
         try (FileOutputStream ostream = new FileOutputStream(file))
