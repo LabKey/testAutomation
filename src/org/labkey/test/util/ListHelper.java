@@ -43,6 +43,14 @@ public class ListHelper extends AbstractHelper
         _test = test;
     }
 
+    public void uploadCSVData(String listData)
+    {
+        clickImportData();
+        _test.setFormElement(Locator.id("tsv3"), listData);
+        _test._extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
+        submitImportTsv_success();
+    }
+
     public void uploadData(String listData)
     {
         clickImportData();
