@@ -159,12 +159,13 @@ public class WikiHelper
      */
     public void convertWikiFormat(String format)
     {
-        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
-        if(curFormat.equalsIgnoreCase(format))
+        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
+        if (curFormat.equalsIgnoreCase(format))
             return;
 
         _test.clickButton("Convert To...", 0);
-        _test._extHelper.waitForExtDialog("Change Format");
+        _test.sleep(500); // animation
+        _test.waitForElement(Locator.id("wiki-input-window-change-format-to"));
         _test.selectOptionByValue(Locator.id("wiki-input-window-change-format-to"), format);
         _test.clickButton("Convert", 0);
         _test.waitForElement(Locator.id("status").containing("Converted."));
@@ -217,7 +218,7 @@ public class WikiHelper
      */
     public void switchWikiToSourceView()
     {
-        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
+        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
         if (curFormat.equalsIgnoreCase("HTML"))
         {
             if (_test.isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
@@ -230,7 +231,7 @@ public class WikiHelper
 
     public void switchWikiToVisualView()
     {
-        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
+        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
         if (curFormat.equalsIgnoreCase("HTML"))
         {
             if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
