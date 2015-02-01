@@ -43,6 +43,15 @@ public class QuerySnapshotTest extends StudyBaseTest
             "SELECT 2 as sequenceNum, '065' as protocol, ds2.MouseId, ds2.demsex, ds2.demsexor\n" +
             "FROM Project.\"065\".study.\"DEM-1: Demographics\" ds2";
 
+    private static final String CUSTOM_QUERY_SQL =
+            "SELECT \"APX-1\".MouseId,\n" +
+                    "\"APX-1\".SequenceNum,\n" +
+                    "\"APX-1\".APXdt,\n" +
+                    "\"APX-1\".APXwtkg,\n" +
+                    "\"APX-1\".APXwtqc,\n" +
+                    "\"APX-1\".APXtempc,\n" +
+                    "\"APX-1\".APXtemqc,\n" +
+                    "FROM \"APX-1\"";
     @Override
     protected BrowserType bestBrowser()
     {
@@ -183,19 +192,13 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
         createNewQuery("study");
 
-        setFormElement(Locator.id("ff_newQueryName"), "APX: Custom Query");
+        setFormElement(Locator.id("ff_newQueryName"), "APX: Custom Query Advanced");
         selectOptionByText(Locator.name("ff_baseTableName"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create and Edit Source");
-        clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
-        clickButton("Edit Properties");
-        setFormElement("rename", "APX: Custom Query Advanced");        
-        clickButton("Save");
-        waitForText("study.APX: Custom Query Advanced", WAIT_FOR_PAGE);
-        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText("view data"));
-        assertTextPresent("Custom Query Advanced");
+        setCodeEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
+        clickButton("Save & Finish");
 
+        waitForText("APX: Custom Query Advanced", WAIT_FOR_PAGE);
         createQuerySnapshot("Custom Query Snapshot", true, true);
         assertTextPresent("Dataset: Custom Query Snapshot");
 
