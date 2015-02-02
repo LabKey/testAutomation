@@ -161,11 +161,11 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
-    protected void importDatasetData(String dataSetName, String header, String tsv, String msg)
+    protected void importDatasetData(String datasetName, String header, String tsv, String msg)
     {
         goToManageDatasets();
-        waitForElement(Locator.xpath("//a[text()='" + dataSetName + "']"));
-        click(Locator.xpath("//a[text()='" + dataSetName + "']"));
+        waitForElement(Locator.xpath("//a[text()='" + datasetName + "']"));
+        click(Locator.xpath("//a[text()='" + datasetName + "']"));
         waitForText("Dataset Properties");
         clickButtonContainingText("View Data");
         waitForText("All data");

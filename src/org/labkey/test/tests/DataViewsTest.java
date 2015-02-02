@@ -90,7 +90,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         log("Data Views Test");
         clickAndWait(Locator.linkContainingText("Data & Reports"));
-        waitForText(someDataSets[3]);
+        waitForText(someDatasets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         assertDataDisplayedAlphabetically();
@@ -197,7 +197,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         log("Testing status settings for datasets");
         clickAndWait(Locator.linkContainingText("Data & Reports"));
-        waitForText(someDataSets[3]);
+        waitForText(someDatasets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
@@ -261,7 +261,7 @@ public class DataViewsTest extends ParticipantListTest
     private void assertDataDisplayedAlphabetically()
     {
         //ideally we'd grab the test names from the normal dataset part, but that would take a lot of time to write
-        assertTextPresentInThisOrder(someDataSets);
+        assertTextPresentInThisOrder(someDatasets);
     }
 
     private void setDataBrowseSearch(String value)
@@ -295,7 +295,7 @@ public class DataViewsTest extends ParticipantListTest
         log("Verify refresh date");
         String refreshDate = "2012-03-01";
         clickAndWait(Locator.linkContainingText("Data & Reports"));
-        waitForText(someDataSets[3]);
+        waitForText(someDatasets[3]);
         // Refresh date not present when not set.
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Type:");

@@ -918,37 +918,37 @@ public class StudyTest extends StudyBaseTest
 
         // test optional/required/not associated
         clickAndWait(Locator.linkWithText("edit", 1));
-        selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 1, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 2, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 3, "OPTIONAL");
-        selectOption("dataSetStatus", 4, "OPTIONAL");
-        selectOption("dataSetStatus", 5, "OPTIONAL");
-        selectOption("dataSetStatus", 6, "REQUIRED");
-        selectOption("dataSetStatus", 7, "REQUIRED");
-        selectOption("dataSetStatus", 8, "REQUIRED");
+        selectOption("datasetStatus", 0, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 1, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 2, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 3, "OPTIONAL");
+        selectOption("datasetStatus", 4, "OPTIONAL");
+        selectOption("datasetStatus", 5, "OPTIONAL");
+        selectOption("datasetStatus", 6, "REQUIRED");
+        selectOption("datasetStatus", 7, "REQUIRED");
+        selectOption("datasetStatus", 8, "REQUIRED");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("edit", 1));
-        selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 1, "OPTIONAL");
-        selectOption("dataSetStatus", 2, "REQUIRED");
-        selectOption("dataSetStatus", 3, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 4, "OPTIONAL");
-        selectOption("dataSetStatus", 5, "REQUIRED");
-        selectOption("dataSetStatus", 6, "NOT_ASSOCIATED");
-        selectOption("dataSetStatus", 7, "OPTIONAL");
-        selectOption("dataSetStatus", 8, "REQUIRED");
+        selectOption("datasetStatus", 0, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 1, "OPTIONAL");
+        selectOption("datasetStatus", 2, "REQUIRED");
+        selectOption("datasetStatus", 3, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 4, "OPTIONAL");
+        selectOption("datasetStatus", 5, "REQUIRED");
+        selectOption("datasetStatus", 6, "NOT_ASSOCIATED");
+        selectOption("datasetStatus", 7, "OPTIONAL");
+        selectOption("datasetStatus", 8, "REQUIRED");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("edit", 1));
-        assertSelectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
-        assertSelectOption("dataSetStatus", 1, "OPTIONAL");
-        assertSelectOption("dataSetStatus", 2, "REQUIRED");
-        assertSelectOption("dataSetStatus", 3, "NOT_ASSOCIATED");
-        assertSelectOption("dataSetStatus", 4, "OPTIONAL");
-        assertSelectOption("dataSetStatus", 5, "REQUIRED");
-        assertSelectOption("dataSetStatus", 6, "NOT_ASSOCIATED");
-        assertSelectOption("dataSetStatus", 7, "OPTIONAL");
-        assertSelectOption("dataSetStatus", 8, "REQUIRED");
+        assertSelectOption("datasetStatus", 0, "NOT_ASSOCIATED");
+        assertSelectOption("datasetStatus", 1, "OPTIONAL");
+        assertSelectOption("datasetStatus", 2, "REQUIRED");
+        assertSelectOption("datasetStatus", 3, "NOT_ASSOCIATED");
+        assertSelectOption("datasetStatus", 4, "OPTIONAL");
+        assertSelectOption("datasetStatus", 5, "REQUIRED");
+        assertSelectOption("datasetStatus", 6, "NOT_ASSOCIATED");
+        assertSelectOption("datasetStatus", 7, "OPTIONAL");
+        assertSelectOption("datasetStatus", 8, "REQUIRED");
     }
 
     @LogMethod

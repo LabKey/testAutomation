@@ -162,7 +162,7 @@ public class StudyExportTest extends StudyManualTest
 
         // verify visit modifications
         editVisit(MODIFIED_VISIT);
-        assertFormElementEquals("dataSetStatus", "OPTIONAL");
+        assertFormElementEquals("datasetStatus", "OPTIONAL");
         assertOptionEquals(Locator.name("cohortId"), GROUP_2);
     }
 
@@ -521,7 +521,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Move Down", 0);
         clickButton("Save");
         editVisit(MODIFIED_VISIT);
-        selectOption("dataSetStatus", 0, "OPTIONAL");
+        selectOption("datasetStatus", 0, "OPTIONAL");
         selectOptionByText(Locator.name("cohortId"), GROUP_2);
         clickButton("Save");
         

@@ -24,11 +24,10 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class QCAssayScriptHelper
 {
@@ -93,7 +92,8 @@ public class QCAssayScriptHelper
     public void createNetrcFile()
     {
         // ensure the .netrc file exists
-        try {
+        try
+        {
             File netrcFile = new File(System.getProperty("user.home") + "/" + "_netrc");
 
             if (!netrcFile.exists())
