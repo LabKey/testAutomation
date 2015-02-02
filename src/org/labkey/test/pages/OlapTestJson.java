@@ -27,6 +27,7 @@ public class OlapTestJson
         clear();
         setType("json");
         setQuery(query);
+        _test.sleep(1000); // TODO: can't repro TeamCity failure locally. Seems like it is clicking submit befor the query text has been pasted?
         submit();
 
         Locator.XPathLocator table = Locator.tagWithClass("table", "labkey-data-region");
