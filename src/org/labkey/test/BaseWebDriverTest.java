@@ -3866,6 +3866,46 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return true;
     }
 
+    public void waitForAnyElement(final Locator... locators)
+    {
+        if (locators.length > 0)
+        {
+            waitFor(new Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    for (Locator loc : locators)
+                    {
+                        if (isElementPresent(loc))
+                            return true;
+                    }
+                    return false;
+                }
+            }, "No Element Appeared", WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    public void waitForAllElements(final Locator... locators)
+    {
+        if (locators.length > 0)
+        {
+            waitFor(new Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    for (Locator loc : locators)
+                    {
+                        if (!isElementPresent(loc))
+                            return false;
+                    }
+                    return true;
+                }
+            }, "No Element Appeared", WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
     public void waitForElementWithRefresh(Locator loc, int wait)
     {
         long startTime = System.currentTimeMillis();
