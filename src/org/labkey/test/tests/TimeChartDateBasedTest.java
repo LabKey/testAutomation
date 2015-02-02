@@ -219,13 +219,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.paginationText(31));
 
         // verify column headers for date based plotting option
-        assertTextPresent("Participant ID");
-        assertTextPresent("Visit Date");
-        assertTextPresent("Visit");
-        assertTextPresent("Viral Load Quantified");
-        assertTextPresent("Start Date");
-        assertTextPresent("Days");
-        assertTextNotPresent("sequencenum");
+        Locator.XPathLocator colHeaderLoc = Locator.tagWithClass("td", "labkey-column-header");
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Participant ID")));
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Visit Date")));
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Visit")));
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Viral Load Quantified")));
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Start Date")));
+        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Days")));
+        assertElementNotPresent(colHeaderLoc.child(Locator.tag("div").containing("sequencenum")));
 
         log("Test X-Axis");
         clickButton("View Chart(s)", 0);
@@ -569,7 +570,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     }
 
     private static final String SVG_MULTI_MANUAL_1 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n12.5\n13.0\n13.5\n14.0\n14.5\n15.0\n15.5\n16.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_MULTI_MANUAL_2 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n20.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_2 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n21.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
     @LogMethod public void multiAxisTimeChartTest()
     {
         clickProject(getProjectName());
