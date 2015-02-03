@@ -246,7 +246,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
         {
-            if (isTestRunningOnTeamCity() || (bestBrowser() == BrowserType.CHROME && ensureChromedriverExeProperty() == null))
+            if (isTestRunningOnTeamCity() || (bestBrowser() == BrowserType.CHROME))
                 BROWSER_TYPE = BrowserType.FIREFOX;
             else
                 BROWSER_TYPE = bestBrowser();
@@ -365,6 +365,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 if(_driver == null)
                 {
+                    TestProperties.ensureChromedriverExeProperty();
                     ChromeOptions options = new ChromeOptions();
                     Dictionary<String, Object> prefs = new Hashtable<>();
 
