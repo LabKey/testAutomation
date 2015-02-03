@@ -50,10 +50,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -76,25 +74,6 @@ public class WebTestHelper
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     public static long leakCRC = 0;
-
-    public static void saveHostSettings(String urlString)
-    {
-        try
-        {
-            URL url = new URL(urlString);
-            _targetServer = url.getProtocol() + "://" + url.getHost();
-            _webPort = url.getPort();
-
-            if ("https".equals(url.getProtocol()) && isLocalServer())
-            {
-                acceptLocalhostCert();
-            }
-        }
-        catch (Exception fail)
-        {
-            throw new RuntimeException(fail);
-        }
-    }
 
     private static void acceptLocalhostCert() throws Exception
     {

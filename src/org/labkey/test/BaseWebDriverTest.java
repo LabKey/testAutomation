@@ -93,7 +93,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -1296,7 +1295,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
-        WebTestHelper.saveHostSettings(getDriver().getCurrentUrl());
     }
 
     @LogMethod

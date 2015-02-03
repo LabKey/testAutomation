@@ -16,11 +16,31 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.SystemUtils;
+import org.labkey.api.reader.UTF8Reader;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 
 public abstract class TestProperties
 {
+    static
+    {
+        try (UTF8Reader propReader = new UTF8Reader(new File(TestFileUtils.getLabKeyRoot(), "server/test/test.properties")))
+        {
+            TestLogger.log("Loading properties from test.properties");
+            Properties properties = new Properties();
+            properties.load(propReader);
+            properties.putAll(System.getProperties());
+            System.setProperties(properties);
+        }
+        catch (IOException ignore)
+        {
+            TestLogger.log("Failed to load test.properties file");
+        }
+    }
+
     public static boolean isTestCleanupSkipped()
     {
         return "false".equals(System.getProperty("clean", "false"));

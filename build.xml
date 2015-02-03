@@ -20,6 +20,7 @@
     <antversion property="ant.version.check" atleast="1.8.0" />
     <fail message="Please use Ant 1.8.0 or greater. A copy is checked in to LABKEY_ROOT/external/ant" unless="ant.version.check" />
 
+    <loadproperties srcfile="test.properties" prefix="default"/>
     <property environment="env"/>
     <property name="test.dir" value="${basedir}" />
     <property name="test.build.home" value="${test.dir}/build"/>
@@ -779,98 +780,132 @@
 
     <target name="set-user-props" depends="init_database_properties">
         <!-- Set property sysprop.test: empty string if not provided, user string otherwise -->
-        <condition property="sysprop.test" value="${test}" else="">
+        <condition property="sysprop.test" value="${test}" else="${default.test}">
             <isset property="test"/>
         </condition>
 
         <!-- Set property sysprop.cleanOnly: true or false -->
-        <condition property="sysprop.cleanOnly" value="${cleanOnly}" else="false">
+        <condition property="sysprop.cleanOnly" value="${cleanOnly}" else="${default.cleanOnly}">
             <isset property="cleanOnly"/>
         </condition>
 
         <!-- Set property sysprop.haltOnError: true or false -->
-        <condition property="sysprop.haltOnError" value="${haltOnError}" else="true">
+        <condition property="sysprop.haltOnError" value="${haltOnError}" else="${default.haltOnError}">
             <isset property="haltOnError"/>
         </condition>
 
         <!-- Set property sysprop.loop: true or false -->
-        <condition property="sysprop.loop" value="${loop}" else="false">
+        <condition property="sysprop.loop" value="${loop}" else="${default.loop}">
             <isset property="loop"/>
         </condition>
 
         <!-- Set property sysprop.noclean: true or false -->
-        <condition property="sysprop.clean" value="${clean}" else="true">
+        <condition property="sysprop.clean" value="${clean}" else="${default.clean}">
             <isset property="clean"/>
         </condition>
 
         <!-- Set property sysprop.linkCheck: true or false -->
-        <condition property="sysprop.linkCheck" value="${linkCheck}" else="false">
+        <condition property="sysprop.linkCheck" value="${linkCheck}" else="${default.linkCheck}">
             <isset property="linkCheck"/>
         </condition>
 
         <!-- Set property sysprop.injectCheck: true or false -->
-        <condition property="sysprop.injectCheck" value="${injectCheck}" else="false">
+        <condition property="sysprop.injectCheck" value="${injectCheck}" else="${default.injectCheck}">
             <isset property="injectCheck"/>
         </condition>
 
         <!-- Set property sysprop.memCheck: true or false -->
-        <condition property="sysprop.memCheck" value="${memCheck}" else="true">
+        <condition property="sysprop.memCheck" value="${memCheck}" else="${default.memCheck}">
             <isset property="memCheck"/>
         </condition>
 
         <!-- Set property sysprop.scriptCheck: true or false -->
-        <condition property="sysprop.scriptCheck" value="${scriptCheck}" else="true">
+        <condition property="sysprop.scriptCheck" value="${scriptCheck}" else="${default.scriptCheck}">
             <isset property="scriptCheck"/>
         </condition>
 
         <!-- Set property sysprop.queryCheck: true or false -->
-        <condition property="sysprop.queryCheck" value="${queryCheck}" else="true">
+        <condition property="sysprop.queryCheck" value="${queryCheck}" else="${default.queryCheck}">
             <isset property="queryCheck"/>
         </condition>
 
         <!-- Set property selenium.reuseWebDriver: true or false -->
-        <condition property="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}" else="true">
+        <condition property="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}" else="${default.selenium.reuseWebDriver}">
             <isset property="selenium.reuseWebDriver"/>
         </condition>
 
         <!-- Set property sysprop.viewCheck: true or false -->
-        <condition property="sysprop.viewCheck" value="${viewCheck}" else="false">
+        <condition property="sysprop.viewCheck" value="${viewCheck}" else="${default.viewCheck}">
             <isset property="viewCheck"/>
         </condition>
 
         <!-- Set property sysprop.labkey.port: user provided or '8080' -->
-        <condition property="sysprop.labkey.port" value="${labkey.port}" else="8080">
+        <condition property="sysprop.labkey.port" value="${labkey.port}" else="${default.labkey.port}">
             <isset property="labkey.port"/>
         </condition>
 
         <!-- Set property sysprop.labkey.server: user provided or 'http://localhost' -->
-        <condition property="sysprop.labkey.server" value="${labkey.server}" else="http://localhost">
+        <condition property="sysprop.labkey.server" value="${labkey.server}" else="${default.labkey.server}">
             <isset property="labkey.server"/>
         </condition>
 
         <!-- Set property sysprop.cpas.contextpath: user provided or '/labkey' -->
-        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="/labkey">
+        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="${default.labkey.contextpath}">
             <isset property="labkey.contextpath"/>
         </condition>
 
         <!-- Set property sysprop.closeOnFail: true or false -->
-        <condition property="sysprop.close.on.fail" value="${close.on.fail}" else="false">
+        <condition property="sysprop.close.on.fail" value="${close.on.fail}" else="${default.close.on.fail}">
             <isset property="close.on.fail"/>
         </condition>
 
         <!-- Set property sysprop.selenium.browser -->
-        <condition property="sysprop.selenium.browser" value="${selenium.browser}" else="best">
+        <condition property="sysprop.selenium.browser" value="${selenium.browser}" else="${default.selenium.browser}">
             <isset property="selenium.browser"/>
         </condition>
 
         <!-- Set property sysprop.selenium.debug.port -->
-        <condition property="sysprop.selenium.debug.port" value="${selenium.debug.port}" else="5005">
+        <condition property="sysprop.selenium.debug.port" value="${selenium.debug.port}" else="${default.selenium.debug.port}">
             <isset property="selenium.debug.port"/>
         </condition>
 
         <!-- Set property sysprop.selenium.browser.path -->
-        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}" else="">
+        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}" else="${default.selenium.browser.path}">
             <isset property="selenium.browser.path"/>
+        </condition>
+
+        <!-- Set property sysprop.shuffleTests: true or false -->
+        <condition property="sysprop.shuffleTests" value="${shuffleTests}" else="${default.shuffleTests}">
+            <isset property="shuffleTests"/>
+        </condition>
+
+        <!-- Set property sysprop.disableAssertions: true or false -->
+        <condition property="sysprop.disableAssertions" value="${disableAssertions}" else="${default.disableAssertions}">
+            <isset property="disableAssertions"/>
+        </condition>
+
+        <!-- Set property sysprop.devMode: true or false -->
+        <condition property="sysprop.devMode" value="${devMode}" else="${default.devMode}">
+            <isset property="devMode"/>
+        </condition>
+
+        <!-- Set property sysprop.databaseType: "pg" or "mssql" -->
+        <condition property="sysprop.databaseType" value="${databaseType}" else="${default.databaseType}">
+            <isset property="databaseType"/>
+        </condition>
+
+        <!-- Set property sysprop.databaseVersion: db version string we use in TeamCity e.g. 9.1 or 2008 -->
+        <condition property="sysprop.databaseVersion" value="${databaseVersion}" else="${default.databaseVersion}">
+            <isset property="databaseVersion"/>
+        </condition>
+
+        <!-- Set property sysprop.suite: user provided string or DRT by default -->
+        <condition property="sysprop.suite" value="${suite}" else="DRT">
+            <isset property="suite"/>
+        </condition>
+
+        <condition property="additional.pipeline.tools" else="${default.additional.pipeline.tools}">
+            <isset property="additional.pipeline.tools"/>
         </condition>
 
         <!-- Set property sysprop.teamcity.tests.recentlyFailedTests.file : Absolute path -->
@@ -897,38 +932,6 @@
         <condition property="sysprop.testNewAndModified" value="true" else="false">
             <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
         </condition>
-
-        <!-- Set property sysprop.shuffleTests: true or false -->
-        <condition property="sysprop.shuffleTests" value="${shuffleTests}" else="false">
-            <isset property="shuffleTests"/>
-        </condition>
-
-        <!-- Set property sysprop.disableAssertions: true or false -->
-        <condition property="sysprop.disableAssertions" value="${disableAssertions}" else="false">
-            <isset property="disableAssertions"/>
-        </condition>
-
-        <!-- Set property sysprop.devMode: true or false -->
-        <condition property="sysprop.devMode" value="${devMode}" else="true">
-            <isset property="devMode"/>
-        </condition>
-
-        <!-- Set property sysprop.databaseType: "pg" or "mssql" -->
-        <condition property="sysprop.databaseType" value="${databaseType}" else="">
-            <isset property="databaseType"/>
-        </condition>
-
-        <!-- Set property sysprop.databaseVersion: db version string we use in TeamCity e.g. 9.1 or 2008 -->
-        <condition property="sysprop.databaseVersion" value="${databaseVersion}" else="">
-            <isset property="databaseVersion"/>
-        </condition>
-
-        <!-- Set property sysprop.suite: user provided string or DRT by default -->
-        <condition property="sysprop.suite" value="${suite}" else="DRT">
-            <isset property="suite"/>
-        </condition>
-
-        <property name="additional.pipeline.tools" value="" />
 
         <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/amd64/IEDriverServer.exe">
             <and>
