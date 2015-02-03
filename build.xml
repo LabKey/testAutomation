@@ -20,9 +20,11 @@
     <antversion property="ant.version.check" atleast="1.8.0" />
     <fail message="Please use Ant 1.8.0 or greater. A copy is checked in to LABKEY_ROOT/external/ant" unless="ant.version.check" />
 
-    <loadproperties srcfile="test.properties" prefix="default"/>
     <property environment="env"/>
-    <property name="test.dir" value="${basedir}" />
+    <property name="test.dir" value="${ant.file}/.." />
+
+    <loadproperties srcfile="${test.dir}/test.properties" prefix="default"/>
+
     <property name="test.build.home" value="${test.dir}/build"/>
     <property name="test.build.uptodate" value="${test.build.home}/.uptodate"/>
     <property name="test.src.home" value="${test.dir}/src"/>
@@ -158,7 +160,7 @@
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <echo message="Deleting tomcat temp dir ${tomcat.home}/temp"/>
         <delete failonerror="false" dir="${tomcat.home}/temp" />
-        <delete file="${basedir}/../teamcity-info.xml"/>
+        <delete file="${test.dir}/../teamcity-info.xml"/>
         <mkdir dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/temp" />
     </target>
@@ -1141,12 +1143,12 @@
 
     <target name="clean-rpackages">
         <delete failonerror="false" dir="${project.root}/sampledata/rlabkey"/>
-        <delete failonerror="false" file="${basedir}/rPackageDeployment.timestamp" verbose="true" />
+        <delete failonerror="false" file="${test.dir}/rPackageDeployment.timestamp" verbose="true" />
     </target>
 
     <!-- Rely on our own private file that we touch every time we install R packages to see if they need to be reinstalled -->
     <target name="install-rpackages">
-        <uptodate targetfile="${basedir}/rPackageDeployment.timestamp" property="rPackagesUpToDate">
+        <uptodate targetfile="${test.dir}/rPackageDeployment.timestamp" property="rPackagesUpToDate">
             <srcfiles dir="${project.root}/tools/Rpackages" />
         </uptodate>
         <antcall target="install-rpackages-if-dirty" />
@@ -1160,7 +1162,7 @@
         <antcall target="install-knitr" />
         <antcall target="install-ehr-dependencies" />
         <antcall target="install-rsurvival" />
-        <touch file="${basedir}/rPackageDeployment.timestamp" />
+        <touch file="${test.dir}/rPackageDeployment.timestamp" />
     </target>
 
     <macrodef name="check-R-package-installed">
