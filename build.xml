@@ -21,7 +21,7 @@
     <fail message="Please use Ant 1.8.0 or greater. A copy is checked in to LABKEY_ROOT/external/ant" unless="ant.version.check" />
 
     <property environment="env"/>
-    <property name="test.dir" value="${ant.file}/.." />
+    <property name="test.dir" location="${ant.file}/.."/>
 
     <loadproperties srcfile="${test.dir}/test.properties" prefix="default"/>
 
