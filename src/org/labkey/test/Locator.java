@@ -629,7 +629,7 @@ public abstract class Locator
     public static XPathLocator permissionButton(String groupName, String role)
     {
         // Supports permission types from a variety of modules.
-        return tag("div").withClass("rolepanel").withDescendant(Locator.tag("h3").withText(role)).append(Locator.tag("a").withClass("x4-btn").withDescendant(Locator.tag("span").withText(groupName)));
+        return tag("div").withClass("rolepanel").withDescendant(Locator.tag("h3").withText(role)).append(Locator.tag("a").withClass("x4-btn").withDescendant(Locator.tag("span").startsWith(groupName)));
     }
 
     public static XPathLocator closePermissionButton(String groupName, String role)
