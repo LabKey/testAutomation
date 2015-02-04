@@ -19,7 +19,9 @@ package org.labkey.test.testpicker;
 import org.labkey.api.util.FileUtil;
 import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestConfig;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestSet;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.SuiteComparator;
 import org.labkey.test.categories.Test;
@@ -35,10 +37,10 @@ import java.io.*;
 
 public class TestHelper
 {
-    public static final String DEFAULT_PORT = "8080";
-    public static final String DEFAULT_CONTEXT_PATH = "/labkey";
-    public static final String DEFAULT_SERVER = "http://localhost";
-    public static final String DEFAULT_ROOT = System.getProperty("labkey.root");
+    public static final String DEFAULT_PORT = WebTestHelper.getWebPort().toString();
+    public static final String DEFAULT_CONTEXT_PATH = WebTestHelper.getContextPath();
+    public static final String DEFAULT_SERVER = WebTestHelper.getTargetServer();
+    public static final String DEFAULT_ROOT = TestFileUtils.getLabKeyRoot();
 
     private static Thread awtThread = null;
     private static String _saveFileName = "savedConfigs.idx";
