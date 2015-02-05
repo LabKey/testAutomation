@@ -425,7 +425,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertTextPresent("Query Name:" + datasetName);
         assertTextNotPresent("Query Name:" + datasetLabel);
         clickButton("OK", 0);
-        goToAxisTab("APX Main Title");
+        goToSvgAxisTab("APX Main Title");
         waitAndClick(Locator.xpath("//span[contains(@class, 'iconReload')]"));
         assertEquals(datasetLabel, getFormElement(Locator.name("chart-title-textfield")));
         clickButton("Cancel", 0);
@@ -440,7 +440,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
         assertTextNotPresent("An unexpected error occurred while retrieving data", "doesn't exist", "may have been deleted");
         // verify that the main title reset goes back to the dataset label - measue name
-        goToAxisTab("APX Main Title");
+        goToSvgAxisTab("APX Main Title");
         setFormElement(Locator.name("chart-title-textfield"), "test");
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
         click(Locator.xpath("//span[contains(@class, 'iconReload')]"));

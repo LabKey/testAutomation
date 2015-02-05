@@ -764,7 +764,7 @@ public class Ext4Helper extends AbstractHelper
          * @param index 0-based index of rows with matching cellText
          * @return XPathLocator for the desired row
          */
-        private static Locator.XPathLocator getGridRow(String cellText, int index)
+        public static Locator.XPathLocator getGridRow(String cellText, int index)
         {
             return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
         }

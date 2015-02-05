@@ -114,6 +114,7 @@ public abstract class TimeChartTest extends ReportTest
 
     protected void clickChooseInitialMeasure()
     {
+        // TODO: migrate usage to TimeChartWizard.chooseInitialMeasure
         waitForElement(getButtonLocator("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);

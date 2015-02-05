@@ -364,13 +364,6 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
     }
 
-    protected void goToAxisTab(String axisLabel)
-    {
-        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
-        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
-        waitForElement(Ext4Helper.Locators.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
-    }
-
     //this assumes a QWP for VisitTag schema has been created and is visible
     protected void insertVisitTag(String QWPname, VisitTag tag)
     {

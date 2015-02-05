@@ -87,7 +87,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title");
-        goToAxisTab("APX-1: Abbreviated Physical Exam");
+        goToSvgAxisTab("APX-1: Abbreviated Physical Exam");
         _extHelper.waitForExtDialog("Main Title");
         setFormElement(Locator.name("chart-title-textfield"), CHART_TITLE);
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
@@ -95,7 +95,7 @@ public class ScatterPlotTest extends GenericChartsTest
         waitForText(CHART_TITLE);
 
         log("Set Y Axis");
-        goToAxisTab("1. Weight");
+        goToSvgAxisTab("1. Weight");
         _extHelper.waitForExtDialog("Y Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText("2. Body Temp", WAIT_FOR_JAVASCRIPT);
@@ -105,7 +105,7 @@ public class ScatterPlotTest extends GenericChartsTest
         waitForText("TestYAxis");
 
         log("Set X Axis");
-        goToAxisTab("4. Pulse");
+        goToSvgAxisTab("4. Pulse");
         _extHelper.waitForExtDialog("X Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
@@ -187,7 +187,7 @@ public class ScatterPlotTest extends GenericChartsTest
         datasetTable.createQuickChart("dbl");
 
         log("Set X Axis");
-        goToAxisTab("Cohort");
+        goToSvgAxisTab("Cohort");
         _extHelper.waitForExtDialog("X Axis");
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Integer']"));
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Integer']"));
@@ -327,7 +327,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         log("Set X Axis to categorical measure.");
-        goToAxisTab("4. Pulse");
+        goToSvgAxisTab("4. Pulse");
         _extHelper.waitForExtDialog("X Axis");
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Form Language']"));
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Form Language']"));

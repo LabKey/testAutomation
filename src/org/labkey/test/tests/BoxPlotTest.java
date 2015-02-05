@@ -64,7 +64,7 @@ public class BoxPlotTest extends GenericChartsTest
         //Verify box plot
         assertSVG(BOX_PLOT_MV_1);
         log("Set Plot Title");
-        goToAxisTab("4c.Induration 1st measure");
+        goToSvgAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Main Title");
         setFormElement(Locator.name("chart-title-textfield"), CHART_TITLE);
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
@@ -72,7 +72,7 @@ public class BoxPlotTest extends GenericChartsTest
         waitForText(CHART_TITLE);
 
         log("Set Y Axis");
-        goToAxisTab("4c.Induration 1st measure");
+        goToSvgAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Y Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
@@ -82,7 +82,7 @@ public class BoxPlotTest extends GenericChartsTest
         waitForText("TestYAxis");
 
         log("Set X Axis");
-        goToAxisTab("Cohort");
+        goToSvgAxisTab("Cohort");
         _extHelper.waitForExtDialog("X Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);

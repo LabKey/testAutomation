@@ -126,19 +126,19 @@ public class TimeChartDateBasedTest extends TimeChartTest
         applyChanges();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249318596"), WAIT_FOR_JAVASCRIPT, false);
 
-        goToAxisTab("Days Since Start Date");
+        goToSvgAxisTab("Days Since Start Date");
         click(Locator.id("xaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
         assertSVG(SVG_AXIS_X, 1);
 
-        goToAxisTab("Viral Load Quantified (copies/ml)");
+        goToSvgAxisTab("Viral Load Quantified (copies/ml)");
         click(Locator.id("leftaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
         assertSVG(SVG_AXIS_X_LEFT, 1);
 
-        goToAxisTab("CD4+ (cells/mm3)");
+        goToSvgAxisTab("CD4+ (cells/mm3)");
         click(Locator.id("rightaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
@@ -231,25 +231,25 @@ public class TimeChartDateBasedTest extends TimeChartTest
         log("Test X-Axis");
         clickButton("View Chart(s)", 0);
         _ext4Helper.waitForMaskToDisappear();
-        goToAxisTab("Days Since Start Date");
+        goToSvgAxisTab("Days Since Start Date");
         _ext4Helper.selectComboBoxItem("Draw x-axis as:", "Weeks");
         applyChanges();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
-        goToAxisTab("Weeks Since Start Date");
+        goToSvgAxisTab("Weeks Since Start Date");
         setAxisValue(Axis.X, null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
-        goToAxisTab(X_AXIS_LABEL);
+        goToSvgAxisTab(X_AXIS_LABEL);
         _ext4Helper.selectComboBoxItem("Draw x-axis as:", "Days");
         assertEquals(X_AXIS_LABEL, getFormElement(Locator.name("x-axis-label-textfield"))); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
-        goToAxisTab(X_AXIS_LABEL);
+        goToSvgAxisTab(X_AXIS_LABEL);
         setAxisValue(Axis.X, "xaxis_range_manual", "15", "40", X_AXIS_LABEL_MANUAL, null, null, new String[] {X_AXIS_LABEL_MANUAL,"15","20","25","30","35","40"}, null);
 
         log("Test Y-Axis");
-        goToAxisTab("Viral Load Quantified (copies/ml)");
+        goToSvgAxisTab("Viral Load Quantified (copies/ml)");
         setAxisValue(Axis.LEFT, "leftaxis_range_manual", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","150000"});
-        goToAxisTab(Y_AXIS_LABEL);
+        goToSvgAxisTab(Y_AXIS_LABEL);
         setAxisValue(Axis.LEFT, "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000"}, null );
     }
 
@@ -264,7 +264,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText("HIV Test Results: 249318596");
         assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
 
-        goToAxisTab("HIV Test Results: 249318596");
+        goToSvgAxisTab("HIV Test Results: 249318596");
         setChartTitle(CHART_TITLE);
         applyChanges();
         waitForText(CHART_TITLE);
@@ -339,9 +339,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         // change to the data points are visible again
-        goToAxisTab(Y_AXIS_LABEL);
+        goToSvgAxisTab(Y_AXIS_LABEL);
         setAxisValue(Axis.LEFT, "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
-        goToAxisTab(X_AXIS_LABEL_MANUAL);
+        goToSvgAxisTab(X_AXIS_LABEL_MANUAL);
         setAxisValue(Axis.X, "xaxis_range_automatic", null, null, null, null, null, null, null);
         waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
         // open the developer panel and verify that it is disabled by default
@@ -433,7 +433,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
         applyChanges();
         waitForText("CD4+ (cells/mm3), Lymphs (cells/mm3)"); // y-axis default label
-        goToAxisTab("Lab Results: CD4+ (cells/mm3)");
+        goToSvgAxisTab("Lab Results: CD4+ (cells/mm3)");
         setChartTitle(CHART_TITLE);
         applyChanges();
         waitForText(CHART_TITLE);
@@ -599,11 +599,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         applyChanges();
         waitForElement(Locator.css("svg").withText(GROUP2_PTIDS[0]+" Hemoglobin"), WAIT_FOR_JAVASCRIPT, false);
 
-        goToAxisTab("Hemoglobin");
+        goToSvgAxisTab("Hemoglobin");
         setAxisValue(Axis.RIGHT, "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
         assertSVG(SVG_MULTI_MANUAL_1, 0);
 
-        goToAxisTab("Hemogoblins");
+        goToSvgAxisTab("Hemogoblins");
         setAxisValue(Axis.RIGHT, "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
         assertSVG(SVG_MULTI_MANUAL_2, 0);
 

@@ -68,7 +68,8 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
 
-        goToAxisTab("Days Since Contact Date");
+        // TODO: migrate usage to TimeChartWizard.changeXAxisToVisitBased
+        goToSvgAxisTab("Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
@@ -108,7 +109,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElementToDisappear(Locator.paginationText(19));
         waitForCharts(1);
         log("Revert to Date-based chart to check axis panel state.");
-        goToAxisTab("Visit");
+        goToSvgAxisTab("Visit");
         _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
@@ -117,7 +118,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertTextNotPresent(VISIT_STRINGS);
 
         log("Back to visit-based chart for save.");
-        goToAxisTab("Days Since Contact Date");
+        goToSvgAxisTab("Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
@@ -156,7 +157,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         _ext4Helper.clickGridRowText("2. Body Temp", 0);
         clickButton("Select", 0);
         waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", WAIT_FOR_JAVASCRIPT);
-        goToAxisTab("Days Since Contact Date");
+        goToSvgAxisTab("Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
         waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
