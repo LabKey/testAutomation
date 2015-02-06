@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
@@ -57,7 +58,19 @@ public class OlapTestJson
         {
             for (int j = 0; j < results[i].length; j++)
             {
-                assertEquals(results[i][j], _test.getTableCellText(table, i, j));
+                String expected = results[i][j];
+                String actual = _test.getTableCellText(table, i, j);
+                if (StringUtils.equals(expected,actual))
+                    continue;
+                try
+                {
+                    if (Double.parseDouble(expected) == Double.parseDouble(actual))
+                        continue;
+                }
+                catch (Exception x)
+                {
+                }
+                assertEquals(expected,actual);
             }
         }
     }
