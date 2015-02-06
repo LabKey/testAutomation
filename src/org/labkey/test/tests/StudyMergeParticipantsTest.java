@@ -35,7 +35,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
     private static final String SUBJECT_NOUN = "Participant";
     private static final String SUBJECT_NOUN_PLURAL = "Participants";
     private static final String SUBJECT_COLUMN = SUBJECT_NOUN + "Id";
-    private static final String ALIAS_DATASET = "AliasDataset";
+    private static final String ALIAS_DATASET = "MyAliasDataset";
     private static final String ALIAS_COLUMN = "MyAlias";
     private static final String SOURCE_COLUMN = "MySource";
 
@@ -92,10 +92,12 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
         goToMergeParticipants();
 
         log("Check have error for alias creation, as source field is blank");
+        assertElementPresent(ALIAS_SOURCE_FIELD); // if it's missing, the participant alias setup didn't work.
         setFormElement(OLD_ID_FIELD, PTID_WITH_ALIAS);
         setFormElement(NEW_ID_FIELD, PTID_NEW_1);
         clickButton("Preview", 0);
         waitForElement(Locator.tag("span").containing("Specimen data is not editable"), MERGE_SUCCESS_TIMEOUT);
+        // Error on missing value for source field.
         assertElementPresent(Locator.tag("span").containing("Missing value for required property"));
 
         log("Check not reporting conflict when no conflict exists, and warning on existing alias");
@@ -172,6 +174,10 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
         clickButton("Save Changes", 0);
         waitForText(SUBJECT_NOUN + " alias settings saved successfully");
         clickButton("OK", 0);
+
+        // Refresh the page and make sure the configuration stuck
+        refresh();
+        assertFormElementEquals(Locator.input("datasetCombo"),ALIAS_DATASET);
 
         clickButton("Done", "Manage Study");
     }
