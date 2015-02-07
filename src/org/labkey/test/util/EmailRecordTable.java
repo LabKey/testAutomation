@@ -19,6 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.junit.Assert.*;
 
 public class EmailRecordTable extends DataRegionTable
@@ -98,7 +101,16 @@ public class EmailRecordTable extends DataRegionTable
                 {
                     EmailMessage em = new EmailMessage();
                     em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));
-                    em.setTo(trimAll(StringUtils.split(getDataAsText(i, colTo), ',')));
+                    String[] to = trimAll(StringUtils.split(getDataAsText(i, colTo), ','));
+                    for (int j = 0; j < to.length; j++)
+                    {
+                        // Extract email from : "Display <display@labkey.test>"
+                        Pattern pattern = Pattern.compile(".*<(.+)>");
+                        Matcher matcher = pattern.matcher(to[j]);
+                        if (matcher.find())
+                            to[j] = matcher.group(1);
+                    }
+                    em.setTo(to);
                     em.setSubject(subjectLine);
                     em.setBody(StringUtils.join(lines, "\n", 1, lines.length - 1));
                     return em;

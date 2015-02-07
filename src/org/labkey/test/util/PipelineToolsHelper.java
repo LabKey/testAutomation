@@ -41,14 +41,9 @@ public class PipelineToolsHelper
         _test = test;
     }
 
-    public static void setPathSeparator(String pathSeparator)
-    {
-        _pathSeparator = pathSeparator;
-    }
-
     private static String getDefaultToolsPath()
     {
-        return (_extraPipelineTools != null ? _extraPipelineTools + _pathSeparator : "") + _defaultToolsDirectory;
+        return (_extraPipelineTools != null && !_extraPipelineTools.isEmpty() ? _extraPipelineTools + _pathSeparator : "") + _defaultToolsDirectory;
     }
 
     @LogMethod
