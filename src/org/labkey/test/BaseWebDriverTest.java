@@ -41,6 +41,7 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -5669,6 +5670,28 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Select select = new Select(selectElement);
         select.selectByVisibleText(value);
+    }
+
+    public void selectOptionByTextContaining(WebElement selectElement, String value)
+    {
+        Select select = new Select(selectElement);
+        List<WebElement> options = select.getOptions();
+        List<String> matches = new ArrayList<>();
+
+        for (WebElement option : options)
+        {
+            String optionText = option.getText();
+            if (optionText.contains(value))
+                matches.add(optionText);
+        }
+
+        if (matches.size() == 1)
+            select.selectByVisibleText(matches.get(0));
+        else if (matches.isEmpty())
+            select.selectByVisibleText(value);
+        else
+            Assert.fail("Too many matches for '" + value + "': ['" + StringUtils.join(matches, "', '") + "']");
+
     }
 
     public void addUrlParameter(String parameter)
