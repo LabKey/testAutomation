@@ -495,7 +495,7 @@
         </condition>
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props, install-rpackages">
+    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
         <fail unless="tomcat.home" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
