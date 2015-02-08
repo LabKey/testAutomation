@@ -24,7 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
-import org.labkey.test.WebTestHelper;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
@@ -59,6 +59,17 @@ public class KnitrReportTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return "KnitrReportProject";
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+
+        if (afterTest)
+            revertLibXml();
+        else
+            deleteLibXml();
     }
 
     @BeforeClass
@@ -110,7 +121,7 @@ public class KnitrReportTest extends BaseWebDriverTest
                                     Locator.css("code.r").containing("set.seed(123)"),       // Echoed R code
                                     Locator.xpath("//img").withAttribute("alt", "plot of chunk graphics"),
                                     //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
-                                    Locator.css(".MathJax")};
+                                    Locator.css(".MathJax, .mathjax")};
         String[] reportNotContains = {"```",              // Markdown for R code chunks
                                       "## R code chunks", // Uninterpreted Markdown
                                       "{r",               // Markdown for R code chunks
@@ -137,6 +148,7 @@ public class KnitrReportTest extends BaseWebDriverTest
     @Test
     public void testAdhocReportDependenciesString()
     {
+        deleteLibXml();
         verifyAdhocReportDependencies("Strings",
                 "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
                 "https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
@@ -147,30 +159,73 @@ public class KnitrReportTest extends BaseWebDriverTest
     @Test
     public void testAdhocReportDependenciesLib()
     {
+        copyLibXml();
+
+        verifyAdhocReportDependencies("ClientLib", "knitr");
+    }
+
+    final Path libXmlSource = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
+    final Path libXmlDest = Paths.get(TestFileUtils.getDefaultWebAppRoot()).resolve(libXmlSource.getFileName());
+    final Path libXmlBackup = libXmlDest.resolveSibling(libXmlDest.getFileName() + ".bak");
+
+    private void copyLibXml()
+    {
         //
         // copy over a lib to the webapp path that includes the required dependencies and ensure
         // the report loads by referencing those dependencies
         //
-        Path source = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
-        Path destDir = Paths.get(TestFileUtils.getDefaultWebAppRoot());
 
         try
         {
-            Files.copy(source, destDir.resolve(source.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            backupLibXml();
+
+            Files.copy(libXmlSource, libXmlDest, StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
-            fail("Failed to copy knitr.lib.xml to [" + destDir.toString() + "]: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-
-        verifyAdhocReportDependencies("ClientLib", "knitr");
     }
+
+    private void deleteLibXml()
+    {
+        try
+        {
+            backupLibXml();
+
+            Files.deleteIfExists(libXmlDest);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void backupLibXml() throws IOException
+    {
+        if (libXmlDest.toFile().exists() && !libXmlBackup.toFile().exists())
+            Files.move(libXmlDest, libXmlBackup, StandardCopyOption.ATOMIC_MOVE);
+    }
+
+    private void revertLibXml()
+    {
+        try
+        {
+            if (libXmlBackup.toFile().exists())
+                Files.move(libXmlBackup, libXmlDest, StandardCopyOption.REPLACE_EXISTING);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void verifyAdhocReportDependencies(String viewName, String dependencies)
     {
         // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
         Locator[] reportContains = {Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
-        String expectedError = "ReferenceError: $ is not defined";
+        String expectedError = "$ is not";
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
@@ -178,7 +233,8 @@ public class KnitrReportTest extends BaseWebDriverTest
         if (getBrowserType() == BrowserType.FIREFOX)
         {
             // no exception thrown, so look into the JS errors collection
-            _rReportHelper.clickViewTab();
+            click(Locator.linkWithText("View")); // JS error causes report to not render as RReportHelper expects
+            waitForElement(Locator.linkWithText("DataTables"));
             verifyJsErrors(expectedError, true);
         }
         else
