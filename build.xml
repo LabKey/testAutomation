@@ -15,7 +15,7 @@
  * limitations under the License.
 
  -->
-<project name="test" default="usage" basedir=".">
+<project name="test" default="usage">
 
     <antversion property="ant.version.check" atleast="1.8.0" />
     <fail message="Please use Ant 1.8.0 or greater. A copy is checked in to LABKEY_ROOT/external/ant" unless="ant.version.check" />
@@ -500,11 +500,8 @@
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
 
-        <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}">
+        <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}" else="${sysprop.suite}">
             <isset property="sysprop.moduleSuite"/>
-        </condition>
-        <condition property="sysprop.suiteToUse" value="${sysprop.suite}">
-            <not><isset property="sysprop.moduleSuite"/></not>
         </condition>
 
         <junit fork="true" forkmode="once" maxmemory="512m"
@@ -1196,15 +1193,15 @@
             <isset property="skipfish.supplemental.wordlist"/>
         </condition>
 
-        <condition property="sysprop.labkey.port" value="${labkey.port}" else="8080">
+        <condition property="sysprop.labkey.port" value="${labkey.port}" else="${default.labkey.port}">
             <isset property="labkey.port"/>
         </condition>
 
-        <condition property="sysprop.labkey.server" value="${labkey.server}" else="http://localhost">
+        <condition property="sysprop.labkey.server" value="${labkey.server}" else="${default.labkey.server}">
             <isset property="labkey.server"/>
         </condition>
 
-        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="/labkey">
+        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="${default.labkey.contextpath}">
             <isset property="labkey.contextpath"/>
         </condition>
 

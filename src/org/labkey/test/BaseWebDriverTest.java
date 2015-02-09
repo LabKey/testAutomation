@@ -133,7 +133,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestProperties.ensureChromedriverExeProperty;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
