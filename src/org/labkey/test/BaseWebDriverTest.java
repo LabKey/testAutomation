@@ -3819,22 +3819,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public abstract boolean check();
     }
 
-    public void waitForExt4FolderTreeNode(String nodeText, int wait)
+    public WebElement waitForElement(final Locator locator)
     {
-        final Locator locator = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
-        String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isElementPresent(locator);
-            }
-        }, failMessage, wait);
+        return waitForElement(locator, WAIT_FOR_JAVASCRIPT);
     }
 
-    public void waitForElement(final Locator locator)
+    public WebElement waitForElement(final Locator locator, int wait)
     {
-        waitForElement(locator, WAIT_FOR_JAVASCRIPT);
+        return locator.waitForElement(getDriver(), wait);
     }
 
     /**
@@ -3917,11 +3909,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }while(System.currentTimeMillis() - startTime < wait);
 
         waitForElement(loc, 1000);
-    }
-
-    public void waitForElement(final Locator locator, int wait)
-    {
-        waitForElement(locator, wait, true);
     }
 
     public void waitForElementText(final Locator locator, final String text)
