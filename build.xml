@@ -497,12 +497,6 @@
 
     <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
         <fail unless="tomcat.home" />
-        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
-        <antcall target="waitfor-labkey-started"/>
-
-        <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}" else="${sysprop.suite}">
-            <isset property="sysprop.moduleSuite"/>
-        </condition>
 
         <!--Can't pass empty values to jvmarg on Linux; use a dummy value instead-->
         <condition property="trustStore" value="-Djavax.net.ssl.trustStore=${tomcat.home}/localhost.truststore" else="-Dnull=null">
@@ -510,6 +504,13 @@
         </condition>
         <condition property="trustStorePassword" value="-Djavax.net.ssl.trustStorePassword=changeit" else="-Dnull=null">
             <available file="${tomcat.home}/localhost.truststore" />
+        </condition>
+
+        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
+        <antcall target="waitfor-labkey-started"/>
+
+        <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}" else="${sysprop.suite}">
+            <isset property="sysprop.moduleSuite"/>
         </condition>
 
         <junit fork="true" forkmode="once" maxmemory="512m"
