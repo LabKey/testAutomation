@@ -409,10 +409,16 @@ public class ExtHelper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
-        _test.click(parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]"));
+        Locator.XPathLocator comboArrow = parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]");
+        _test.click(comboArrow);
         Locator.XPathLocator comboListItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
         _test.waitAndClick(comboListItem);
-        _test.waitForElementToDisappear(comboListItem, WAIT_FOR_JAVASCRIPT);
+        _test.waitForFormElementToEqual(parentLocator.append("//input"), selection);
+        if (_test.isElementPresent(comboListItem))
+        {
+            _test.click(comboArrow);
+            _test.waitForElementToDisappear(comboListItem, WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     @LogMethod(quiet = true)
