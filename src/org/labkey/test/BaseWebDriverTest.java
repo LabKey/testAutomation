@@ -3545,7 +3545,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }, "Page failed to load", millis);
         _testTimeout = false;
-        waitForExtOnReady();
+//        waitForExtOnReady(); // TODO: Removing temporarily. This might be causing more timeouts than its worth.
         _preppedForPageLoad = false;
     }
 
