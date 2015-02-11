@@ -343,7 +343,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         setAxisValue(Axis.LEFT, "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
         goToSvgAxisTab(X_AXIS_LABEL_MANUAL);
         setAxisValue(Axis.X, "xaxis_range_automatic", null, null, null, null, null, null, null);
-        waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
+        waitForText("249318596,\n Days", 40, WAIT_FOR_JAVASCRIPT); // 20 in first ptid chart and 20 in save dialog thumbnail preview
         // open the developer panel and verify that it is disabled by default
         assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         goToDeveloperTab();
