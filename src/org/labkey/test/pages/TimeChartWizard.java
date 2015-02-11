@@ -91,12 +91,14 @@ public class TimeChartWizard
     {
         _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
         _test._ext4Helper.checkGridRowCheckbox(label);
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     public void uncheckFilterGridRow(String label)
     {
         _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
         _test._ext4Helper.uncheckGridRowCheckbox(label);
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     public void clickSwitchToGroupButton(boolean clickYes)
@@ -156,5 +158,6 @@ public class TimeChartWizard
         _test.clickButton("Grouping", 0);
         _test.waitForElement(_test.getButtonLocator("Cancel"));
     }
+
 
 }
