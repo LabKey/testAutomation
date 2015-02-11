@@ -177,7 +177,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
 
         // Refresh the page and make sure the configuration stuck
         refresh();
-        assertFormElementEquals(Locator.input("datasetCombo"),ALIAS_DATASET);
+        waitForFormElementToEqual(Locator.input("datasetCombo"),ALIAS_DATASET);
 
         clickButton("Done", "Manage Study");
     }
