@@ -209,9 +209,9 @@ public class WikiLongTest extends BaseWebDriverTest
         File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
         _wikiHelper.saveWikiPage();
-        assertTextPresent("common.properties");
-        assertTextPresent(WIKI_PAGE3_WEBPART_TEST);
-        assertTextPresent("Some HTML content");
+        waitForElement(Locator.linkContainingText("common.properties"));
+        assertTextPresent(WIKI_PAGE3_WEBPART_TEST,
+                "Some HTML content");
 
         searchFor(PROJECT_NAME, "Wiki", 3, WIKI_PAGE3_NAME_TITLE);
 
@@ -293,16 +293,16 @@ public class WikiLongTest extends BaseWebDriverTest
         waitForExtReady();
         click(Locator.linkWithText("see discussions (1)"));
         clickAndWait(Locator.linkWithText(DISC1_TITLE));
-        assertTextPresent(DISC1_TITLE);
-        assertTextPresent(DISC1_BODY);
+        assertTextPresent(DISC1_TITLE,
+                DISC1_BODY);
 
         log("Check response on discussion board works");
         clickButton("Respond");
         setFormElement(Locator.name("title"), RESP1_TITLE);
         setFormElement("body", RESP1_BODY);
         submit();
-        assertTextPresent(RESP1_TITLE);
-        assertTextPresent(RESP1_BODY);
+        assertTextPresent(RESP1_TITLE,
+                RESP1_BODY);
         clickButton("Delete Message");
         clickButton("Delete");
         assertTextNotPresent(DISC1_TITLE);
@@ -353,8 +353,8 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("6");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText("next"));
-        assertTextPresent("More HTML content");
-        assertTextPresent(WIKI_PAGE3_ALTTITLE);
+        assertTextPresent("More HTML content",
+                WIKI_PAGE3_ALTTITLE);
 
         termsOfUseTest();
 
@@ -500,8 +500,8 @@ public class WikiLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
         submit();
         log("check that TOC title is set correctly");
-        assertTextPresent("Test Customize TOC");
-        assertTextPresent(WIKI_PAGE2_TITLE);
+        assertTextPresent("Test Customize TOC",
+                WIKI_PAGE2_TITLE);
 
         log("Check that 'Copy Pages' in TOC works");
         portalHelper.clickWebpartMenuItem("Test Customize TOC", true, "Copy");
