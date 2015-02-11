@@ -487,7 +487,6 @@ src/org/labkey/test/tests/PipelineCancelTest.java -text
 src/org/labkey/test/tests/PipelineTest.java -text
 src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
-src/org/labkey/test/tests/ProductionBuildTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
@@ -498,6 +497,7 @@ src/org/labkey/test/tests/ReportAndDatasetNotificationTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
+src/org/labkey/test/tests/ResourceEncodingTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text
 src/org/labkey/test/tests/SCHARPStudyTest.java -text
 src/org/labkey/test/tests/SampleMindedImportTest.java -text

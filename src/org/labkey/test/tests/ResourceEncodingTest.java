@@ -23,7 +23,7 @@ import java.util.List;
  * This test will only work if you have built with `ant production`
  */
 @Category({DailyB.class})
-public class ProductionBuildTest extends BaseWebDriverTest
+public class ResourceEncodingTest extends BaseWebDriverTest
 {
     @Nullable
     @Override
