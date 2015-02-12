@@ -6185,6 +6185,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors)
     {
+        importFolderFromZip(folderFile, validateQueries, completedJobs, expectErrors, MAX_WAIT_SECONDS * 1000);
+    }
+
+    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
+    {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         waitForElement(Locator.name("folderZip"));
@@ -6193,7 +6198,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             uncheckCheckbox(Locator.name("validateQueries"));
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
-        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors);
+        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
     protected void importFolderFromPipeline(String folderFile)
