@@ -99,12 +99,14 @@ public class ResourceEncodingTest extends BaseWebDriverTest
 
     private void assertGzipResource(String fileName) throws IOException
     {
-        int expectedResponse = TestProperties.isDevModeEnabled() ? HttpStatus.SC_NOT_FOUND : HttpStatus.SC_OK;
         int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName + ".gz");
-        Assert.assertEquals("GZ file returned wrong response: " + fileName, expectedResponse, responseCode);
-
+        Assert.assertEquals("GZ file not available: " + fileName, HttpStatus.SC_OK, responseCode);
     }
 
+    /**
+     * Might come back to this. This is, theoretically, a better way to check that js files are Gzipped
+     * I can't get response.getEntity().getContentEncoding() to return anything but null
+     */
     private void assertGzipEncodedResponse(String fileName) throws IOException
     {
         String url = WebTestHelper.getBaseURL() + "/" + fileName;
