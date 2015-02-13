@@ -46,7 +46,7 @@ public class ResourceEncodingTest extends BaseWebDriverTest
         List<String> baseFileNames = Arrays.asList(
                 "labkey",
                 "GuidedTip",
-                "ext-all-sandbox"
+                "ext-4.2.1/ext-all-sandbox"
         );
 
         for (String baseFileName : baseFileNames)
@@ -99,7 +99,9 @@ public class ResourceEncodingTest extends BaseWebDriverTest
 
     private void assertGzipResource(String fileName) throws IOException
     {
-        int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName + ".gz");
+        int responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName);
+        Assert.assertEquals("File not available: " + fileName, HttpStatus.SC_OK, responseCode);
+        responseCode = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/" + fileName + ".gz");
         Assert.assertEquals("GZ file not available: " + fileName, HttpStatus.SC_OK, responseCode);
     }
 
