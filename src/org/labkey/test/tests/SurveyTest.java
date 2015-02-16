@@ -83,7 +83,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA", null);
+        createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -95,7 +95,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule("Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA", null);
+        createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA");
 
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
@@ -110,7 +110,7 @@ public class SurveyTest extends BaseWebDriverTest
     }
 
     protected void createSurveyDesign(String project, @Nullable String folder, @Nullable String tabName, String designName, @Nullable String description,
-                                      String schemaName, String queryName, @Nullable String metadataFilePath)
+                                      String schemaName, String queryName)
     {
         log("Create new survey design");
         if (folder != null && !isElementPresent(Locator.id("folderBar").withText(folder)))
@@ -118,32 +118,7 @@ public class SurveyTest extends BaseWebDriverTest
         if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'tab-nav-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
-        clickButton("Create Survey Design");
-        waitForElement(Locator.name("label"));
-        setFormElement(Locator.name("label"), designName);
-        if (description != null) setFormElement(Locator.name("description"), description);
-        _ext4Helper.selectComboBoxItem("Schema", schemaName);
-        // the schema selection enables the query combo, so wait for it to enable
-        waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
-        sleep(1000); // give it a second to get the queries for the selected schema
-        _ext4Helper.selectComboBoxItem("Query", queryName);
-
-        clickButton("Generate Survey Questions", 0);
-        sleep(1000); // give it a second to generate the metadata
-        String metadataValue = _extHelper.getCodeMirrorValue("metadata");
-        assertNotNull("No generate survey question metadata available", metadataValue);
-        if (metadataFilePath != null)
-        {
-            // the metadata file path needs to be a full path
-            File metadataFile = new File(metadataFilePath);
-
-            assertTrue(metadataFile.exists());
-            String json = TestFileUtils.getFileContents(metadataFile);
-            _extHelper.setCodeMirrorValue("metadata", json);
-        }
-
-        clickButton("Save Survey");
-        waitForText(designName);
+        createSurveyDesign(designName, description, schemaName, queryName, null);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)

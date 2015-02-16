@@ -232,6 +232,13 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
+    public void selectRadioButton(@LoggedParam String label, boolean labelContains, @LoggedParam String selection)
+    {
+        Locator l = Locator.xpath("//table/tbody/tr[td/label/span[contains(text(), '" + label + "')]]//label[text()='" + selection + "']");
+        _test.click(l);
+    }
+
+    @LogMethod(quiet = true)
     public void selectRadioButton(@LoggedParam String label, @LoggedParam String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");

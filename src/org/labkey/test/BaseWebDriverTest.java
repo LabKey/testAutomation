@@ -6873,4 +6873,30 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         fireEvent(Locator.css("svg text").containing(axisLabel).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
         waitForElement(Ext4Helper.Locators.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
+
+    public void createSurveyDesign(String label, @Nullable String description, String schemaName, String queryName, @Nullable File metadataFile)
+    {
+        clickButton("Create Survey Design");
+        waitForElement(Locator.name("label"));
+        setFormElement(Locator.name("label"), label);
+        if (description != null) setFormElement(Locator.name("description"), description);
+        _ext4Helper.selectComboBoxItem("Schema", schemaName);
+        // the schema selection enables the query combo, so wait for it to enable
+        waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
+        sleep(1000); // give it a second to get the queries for the selected schema
+        _ext4Helper.selectComboBoxItem("Query", queryName);
+        clickButton("Generate Survey Questions", 0);
+        sleep(1000); // give it a second to generate the metadata
+        String metadataValue = _extHelper.getCodeMirrorValue("metadata");
+        assertNotNull("No generate survey question metadata available", metadataValue);
+        if (metadataFile != null)
+        {
+            assertTrue(metadataFile.exists());
+            String json = TestFileUtils.getFileContents(metadataFile);
+            _extHelper.setCodeMirrorValue("metadata", json);
+        }
+
+        clickButton("Save Survey");
+        waitForElement(Locator.tagWithText("td", label));
+    }
 }
