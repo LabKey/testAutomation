@@ -3238,6 +3238,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return el.getText();
     }
 
+    public List<String> getTexts(List<WebElement> elements)
+    {
+        List<String> texts = new ArrayList<>();
+
+        for (WebElement el : elements)
+        {
+            texts.add(el.getText());
+        }
+
+        return texts;
+    }
+
     public WebElement getElement(Locator locator)
     {
         return locator.findElement(getDriver());

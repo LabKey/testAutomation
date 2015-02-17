@@ -16,12 +16,14 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -38,15 +40,15 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
-    protected static final String PROJECT_NAME = "IssuesVerifyProject";
-    protected static final String SUB_FOLDER_NAME = "SubFolder";
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String ISSUE_TITLE_2 = "A not so serious issue";
@@ -54,8 +56,6 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
 
-    private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
-            "NotifyList", "String1", "Int1"};
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
             "You can review this issue here: ^detailsURL^\n" +
@@ -85,7 +85,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "IssuesVerifyProject";
     }
 
     @BeforeClass
@@ -98,13 +98,13 @@ public class IssuesTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, USER1, USER2);
-        deleteProject(PROJECT_NAME, afterTest);
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Before
     public void returnToProject()
     {
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         readyState();
     }
@@ -124,22 +124,19 @@ public class IssuesTest extends BaseWebDriverTest
     public void setupProject()
     {
         PortalHelper portalHelper = new PortalHelper(this);
-        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(getProjectName(), null);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
         clickButton("Save and Finish");
 
-        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
+        _containerHelper.enableModule(getProjectName(), "Dumbster");
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
 
         portalHelper.addWebPart("Issues Summary");
         portalHelper.addWebPart("Search");
         assertTextPresent("Open");
-
-        _containerHelper.createSubfolder(PROJECT_NAME, SUB_FOLDER_NAME, null);
-        portalHelper.addWebPart("Issues List");
 
         enableEmailRecorder();
         checkEmptyToAssignedList();
@@ -151,6 +148,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
 
+        goToModule("Issues");
         clickButton("New Issue");
         String assignedToText = getText(Locator.name("assignedTo"));
         assertEquals(assignedToText, "");
@@ -160,14 +158,14 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // Add to group so user appears
         clickProject("IssuesVerifyProject");
-        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
-        _permissionsHelper.addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
         createUser(USER2, null, false);
     }
 
     private void createIssues()
     {
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
@@ -243,12 +241,6 @@ public class IssuesTest extends BaseWebDriverTest
         addKeywordsAndVerify("string1", "MyFirstString", "North", "South");
         addKeywordsAndVerify("string5", "MyFifthString", "Cadmium", "Polonium");
 
-        // UpdateRequiredFieldsAction
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Milestone"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String4"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String5"));
-        clickButton("Update");
-
         // ListAction (empty)
         clickButton("Back to Issues");
 
@@ -261,19 +253,9 @@ public class IssuesTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("area"), "Area51");
         selectOptionByText(Locator.name("priority"), "2");
         setFormElement(Locator.name("comment"), "a bright flash of light");
-        clickButton("Save");
-
-        // test validate
-        assertTextPresent("Field AssignedTo cannot be blank");
         selectOptionByText(Locator.name("assignedTo"), getDisplayName());
-        clickButton("Save");
-        assertTextPresent("Field Milestone cannot be blank");
         selectOptionByText(Locator.name("milestone"), "2012");
-        clickButton("Save");
-        assertTextPresent("Field MyFourthString cannot be blank");
         setFormElement(Locator.name("string4"), "http://www.issues.test");
-        clickButton("Save");
-        assertTextPresent("Field MyFifthString cannot be blank");
         selectOptionByText(Locator.name("string5"), "Polonium");
         clickButton("Save");
 
@@ -296,7 +278,7 @@ public class IssuesTest extends BaseWebDriverTest
         updateIssue();
         setFormElement(Locator.name("comment"), "don't believe the hype");
         clickButton("Save");
-        searchFor(PROJECT_NAME, "2012", 1, issueTitle);
+        searchFor(getProjectName(), "hype", 1, issueTitle);
 
         // ResolveAction
         clickAndWait(Locator.linkWithText("resolve"));
@@ -324,24 +306,16 @@ public class IssuesTest extends BaseWebDriverTest
         // SearchAction
         clickAndWait(Locator.linkWithText("return to grid"));
         pushLocation();
-        String index = WebTestHelper.getContextPath() + "/search/" + PROJECT_NAME + "/index.view?wait=1";
+        String index = WebTestHelper.getContextPath() + "/search/" + getProjectName() + "/index.view?wait=1";
         log(index);
         beginAt(index, 5 * defaultWaitForPage);
         popLocation();
         // UNDONE: test grid search box
 
         // SearchWebPart
-        searchFor(PROJECT_NAME, "hype", 1, issueTitle);
+        searchFor(getProjectName(), "hype", 1, issueTitle);
         // SearchWebPart
-        searchFor(PROJECT_NAME, "2012", 1, issueTitle);
-
-        // clean up required fields
-        clickAndWait(Locator.linkWithText("return to grid"));
-        clickButton("Admin");
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Milestone"));
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String4"));
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String5"));
-        clickButton("Update");
+        searchFor(getProjectName(), "2012", 1, issueTitle);
 
         // UNDONE test these actions
         // CompleteUserAction
@@ -425,14 +399,14 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Update");
 
         impersonate(USER1);
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         uncheckCheckbox(Locator.checkboxByNameAndValue("emailPreference", "2")); // issue assigned to me is modified
         clickButton("Update");
         stopImpersonating();
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
 
         // need to make change that will message current admin
@@ -458,15 +432,15 @@ public class IssuesTest extends BaseWebDriverTest
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
         assertTrue("User did not receive issue notification", recipients.contains(PasswordUtil.getUsername()));
-        assertTrue(USER2 + " did not receieve issue notification", recipients.contains(USER2));
         assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
+        assertFalse(USER2 + " receieved issue notification without container read permission", recipients.contains(USER2));
 
         assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
 
         assertTextNotPresent("This line shouldn't appear");
 
         impersonate(USER1);
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
         updateIssue();
@@ -524,21 +498,48 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void requiredFieldsTest()
     {
+        final String subFolder = "Required Fields";
+        final String[] requiredFields = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
+                "NotifyList", "String1", "Int1"};
+        final String[] requiredFieldLabels = {"Title", "AssignedTo", "Type", "Area", "Milestone",
+                "NotifyList", "Customer Name", "Contract Number"};
+        Set<String> expectedErrors = new HashSet<>();
+
+        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+
         goToModule("Issues");
         clickButton("Admin");
+
+        addKeywordsAndVerify("type", "Type", "Type");
+        addKeywordsAndVerify("area", "Area", "Area");
+        addKeywordsAndVerify("milestone", "Milestone", "Milestone");
+
         setFormElement(Locator.name("int1"), "Contract Number");
         setFormElement(Locator.name("string1"), "Customer Name");
 
         updateIssue();
 
-        for (String field : REQUIRED_FIELDS)
+        for (String field : requiredFields)
             checkRequiredField(field, true);
 
         clickButton("Update");
         clickButton("Back to Issues");
+        clickButton("New Issue");
+        clickButton("Save");
+
+        for (String label : requiredFieldLabels)
+        {
+            expectedErrors.add(String.format("Field %s cannot be blank.", label));
+        }
+
+        Set<String> errors = new HashSet<>(getTexts(Locators.labkeyError.findElements(getDriver())));
+        errors.remove("*"); // From "Fields marked with an asterisk * are required."
+        Assert.assertEquals("Wrong errors", expectedErrors, errors);
+        clickButton("Cancel");
+
         clickButton("Admin");
 
-        for (String field : REQUIRED_FIELDS)
+        for (String field : requiredFields)
         {
             verifyFieldChecked(field);
             checkRequiredField(field, false);
@@ -552,10 +553,6 @@ public class IssuesTest extends BaseWebDriverTest
 
         assertTextPresent("Field Title cannot be blank.");
         clickButton("Cancel");
-
-        clickButton("Admin");
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
-        clickButton("Update");
     }
 
     @LogMethod
@@ -566,19 +563,13 @@ public class IssuesTest extends BaseWebDriverTest
         if (select)
             checkCheckbox(checkBoxLocator);
         else
-        {
-            if (isChecked(checkBoxLocator))
-                click(checkBoxLocator);
-        }
+            uncheckCheckbox(checkBoxLocator);
     }
 
     @LogMethod
     private void verifyFieldChecked(@LoggedParam String fieldName)
     {
-        if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
-            return;
-
-        assertFalse("Checkbox not set for element: " + fieldName, false);
+        assertTrue("Checkbox not set for element: " + fieldName, isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)));
     }
 
     @Test
@@ -623,7 +614,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void queryTest()
     {
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("issues");
 
@@ -636,10 +627,10 @@ public class IssuesTest extends BaseWebDriverTest
         waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
 
         // remove query which is broken now because requiredFieldsTest() renames MyFirstString
-        deleteQuery(PROJECT_NAME, "issues", "xxyzzy");
+        deleteQuery(getProjectName(), "issues", "xxyzzy");
     }
 
     @LogMethod
@@ -654,36 +645,41 @@ public class IssuesTest extends BaseWebDriverTest
     // Test issues grid with issues in a sub-folder
     public void subFolderIssuesTest()
     {
-        String[] issueTitles = {"This is for the subfolder test", "A sub-folder issue"};
+        final String[] issueTitles = {"This is for the subfolder test", "A sub-folder issue"};
+        final String subFolder = "SubFolder";
 
         // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[0], "priority", "2", "comment", "a bright flash of light"));
 
-        clickFolder(SUB_FOLDER_NAME);
+        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+        (new PortalHelper(this)).addWebPart("Issues List");
+
 
         //Issue 15550: Better tests for view details, admin, and email preferences
         for (String button : new String[]{"Admin", "Email Preferences"})
         {
             Locator l = Locator.xpath("//span/a[span[text()='" + button + "']]");
-            assertTrue(getAttribute(l, "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
+            String href = getAttribute(l, "href");
+            String containerPath = getProjectName() + "/" + subFolder;
+            assertTrue("'" + href + "' did not contain '" + containerPath + "'", href.contains(containerPath));
         }
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[1], "priority", "2", "comment", "We are in a sub-folder"));
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         // Set the container filter to include subfolders
         _extHelper.clickMenuButton(true, "Views", "Folder Filter", "Current folder and subfolders");
 
-        // Verify the URL of issueTitles[0] goes to PROJECT_NAME
+        // Verify the URL of issueTitles[0] goes to getProjectName()
         String href = getAttribute(Locator.linkContainingText(issueTitles[0]), "href");
         assertTrue("Expected issue details URL to link to project container",
-                href.contains("/issues/" + PROJECT_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/issues-details.view"));
+                href.contains("/issues/" + getProjectName() + "/details.view") || href.contains("/" + getProjectName() + "/issues-details.view"));
 
-        // Verify the URL of issueTitles[1] goes to PROJECT_NAME/SUB_FOLDER_NAME
+        // Verify the URL of issueTitles[1] goes to getProjectName()/SUB_FOLDER_NAME
         href = getAttribute(Locator.linkContainingText(issueTitles[1]), "href");
         assertTrue("Expected issue details URL to link to sub-folder container",
-                href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/issues-details.view"));
+                href.contains("/issues/" + getProjectName() + "/" + subFolder + "/details.view") || href.contains("/" + getProjectName() + "/" + subFolder + "/issues-details.view"));
     }
 
     @Test
@@ -713,17 +709,15 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void moveIssueTest()
     {
-        String issueTitle = "This issue will be moved";
-        String displayName = getDisplayName();
-        String path = String.format("/%s/%s", PROJECT_NAME, SUB_FOLDER_NAME);
+        final String subFolder = "Move Folder";
+        final String issueTitle = "This issue will be moved";
+        final String displayName = getDisplayName();
+        final String path = String.format("/%s/%s", getProjectName(), subFolder);
 
+        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+
+        goToProjectHome();
         goToModule("Issues");
-
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
-        issuesTable.uncheckAll();
-
-        // validate that the move button not active without destination (here we validate list view)
-        assertElementPresent(Locator.xpath("//a[@class=' labkey-disabled-button']/span[text()='Move']"));
 
         // create a new issue to be moved
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
@@ -732,6 +726,8 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText("move"));
 
         goToModule("Issues");
+        // validate that the move button not active without destination (here we validate list view)
+        assertElementPresent(Locator.xpath("//a[@class=' labkey-disabled-button']/span[text()='Move']"));
         clickButton("Admin");
 
         /// attempt a bad destination
@@ -784,6 +780,8 @@ public class IssuesTest extends BaseWebDriverTest
         String issueIdB = getLastPageIssueId();
 
         goToModule("Issues");
+
+        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
         issuesTable.checkCheckbox(issueIdA);
         issuesTable.checkCheckbox(issueIdB);
         click(Locator.linkWithText("move"));
@@ -902,8 +900,8 @@ public class IssuesTest extends BaseWebDriverTest
 
         // issue 20699 - NPE b/c default assign to user deleted!
         String deletedUser = "deleteme@deletronia.com";
-        _permissionsHelper.addUserToProjGroup(deletedUser, PROJECT_NAME, TEST_GROUP);
-        clickProject(PROJECT_NAME);
+        _permissionsHelper.addUserToProjGroup(deletedUser, getProjectName(), TEST_GROUP);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Admin");
         checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
@@ -913,7 +911,7 @@ public class IssuesTest extends BaseWebDriverTest
         // taking care of some clean-up while here for the test.
         deleteUsers(true, deletedUser, user);
 
-        clickProject(PROJECT_NAME);
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("New Issue");
         // NPE

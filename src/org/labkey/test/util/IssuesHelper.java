@@ -16,10 +16,14 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class IssuesHelper extends AbstractHelper
@@ -54,6 +58,10 @@ public class IssuesHelper extends AbstractHelper
         }
 
         _test.clickButton("Save");
+
+        List<String> errors = _test.getTexts(Locators.labkeyError.findElements(_test.getDriver()));
+
+        Assert.assertEquals("Unexpected errors", Collections.<String>emptyList(), errors);
     }
 
     @LogMethod

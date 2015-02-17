@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 
 /**
  * Placeholder
@@ -33,4 +34,9 @@ public class LabKeyPage
     }
 
     protected void waitForPage() {}
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
+    }
 }
