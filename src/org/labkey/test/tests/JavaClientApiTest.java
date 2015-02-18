@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
@@ -284,11 +285,11 @@ public class JavaClientApiTest extends BaseWebDriverTest
         selCmd.addSort("LastName", Sort.Direction.ASCENDING);
         SelectRowsResponse resp = selCmd.execute(cn, PROJECT_NAME);
 
-        assert null != resp.getRows() : "null rows array";
-        assert resp.getRows().size() > 0 : "empty rows array";
-        assert resp.getRows().get(0).get("FirstName") instanceof Map : "FirstName column value was not a map";
+        assertNotNull("null rows array", resp.getRows());
+        assertNotEquals("empty rows array", 0, resp.getRows().size());
+        assertTrue("FirstName column value was not a map: " + resp.getRows().get(0).get("FirstName").getClass().getName(), resp.getRows().get(0).get("FirstName") instanceof Map);
         Map<String,Object> colMap = resp.getRows().get(0);
-        assert "Fred".equals(colMap.get("value")) : "FirstName.value contained '" + colMap.get("value") + "': expected 'Fred'";
+        assertEquals("FirstName.value is incorrect", "Fred", colMap.get("value"));
 
         log("Completed test of the new extended select results format.");
 
@@ -296,8 +297,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Testing maxrows=0...");
         selCmd.setMaxRows(0);
         resp = selCmd.execute(cn, PROJECT_NAME);
-        assert null != resp.getRows() : "Rows array was null! Expected an empty array.";
-        assert 0 == resp.getRows().size() : "Rows array contained " + resp.getRows().size() + " items: expected 0.";
+        assertNotNull("Rows array was null! Expected an empty array.", resp.getRows());
+        assertEquals("Too many rows when maxrows=0", 0, resp.getRows().size());
+
         log("Completed test of maxrows=0");
     }
 
