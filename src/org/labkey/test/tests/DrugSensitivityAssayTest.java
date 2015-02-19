@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.collections15.CollectionUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -24,6 +25,11 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class})
 public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
@@ -190,7 +196,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         clickAndWait(Locator.linkWithText("new 96 well (8x12) Drug Sensitivity default template"));
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);
+        setFormElement(nameField, PLATE_TEMPLATE_NAME);  sleep(100);
 
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
@@ -212,15 +218,19 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
 
-        assert(table.getDataRowCount() == 3);
+        assertEquals("Wrong number of rows", 3, table.getDataRowCount());
 
         // verify cutoff properties are pulled through
-        assert(table.getColumn("FitError") != -1);
-        assert(table.getColumn("Cutoff50/IC") != -1);
-        assert(table.getColumn("Cutoff50/Point") != -1);
-        assert(table.getColumn("Cutoff75/IC") != -1);
-        assert(table.getColumn("Cutoff75/Point") != -1);
-        assert(table.getColumn("Cutoff99/IC") != -1);
-        assert(table.getColumn("Cutoff99/Point") != -1);
+        Set<String> cutoffColumns = new HashSet<>(Arrays.asList(
+                "Fit Error",
+                "Curve IC50",
+                "Point IC50",
+                "Curve IC75",
+                "Point IC75",
+                "Curve IC99",
+                "Point IC99"));
+        Set<String> columnHeaders = new HashSet<>(table.getColumnHeaders());
+
+        assertEquals("Cutoff properties not present", cutoffColumns, new HashSet<>(CollectionUtils.intersection(cutoffColumns, columnHeaders)));
     }
 }
