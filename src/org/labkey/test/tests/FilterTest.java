@@ -414,7 +414,7 @@ public class FilterTest extends BaseWebDriverTest
             setUpFilter(regionName, columnName, filterType, filterValue);
         sleep(300);
         clickButton("OK",0);
-        assert(isElementPresent(Locator.extButton("OK")));
+        assertElementPresent(Locator.extButton("OK"));
         assertTextPresent(expectedError);
 
         clickButton("CANCEL", 0);

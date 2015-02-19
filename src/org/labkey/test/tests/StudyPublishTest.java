@@ -299,7 +299,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
-        assert(getElementCount(Locator.xpath("//table[@name='webpart']")) == 7);
+        assertElementPresent("Wrong number of WebParts", Locator.xpath("//table[@name='webpart']"), 7);
         waitForText("Test Wiki Title");
         //assertTextPresent("Test Wiki Title");
 
@@ -1206,11 +1206,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         Locator checkedCheckboxLocator = Locator.xpath("//div[contains(@class,'" + marker + "')]//div[contains(@class,'x-grid3-row-selected')]//span[@class='labkey-link']");
         List<WebElement> checkboxes = checkedCheckboxLocator.findElements(getDriver());
-        List<String> checkboxLabels = new ArrayList<>();
-        for(WebElement checkbox : checkboxes)
-        {
-            checkboxLabels.add(checkbox.getText());
-        }
-        assert(checkboxLabels.equals(expectedCheckboxes));
+        List<String> checkboxLabels = getTexts(checkboxes);
+        assertEquals("Wizard has wrong checkboxes checked", Arrays.asList(expectedCheckboxes), checkboxLabels);
     }
 }

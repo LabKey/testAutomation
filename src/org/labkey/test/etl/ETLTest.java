@@ -15,7 +15,6 @@
  */
 package org.labkey.test.etl;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
@@ -27,6 +26,8 @@ import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.io.File;
 import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class, Data.class})
 public class ETLTest extends ETLBaseTest
@@ -150,15 +151,15 @@ UNDONE: need to fix the merge case
         File etlFile = new File(dir.getAbsolutePath() + ETL_OUT_FILE);
         String fileContents = TestFileUtils.getFileContents(etlFile);
         String[] rows = fileContents.split("\r");
-        Assert.assertEquals("ETL output file did not contain header",rows[0], "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified");
-        assert(rows[1].contains("Subject 2"));
-        assert(rows[2].contains("Subject 3"));
+        assertEquals("ETL output file did not contain header", "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified", rows[0]);
+        assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
+        assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
         //file created by external pipeline
         File etlFile2 = new File(dir.getAbsolutePath() + ETL_OUT_FILE2);
         fileContents = TestFileUtils.getFileContents(etlFile2);
         rows = fileContents.split("\r");
-        assert(rows[1].contains("Subject 2"));
-        assert(rows[2].contains("Subject 3"));
+        assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
+        assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
         // be sure to check for all expected errors here so that the test won't fail on exit
         checkExpectedErrors(_expectedErrors);
     }

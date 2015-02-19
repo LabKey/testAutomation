@@ -122,7 +122,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
 
         DataRegionTable table = new DataRegionTable("Data", this);
 
-        assert(table.getDataRowCount() == 3);
+        assertEquals("Wrong number of rows", 3, table.getDataRowCount());
 
         testCopyToStudy();
     }

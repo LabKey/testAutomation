@@ -199,9 +199,8 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
         clickAndWait(Locator.linkContainingText("View Results"));
 
-        // verify the correct number of records
         DataRegionTable table = new DataRegionTable("Data", this);
-        assert(table.getDataRowCount() == 20);
+        assertEquals("Wrong number of records", 20, table.getDataRowCount());
 
         verifyGraphSettings();
     }

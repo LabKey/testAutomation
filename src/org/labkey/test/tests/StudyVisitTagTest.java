@@ -25,9 +25,10 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 @Category({DailyB.class, Study.class})
 public class StudyVisitTagTest extends StudyBaseTest
@@ -55,11 +56,6 @@ public class StudyVisitTagTest extends StudyBaseTest
     protected final String[] DATE_BASED_STUDIES = {DATE_FOLDER_STUDY1}; //, DATE_FOLDER_STUDY2, DATE_FOLDER_STUDY3, DATE_FOLDER_STUDY4, DATE_FOLDER_STUDY7, DATE_FOLDER_STUDY8};
     protected final String[] SINGLE_USE_TAG_ERRORS = {DATE_FOLDER_STUDY5}; //, DATE_FOLDER_STUDY6};
     protected final String[] VISIT_BASED_STUDIES = {VISIT_FOLDER_STUDY1}; //, VISIT_FOLDER_STUDY2, VISIT_FOLDER_STUDY3, VISIT_FOLDER_STUDY4, VISIT_FOLDER_STUDY5, VISIT_FOLDER_STUDY6, VISIT_FOLDER_STUDY7, VISIT_FOLDER_STUDY8};
-    protected final String[] VISIT_TAG_NAMES = {"day0", "finalvaccination", "finalvisit", "firstvaccination", "notsingleuse", "peakimmunogenicity"};
-    protected final String[] VISIT_TAG_CAPTIONS = {"Day 0 (meaning varies)", "Final Vaccination", "Final visit", "First Vaccination", "Not Single Use Tag", "Predicted peak immunogenicity visit"};
-    protected final String[] VISIT_TAG_MAP_TAGS = {"Day 0 (meaning varies)", "First Vaccination", "First Vaccination", "Final Vaccination", "Final Vaccination", "Final visit"};
-    protected final String[] VISIT_TAG_MAP_VISITS = {"Visit1", "Visit2", "Visit3", "Visit3", "Visit4", "Visit5"};
-    protected final String[] VISIT_TAG_MAP_COHORTS = {"", "Positive", "Negative", "Negative", "Positive", ""};
     protected final String WIKIPAGE_NAME = "VisitTagGetDataAPITest";
     protected final String TEST_DATA_API_PATH = "server/test/data/api";
     //TODO: placeholder, need to create a new test page with appropriate js to test getData api in this context
@@ -143,30 +139,28 @@ public class StudyVisitTagTest extends StudyBaseTest
     @Override
     protected void doVerifySteps() throws Exception
     {
+        final List<String> VISIT_TAG_NAMES = Arrays.asList("day0", "finalvaccination", "finalvisit", "firstvaccination", "notsingleuse", "peakimmunogenicity");
+        final List<String> VISIT_TAG_CAPTIONS = Arrays.asList("Day 0 (meaning varies)", "Final Vaccination", "Final visit", "First Vaccination", "Not Single Use Tag", "Predicted peak immunogenicity visit");
+        final List<String> VISIT_TAG_MAP_TAGS = Arrays.asList("Day 0 (meaning varies)", "First Vaccination", "First Vaccination", "Final Vaccination", "Final Vaccination", "Final visit");
+        final List<String> VISIT_TAG_MAP_VISITS = Arrays.asList("Visit1", "Visit2", "Visit3", "Visit3", "Visit4", "Visit5");
+        final List<String> VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", "Positive", "Negative", "Negative", "Positive", " ");
+
         goToProjectHome();
         DataRegionTable visitTags = getVisitTagTable();
         DataRegionTable visitTagMaps = getVisitTagMapTable();
         List<String> tagNames = visitTags.getColumnDataAsText("Name");
         List<String> tagCaptions = visitTags.getColumnDataAsText("Caption");
-        for(String tagName : VISIT_TAG_NAMES)
-        {
-            assert(tagNames.contains(tagName));
-        }
-        for(String tagCaption : VISIT_TAG_CAPTIONS)
-        {
-            assert(tagCaptions.contains(tagCaption));
-        }
+        assertEquals("Wrong Tag Names", VISIT_TAG_NAMES, tagNames);
+        assertEquals("Wrong Tag Names", VISIT_TAG_CAPTIONS, tagCaptions);
+
         //TODO: need to add a method to return an entire row from DataTable as delimited strings so we can do this more easily
-        int mapCount = visitTagMaps.getColumnCount();
         List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
-        for(int i = 0; i < mapCount; i++)
-        {
-            assert(tagMapNames.get(i).equals(VISIT_TAG_MAP_TAGS[i]));
-            assert(tagMapVisits.get(i).equals(VISIT_TAG_MAP_VISITS[i]));
-            assert(tagMapCohort.get(i).equals(VISIT_TAG_MAP_COHORTS[i]));
-        }
+
+        assertEquals("Wrong Tag Map Names", VISIT_TAG_MAP_TAGS, tagMapNames);
+        assertEquals("Wrong Tag Map Visits", VISIT_TAG_MAP_VISITS, tagMapVisits);
+        assertEquals("Wrong Tag Map Cohorts", VISIT_TAG_MAP_COHORTS, tagMapCohort);
 
         verifyInsertEditVisitTags();
     }

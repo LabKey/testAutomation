@@ -207,8 +207,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Ext4Helper.Locators.radiobutton(this, "File Upload"));
         Ext4CmpRef.waitForComponent(this, "filefield");
         Ext4FileFieldRef ff = Ext4FileFieldRef.create(this);
-        File sampleExcel = new File(TestFileUtils.getSampledataPath(), "HormoneAssay/HormoneAssayPivotData.xlsx");
-        assert sampleExcel.exists();
+        File sampleExcel = TestFileUtils.getSampleData("HormoneAssay/HormoneAssayPivotData.xlsx");
         ff.setToFile(sampleExcel);
 
         Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
