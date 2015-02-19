@@ -149,23 +149,12 @@ public class DataRegionTable
         return _test.isElementPresent(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]//tr[contains(@class, 'labkey-col-total')]"));
     }
 
-    private String getJSParam(String func, int i, boolean bStr)
+    public List<WebElement> getHeaderButtons()
     {
-        int lParen = func.indexOf("(");
-        int rParen = func.indexOf(")");
-        if (lParen == -1 || lParen > rParen)
-            return null;
+        Locator.CssLocator allButtonsLoc = Locator.css("#dataregion_header_row_" + _tableName + " a.labkey-button, #dataregion_header_row_" + _tableName + " a.labkey-menu-button");
+        List<WebElement> headerButtons = allButtonsLoc.findElements(_test.getDriver());
 
-        String[] params = func.substring(lParen + 1, rParen).split(",");
-        String param = params[i].trim();
-        if (!bStr)
-            return param;
-
-        if ((param.charAt(0) != '"' || param.charAt(param.length() - 1) != '"') &&
-                (param.charAt(0) != '\'' || param.charAt(param.length() - 1) != '\''))
-            return null;
-
-        return param.substring(1, param.length() - 1);
+        return headerButtons;
     }
 
     public int getDataRowCount()

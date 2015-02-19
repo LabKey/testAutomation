@@ -25,8 +25,10 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -205,54 +207,52 @@ public class StudyDataspaceTest extends StudyBaseTest
         verifyVisitTags();
     }
 
-    protected final String[] VISIT_TAG_MAP_TAGS = {"First Vaccination", "First Vaccination", "Second Vaccination", "Second Vaccination",
-                                                   "Follow Up", "Follow Up", "Second Vaccination", "First Vaccination", "Follow Up", "Follow Up",
-                                                   "Second Vaccination", "First Vaccination"};
-    protected final String[] VISIT_TAG_MAP_VISITS = {"Day 0", "Day 3", "Day 62", "Day 101", "Day -1377"};
-    protected final String[] VISIT_TAG_MAP_COHORTS = {"1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
-                                                      "1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen", ""};
-
-    protected final String[] STUDY5_VISIT_TAG_MAP_TAGS = {"Follow Up", "Follow Up", "Second Vaccination", "First Vaccination"};
-    protected final String[] STUDY5_VISIT_TAG_MAP_VISITS = {"Day -1377", "Day -1351", "Day -1316", "Day -1001"};
-    protected final String[] STUDY5_VISIT_TAG_MAP_COHORTS = {"", "", "", ""};
-
     private void verifyVisitTags()
     {
+        final List<String> VISIT_TAG_MAP_TAGS =
+                Arrays.asList("First Vaccination", "First Vaccination", "Second Vaccination", "Second Vaccination",
+                              "Follow Up", "Follow Up", "Second Vaccination", "First Vaccination", "Follow Up",
+                              "Follow Up", "Second Vaccination", "First Vaccination");
+        final List<String> VISIT_TAG_MAP_VISITS =
+                Arrays.asList("Day 0", "Day 3", "Day 62", "Day 101", "Day -1377", "Day -1351",
+                              "Day -1316", "Day -1001", "Day -1377", "Day -1351", "Day -1316", "Day -1001");
+        final List<String> VISIT_TAG_MAP_COHORTS =
+                Arrays.asList("1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
+                              "1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
+                              " ", " ", " ", " ", " ", " ", " ", " ");
+
         // Check visit tags
         clickFolder(getProjectName());
         _portalHelper.addQueryWebPart(VISIT_TAG_MAP_QWP_TITLE, "study", "VisitTagMap", null);
-        DataRegionTable visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
-        int mapCount = visitTagMaps.getColumnCount();
+        DataRegionTable visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this, false);
         List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
-        for(int i = 0; i < mapCount; i++)
-            assert(tagMapNames.get(i).equals(VISIT_TAG_MAP_TAGS[i]));
 
-        for(int i = 0; i < 5; i++)
-            assert(tagMapVisits.get(i).equals(VISIT_TAG_MAP_VISITS[i]));
+        assertEquals("Wrong Visit Tags", VISIT_TAG_MAP_TAGS, tagMapNames);
+        assertEquals("Wrong Visits", VISIT_TAG_MAP_VISITS, tagMapVisits);
+        assertEquals("Wrong Cohorts", VISIT_TAG_MAP_COHORTS, tagMapCohort);
 
-        for(int i = 0; i < 5; i++)
-            assert(tagMapCohort.get(i).equals(VISIT_TAG_MAP_COHORTS[i]));
+        List<WebElement> buttons = visitTagMaps.getHeaderButtons();
+        Assert.assertFalse("Should not be able to 'Insert New' into VisitTagMap from dataspace project", getTexts(buttons).contains("INSERT NEW"));
 
-        _portalHelper.removeWebPart("Product");
-        assertTextNotPresent("Insert New");     // Is there a better way to assert which controls a table has?
+
+        final List<String> STUDY5_VISIT_TAG_MAP_TAGS = Arrays.asList("Follow Up", "Follow Up", "Second Vaccination", "First Vaccination");
+        final List<String> STUDY5_VISIT_TAG_MAP_VISITS = Arrays.asList("Day -1377", "Day -1351", "Day -1316", "Day -1001");
+        final List<String> STUDY5_VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", " ", " ", " ");
 
         clickFolder(FOLDER_STUDY5);
         visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
         tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
-        for(int i = 0; i < 4; i++)
-            assert(tagMapNames.get(i).equals(STUDY5_VISIT_TAG_MAP_TAGS[i]));
 
-        for(int i = 0; i < 4; i++)
-            assert(tagMapVisits.get(i).equals(STUDY5_VISIT_TAG_MAP_VISITS[i]));
+        assertEquals("Wrong Visit Tags", STUDY5_VISIT_TAG_MAP_TAGS, tagMapNames);
+        assertEquals("Wrong Visits", STUDY5_VISIT_TAG_MAP_VISITS, tagMapVisits);
+        assertEquals("Wrong Cohorts", STUDY5_VISIT_TAG_MAP_COHORTS, tagMapCohort);
 
-        for(int i = 0; i < 4; i++)
-            assert(tagMapCohort.get(i).equals(STUDY5_VISIT_TAG_MAP_COHORTS[i]));
-
-        assertTextPresent("Insert New");
+        buttons = visitTagMaps.getHeaderButtons();
+        Assert.assertTrue("Should be able to 'Insert New' into VisitTagMap from dataspace study", getTexts(buttons).contains("INSERT NEW"));
 
         _portalHelper.removeWebPart("VisitTagMap");
         _portalHelper.addQueryWebPart(VISIT_TAG_QWP_TITLE, "study", "VisitTag", null);
