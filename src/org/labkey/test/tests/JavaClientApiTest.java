@@ -288,8 +288,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertNotNull("null rows array", resp.getRows());
         assertNotEquals("empty rows array", 0, resp.getRows().size());
         assertTrue("FirstName column value was not a map: " + resp.getRows().get(0).get("FirstName").getClass().getName(), resp.getRows().get(0).get("FirstName") instanceof Map);
-        Map<String,Object> colMap = resp.getRows().get(0);
-        assertEquals("FirstName.value is incorrect", "Fred", colMap.get("value"));
+        Map firstNameField = (Map)resp.getRows().get(0).get("FirstName");
+        assertEquals("FirstName.value is incorrect", "Fred", firstNameField.get("value"));
 
         log("Completed test of the new extended select results format.");
 
