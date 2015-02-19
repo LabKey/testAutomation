@@ -460,13 +460,10 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
 
     protected void assertData(boolean assertTextPresent, String... targets)
     {
-        for(String target : targets)
-        {
-            if (assertTextPresent)
-                assertTextPresent(target);
-            else
-                assertTextNotPresent(target);
-        }
+        if (assertTextPresent)
+            assertTextPresent(targets);
+        else
+            assertTextNotPresent(targets);
     }
 
     protected void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
