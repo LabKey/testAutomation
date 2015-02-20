@@ -52,19 +52,6 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Charting.class})
 public class ChartingAPITest extends BaseWebDriverTest
 {
-    protected static final String[] CHARTING_API_TITLES = {
-            "Line Plot - no y-scale defined",
-            "Line Plot - y-scale defined, no legend, no shape aes",
-            "Line Plot - No Layer AES, Changed Opacity",
-            "Two Axis Scatter, plot null points",
-            "Discrete X Scale Scatter No Geom Config",
-            "Discrete X Scale Scatter, Log Y",
-            "Boxplot no Geom Config",
-            "Boxplot No Outliers",
-            "Boxplot No Outliers, All Points",
-            "Barplot With Cumulative Totals",
-            "Base Pie Chart"
-    };
 
     @Override
     public BrowserType bestBrowser()
@@ -139,18 +126,70 @@ public class ChartingAPITest extends BaseWebDriverTest
     public void chartAPITest() throws Exception
     {
         goToChartingTestPage("chartTest2");
+        verifyChartAPIPlots(new String[]{
+            "Line Plot - no y-scale defined",
+            "Line Plot - y-scale defined, no legend, no shape aes",
+            "Line Plot - No Layer AES, Changed Opacity",
+            "Two Axis Scatter, plot null points",
+            "Discrete X Scale Scatter No Geom Config",
+            "Discrete X Scale Scatter, Log Y",
+            "Binned plot, hex shape",
+            "Binned plot, square shape",
+            "Boxplot no Geom Config",
+            "Boxplot No Outliers",
+            "Boxplot No Outliers, All Points"
+        });
+    }
 
-        //Some things we know about test 0. After this we loop through some others and just test to see if they convert
-        waitForText("Current Config");
+    @Test
+    public void customChartPlotWrapperTest() throws Exception
+    {
+        goToChartingTestPage("customPlotWrappers");
+        verifyChartAPIPlots(new String[]{
+            "Barplot With Cumulative Totals",
+            "Levey-Jennings Plot",
+            "Survival Curve Plot",
+            "Base Pie Chart"
+        });
+    }
+
+    private void verifyChartAPIPlots(String[] chartTitles) throws Exception
+    {
+        waitForElement(Locator.tagWithText("label", "Current Config:"));
 
         String testCountStr = getFormElement(Locator.id("configCount"));
         int testCount = Integer.parseInt(testCountStr);
         for (int currentTest = 0; currentTest < testCount; currentTest++)
         {
-            waitForText(CHARTING_API_TITLES[currentTest]);
+            waitForSvgText(chartTitles[currentTest]);
             checkSVGConversion();
             click(Ext4Helper.Locators.ext4Button("Next"));
         }
+    }
+
+    private void waitForSvgText(String title)
+    {
+        waitForSvgText(title, true);
+    }
+
+    private void waitForSvgText(String title, boolean wait)
+    {
+        Locator l = Locator.css("svg text").withText(title);
+        assertOrWait(l, wait);
+    }
+
+    private void assertErrorMessage(String msg, boolean wait)
+    {
+        Locator l = Locator.tagWithClass("div", "labkey-error").containing(msg);
+        assertOrWait(l, wait);
+    }
+
+    private void assertOrWait(Locator l, boolean wait)
+    {
+        if (wait)
+            waitForElement(l);
+        else
+            assertElementPresent(l);
     }
 
     private void checkSVGConversion() throws Exception
@@ -200,23 +239,23 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         goToChartingTestPage("exportGenericChartTest");
 
-        waitForText(SCATTER_ONE);
+        waitForSvgText(SCATTER_ONE);
         checkExportedChart(SCATTER_ONE, SCATTER_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(SCATTER_TWO);
+        waitForSvgText(SCATTER_TWO);
         checkExportedChart(SCATTER_TWO, SCATTER_TWO_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(BOX_ONE);
+        waitForSvgText(BOX_ONE);
         checkExportedChart(BOX_ONE, BOX_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(BOX_TWO);
+        waitForSvgText(BOX_TWO);
         checkExportedChart(BOX_TWO, BOX_TWO_TEXT, true);
 
         click(Locator.input("next-btn"));
-        waitForText("The measure Cohort was not found. It may have been renamed or removed.");
+        assertErrorMessage("The measure Cohort was not found. It may have been renamed or removed.", true);
         checkExportedChart(BOX_THREE, null, true, 0);
     }
 
@@ -239,43 +278,43 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         goToChartingTestPage("exportTimeChartTest");
 
-        waitForText(TIME_CHART_1);
+        waitForSvgText(TIME_CHART_1);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_1, false, 3, 0);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_2, false, 3, 1);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_3, false, 3, 2);
 
         click(Locator.input("next-btn"));
-        waitForText(TIME_CHART_2);
+        waitForSvgText(TIME_CHART_2);
         checkExportedChart(TIME_CHART_2, TIME_CHART_2_TEXT_1);
 
         click(Locator.input("next-btn"));
-        waitForText(TIME_CHART_3);
+        waitForSvgText(TIME_CHART_3);
         checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_1, false, 2, 0);
         checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_2, false, 2, 1);
 
         click(Locator.input("next-btn"));
-        waitForText(TIME_CHART_4);
+        waitForSvgText(TIME_CHART_4);
         checkExportedChart(TIME_CHART_4, TIME_CHART_4_TEXT_1, true);
-        assertTextPresent("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
+        assertErrorMessage("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", false);
 
         click(Locator.input("next-btn"));
-        waitForText(TIME_CHART_5);
+        waitForSvgText(TIME_CHART_5);
         checkExportedChart(TIME_CHART_5, TIME_CHART_5_TEXT_1, true);
-        assertTextPresent("The data limit for plotting has been reached. Consider filtering your data.");
-        assertTextPresent("No data found for the following measures/dimensions: IL-6");
+        assertErrorMessage("The data limit for plotting has been reached. Consider filtering your data.", false);
+        assertErrorMessage("No data found for the following measures/dimensions: IL-6", false);
 
         click(Locator.input("next-btn"));
-        waitForText("No measure selected. Please select at lease one measure.");
+        assertErrorMessage("No measure selected. Please select at lease one measure.", true);
         click(Locator.input("next-btn"));
-        waitForText("Could not find x-axis in chart measure information.");
+        assertErrorMessage("Could not find x-axis in chart measure information.", true);
         click(Locator.input("next-btn"));
-        waitForText("No participant selected. Please select at least one participant.");
+        assertErrorMessage("No participant selected. Please select at least one participant.", true);
         click(Locator.input("next-btn"));
-        waitForText("No group selected. Please select at least one group.");
+        assertErrorMessage("No group selected. Please select at least one group.", true);
         click(Locator.input("next-btn"));
-        waitForText("No series or dimension selected. Please select at least one series/dimension value.");
+        assertErrorMessage("No series or dimension selected. Please select at least one series/dimension value.", true);
         click(Locator.input("next-btn"));
-        waitForText("Please select either \"Show Individual Lines\" or \"Show Mean\".");
+        assertErrorMessage("Please select either \"Show Individual Lines\" or \"Show Mean\".", true);
     }
     protected static final String BOX_PLOT_COLOR_SHAPE = "Box Plot - Change outlier color/shape";
     protected static final String SCATTER_PLOT_SHAPE_COLOR_X = "Scatter - add shape/color change x";
@@ -298,42 +337,42 @@ public class ChartingAPITest extends BaseWebDriverTest
         Locator setAesBtn = Locator.input("set-aes-btn");
         goToChartingTestPage("setAesTest");
 
-        waitForText(BOX_PLOT_COLOR_SHAPE);
+        waitForSvgText(BOX_PLOT_COLOR_SHAPE);
         click(setAesBtn);
-        waitForText("119180");
-        assertTextPresent("Females");
+        waitForSvgText("119180");
+        waitForSvgText("Females");
 
         click(nextBtn);
-        waitForText(SCATTER_PLOT_SHAPE_COLOR_X);
+        waitForSvgText(SCATTER_PLOT_SHAPE_COLOR_X);
         assertSVG(SCATTER_PLOT_SHAPE_COLOR_X_SVG_BEFORE);
         click(setAesBtn);
-        waitForText("103866");
+        waitForSvgText("103866");
         assertSVG(SCATTER_PLOT_SHAPE_COLOR_X_SVG_AFTER);
 
         click(nextBtn);
-        waitForText(SCATTER_HOVER_CLICK);
+        waitForSvgText(SCATTER_HOVER_CLICK);
         click(Locator.css("svg g a path"));
-        waitForText("Look a click handler!");
+        waitForElement(Locator.css(".x4-window div").withText("Look a click handler!"));
         clickButton("OK", 0);
         click(setAesBtn);
         click(Locator.css("svg g a path"));
-        waitForText("The click handler has changed!");
+        waitForElement(Locator.css(".x4-window div").withText("The click handler has changed!"));
         clickButton("OK", 0);
 
         click(nextBtn);
-        waitForText(LINE_ERROR_COLOR_Y);
+        waitForSvgText(LINE_ERROR_COLOR_Y);
         click(setAesBtn);
-        waitForText("Alan");
+        waitForSvgText("Alan");
         assertSVG(LINE_ERROR_COLOR_Y_SVG);
 
         click(nextBtn);
-        waitForText(SCATTER_REMOVE_LEGEND);
+        waitForSvgText(SCATTER_REMOVE_LEGEND);
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_BEFORE);
         click(setAesBtn);
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_AFTER);
 
         click(nextBtn);
-        waitForText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
+        waitForSvgText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
         assertSVG(BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG);
 
         List<WebElement> points;
@@ -359,7 +398,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         Actions builder = new Actions(getDriver());
         List<WebElement> points;
         goToChartingTestPage("interactivityTest");
-        waitForText("Interactive Plot");
+        waitForSvgText("Interactive Plot");
 
         /*
         The points on the scatter plot are split into two groups. Each 10 points wide and 20 points tall, for a
@@ -390,7 +429,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         Actions builder = new Actions(getDriver());
         List<WebElement> points;
         goToChartingTestPage("interactivityTest");
-        waitForText("Interactive Plot");
+        waitForSvgText("Interactive Plot");
 
         // Brush from the top left point of the left group, to the bottom right point of the left group.
         points = Locator.css("svg g a path").findElements(getDriver());
@@ -423,7 +462,7 @@ public class ChartingAPITest extends BaseWebDriverTest
 
         Actions builder = new Actions(getDriver());
         goToChartingTestPage("interactivityTest");
-        waitForText("Interactive Plot");
+        waitForSvgText("Interactive Plot");
 
         WebElement xRightHandle = Locator.css(".x-axis-handle .resize.e").findElement(getDriver());
         WebElement yTopHandle = Locator.css(".y-axis-handle .resize.n").findElement(getDriver());
@@ -610,7 +649,7 @@ public class ChartingAPITest extends BaseWebDriverTest
 
         if (svgCount > 0)
         {
-            assertTextPresent(title);
+            waitForSvgText(title, false);
             assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
         }
         else

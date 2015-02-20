@@ -59,6 +59,7 @@ modules/chartingapi/module.properties -text
 modules/chartingapi/resources/views/begin.html -text
 modules/chartingapi/resources/views/chartTest.html -text
 modules/chartingapi/resources/views/chartTest2.html -text
+modules/chartingapi/resources/views/customPlotWrappers.html -text
 modules/chartingapi/resources/views/exportGenericChartTest.html -text
 modules/chartingapi/resources/views/exportTimeChartTest.html -text
 modules/chartingapi/resources/views/interactivityTest.html -text
