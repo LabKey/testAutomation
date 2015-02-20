@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import com.google.common.base.Function;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -452,9 +453,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
-        prepForPageLoad();
         resaveReport();
-        waitForPageToLoad();
 
         log("Check that edit worked");
         clickProject(getProjectName());
@@ -472,9 +471,7 @@ public class DataReportsTest extends ReportTest
         waitForText(R_SCRIPT2_TEXT2);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
-        prepForPageLoad();
         resaveReport();
-        waitForPageToLoad();
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
@@ -521,7 +518,16 @@ public class DataReportsTest extends ReportTest
 
     private void resaveReport()
     {
-        saveReport(null);
+        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                saveReport(null);
+                return null;
+            }
+        });
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void clickViewTab()
