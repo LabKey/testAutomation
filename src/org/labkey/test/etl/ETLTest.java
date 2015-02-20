@@ -46,14 +46,11 @@ public class ETLTest extends ETLBaseTest
     private static final File TRANSFORM_REMOTE_STUDY = new File(TestFileUtils.getSampledataPath(), "dataintegration/ETLTestStudy.zip");
     private static final File TransformXMLdest = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/simpletest/ETLs");
     private static final File TransformXMLsrc = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/ETLtest/ETLs");
-    private static final String PROJECT_NAME = "ETLTestProject";
-    private final String ETL_OUT_FILE = "/etlOut/report.testIn.tsv";
-    private final String ETL_OUT_FILE2 = "/etlOut/report.testOut.tsv";
 
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "ETLTestProject";
     }
 
     protected void doCleanup() throws Exception
@@ -148,14 +145,14 @@ UNDONE: need to fix the merge case
         dir.mkdirs();
         setPipelineRoot(dir.getAbsolutePath());
         runETL("targetFile");
-        File etlFile = new File(dir.getAbsolutePath() + ETL_OUT_FILE);
+        File etlFile = new File(dir, "etlOut/report.testIn.tsv");
         String fileContents = TestFileUtils.getFileContents(etlFile);
         String[] rows = fileContents.split("\r");
         assertEquals("ETL output file did not contain header", "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified", rows[0]);
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
         assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
         //file created by external pipeline
-        File etlFile2 = new File(dir.getAbsolutePath() + ETL_OUT_FILE2);
+        File etlFile2 = new File(dir, "etlOut/report.testOut.tsv");
         fileContents = TestFileUtils.getFileContents(etlFile2);
         rows = fileContents.split("\r");
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);

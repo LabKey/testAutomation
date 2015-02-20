@@ -4176,34 +4176,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return values;
     }
 
-    public void assertOptionsAvailable(Locator loc, String... expectedOptions)
-    {
-        List<String> availableOptions = getSelectOptions(loc);
-        for(String option : expectedOptions)
-        {
-            assert(availableOptions.contains(option));
-        }
-    }
-
-    public void assertOptionUnavailable(Locator loc, String... unexpectedOptions)
-    {
-        List<String> availableOptions = getSelectOptions(loc);
-        for(String option: unexpectedOptions)
-        {
-            assert(!availableOptions.contains(option));
-        }
-    }
-
     public List<String> getSelectOptions(Locator loc)
     {
-        List<String> options = new ArrayList<>();
         Select select = new Select(loc.findElement(getDriver()));
-        List<WebElement> selectElements = select.getOptions();
-        for(WebElement selectElement : selectElements)
-        {
-            options.add(selectElement.getText());
-        }
-        return options;
+        List<WebElement> selectOptions = select.getOptions();
+        return getTexts(selectOptions);
     }
 
     public void assertElementNotPresent(String errorMsg, Locator loc)
