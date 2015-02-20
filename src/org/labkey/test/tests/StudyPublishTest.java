@@ -299,7 +299,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
-        assertElementPresent("Wrong number of WebParts", Locator.xpath("//table[@name='webpart']"), 7);
+        assertElementPresent("Wrong number of WebParts", Locator.xpath("//table[@name='webpart']"), 8);
         waitForText("Test Wiki Title");
         //assertTextPresent("Test Wiki Title");
 
