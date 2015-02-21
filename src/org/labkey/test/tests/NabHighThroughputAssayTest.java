@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 LabKey Corporation
+ * Copyright (c) 2013-2014 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -26,19 +30,20 @@ import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Assays.class})
-public class NabHighThroughputAssayTest extends AbstractAssayTest
+public class NabHighThroughputAssayTest extends BaseWebDriverTest
 {
-    private final static String TEST_ASSAY_PRJ_NAB = "Nab High Throughput Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
     private static final String PLATE_TEMPLATE_NAME = "NabHighThroughputAssayTest Template";
-
-    private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
     protected static final String MULTI_FILE_ASSAY_NAB = "MultiFileHighThroughputNab";
     protected static final String MULTI_FILE_ASSAY_NAB_DESC = "Description for Multi File High Throughput NAb assay";
@@ -46,41 +51,25 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     protected static final String SINGLE_FILE_ASSAY_NAB = "SingleFileHighThroughputNab";
     protected static final String SINGLE_FILE_ASSAY_NAB_DESC = "Description for Single File High Throughput NAb assay";
 
-    protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
-    private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
+    protected final File TEST_ASSAY_NAB_METADATA_FILE = TestFileUtils.getSampleData("Nab/NVITAL (short) metadata.xlsx");
+    protected final File TEST_ASSAY_NAB_DATA_FILE = TestFileUtils.getSampleData("Nab/NVITAL (short) test data.xlsx");
+    protected final File COMBINED_NAB_DATA_FILE = TestFileUtils.getSampleData("Nab/NVITAL (short) single file.xlsx");
 
-    protected final String TEST_ASSAY_NAB_METADATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) metadata.xlsx";
-    protected final String TEST_ASSAY_NAB_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) test data.xlsx";
-
-    protected final String COMBINED_NAB_DATA_FILE = TestFileUtils.getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) single file.xlsx";
-
-    @Override
-    protected void runUITests() throws Exception
+    @BeforeClass
+    public static void setupProject()
     {
-        doCreateSteps();
-        doVerifySteps();
+        NabHighThroughputAssayTest init = (NabHighThroughputAssayTest)getCurrentTest();
+        init.doInit();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    protected void doCreateSteps()
+    protected void doInit()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         //create a new test project
-        _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
-
-        //setup a pipeline for it
-        setupPipeline(TEST_ASSAY_PRJ_NAB);
-
-        // create a study so we can test copy-to-study later:
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
-        addWebPart("Study Overview");
-        clickButton("Create Study");
-        clickButton("Create Study");
-
-        //add the Assay List web part so we can create a new nab assay
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        addWebPart("Assay List");
+        _containerHelper.createProject(getProjectName(), null);
+        portalHelper.addWebPart("Assay List");
+        clickProject(getProjectName());
 
         //create a new nab assay
         clickButton("Manage Assays");
@@ -88,18 +77,16 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickButton("Configure Plate Templates");
         clickAndWait(Locator.linkWithText("new 384 well (16x24) NAb high-throughput (single plate dilution) template"));
 
-        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[@id='templateName']"), PLATE_TEMPLATE_NAME);
+        Locator.IdLocator nameField = Locator.id("templateName");
+        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
+        setFormElement(nameField, PLATE_TEMPLATE_NAME);
+        fireEvent(nameField, SeleniumEvent.change);
 
         clickButton("Save & Close");
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
-        addWebPart("Assay List");
-
-        createAssay(MULTI_FILE_ASSAY_NAB, MULTI_FILE_ASSAY_NAB_DESC, false);
-        createAssay(SINGLE_FILE_ASSAY_NAB, SINGLE_FILE_ASSAY_NAB_DESC, true);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB, null);
+        portalHelper.addWebPart("Assay List");
     }
 
     private void createAssay(String name, String description, boolean singleFile)
@@ -123,49 +110,31 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickButton("Save & Close");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void doVerifySteps()
+    @Before
+    public void preTest()
     {
-        doMultiFileTest();
-        doSingleFileTest();
-        doResolverTypeTest();
-    }
-
-    @LogMethod
-    private void doResolverTypeTest()
-    {
-        doResolverTypeTest(MULTI_FILE_ASSAY_NAB);
-        doResolverTypeTest(SINGLE_FILE_ASSAY_NAB);
-    }
-
-    @LogMethod
-    private void doResolverTypeTest(String assayName)
-    {
-        // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
-        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickProject(getProjectName());
         clickFolder(TEST_ASSAY_FLDR_NAB);
-        clickAndWait(Locator.linkWithText(assayName));
-        clickButton("Import Data");
-        assertElementNotPresent(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
-        clickButton("Cancel");
     }
 
-    @LogMethod
-    private void doMultiFileTest()
+    @Test
+    public void testMultiFile()
     {
+        createAssay(MULTI_FILE_ASSAY_NAB, MULTI_FILE_ASSAY_NAB_DESC, false);
         doNAbTest(MULTI_FILE_ASSAY_NAB, TEST_ASSAY_NAB_DATA_FILE, TEST_ASSAY_NAB_METADATA_FILE);
     }
 
-    @LogMethod
-    private void doSingleFileTest()
+    @Test
+    public void testSingleFile()
     {
+        createAssay(SINGLE_FILE_ASSAY_NAB, SINGLE_FILE_ASSAY_NAB_DESC, true);
         doNAbTest(SINGLE_FILE_ASSAY_NAB, COMBINED_NAB_DATA_FILE, null);
     }
 
     @LogMethod
-    private void doNAbTest(String assayName, String dataFileName, @Nullable String metadataFileName)
+    private void doNAbTest(String assayName, File dataFile, @Nullable File metadataFile)
     {
-        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickProject(getProjectName());
         clickFolder(TEST_ASSAY_FLDR_NAB);
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -175,34 +144,36 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement("cutoff1", "50");
-        setFormElement("cutoff2", "70");
+        setFormElement(Locator.name("cutoff1"), "50");
+        setFormElement(Locator.name("cutoff2"), "70");
         selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
 
-        if(metadataFileName != null)
+        if(metadataFile != null)
         {
-            File metadata = new File(metadataFileName);
-            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile__']"), metadata);
+            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile__']"), metadataFile);
         }
 
-        File data = new File(dataFileName);
-        setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), data);
+        setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), dataFile);
 
-        clickButton("Save and Finish");
+        clickButton("Save and Finish", longWaitForPage);
 
         // verify expected sample names and virus names
+        List<String> expectedTexts = new ArrayList<>();
         for (int i=1; i <= 20; i++)
-            assertTextPresent("SPECIMEN-" + i);
-
+            expectedTexts.add("SPECIMEN-" + i);
         for (int i=1; i <= 3; i++)
-            assertTextPresent("VIRUS-" + i);
+            expectedTexts.add("VIRUS-" + i);
+
+        assertTextPresent(expectedTexts);
 
         clickAndWait(Locator.linkContainingText("View Results"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
-        assertEquals("Wrong number of records", 20, table.getDataRowCount());
+        assertEquals("Wrong number of records", 60, table.getDataRowCount()); // 20 specimens x 3 viruses
 
         verifyGraphSettings();
+
+        verifyResolverTypes();
     }
 
     @LogMethod
@@ -293,23 +264,35 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
     }
 
+    private void verifyResolverTypes()
+    {
+        // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
+        clickAndWait(Locator.linkWithText("Import Data"));
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        clickButton("Cancel");
+    }
 
     @Override
     protected String getProjectName()
     {
-        return TEST_ASSAY_PRJ_NAB;
+        return "Nab High Throughput Test Verify Project";
     }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
-        deleteDir(getTestTempDir());
     }
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("Nab");
     }
 }
