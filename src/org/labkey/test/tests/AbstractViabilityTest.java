@@ -51,8 +51,6 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         deleteProject(getProjectName(), afterTest);
         try{deleteEngine();}
         catch(Throwable ignored) {}
-
-        deleteDir(getTestTempDir());
     }
 
     protected void initializeStudyFolder(String... tabs)

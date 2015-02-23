@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -117,7 +118,6 @@ public class AssayTest extends AbstractAssayTest
 
         //delete user accounts
         deleteUsers(afterTest, TEST_ASSAY_USR_PI1, TEST_ASSAY_USR_TECH1);
-        deleteDir(getTestTempDir());
     } //doCleanup()
 
     /**
@@ -126,8 +126,8 @@ public class AssayTest extends AbstractAssayTest
      *  defines an Assay at the project level; uploads run data as a labtech; publishes
      *  as a PI, and tests to make sure that security is properly enforced
      */
-    @LogMethod
-    protected void runUITests()
+    @Test
+    public void testAssaySecurity()
     {
         log("Starting Assay security scenario tests");
         setupEnvironment();

@@ -16,12 +16,12 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.collections15.CollectionUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -32,7 +32,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 @Category({DailyB.class})
-public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
+public class DrugSensitivityAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PROJECT = "Drug Sensitivity Test Verify Project";
     private static final String PLATE_TEMPLATE_NAME = "DrugSensitivityAssayTest Template";
@@ -48,8 +48,8 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
     protected final String TEST_ASSAY_DATA_ACQUISITION_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition2.xlsx";
     protected final String TEST_ASSAY_DATA_ACQUISITION_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition3.xlsx";
 
-    @Override @LogMethod
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests()
     {
         PortalHelper portalHelper = new PortalHelper(this);
 
@@ -188,7 +188,6 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         return TEST_ASSAY_PROJECT;
     }
 
-    @Override
     protected void createTemplate()
     {
         clickButton("Manage Assays");

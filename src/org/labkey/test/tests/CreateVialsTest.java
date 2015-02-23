@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -60,19 +61,12 @@ public class CreateVialsTest extends AbstractViabilityTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteDir(getTestTempDir());
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    @Override
-    protected void cleanUp()
+    public void validateQueries(boolean validateSubfolders)
     {
         // Disable the Letvin module so the study queries don't cause the query validation to fail.
         _containerHelper.disableModules("Letvin");
 
-        super.cleanUp();
+        super.validateQueries(true);
     }
 
     @Override
@@ -102,8 +96,8 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertEquals(" ", table.getDataAsText(1, "External Id"));
     }
 
-    @Override
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests()
     {
         // Create study with 'Letvin' module activated
         initializeStudyFolder("Letvin");

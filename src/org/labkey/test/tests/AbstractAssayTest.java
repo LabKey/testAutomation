@@ -16,20 +16,20 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
-
-import static org.junit.Assert.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
- * This class does not leave enough flexibility in test design.
  */
 @Deprecated
-public abstract class AbstractAssayTest extends SimpleApiTest
+public abstract class AbstractAssayTest extends BaseWebDriverTest
 {
     //constants added for security tests
     protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
@@ -65,6 +65,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
+        dir.delete();
         dir.mkdirs();
 
         setPipelineRoot(dir.getAbsolutePath());
@@ -247,11 +248,6 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickButton("Save");
     }
 
-    protected File[] getTestFiles()
-    {
-        return new File[0];
-    }
-
     protected void setRequired(String where, int index)
     {
         String prefix = getPropertyXPath(where);
@@ -265,5 +261,11 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
         clickButton("Study Security", defaultWaitForPage);
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("study");
     }
 }

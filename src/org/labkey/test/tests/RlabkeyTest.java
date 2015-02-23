@@ -15,12 +15,16 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -30,7 +34,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyB.class})
-public class RlabkeyTest extends SimpleApiTest
+public class RlabkeyTest extends BaseWebDriverTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
@@ -42,8 +46,14 @@ public class RlabkeyTest extends SimpleApiTest
     private static final String ISSUE_TITLE_1 = "Rlabkey: Issue in the subfolder";
     private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
 
-    @Override
-    public void runUITests() throws Exception
+    @BeforeClass
+    public static void setupProject()
+    {
+        RlabkeyTest init = (RlabkeyTest)getCurrentTest();
+        init.doInit();
+    }
+
+    public void doInit()
     {
         log("Create Projects");
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -95,14 +105,14 @@ public class RlabkeyTest extends SimpleApiTest
         _rReportHelper.ensureRConfig();
     }
 
-    @Override
-    public void runApiTests() throws Exception
+    @Test
+    public void testRlabkey()
     {
         File testData = new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml");
         if (testData.exists())
         {
             // cheating here, to use the api test framework to store rlabkey tests
-            List<ApiTestCase> tests = parseTests(testData);
+            List<APITestHelper.ApiTestCase> tests = APITestHelper.parseTests(testData);
 
             if (!tests.isEmpty())
             {
@@ -114,7 +124,7 @@ public class RlabkeyTest extends SimpleApiTest
                 File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");
                 String pathCmd = String.format(LIBPATH_OVERRIDE, libPath.getAbsolutePath().replaceAll("\\\\", "/"));
 
-                for (ApiTestCase test : tests)
+                for (APITestHelper.ApiTestCase test : tests)
                 {
                     StringBuilder sb = new StringBuilder(pathCmd);
 
@@ -133,12 +143,6 @@ public class RlabkeyTest extends SimpleApiTest
                 _rReportHelper.saveReport("dummy");
             }
         }
-    }
-
-    @Override
-    protected File[] getTestFiles()
-    {
-        return new File[]{new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/rlabkey-api.xml")};
     }
 
     @Override

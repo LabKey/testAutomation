@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -24,6 +25,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -181,10 +183,19 @@ public class NabAssayTest extends AbstractQCAssayTest
         return BrowserType.CHROME;
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        deleteProject(getProjectName(), afterTest);
+        try{deleteEngine();}
+        catch(Throwable ignore) {}
+    } //doCleanup()
+
     /**
      * Performs Nab designer/upload/publish.
      */
-    protected void runUITests()
+    @Test
+    public void runUITests() throws Exception
     {
         log("Starting Assay BVT Test");
         //revert to the admin user
@@ -495,7 +506,6 @@ public class NabAssayTest extends AbstractQCAssayTest
      * previously, assays sometimes failed to find their source files after a folder move
      * this test verifies the fix
      */
-
     @LogMethod
     private void moveAssayFolderTest()
     {
@@ -571,6 +581,24 @@ public class NabAssayTest extends AbstractQCAssayTest
         setWikiSource("runNabAssayTest({renderTo : 'testDiv'})");
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
+
+        APITestHelper apiTester = new APITestHelper(this);
+        apiTester.setTestFiles(new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/nab-api.xml"));
+        apiTester.setIgnoredElements(getIgnoredElements());
+    }
+
+    protected Pattern[] getIgnoredElements()
+    {
+        return new Pattern[] {
+                Pattern.compile("RunProperties", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("RunGroups", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("Input", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("Batch", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("Output", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("Links", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("runId", Pattern.CASE_INSENSITIVE),
+                Pattern.compile("assayId", Pattern.CASE_INSENSITIVE)
+        };
     }
 
     private void assertStudyData(int ptidCount)
@@ -730,20 +758,6 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertEquals(" ", table.getDataAsText(1, CURVE_IC70_STUDY_COL_TITLE)); //IC70 = blank
     }
 
-    /**
-     * Cleanup entry point.
-     * @param afterTest
-     */
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        ensureSignedInAsAdmin();
-        deleteProject(getProjectName(), afterTest);
-        try{deleteEngine();}
-        catch(Throwable T) {}
-
-        deleteDir(getTestTempDir());
-    } //doCleanup()
-
     @LogMethod
     protected void runTransformTest()
     {
@@ -787,29 +801,6 @@ public class NabAssayTest extends AbstractQCAssayTest
         {
             assertEquals("0.0", table.getDataAsText(i, "Fit Error"));
         }
-    }
-
-    @Override
-    protected Pattern[] getIgnoredElements()
-    {
-        return new Pattern[] {
-            Pattern.compile("RunProperties", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("RunGroups", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Input", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Batch", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Output", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Links", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("runId", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("assayId", Pattern.CASE_INSENSITIVE)
-        };
-    }
-
-    @Override
-    protected File[] getTestFiles()
-    {
-        return new File[] {
-            new File(TestFileUtils.getLabKeyRoot() + "/server/test/data/api/nab-api.xml")
-        };
     }
 
     protected void verifyRunDetails()

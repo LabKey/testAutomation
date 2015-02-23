@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -58,7 +59,8 @@ public class ViabilityTest extends AbstractViabilityTest
         return ASSAY_NAME;
     }
 
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests() throws Exception
     {
         // setup a scripting engine to run a java transform script
         prepareProgrammaticQC();

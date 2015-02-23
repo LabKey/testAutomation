@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -75,7 +76,8 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     /**
      * Performs Nab Thaw List Default save/apply at upload.
      */
-    protected void runUITests()
+    @Test
+    public void runUITests()
     {
         log("Testing NAb Assay Designer with Thaw List default");
          _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);

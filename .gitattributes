@@ -394,7 +394,6 @@ src/org/labkey/test/tests/AbstractAssayTest.java -text
 src/org/labkey/test/tests/AbstractExportTest.java -text
 src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractMS2ImportTest.java -text
-src/org/labkey/test/tests/AbstractPlateBasedAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
@@ -574,6 +573,7 @@ src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
 src/org/labkey/test/unsupported/PeptideModuleTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
+src/org/labkey/test/util/APITestHelper.java -text
 src/org/labkey/test/util/APIUserHelper.java -text
 src/org/labkey/test/util/AbstractAssayHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text

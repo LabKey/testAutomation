@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -63,15 +64,8 @@ public class ModuleAssayTest extends AbstractAssayTest
         return BrowserType.CHROME;
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteDir(getTestTempDir());
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    @Override
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests() throws Exception
     {
         log("Starting ModuleAssayTest");
 

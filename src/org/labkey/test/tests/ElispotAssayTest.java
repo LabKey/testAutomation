@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -38,7 +39,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @Category({DailyB.class, Assays.class})
-public class ElispotAssayTest extends AbstractPlateBasedAssayTest
+public class ElispotAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_ELISPOT = "Elispot Test Verify Project";
 
@@ -74,8 +75,8 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     /**
      * Performs Luminex designer/upload/publish.
      */
-    @LogMethod
-    protected void runUITests()
+    @Test
+    public void runUITests()
     {
         log("Starting Elispot Assay BVT Test");
 
@@ -365,16 +366,13 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        ensureSignedInAsAdmin();
         super.doCleanup(afterTest);
 
         try
         {
             deleteEngine();
         }
-        catch(Throwable T) {}
-
-        deleteDir(getTestTempDir());
+        catch(Exception ignore) {}
     } //doCleanup()
 
     protected void runTransformTest()

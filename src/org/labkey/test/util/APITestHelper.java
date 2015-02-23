@@ -1,0 +1,286 @@
+package org.labkey.test.util;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
+import org.labkey.query.xml.ApiTestsDocument;
+import org.labkey.query.xml.TestCaseType;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.fail;
+
+public class APITestHelper
+{
+    BaseWebDriverTest test;
+    JSONHelper jsonHelper = null;
+    File[] testFiles;
+
+    public APITestHelper(BaseWebDriverTest test)
+    {
+        this.test = test;
+    }
+
+    public void setTestFiles(File... testFiles)
+    {
+        this.testFiles = testFiles;
+    }
+
+    public void setIgnoredElements(Pattern[] ignoredElements)
+    {
+        jsonHelper = new JSONHelper(test, ignoredElements);
+    }
+
+    public void runApiTests() throws Exception
+    {
+        if (testFiles != null && testFiles.length > 0)
+        {
+            if (jsonHelper == null)
+                jsonHelper = new JSONHelper(test, new Pattern[0]);
+
+            int tests = 0;
+            for (File testFile : testFiles)
+            {
+                if (testFile.exists())
+                {
+                    for (ApiTestCase testCase : parseTests(testFile))
+                    {
+                        tests++;
+                        test.log("Starting new test case: \"" + StringUtils.trimToEmpty(testCase.getName()) + "\" in file " + testFile.getPath());
+                        sendRequestDirect(testFile.getName(), testCase.getUrl(), testCase.getType(), testCase.getFormData(), testCase.getReponse(), testCase.isFailOnMatch(), null, null, false);
+                        test.log("test case completed");
+                    }
+                }
+            }
+            test.log("Finished running recorded tests, a total of " + tests + " were completed");
+        }
+    }
+
+    public static List<ApiTestCase> parseTests(File testFile)
+    {
+        try
+        {
+            List<ApiTestCase> tests = new ArrayList<>();
+            ApiTestsDocument doc = ApiTestsDocument.Factory.parse(testFile);
+
+            if (doc != null)
+            {
+                for (TestCaseType testCase : doc.getApiTests().getTestArray())
+                {
+                    tests.add(parseTestCase(testCase));
+                }
+            }
+            return tests;
+        }
+        catch (Exception e)
+        {
+            fail("An unexpected error occurred: " + e.getMessage());
+        }
+        return Collections.emptyList();
+    }
+
+    private static ApiTestCase parseTestCase(TestCaseType element)
+    {
+        ApiTestCase testCase = new ApiTestCase();
+
+        String type = element.getType();
+        if ("get".equalsIgnoreCase(type))
+            testCase.setType(ActionType.get);
+        else if ("post".equalsIgnoreCase(type))
+            testCase.setType(ActionType.post);
+        else
+            throw new RuntimeException("Invalid test type, only 'GET' or 'POST' types are allowed");
+
+        testCase.setName(element.getName());
+        testCase.setFailOnMatch(element.getFailOnMatch());
+
+        String url = element.getUrl();
+        if (url != null)
+            testCase.setUrl(StringUtils.trim(url));
+        else
+            fail("Test case did not have the required url element");
+
+        String response = element.getResponse();
+        if (response != null)
+            testCase.setReponse(StringUtils.trim(response));
+
+        String formData = element.getFormData();
+        if (formData != null)
+            testCase.setFormData(StringUtils.trim(formData));
+
+        return testCase;
+    }
+
+    private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException
+    {
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpUriRequest method = null;
+        HttpResponse response = null;
+        String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
+
+        switch (type)
+        {
+            case get:
+                method = new HttpGet(requestUrl);
+                break;
+            case post:
+                method = new HttpPost(requestUrl);
+                ((HttpPost)method).setEntity(new StringEntity(formData, "application/json", "UTF-8"));
+                break;
+        }
+
+        try (CloseableHttpClient client = (CloseableHttpClient)(
+                username == null ?
+                        WebTestHelper.getHttpClient() :
+                        WebTestHelper.getHttpClient(username, password)))
+        {
+
+            response = client.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
+            String responseBody = WebTestHelper.getHttpResponseBody(response);
+            if (status == HttpStatus.SC_OK || acceptErrors)
+            {
+                jsonHelper.assertEquals("FAILED: test " + name, expectedResponse, responseBody);
+            }
+            else
+                fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, responseBody != null ? "\n" + responseBody : ""));
+        }
+        catch (IOException e)
+        {
+            fail("Test failed requesting the URL: " + e.getMessage());
+        }
+        finally
+        {
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
+        }
+    }
+
+    private void sendRequest(String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch)
+    {
+        switch (type)
+        {
+            case get:
+                test.setFormElement("txtUrlGet", url);
+                test.click(Locator.xpath("//input[@id='btnGet']"));
+                break;
+            case post:
+                test.setFormElement("txtUrlPost", url);
+                test.setFormElement("txtPost", StringUtils.trimToEmpty(formData));
+                test.click(Locator.xpath("//input[@id='btnPost']"));
+                break;
+        }
+
+        if (test.isElementPresent(Locator.xpath("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
+            fail("The request has failed: " + url);
+
+        test.waitForText("Request Complete", test.getDefaultWaitForPage());
+
+        // Once response has loaded, check it, also check 'Request Complete'
+        if (!StringUtils.isEmpty(expectedResponse))
+        {
+            if (failOnMatch)
+                test.assertElementNotPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
+            else
+                test.assertElementPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
+
+            test.assertTextPresent("Request Complete.");
+        }
+
+        // clear all the forms elements
+        test.setFormElement("txtUrlGet", "");
+        test.setFormElement("txtUrlPost", "");
+        test.setFormElement("txtPost", "");
+    }
+
+    enum ActionType {
+        get,
+        post
+    }
+
+    public static class ApiTestCase
+    {
+        private String _name;
+        private ActionType _type;
+        private String _url;
+        private String _reponse;
+        private String _formData;
+        private boolean _failOnMatch;
+
+        public String getName()
+        {
+            return _name;
+        }
+
+        public void setName(String name)
+        {
+            _name = name;
+        }
+
+        public ActionType getType()
+        {
+            return _type;
+        }
+
+        public void setType(ActionType type)
+        {
+            _type = type;
+        }
+
+        public String getUrl()
+        {
+            return _url;
+        }
+
+        public void setUrl(String url)
+        {
+            _url = url;
+        }
+
+        public String getReponse()
+        {
+            return _reponse;
+        }
+
+        public void setReponse(String reponse)
+        {
+            _reponse = reponse;
+        }
+
+        public boolean isFailOnMatch()
+        {
+            return _failOnMatch;
+        }
+
+        public void setFailOnMatch(boolean failOnMatch)
+        {
+            _failOnMatch = failOnMatch;
+        }
+
+        public String getFormData()
+        {
+            return _formData;
+        }
+
+        public void setFormData(String formData)
+        {
+            _formData = formData;
+        }
+    }
+}

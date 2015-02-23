@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -58,8 +59,8 @@ public class ElisaAssayTest extends ElispotAssayTest
         return TEST_ASSAY_PRJ_ELISA;
     }
     
-    @LogMethod
-    protected void runUITests()
+    @Test
+    public void runUITests()
     {
         log("Starting ELISA Assay BVT Test");
 

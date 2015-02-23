@@ -84,7 +84,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
     {
         deleteProject(getProjectName(), afterTest);
         deleteUsers(afterTest, TEST_USER);
-        deleteDir(getTestTempDir());
     }
 
     private void doSetupSteps()

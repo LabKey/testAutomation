@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -64,7 +65,8 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
             "s7\tg\t5\tfalse\t16\t2000-05-05\n" +
             "s8\th\t6\tfalse\t15\t2000-06-06";
 
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests() throws Exception
     {
         prepareProgrammaticQC();
 

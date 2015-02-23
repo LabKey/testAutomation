@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -69,8 +70,8 @@ public class TargetStudyTest extends AbstractAssayTest
     }
 
 
-    @Override
-    protected void runUITests() throws Exception
+    @Test
+    public void runUITests()
     {
         log("** Setup");
         setupEnvironment();
