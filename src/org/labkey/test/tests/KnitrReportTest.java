@@ -121,12 +121,12 @@ public class KnitrReportTest extends BaseWebDriverTest
                                     Locator.css("code.r").containing("set.seed(123)"),       // Echoed R code
                                     Locator.xpath("//img").withAttribute("alt", "plot of chunk graphics"),
                                     //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
-                                    Locator.css(".MathJax, .mathjax")
+                                    //Locator.css(".MathJax, .mathjax")
         };
         String[] reportNotContains = {"```",              // Markdown for R code chunks
                                       "## R code chunks", // Uninterpreted Markdown
                                       "{r",               // Markdown for R code chunks
-                                      "propto",           // MathJax source
+                                      //"propto",           // MathJax source
                                       "data_means"};      // Non-echoed R code
 
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
