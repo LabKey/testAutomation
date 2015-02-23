@@ -18,11 +18,17 @@ package org.labkey.test.tests;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -41,9 +47,16 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
@@ -130,7 +143,7 @@ public class ClientAPITest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, EMAIL_RECIPIENTS);
-
+        deleteUsers(afterTest, AUTOCOMPLETE_USER);
         deleteProject(PROJECT_NAME, afterTest);
         deleteProject(OTHER_PROJECT, afterTest);
     }
@@ -283,6 +296,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // create the users for emailApiTest
         for (String user : EMAIL_RECIPIENTS)
             createUser(user, null);
+        createUserAndNotify(AUTOCOMPLETE_USER, PasswordUtil.getUsername());
     }
 
     protected String waitForDivPopulation()
@@ -702,6 +716,89 @@ public class ClientAPITest extends BaseWebDriverTest
         }
         assertFalse(scriptResult.contains("ERROR"));
         assertTrue("WebDav test did not complete", scriptResult.contains("Test Complete"));
+    }
+
+    private static final String AUTOCOMPLETE_USER = "autocomplete1@clientapi.test";
+
+    @Test
+    public void usernameAutocompleteValuesTest()
+    {
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        verifyAutocompletionResponse(cn, "security", false, true);
+        verifyAutocompletionResponse(cn, "issues", false, true);
+        verifyAutocompletionResponse(cn, "announcements", false, true);
+        verifyAutocompletionResponse(cn, "pipeline", false, true);
+
+        // Impersonate a role that shouldn't be allowed to see emails, and shouldn't even be allowed the action for security & pipeline
+        PostCommand command = new PostCommand("user", "impersonateRoles") {
+            @Override
+            public JSONObject getJsonObject()
+            {
+                JSONObject json = new JSONObject();
+                json.put("roleNames", Arrays.asList("org.labkey.api.security.roles.EditorRole"));
+                return json;
+            }
+        };
+        try
+        {
+            command.execute(cn, "/" + getProjectName());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Impersonation error", e);
+        }
+        verifyAutocompletionResponse(cn, "security", true, false);
+        verifyAutocompletionResponse(cn, "issues", true, true);
+        verifyAutocompletionResponse(cn, "announcements", true, true);
+        verifyAutocompletionResponse(cn, "pipeline", true, false);
+        // Probably overkill to stop impersonating on the connection as it's about to go out of scope, but just to be safe...
+        try
+        {
+            new Command("login", "logout").execute(cn, "/" + getProjectName());
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Stop Impersonating error", e);
+        }
+    }
+
+    @LogMethod
+    private void verifyAutocompletionResponse(Connection cn, String controller, boolean displayNameOnly, boolean actionAllowed)
+    {
+        Command command = new Command(controller, "completeUser");
+        Map<String, Object> completionValues;
+        String errMsg =  " for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
+        try
+        {
+            completionValues = command.execute(cn, "/" + getProjectName()).getParsedData();
+        }
+        catch (IOException | CommandException e)
+        {
+            if (e instanceof CommandException && !actionAllowed && e.getMessage().equals("Forbidden"))
+                return; // This is OK. Properly validated action wasn't allowed
+            throw new RuntimeException("Command execution error " + errMsg, e);
+        }
+
+        // Awful lot of casting going on here, but if any of it fails that's indication we've unintentionally
+        // changed this API response format.
+        JSONArray entries = (JSONArray)completionValues.get("completions");
+        assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
+        boolean testPassed = false;
+        String displayName = displayNameFromEmail(AUTOCOMPLETE_USER);
+        for (int i = 0 ; i < entries.size() ; i++)
+        {
+            // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
+            JSONObject entry = (JSONObject)entries.get(0);
+            String responseValue = (String)entry.get("value");
+            if (StringUtils.startsWith(responseValue, displayName))
+            {
+                String correctValue = displayNameOnly ? displayName : AUTOCOMPLETE_USER + " (" + displayName + ")";
+                assertEquals("Incorrect autocomplete value from for user " + AUTOCOMPLETE_USER + errMsg, correctValue, responseValue);
+                testPassed = true;
+                break;
+            }
+        }
+        assertTrue("No autocomplete value found for " + AUTOCOMPLETE_USER + errMsg, testPassed);
     }
 
     @Override
