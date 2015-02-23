@@ -470,9 +470,9 @@ public class ContainerContextTest extends BaseWebDriverTest
     protected void overrideMetadata(String container, String schemaName, String queryName, String xml)
     {
         beginAt("/query/" + container + "/schema.view?schemaName=" + schemaName + "&queryName=" + queryName);
-        waitForText("edit metadata", 10000);
+        waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
-        waitForText("Label", 10000);
+        waitForText(10000, "Label");
         clickButton("Edit Source", WAIT_FOR_PAGE);
         _extHelper.clickExtTab("XML Metadata");
         setCodeEditorValue("metadataText", xml);

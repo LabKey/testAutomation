@@ -109,7 +109,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         // assert custom buttons can be added to the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
         selectQuery("lists", "Cities");
-        waitForText("edit metadata", 10000);
+        waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         // wait for the domain editor to appear:
         clickButton("Edit Source", defaultWaitForPage);
@@ -117,9 +117,9 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         setCodeEditorValue("metadataText", getMetadataXML(true));
         _extHelper.clickExtTab("Source");
         clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Saved");
         clickButton("Execute Query", 0);
-        waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Seattle");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
         _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
@@ -129,7 +129,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         // assert custom buttons can REPLACE the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
         selectQuery("lists", "Cities");
-        waitForText("edit metadata", 10000);
+        waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         clickButton("Edit Source", defaultWaitForPage);
         _extHelper.clickExtTab("XML Metadata");

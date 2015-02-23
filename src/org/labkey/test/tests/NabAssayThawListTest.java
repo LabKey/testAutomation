@@ -97,7 +97,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_NAB_DESC);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
         log("Set default for ParticipantVisitResolver at Project level");
         // We'll override it later at the folder level.

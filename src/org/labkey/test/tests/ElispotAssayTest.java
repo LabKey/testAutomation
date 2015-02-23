@@ -449,7 +449,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         runTable.checkAllOnPage();
         clickButton("Subtract Background");
 
-        waitForTextWithRefresh("COMPLETE", WAIT_FOR_PAGE);
+        waitForTextWithRefresh(WAIT_FOR_PAGE, "COMPLETE");
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);

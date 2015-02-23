@@ -69,7 +69,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         setFilter("AnnotInsertions", "FileName", "Contains", UNIPROT_FILENAME);
         setFilter("AnnotInsertions", "CompletionDate", "Is Not Blank");
 
-        waitForTextWithRefresh(UNIPROT_FILENAME, 60000);
+        waitForTextWithRefresh(60000, UNIPROT_FILENAME);
 
         _containerHelper.createProject(PROJECT_NAME, "MS2");
         clickProject(PROJECT_NAME);
@@ -86,7 +86,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         getDriver().switchTo().window((String) windows[1]);
         waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
         assertTextPresent("PPIA_MOUSE");
-        waitForText("Q9CWJ5", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Q9CWJ5");
         assertTextPresent("Q9R137");
         assertTextPresent("Mus musculus");
 
@@ -106,7 +106,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String) windows[1]);
         waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
-        waitForText("P11477", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "P11477");
         assertTextPresent("Q61448");
         assertTextPresent("DEF1_MOUSE");
         assertTextPresent("ENSMUSG00000074440");

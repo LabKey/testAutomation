@@ -541,7 +541,7 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
-        waitForText(_listCol1.getLabel(), WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, _listCol1.getLabel());
         assertTextPresent(_listCol1.getLabel());
         assertTextPresent(_listCol2.getLabel());
         assertTextPresent(_listCol4.getLabel());

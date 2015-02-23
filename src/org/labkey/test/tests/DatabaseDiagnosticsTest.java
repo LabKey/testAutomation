@@ -47,7 +47,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         clickAndWait(PipelineHelper.Locators.pipelineStatusLink(0));
 
-        waitForTextWithRefresh("Check complete", 30000);
+        waitForTextWithRefresh(30000, "Check complete");
         assertTextPresent("Check complete, 0 errors found");
     }
 
@@ -57,7 +57,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         goToAdmin();
         clickAndWait(Locator.linkWithText("Check Database"));
         clickAndWait(Locator.linkWithText("Do Database Check"), 120000);
-        waitForText("Database Consistency checker complete", 60000);
+        waitForText(60000, "Database Consistency checker complete");
         assertTextNotPresent("ERROR");
     }
 

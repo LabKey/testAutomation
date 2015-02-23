@@ -308,9 +308,9 @@ public class TimeChartAPITest extends TimeChartTest
         // insert JS for getData calls and querywebpart
         wikiHelper.setWikiBody(TestFileUtils.getFileContents(htmlPage));
         wikiHelper.saveWikiPage();
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Current Config");
         clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Current Config");
 
         // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
         waitForElement(Locator.name("configCount"));

@@ -51,7 +51,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
 //        waitForText("CANCELLED");
         waitForText("Attempting to cancel");
 //        waitForTextWithRefresh("Interrupting job by sending interrupt request", defaultWaitForPage);
-        waitForTextWithRefresh("CANCELLED", defaultWaitForPage);
+        waitForTextWithRefresh(defaultWaitForPage, "CANCELLED");
 
         goToProjectHome();
         assertTextPresent("This folder does not contain a study."); //part of the import will be done, but it shouldn't have gotten to participants.

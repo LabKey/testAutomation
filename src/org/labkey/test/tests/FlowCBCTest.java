@@ -83,7 +83,7 @@ public class FlowCBCTest extends BaseFlowTest
         _listHelper.addField("Result Fields", "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
     }
 
     @LogMethod

@@ -162,9 +162,9 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
         clickButton("Save", 0);
-        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, CATEGORIES[1]);
         refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
-        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, CATEGORIES[1]);
         assertTextNotPresent(CATEGORIES[0]);
         assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", REPORT_NAME, "APX-1");
 

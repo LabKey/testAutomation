@@ -74,11 +74,11 @@ public class ScatterPlotTest extends GenericChartsTest
         sleep(5000);
         _ext4Helper.clickWindowButton("Select Query", "Ok", 0, 0);
         _extHelper.waitForExtDialog("Y Axis");
-        waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "1. Weight");
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
         _ext4Helper.clickWindowButton("Y Axis", "Ok", 0, 0);
         _extHelper.waitForExtDialog("X Axis");
-        waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "4. Pulse");
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
@@ -98,7 +98,7 @@ public class ScatterPlotTest extends GenericChartsTest
         goToSvgAxisTab("1. Weight");
         _extHelper.waitForExtDialog("Y Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
-        waitForText("2. Body Temp", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "2. Body Temp");
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='2. Body Temp']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
@@ -108,7 +108,7 @@ public class ScatterPlotTest extends GenericChartsTest
         goToSvgAxisTab("4. Pulse");
         _extHelper.waitForExtDialog("X Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
-        waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, MOUSE_GROUP_CATEGORY);
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='" + MOUSE_GROUP_CATEGORY + "']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
@@ -149,11 +149,11 @@ public class ScatterPlotTest extends GenericChartsTest
         datasetTable.clickHeaderButton("Charts", "Create Scatter Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
-        waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "1. Weight");
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
         _ext4Helper.clickWindowButton("Y Axis", "Ok", 0, 0);
         _extHelper.waitForExtDialog("X Axis");
-        waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "4. Pulse");
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 

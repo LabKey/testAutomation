@@ -413,7 +413,7 @@ public class ExtHelper extends AbstractHelper
         _test.click(comboArrow);
         Locator.XPathLocator comboListItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
         _test.waitAndClick(comboListItem);
-        _test.waitForFormElementToEqual(parentLocator.append(Locator.tagWithClass("input", "x-form-text")), selection);
+       // _test.waitForFormElementToEqual(parentLocator.append(Locator.tagWithClass("input", "x-form-text")), selection);
         if (_test.isElementPresent(comboListItem))
         {
             _test.click(comboArrow);

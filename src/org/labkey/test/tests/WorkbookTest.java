@@ -93,12 +93,12 @@ public class WorkbookTest extends BaseWebDriverTest
 
         // Clear description
         setFormElement(Locator.xpath("//textarea"), ""); // textarea is a barely used tag, so this xpath is sufficient for now.
-        waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
+        waitForText(WAIT_FOR_JAVASCRIPT, "No description provided. Click to add one."); // Takes a moment to appear.
 
         // Check that title and description are saved
         refresh();
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
-        waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
+        waitForText(WAIT_FOR_JAVASCRIPT, "No description provided. Click to add one."); // Takes a moment to appear.
 
         clickProject(PROJECT_NAME);
 
@@ -131,8 +131,8 @@ public class WorkbookTest extends BaseWebDriverTest
 
         clickButton("RunAPITest", 0);
 
-        waitForText("Insert complete", WAIT_FOR_JAVASCRIPT);
-        waitForText("Delete complete", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Insert complete");
+        waitForText(WAIT_FOR_JAVASCRIPT, "Delete complete");
         assertTextPresent("Insert complete - Success.", "Delete complete - Success.");
 
         //Create new project, add a workbook to it and ensure that the id is 1

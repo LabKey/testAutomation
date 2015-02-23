@@ -89,7 +89,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test Show Modifications");
         click(Locator.linkWithText("Show Modifications"));
         // Wait for tooltip to show up
-        waitForText("Variable", 2000);
+        waitForText(2000, "Variable");
         assertTextPresent(
                 "E^",
                 "Q^");
@@ -895,7 +895,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickButton("Compare");
 
         click(Locator.linkWithText("Comparison Overview"));
-        waitForText(RUN_GROUP1_NAME2, 1000);
+        waitForText(1000, RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP1_NAME2,
                 RUN_GROUP2_NAME,
                 DEFAULT_EXPERIMENT);
@@ -1193,7 +1193,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickButton("Process and Import Data");
         _fileBrowserHelper.importFile("pepXML/truncated.pep.xml", "Import Search Results");
         String ms2Run = "ms2pipe/truncated (pepXML)";
-        waitForTextWithRefresh(ms2Run, defaultWaitForPage);
+        waitForTextWithRefresh(defaultWaitForPage, ms2Run);
         clickAndWait(Locator.linkWithText(ms2Run));
 
         click(Locator.linkWithText("Show Peptide Prophet Details"));

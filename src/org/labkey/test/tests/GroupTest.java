@@ -389,7 +389,7 @@ public class GroupTest extends BaseWebDriverTest
 
         // Run the Test Script
         clickButton("Start Test", 0);
-        waitForText("Done!", defaultWaitForPage);
+        waitForText(defaultWaitForPage, "Done!");
         assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
     }
 

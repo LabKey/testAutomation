@@ -624,8 +624,8 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Create and Edit Source");
         _extHelper.clickExtTab("Data");
 
-        waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
-        waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, ISSUE_TITLE_0);
+        waitForText(WAIT_FOR_JAVASCRIPT, ISSUE_TITLE_1);
 
         clickProject(getProjectName());
 

@@ -198,7 +198,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         setCodeEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
         clickButton("Save & Finish");
 
-        waitForText("APX: Custom Query Advanced", WAIT_FOR_PAGE);
+        waitForText(WAIT_FOR_PAGE, "APX: Custom Query Advanced");
         createQuerySnapshot("Custom Query Snapshot", true, true);
         assertTextPresent("Dataset: Custom Query Snapshot");
 
@@ -212,14 +212,14 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Update Snapshot", 0);
         getAlert();
         waitForPageToLoad();
-        waitForText("Dataset: Custom Query Snapshot", 10000);
+        waitForText(10000, "Dataset: Custom Query Snapshot");
 
         log("delete the snapshot");
         _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
 
         clickTab("Manage");
-        waitForText("Manage Datasets", 10000);
+        waitForText(10000, "Manage Datasets");
         assertElementNotPresent(Locator.linkWithText("Custom Query Snapshot"));
 
         // create a custom query for a cross study scenario

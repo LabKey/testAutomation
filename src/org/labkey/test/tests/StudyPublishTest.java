@@ -536,7 +536,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         else
         {
-            waitForText("No specimens found.", WAIT_FOR_JAVASCRIPT);
+            waitForText(WAIT_FOR_JAVASCRIPT, "No specimens found.");
         }
         // verify that the specimen request options are hidden from the manage study page
         goToManageStudy();
@@ -858,7 +858,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath(measureXpath));
         click(Locator.xpath(measureXpath));
         click(Ext4Helper.Locators.ext4Button("Select"));
-        waitForText("No data found for the following measures/dimensions", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No data found for the following measures/dimensions");
 
         if (datasetMeasurePairs.length > 1)
         {

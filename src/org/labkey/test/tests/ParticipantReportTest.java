@@ -444,7 +444,7 @@ public class ParticipantReportTest extends ReportTest
         _ext4Helper.selectGridItem("label", "2.What is your sex?", -1, "measuresGridPanel", true);
         _ext4Helper.selectGridItem("label", "5. Sexual orientation", -1, "measuresGridPanel", true);
         clickButton("Select", 0);
-        waitForText("Showing partial results while in edit mode.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Showing partial results while in edit mode.");
 
         // verify the data in the report
         waitForText("1.Date of Birth", 27, WAIT_FOR_JAVASCRIPT); // 24 mice + 1 Report Measures list + 2 in hidden add measure dialog

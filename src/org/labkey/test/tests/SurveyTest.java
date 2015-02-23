@@ -145,7 +145,7 @@ public class SurveyTest extends BaseWebDriverTest
         addSurveyFileAttachment("attfield", pipelineLoc + "/TestAttachment.txt");
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), true, "Test1");
         log("Wait for the survey autosave (save attempts every minute)");
-        waitForText("Responses automatically saved at", 65000);
+        waitForText(65000, "Responses automatically saved at");
 
         log("Verify that the survey was saved and the responses were saved to the subfolder list");
         clickFolder(folderName);

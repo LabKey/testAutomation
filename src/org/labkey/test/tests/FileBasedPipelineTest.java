@@ -25,7 +25,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -262,8 +261,8 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         _listHelper.addField("Data Fields", "Age", "Age", ListHelper.ListColumnType.Integer);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
-        waitForText("Save successful.", 20000);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
+        waitForText(20000, "Save successful.");
     }
 
     @LogMethod

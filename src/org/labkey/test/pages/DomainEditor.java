@@ -61,7 +61,7 @@ public abstract class DomainEditor
     public void save()
     {
         _test.clickButton("Save", 0);
-        _test.waitForText("Save successful.", 20000);
+        _test.waitForText(20000, "Save successful.");
     }
 
     public void saveAndClose()

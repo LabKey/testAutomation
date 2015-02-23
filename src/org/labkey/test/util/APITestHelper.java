@@ -205,7 +205,7 @@ public class APITestHelper
         if (test.isElementPresent(Locator.xpath("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
             fail("The request has failed: " + url);
 
-        test.waitForText("Request Complete", test.getDefaultWaitForPage());
+        test.waitForText(test.getDefaultWaitForPage(),"Request Complete");
 
         // Once response has loaded, check it, also check 'Request Complete'
         if (!StringUtils.isEmpty(expectedResponse))

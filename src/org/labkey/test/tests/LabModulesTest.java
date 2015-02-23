@@ -827,7 +827,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(Locator.linkContainingText("Control Item Visibility"));
 
         waitForText("Sequence"); //proxy for page load
-        waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 3); //proxy for page load
+        waitForText(WAIT_FOR_JAVASCRIPT * 3, "TruCount"); //proxy for page load
 
         log("Disabling items");
 
@@ -923,7 +923,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(_helper.toolIcon("Settings"));
         waitAndClickAndWait(Locator.linkContainingText("Control Item Visibility"));
         waitForText("Sequence"); //proxy for page load
-        waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 2); //proxy for page load
+        waitForText(WAIT_FOR_JAVASCRIPT * 2, "TruCount"); //proxy for page load
 
         for (Pair<String, String> pair : getAssaysToCreate())
         {
@@ -1441,7 +1441,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Alert alert = getDriver().switchTo().alert();
         alert.accept();
         waitForPageToLoad();
-        waitForText(LabModuleHelper.LAB_HOME_TEXT, WAIT_FOR_PAGE);
+        waitForText(WAIT_FOR_PAGE, LabModuleHelper.LAB_HOME_TEXT);
     }
 
     @Override

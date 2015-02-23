@@ -39,7 +39,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.List;
@@ -450,7 +449,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
         
         setSourceFromFile("assayTest.js");
 
@@ -473,7 +472,7 @@ public class ClientAPITest extends BaseWebDriverTest
         // next page
         clickButton("Create Study");
         clickAndWait(Locator.linkWithText("Edit Definition"));
-        waitForText("No fields have been defined.", 10000);
+        waitForText(10000, "No fields have been defined.");
 
         clickButton("Add Field", 0);
 

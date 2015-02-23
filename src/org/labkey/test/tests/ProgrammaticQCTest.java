@@ -143,7 +143,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
     }
 
     private void uploadQCRuns()

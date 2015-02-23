@@ -656,14 +656,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
         _extHelper.clickMenuButton("Views", "Want To Be Cool");
-        waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
         clickProject(getProjectName());
         portalHelper.addWebPart("Report");
         setFormElement(Locator.name("title"), "Report Tester Part");
         selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
         clickButton("Submit");
-        waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
         String WikiName = "JS Report Wiki";
         portalHelper.addWebPart("Wiki");
@@ -673,7 +673,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         wikiHelper.setWikiBody("placeholder text");
         wikiHelper.saveWikiPage();
         wikiHelper.setSourceFromFile("jsReportTest.html", WikiName);
-        waitForText("Console output", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         waitForText("Less cool than expected. Loaded dependent scripts.", 2, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("JS Module Report");
         assertTextPresent("Hello, Bob!");
@@ -681,7 +681,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
         _extHelper.clickMenuButton("Views", "Super Cool R Report");
-        waitForText("Console output", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
         assertTextPresent("\"crazy\"");
@@ -803,7 +803,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Submit", 0);
         waitForText("Manufacturer");
         assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("search-input")));
-        waitForText("Pinto", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Pinto");
         assertTextNotPresent("Prius");
     }
 

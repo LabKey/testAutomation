@@ -120,7 +120,7 @@ public class ExpTest extends BaseWebDriverTest
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
@@ -135,7 +135,7 @@ public class ExpTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 
         // Verify that it ended up in the XML version of the metadata
         clickButton("Edit Source");
@@ -146,9 +146,9 @@ public class ExpTest extends BaseWebDriverTest
 
         // Run it and see if we used the format correctly
         _extHelper.clickExtTab("Data");
-        waitForText("editedCreated", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "editedCreated");
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
-        waitForText(dateFormat.format(new Date()), WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
 
         // Add a new wrapped column to the exp.Datas table
         clickTab("Query");
@@ -171,7 +171,7 @@ public class ExpTest extends BaseWebDriverTest
 
         // Save it
         clickButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
         clickButton("View Data");
 
         // Customize the view to add the newly joined column
@@ -189,6 +189,6 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         click(Locator.xpath("//span").append(Locator.lkButton("Reset to Default")));
         click(Locator.xpath("//span").append(Locator.lkButton("OK")));
-        waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Reset successful");
     }
 }

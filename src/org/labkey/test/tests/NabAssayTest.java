@@ -235,7 +235,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
         clickAndWait(Locator.linkWithText("configure templates"));
 
@@ -279,7 +279,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
         clickAndWait(Locator.linkWithText("configure templates"));
 

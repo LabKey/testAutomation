@@ -66,7 +66,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("1. Weight", 0);
         clickButton("Select", 0);
-        waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Days Since Contact Date");
 
         // TODO: migrate usage to TimeChartWizard.changeXAxisToVisitBased
         goToSvgAxisTab("Days Since Contact Date");
@@ -127,7 +127,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME);
         setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
         saveReport(true);
-        waitForText(VISIT_CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, VISIT_CHART_TITLE);
     }
 
     @LogMethod public void filteredViewQueryMeasureTest()
@@ -156,13 +156,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForText("My APX Query");
         _ext4Helper.clickGridRowText("2. Body Temp", 0);
         clickButton("Select", 0);
-        waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
         goToSvgAxisTab("Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
-        waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
         click(Locator.tagWithText("span", "999320016"));
-        waitForText("4 wk Post-V#2/V#3", WAIT_FOR_JAVASCRIPT); // last visit from ptid 999320016
+        waitForText(WAIT_FOR_JAVASCRIPT, "4 wk Post-V#2/V#3"); // last visit from ptid 999320016
         // TODO: Not accurate anymore. Shows up around 30 times now, which doesnt make sense since it only shows up 9
         // times per SVG and there are 2 SVG's on the page. I'm unable to locate the other 12 occurances of it on the page.
 //        assertTextPresent("2. Body Temp: ", 6); // hover text label (3 for chart and 3 for thumbnail in save dialog)
@@ -175,7 +175,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         openSaveMenu();
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");
         saveReport(true);
-        waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
     }
 
     @LogMethod private void errorMessageTest()

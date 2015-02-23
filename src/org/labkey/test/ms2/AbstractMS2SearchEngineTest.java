@@ -58,7 +58,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");

@@ -365,7 +365,7 @@ public class DataReportsTest extends ReportTest
         //clickButton("Reports >>", 0);
         //clickAndWait(Locator.linkWithText(R_SCRIPTS[0]));
         _extHelper.clickMenuButton("Views", R_SCRIPTS[0]);
-        waitForText("Console output", WAIT_FOR_PAGE);
+        waitForText(WAIT_FOR_PAGE, "Console output");
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
         assertTextNotPresent("Error executing command");

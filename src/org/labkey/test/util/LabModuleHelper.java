@@ -78,7 +78,7 @@ public class LabModuleHelper
 
         _test.sleep(1000);
         _test.clickButton("Save", 0);
-        _test.waitForText("Save successful.", 20000);
+        _test.waitForText(20000, "Save successful.");
         _test.assertTextNotPresent("Unknown");
     }
 

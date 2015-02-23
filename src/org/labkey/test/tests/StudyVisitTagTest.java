@@ -184,7 +184,7 @@ public class StudyVisitTagTest extends StudyBaseTest
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         wikiHelper.setWikiBody(TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/getDataVisitTest.html"));
         wikiHelper.saveWikiPage();
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Current Config");
     }
 
     protected DataRegionTable getVisitTagTable()

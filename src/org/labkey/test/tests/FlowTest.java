@@ -99,7 +99,7 @@ public class FlowTest extends BaseFlowTest
         createQuery(getContainerPath(), query1, "flow", querySql, null, false);
 
         clickButton("Execute Query", 0);
-        waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No data to show.");
     }
 
     @LogMethod

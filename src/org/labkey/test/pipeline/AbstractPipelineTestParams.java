@@ -398,7 +398,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.selectOptionByTextContaining(Locator.id("escalateUser").findElement(_test.getDriver()), escalateEmail);
         _test.setFormElement(Locator.id("escalationMessage"), messageText);
         // DetailsView adds a useless form.
-        //_test.submit();
+        //test.submit();
         _test.clickButton("Send");
         _test.popLocation();
 

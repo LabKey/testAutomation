@@ -66,6 +66,11 @@ public class Ext4GridRef extends Ext4CmpRef
         return Ext4GridRef.locateExt4GridCell(rowIndex, cellIdx, _id);
     }
 
+    public Locator getCell(int rowIndex, int colIndex)
+    {
+        return Ext4GridRef.locateExt4GridCell(rowIndex, colIndex, _id);
+    }
+
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
         Locator row = Ext4GridRef.locateExt4GridRow(rowIdx, parentId);
@@ -288,7 +293,7 @@ public class Ext4GridRef extends Ext4CmpRef
                 if (_test.isElementPresent(Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id)))
                 {
                     _test.log("cell was present on second try");
-                    //_test.waitForElement(cell);
+                    //test.waitForElement(cell);
                 }
                 else
                 {

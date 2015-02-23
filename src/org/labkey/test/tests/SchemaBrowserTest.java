@@ -96,12 +96,12 @@ public class SchemaBrowserTest extends BaseWebDriverTest
 
         //test in-place fk expansion
         clickFkExpando("lists", BOOKS_LIST, "AuthorId");
-        waitForText("AuthorId/FirstName", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "AuthorId/FirstName");
         assertTextPresent("AuthorId/LastName");
         assertElementPresent(Locator.tag("td").withText(TEST_DESC_AUTHORS).notHidden());
 
         clickFkExpando("lists", BOOKS_LIST, "PublisherId");
-        waitForText("PublisherId/Name", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "PublisherId/Name");
         assertElementPresent(Locator.tag("td").withText(TEST_DESC_PUBLISHERS).notHidden());
 
         clickFkExpando("lists", BOOKS_LIST, "AuthorId");

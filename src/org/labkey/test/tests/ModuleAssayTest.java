@@ -229,7 +229,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
     }
 
     protected void createSampleSet()
@@ -287,7 +287,7 @@ public class ModuleAssayTest extends AbstractAssayTest
             } while (--count > 0);
             assertElementContains(Locator.id("batch_runCount_div"), String.valueOf(i+1));
             // file name should appear in runs grid on upload page
-            waitForText(uploadedFile, WAIT_FOR_JAVASCRIPT);
+            waitForText(WAIT_FOR_JAVASCRIPT, uploadedFile);
         }
     }
 }

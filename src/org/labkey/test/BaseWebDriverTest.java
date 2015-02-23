@@ -3982,12 +3982,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }, failMessage, wait);
     }
 
-    public void waitForText(final String text)
-    {
-        waitForText(text, WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void waitForTextWithRefresh(String text, int wait)
+    public void waitForTextWithRefresh(int wait, String... text)
     {
         startTimer();
         do
@@ -4000,7 +3995,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }while(elapsedMilliseconds() < wait);
         assertTrue(text + " did not appear [" + wait + "ms]", isTextPresent(text));
     }
-    public void waitForText(final String text, int wait)
+
+    public void waitForText(final String... text)
+    {
+        waitForText(WAIT_FOR_JAVASCRIPT, text);
+    }
+
+    public void waitForText(int wait, final String... text)
     {
         String failMessage = text + " did not appear";
         waitFor(new Checker()
@@ -4933,7 +4934,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)
     {
         clickButtonContainingText(buttonText, 0);
-        waitForText(textShouldAppearAfterLoading, defaultWaitForPage);
+        waitForText(defaultWaitForPage, textShouldAppearAfterLoading);
     }
 
     /**

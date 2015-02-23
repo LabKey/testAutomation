@@ -298,7 +298,7 @@ public class AssayTest extends AbstractAssayTest
 
         sleep(1000);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
     } //defineAssay()
 
@@ -471,7 +471,7 @@ public class AssayTest extends AbstractAssayTest
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
         beginAt("specimencheck/" + TEST_ASSAY_PRJ_SECURITY + "/assayReport.view");
-        waitForText("Global Specimen ID", 10000);
+        waitForText(10000, "Global Specimen ID");
         waitForElement(Locator.linkWithText("BAQ00051-09"), 10000);
         assertElementPresent(Locator.linkWithText("BAQ00051-09"));
         assertElementPresent(Locator.linkWithText("BAQ00051-08"));
@@ -824,7 +824,7 @@ public class AssayTest extends AbstractAssayTest
         _listHelper.setColumnLabel(getPropertyXPathContains("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         _listHelper.deleteField("Data Fields", 4);
         clickButton("Save", 0);
-        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
 
         //ensure that label has changed in run data in Lab 1 folder
         clickFolder(TEST_ASSAY_FLDR_LAB1);

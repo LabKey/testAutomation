@@ -57,7 +57,7 @@ public class BoxPlotTest extends GenericChartsTest
         sleep(5000);
         _ext4Helper.clickWindowButton("Select Query", "Ok", 0, 0);
         _extHelper.waitForExtDialog("Y Axis");
-        waitForText("4c.Induration 1st measure", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "4c.Induration 1st measure");
         click(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
@@ -75,7 +75,7 @@ public class BoxPlotTest extends GenericChartsTest
         goToSvgAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Y Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
-        waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "2.Body temperature");
         click(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
@@ -85,7 +85,7 @@ public class BoxPlotTest extends GenericChartsTest
         goToSvgAxisTab("Cohort");
         _extHelper.waitForExtDialog("X Axis");
         click(Ext4Helper.Locators.ext4Radio("log"));
-        waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, MOUSE_GROUP_CATEGORY);
         click(Locator.xpath("//div[text()='"+ MOUSE_GROUP_CATEGORY +"']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
@@ -126,7 +126,7 @@ public class BoxPlotTest extends GenericChartsTest
         datasetTable.clickHeaderButton("Charts", "Create Box Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
-        waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "2.Body temperature");
         click(Locator.xpath("//div[text()='2.Body temperature']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 

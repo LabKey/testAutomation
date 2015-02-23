@@ -154,7 +154,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToManageViews();
         clickAddReport("Time Chart");
         clickChooseInitialMeasure();
-        waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "NAbAssay");
 
         log("Test measure search.");
         Locator.XPathLocator gridRow = Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr");
@@ -167,7 +167,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         log("Check for appropriate message for measure with no data.");
         _ext4Helper.clickGridRowText("Cutoff Percentage (3)", 0);
         clickButton("Select", 0);
-        waitForText("No data found for the following measures/dimensions: RunCutoff3", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No data found for the following measures/dimensions: RunCutoff3");
     }
 
     // Regression test for "11764: Time Chart Wizard raises QueryParseException on 'StdDev' measure"
@@ -177,7 +177,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         enterMeasuresPanel();
         clickButton("Remove Measure", 0);
         applyChanges();
-        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No measure selected.");
         enterMeasuresPanel();
         addMeasure();
         _ext4Helper.clickGridRowText("StdDev", 0);
@@ -185,8 +185,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText("StdDev from LuminexAssay");
         applyChanges();
         waitForElement(Locator.css("svg").withText("Days Since Start Date"), WAIT_FOR_JAVASCRIPT, false);
-        waitForText("StdDev", WAIT_FOR_JAVASCRIPT); // left-axis label
-        waitForText("LuminexAssay", WAIT_FOR_JAVASCRIPT); // main title
+        waitForText(WAIT_FOR_JAVASCRIPT, "StdDev"); // left-axis label
+        waitForText(WAIT_FOR_JAVASCRIPT, "LuminexAssay"); // main title
     }
 
     @LogMethod public void visualizationTest()
@@ -195,7 +195,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         enterMeasuresPanel();
         clickButton("Remove Measure", 0);
         applyChanges();
-        waitForText("No measure selected.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "No measure selected.");
         enterMeasuresPanel();
         addMeasure();
         waitForElement(Locator.name("filterSearch"));
@@ -206,9 +206,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickButton("Select", 0);
         waitForText("Viral Load Quantified (copies/ml) from HIV Test Results");
         applyChanges();
-        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT); // x-axis label
-        waitForText("Viral Load Quantified (copies/ml)", WAIT_FOR_JAVASCRIPT); // left-axis label
-        waitForText("HIV Test Results", WAIT_FOR_JAVASCRIPT); // main title
+        waitForText(WAIT_FOR_JAVASCRIPT, "Days Since Start Date"); // x-axis label
+        waitForText(WAIT_FOR_JAVASCRIPT, "Viral Load Quantified (copies/ml)"); // left-axis label
+        waitForText(WAIT_FOR_JAVASCRIPT, "HIV Test Results"); // main title
         assertTextNotPresent("No data found");
 
         clickButton("View Data", 0);
@@ -234,7 +234,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToSvgAxisTab("Days Since Start Date");
         _ext4Helper.selectComboBoxItem("Draw x-axis as:", "Weeks");
         applyChanges();
-        waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Weeks Since Start Date");
         goToSvgAxisTab("Weeks Since Start Date");
         setAxisValue(Axis.X, null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
@@ -272,7 +272,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         // re-select participant
         _ext4Helper.checkGridRowCheckbox("249320127");
-        waitForText(CHART_TITLE + ": 249320127", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, CHART_TITLE + ": 249320127");
         assertTextPresent(CHART_TITLE, 7); // 6 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
     }
 
@@ -297,12 +297,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         log("Verify saved report");
         goToManageViews();
-        waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, REPORT_NAME_1);
         assertTextPresent(REPORT_NAME_2);
         clickReportDetailsLink(REPORT_NAME_1);
         assertTextPresent(REPORT_DESCRIPTION);
         click(Locator.linkContainingText("Edit Report"));
-        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
         pushLocation();
         pushLocation();
@@ -334,10 +334,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, REPORT_NAME_1);
         clickReportDetailsLink(REPORT_NAME_1);
         click(Locator.linkContainingText("Edit Report"));
-        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         // change to the data points are visible again
         goToSvgAxisTab(Y_AXIS_LABEL);
         setAxisValue(Axis.LEFT, "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
@@ -386,10 +386,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         pushLocation(); // for impersonation test
 
         goToManageViews();
-        waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, REPORT_NAME_1);
         clickReportDetailsLink(REPORT_NAME_1);
         click(Locator.linkContainingText("Edit Report"));
-        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         // TODO: Is this actually the selector we want?
         clickAndWait(Locator.css("svg a path"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
@@ -398,14 +398,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // USER2 is not yet a developer, so shouldn't have permissions to this feature
         impersonate(USER2);
         popLocation();
-        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
         // give USER2 developer perms and try again
         createSiteDeveloper(USER2);
         impersonate(USER2);
         popLocation();
-        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
     }
@@ -518,7 +518,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToManageViews();
         clickReportDetailsLink(REPORT_NAME_3);
         click(Locator.linkContainingText("Edit Report"));
-        waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "One or more of the participant groups originally saved with this chart are not currently visible");
         assertTextNotPresent(GROUP3_NAME);
 
         waitForText(CHART_TITLE);
@@ -563,7 +563,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         waitForText("No group selected. Please select at least one group.");
         assertElementNotPresent(Locator.css("svg"));
-        waitForText("One or more of the participant groups originally saved with this chart are not currently visible.", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "One or more of the participant groups originally saved with this chart are not currently visible.");
         assertTextPresent(GROUP1_NAME);
         assertTextNotPresent(GROUP2_NAME, GROUP3_NAME);
         stopImpersonating();
@@ -692,11 +692,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         _extHelper.clickMenuButton("Charts", "Create Time Chart");
         clickChooseInitialMeasure();
-        waitForText("Physical Exam", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Physical Exam");
 
         _ext4Helper.clickGridRowText("Pulse", 0);
         clickButton("Select", 0);
-        waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, "Days Since Start Date");
 
         enterMeasuresPanel();
         waitForText("This chart data is filtered");

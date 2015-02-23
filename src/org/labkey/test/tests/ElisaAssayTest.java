@@ -107,7 +107,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
 
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 //
         clickProject(TEST_ASSAY_PRJ_ELISA);
         clickAndWait(Locator.linkWithText("Assay List"));

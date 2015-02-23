@@ -87,7 +87,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         _listHelper.addField("Run Fields", RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
         _listHelper.addField("Data Properties", DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
         clickButton("Save & Close");
 
         log("Setup the pipeline");
@@ -131,7 +131,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), "Third");
         selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), "Fourth");
         clickButton("Save and Finish");
-        waitForText(ASSAY_NAME + " Runs", 30000);
+        waitForText(30000, ASSAY_NAME + " Runs");
         assertTextPresent("SingleRunProperties");
 
         verifyCanCreateAndSaveCustomView();
@@ -241,10 +241,10 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MAGEML_FILE2));
         assertTextPresent("115468002");
         clickAndWait(Locator.xpath("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
-        waitForText(ASSAY_DESCRIPTION, 30000);
+        waitForText(30000, ASSAY_DESCRIPTION);
         assertTextPresent(DATA_FIELD_TEST_NAME);
         clickAndWait(Locator.linkWithText("view results"));
-        waitForText(ASSAY_DESCRIPTION, 30000);
+        waitForText(30000, ASSAY_DESCRIPTION);
         assertTextPresent(DATA_FIELD_TEST_NAME);
 
         log("Test graph views");

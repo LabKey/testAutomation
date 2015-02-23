@@ -16,32 +16,14 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
-import org.labkey.query.xml.ApiTestsDocument;
-import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APITestHelper;
-import org.labkey.test.util.JSONHelper;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.junit.Assert.*;
 
 /**
  * @deprecated TODO: Move API test parsing and execution to a Helper class

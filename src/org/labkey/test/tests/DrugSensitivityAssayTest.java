@@ -94,7 +94,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_DESC);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        waitForText(20000, "Save successful.");
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Assay List"));

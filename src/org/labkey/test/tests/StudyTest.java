@@ -533,7 +533,7 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Save", 0);
 
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        waitForText(listName, WAIT_FOR_JAVASCRIPT);
+        waitForText(WAIT_FOR_JAVASCRIPT, listName);
         return idsInForm;
     }
 
