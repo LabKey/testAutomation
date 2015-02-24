@@ -3101,7 +3101,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (window.HoverNavigation) rern true; else return false;");
+                return (Boolean)executeScript("if (window.HoverNavigation) return true; else return false;");
             }
         }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
