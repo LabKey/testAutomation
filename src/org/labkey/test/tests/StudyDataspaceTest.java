@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
@@ -211,20 +212,21 @@ public class StudyDataspaceTest extends StudyBaseTest
     {
         final List<String> VISIT_TAG_MAP_TAGS =
                 Arrays.asList("First Vaccination", "First Vaccination", "Second Vaccination", "Second Vaccination",
-                              "Follow Up", "Follow Up", "Second Vaccination", "First Vaccination", "Follow Up",
-                              "Follow Up", "Second Vaccination", "First Vaccination");
+                              "Follow Up", "Follow Up", "Follow Up", "Follow Up", "First Vaccination",
+                              "Second Vaccination", "First Vaccination", "Second Vaccination");
         final List<String> VISIT_TAG_MAP_VISITS =
-                Arrays.asList("Day 0", "Day 3", "Day 62", "Day 101", "Day -1377", "Day -1351",
-                              "Day -1316", "Day -1001", "Day -1377", "Day -1351", "Day -1316", "Day -1001");
+                Arrays.asList("Day -1001", "Day -1001", "Day -1316", "Day -1316", "Day -1351", "Day -1351",
+                              "Day -1377", "Day -1377", "Day 0", "Day 101", "Day 3", "Day 62");
         final List<String> VISIT_TAG_MAP_COHORTS =
-                Arrays.asList("1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
+                Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ",
                               "1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
-                              " ", " ", " ", " ", " ", " ", " ", " ");
+                              "2/4 - Heterologous boost regimen", "1/3 - Heterologous boost regimen");
 
         // Check visit tags
         clickFolder(getProjectName());
         _portalHelper.addQueryWebPart(VISIT_TAG_MAP_QWP_TITLE, "study", "VisitTagMap", null);
         DataRegionTable visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this, false);
+        visitTagMaps.setSort("Visit", SortDirection.ASC);
         List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
@@ -237,12 +239,13 @@ public class StudyDataspaceTest extends StudyBaseTest
         Assert.assertFalse("Should not be able to 'Insert New' into VisitTagMap from dataspace project", getTexts(buttons).contains("INSERT NEW"));
 
 
-        final List<String> STUDY5_VISIT_TAG_MAP_TAGS = Arrays.asList("Follow Up", "Follow Up", "Second Vaccination", "First Vaccination");
-        final List<String> STUDY5_VISIT_TAG_MAP_VISITS = Arrays.asList("Day -1377", "Day -1351", "Day -1316", "Day -1001");
+        final List<String> STUDY5_VISIT_TAG_MAP_TAGS = Arrays.asList("First Vaccination", "Second Vaccination", "Follow Up", "Follow Up");
+        final List<String> STUDY5_VISIT_TAG_MAP_VISITS = Arrays.asList("Day -1001", "Day -1316", "Day -1351", "Day -1377");
         final List<String> STUDY5_VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", " ", " ", " ");
 
         clickFolder(FOLDER_STUDY5);
         visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
+        visitTagMaps.setSort("Visit", SortDirection.ASC);
         tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
