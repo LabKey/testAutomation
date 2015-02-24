@@ -3614,7 +3614,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(Locator.id("seleniumExtReady"), defaultWaitForPage);
     }
 
-    public boolean doesElementAppear(Checker checker, int wait)
+    /**
+     * Wait for Checker.check() to return true
+     * @param wait milliseconds
+     * @return false if Checker.check() doesn't return true within 'wait' ms
+     */
+    public boolean waitFor(Checker checker, int wait)
     {
         Long startTime = System.currentTimeMillis();
         do
@@ -3629,7 +3634,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitFor(Checker checker, String failMessage, int wait)
     {
-        if (!doesElementAppear(checker, wait))
+        if (!waitFor(checker, wait))
         {
             _testTimeout = true;
             fail(failMessage + " ["+wait+"ms]");
@@ -3993,7 +3998,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 sleep(1000);
             refresh();
         }while(elapsedMilliseconds() < wait);
-        assertTrue(text + " did not appear [" + wait + "ms]", isTextPresent(text));
+        assertTextPresent(text);
     }
 
     public void waitForText(final String... text)
@@ -4003,14 +4008,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForText(int wait, final String... text)
     {
-        String failMessage = text + " did not appear";
         waitFor(new Checker()
         {
             public boolean check()
             {
                 return isTextPresent(text);
             }
-        }, failMessage, wait);
+        }, wait);
+        assertTextPresent(text);
     }
 
     public void waitForText(final String text, final int count, int wait)
@@ -6767,7 +6772,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         if (!isDumpSvgs())
         {
-            doesElementAppear(new BaseWebDriverTest.Checker()
+            waitFor(new BaseWebDriverTest.Checker()
             {
                 @Override
                 public boolean check()
