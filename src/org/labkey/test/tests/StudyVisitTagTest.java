@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -141,19 +142,21 @@ public class StudyVisitTagTest extends StudyBaseTest
     {
         final List<String> VISIT_TAG_NAMES = Arrays.asList("day0", "finalvaccination", "finalvisit", "firstvaccination", "notsingleuse", "peakimmunogenicity");
         final List<String> VISIT_TAG_CAPTIONS = Arrays.asList("Day 0 (meaning varies)", "Final Vaccination", "Final visit", "First Vaccination", "Not Single Use Tag", "Predicted peak immunogenicity visit");
-        final List<String> VISIT_TAG_MAP_TAGS = Arrays.asList("Day 0 (meaning varies)", "First Vaccination", "First Vaccination", "Final Vaccination", "Final Vaccination", "Final visit");
+        final List<String> VISIT_TAG_MAP_TAGS = Arrays.asList("Day 0 (meaning varies)", "First Vaccination", "Final Vaccination", "First Vaccination", "Final Vaccination", "Final visit");
         final List<String> VISIT_TAG_MAP_VISITS = Arrays.asList("Visit1", "Visit2", "Visit3", "Visit3", "Visit4", "Visit5");
         final List<String> VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", "Positive", "Negative", "Negative", "Positive", " ");
 
         goToProjectHome();
         DataRegionTable visitTags = getVisitTagTable();
-        DataRegionTable visitTagMaps = getVisitTagMapTable();
         List<String> tagNames = visitTags.getColumnDataAsText("Name");
         List<String> tagCaptions = visitTags.getColumnDataAsText("Caption");
         assertEquals("Wrong Tag Names", VISIT_TAG_NAMES, tagNames);
         assertEquals("Wrong Tag Names", VISIT_TAG_CAPTIONS, tagCaptions);
 
-        //TODO: need to add a method to return an entire row from DataTable as delimited strings so we can do this more easily
+        DataRegionTable visitTagMaps = getVisitTagMapTable();
+        // Ensure consistent sorting
+        visitTagMaps.setSort("VisitTag", SortDirection.ASC);
+        visitTagMaps.setSort("Visit", SortDirection.ASC);
         List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
         List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
         List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
