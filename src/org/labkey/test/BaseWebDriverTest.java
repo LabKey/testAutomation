@@ -5684,7 +5684,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         if (!currentURL.contains(parameter))
             if (currentURL.contains("?"))
-                beginAt(currentURL.concat("&" + parameter + suffix));
+            {
+                if (currentURL.indexOf("?") == currentURL.length() - 1)
+                    beginAt(currentURL.concat(parameter + suffix));
+                else
+                    beginAt(currentURL.concat("&" + parameter + suffix));
+            }
             else
                 beginAt(currentURL.concat("?" + parameter + suffix));
     }
