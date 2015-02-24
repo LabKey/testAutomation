@@ -373,8 +373,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         {
             // pipeline job does not run
             waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
-            waitForElement(Locator.labkeyAlert(hasCheckerError ? "Error" : "Success"));
-            clickButton("OK", 0);
+            _ext4Helper.clickWindowButton(hasCheckerError ? "Error" : "Success", "OK", 0, 0);
         }
     }
 

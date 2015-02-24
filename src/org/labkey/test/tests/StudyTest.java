@@ -415,7 +415,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.name(LABEL_FIELD), listName);
         setFormElement(Locator.name(ID_FIELD), ids);
         clickButton("Save", 0);
-        waitForElement(Locator.labkeyAlert("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent(expectedError);
         clickButton("OK", 0);
         waitForElementToDisappear(Ext4Helper.Locators.mask().index(1));
