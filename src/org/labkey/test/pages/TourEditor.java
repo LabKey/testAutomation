@@ -18,46 +18,46 @@ public class TourEditor
 
     public void save()
     {
-        _test.click(MyLocators.saveLocator);
+        _test.click(Locators.saveButton);
     }
 
     public void saveAndClose()
     {
-        _test.click(MyLocators.saveAndCloseLocator);
+        _test.click(Locators.saveAndCloseButton);
     }
 
     public void cancel()
     {
-        _test.click(MyLocators.cancelLocator);
+        _test.click(Locators.cancelButton);
     }
 
     public void clear()
     {
-        _test.click(MyLocators.clearLocator);
+        _test.click(Locators.clearButton);
     }
 
     public void addStep()
     {
-        _test.click(MyLocators.addStepLocator);
+        _test.click(Locators.addStepButton);
     }
 
     public void importTour(String JSON)
     {
-        _test.click(MyLocators.importTourLocator);
+        _test.click(Locators.importTourButton);
         _test._extHelper.setCodeMirrorValue("export-script-textarea", JSON);
         _test.click(Locator.tagContainingText("span", "Import").index(2));
     }
 
     public String export()
     {
-        _test.click(MyLocators.exportLocator);
+        _test.click(Locators.exportButton);
         _test.waitForElement(Ext4Helper.Locators.window("Export Tour"));
         return _test._extHelper.getCodeMirrorValue("export-script-textarea");
     }
 
     public void setTitle(String title)
     {
-        _test.setFormElement(MyLocators.titleLocator, title);
+        _test.setFormElement(Locators.titleTextArea, title);
     }
 
     public void setMode(TourMode mode)
@@ -65,33 +65,33 @@ public class TourEditor
         switch(mode)
         {
             case RUNALWAYS:
-            _test.selectOptionByText(MyLocators.setModeSelector, "Run Always");
+            _test.selectOptionByText(Locators.setModeCombo, "Run Always");
             break;
 
             case RUNONCE:
-            _test.selectOptionByText(MyLocators.setModeSelector, "Run Once");
+            _test.selectOptionByText(Locators.setModeCombo, "Run Once");
             break;
 
             case OFF:
-            _test.selectOptionByText(MyLocators.setModeSelector, "Off");
+            _test.selectOptionByText(Locators.setModeCombo, "Off");
         }
     }
 
     public void setDescription(String description)
     {
-        _test.setFormElement(MyLocators.descriptionLocator, description);
+        _test.setFormElement(Locators.descriptionTextArea, description);
     }
 
     //index is 1 based
     public void setSelector(int index, String selector)
     {
-        _test.setFormElement(MyLocators.getSelectorLocator(index), selector);
+        _test.setFormElement(Locators.getSelectorTextArea(index), selector);
     }
 
     //index is 1 based
     public void setStep(int index, String step)
     {
-        _test.setFormElement(MyLocators.getStepLocator(index), step);
+        _test.setFormElement(Locators.getStepTextArea(index), step);
     }
 
     public enum TourMode
@@ -101,19 +101,19 @@ public class TourEditor
         RUNALWAYS
     }
 
-    public static class MyLocators
+    public static class Locators
     {
-        public static Locator saveLocator = Locator.xpath("//span[contains(.,'Save')]");
-        public static Locator saveAndCloseLocator = Locator.xpath("//span[contains(.,'Save & Close')]");
-        public static Locator cancelLocator = Locator.xpath("//span[contains(.,'Cancel')]");
-        public static Locator clearLocator = Locator.xpath("//span[contains(.,'Clear')]");
-        public static Locator addStepLocator = Locator.xpath("//span[contains(.,'Add Step')]");
-        public static Locator importTourLocator = Locator.xpath("//span[contains(.,'Import')]");
-        public static Locator exportLocator = Locator.xpath("//span[contains(.,'Export')]");
-        public static Locator.XPathLocator setModeSelector = Locator.tagWithId("select", "tour-mode");
-        public static Locator descriptionLocator = Locator.xpath("//textarea[@id='tour-description']");
-        public static Locator titleLocator = Locator.xpath("//input[@id='tour-title']");
-        public static Locator getSelectorLocator(int index) {return Locator.xpath("//input[@id='tour-selector"+index+"']");}
-        public static Locator getStepLocator(int index) {return Locator.xpath("//textarea[@id='tour-step"+index+"']/../div//textarea");}
+        public static Locator saveButton = Locator.xpath("//span[contains(.,'Save')]");
+        public static Locator saveAndCloseButton = Locator.xpath("//span[contains(.,'Save & Close')]");
+        public static Locator cancelButton = Locator.xpath("//span[contains(.,'Cancel')]");
+        public static Locator clearButton = Locator.xpath("//span[contains(.,'Clear')]");
+        public static Locator addStepButton = Locator.xpath("//span[contains(.,'Add Step')]");
+        public static Locator importTourButton = Locator.xpath("//span[contains(.,'Import')]");
+        public static Locator exportButton = Locator.xpath("//span[contains(.,'Export')]");
+        public static Locator.XPathLocator setModeCombo = Locator.tagWithId("select", "tour-mode");
+        public static Locator descriptionTextArea = Locator.xpath("//textarea[@id='tour-description']");
+        public static Locator titleTextArea = Locator.xpath("//input[@id='tour-title']");
+        public static Locator getSelectorTextArea(int index) {return Locator.xpath("//input[@id='tour-selector"+index+"']");}
+        public static Locator getStepTextArea(int index) {return Locator.xpath("//textarea[@id='tour-step"+index+"']/../div//textarea");}
     }
 }

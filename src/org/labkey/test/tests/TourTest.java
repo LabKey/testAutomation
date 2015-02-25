@@ -1,7 +1,7 @@
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -10,7 +10,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.TourEditor;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.util.List;
 
@@ -87,13 +86,14 @@ public class TourTest extends BaseWebDriverTest
                 "        title: \"This is the folder menu.\",\n" +
                 "        content: \"Use the links here to navigate to different folders.\",\n" +
                 "}");
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         tourEditor.save();
     }
 
     @Test
     public void runTests()
     {
+        getDriver().manage().window().maximize();
         testBasicTour();
         testTourRoundTrip();
         testRunAlways();
@@ -102,17 +102,19 @@ public class TourTest extends BaseWebDriverTest
 
     public void testBasicTour()
     {
+        TourNavigator tourNavigator = new TourNavigator();
         goToProjectHome();
         clickFolder(SUBFOLDER1);
         assertBasicTour();
         //tour should only run once
         goToProjectHome();
         clickFolder(SUBFOLDER1);
-        assertNoTourBubble();
+        tourNavigator.assertNoTourBubble();
     }
 
     public void testTourRoundTrip()
     {
+        TourNavigator tourNavigator = new TourNavigator();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         click(Locator.linkWithText("Edit"));
@@ -132,12 +134,11 @@ public class TourTest extends BaseWebDriverTest
         //tour should only run once
         goToProjectHome();
         clickFolder(SUBFOLDER1);
-        assertNoTourBubble();
+        tourNavigator.assertNoTourBubble();
     }
 
     public void testRunAlways()
     {
-        getDriver().manage().window().maximize();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         click(Locator.linkWithText("Edit"));
@@ -154,6 +155,7 @@ public class TourTest extends BaseWebDriverTest
 
     public void testOffMode()
     {
+        TourNavigator tourNavigator = new TourNavigator();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         click(Locator.linkWithText("Edit"));
@@ -162,48 +164,57 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.save();
         goToProjectHome();
         clickFolder(SUBFOLDER1);
-        assertNoTourBubble();
+        tourNavigator.assertNoTourBubble();
     }
 
     private void assertBasicTour()
     {
-        assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
-        dismissTourBubble();
+        TourNavigator tourNavigator = new TourNavigator();
+        tourNavigator.assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
+        tourNavigator.nextTourBubble();
+        tourNavigator.waitForTourBubble("2");
+        tourNavigator.assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
+        tourNavigator.nextTourBubble();
+        tourNavigator.waitForTourBubble("3");
+        tourNavigator.assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
+        tourNavigator.nextTourBubble();
+        tourNavigator.waitForTourBubble("4");
+        tourNavigator.assertTourBubble("4", "This is the folder menu.", "Use the links here to navigate to different folders.");
+        tourNavigator.doneTourBubble();
         sleep(WAIT);
-        assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertTourBubble("4", "This is the folder menu.", "Use the links here to navigate to different folders.");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertNoTourBubble();
+        tourNavigator.assertNoTourBubble();
     }
 
-    private void assertTourBubble(String number, String title, String content)
+    private class TourNavigator
     {
-        Assert.assertEquals(number, getText(Locator.tagWithClass("span", "hopscotch-bubble-number")));
-        Assert.assertEquals(title, getText(Locator.tagWithClass("h3", "hopscotch-title")));
-        Assert.assertEquals(content, getText(Locator.tagWithClass("div", "hopscotch-content")));
-    }
-
-    private void dismissTourBubble()
-    {
-        try
+        public void nextTourBubble()
         {
-            click(Locator.button("Next"));
+            //make this more specific
+            click(Locator.tagWithClass("button", "hopscotch-nav-button next hopscotch-next").withText("Next"));
         }
-        catch (NoSuchElementException ignore)
-        {
-            click(Locator.button("Done"));
-        }
-    }
 
-    private void assertNoTourBubble()
-    {
-        if(isElementPresent(Locator.divByClassContaining("hopscotch-bubble animated hide"))) return;
-        assertElementNotPresent(Locator.divByClassContaining("hopscotch"));
+        public void doneTourBubble()
+        {
+            //make more specific
+            click(Locator.tagWithClass("button", "hopscotch-nav-button next hopscotch-next").withText("Done"));
+        }
+
+        public void assertNoTourBubble()
+        {
+            if(isElementPresent(Locator.divByClassContaining("hopscotch-bubble animated hide"))) return;
+            assertElementNotPresent(Locator.divByClassContaining("hopscotch"));
+        }
+
+        private void assertTourBubble(String number, String title, String content)
+        {
+            Assert.assertEquals(number, getText(Locator.tagWithClass("span", "hopscotch-bubble-number")));
+            Assert.assertEquals(title, getText(Locator.tagWithClass("h3", "hopscotch-title")));
+            Assert.assertEquals(content, getText(Locator.tagWithClass("div", "hopscotch-content")));
+        }
+
+        private void waitForTourBubble(String stepNum)
+        {
+            waitForElement(Locator.tagWithClass("span", "hopscotch-bubble-number").withText(stepNum));
+        }
     }
 }
