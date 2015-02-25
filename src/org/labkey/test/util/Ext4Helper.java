@@ -726,9 +726,14 @@ public class Ext4Helper extends AbstractHelper
             return Locator.xpath("//tr").withClass(_cssPrefix + "grid-row").append("/td/div").withText(nodeText);
         }
 
+        public static Locator.XPathLocator tab()
+        {
+            return Locator.tagWithClass("a", _cssPrefix + "tab");
+        }
+
         public static Locator.XPathLocator tab(String tabName)
         {
-            return Locator.xpath("//a[contains(@class, '" + _cssPrefix + "tab') and contains( normalize-space(), '" + tabName + "')]");
+            return tab().containing(tabName);
         }
 
         public static Locator.XPathLocator ext4Button(String text)

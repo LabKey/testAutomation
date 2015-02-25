@@ -339,13 +339,13 @@ public class RReportHelper extends AbstractHelper
 
     public void clickViewTab()
     {
-        _test._ext4Helper.clickTabContainingText("View");
+        _test.waitAndClick(Ext4Helper.Locators.tab("View"));
         _test.waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clickSourceTab()
     {
-        _test._ext4Helper.clickTabContainingText("Source");
+        _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
         _test.waitForElement(Locator.tagWithClass("div", "reportSource").notHidden(), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
