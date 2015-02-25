@@ -418,7 +418,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         goToManageViews();
         clickViewDetailsLink(TIME_CHART_REPORT_NAME);
         clickAndWait(Locator.linkContainingText("Edit Report"));
-        waitForText("APX Main Title");
+        waitForElement(Locator.css("svg text").withText("APX Main Title"));
         assertTextNotPresent("Error: Could not find query"); // error message from 13.1 when dataset label was changed
         waitAndClick(Locator.css("svg a>path")); // click first data point
         _extHelper.waitForExtDialog("Data Point Information");
