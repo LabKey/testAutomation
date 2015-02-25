@@ -544,6 +544,11 @@ public abstract class Locator
         return xpath("//input[@type='checkbox' and @id=" + xq(id) + "]");
     }
 
+    public static CssLocator checkedRadioInGroup(String groupName)
+    {
+        return css("input:checked[name=" + groupName + "][type=radio]");
+    }
+
     public static XPathLocator radioButtonByNameAndValue(String name, String value)
     {
         return xpath("//input[@type='radio' and @name=" + xq(name) + " and @value=" + xq(value) + "]");

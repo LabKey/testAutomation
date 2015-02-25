@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -121,11 +122,12 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         log("Set folder level override of PVR default to thaw list.");
         click(Locator.linkWithText("manage assay design"));
         mouseOver(Locator.linkWithText("set default values"));
-        prepForPageLoad();
-        waitAndClick(Ext4Helper.Locators.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        waitAndClickAndWait(Ext4Helper.Locators.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
 
         // Are we seeing the default set in the parent project?
-        assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
+        Assert.assertEquals("Default participant visit resolver not inherited from project",
+                AssayImportOptions.VisitResolverType.ParticipantVisitDate.name(),
+                Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
 
         // Now override
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
@@ -134,7 +136,6 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
 
         // 20998 as part of that fix, the List option should already be checked
-        // click(Locator.radioButtonByNameAndValue("ThawListType", "List"));
 
         waitForElement(Locator.css(".schema-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
@@ -174,19 +175,21 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         click(Locator.linkWithText("manage assay design"));
         mouseOver(Locator.linkWithText("set default values"));
-        prepForPageLoad();
-        waitAndClick(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        waitAndClickAndWait(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
         // If we don't blow up hitting this next link, the fix for 20441 is good.
         waitAndClick(Locator.linkContainingText("edit default values for this table in"));
 
         // As long as we're here, make sure inheritance is still being acknowledged.
-        assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
+        Assert.assertEquals("Default participant visit resolver not inherited from project",
+                            AssayImportOptions.VisitResolverType.ParticipantVisitDate.name(),
+                            Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
         assertTextPresent("These values are overridden by defaults");
 
         log("Verify Delete and Re-import doesn't autofill SpecimenId");
         navToRunDetails();
         click(Locator.linkWithText("Delete and Re-import"));
-        assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+        Assert.assertEquals("Wrong participant visit resolver selected", "List",
+                Locator.checkedRadioInGroup("ThawListType").findElement(getDriver()).getAttribute("value"));
         // TODO: verify its the NabThawList thats selected
         clickButton("Next");
         assertElementPresent(Locator.input("specimen1_SpecimenID").withAttribute("value", ""));
