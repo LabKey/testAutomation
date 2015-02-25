@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+ //This script was erroneously numbered, and would only run on a bootstrapped system.  Problem is fixed by vehicle-15.00-15.01
+
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
