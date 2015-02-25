@@ -25,6 +25,7 @@ public class TourTest extends BaseWebDriverTest
     public static final String SUBFOLDER2 = "test project 2";
     public static final String TOUR_NAME = "Test Tour";
     public static final String TOUR_DESC = "Test Tour Description";
+    public static final int WAIT = 1000;
 
     @Nullable
     @Override
@@ -103,16 +104,16 @@ public class TourTest extends BaseWebDriverTest
         clickFolder(SUBFOLDER1);
         assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("4", "This is the folder menu.", "Use the links here to navigate to different folders.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertNoTourBubble();
         //tour should only run once
         goToProjectHome();
@@ -139,16 +140,16 @@ public class TourTest extends BaseWebDriverTest
         clickFolder(SUBFOLDER2);
         assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertTourBubble("4", "This is the folder menu.", "Use the links here to navigate to different folders.");
         dismissTourBubble();
-        sleep(WAIT_FOR_JAVASCRIPT);
+        sleep(WAIT);
         assertNoTourBubble();
         //tour should only run once
         goToProjectHome();
