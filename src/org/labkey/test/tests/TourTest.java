@@ -96,25 +96,15 @@ public class TourTest extends BaseWebDriverTest
     {
         testBasicTour();
         testTourRoundTrip();
+        testRunAlways();
+        testOffMode();
     }
 
     public void testBasicTour()
     {
         goToProjectHome();
         clickFolder(SUBFOLDER1);
-        assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertTourBubble("4", "This is the folder menu.", "Use the links here to navigate to different folders.");
-        dismissTourBubble();
-        sleep(WAIT);
-        assertNoTourBubble();
+        assertBasicTour();
         //tour should only run once
         goToProjectHome();
         clickFolder(SUBFOLDER1);
@@ -138,6 +128,45 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.save();
         goToProjectHome();
         clickFolder(SUBFOLDER2);
+        assertBasicTour();
+        //tour should only run once
+        goToProjectHome();
+        clickFolder(SUBFOLDER1);
+        assertNoTourBubble();
+    }
+
+    public void testRunAlways()
+    {
+        getDriver().manage().window().maximize();
+        beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
+        waitForText("Tours");
+        click(Locator.linkWithText("Edit"));
+        TourEditor tourEditor = new TourEditor(this);
+        tourEditor.setMode(TourEditor.TourMode.RUNALWAYS);
+        tourEditor.save();
+        goToProjectHome();
+        clickFolder(SUBFOLDER1);
+        assertBasicTour();
+        goToProjectHome();
+        clickFolder(SUBFOLDER1);
+        assertBasicTour();
+    }
+
+    public void testOffMode()
+    {
+        beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
+        waitForText("Tours");
+        click(Locator.linkWithText("Edit"));
+        TourEditor tourEditor = new TourEditor(this);
+        tourEditor.setMode(TourEditor.TourMode.OFF);
+        tourEditor.save();
+        goToProjectHome();
+        clickFolder(SUBFOLDER1);
+        assertNoTourBubble();
+    }
+
+    private void assertBasicTour()
+    {
         assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
         dismissTourBubble();
         sleep(WAIT);
@@ -151,17 +180,13 @@ public class TourTest extends BaseWebDriverTest
         dismissTourBubble();
         sleep(WAIT);
         assertNoTourBubble();
-        //tour should only run once
-        goToProjectHome();
-        clickFolder(SUBFOLDER1);
-        assertNoTourBubble();
     }
 
     private void assertTourBubble(String number, String title, String content)
     {
-        Assert.assertEquals(getText(Locator.tagWithClass("span", "hopscotch-bubble-number")), number);
-        Assert.assertEquals(getText(Locator.tagWithClass("h3", "hopscotch-title")), title);
-        Assert.assertEquals(getText(Locator.tagWithClass("div", "hopscotch-content")), content);
+        Assert.assertEquals(number, getText(Locator.tagWithClass("span", "hopscotch-bubble-number")));
+        Assert.assertEquals(title, getText(Locator.tagWithClass("h3", "hopscotch-title")));
+        Assert.assertEquals(content, getText(Locator.tagWithClass("div", "hopscotch-content")));
     }
 
     private void dismissTourBubble()
