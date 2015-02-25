@@ -588,21 +588,25 @@ public class ClientAPITest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         enableEmailRecorder();
 
-        assertFalse("api requires sender", executeEmailScript("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        assertFalse("api requires sender", executeEmailScript("", EMAIL_SUBJECT, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
 
-        assertFalse("api requires recipients", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        assertFalse("api requires recipients", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[0], EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
 
-        assertFalse("api requires message body", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null, false));
+        assertFalse("api requires message body", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, EMAIL_RECIPIENTS, null, null));
 
-        assertFalse("api requires user in system unless flag set", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
+        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML));
 
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, true));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_1, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_2, EMAIL_RECIPIENTS, EMAIL_BODY_PLAIN, null, true));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT_3, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, false));
-        assertTrue(executeEmailScript(PasswordUtil.getUsername(), null, EMAIL_RECIPIENTS, null, EMAIL_BODY_HTML, true));
+        assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
 
-        assertFalse("principalId only allowed from a server side script", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"-1", "-2"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML, false));
+        signOut();
+        assertFalse("api requires user in system for guests", executeEmailScript(PasswordUtil.getUsername(), EMAIL_SUBJECT, new String[]{"user4@clientapi.test"}, EMAIL_BODY_PLAIN, EMAIL_BODY_HTML));
+        signIn();
+
+        clickProject(PROJECT_NAME);
 
         goToModule("Dumbster");
 
@@ -613,7 +617,7 @@ public class ClientAPITest extends BaseWebDriverTest
         assertEquals("Number of notification emails", 5, getElementCount(Locator.linkWithText("View headers")));
     }
 
-    private Boolean executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody, boolean allowUnregisteredUser)
+    private Boolean executeEmailScript(String from, String subject, String[] recipients, String plainTxtBody, String htmlTxtBody)
     {
         final String emailScriptTemplate =
                 "var callback = arguments[arguments.length - 1];" +
@@ -631,7 +635,6 @@ public class ClientAPITest extends BaseWebDriverTest
                 "   msgSubject: '%s',\n" +
                 "   msgRecipients: [%s],\n" +
                 "   msgContent: [%s],\n" +
-                "   allowUnregisteredUser: '%s',\n" +
                 "   successCallback: onSuccess,\n" +
                 "   errorCallback: errorHandler,\n" +
                 "});";
@@ -641,7 +644,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         for (String email : recipients)
         {
-            if (NumberUtils.isDigits(email))
+            if (NumberUtils.isNumber(email))
             {
                 // principal id
                 recipientStr.append("LABKEY.Message.createPrincipalIdRecipient(LABKEY.Message.recipientType.to, '");
@@ -671,7 +674,7 @@ public class ClientAPITest extends BaseWebDriverTest
         }
 
         String emailScript = String.format(emailScriptTemplate, from, StringUtils.trimToEmpty(subject), recipientStr.toString(),
-                contentStr.toString(), String.valueOf(allowUnregisteredUser));
+                contentStr.toString());
 
         return (Boolean)((JavascriptExecutor) getDriver()).executeAsyncScript(emailScript);
     }
