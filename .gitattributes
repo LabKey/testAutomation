@@ -377,6 +377,7 @@ src/org/labkey/test/pages/LabKeyPage.java -text
 src/org/labkey/test/pages/OlapTestJson.java -text
 src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
+src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text
@@ -555,6 +556,7 @@ src/org/labkey/test/tests/TimeChartImportTest.java -text
 src/org/labkey/test/tests/TimeChartTest.java -text
 src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
+src/org/labkey/test/tests/TourTest.java -text
 src/org/labkey/test/tests/TruncationTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
