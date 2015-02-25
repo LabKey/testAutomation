@@ -4735,32 +4735,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      * @deprecated Use {@link org.labkey.test.util.DataRegionTable#getFullColumnValues(String...)}
      */
     @Deprecated
-    /**get values for all specifed columns for all pages of the table
-     * preconditions:  must be on start page of table
-     * postconditions:  at start of table
-     */
     public List<List<String>> getColumnValues(String tableName, String... columnNames)
     {
-        boolean moreThanOnePage = isTextPresent("Next");
         DataRegionTable table = new DataRegionTable(tableName, this);
-
-        if (moreThanOnePage)
-        {
-            table.clickHeaderButton("Page Size", "Show All");
-        }
-
-        List<List<String>> columns = new ArrayList<>();
-        for (String columnName : columnNames)
-        {
-            columns.add(table.getColumnDataAsText(columnName));
-        }
-
-        if (moreThanOnePage)
-        {
-            table.clickHeaderButton("Page Size", "100 per page");
-        }
-
-        return columns;
+        return table.getFullColumnValues(columnNames);
     }
 
     // Returns the number of rows (both <tr> and <th>) in the specified table

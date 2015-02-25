@@ -15,9 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.collections15.Bag;
+import org.apache.commons.collections15.bag.HashBag;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -142,28 +143,21 @@ public class StudyVisitTagTest extends StudyBaseTest
     {
         final List<String> VISIT_TAG_NAMES = Arrays.asList("day0", "finalvaccination", "finalvisit", "firstvaccination", "notsingleuse", "peakimmunogenicity");
         final List<String> VISIT_TAG_CAPTIONS = Arrays.asList("Day 0 (meaning varies)", "Final Vaccination", "Final visit", "First Vaccination", "Not Single Use Tag", "Predicted peak immunogenicity visit");
-        final List<String> VISIT_TAG_MAP_TAGS = Arrays.asList("Day 0 (meaning varies)", "First Vaccination", "Final Vaccination", "First Vaccination", "Final Vaccination", "Final visit");
-        final List<String> VISIT_TAG_MAP_VISITS = Arrays.asList("Visit1", "Visit2", "Visit3", "Visit3", "Visit4", "Visit5");
-        final List<String> VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", "Positive", "Negative", "Negative", "Positive", " ");
+        Bag<List<String>> expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(VISIT_TAG_NAMES, VISIT_TAG_CAPTIONS));
 
         goToProjectHome();
         DataRegionTable visitTags = getVisitTagTable();
-        List<String> tagNames = visitTags.getColumnDataAsText("Name");
-        List<String> tagCaptions = visitTags.getColumnDataAsText("Caption");
-        assertEquals("Wrong Tag Names", VISIT_TAG_NAMES, tagNames);
-        assertEquals("Wrong Tag Names", VISIT_TAG_CAPTIONS, tagCaptions);
+        Bag<List<String>> actualRows = new HashBag<>(visitTags.getRows("Name", "Caption"));
+        assertEquals("Wrong Visit Tag Data", expectedRows, actualRows);
+
+        final List<String> VISIT_TAG_MAP_TAGS = Arrays.asList("Day 0 (meaning varies)", "First Vaccination", "Final Vaccination", "First Vaccination", "Final Vaccination", "Final visit");
+        final List<String> VISIT_TAG_MAP_VISITS = Arrays.asList("Visit1", "Visit2", "Visit3", "Visit3", "Visit4", "Visit5");
+        final List<String> VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", "Positive", "Negative", "Negative", "Positive", " ");
+        expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(VISIT_TAG_MAP_TAGS, VISIT_TAG_MAP_VISITS, VISIT_TAG_MAP_COHORTS));
 
         DataRegionTable visitTagMaps = getVisitTagMapTable();
-        // Ensure consistent sorting
-        visitTagMaps.setSort("VisitTag", SortDirection.ASC);
-        visitTagMaps.setSort("Visit", SortDirection.ASC);
-        List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
-        List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
-        List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
-
-        assertEquals("Wrong Tag Map Names", VISIT_TAG_MAP_TAGS, tagMapNames);
-        assertEquals("Wrong Tag Map Visits", VISIT_TAG_MAP_VISITS, tagMapVisits);
-        assertEquals("Wrong Tag Map Cohorts", VISIT_TAG_MAP_COHORTS, tagMapCohort);
+        actualRows = new HashBag<>(visitTagMaps.getRows("VisitTag", "Visit", "Cohort"));
+        assertEquals("Wrong Visit Tag Map Data", expectedRows, actualRows);
 
         verifyInsertEditVisitTags();
     }

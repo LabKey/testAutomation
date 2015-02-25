@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.collections15.Bag;
+import org.apache.commons.collections15.bag.HashBag;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
@@ -23,11 +25,11 @@ import org.labkey.test.SortDirection;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -366,9 +368,69 @@ public class DataRegionTable
         return getColumnDataAsText(col);
     }
 
+    /**
+     * Get values for all specifed columns for all pages of the table
+     * preconditions:  must be on start page of table
+     * postconditions:  at start of table
+     */
     public List<List<String>> getFullColumnValues(String... columnNames)
     {
-        return _test.getColumnValues(getTableName(), columnNames);
+        boolean moreThanOnePage = _test.isElementPresent(Locator.linkWithText("Next"));
+
+        if (moreThanOnePage)
+        {
+            clickHeaderButton("Page Size", "Show All");
+        }
+
+        List<List<String>> columns = new ArrayList<>();
+        for (String columnName : columnNames)
+        {
+            columns.add(getColumnDataAsText(columnName));
+        }
+
+        if (moreThanOnePage)
+        {
+            clickHeaderButton("Page Size", "100 per page");
+        }
+
+        return columns;
+    }
+
+    public List<List<String>> getRows(String...columnNames)
+    {
+        List<List<String>> fullColumnValues = getFullColumnValues(columnNames);
+        return collateColumnsIntoRows(fullColumnValues);
+    }
+
+    @SafeVarargs
+    public static List<List<String>> collateColumnsIntoRows(List<String>...columns)
+    {
+        return collateColumnsIntoRows(Arrays.asList(columns));
+    }
+
+    public static List<List<String>> collateColumnsIntoRows(List<List<String>> columns)
+    {
+        int rowCount = 0;
+        for (int i = 0; i < columns.size() - 1; i++)
+        {
+            rowCount = columns.get(i).size();
+            if (columns.get(i).size() != columns.get(i+1).size())
+                throw new IllegalArgumentException("Columns not of equal sizes");
+        }
+
+        List<List<String>> rows = new ArrayList<>();
+
+        for (int rowNum = 0; rowNum < rowCount; rowNum++)
+        {
+            List<String> row = new ArrayList<>(columns.size());
+            for (List<String> column : columns)
+            {
+                row.add(column.get(rowNum));
+            }
+            rows.add(row);
+        }
+
+        return rows;
     }
 
     /** Find the row number for the given primary key. */

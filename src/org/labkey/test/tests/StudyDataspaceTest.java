@@ -15,11 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.collections15.Bag;
+import org.apache.commons.collections15.bag.HashBag;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
@@ -222,18 +223,15 @@ public class StudyDataspaceTest extends StudyBaseTest
                               "1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
                               "2/4 - Heterologous boost regimen", "1/3 - Heterologous boost regimen");
 
+        Bag<List<String>> expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(VISIT_TAG_MAP_TAGS, VISIT_TAG_MAP_VISITS, VISIT_TAG_MAP_COHORTS));
+
         // Check visit tags
         clickFolder(getProjectName());
         _portalHelper.addQueryWebPart(VISIT_TAG_MAP_QWP_TITLE, "study", "VisitTagMap", null);
         DataRegionTable visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this, false);
-        visitTagMaps.setSort("Visit", SortDirection.ASC);
-        List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
-        List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
-        List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
+        Bag<List<String>> actualRows = new HashBag<>(visitTagMaps.getRows("VisitTag", "Visit", "Cohort"));
 
-        assertEquals("Wrong Visit Tags", VISIT_TAG_MAP_TAGS, tagMapNames);
-        assertEquals("Wrong Visits", VISIT_TAG_MAP_VISITS, tagMapVisits);
-        assertEquals("Wrong Cohorts", VISIT_TAG_MAP_COHORTS, tagMapCohort);
+        assertEquals("Wrong Rows", expectedRows, actualRows);
 
         List<WebElement> buttons = visitTagMaps.getHeaderButtons();
         Assert.assertFalse("Should not be able to 'Insert New' into VisitTagMap from dataspace project", getTexts(buttons).contains("INSERT NEW"));
@@ -242,17 +240,13 @@ public class StudyDataspaceTest extends StudyBaseTest
         final List<String> STUDY5_VISIT_TAG_MAP_TAGS = Arrays.asList("First Vaccination", "Second Vaccination", "Follow Up", "Follow Up");
         final List<String> STUDY5_VISIT_TAG_MAP_VISITS = Arrays.asList("Day -1001", "Day -1316", "Day -1351", "Day -1377");
         final List<String> STUDY5_VISIT_TAG_MAP_COHORTS = Arrays.asList(" ", " ", " ", " ");
+        expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(STUDY5_VISIT_TAG_MAP_TAGS, STUDY5_VISIT_TAG_MAP_VISITS, STUDY5_VISIT_TAG_MAP_COHORTS));
 
         clickFolder(FOLDER_STUDY5);
         visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
-        visitTagMaps.setSort("Visit", SortDirection.ASC);
-        tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
-        tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
-        tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
+        actualRows = new HashBag<>(visitTagMaps.getRows("VisitTag", "Visit", "Cohort"));
 
-        assertEquals("Wrong Visit Tags", STUDY5_VISIT_TAG_MAP_TAGS, tagMapNames);
-        assertEquals("Wrong Visits", STUDY5_VISIT_TAG_MAP_VISITS, tagMapVisits);
-        assertEquals("Wrong Cohorts", STUDY5_VISIT_TAG_MAP_COHORTS, tagMapCohort);
+        assertEquals("Wrong Visit Tag Map Rows in study folder", expectedRows, actualRows);
 
         buttons = visitTagMaps.getHeaderButtons();
         Assert.assertTrue("Should be able to 'Insert New' into VisitTagMap from dataspace study", getTexts(buttons).contains("INSERT NEW"));
