@@ -79,6 +79,14 @@ public class ListHelper extends AbstractHelper
         _test.waitForElement(Locator.css(".labkey-error").containing(error));
     }
 
+    public void importDataFromFile(File inputFile)
+    {
+        clickImportData();
+        _test.click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
+        _test.setFormElement(Locator.name("file"), inputFile);
+        _test.clickButton("Submit", BaseWebDriverTest.WAIT_FOR_PAGE * 5);
+    }
+
     /**
      * From the list data grid, insert a new entry into the current list
      *
