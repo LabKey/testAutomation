@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DataRegionTable
 {
@@ -157,6 +158,17 @@ public class DataRegionTable
         List<WebElement> headerButtons = allButtonsLoc.findElements(_test.getDriver());
 
         return headerButtons;
+    }
+
+    public List<String> getHeaderButtonTexts()
+    {
+        List<WebElement> headerButtons = getHeaderButtons();
+        List<String> headerButtonTexts = new ArrayList<>();
+        for(WebElement button : headerButtons)
+        {
+            headerButtonTexts.add(button.getText());
+        }
+        return headerButtonTexts;
     }
 
     public int getDataRowCount()
@@ -786,6 +798,17 @@ public class DataRegionTable
     public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
     {
         _test._ext4Helper.clickExt4MenuButton(wait, DataRegionTable.Locators.headerMenuButton(_tableName, buttonText), false, subMenuLabels);
+    }
+
+    public List<String> getHeaderButtonSubmenuText(String buttonText)
+    {
+        List<String> subMenuItems = new ArrayList<>();
+        List<WebElement> buttonElements = _test._ext4Helper.getExt4MenuButtonSubMenu(DataRegionTable.Locators.headerMenuButton(_tableName, buttonText));
+        for(WebElement buttonElement : buttonElements)
+        {
+            subMenuItems.add(buttonElement.getText());
+        }
+        return subMenuItems;
     }
 
     public static class Locators

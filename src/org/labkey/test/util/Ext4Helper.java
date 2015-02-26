@@ -647,6 +647,12 @@ public class Ext4Helper extends AbstractHelper
             _test.waitAndClick(itemLocator);
     }
 
+    public List<WebElement> getExt4MenuButtonSubMenu(Locator menu)
+    {
+        _test.waitAndClick(menu);
+        return _test.getDriver().findElements(Locator.tagWithClass("span", _cssPrefix + "menu-item-text").toBy());
+    }
+
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);
