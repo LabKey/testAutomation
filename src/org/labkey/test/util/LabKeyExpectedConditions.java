@@ -77,8 +77,6 @@ public abstract class LabKeyExpectedConditions
                 {
                     firstDimension = el.getSize();
                     firstPosition = el.getLocation();
-                    System.out.println("Dimension: " + firstDimension);
-                    System.out.println("Postion: " + firstPosition);
                     Thread.sleep(100);
                     secondDimension = el.getSize();
                     secondPosition = el.getLocation();
