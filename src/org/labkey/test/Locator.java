@@ -806,6 +806,16 @@ public abstract class Locator
             return this.withPredicate("string-length() > 0");
         }
 
+        public XPathLocator withoutText(String text)
+        {
+            return this.withPredicate("not(normalize-space()=" + xq(text) + ")");
+        }
+
+        public XPathLocator withoutText()
+        {
+            return this.withPredicate("string-length() == 0");
+        }
+
         public XPathLocator withTextMatching(String regex)
         {
             return this.withPredicate("matches(normalize-space(), " + xq(regex) + ")");
