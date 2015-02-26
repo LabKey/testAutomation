@@ -16,9 +16,9 @@
 package org.labkey.test.util;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -71,10 +71,16 @@ public abstract class LabKeyExpectedConditions
             {
                 Point firstPosition;
                 Point secondPosition;
+                Dimension firstDimension;
+                Dimension secondDimension;
                 try
                 {
+                    firstDimension = el.getSize();
                     firstPosition = el.getLocation();
+                    System.out.println("Dimension: " + firstDimension);
+                    System.out.println("Postion: " + firstPosition);
                     Thread.sleep(100);
+                    secondDimension = el.getSize();
                     secondPosition = el.getLocation();
                 }
                 catch (InterruptedException recheck)
@@ -82,7 +88,7 @@ public abstract class LabKeyExpectedConditions
                     return false;
                 }
 
-                return secondPosition.equals(firstPosition);
+                return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);
             }
 
             @Override
