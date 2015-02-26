@@ -371,6 +371,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                     prefs.put("download.prompt_for_download", "false");
                     prefs.put("download.default_directory", getDownloadDir().getAbsolutePath());
+                    prefs.put("profile.content_settings.pattern_pairs.*.multiple-automatic-downloads", 1); // Turns off multiple download warning
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
@@ -6801,11 +6802,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void waitForElements(Locator loc, int count)
+    public void waitForElements(final Locator loc, final int count)
     {
-        waitForElementToDisappear(loc.index(count), WAIT_FOR_JAVASCRIPT);
-        if (count > 0)
-            waitForElement(loc.index(count - 1));
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return count == loc.findElements(getDriver()).size();
+            }
+        }, WAIT_FOR_JAVASCRIPT);
+
+        assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
     }
 
     public String waitForWikiDivPopulation(String testDivName, int waitSeconds)
