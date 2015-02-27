@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -57,6 +58,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
 import static org.junit.Assert.*;
@@ -102,7 +104,7 @@ public class SequenceTest extends BaseWebDriverTest
         addReferenceGenomeTracks(this, TEST_GENOME_NAME);
 
         File testBam = new File(TestFileUtils.getLabKeyRoot(), "/externalModules/labModules/SequenceAnalysis/resources/sampleData/test.bam");
-        SequenceTest.addOutputFile(this, testBam, SequenceTest.TEST_GENOME_NAME, "TestBAM", "This is an output file");
+        SequenceTest.addOutputFile(this, testBam, SequenceTest.TEST_GENOME_NAME, "TestBAM", "This is an output file", false);
     }
 
     protected void setUpTest()
@@ -128,7 +130,7 @@ public class SequenceTest extends BaseWebDriverTest
     {
         //create readset records for illumina run
         goToProjectHome();
-        waitAndClick(Locator.linkWithText("Create Readsets"));
+        waitAndClick(Locator.linkWithText("Plan Sequence Run (Create Readsets)"));
         waitForElement(Ext4Helper.Locators.window("Create Readsets"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
@@ -156,7 +158,7 @@ public class SequenceTest extends BaseWebDriverTest
     private void createIlluminaSampleSheet()
     {
         goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
         _helper.waitForDataRegion("query");
 
         //verify CSV file creation
@@ -283,7 +285,7 @@ public class SequenceTest extends BaseWebDriverTest
     private void importIlluminaTest()
     {
         setPipelineRoot(_illuminaPipelineLoc);
-        initiatePipelineJob("Import Illumina data", ILLUMINA_CSV);
+        initiatePipelineJob("Import Illumina data", Arrays.asList(ILLUMINA_CSV));
 
         setFormElement(Locator.name("protocolName"), "TestIlluminaRun" + _helper.getRandomInt());
         setFormElement(Locator.name("runDate"), "08/25/2011");
@@ -309,11 +311,11 @@ public class SequenceTest extends BaseWebDriverTest
     private void readsetFeaturesTest() throws IOException
     {
         //verify import and instrument run creation
-        goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
-        _helper.waitForDataRegion("query");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=sequenceanalysis&query.queryName=read_data");
 
         DataRegionTable dr = new DataRegionTable("query", this);
+        _helper.waitForDataRegion("query");
+
         for (int i = 0; i < dr.getDataRowCount(); i++)
         {
             String rowId = dr.getDataAsText(i, "Readset Id");
@@ -326,6 +328,12 @@ public class SequenceTest extends BaseWebDriverTest
             String instrumentRun = dr.getDataAsText(i, "Instrument Run");
             assertTrue("Incorrect or no instrument run associated with readset", instrumentRun.startsWith("TestIlluminaRun"));
         }
+
+        goToProjectHome();
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
+        _helper.waitForDataRegion("query");
+
+        dr = new DataRegionTable("query", this);
 
         log("Verifying instrument run and details page");
         clickAndWait(dr.link(2, "Instrument Run"));
@@ -344,7 +352,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying readset details page");
         goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         clickAndWait(dr.link(1, 1));
@@ -363,7 +371,7 @@ public class SequenceTest extends BaseWebDriverTest
         //verify export
         log("Verifying FASTQ Export");
         goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
@@ -398,31 +406,9 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("File Summary");
         assertTextPresent("Per base sequence quality");
 
-        log("Verifying View Analyses");
-        goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
-
-        waitForText("Instrument Run"); //proxy for dataRegion loading
-        dr = new DataRegionTable("query", this);
-        dr.uncheckAllOnPage();
-
-        //NOTE: this is going to be sensitive to the ordering of params by the DataRegion.  May need a more robust
-        //approach if that is variable.
-        dr.checkCheckbox(1);
-        String id1 = dr.getDataAsText(1, "Readset Id");
-        dr.checkCheckbox(2);
-        String id2 = dr.getDataAsText(2, "Readset Id");
-
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View Analyses");
-
-        waitForText("Analysis Type"); //proxy for dataRegion loading
-
-        assertTextPresent("readset IS ONE OF (");
-        assertTrue("Filter not applied correct", (isTextPresent(id1 + ", " + id2) || isTextPresent(id2 + ", " + id1)));
-
         log("Verifying Readset Edit");
         goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
 
         waitForText("Instrument Run"); //proxy for dataRegion loading
         clickAndWait(dr.link(1, 0));
@@ -453,7 +439,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying Analysis Panel UI");
 
         goToProjectHome();
-        _helper.clickNavPanelItemAndWait("Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Readsets:", 1);
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
@@ -463,7 +449,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Analyze Selected");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Align/Analyze Selected");
         waitForElement(Ext4Helper.Locators.window("Import Data"));
         waitForText("Description");
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
@@ -474,7 +460,7 @@ public class SequenceTest extends BaseWebDriverTest
         String totalReads = "450";
         String minReadLength = "68";
         String seedMismatches = "3";
-        String simpleClipThreshold = "0";
+        String simpleClipThreshould = "0";
         String qualWindowSize = "8";
         String qualAvgQual = "19";
         //String maskMinQual = "21";
@@ -657,25 +643,13 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorect param in form JSON", 0.02, params.get("alignment.Mosaik.max_mismatch_pct"));
         assertEquals("Incorect param in form JSON", true, params.get("alignment.Mosaik.output_multiple"));
 
-        Map sample = (Map) params.get("sample_0");
-        Long readset = (Long) sample.get("readset");
-        assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
-        assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
-        assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
-        assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        Map sample = (Map) params.get("readset_0");
+        assertFalse("Incorect param in form JSON", null == sample.get("readset"));
         assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
-        assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
-        assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
-        sample = (Map) params.get("sample_1");
-        readset = (Long) sample.get("readset");
-        assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
-        assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
-        assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
-        assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        sample = (Map) params.get("readset_1");
+        assertFalse("Incorect param in form JSON", null == sample.get("readset"));
         assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
-        assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
-        assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
     }
 
     /**
@@ -708,7 +682,7 @@ public class SequenceTest extends BaseWebDriverTest
         }
     }
 
-    protected void initiatePipelineJob(String importAction, String... files)
+    protected void initiatePipelineJob(String importAction, List<String> files)
     {
         goToProjectHome();
         waitForText("Upload Files");
@@ -730,16 +704,36 @@ public class SequenceTest extends BaseWebDriverTest
      * The intent of this method is to perform additional tests of this Readset Import Panel,
      * with the goal of exercising all UI options
      */
-    private void readsetPanelTest()
+    private void readsetPanelTest() throws IOException
     {
         log("Verifying Readset Import Panel UI");
 
         goToProjectHome();
         setPipelineRoot(_sequencePipelineLoc);
 
-        String filename2 = "sample454_SIV.sff";
+        List<String> files = new ArrayList<>();
+
         String filename1 = "dualBarcodes_SIV.fastq.gz";
-        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        files.add(filename1);
+
+        String filename2 = "sample454_SIV.sff";
+        files.add(filename2);
+
+        //multiples files from a single group
+        List<Pair<String, String>> readGroup = new ArrayList<>();
+        readGroup.add(Pair.of("s_G1_L001_R1_001.fastq.gz", "s_G1_L001_R2_001.fastq.gz"));
+        readGroup.add(Pair.of("s_G1_L001_R1_002.fastq.gz", "s_G1_L001_R2_002.fastq.gz"));
+        readGroup.add(Pair.of("s_G1_L002_R1_001.fastq.gz", "s_G1_L002_R2_001.fastq.gz"));
+        for (Pair<String, String> pair : readGroup)
+        {
+            FileUtils.copyFile(new File(_sequencePipelineLoc, "paired1.fastq.gz"), new File(_sequencePipelineLoc, pair.getLeft()));
+            files.add(pair.getLeft());
+
+            FileUtils.copyFile(new File(_sequencePipelineLoc, "paired2.fastq.gz"), new File(_sequencePipelineLoc, pair.getRight()));
+            files.add(pair.getRight());
+        }
+
+        initiatePipelineJob(_readsetPipelineName, files);
         waitForText("Job Name");
 
         Ext4FieldRef.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
@@ -749,71 +743,105 @@ public class SequenceTest extends BaseWebDriverTest
 
         Ext4FieldRef barcodeField = Ext4FieldRef.getForLabel(this, "Use Barcodes");
         Ext4FieldRef treatmentField = Ext4FieldRef.getForLabel(this, "Treatment of Input Files");
-        Ext4FieldRef pairedField = Ext4FieldRef.getForLabel(this, "Data Is Paired End");
-        Ext4GridRef grid = getSampleGrid();
 
         assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
 
+        Ext4GridRef readDataGrid = _ext4Helper.queryOne("#readDataGrid", Ext4GridRef.class);
+        Ext4GridRef readsetGrid = _ext4Helper.queryOne("#readsetGrid", Ext4GridRef.class);
+
+        //verify file groups worked right
+        Assert.assertEquals("incorrect row count", 5, readDataGrid.getRowCount());
+        Assert.assertEquals("incorrect row count", 3, readsetGrid.getRowCount());
+
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(1, "fileRecord1"))));
+        Assert.assertNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(1, "fileRecord2"))));
+
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(2, "fileRecord1"))));
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(2, "fileRecord2"))));
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(3, "fileRecord1"))));
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(3, "fileRecord2"))));
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(4, "fileRecord1"))));
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(4, "fileRecord2"))));
+
+        Assert.assertNotNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(5, "fileRecord1"))));
+        Assert.assertNull(StringUtils.trimToNull(Objects.toString(readDataGrid.getFieldValue(5, "fileRecord2"))));
+
+        Assert.assertEquals("incorrect group count", 3L, readDataGrid.getEval("store.getGroups().length"));
+
+        //then split groups
+        waitAndClick(readDataGrid.getRow(2));
+        readDataGrid.clickTbarButton("Split/Regroup Selected");
+        waitForElement(Ext4Helper.Locators.window("Split/Regroup Files"));
+        String groupName = "NewGroup";
+        _ext4Helper.queryOne("window textfield", Ext4FieldRef.class).setValue(groupName);
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("OK"));
+        sleep(200);
+        Assert.assertEquals("incorrect group count", 4L, readDataGrid.getEval("store.getGroups().length"));
+        Assert.assertEquals("incorrect readsetname", "dualBarcodes_SIV", readsetGrid.getFieldValue(1, "fileGroupId"));
+        readDataGrid.setGridCell(2, "fileGroupId", groupName);
+        sleep(200);
+        Assert.assertEquals("incorrect group count", 3L, readDataGrid.getEval("store.getGroups().length"));
+        Assert.assertEquals("incorrect readsetname", groupName, readsetGrid.getFieldValue(1, "fileGroupId"));
+
+        readDataGrid.setGridCell(1, "fileGroupId", groupName);
+        Assert.assertEquals("incorrect readsetname", "sample454_SIV", readsetGrid.getFieldValue(3, "fileGroupId"));
+        readDataGrid.setGridCell(5, "fileGroupId", "sample454_SIVb");
+        Assert.assertEquals("incorrect readsetname", "sample454_SIVb", readsetGrid.getFieldValue(3, "fileGroupId"));
+
+        //now we check readset info
+        readsetGrid.clickTbarButton("Bulk Edit");
+        waitForElement(Ext4Helper.Locators.window("Bulk Edit").notHidden());
+        Ext4FieldRef.waitForField(this, "Select Field");
+        sleep(200);
+
+        _ext4Helper.selectComboBoxItem("Select Field:", Ext4Helper.TextMatchTechnique.CONTAINS, "Application");
+        Ext4ComboRef.waitForField(this, "Application");
+        Ext4ComboRef.getForLabel(this, "Application").setValue("DNA Sequencing (Genome)");
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Submit"));
+        waitForElementToDisappear(Ext4Helper.Locators.window("Bulk Edit"));
+        sleep(200);
+        Assert.assertEquals("field not set", "DNA Sequencing (Genome)", readsetGrid.getFieldValue(1, "application"));
+        Assert.assertEquals("field not set", "DNA Sequencing (Genome)", readsetGrid.getFieldValue(2, "application"));
+        Assert.assertEquals("field not set", "DNA Sequencing (Genome)", readsetGrid.getFieldValue(3, "application"));
+
         barcodeField.setChecked(true);
-        sleep(100);
-        assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
-        assertFalse("MID5 column should not be hidden", (Boolean) grid.getEval("columns[2].hidden"));
-        assertFalse("MID3 column should not be hidden", (Boolean) grid.getEval("columns[3].hidden"));
+        sleep(200);
+        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
+        Assert.assertFalse("MID5 column should not be hidden", (Boolean) readsetGrid.getEval("columns[1].hidden"));
+        Assert.assertFalse("MID3 column should not be hidden", (Boolean) readsetGrid.getEval("columns[2].hidden"));
 
         barcodeField.setChecked(false);
-        sleep(100);
+        sleep(200);
         assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", treatmentField.getValue());
-        assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
-        assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
+        assertTrue("MID5 column should be hidden", (Boolean) readsetGrid.getEval("columns[1].hidden"));
+        assertTrue("MID3 column should be hidden", (Boolean) readsetGrid.getEval("columns[2].hidden"));
 
-        pairedField.setChecked(true);
-        assertFalse("Paired file column should not be hidden", (Boolean) grid.getEval("columns[1].hidden"));
-
-        pairedField.setChecked(false);
-        assertTrue("Paired file column should be hidden", (Boolean) grid.getEval("columns[1].hidden"));
-
-        //now set real values
-        click(Ext4Helper.Locators.ext4Button("Add"));
-        waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
-
-        //the first field is pre-selected
-        grid.cancelEdit();
-
-        grid.setGridCell(1, "fileName", filename1);
-        grid.setGridCell(2, "fileName", filename1);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.Locators.window("Error"));
-        assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
+        waitForElement(Locator.tagContainingText("div", "There are 12 errors.  Please review the cells highlighted in red."));
         click(Ext4Helper.Locators.ext4Button("OK"));
 
-        setBasicSampleDetails(grid);
+        setBasicSampleDetails(readsetGrid);
+        readsetGrid.setGridCell(2, "readsetname", "Readset1"); //duplicate name
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.Locators.window("Error"));
-        waitForElement(Locator.tagContainingText("div", "Duplicate Sample: " + filename1 + ". Please remove or edit rows"));
+        waitForElement(Locator.tagContainingText("div", "There are 2 errors.  Please review the cells highlighted in red.  Note: you can hover over the cell for more information on the issue."));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
-
-        //verify paired end
-        pairedField.setChecked(true);
-        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.Locators.window("Error"));
-        assertTextPresent("For each file, you must provide either");
-        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
-        pairedField.setChecked(false);
 
         //try duplicate barcodes
         barcodeField.setChecked(true);
-        setBasicSampleDetails(grid);
+
         String barcode = "FLD0376";
-        grid.setGridCellJS(1, "mid5", barcode);
-        grid.setGridCellJS(2, "mid3", barcode);
+        readsetGrid.setGridCellJS(1, "barcode5", barcode);
+        readsetGrid.setGridCellJS(2, "barcode3", barcode);
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.Locators.window("Error"));
-        assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
+
+        waitForElement(Locator.tagContainingText("div", "There are 2 errors.  Please review the cells highlighted in red."));
         click(Ext4Helper.Locators.ext4Button("OK"));
         barcodeField.setChecked(false);
-        grid.setGridCell(2, "fileName", filename2);
-
+        readsetGrid.setGridCell(2, "readsetname", "Readset2");
         Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         Map<String, Object> params = (Map) panel.getEval("getJsonParams()");
         Map<String, Object> fieldsJson = (Map) params.get("json");
@@ -830,8 +858,9 @@ public class SequenceTest extends BaseWebDriverTest
         String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
         assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
 
-        assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
-        assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
+        Collections.sort(files);
+        assertEquals("Unexpected value for param", StringUtils.join(files, ";"), fieldsJson.get("fileNames"));
+
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.barcodeGroups")));
         assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
         assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
@@ -840,29 +869,52 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", "delete", fieldsJson.get("inputfile.inputTreatment"));
         assertEquals("Unexpected value for param", true, fieldsJson.get("deleteIntermediateFiles"));
 
-        Map<String, Object> sample0 = (Map) fieldsJson.get("sample_0");
-        Map<String, Object> sample1 = (Map) fieldsJson.get("sample_1");
+        Map<String, Object> fileGroup0 = (Map) fieldsJson.get("fileGroup_1");
+        Assert.assertEquals("Unexpected value for param", groupName, fileGroup0.get("name"));
+        List<Map> arr0 = (List)fileGroup0.get("files");
+        Assert.assertEquals(2, arr0.size());
+        Assert.assertEquals(groupName, arr0.get(0).get("fileGroupId"));
+        Assert.assertEquals("s-G1_L001", arr0.get(0).get("platformUnit"));
 
-        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
-        assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
-        assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        assertEquals("Unexpected value for param", "gDNA", sample0.get("inputmaterial"));
-        assertFalse("param shold not be present", sample0.containsKey("mid5"));
-        assertFalse("param shold not be present", sample0.containsKey("mid3"));
+        Assert.assertEquals(groupName, arr0.get(1).get("fileGroupId"));
+        Assert.assertEquals("", arr0.get(1).get("platformUnit"));
 
-        assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
-        assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
-        assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
-        assertEquals("Unexpected value for param", "2010-10-20T07:00:00.000Z", sample1.get("sampledate"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
-        assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
-        assertEquals("Unexpected value for param", "gDNA", sample1.get("inputmaterial"));
-        assertFalse("param shold not be present", sample1.containsKey("mid5"));
-        assertFalse("param shold not be present", sample1.containsKey("mid3"));
+        Map<String, Object> fileGroup1 = (Map) fieldsJson.get("fileGroup_2");
+        Assert.assertEquals(2, ((List)fileGroup1.get("files")).size());
+        Map<String, Object> fileGroup2 = (Map) fieldsJson.get("fileGroup_3");
+        Assert.assertEquals(1, ((List)fileGroup2.get("files")).size());
+
+        Map<String, Object> sample0 = (Map) fieldsJson.get("readset_0");
+        Map<String, Object> sample1 = (Map) fieldsJson.get("readset_1");
+        Map<String, Object> sample2 = (Map) fieldsJson.get("readset_2");
+
+        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        Assert.assertEquals("Unexpected value for param", groupName, StringUtils.trimToNull((String) sample0.get("fileGroupId")));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String) sample0.get("barcode5")));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String) sample0.get("barcode3")));
+
+        Assert.assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", "2010-10-20T07:00:00.000Z", sample1.get("sampledate"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
+        Assert.assertEquals("Unexpected value for param", "s-G1", StringUtils.trimToNull((String) sample1.get("fileGroupId")));
+        Assert.assertEquals("Unexpected value for param", "gDNA", sample1.get("sampletype"));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String)sample1.get("barcode5")));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String)sample1.get("barcode3")));
+
+        Assert.assertEquals("Unexpected value for param", "Readset3", sample2.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject3", sample2.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", "2010-10-20T07:00:00.000Z", sample2.get("sampledate"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample2.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "LS454", sample2.get("platform"));
+        Assert.assertEquals("Unexpected value for param", "sample454_SIVb", StringUtils.trimToNull((String) sample2.get("fileGroupId")));
+        Assert.assertEquals("Unexpected value for param", "gDNA", sample2.get("sampletype"));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String)sample2.get("barcode5")));
+        Assert.assertNull("param should not be present", StringUtils.trimToNull((String)sample2.get("barcode3")));
 
         barcodeField.setValue(true);
         Ext4FieldRef.getForLabel(this, "Additional Barcodes To Test").setValue("GSMIDs");
@@ -873,116 +925,86 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRef.getForLabel(this, "Delete Intermediate Files").setValue(false);
         treatmentField.setValue("compress");
 
-        params = (Map) panel.getEval("getJsonParams()");
-        fieldsJson = (Map) params.get("json");
-
-        assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
-        assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
-        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeEditDistance"));
-        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
-        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
-
-        assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
-        assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
-
-        sample0 = (Map) fieldsJson.get("sample_0");
-        assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
-        assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
-        assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        assertEquals("Unexpected value for param", "gDNA", sample0.get("inputmaterial"));
-        assertFalse("param shold not be present", sample0.containsKey("mid5"));
-        assertFalse("param shold not be present", sample0.containsKey("mid3"));
-
-        barcodeField.setValue(false);
-
-        pairedField.setValue(true);
-        grid.setGridCell(1, "fileName", filename1);
-        grid.setGridCellJS(1, "fileName2", filename2);
-        grid.setGridCell(1, "readsetname", "Readset1");
-        grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCellJS(1, "inputmaterial", "gDNA");
-        grid.setGridCell(1, "subjectid", "Subject1");
+        readsetGrid.setGridCell(1, "barcode5", "FLD0001");
+        readsetGrid.setGridCell(2, "barcode5", "FLD0002");
+        readsetGrid.setGridCell(3, "barcode5", "FLD0003");
 
         params = (Map) panel.getEval("getJsonParams()");
         fieldsJson = (Map) params.get("json");
-        sample0 = (Map) fieldsJson.get("sample_0");
-        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
 
-        pairedField.setValue(false);
-        setBasicSampleDetails(grid);
-        barcodeField.setValue(true);
-        waitAndClick(Ext4Helper.Locators.ext4Button("Add"));
-        waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
-        getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
-        sleep(100);
+        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
+        Assert.assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeEditDistance"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
 
-        grid.setGridCell(1, "fileName", filename1);
-        String readsetNew = "ReadsetNew";
-        grid.setGridCell(1, "readsetname", readsetNew);
-        grid.setGridCellJS(1, "platform", "SANGER");
-        grid.setGridCell(2, "fileName", filename2);
-        String barcode2 = "FLD0374";
-        grid.setGridCellJS(1, "mid5", barcode);
-        grid.setGridCellJS(1, "mid3", barcode2);
-        grid.setGridCellJS(2, "mid3", barcode);
-        grid.setGridCellJS(2, "mid5", barcode2);
-        grid.setGridCellJS(3, "mid3", barcode);
-        grid.setGridCellJS(3, "mid5", barcode2);
+        Assert.assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
+        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
 
-        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
-        waitForElement(Ext4Helper.Locators.window("Error"));
-        assertTextPresent("Duplicate Sample: " + filename2);
-        click(Ext4Helper.Locators.ext4Button("OK"));
-
-        click(grid.getRow(3));
-        grid.cancelEdit();
-        waitAndClick(Ext4Helper.Locators.ext4Button("Remove"));
-        grid.waitForRowCount(2);
-
-        params = (Map) panel.getEval("getJsonParams()");
-        fieldsJson = (Map) params.get("json");
-        sample0 = (Map) fieldsJson.get("sample_0");
-        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileName2")));
-        assertEquals("Unexpected value for param", barcode, sample0.get("mid5"));
-        assertEquals("Unexpected value for param", barcode2, sample0.get("mid3"));
-        assertEquals("Unexpected value for param", "SANGER", sample0.get("platform"));
-        assertEquals("Unexpected value for param", readsetNew, sample0.get("readsetname"));
-
-        sample1 = (Map) fieldsJson.get("sample_1");
-        assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
-        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileName2")));
-        assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
-        assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
+        sample0 = (Map) fieldsJson.get("readset_0");
+        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
+        Assert.assertEquals("Unexpected value for param", "gDNA", sample0.get("sampletype"));
+        Assert.assertEquals("Unexpected value for param", "FLD0001", sample0.get("barcode5"));
+        Assert.assertNull("Unexpected value for param", StringUtils.trimToNull((String)sample0.get("barcode3")));
     }
 
     private void setBasicSampleDetails(Ext4GridRef grid)
     {
         grid.setGridCell(1, "readsetname", "Readset1");
         grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCellJS(1, "inputmaterial", "gDNA");
+        grid.setGridCellJS(1, "sampletype", "gDNA");
         grid.setGridCell(1, "subjectid", "Subject1");
 
         grid.setGridCell(2, "readsetname", "Readset2");
         grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCellJS(2, "inputmaterial", "gDNA");
+        grid.setGridCellJS(2, "sampletype", "gDNA");
         grid.setGridCell(2, "subjectid", "Subject2");
         grid.setGridCell(2, "sampledate", "2010-10-20");
+
+        if (grid.getRowCount() > 2)
+        {
+            grid.setGridCell(3, "readsetname", "Readset3");
+            grid.setGridCellJS(3, "platform", "LS454");
+            grid.setGridCellJS(3, "sampletype", "gDNA");
+            grid.setGridCell(3, "subjectid", "Subject3");
+            grid.setGridCell(3, "sampledate", "2010-10-20");
+        }
     }
 
-    private void readsetImportTest()
+    private void readsetImportTest() throws IOException, CommandException
     {
         log("Verifying Readset Import");
 
         goToProjectHome();
         setPipelineRoot(_sequencePipelineLoc);
 
-        String filename1 = "paired1.fastq.gz";
-        String filename2 = "dualBarcodes_SIV.fastq.gz";
-        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        List<String> files = new ArrayList<>();
+
+        String filename1 = "dualBarcodes_SIV.fastq.gz";
+        files.add(filename1);
+
+        String filename2 = "paired1.fastq.gz";
+        files.add(filename2);
+
+        //multiples files from a single group
+        List<Pair<String, String>> readGroup = new ArrayList<>();
+        readGroup.add(Pair.of("s_G1_L001_R1_001.fastq.gz", "s_G1_L001_R2_001.fastq.gz"));
+
+        readGroup.add(Pair.of("s_G1_L002_R1_001.fastq.gz", "s_G1_L002_R2_001.fastq.gz"));
+        for (Pair<String, String> pair : readGroup)
+        {
+            FileUtils.copyFile(new File(_sequencePipelineLoc, "paired1.fastq.gz"), new File(_sequencePipelineLoc, pair.getLeft()));
+            files.add(pair.getLeft());
+
+            FileUtils.copyFile(new File(_sequencePipelineLoc, "paired2.fastq.gz"), new File(_sequencePipelineLoc, pair.getRight()));
+            files.add(pair.getRight());
+        }
+
+        initiatePipelineJob(_readsetPipelineName, files);
         waitForText("Job Name");
 
         Ext4FieldRef.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
@@ -991,21 +1013,30 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Locator.linkContainingText(filename2));
 
         Ext4FieldRef.getForLabel(this, "Treatment of Input Files").setValue("none");
-        Ext4GridRef grid = getSampleGrid();
+        Ext4GridRef readsetGrid = _ext4Helper.queryOne("#readsetGrid", Ext4GridRef.class);
 
-        String readset1 = "ReadsetTest1";
-        String readset2 = "ReadsetTest2";
+        String readset1 = "ImportReadsetTest1";
+        String readset2 = "ImportReadsetTest2";
+        String readset3 = "ImportReadsetTest3";
 
-        grid.setGridCell(1, "readsetname", readset1);
-        grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCellJS(1, "inputmaterial", "gDNA");
-        grid.setGridCell(1, "subjectid", "Subject1");
-        grid.setGridCell(1, "sampledate", "2011-02-03");
+        readsetGrid.setGridCell(1, "readsetname", readset1);
+        readsetGrid.setGridCellJS(1, "platform", "ILLUMINA");
+        readsetGrid.setGridCellJS(1, "application", "DNA Sequencing (Genome)");
+        readsetGrid.setGridCellJS(1, "sampletype", "gDNA");
+        readsetGrid.setGridCell(1, "subjectid", "Subject1");
+        readsetGrid.setGridCell(1, "sampledate", "2011-02-03");
 
-        grid.setGridCell(2, "readsetname", readset2);
-        grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCellJS(2, "inputmaterial", "gDNA");
-        grid.setGridCell(2, "subjectid", "Subject2");
+        readsetGrid.setGridCell(2, "readsetname", readset2);
+        readsetGrid.setGridCellJS(2, "platform", "LS454");
+        readsetGrid.setGridCellJS(2, "application", "DNA Sequencing (Genome)");
+        readsetGrid.setGridCellJS(2, "sampletype", "gDNA");
+        readsetGrid.setGridCell(2, "subjectid", "Subject2");
+
+        readsetGrid.setGridCell(3, "readsetname", readset3);
+        readsetGrid.setGridCellJS(3, "platform", "LS454");
+        readsetGrid.setGridCellJS(3, "application", "DNA Sequencing (Genome)");
+        readsetGrid.setGridCellJS(3, "sampletype", "gDNA");
+        readsetGrid.setGridCell(3, "subjectid", "Subject3");
 
         waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
@@ -1019,26 +1050,30 @@ public class SequenceTest extends BaseWebDriverTest
         log("verify readsets created");
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         SelectRowsCommand sr = new SelectRowsCommand("sequenceanalysis", "sequence_readsets");
-        sr.addFilter(new Filter("name", readset1 + ";" + readset2, Filter.Operator.IN));
-        SelectRowsResponse resp;
-        try
-        {
-            resp = sr.execute(cn, getProjectName());
-        }
-        catch (IOException | CommandException fail)
-        {
-            throw new RuntimeException(fail);
-        }
-        assertEquals("Incorrect readset number", 2, resp.getRowCount().intValue());
+        sr.addFilter(new Filter("name", readset1 + ";" + readset2 + ";" + readset3, Filter.Operator.IN));
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect readset number", 3, resp.getRowCount().intValue());
+
+
+        SelectRowsCommand sr2 = new SelectRowsCommand("sequenceanalysis", "readdata");
+        sr2.addFilter(new Filter("readset/name", readset1, Filter.Operator.EQUAL));
+        Assert.assertEquals("Incorrect readdata number", 1, sr2.execute(cn, getProjectName()).getRowCount().intValue());
+
+        SelectRowsCommand sr3 = new SelectRowsCommand("sequenceanalysis", "readdata");
+        sr3.addFilter(new Filter("readset/name", readset2, Filter.Operator.EQUAL));
+        Assert.assertEquals("Incorrect readdata number", 1, sr3.execute(cn, getProjectName()).getRowCount().intValue());
+
+        SelectRowsCommand sr4 = new SelectRowsCommand("sequenceanalysis", "readdata");
+        sr4.addFilter(new Filter("readset/name", readset3, Filter.Operator.EQUAL));
+        Assert.assertEquals("Incorrect readdata number", 2, sr4.execute(cn, getProjectName()).getRowCount().intValue());
 
         log("attempting to re-import same files");
         goToProjectHome();
-        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        initiatePipelineJob(_readsetPipelineName, Arrays.asList(filename1, filename2));
         waitForText("Job Name");
         waitForElement(Ext4Helper.Locators.window("Error"));
         waitForElement(Locator.tagContainingText("div", "There are errors with the input files"));
         isTextPresent("File is already used in existing readsets')]");
-        assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         goToProjectHome();
     }
@@ -1047,12 +1082,7 @@ public class SequenceTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         cleanupDirectory(_illuminaPipelineLoc);
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    protected Ext4GridRef getSampleGrid()
-    {
-        return _ext4Helper.queryOne("#sampleGrid", Ext4GridRef.class);
+        super.doCleanup(afterTest);
     }
 
     protected void cleanupDirectory(String path)
@@ -1137,12 +1167,18 @@ public class SequenceTest extends BaseWebDriverTest
         }
     }
 
-    public static void addOutputFile(BaseWebDriverTest test, File toAdd, String genomeName, String name, String description) throws Exception
+    public static void addOutputFile(BaseWebDriverTest test, File toAdd, String genomeName, String name, String description, boolean isWorkbook) throws Exception
     {
         test.log("adding output file: " + toAdd.getName());
         test.beginAt("/query/" + test.getContainerId() + "/executeQuery.view?query.queryName=outputfiles&schemaName=sequenceanalysis");
 
         test.clickButton("Import Files", 0);
+        if (!isWorkbook)
+        {
+            test.waitForElement(Ext4Helper.Locators.window("Import Sequence Output File"));
+            test.waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
+        }
+
         test.waitForElement(Ext4Helper.Locators.window("Import Output File"));
         Ext4FieldRef.getForLabel(test, "Name").setValue(name);
         Ext4FieldRef.getForLabel(test, "Description").setValue(description);

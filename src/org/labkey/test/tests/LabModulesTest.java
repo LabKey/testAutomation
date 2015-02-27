@@ -610,11 +610,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Sequence:", IMPORT_DATA_TEXT);
-        assertElementPresent(Ext4Helper.Locators.menuItem("Create Readsets"));
-        assertElementPresent(Ext4Helper.Locators.menuItem("Upload Raw Data"));
+        assertElementPresent(Ext4Helper.Locators.menuItem("Plan Sequence Run (Create Readsets)"));
+        assertElementPresent(Ext4Helper.Locators.menuItem("Upload/Import Data"));
 
-        click(Ext4Helper.Locators.menuItem("Create Readsets"));
-        waitForElement(Ext4Helper.Locators.window("Create Readsets"));
+        click(Ext4Helper.Locators.menuItem("Plan Sequence Run (Create Readsets)"));
+        waitForElement(Ext4Helper.Locators.window("Plan Sequence Run (Create Readsets)"));
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
     }
