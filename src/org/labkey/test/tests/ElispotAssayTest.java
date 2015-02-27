@@ -16,6 +16,8 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.collections15.Bag;
+import org.apache.commons.collections15.bag.HashBag;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -620,39 +622,31 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // test the mean and median values of columns that had a TNTC spot count
         DataRegionTable table = new DataRegionTable("AntigenStats", this);
-        String[] expectedMeans = new String[]{"4000.0", "0.0", "2222.2", "2222.2"};
-        String[] expectedMedians = new String[]{"6666.7", "0.0", "0.0", "0.0"};
+        List<String> expectedPtids = Arrays.asList("ptid 1 F", "ptid 2 F", "ptid 3 F", "ptid 4 F");
+        List<String> expected2FMeans = Arrays.asList("4000.0", "0.0", "2222.2", "2222.2");
+        List<String> expected2FMedians = Arrays.asList("6666.7", "0.0", "0.0", "0.0");
+        List<String> expected4FMeans = Arrays.asList("0.0", "0.0", "444444.4", "628888.9");
+        List<String> expected4FMedians = Arrays.asList("0.0", "0.0", "6666.7", "0.0");
+        List<String> expected6FMeans = Arrays.asList("0.0", "0.0", "0.0", "0.0");
+        List<String> expected6FMedians = Arrays.asList("0.0", "0.0", "0.0", "0.0");
+        Bag<List<String>> expectedRows = new HashBag<>(DataRegionTable.collateColumnsIntoRows(
+                expectedPtids,
+                expected2FMeans,
+                expected2FMedians,
+                expected4FMeans,
+                expected4FMedians,
+                expected6FMeans,
+                expected6FMedians));
 
-        int row = 0;
-        for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, "Atg2FMean"));
+        Bag<List<String>> actualRows = new HashBag<>(table.getRows(
+                "ParticipantID",
+                "Atg2FMean",
+                "Atg2FMedian",
+                "Atg4FMean",
+                "Atg4FMedian",
+                "Atg6FMean",
+                "Atg6FMedian"));
 
-        row = 0;
-        for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, "Atg2FMedian"));
-
-        expectedMeans = new String[]{"0.0", "0.0", "444444.4", "628888.9"};
-        expectedMedians = new String[]{"0.0", "0.0", "6666.7", "0.0"};
-
-        row = 0;
-        for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, "Atg4FMean"));
-
-        row = 0;
-        for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, "Atg4FMedian"));
-
-        expectedMeans = new String[]{"0.0", "0.0", "0.0", "0.0"};
-        expectedMedians = new String[]{"0.0", "0.0", "0.0", "0.0"};
-
-        row = 0;
-        for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, "Atg6FMean"));
-
-        row = 0;
-        for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, "Atg6FMedian"));
-
-
+        assertEquals(expectedRows, actualRows);
     }
 }
