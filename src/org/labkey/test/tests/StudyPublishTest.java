@@ -637,6 +637,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickButton("Publish Study", 0);
         _extHelper.waitForExtDialog("Publish Study");
 
+        // Need to handle republish panel (Previous Settings)
+        if (isElementPresent(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Previous Settings']")))
+        {
+            checkCheckbox(Locator.radioButtonByNameAndValue("publishType", "publish"));
+            clickButton("Next", 0);
+        }
+
         // Wizard page 1 : General Setup
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
         setFormElement(Locator.name("studyName"), name);
