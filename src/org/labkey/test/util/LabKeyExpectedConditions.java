@@ -19,6 +19,7 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -40,14 +41,25 @@ public abstract class LabKeyExpectedConditions
             @Override
             public Boolean apply(WebDriver driver)
             {
+                Point firstPosition;
+                Point secondPosition;
+                Dimension firstDimension;
+                Dimension secondDimension;
+                WebElement el = loc.findElement(driver);
                 try
                 {
-                    return loc.findElement(driver).getCssValue("position").equals("static");
+                    firstDimension = el.getSize();
+                    firstPosition = el.getLocation();
+                    Thread.sleep(100);
+                    secondDimension = el.getSize();
+                    secondPosition = el.getLocation();
                 }
-                catch (StaleElementReferenceException ignore)
+                catch (InterruptedException | StaleElementReferenceException | NoSuchElementException recheck)
                 {
                     return false;
                 }
+
+                return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);
             }
 
             @Override
