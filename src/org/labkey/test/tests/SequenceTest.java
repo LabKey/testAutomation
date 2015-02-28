@@ -311,7 +311,7 @@ public class SequenceTest extends BaseWebDriverTest
     private void readsetFeaturesTest() throws IOException
     {
         //verify import and instrument run creation
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=sequenceanalysis&query.queryName=read_data");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=sequenceanalysis&query.queryName=readdata");
 
         DataRegionTable dr = new DataRegionTable("query", this);
         _helper.waitForDataRegion("query");
@@ -324,9 +324,6 @@ public class SequenceTest extends BaseWebDriverTest
 
             String file2 = dr.getDataAsText(i, "Input File2");
             assertEquals("Incorrect or no filename associated with readset", "Illumina-R2-" + rowId + ".fastq.gz", file2);
-
-            String instrumentRun = dr.getDataAsText(i, "Instrument Run");
-            assertTrue("Incorrect or no instrument run associated with readset", instrumentRun.startsWith("TestIlluminaRun"));
         }
 
         goToProjectHome();
