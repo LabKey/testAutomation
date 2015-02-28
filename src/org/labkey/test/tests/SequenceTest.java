@@ -479,6 +479,10 @@ public class SequenceTest extends BaseWebDriverTest
         String minContigsForNovel = "7";
 
         waitForText("Readset Name");
+        waitForElement(Ext4Helper.Locators.window("Copy Previous Run?"));
+        waitAndClick(Ext4Helper.Locators.window("Copy Previous Run?").append(Ext4Helper.Locators.ext4Button("Cancel")));
+        waitForElementToDisappear(Ext4Helper.Locators.window("Copy Previous Run?"));
+
         for (String rowId : rowIds)
         {
             assertTextPresent("Illumina-R1-" + rowId + ".fastq.gz");
