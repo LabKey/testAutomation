@@ -6447,15 +6447,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Validate Queries']"));
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
-        waitForElement(Locator.id("lk-vq-panel"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.tagWithClass("div", "qbrowser-validate"), WAIT_FOR_JAVASCRIPT);
         if (validateSubfolders)
         {
-            shortWait().until(ExpectedConditions.elementToBeClickable(By.id("lk-vq-subfolders")));
-            checkCheckbox(Locator.id("lk-vq-subfolders"));
+            shortWait().until(ExpectedConditions.elementToBeClickable(By.className("lk-vq-subfolders")));
+            checkCheckbox(Locator.tagWithClass("table", "lk-vq-subfolders"));
         }
-//        if (!isViewCheckSkipped())
-//            checkCheckbox(Locator.id("lk-vq-validatemetadata"));
-        checkCheckbox(Locator.id("lk-vq-systemqueries"));
+        checkCheckbox(Locator.tagWithClass("table", "lk-vq-systemqueries"));
         clickButton("Start Validation", 0);
         waitForElement(locFinishMsg, 120000);
         //test for success
