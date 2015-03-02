@@ -868,7 +868,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickAndWait(Locator.linkWithText("999320016"));
-        click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
+        waitAndClick(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextPresent("right deltoid");
         
         verifyDemoCustomizeOptions();
