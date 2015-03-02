@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -64,7 +65,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         clickProject(project);
         portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
-        File dir = getTestTempDir();
+        File dir = TestFileUtils.getTestTempDir();
         dir.delete();
         dir.mkdirs();
 

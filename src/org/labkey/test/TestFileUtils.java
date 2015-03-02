@@ -166,4 +166,10 @@ public abstract class TestFileUtils
                 getStreamContentsAsString(p.getInputStream()) + System.lineSeparator() +
                 getStreamContentsAsString(p.getErrorStream()));
     }
+
+    public static File getTestTempDir()
+    {
+        File buildDir = new File(getLabKeyRoot(), "build");
+        return new File(buildDir, "testTemp");
+    }
 }

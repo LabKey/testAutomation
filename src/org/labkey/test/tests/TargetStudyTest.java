@@ -94,10 +94,10 @@ public class TargetStudyTest extends AbstractAssayTest
     {
         log("** Import specimens into Study 1 and Study 2");
         setupPipeline(TEST_ASSAY_PRJ_SECURITY);
-        SpecimenImporter importer1 = new SpecimenImporter(getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY1, 1);
+        SpecimenImporter importer1 = new SpecimenImporter(TestFileUtils.getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(TestFileUtils.getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY1, 1);
         importer1.startImport();
 
-        SpecimenImporter importer2 = new SpecimenImporter(getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY2, 1);
+        SpecimenImporter importer2 = new SpecimenImporter(TestFileUtils.getTestTempDir(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/study/specimens/sample_a.specimens"), new File(TestFileUtils.getTestTempDir(), "specimensSubDir"), TEST_ASSAY_FLDR_STUDY2, 1);
         importer2.startImport();
 
         importer1.waitForComplete();

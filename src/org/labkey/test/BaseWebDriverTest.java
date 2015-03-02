@@ -3648,12 +3648,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertAlert(alertText);
     }
 
-    protected File getTestTempDir()
-    {
-        File buildDir = new File(TestFileUtils.getLabKeyRoot(), "build");
-        return new File(buildDir, "testTemp");
-    }
-
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();

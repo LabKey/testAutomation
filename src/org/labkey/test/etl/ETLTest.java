@@ -141,7 +141,7 @@ UNDONE: need to fix the merge case
         assertInTarget2("Subject 2", "Subject 3");
 
         //file ETL output and external pipeline test
-        File dir = getTestTempDir();
+        File dir = TestFileUtils.getTestTempDir();
         dir.mkdirs();
         setPipelineRoot(dir.getAbsolutePath());
         runETL("targetFile");
