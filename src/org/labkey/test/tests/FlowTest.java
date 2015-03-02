@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
@@ -37,6 +38,7 @@ import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -482,10 +484,11 @@ public class FlowTest extends BaseFlowTest
         waitForText("Import Analysis: Analysis Folder");
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
-        clickButton("Finish", 0);
-        sleep(15000);
-        waitForText("Ignoring filter");
-        assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
+        clickButton("Finish");
+        waitForElement(Locators.labkeyError.containing("Ignoring filter/sort"), defaultWaitForPage);
+        DataRegionTable query = new DataRegionTable("query", this);
+        List<String> names = query.getColumnDataAsText("Name");
+        assertEquals("Wrong name for data row", Arrays.asList("88436.fcs-050112-8ColorQualitative-ET"), names);
     }
 
     @LogMethod
