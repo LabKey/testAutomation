@@ -105,8 +105,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
         setupCustomFileProperties();
         goToProjectHome();
 
-        File testFile = TestFileUtils.getSampleData("security/InlineFile.html");
-        String filename = testFile.getName();
+        final File testFile = TestFileUtils.getSampleData("security/InlineFile.html");
+        final String filename = testFile.getName();
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_2, true));
@@ -124,26 +124,30 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.uploadFile(testFile, FILE_DESCRIPTION, fileProperties, true);
 
         log("move file");
-        String folderName = "Test folder";
+        final String folderName = "Test folder";
         _fileBrowserHelper.createFolder(folderName);
         _fileBrowserHelper.moveFile(filename, folderName);
 
         log("rename file");
-        String newFileName = "changedFilename.html";
+        final String newFileName = "changedFilename.html";
         _fileBrowserHelper.renameFile(folderName + "/" + filename, newFileName);
-        filename = newFileName;
 
-        _searchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
-        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(filename));
+        _searchHelper.enqueueSearchItem(newFileName, true, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(newFileName));
 
         _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, false);
+        _searchHelper.assertNoSearchResult(filename);
 
         // Delete file.
         clickProject(getProjectName());
-        _fileBrowserHelper.deleteFile(folderName + "/" + filename);
-        waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(filename));
+        _fileBrowserHelper.deleteFile(folderName + "/" + newFileName);
+        waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newFileName));
+        _searchHelper.assertNoSearchResult(newFileName);
+        _searchHelper.assertNoSearchResult(FILE_DESCRIPTION);
+        _searchHelper.assertNoSearchResult(CUSTOM_PROPERTY_VALUE);
 
+        clickProject(getProjectName());
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);
         assertTextPresent("File uploaded to project: /" + getProjectName());
         assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);

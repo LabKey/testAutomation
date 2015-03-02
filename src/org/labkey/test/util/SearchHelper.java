@@ -15,11 +15,15 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -151,6 +155,22 @@ public class SearchHelper extends AbstractHelper
             {
                 _test.assertElementNotPresent(loc);
             }
+        }
+    }
+
+    public void assertNoSearchResult(String searchTerm)
+    {
+        long startTime = System.currentTimeMillis();
+        List<WebElement> results = new ArrayList<>();
+
+        do {
+            searchFor(searchTerm);
+            results = Locator.css("#searchResults a.labkey-search-title").findElements(_test.getDriver());
+        } while (System.currentTimeMillis() - startTime < _test.defaultWaitForPage && !results.isEmpty());
+
+        if (!results.isEmpty())
+        {
+            Assert.fail("Found unwanted search results for '" + searchTerm + "': ['" + StringUtils.join(_test.getTexts(results).toArray(), "', '") + "']");
         }
     }
 
