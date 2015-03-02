@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
@@ -1164,7 +1165,7 @@ public class SequenceTest extends BaseWebDriverTest
             test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Submit"));
             test.waitForElement(Ext4Helper.Locators.window("Success"));
             test.waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("OK"));
-            test.waitForElement(Locator.tagContainingText("a", f.getName())); //proxy for DR reload
+            test.waitForElement(Locator.tagContainingText("a", FileUtil.getBaseName(f.getName()))); //proxy for DR reload
         }
     }
 
