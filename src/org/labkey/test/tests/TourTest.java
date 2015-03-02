@@ -204,13 +204,11 @@ public class TourTest extends BaseWebDriverTest
     {
         public void nextTourBubble()
         {
-            //make this more specific
             click(Locator.tagWithClass("button", "hopscotch-nav-button next hopscotch-next").withText("Next"));
         }
 
         public void doneTourBubble()
         {
-            //make more specific
             click(Locator.tagWithClass("button", "hopscotch-nav-button next hopscotch-next").withText("Done"));
         }
 
@@ -222,14 +220,15 @@ public class TourTest extends BaseWebDriverTest
 
         private void assertTourBubble(String number, String title, String content)
         {
+            waitForTourBubble(number);
             Assert.assertEquals(number, getText(Locator.tagWithClass("span", "hopscotch-bubble-number")));
             Assert.assertEquals(title, getText(Locator.tagWithClass("h3", "hopscotch-title")));
             Assert.assertEquals(content, getText(Locator.tagWithClass("div", "hopscotch-content")));
         }
 
-        private void waitForTourBubble(String stepNum)
+        private void waitForTourBubble(String number)
         {
-            waitForElement(Locator.tagWithClass("span", "hopscotch-bubble-number").withText(stepNum));
+            waitForElement(Locator.tagWithClass("span", "hopscotch-bubble-number").withText(number));
         }
     }
 }
