@@ -426,8 +426,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         expected.put("23", new String[]{"STD_10000", "Standard", "", "120500"});
         expected.put("24", new String[]{"STD_32000", "Standard", "", "365300"});
         expected.put("25", new String[]{"STD_32000", "Standard", "", "301700"});
-        expected.put("26", new String[]{"STD_100000", "Standard", "", "1077000"});
-        expected.put("27", new String[]{"STD_100000", "Standard", "", "1250000"});
+        expected.put("26", new String[]{"STD_100000", "Standard", "", "1152034"});
+        expected.put("27", new String[]{"STD_100000", "Standard", "", "1168387"});
         expected.put("28", new String[]{"STD_320000", "Standard", "", "2529000"});
         expected.put("29", new String[]{"STD_320000", "Standard", "", "3637000"});
         expected.put("30", new String[]{"STD_1000000", "Standard", "", "8328000"});
