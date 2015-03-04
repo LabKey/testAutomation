@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -353,7 +354,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         if (null == expected)
             assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            assertTrue("Thumbnail wasn't persisted correctly", expected.equals(thumbnailData));
+            assertEquals("Thumbnail wasn't persisted correctly", expected, thumbnailData);
 
         THUMBNAIL_DATA = thumbnailData;
     }
@@ -467,7 +468,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         if (null == expected)
             assertFalse("Icon was still default", ICON_DATA.equals(iconData));
         else
-            assertTrue("Unexpected icon", expected.equals(iconData));
+            assertEquals("Unexpected icon", expected, iconData);
 
         ICON_DATA = iconData;
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);

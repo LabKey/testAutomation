@@ -404,7 +404,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);
         assertNotNull("Escalation message not sent", message);
-        assertTrue("Escalation not sent to " + escalateEmail, escalateEmail.equals(message.getTo()[0]));
+        assertEquals("Escalation not sent to " + escalateEmail, escalateEmail, message.getTo()[0]);
 
         // Not sure why the angle-brackets are added...
         String escalateFrom = '<' + userEmail + '>';

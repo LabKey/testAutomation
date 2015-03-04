@@ -276,7 +276,7 @@ public class ViabilityTest extends AbstractViabilityTest
         List<String> specimenIDColumnValues = table.getColumnDataAsText("Specimen IDs");
         for (String s : specimenIDColumnValues)
         {
-            assertTrue("Specimen not Transformed", s.equals("Transformed"));
+            assertEquals("Specimen not Transformed", "Transformed", s);
         }
     }
 
