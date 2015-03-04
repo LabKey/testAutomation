@@ -174,8 +174,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long)row.get("RowId");
-            String name = (String)row.get("Name");
+            Long rowId = (Long) row.get("RowId");
+            String name = (String) row.get("Name");
             assertNotNull("Expected response row to have a Name column", name);
             assertNotNull("Expected response row to have a RowId column", rowId);
             if (name.equalsIgnoreCase("Ford"))
@@ -191,15 +191,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.<String, Object>of("ManufacturerId", toyotaId,
-                                        "Name", "Prius C"),
+                        "Name", "Prius C"),
                 Maps.<String, Object>of("ManufacturerId", toyotaId,
-                                        "Name", "Camry"),
+                        "Name", "Camry"),
                 Maps.<String, Object>of("ManufacturerId", fordId,
-                                        "Name", "Focus"),
+                        "Name", "Focus"),
                 Maps.<String, Object>of("ManufacturerId", fordId,
-                                        "Name", "F150"),
+                        "Name", "F150"),
                 Maps.<String, Object>of("ManufacturerId", fordId,
-                                        "Name", "Pinto")
+                        "Name", "Pinto")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 5 rows.", 5, insertResp.getRowsAffected().intValue());
@@ -209,8 +209,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         for (Map<String, Object> row : insertResp.getRows())
         {
-            Long rowId = (Long)row.get("RowId");
-            String name = (String)row.get("Name");
+            Long rowId = (Long) row.get("RowId");
+            String name = (String) row.get("Name");
             if (name.equalsIgnoreCase("Prius C"))
                 priusId = rowId;
             else if (name.equalsIgnoreCase("F150"))
@@ -232,8 +232,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
         clickAndWait(Locator.linkWithText("details"));
-        assertTextPresent("Name");
-        assertTextPresent("Toyota");
+        assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?");
@@ -247,9 +246,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing query of vehicle schema...");
         beginAt("/query/" + getProjectName() + "/begin.view?");
         viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
-        
-        assertTextPresent("Prius");
-        assertTextPresent("Camry");
+
+        assertTextPresent("Prius", "Camry");
 
         // Issue 15595: Generic query details links for tables and queries
         // reenable this check once default details links are provided for queries.
@@ -290,8 +288,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertEquals("Expected to insert 2 rows.", 2, insertResp.getRowsAffected().intValue());
 
         Long[] vehicleIds = new Long[2];
-        vehicleIds[0] = (Long)(insertResp.getRows().get(0).get("RowId"));
-        vehicleIds[1] = (Long)(insertResp.getRows().get(1).get("RowId"));
+        vehicleIds[0] = (Long) (insertResp.getRows().get(0).get("RowId"));
+        vehicleIds[1] = (Long) (insertResp.getRows().get(1).get("RowId"));
 
         log("** Trying to update Vehicle from wrong container...");
         updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
@@ -310,7 +308,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         catch (CommandException ex)
         {
             assertEquals(403, ex.getStatusCode());
-    //            assertEquals("The row is from the wrong container.", ex.getMessage());
+            //assertEquals("The row is from the wrong container.", ex.getMessage());
         }
 
         // Make sure that the schema isn't resolved if the module is not enabled in the container
@@ -327,7 +325,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Updating vehicles...");
         SaveRowsResponse updateRows = updateCmd.execute(cn, getProjectName());
         assertEquals("Expected to update 1 row.", 1, updateRows.getRowsAffected().intValue());
-        assertEquals(4, ((Number)(updateRows.getRows().get(0).get("Milage"))).intValue());
+        assertEquals(4, ((Number) (updateRows.getRows().get(0).get("Milage"))).intValue());
 
 
         log("** Testing vehicle.Vehicles details url link...");
@@ -353,7 +351,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         ));
         insertResp = insertCmd.execute(cn, getProjectName() + "/" + FOLDER_NAME);
         assertEquals("Expected to insert 1 row.", 1, insertResp.getRowsAffected().intValue());
-        
+
         log("** Select with url containerFilter");
         SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         selectCmd.setMaxRows(-1);
@@ -610,9 +608,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
-        assertTextPresent("Adam");
-        assertTextPresent("Dave");
-        assertTextPresent("Josh");
+        assertTextPresent("Adam", "Dave", "Josh");
         assertTextNotPresent("Britt");
     }
 
@@ -624,9 +620,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
         _extHelper.clickMenuButton("Views", "Crazy People");
-        assertTextPresent("Adam");
-        assertTextPresent("Dave");
-        assertTextPresent("Josh");
+        assertTextPresent("Adam", "Dave", "Josh");
         assertTextNotPresent("Britt");
 
         //custom view has a sort by age descending
@@ -636,8 +630,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("CreatedBy");
         _customizeViewsHelper.applyCustomView();
-        assertTextPresent("is unsaved");
-        assertTextPresent("Created By");
+        assertTextPresent("is unsaved", "Created By");
         _customizeViewsHelper.saveUnsavedViewGridClosed(null);
         waitForText("Crazy People Copy");
 
@@ -675,16 +668,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         wikiHelper.setSourceFromFile("jsReportTest.html", WikiName);
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         waitForText("Less cool than expected. Loaded dependent scripts.", 2, WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("JS Module Report");
-        assertTextPresent("Hello, Bob!");
+        assertTextPresent("JS Module Report", "Hello, Bob!");
 
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
         _extHelper.clickMenuButton("Views", "Super Cool R Report");
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
-        assertTextPresent("\"name\"");
-        assertTextPresent("\"age\"");
-        assertTextPresent("\"crazy\"");
+        assertTextPresent("\"name\"", "\"age\"", "\"crazy\"");
     }
 
     @LogMethod

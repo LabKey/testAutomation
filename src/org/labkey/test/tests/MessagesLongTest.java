@@ -132,7 +132,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         enableEmailRecorder();
         basicMessageTests();
         schemaTest();
-        
+
         doTestEmailPrefsMine();
 
         clickProject(PROJECT_NAME);
@@ -159,8 +159,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         assertTextPresent(MSG1_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
-        assertTextPresent(EXPIRES1);
-        assertTextPresent("<b>first message testing</b>");
+        assertTextPresent(EXPIRES1, "<b>first message testing</b>");
         clickButton("Delete Message");
         clickButton("Delete");
 
@@ -188,9 +187,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Make sure response was entered correctly");
-        assertTextPresent(RESP1_TITLE);
-        assertTextPresent(EXPIRES2);
-        assertTextPresent(RESP1_BODY);
+        assertTextPresent(
+                RESP1_TITLE,
+                EXPIRES2,
+                RESP1_BODY);
 
         log("Add second response, make sure it was entered and recognized");
         clickButton("Respond");
@@ -225,8 +225,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("boardName"), "Notes");
         setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
-        assertTextPresent("Notes");
-        assertTextPresent("thread");
+        assertTextPresent("Notes", "thread");
         portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
         setFormElement(Locator.name("boardName"), "Messages");
         setFormElement(Locator.name("conversationName"), "Message");
@@ -312,8 +311,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 6);
         click(Locator.linkWithText(MSG1_TITLE, 0));
-        assertTextPresent("1 <b>x</b>");
-        assertTextPresent("<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
+        assertTextPresent(
+                "1 <b>x</b>",
+                "<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
         click(Locator.linkWithText(MSG1_TITLE, 1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
@@ -532,8 +532,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Submit");
-        assertTextPresent("common.properties");
-        assertTextPresent(MSG1_BODY_FIRST);
+        assertTextPresent("common.properties",
+                MSG1_BODY_FIRST);
         clickAndWait(Locator.linkWithText("view message or respond"));
         clickAndWait(Locator.linkWithText("view list"));
         assertTextPresent(MSG1_TITLE);
@@ -581,8 +581,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("Make sure response was entered correctly");
-        assertTextPresent(RESP1_TITLE);
-        assertTextPresent(RESP1_BODY);
+        assertTextPresent(RESP1_TITLE,
+                RESP1_BODY);
 
         log("test the search module on messages");
         clickProject(PROJECT_NAME);

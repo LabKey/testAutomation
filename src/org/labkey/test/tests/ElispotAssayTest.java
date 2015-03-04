@@ -198,29 +198,13 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     private void assertElispotData()
     {
         clickAndWait(Locator.linkWithText("Zeiss_datafile.txt"));
-        
-        assertTextPresent("ptid 1 C");
-        assertTextPresent("ptid 2 C");
-        assertTextPresent("ptid 3 C");
-        assertTextPresent("ptid 4 C");
 
-        assertTextPresent("atg_1C");
-        assertTextPresent("atg_2C");
-        assertTextPresent("atg_3C");
-        assertTextPresent("atg_4C");
+        assertTextPresent("ptid 1 C", "ptid 2 C", "ptid 3 C", "ptid 4 C", "atg_1C", "atg_2C", "atg_3C", "atg_4C");
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkWithText("AID_0161456 W4.txt"));
 
-        assertTextPresent("ptid 1 B");
-        assertTextPresent("ptid 2 B");
-        assertTextPresent("ptid 3 B");
-        assertTextPresent("ptid 4 B");
-
-        assertTextPresent("atg_1B");
-        assertTextPresent("atg_2B");
-        assertTextPresent("atg_3B");
-        assertTextPresent("atg_4B");
+        assertTextPresent("ptid 1 B", "ptid 2 B", "ptid 3 B", "ptid 4 B", "atg_1B", "atg_2B", "atg_3B", "atg_4B");
 
         // show the normalized spot count column and verify it is calculated correctly
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -232,7 +216,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
 
-        for (int i=0; i < cellWell.size(); i++)
+        for (int i = 0; i < cellWell.size(); i++)
         {
             int cpw = NumberUtils.toInt(cellWell.get(i), 0);
             Float sc = NumberUtils.toFloat(spotCount.get(i));
@@ -251,12 +235,13 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkContainingText("details"));
         new DataRegionTable("AntigenStats", this).setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);
 
-        assertTextPresent("Plate Summary Information");
-        assertTextPresent("Antigen 7 Mean");
-        assertTextPresent("Antigen 7 Median");
-        assertTextPresent("Antigen 8 Mean");
-        assertTextPresent("Antigen 8 Median");
-        assertTextPresent("blood");
+        assertTextPresent(
+                "Plate Summary Information",
+                "Antigen 7 Mean",
+                "Antigen 7 Median",
+                "Antigen 8 Mean",
+                "Antigen 8 Median",
+                "blood");
 
         waitForElement(Locator.xpath("//label[contains(@class, 'x4-form-item-label') and text() = 'Sample Well Groups']"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//label[contains(@class, 'x4-form-item-label') and text() = 'Antigen Well Groups']"), WAIT_FOR_JAVASCRIPT);
@@ -301,16 +286,17 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.saveDefaultView();
 
         _extHelper.clickMenuButton("Views", "Without Antigen7&8");
-        assertTextNotPresent("Antigen 7 Mean");
-        assertTextNotPresent("Antigen 7 Median");
-        assertTextNotPresent("Antigen 8 Mean");
-        assertTextNotPresent("Antigen 8 Median");
+        assertTextNotPresent(
+                "Antigen 7 Mean",
+                "Antigen 7 Median",
+                "Antigen 8 Mean",
+                "Antigen 8 Median");
 
         _extHelper.clickMenuButton("Views", "default");
-        assertTextNotPresent("Antigen 7 Mean");
-        assertTextNotPresent("Antigen 7 Median");
-        assertTextPresent("Antigen 8 Mean");
-        assertTextPresent("Antigen 8 Median");
+        assertTextNotPresent("Antigen 7 Mean", "Antigen 7 Median");
+        assertTextPresent(
+                "Antigen 8 Mean",
+                "Antigen 8 Median");
     }
 
     private Locator getLocatorForHilightedWell(String className, String count)
@@ -402,9 +388,10 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
         clickAndWait(Locator.linkWithText("AID_0161456 W5.txt"));
-        assertTextPresent("747.7");
-        assertTextPresent("Custom Elispot Column");
-        assertTextPresent("transformed!");
+        assertTextPresent(
+                "747.7",
+                "Custom Elispot Column",
+                "transformed!");
     }
 
     protected void doBackgroundSubtractionTest()

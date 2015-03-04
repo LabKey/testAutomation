@@ -82,7 +82,7 @@ public class SampleSetTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment" });
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
 
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Sets");
@@ -110,8 +110,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         // Do some manual derivation
         clickAndWait(Locator.linkWithText("Sample Sets"));
-        assertTextPresent(PROJECT_SAMPLE_SET_NAME);
-        assertTextPresent(FOLDER_NAME);
+        assertTextPresent(PROJECT_SAMPLE_SET_NAME, FOLDER_NAME);
 
         clickButton("Show All Materials");
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
@@ -126,8 +125,7 @@ public class SampleSetTest extends BaseWebDriverTest
         }
 
         clickFolder(FOLDER_NAME);
-        assertTextPresent(FOLDER_SAMPLE_SET_NAME);
-        assertTextPresent(PROJECT_SAMPLE_SET_NAME);
+        assertTextPresent(FOLDER_SAMPLE_SET_NAME, PROJECT_SAMPLE_SET_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
         checkCheckbox(Locator.name(".toggle"));
         clickButton("Derive Samples");
@@ -159,10 +157,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));
         clickAndWait(Locator.linkContainingText("Text View"));
-        assertTextPresent("FirstRole");
-        assertTextPresent("SecondRole");
-        assertTextPresent("ThirdRole");
-        assertTextPresent("FourthRole");
+        assertTextPresent("FirstRole", "SecondRole", "ThirdRole", "FourthRole");
 
         clickAndWait(Locator.linkContainingText("16"));
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
@@ -196,17 +191,11 @@ public class SampleSetTest extends BaseWebDriverTest
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
 
-        assertTextPresent("aa");
-        assertTextPresent("bb");
-        assertTextPresent("cc");
-        assertTextPresent("dd");
-        assertTextPresent("firstOutput");
-        assertTextPresent("secondOutput");
+        assertTextPresent("aa", "bb", "cc", "dd", "firstOutput", "secondOutput");
 
         clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Show All Materials");
-        assertTextPresent("ProjectSampleSet");
-        assertTextPresent("200");
+        assertTextPresent("ProjectSampleSet", "200");
 
         // Try to derive samples using the parent column
         clickTab("Experiment");
@@ -259,9 +248,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // Filter out any child materials, though there shouldn't be any
         setFilter("childMaterials", "Name", "Is Blank");
         // Check for parents and grandparents
-        assertTextPresent("SampleSetBVTChildB");
-        assertTextPresent("SampleSetBVT4");
-        assertTextPresent("SampleSetBVT11");
+        assertTextPresent("SampleSetBVTChildB", "SampleSetBVT4", "SampleSetBVT11");
 
         // Verify that we've chained things together properly
         clickAndWait(Locator.linkWithText("SampleSetBVTChildA"));
@@ -285,8 +272,7 @@ public class SampleSetTest extends BaseWebDriverTest
         // Switch to filter out any parent materials so we can just check for children
         setFilter("parentMaterials", "Name", "Is Blank");
         clearFilter("childMaterials", "Name");
-        assertTextPresent("SampleSetBVTChildA");
-        assertTextPresent("SampleSetBVTGrandchildA");
+        assertTextPresent("SampleSetBVTChildA", "SampleSetBVTGrandchildA");
 
         clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
         clickButton("Import More Samples");
@@ -312,9 +298,10 @@ public class SampleSetTest extends BaseWebDriverTest
         selectQuery("auditLog", "SampleSetAuditEvent");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.linkWithText("view data"));
-        assertTextPresent("Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
-            "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
-            "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
+        assertTextPresent(
+                "Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
+                "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
+                "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
     }
 
     final File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");

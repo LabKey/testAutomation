@@ -160,7 +160,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //insert a row
         Date now = new Date();
         InsertRowsCommand insertCmd = new InsertRowsCommand("lists", LIST_NAME);
-        Map<String,Object> rowMap = new HashMap<>();
+        Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "first to be inserted");
         rowMap.put("LastName", "last to be inserted");
         rowMap.put("Birthdate", now);
@@ -171,7 +171,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertTrue(1 == saveResp.getRowsAffected().intValue());
 
         //get new key value
-        Number newKey = (Number)saveResp.getRows().get(0).get("Key");
+        Number newKey = (Number) saveResp.getRows().get(0).get("Key");
         assertTrue(null != newKey);
         int key = newKey.intValue();
 
@@ -189,8 +189,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
-        assertTextPresent("first to be inserted");
-        assertTextPresent("last to be inserted");
+        assertTextPresent("first to be inserted", "last to be inserted");
 
         //update the record
         log("Updating the record...");

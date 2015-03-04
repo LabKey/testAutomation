@@ -106,25 +106,25 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         final String LIST_NAME = "MVList";
         final String TEST_DATA_SINGLE_COLUMN_LIST =
-                "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
+                "Name" + "\t" + "Age" + "\t" + "Sex" + "\n" +
                         "Ted" + "\t" + "N" + "\t" + "male" + "\n" +
                         "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
                         "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
         final String TEST_DATA_TWO_COLUMN_LIST =
-                "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
-                        "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
-                        "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
-                        "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  "Q" + "\n";
+                "Name" + "\t" + "Age" + "\t" + "AgeMVIndicator" + "\t" + "Sex" + "\t" + "SexMVIndicator" + "\n" +
+                        "Franny" + "\t" + "" + "\t" + "N" + "\t" + "male" + "\t" + "" + "\n" +
+                        "Zoe" + "\t" + "25" + "\t" + "Q" + "\t" + "female" + "\t" + "" + "\n" +
+                        "J.D." + "\t" + "50" + "\t" + "" + "\t" + "male" + "\t" + "Q" + "\n";
         final String TEST_DATA_SINGLE_COLUMN_LIST_BAD =
-                "Name" + "\t" + "Age" + "\t"  + "Sex" + "\n" +
+                "Name" + "\t" + "Age" + "\t" + "Sex" + "\n" +
                         "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
                         "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
                         "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
         final String TEST_DATA_TWO_COLUMN_LIST_BAD =
-                "Name" +    "\t" + "Age" +  "\t" + "AgeMVIndicator" +   "\t" + "Sex" +  "\t" + "SexMVIndicator" + "\n" +
-                        "Franny" +  "\t" + "" +     "\t" + "N" +               "\t" + "male" + "\t" +  "" + "\n" +
-                        "Zoe" +     "\t" + "25" +   "\t" + "Q" +               "\t" + "female" +     "\t" +  "" + "\n" +
-                        "J.D." +    "\t" + "50" +   "\t" + "" +                 "\t" + "male" + "\t" +  ".Q" + "\n";
+                "Name" + "\t" + "Age" + "\t" + "AgeMVIndicator" + "\t" + "Sex" + "\t" + "SexMVIndicator" + "\n" +
+                        "Franny" + "\t" + "" + "\t" + "N" + "\t" + "male" + "\t" + "" + "\n" +
+                        "Zoe" + "\t" + "25" + "\t" + "Q" + "\t" + "female" + "\t" + "" + "\n" +
+                        "J.D." + "\t" + "50" + "\t" + "" + "\t" + "male" + "\t" + ".Q" + "\n";
 
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
@@ -161,9 +161,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         selectOptionByValue(Locator.name("quf_ageMVIndicator"), "Z");
         clickButton("Submit");
         assertNoLabKeyErrors();
-        assertTextPresent("Sid");
-        assertTextPresent("male");
-        assertTextPresent("N");
+        assertTextPresent("Sid", "male", "N");
 
         deleteListData(1);
 
@@ -260,9 +258,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_Sex"), "male");
         clickButton("Submit");
         assertNoLabKeyErrors();
-        assertTextPresent("Sid");
-        assertTextPresent("male");
-        assertTextPresent("N");
+        assertTextPresent("Sid", "male", "N");
 
         deleteDatasetData(1);
 
@@ -289,34 +285,19 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         assertNoLabKeyErrors();
         assertMvIndicatorPresent();
-        assertTextPresent("Ted");
-        assertTextPresent("Alice");
-        assertTextPresent("Bob");
-        assertTextPresent("Q");
-        assertTextPresent("N");
-        assertTextPresent("male");
-        assertTextPresent("female");
-        assertTextPresent("17");
+        assertTextPresent("Ted", "Alice", "Bob", "Q", "N", "male", "female", "17");
     }
 
     private void validateTwoColumnData(String dataRegionName, String columnName)
     {
         assertNoLabKeyErrors();
         assertMvIndicatorPresent();
-        assertTextPresent("Franny");
-        assertTextPresent("Zoe");
-        assertTextPresent("J.D.");
-        assertTextPresent("Q");
-        assertTextPresent("N");
-        assertTextPresent("male");
-        assertTextPresent("female");
-        assertTextPresent("50");
+        assertTextPresent("Franny", "Zoe", "J.D.", "Q", "N", "male", "female", "50");
         assertTextNotPresent("'25'");
         DataRegionTable dataRegion = new DataRegionTable(dataRegionName, this);
         dataRegion.setFilter(columnName, "Equals", "Zoe");
         assertTextNotPresent("'25'");
-        assertTextPresent("Zoe");
-        assertTextPresent("female");
+        assertTextPresent("Zoe", "female");
         assertMvIndicatorPresent();
         click(Locator.xpath("//img[@class='labkey-mv-indicator']/../../a"));
         assertTextPresent("'25'");

@@ -771,8 +771,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitAndClick(Ext4Helper.Locators.ext4Button("View Summary of Demographics Sources"));
         waitForText("The following sources have been defined:");
-        assertTextPresent("/" + getProjectName());
-        assertTextPresent(SUBJECT_LIST + " (laboratory.subjects)");
+        assertTextPresent("/" + getProjectName(), SUBJECT_LIST + " (laboratory.subjects)");
 
         cleanupDataSources();
     }
@@ -1114,8 +1113,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitForText("There were errors in the upload:");
 
-        assertTextPresent("Row 3:");
-        assertTextPresent(errorMsg);
+        assertTextPresent("Row 3:", errorMsg);
 
         String sequence = "tggGg gGAAAAgg";
         setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\t" + sequence);

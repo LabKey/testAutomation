@@ -5913,7 +5913,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             clickButton("Delete");
             assertTextPresent(displayNames);
-            assertTextPresent("permanently delete");
             clickButton("Permanently Delete");
             assertTextNotPresent(userEmails);
         }

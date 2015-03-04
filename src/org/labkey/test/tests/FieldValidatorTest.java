@@ -52,7 +52,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
         log("Setup project and list module");
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
+        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[]{
 
                 new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
                 new ListHelper.ListColumn("id", "ID", ListHelper.ListColumnType.String, "",
@@ -69,13 +69,10 @@ public class FieldValidatorTest extends BaseWebDriverTest
         clickButton("Import Data");
         setFormElement(Locator.name("text"), TEST_DATA_FAIL);
         _listHelper.submitImportTsv_error(SEX_ERROR_MSG);
-        assertTextPresent(ID_ERROR_MSG);
-        assertTextPresent(AGE_ERROR_MSG);
+        assertTextPresent(ID_ERROR_MSG, AGE_ERROR_MSG);
 
         _listHelper.submitTsvData(TEST_DATA_PASS);
-        assertTextPresent("Ted");
-        assertTextPresent("Alice");
-        assertTextPresent("Bob");
+        assertTextPresent("Ted", "Alice", "Bob");
 
         // ID regex validation
         log("Test inserting new row");

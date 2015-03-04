@@ -343,8 +343,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
         goBack();
         proteinsTable.clickHeaderButton("Export All", "AMT");
-        assertTextPresent("Run");
-        assertTextPresent("Peptide");
+        assertTextPresent("Run", "Peptide");
         assertTextPresent("\n", 20);
         assertTextBefore("K.TKDYEGMQVPVK.V", "R.RDYLHYLPKYNR.F");
         assertTextNotPresent("K.LLASMLAK.A",

@@ -476,9 +476,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // kbl : TODO, filter panel behavior has changed and it's still not certain what the proper AND / OR behavior for categories is
         // until the final details are worked out, just ignore the number of occurances of text, and fix them later
         //
-        assertTextPresent("Days Since Start Date");//, 2); // X-Axis labels for each measure
-        assertTextPresent(CHART_TITLE+": Lymphs (cells/mm3)");//, 1); // Title
-        assertTextPresent(CHART_TITLE+": CD4+ (cells/mm3)");//, 1); // Title
+        assertTextPresent(
+                "Days Since Start Date", //, 2); // X-Axis labels for each measure
+                CHART_TITLE+": Lymphs (cells/mm3)",//, 1); // Title
+                CHART_TITLE+": CD4+ (cells/mm3)");//, 1); // Title
 
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);

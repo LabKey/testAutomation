@@ -267,8 +267,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         clickButton("Save & Close");
 
-        assertTextPresent(PLATE_TEMPLATE_NAME);
-        assertTextPresent("NAb: 5 specimens in duplicate");
+        assertTextPresent(PLATE_TEMPLATE_NAME, "NAb: 5 specimens in duplicate");
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
@@ -395,8 +394,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("edit"));
         // Make sure that the properties that affect calculations aren't shown
-        assertTextNotPresent("Cutoff");
-        assertTextNotPresent("Curve Fit Method");
+        assertTextNotPresent("Cutoff", "Curve Fit Method");
         setFormElement(Locator.name("quf_Name"), "NameEdited.xlsx");
         setFormElement(Locator.name("quf_HostCell"), "EditedHostCell");
         setFormElement(Locator.name("quf_PlateNumber"), "EditedPlateNumber");
@@ -438,10 +436,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
         setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
-        assertTextPresent("ptid 1 A");
-        assertTextPresent("ptid 1 B");
-        assertTextNotPresent("ptid 1 C");
-        assertTextNotPresent("ptid 5");
+        assertTextPresent("ptid 1 A", "ptid 1 B");
+        assertTextNotPresent("ptid 1 C", "ptid 5");
         checkAllOnPage("Data");
         clickButton("Copy to Study");
 
@@ -608,46 +604,32 @@ public class NabAssayTest extends AbstractQCAssayTest
         if (ptidCount >= 1)
         {
             // reversed dilution direction:
-            assertTextPresent("ptid 1 A");
-            assertTextPresent("ptid 1 B");
-            assertTextPresent("Curve IC50");
-            assertTextPresent("493");
+            assertTextPresent("ptid 1 A", "ptid 1 B", "Curve IC50", "493");
             assertTextPresent("Specimen 1", 2);
         }
         if (ptidCount >= 2)
         {
             // standard dilution direction
-            assertTextPresent("ptid 2 A");
-            assertTextPresent("ptid 2 B");
-            assertTextPresent("134");
+            assertTextPresent("ptid 2 A", "ptid 2 B", "134");
             assertTextPresent("Specimen 2", 2);
         }
         if (ptidCount >= 3)
         {
             // invalid dilution direction
-            assertTextPresent("ptid 3 A");
-            assertTextPresent("ptid 3 B");
-            assertTextPresent("436");
+            assertTextPresent("ptid 3 A", "ptid 3 B", "436");
             assertTextPresent("Specimen 3", 2);
         }
         if (ptidCount >= 4)
         {
             // unspecified dilution direction
-            assertTextPresent("ptid 4 A");
-            assertTextPresent("ptid 4 B");
-            assertTextPresent("277.9");
+            assertTextPresent("ptid 4 A", "ptid 4 B", "277.9");
             assertTextPresent("Specimen 4", 2);
         }
     }
 
     private void assertNabData(boolean hasCustomView)
     {
-        assertTextPresent("Cutoff Dilutions");
-        assertTextPresent("ptid 1");
-        assertTextPresent("ptid 2");
-        assertTextPresent("ptid 3");
-        assertTextPresent("ptid 4");
-        assertTextPresent("ptid 5");
+        assertTextPresent("Cutoff Dilutions", "ptid 1", "ptid 2", "ptid 3", "ptid 4", "ptid 5");
 /*
         assertTextPresent("Virus ID");
         if (hasCustomView)
@@ -668,18 +650,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Checking for AUC columns");
         // verify that most AUC columns are hidden by default
         assertTextPresent("AUC");
-        assertTextNotPresent("AUC 4pl");
-        assertTextNotPresent("AUC 5pl");
-        assertTextNotPresent("AUC Poly");
-        assertTextNotPresent("Curve IC50 4pl");
-        assertTextNotPresent("Curve IC50 5pl");
-        assertTextNotPresent("Curve IC50 Poly");
-        assertTextNotPresent("Curve IC70 4pl");
-        assertTextNotPresent("Curve IC70 5pl");
-        assertTextNotPresent("Curve IC70 Poly");
-        assertTextNotPresent("Curve IC80 4pl");
-        assertTextNotPresent("Curve IC80 5pl");
-        assertTextNotPresent("Curve IC80 Poly");
+        assertTextNotPresent("AUC 4pl", "AUC 5pl", "AUC Poly", "Curve IC50 4pl", "Curve IC50 5pl", "Curve IC50 Poly",
+                "Curve IC70 4pl", "Curve IC70 5pl", "Curve IC70 Poly", "Curve IC80 4pl", "Curve IC80 5pl", "Curve IC80 Poly");
     }
 
     private void addAUCColumns()

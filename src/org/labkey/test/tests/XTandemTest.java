@@ -192,8 +192,6 @@ public class XTandemTest extends AbstractXTandemTest
 
         checkRadioButton(Locator.radioButtonByNameAndValue(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE));
         clickButton("Compare");
-        assertTextPresent(PEPTIDE3);
-        assertTextPresent(PEPTIDE4);
-        assertTextPresent(PEPTIDE);
+        assertTextPresent(PEPTIDE3, PEPTIDE4, PEPTIDE);
     }
 }

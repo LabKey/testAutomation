@@ -456,8 +456,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         log("Study Properties: verify display of some properties in overview webpart");
         waitAndClickAndWait(Locator.linkWithText("Overview"));
         waitForText(newProps.get("Investigator"));
-        assertTextPresent(newProps.get("Grant"));
-        assertTextPresent(newProps.get("Description"));
+        assertTextPresent(newProps.get("Grant"), newProps.get("Description"));
         assertElementPresent(Locator.linkWithText(newProps.get("SubjectNounPlural")), 1);
 
         log("Study Properties: clean up study properties");

@@ -303,8 +303,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Next", 0);
         clickButton("Next", 0);
         // verify question counts on section header
-        assertTextPresent("Section 1 (2)");
-        assertTextPresent("Section 2 (5)");
+        assertTextPresent("Section 1 (2)", "Section 2 (5)");
         assertTextNotPresent("-Txt Field", "-Int Field", "-Dt Field");
         assertTrue("Submit button should not be disabled", !isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         clickButton("Submit completed form");
@@ -339,8 +338,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickProject(getProjectName());
         addSurveyWebpart(projectSurveyDesign);
         assertTextPresent("No data to show.");
-        assertTextNotPresent(firstSurvey);
-        assertTextNotPresent(secondSurvey);
+        assertTextNotPresent(firstSurvey, secondSurvey);
     }
 
     private void addSurveyGridQuestionRecord(String val1, String val2)

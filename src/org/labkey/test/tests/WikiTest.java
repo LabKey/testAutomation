@@ -87,7 +87,7 @@ public class WikiTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("full-text search"));
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
-        beginAt(getDriver().getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
+        beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);
 
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Wiki");
@@ -108,10 +108,9 @@ public class WikiTest extends BaseWebDriverTest
         wikiHelper.saveWikiPage();
 
         waitForElement(Locator.id(WIKI_PAGE_WEBPART_ID));
-        assertTextPresent("common.properties");
-        assertTextPresent("Some HTML content");
-        assertElementPresent (Locator.linkContainingText("_Test Wiki"));
-        impersonateRole ("Reader");
+        assertTextPresent("common.properties", "Some HTML content");
+        assertElementPresent(Locator.linkContainingText("_Test Wiki"));
+        impersonateRole("Reader");
         assertElementNotPresent(Locator.linkContainingText("_Test Wiki"));
         stopImpersonatingRole();
 
@@ -122,8 +121,8 @@ public class WikiTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
-            "<b>Some HTML content</b><br>\n" +
-            "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
+                "<b>Some HTML content</b><br>\n" +
+                "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
         wikiHelper.setWikiBody(wikiPageContentEdited);
         wikiHelper.switchWikiToVisualView();
         wikiHelper.saveWikiPage();
@@ -132,10 +131,10 @@ public class WikiTest extends BaseWebDriverTest
         doTestInlineEditor();
 
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
-        createSubfolder(getProjectName(), getSubolderName(), new String[] {});
+        createSubfolder(getProjectName(), getSubolderName(), new String[]{});
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
-        selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
+        selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
         waitForElement(Locator.xpath("//option[@value='_Test Wiki']"));
         clickButton("Submit");
         verifyWikiPagePresent();

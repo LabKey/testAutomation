@@ -160,8 +160,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
-        assertTextPresent("A duplicate PTID was discovered : b");
-        assertTextPresent("A duplicate PTID was discovered : e");
+        assertTextPresent("A duplicate PTID was discovered : b", "A duplicate PTID was discovered : e");
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
@@ -171,8 +170,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
         clickAndWait(Locator.linkWithText("QC Log"));
 
-        assertTextPresent("Programmatic QC was run and 2 errors were found");
-        assertTextPresent("Programmatic QC was run and 0 errors were found");
+        assertTextPresent("Programmatic QC was run and 2 errors were found", "Programmatic QC was run and 0 errors were found");
     }
 
     private void uploadTransformRuns()
@@ -189,8 +187,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
-        assertTextPresent("A duplicate PTID was discovered : b");
-        assertTextPresent("A duplicate PTID was discovered : e");
+        assertTextPresent("A duplicate PTID was discovered : b", "A duplicate PTID was discovered : e");
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
@@ -198,15 +195,14 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkWithText("view results"));
 
-        assertTextPresent("monkey");
-        assertTextPresent("hamster");
+        assertTextPresent("monkey", "hamster");
 
         // verify the log entry
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
         clickAndWait(Locator.linkWithText("QC Log"));
 
-        assertTextPresent("Programmatic Data Transform was run and 2 errors were found");
-        assertTextPresent("Programmatic Data Transform was run and 0 errors were found");
+        assertTextPresent("Programmatic Data Transform was run and 2 errors were found",
+                "Programmatic Data Transform was run and 0 errors were found");
     }
 
     private void uploadTransformQCRuns()
@@ -231,9 +227,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkWithText("view results"));
 
-        assertTextPresent("monkey");
-        assertTextPresent("hamster");
-        assertTextPresent("goat");
+        assertTextPresent("monkey", "hamster", "goat");
 
         // verify the log entry
         clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));

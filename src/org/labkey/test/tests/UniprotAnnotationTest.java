@@ -77,7 +77,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxByName("restrictProteins"));
         clickButton("Search");
 
-        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0); // Search results are hidden by default.
         assertTextPresent("Peptidyl-prolyl cis-trans isomerase A");
 
         click(Locator.linkWithText("PPIA_MOUSE"));
@@ -87,8 +87,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
         assertTextPresent("PPIA_MOUSE");
         waitForText(WAIT_FOR_JAVASCRIPT, "Q9CWJ5");
-        assertTextPresent("Q9R137");
-        assertTextPresent("Mus musculus");
+        assertTextPresent("Q9R137", "Mus musculus");
 
         getDriver().close();
         getDriver().switchTo().window((String) windows[0]);
@@ -98,7 +97,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxByName("restrictProteins"));
         clickButton("Search");
 
-        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
+        clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0); // Search results are hidden by default.
         assertTextPresent("Defensin-1 precursor");
 
         click(Locator.linkWithText("DEF1_MOUSE"));
@@ -107,10 +106,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         getDriver().switchTo().window((String) windows[1]);
         waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
         waitForText(WAIT_FOR_JAVASCRIPT, "P11477");
-        assertTextPresent("Q61448");
-        assertTextPresent("DEF1_MOUSE");
-        assertTextPresent("ENSMUSG00000074440");
-        assertTextPresent("Mus musculus");
+        assertTextPresent("Q61448", "DEF1_MOUSE", "ENSMUSG00000074440", "Mus musculus");
         getDriver().close();
         getDriver().switchTo().window((String) windows[0]);
     }

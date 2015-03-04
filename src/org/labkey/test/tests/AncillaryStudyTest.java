@@ -303,9 +303,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickButton("Submit");
         assertElementPresent(Locator.linkWithText(PROTOCOL_DOC.getName()));
         assertElementPresent(Locator.linkWithText(PROTOCOL_DOC2.getName()));
-        assertTextPresent("Protocol documents:");
-        assertTextPresent("Extra " + STUDY_NAME);
-        assertTextPresent("Extra " + STUDY_DESCRIPTION);
+        assertTextPresent(
+                "Protocol documents:",
+                "Extra " + STUDY_NAME,
+                "Extra " + STUDY_DESCRIPTION);
     }
 
     private void verifyDatasets()
@@ -355,8 +356,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify that Ancillary study doesn't support requests.");
         clickAndWait(Locator.linkWithText("Manage"));
-        assertTextNotPresent("Specimen Repository Settings");
-        assertTextNotPresent("Specimen Request Settings");
+        assertTextNotPresent("Specimen Repository Settings", "Specimen Request Settings");
         assertTextPresent("Note: specimen repository and request settings are not available for ancillary studies.");
         assertElementNotPresent(Locator.linkWithText("Change Repository Type"));
         assertElementNotPresent(Locator.linkWithText("Manage Display and Behavior"));

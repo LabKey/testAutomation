@@ -89,13 +89,10 @@ public class UserTest extends SecurityTest
     private void siteUsersTest()
     {
         goToSiteUsers();
-        assertTextPresent("Last Login");
-        assertTextPresent("Last Name");
-        assertTextPresent("Active");
+        assertTextPresent("Last Login", "Last Name", "Active");
 
         goToMyAccount();
-        assertTextPresent("First Name");
-        assertTextPresent("Last Login");
+        assertTextPresent("First Name", "Last Login");
 
         impersonate(NORMAL_USER);
 

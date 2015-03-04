@@ -471,8 +471,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("There were errors in the upload");
-        assertTextPresent("Missing subject Id");
+        assertTextPresent("There were errors in the upload", "Missing subject Id");
 
         log("Saving valid data");
         textarea.setValue(text);

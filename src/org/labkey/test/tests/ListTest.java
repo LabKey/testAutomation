@@ -188,8 +188,7 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.clickSave();
 
         log("Check that edit list definition worked");
-        assertTextPresent(LIST_KEY_NAME2);
-        assertTextPresent(LIST_DESCRIPTION);
+        assertTextPresent(LIST_KEY_NAME2, LIST_DESCRIPTION);
 
         log("Test upload data");
 
@@ -208,34 +207,35 @@ public class ListTest extends BaseWebDriverTest
         submitImportTsv();
 
         log("Check upload worked correctly");
-        assertTextPresent(_listCol2.getLabel());
-        assertTextPresent(TEST_DATA[0][0]);
-        assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[3][2]);
+        assertTextPresent(
+                _listCol2.getLabel(),
+                TEST_DATA[0][0],
+                TEST_DATA[1][1],
+                TEST_DATA[3][2]);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
         assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][2],  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
-        assertEquals(1,table.getRow(TEST_DATA[0][1]));
+        assertEquals(1, table.getRow(TEST_DATA[0][1]));
         clickAndWait(Locator.linkWithText("edit", 1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
         // Third row (Red)
-        assertEquals(2,table.getRow(TEST_DATA[0][2]));
+        assertEquals(2, table.getRow(TEST_DATA[0][2]));
         clickAndWait(Locator.linkWithText("edit", 2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
 
         table = new DataRegionTable("query", this);
-        assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
         assertEquals("true", table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals("false",  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals("false", table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
@@ -271,9 +271,10 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        assertTextPresent(TEST_DATA[0][0]);
-        assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[3][2]);
+        assertTextPresent(
+                TEST_DATA[0][0],
+                TEST_DATA[1][1],
+                TEST_DATA[3][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
@@ -281,15 +282,16 @@ public class ListTest extends BaseWebDriverTest
         setUpListFinish();
 
         log("Check that data was added correctly");
-        assertTextPresent(TEST_DATA[0][0]);
-        assertTextPresent(TEST_DATA[1][1]);
-        assertTextPresent(TEST_DATA[3][2]);
-        assertTextPresent(TEST_DATA[4][0]);
-        assertTextPresent(TEST_DATA[4][1]);
-        assertTextPresent(TEST_DATA[4][2]);
-        assertTextPresent(TEST_DATA[5][0]);
-        assertTextPresent(TEST_DATA[5][1]);
-        assertTextPresent(TEST_DATA[5][2]);
+        assertTextPresent(
+                TEST_DATA[0][0],
+                TEST_DATA[1][1],
+                TEST_DATA[3][2],
+                TEST_DATA[4][0],
+                TEST_DATA[4][1],
+                TEST_DATA[4][2],
+                TEST_DATA[5][0],
+                TEST_DATA[5][1],
+                TEST_DATA[5][2]);
 
         log("Check that hidden column is hidden.");
         clickAndWait(Locator.linkWithText("details"));
@@ -321,13 +323,14 @@ public class ListTest extends BaseWebDriverTest
         submit();
 
         log("Check new row was added");
-        assertTextPresent(TEST_DATA[0][3]);
-        assertTextPresent(TEST_DATA[1][3]);
-        assertTextPresent(TEST_DATA[2][3]);
-        assertTextPresent(TEST_DATA[3][3]);
+        assertTextPresent(
+                TEST_DATA[0][3],
+                TEST_DATA[1][3],
+                TEST_DATA[2][3],
+                TEST_DATA[3][3]);
         table = new DataRegionTable("query", this);
         assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
-        assertEquals(3,table.getRow(TEST_DATA[0][3]));
+        assertEquals(3, table.getRow(TEST_DATA[0][3]));
         assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
@@ -439,8 +442,7 @@ public class ListTest extends BaseWebDriverTest
         log("Check Customize View worked");
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(TEST_DATA[0][0]);
-        assertTextNotPresent(_listCol4.getLabel());
+        assertTextNotPresent(TEST_DATA[0][0], _listCol4.getLabel());
 
         log("4725: Check Customize View can't remove all fields");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -460,8 +462,7 @@ public class ListTest extends BaseWebDriverTest
         clickExportToText();
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(TEST_DATA[0][0]);
-        assertTextNotPresent(_listCol4.getLabel());
+        assertTextNotPresent(TEST_DATA[0][0], _listCol4.getLabel());
         popLocation();
 
         filterTest();
@@ -489,8 +490,7 @@ public class ListTest extends BaseWebDriverTest
         assertEquals("List Links", 18 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
-        assertTextNotPresent("No details available for this event.");
-        assertTextNotPresent("Unable to find the audit history detail for this event");
+        assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event");
 
         clickButton("Done");
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY, 3));
@@ -503,8 +503,7 @@ public class ListTest extends BaseWebDriverTest
         waitForText("Import Data");
         assertTextPresent("View Design");
         clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
-        assertTextPresent("Colors");
-        assertTextPresent("Views");
+        assertTextPresent("Colors", "Views");
 
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
@@ -524,29 +523,31 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.uploadData(LIST2_DATA);
 
         log("Check that upload worked");
-        assertTextPresent(LIST2_KEY);
-        assertTextPresent(LIST2_KEY2);
-        assertTextPresent(LIST2_KEY3);
-        assertTextPresent(LIST2_KEY4);
+        assertTextPresent(
+                LIST2_KEY,
+                LIST2_KEY2,
+                LIST2_KEY3,
+                LIST2_KEY4);
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol1.getName(), _list2Col1.getLabel() + " " +  _listCol1.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol2.getName(), _list2Col1.getLabel() + " " +  _listCol2.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" +  _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        _customizeViewsHelper.addCustomizeViewFilter(_list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addCustomizeViewSort(_list2Col1.getName() + "/" +  _listCol4.getName(),  _listCol4.getLabel(), "Ascending");
-        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col1.getName(), _list3Col1.getLabel() + " " +  _list3Col1.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" +  _list3Col2.getName(), _list3Col1.getLabel() + " " +  _list3Col2.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol1.getName(), _list2Col1.getLabel() + " " + _listCol1.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol2.getName(), _list2Col1.getLabel() + " " + _listCol2.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
+        _customizeViewsHelper.addCustomizeViewFilter(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addCustomizeViewSort(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Ascending");
+        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
+        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
         waitForText(WAIT_FOR_JAVASCRIPT, _listCol1.getLabel());
-        assertTextPresent(_listCol1.getLabel());
-        assertTextPresent(_listCol2.getLabel());
-        assertTextPresent(_listCol4.getLabel());
-        assertTextPresent(LIST2_FOREIGN_KEY_OUTSIDE);
-        assertTextPresent(LIST3_COL2);
+        assertTextPresent(
+                _listCol1.getLabel(),
+                _listCol2.getLabel(),
+                _listCol4.getLabel(),
+                LIST2_FOREIGN_KEY_OUTSIDE,
+                LIST3_COL2);
         assertTextNotPresent(LIST2_KEY);
         assertTextBefore(LIST2_KEY3, LIST2_KEY2);
         assertTextNotPresent(LIST2_KEY4);
@@ -556,14 +557,13 @@ public class ListTest extends BaseWebDriverTest
         pushLocation();
         waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
-        assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());
-        assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol2.getName());
-        assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol4.getName());
-        assertTextPresent(LIST2_FOREIGN_KEY_OUTSIDE);
-        assertTextPresent(LIST3_COL2);
-        assertTextNotPresent(LIST2_KEY);
+        assertTextPresent(
+                LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
+                LIST_KEY_NAME2.toLowerCase() + _listCol2.getName(),
+                LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
+                LIST2_FOREIGN_KEY_OUTSIDE, LIST3_COL2);
+        assertTextNotPresent(LIST2_KEY, LIST2_KEY4);
         assertTextBefore(LIST2_KEY3, LIST2_KEY2);
-        assertTextNotPresent(LIST2_KEY4);
         popLocation();
 
         log("Test edit row");
@@ -580,9 +580,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected rows?");
         waitForTextToDisappear(LIST2_KEY);
-        assertTextNotPresent(LIST2_KEY2);
-        assertTextNotPresent(LIST2_KEY3);
-        assertTextNotPresent(LIST2_KEY4);
+        assertTextNotPresent(LIST2_KEY2, LIST2_KEY3, LIST2_KEY4);
 
         log("Test deleting data (should any list custom views)");
         clickTab("List");
@@ -621,7 +619,7 @@ public class ListTest extends BaseWebDriverTest
         customizeURLTest();
         crossContainerLookupTest();
         listSelfJoinTest();
-     }
+    }
 
     /*  Issue 6883: Create test for list self join
         Issue 10394: Test spaces & special characters in table/column names
@@ -865,22 +863,18 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         _listHelper.clickEditDesign();
-        setColumnName(1,"FooFoo");
-        setColumnLabel(1,"");
+        setColumnName(1, "FooFoo");
+        setColumnLabel(1, "");
         _listHelper.clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         _listHelper.clickEditDesign();
         ListHelper listHelper = new ListHelper(this);
-        ListColumn newCol = new ListColumn("BarBar","BarBar", ListHelper.ListColumnType.String, "None");
+        ListColumn newCol = new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "None");
         listHelper.addField(newCol);
         _listHelper.clickSave();
-        assertTextPresent("FooFoo");
-        assertTextPresent("BarBar");
         assertTextBefore("FooFoo", "BarBar");
     }
-
-
 
     //
     // CUSTOMIZE URL tests

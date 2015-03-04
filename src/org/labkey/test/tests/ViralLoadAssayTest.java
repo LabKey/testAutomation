@@ -380,10 +380,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(WAIT_FOR_PAGE, Ext4Helper.Locators.ext4Button("Upload"), 0);
         waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("There were errors in the upload");
-        assertTextPresent("Missing sample name for row: 9");
-        assertTextPresent("Row 11: Unable to find detector information for detector: DETECTOR2");
-        assertTextPresent("Row 12: Unable to find detector information for detector: DETECTOR2");
+        assertTextPresent(
+                "There were errors in the upload",
+                "Missing sample name for row: 9",
+                "Row 11: Unable to find detector information for detector: DETECTOR2",
+                "Row 12: Unable to find detector information for detector: DETECTOR2");
 
         log("Saving valid data");
         textarea.setValue(text);
@@ -547,8 +548,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("There were errors in the upload");
-        assertTextPresent("Missing sample name for row: 17");
+        assertTextPresent("There were errors in the upload", "Missing sample name for row: 17");
 
         log("Saving valid data");
         textarea.setValue(text);
@@ -637,9 +637,10 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.Locators.window("Upload Failed"));
         click(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("There were errors in the upload");
-        assertTextPresent("Missing sample name for row: 23");
-        assertTextPresent("Missing sample name for row: 27");
+        assertTextPresent(
+                "There were errors in the upload",
+                "Missing sample name for row: 23",
+                "Missing sample name for row: 27");
 
         log("Saving valid data");
         textarea.setValue(text);

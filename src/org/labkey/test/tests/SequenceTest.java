@@ -483,8 +483,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         for (String rowId : rowIds)
         {
-            assertTextPresent("Illumina-R1-" + rowId + ".fastq.gz");
-            assertTextPresent("Illumina-R2-" + rowId + ".fastq.gz");
+            assertTextPresent("Illumina-R1-" + rowId + ".fastq.gz", "Illumina-R2-" + rowId + ".fastq.gz");
         }
 
         Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName);

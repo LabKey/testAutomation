@@ -162,12 +162,12 @@ public class GpatAssayTest extends BaseWebDriverTest
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String);
         clickButton("Show Assay Designer");
 
-        waitForElement(Locator.xpath( getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnLabel(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields"), 4, "Blank");
         _listHelper.setColumnLabel(7, "Result");
         _listHelper.setColumnName(7, "Result");
         click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
-        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");
+        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"), "Score");
         pressTab(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"));
 
         clickButton("Save & Close");
@@ -224,9 +224,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_FNA));
 
         waitForText("Sequence");
-        assertTextPresent("Header");
-
-        assertTextPresent("HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ");
-        assertTextPresent("CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
+        assertTextPresent(
+                "Header", "HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ",
+                "CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
     }
 }

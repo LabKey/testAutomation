@@ -125,8 +125,9 @@ public class FlowCBCTest extends BaseFlowTest
 
         assertTitleContains("Dataset: Flow");
         assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
-        assertTextPresent(PTID1, "2012-03-17"); // PTID entered in copy verify page and DATE from FCS keywords
-        assertTextPresent(PTID2, "2012-06-20"); // PTID from FCS keyword and DATE entered in copy verify page
+        assertTextPresent(PTID1, "2012-03-17",  // PTID entered in copy verify page and DATE from FCS keywords
+                          PTID2, "2012-06-20"); // PTID from FCS keyword and DATE entered in copy verify page
+
         String href = getAttribute(Locator.linkWithText(PTID2), "href");
         assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
         href = getAttribute(Locator.linkWithText("analysis"), "href");

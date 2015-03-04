@@ -49,10 +49,8 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
         clickButton("Compare");
-        assertTextPresent("(GroupProbability > 0.7)");
+        assertTextPresent("(GroupProbability > 0.7)", "GroupNumber", "0.78");
         assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
-        assertTextPresent("GroupNumber");
-        assertTextPresent("0.78");
         setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|");
         setSort("MS2Compare", "Run0GroupProbability", SortDirection.DESC);
@@ -83,13 +81,13 @@ public class MS2GZTest extends AbstractMS2ImportTest
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
         checkCheckbox(Locator.checkboxByName("total"));
         clickButton("Compare");
-        assertTextPresent("(SequenceMass > 20000)");
-        assertTextPresent("(DeltaMass > 0.0)");
-        assertTextPresent("Total");
-        assertTextNotPresent("gi|32307556|ribosomal_protein");
-        assertTextNotPresent("gi|136348|TRPF_YEAST_N-(5'-ph");
-        assertTextPresent("gi|33241155|ref|NP_876097.1|");
-        assertTextPresent("Pattern");
+        assertTextPresent(
+                "(SequenceMass > 20000)",
+                "(DeltaMass > 0.0)",
+                "Total",
+                "gi|33241155|ref|NP_876097.1|",
+                "Pattern");
+        assertTextNotPresent("gi|32307556|ribosomal_protein", "gi|136348|TRPF_YEAST_N-(5'-ph");
         setSort("MS2Compare", "Protein", SortDirection.ASC);
         assertTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|");
 
@@ -102,12 +100,8 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
         clickButton("Compare");
-        assertTextPresent("(DeltaMass > 0.0)");
-        assertTextNotPresent("R.TIDPVIAR.K");
-        assertTextNotPresent("K.KLYNEELK.A");
-        assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("K.VYLADPVVFTVKHIK.Q");
-        assertTextPresent("Pattern");
+        assertTextPresent("(DeltaMass > 0.0)", "K.VYLADPVVFTVKHIK.Q", "Pattern");
+        assertTextNotPresent("R.TIDPVIAR.K", "K.KLYNEELK.A", "K.EIRQRQGDDLDGLSFAELR.G");
         setSort("MS2Compare", "Peptide", SortDirection.DESC);
         if (!isTextBefore("-.MELFSNELLYK.T", "K.VYLADPVVFTVKHIK.Q"))
             setSort("MS2Compare", "Peptide", SortDirection.ASC);

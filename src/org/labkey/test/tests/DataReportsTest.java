@@ -341,8 +341,7 @@ public class DataReportsTest extends ReportTest
         _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");
-        assertTextNotPresent(R_REMCOL);
-        assertTextNotPresent(R_FILTERED);
+        assertTextNotPresent(R_REMCOL, R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
 
         log("Check that R respects column changes, filters and sorts of data");
@@ -351,8 +350,7 @@ public class DataReportsTest extends ReportTest
         setCodeEditorValue("script-report-editor", "labkey.data");
         clickViewTab();
         waitForText(R_SORT1);
-        assertTextNotPresent(R_REMCOL);
-        assertTextNotPresent(R_FILTERED);
+        assertTextNotPresent(R_REMCOL, R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
 
         saveReport(R_SCRIPTS[3]);

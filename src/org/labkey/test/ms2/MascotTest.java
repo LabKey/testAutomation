@@ -16,6 +16,7 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -76,8 +77,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     {
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
-        if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+        Assert.assertFalse("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists", test2.exists());
 
         //cheehong:
         //  starting with v1.7, "Has Mascot server" checkbox removed
@@ -106,7 +106,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Return to customize page.");
         popLocation();
 
-        if (testAuthentication) {
+        if (testAuthentication)
+        {
             // Case 2: correct server, wrong user id
             log("Testing non-existent Mascot user via " + mascotServerURL);
             setFormElement("mascotUserAccount", "nonexistent");
@@ -116,11 +117,14 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
-        } else {
+        }
+        else
+        {
             log("No authentication information, skip testing non-existent Mascot user via " + mascotServerURL);
         }
 
-        if (testAuthentication) {
+        if (testAuthentication)
+        {
             // Case 3: correct server, wrong user password
             log("Testing wrong password fo Mascot user " + mascotUserAccount + " via " + mascotServerURL);
             setFormElement("mascotUserAccount", mascotUserAccount);
@@ -130,14 +134,16 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
-        } else {
+        }
+        else
+        {
             log("No authentication information, skip testing wrong password fo Mascot user " + mascotUserAccount + " via " + mascotServerURL);
         }
 
         String altMascotServer = "";
         try
         {
-            URL url = new URL((mascotServerURL.startsWith("http://") ? "" : "http://")+ mascotServerURL);
+            URL url = new URL((mascotServerURL.startsWith("http://") ? "" : "http://") + mascotServerURL);
             StringBuffer alternativeLink = new StringBuffer("http://");
             alternativeLink.append(url.getHost());
             if (80 != url.getPort() && -1 != url.getPort())
@@ -147,7 +153,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             alternativeLink.append("/");
             if ("".equals(url.getPath()))
                 alternativeLink.append("alternativefolder/");
-            altMascotServer = alternativeLink.toString ();
+            altMascotServer = alternativeLink.toString();
         }
         catch (MalformedURLException x)
         {
@@ -165,7 +171,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 //        log("Return to customize page.");
 //        popLocation();
 
-        if (testAuthentication) {
+        if (testAuthentication)
+        {
             // Case 5: auto-detect server, wrong user id
             log("Testing non-existent Mascot user and server auto-detection via " + altMascotServer);
             setFormElement("mascotServer", altMascotServer);
@@ -176,11 +183,14 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
-        } else {
+        }
+        else
+        {
             log("No authentication information, skip testing non-existent Mascot user and server auto-detection via " + altMascotServer);
         }
 
-        if (testAuthentication) {
+        if (testAuthentication)
+        {
             // Case 6: auto-detect server, wrong user password
             log("Testing wrong password fo Mascot user " + mascotUserAccount + "  and server auto-detection via " + mascotServerURL);
             setFormElement(Locator.name("mascotServer"), altMascotServer);
@@ -191,7 +201,9 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
-        } else {
+        }
+        else
+        {
             log("No authentication information, skip testing wrong password fo Mascot user " + mascotUserAccount + "  and server auto-detection via " + mascotServerURL);
         }
 
@@ -203,8 +215,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         setFormElement(Locator.name("mascotUserPassword"), mascotUserPassword);
         pushLocation();
         clickAndWait(Locator.linkWithText("Test Mascot settings"));
-        assertTextPresent("Test failed.");
-        assertTextPresent("Failed to interact with Mascot Server");
+        assertTextPresent("Test failed.", "Failed to interact with Mascot Server");
         log("Return to customize page.");
         popLocation();
 
@@ -253,15 +264,16 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         log("Spot check results loaded from .dat file");
         clickAndWait(Locator.linkWithText("CAexample_mini.dat (none)"));
-        assertTextPresent("sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta");
-        assertTextPresent("MASCOT");
-        assertTextPresent("CAexample_mini.dat");
-        assertTextPresent("sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta");
-        assertTextPresent("K.VEHLDKDLFR.R");
-        assertTextPresent("gi|23335713|hypothetical_prot");
-        assertTextPresent("1374.3173");
-        assertTextPresent("R.VWGACVLCLLGPLPIVLGHVHPECDVITQLR.E");
-        assertTextPresent("gi|4689022|ribosomal_protein_");
+        assertTextPresent(
+                "sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta",
+                "MASCOT",
+                "CAexample_mini.dat",
+                "sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta",
+                "K.VEHLDKDLFR.R",
+                "gi|23335713|hypothetical_prot",
+                "1374.3173",
+                "R.VWGACVLCLLGPLPIVLGHVHPECDVITQLR.E",
+                "gi|4689022|ribosomal_protein_");
     }
 
     protected void setupEngine()
@@ -347,8 +359,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         setFormElement(Locator.name("minimumProbability"), "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        assertTextNotPresent(SEARCH_FIND);
-        assertTextNotPresent(SEARCH_FIND_ALT);
+        assertTextNotPresent(SEARCH_FIND, SEARCH_FIND_ALT);
         assertTextPresent("No data to show");
     }
 

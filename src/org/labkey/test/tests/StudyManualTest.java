@@ -150,10 +150,7 @@ public abstract class StudyManualTest extends StudyTest
         assertButtonPresent("Import Custom Mapping");
         assertButtonNotPresent("Replace Custom Mapping");
         assertButtonNotPresent("Clear Custom Mapping");
-        assertTextNotPresent("Vaccine 1");
-        assertTextNotPresent("Vaccination 1");
-        assertTextNotPresent("Cycle 10");
-        assertTextNotPresent("All Done");
+        assertTextNotPresent("Vaccine 1", "Vaccination 1", "Cycle 10", "All Done");
 
         // Import custom mapping again
         importCustomVisitMapping();
@@ -278,9 +275,6 @@ public abstract class StudyManualTest extends StudyTest
         assertTextPresent("Could not convert 'text'");
 
         _listHelper.submitTsvData(_tsv);
-        assertTextPresent("1234");
-        assertTextPresent("2006-02-01");
-        assertTextPresent("1.2");
-        assertTextPresent("aliasedData");
+        assertTextPresent("1234", "2006-02-01", "1.2", "aliasedData");
     }
 }

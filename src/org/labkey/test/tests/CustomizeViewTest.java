@@ -92,8 +92,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Add filter: LastName starts with 'J'");
         addFilter(LAST_NAME_COLUMN, "Starts With", "J");
         assertTextNotPresent("Norbertson");
-        assertTextPresent("Janeson");
-        assertTextPresent("Johnson");
+        assertTextPresent("Janeson", "Johnson");
 
         log("** Add another filter: LastName != 'Johnson'");
         addFilter(LAST_NAME_COLUMN, "Does Not Equal", "Johnson");
@@ -102,8 +101,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         log("** Remove filter");
         removeFilter(LAST_NAME_COLUMN);
-        assertTextPresent("Johnson");
-        assertTextPresent("Norbertson");
+        assertTextPresent("Johnson", "Norbertson");
 
         log("** Add sort by Age");
         assertTextBefore("Billson", "Johnson");
@@ -118,18 +116,29 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextNotPresent("Oldness Factor");
 
         List<Map<String, String>> aggregates = new ArrayList<>();
-        aggregates.add(new HashMap<String, String>(){{put("type", "SUM");}});
-        aggregates.add(new HashMap<String, String>(){{put("type", "COUNT");}});
+        aggregates.add(new HashMap<String, String>()
+        {{
+                put("type", "SUM");
+            }});
+        aggregates.add(new HashMap<String, String>()
+        {{
+                put("type", "COUNT");
+            }});
         setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
-        assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
-        assertTextPresent("Total:");
-        assertTextPresent("Count:");
+        assertTextPresent(
+                "Oldness Factor" + INJECT_CHARS_2,
+                "Total:",
+                "Count:");
         assertTextNotPresent("Total Age:");
         assertTextPresent("279");
 
         log("** Set custom aggregate label");
         aggregates.remove(0);
-        aggregates.add(new HashMap<String, String>(){{put("type", "SUM");put("label", "Total Age");}});
+        aggregates.add(new HashMap<String, String>()
+        {{
+                put("type", "SUM");
+                put("label", "Total Age");
+            }});
         setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
         assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
 
@@ -138,8 +147,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         log("** Clear column title and SUM aggregate");
         setColumnProperties("Age", null, null);
-        assertTextNotPresent("Oldness Factor");
-        assertTextNotPresent("Total Age:");
+        assertTextNotPresent("Oldness Factor", "Total Age:");
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);
@@ -150,7 +158,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
 
         log("** Test HTML/JavaScript escaping");
-        Crawler.tryInject(this, new Function<Void, Void>() {
+        Crawler.tryInject(this, new Function<Void, Void>()
+        {
             @Override
             public Void apply(Void v)
             {
@@ -168,8 +177,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn(newColumnLabel);
         _customizeViewsHelper.applyCustomView();
-        assertTextPresent(newColumnDisplayName);
-        assertTextPresent("unsaved");
+        assertTextPresent(newColumnDisplayName, "unsaved");
 
         _customizeViewsHelper.revertUnsavedViewGridClosed();
         assertTextNotPresent(newColumnDisplayName);

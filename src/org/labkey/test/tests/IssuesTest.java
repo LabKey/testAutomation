@@ -263,8 +263,8 @@ public class IssuesTest extends BaseWebDriverTest
         String issueId = getLastPageIssueId();
 
         // DetailsAction
-        assertTextPresent("Issue " + issueId + ": " + issueTitle);
-        assertTextPresent("Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
+        assertTextPresent("Issue " + issueId + ": " + issueTitle,
+                "Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
         assertTextNotPresent("MySecondString");
         assertElementPresent(Locator.linkWithText("http://www.issues.test"));
 
@@ -580,9 +580,10 @@ public class IssuesTest extends BaseWebDriverTest
         issuesTable.setFilter("Status", "Has Any Value", null);
         issuesTable.checkAll();
         clickButton("View Details");
-        assertTextPresent("a bright flash of light");
-        assertTextPresent("alien autopsy");
-        assertTextPresent("No big whup");
+        assertTextPresent(
+                "a bright flash of light",
+                "alien autopsy",
+                "No big whup");
         clickAndWait(Locator.linkWithText("view grid"));
     }
 
@@ -591,8 +592,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // assert both issues are present
         clearAllFilters("Issues", "IssueId");
-        assertTextPresent(ISSUE_TITLE_0);
-        assertTextPresent(ISSUE_TITLE_1);
+        assertTextPresent(ISSUE_TITLE_0, ISSUE_TITLE_1);
 
         // Filter out all pri-1 bugs; assert newly created issue is filtered out
         DataRegionTable issuesTable = new DataRegionTable("Issues", this);
@@ -702,8 +702,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(issueIdA));
 
         assertElementPresent(Locator.linkWithText(issueIdB));
-        assertTextPresent(String.format("Issue %s marked as duplicate of this issue.", issueIdB));
-        assertTextPresent("Duplicates");
+        assertTextPresent(String.format("Issue %s marked as duplicate of this issue.", issueIdB), "Duplicates");
     }
 
     @Test
@@ -792,8 +791,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Ext4Helper.Locators.ext4Button("Move"));
 
         // make sure the moved issues are no longer shwoing up
-        assertTextNotPresent(issueTitleA);
-        assertTextNotPresent(issueTitleB);
+        assertTextNotPresent(issueTitleA, issueTitleB);
     }
 
     @Test

@@ -203,8 +203,7 @@ public class MS1Test extends BaseWebDriverTest
         clickProject(project);
         checkAllOnPage("MSInspectFeatureRuns");
         clickButton("Compare", 60000);
-        assertTextPresent("-.TMITDSLAVVLQR.R");
-        assertTextPresent("236.9828");
+        assertTextPresent("-.TMITDSLAVVLQR.R", "236.9828");
 
         //test links
         pushLocation();
@@ -252,11 +251,11 @@ public class MS1Test extends BaseWebDriverTest
         clickButton("Search");
 
         //other scans should also be there
-        assertTextPresent("459");
-        assertTextPresent("1948");
-
-        assertTextPresent("K.AVVQDPALKPLALVYGEATSR.R");
-        assertTextPresent("K.E^ASGDLPEAQIVK.H");
+        assertTextPresent(
+                "459",
+                "1948",
+                "K.AVVQDPALKPLALVYGEATSR.R",
+                "K.E^ASGDLPEAQIVK.H");
 
         //make sure that an exact search doesn't find peptides with modifiers
         checkCheckbox(Locator.checkboxByName("exact"));
@@ -292,9 +291,7 @@ public class MS1Test extends BaseWebDriverTest
         selectOptionByValue(Locator.name("mzUnits"), "mz");
         clickButton("Search");
 
-        assertTextPresent("1888");
-        assertTextPresent("1921");
-        assertTextPresent("1976");
+        assertTextPresent("1888", "1921", "1976");
 
         selectOptionByValue(Locator.name("timeUnits"), "scans");
         assertFormElementEquals("timeSource", "1948");
@@ -320,8 +317,7 @@ public class MS1Test extends BaseWebDriverTest
         clickProject(project);
         String run1Title = getRunTitle(BASE_FILE_NAME_1, FEATURES_PROTOCOL);
         String run2Title = getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL);
-        assertTextPresent(run1Title);
-        assertTextPresent(run2Title);
+        assertTextPresent(run1Title, run2Title);
 
         //Features View
         log("Tesitng showFeatures.view....");
@@ -346,8 +342,7 @@ public class MS1Test extends BaseWebDriverTest
         _customizeViewsHelper.applyCustomView();
 
         assertTextPresent("KL");
-        assertTextNotPresent("Related Peptide");
-        assertTextNotPresent("K.AVVQDPALKPLALVYGEATSR.R");
+        assertTextNotPresent("Related Peptide", "K.AVVQDPALKPLALVYGEATSR.R");
 
         //reset view
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -362,38 +357,30 @@ public class MS1Test extends BaseWebDriverTest
         _customizeViewsHelper.moveCustomizeViewSort("RelatedPeptide/PeptideProphet", true);
         _customizeViewsHelper.saveCustomView("My View");
 
-        assertTextPresent("PepProphet");
-        assertTextPresent("Protein");
-        assertTextPresent("18protmix|P46406|G3P_RABIT");
+        assertTextPresent("PepProphet", "Protein", "18protmix|P46406|G3P_RABIT");
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
         _extHelper.clickMenuButton("Views", "default");
-        assertTextNotPresent("PepProphet");
-        assertTextNotPresent("Protein");
-        assertTextNotPresent("18protmix|P46406|G3P_RABIT");
+        assertTextNotPresent("PepProphet", "Protein", "18protmix|P46406|G3P_RABIT");
 
         //test export
         log("Testing export...");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         clickExportToText();
-        assertTextPresent("Scan");
-        assertTextPresent("1948");
-        assertTextPresent("1585");
+        assertTextPresent("Scan", "1948", "1585");
 
         //ensure filtering and sorting are still in effect
         assertTextNotPresent("5,972.8930");
         assertTextBefore("66,204.2900", "49,012.0600");
-        
+
         popLocation();
 
         //test printing
         pushLocation();
         addUrlParameter("exportType=printRows&exportRegion=fv");
-        assertTextPresent("Scan");
-        assertTextPresent("1948");
-        assertTextPresent("1585");
+        assertTextPresent("Scan", "1948", "1585");
 
         //ensure filtering and sorting are still in effect
         assertTextNotPresent("5,972.8930");
@@ -405,13 +392,14 @@ public class MS1Test extends BaseWebDriverTest
 
         //verify the data file information
         log("Verifying data file and software information...");
-        assertTextPresent(BASE_FILE_NAME_2 + FEATURES_TSV_EXTENSION);
-        assertTextPresent(BASE_FILE_NAME_2 + MZXML_EXTENSION);
+        assertTextPresent(BASE_FILE_NAME_2 + FEATURES_TSV_EXTENSION,
+                BASE_FILE_NAME_2 + MZXML_EXTENSION);
 
         //verify the software information
-        assertTextPresent("msInspect");
-        assertTextPresent("(Fred Hutchinson Cancer Research Center)");
-        assertTextPresent("org.fhcrc.cpl.viewer.feature.extraction.FeatureFinder");
+        assertTextPresent(
+                "msInspect",
+                "(Fred Hutchinson Cancer Research Center)",
+                "org.fhcrc.cpl.viewer.feature.extraction.FeatureFinder");
 
         log("showFeatures.view is OK.");
 
@@ -423,13 +411,10 @@ public class MS1Test extends BaseWebDriverTest
         setFilter(DATAREGION_PEAKS, "MZ", "Is Greater Than or Equal To", "1500");
 
         //verify the data file info
-        assertTextPresent(BASE_FILE_NAME_2 + PEAKS_XML_EXTENSION);
-        assertTextPresent(BASE_FILE_NAME_2 + MZXML_EXTENSION);
+        assertTextPresent(BASE_FILE_NAME_2 + PEAKS_XML_EXTENSION, BASE_FILE_NAME_2 + MZXML_EXTENSION);
 
         //very the software info
-        assertTextPresent("peakaboo");
-        assertTextPresent("mzHigh");
-        assertTextPresent("2000");
+        assertTextPresent("peakaboo", "mzHigh", "2000");
 
         log("showPeaks.view OK.");
 

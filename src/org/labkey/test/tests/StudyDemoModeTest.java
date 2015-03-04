@@ -67,8 +67,9 @@ public class StudyDemoModeTest extends StudyBaseTest
     // Verify that we're in demo mode, and that the messages and buttons are correct
     private void verifyInDemoMode()
     {
-        assertTextPresent("This study is currently in demo mode.");
-        assertTextPresent("Remember to hide your browser's address bar and status bar");
+        assertTextPresent(
+                "This study is currently in demo mode.",
+                "Remember to hide your browser's address bar and status bar");
         assertButtonPresent("Leave Demo Mode");
         assertButtonPresent("Done");
     }
@@ -76,9 +77,10 @@ public class StudyDemoModeTest extends StudyBaseTest
     // Verify that we're not in demo mode, and that the messages and buttons are correct
     private void verifyNotInDemoMode()
     {
-        assertTextPresent("This study is currently not in demo mode.");
-        assertTextPresent("Demo mode temporarily obscures mouse IDs in many pages of the study");
-        assertTextPresent("you should hide your browser's address bar and status bar");
+        assertTextPresent(
+                "This study is currently not in demo mode.",
+                "Demo mode temporarily obscures mouse IDs in many pages of the study",
+                "you should hide your browser's address bar and status bar");
         assertButtonPresent("Enter Demo Mode");
         assertButtonPresent("Done");
     }

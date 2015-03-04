@@ -134,7 +134,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         _searchHelper.enqueueSearchItem(newFileName, true, Locator.linkContainingText(newFileName));
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(newFileName));
-        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true,  Locator.linkContainingText(newFileName));
+        _searchHelper.enqueueSearchItem(CUSTOM_PROPERTY_VALUE, true, Locator.linkContainingText(newFileName));
 
         _searchHelper.verifySearchResults("/" + getProjectName() + "/@files/" + folderName, false);
         _searchHelper.assertNoSearchResult(filename);
@@ -149,11 +149,12 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         _fileBrowserHelper.clickFileBrowserButton(BrowserAction.AUDIT_HISTORY);
-        assertTextPresent("File uploaded to project: /" + getProjectName());
-        assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
-        assertTextPresent("File deleted from project: /" + getProjectName());
+        assertTextPresent(
+                "File uploaded to project: /" + getProjectName(),
+                "annotations updated: " + CUSTOM_PROPERTY + "=" + CUSTOM_PROPERTY_VALUE,
+                "File deleted from project: /" + getProjectName());
 
-        beginAt(getBaseURL()+"/filecontent/" + EscapeUtil.encode(getProjectName()) + "/sendShortDigest.view");
+        beginAt(getBaseURL() + "/filecontent/" + EscapeUtil.encode(getProjectName()) + "/sendShortDigest.view");
         goToModule("Dumbster");
         addUrlParameter("reverse=true"); // List emails chronologically, in case of multiple notifications
         click(Locator.linkWithText("File Management Notification"));

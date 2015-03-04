@@ -89,7 +89,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
 
     protected void importFirstFileSet()
     {
-        File[] archives = new File[] {
+        File[] archives = new File[]{
                 new File(TestFileUtils.getLabKeyRoot(), LAB19_SPECIMENS),
                 new File(TestFileUtils.getLabKeyRoot(), LAB20_SPECIMENS),
                 new File(TestFileUtils.getLabKeyRoot(), LAB21_SPECIMENS)
@@ -100,8 +100,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
 
         // Check there was an error in the specimen merge.
         clickAndWait(Locator.linkWithText("ERROR"));
-        assertTextPresent("lab20");
-        assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
+        assertTextPresent("lab20", "Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
         checkExpectedErrors(2);
     }
 

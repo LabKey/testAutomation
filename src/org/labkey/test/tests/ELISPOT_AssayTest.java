@@ -194,8 +194,9 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         click(Ext4Helper.Locators.ext4Button("Save"));
         waitForElement(Ext4Helper.Locators.window("Error"));
-        assertTextPresent("Must provide at least 2 negative controls for each subjectId/date.");
-        assertTextPresent("Missing for: FakeId / 2012-02-09");
+        assertTextPresent(
+                "Must provide at least 2 negative controls for each subjectId/date.",
+                "Missing for: FakeId / 2012-02-09");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //restore valid values

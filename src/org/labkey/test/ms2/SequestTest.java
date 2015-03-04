@@ -16,6 +16,7 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -77,15 +78,13 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         setFormElement("sequestServer", altSequestServer);
         pushLocation();
         clickAndWait(Locator.linkWithText("Test Sequest settings"));
-        assertTextPresent("Test failed.");
-        assertTextPresent("Failed to interact with SequestQueue application");
+        assertTextPresent("Test failed.", "Failed to interact with SequestQueue application");
         log("Return to customize page.");
         popLocation();
 
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
-        if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+        Assert.assertFalse("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists", test2.exists());
 
         basicMS2Check();
     }

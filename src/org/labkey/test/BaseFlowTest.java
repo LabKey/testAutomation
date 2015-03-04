@@ -93,8 +93,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         assertTextNotPresent("Path does not exist");
         if (normalizationEnabled)
         {
-            assertTextNotPresent("The R script engine is not available.");
-            assertTextNotPresent("Please install the flowWorkspace R library");
+            assertTextNotPresent("The R script engine is not available.", "Please install the flowWorkspace R library");
         }
 
         _containerHelper.createProject(getProjectName(), null);

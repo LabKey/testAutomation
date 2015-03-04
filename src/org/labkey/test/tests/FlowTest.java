@@ -116,27 +116,32 @@ public class FlowTest extends BaseFlowTest
         waitForElement(FileBrowserHelper.Locators.gridRowCheckbox(FCS_FILE_2, false), WAIT_FOR_JAVASCRIPT);
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
 
-        assertTextPresent("The following directories within",  "8color");
-        assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
-        assertTextPresent(FCS_FILE_2 + " (14 fcs files)");
+        assertTextPresent(
+                "The following directories within",
+                "8color",
+                FCS_FILE_1 + " (25 fcs files)",
+                FCS_FILE_2 + " (14 fcs files)");
         clickButton("Cancel"); // go back to file-browser
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         _fileBrowserHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
         waitForElement(FileBrowserHelper.Locators.gridRowCheckbox("91761.fcs", false), WAIT_FOR_JAVASCRIPT);
         _fileBrowserHelper.selectImportDataAction("Current directory of 25 FCS Files");
-        assertTextPresent("The following directories within" ,"'8color",  FCS_FILE_1);
-        assertTextPresent("Current Directory (25 fcs files)");
+        assertTextPresent(
+                "The following directories within",
+                "'8color",
+                FCS_FILE_1,
+                "Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         // Drill into the run, and see that it was uploaded, and keywords were read.
         clickAndWait(Locator.linkWithText("1 run"));
-        setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[] { "Flag","Name","ProtocolStep","AnalysisScript","CompensationMatrix","WellCount","Created","RowId","FilePathRoot" } );
+        setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[]{"Flag", "Name", "ProtocolStep", "AnalysisScript", "CompensationMatrix", "WellCount", "Created", "RowId", "FilePathRoot"});
 
         clickAndWait(Locator.linkWithText("details"));
-        setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[] { "Keyword/ExperimentName", "Keyword/Stim","Keyword/Comp","Keyword/PLATE NAME","Flag","Name","RowId"});
+        setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[]{"Keyword/ExperimentName", "Keyword/Stim", "Keyword/Comp", "Keyword/PLATE NAME", "Flag", "Name", "RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
         assertElementNotPresent(Locator.linkWithImage("/flagFCSFile.gif"));
@@ -322,15 +327,18 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     protected void configureSampleSetAndMetadata()
     {
-        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[] { "Exp Name", "Well Id" }, new String[] { "EXPERIMENT NAME", "WELL ID"});
+        uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[]{"Exp Name", "Well Id"}, new String[]{"EXPERIMENT NAME", "WELL ID"});
         setProtocolMetadata(null, "Sample PTID", null, "Sample Visit", true);
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("49 sample descriptions"));
-        assertTextPresent("49 sample descriptions");
-        assertTextPresent("10 samples are not joined");
-        assertTextPresent("39 FCS Files", "have been joined");
-        assertTextPresent("0 FCS Files", "are not joined");
+        assertTextPresent(
+                "49 sample descriptions",
+                "10 samples are not joined",
+                "39 FCS Files",
+                "have been joined",
+                "0 FCS Files",
+                "are not joined");
     }
 
     @LogMethod

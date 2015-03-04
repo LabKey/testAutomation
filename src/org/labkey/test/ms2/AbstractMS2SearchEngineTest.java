@@ -91,7 +91,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         _fileBrowserHelper.selectFileBrowserItem("bov_sample/");
         setupEngine();
 
-        waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Minimum PeptideProphet prob", "Minimum ProteinProphet prob", "Quantitation engine");
 
         searchMS2LibraCheck();
@@ -125,7 +125,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("search");
         popLocation();
 
-        if(isQuickTest())
+        if (isQuickTest())
             return;
 
         log("Analyze again.");
@@ -161,7 +161,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         // Firefox sets the title of the page when we view an image separately from an HTML page, so use that to verify
         // that we got something that matches what we expect. IE doesn't do this, so assume that we're good if we don't
         // get a 404, error message, etc
-        if(getBrowserType() == BrowserType.FIREFOX)
+        if (getBrowserType() == BrowserType.FIREFOX)
             assertTitleContains("showFile.view (PNG Image");
         popLocation();
 
@@ -170,15 +170,15 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Verify experiment run view.");
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Data: CAexample_mini.mzXML"));
-        assertTextPresent("bov_sample/" + SAMPLE_BASE_NAME);
-        assertTextPresent("Data File CAexample_mini.mzXML");
-        assertTextPresent("AutomatedTestAssay");
+        assertTextPresent(
+                "bov_sample/" + SAMPLE_BASE_NAME,
+                "Data File CAexample_mini.mzXML",
+                "AutomatedTestAssay");
 
         clickAndWait(Locator.linkWithText(ANNOTATION_RUN_NAME));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Material: verify:001"));
 
-        assertTextPresent("verify:001");
-        assertTextPresent("Not a member of a sample set");
+        assertTextPresent("verify:001", "Not a member of a sample set");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickAndWait(Locator.linkWithImage(WebTestHelper.getContextPath() + "/MS2/images/runIcon.gif"));
@@ -193,8 +193,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickButton("Pick Peptide Columns");
         clickButton("Pick", 0);
         clickButton("Pick Columns");
-        assertTextPresent("Run Description");
-        assertTextPresent("Next AA");
+        assertTextPresent("Run Description", "Next AA");
 
         basicChecks();
     }

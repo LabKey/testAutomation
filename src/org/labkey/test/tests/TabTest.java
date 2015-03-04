@@ -303,8 +303,7 @@ public class TabTest extends SimpleModuleTest
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
-        assertTextPresent("Assay List");
-        assertTextPresent(EXTRA_ASSAY_WEBPART);
+        assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
         // Change back to Collab
         clickFolder(COLLAB_FOLDER);
@@ -330,8 +329,7 @@ public class TabTest extends SimpleModuleTest
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
-        assertTextPresent("Assay List");
-        assertTextPresent(EXTRA_ASSAY_WEBPART);
+        assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
         deleteFolder(getProjectName(), COLLAB_FOLDER);
     }

@@ -229,7 +229,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("HAQ0003Y-09", "BAQ00051-09");
         assertTextNotPresent("KAQ0003Q-01");
         selectOptionByText(Locator.name("destinationLocation"), "Duke University (Repository, Site Affiliated Lab, Clinic)");
-        setFormElements("textarea", "inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
+        setFormElements("textarea", "inputs", new String[]{"An Assay Plan", "Duke University, NC", "My comments"});
         clickButton("Create and View Details");
 
         assertTextPresent("This request has not been submitted");
@@ -259,8 +259,7 @@ public class StudyExportTest extends StudyManualTest
 
         // manage new request
         clickButton("Details");
-        assertTextNotPresent("Complete");
-        assertTextNotPresent("WARNING: Missing Specimens");
+        assertTextNotPresent("Complete", "WARNING: Missing Specimens");
         assertTextPresent("New Request");
         assertTextNotPresent("Pending Approval");
         clickAndWait(Locator.linkWithText("Update Request"));
@@ -274,7 +273,7 @@ public class StudyExportTest extends StudyManualTest
         checkCheckbox(Locator.checkboxByName("complete"));
         setFormElement(Locator.name("comment"), "Approval granted.");
         setFormElement(Locator.name("formFiles[0]"), VISIT_MAP);
-            log("File upload skipped.");
+        log("File upload skipped.");
         clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
 

@@ -174,9 +174,10 @@ public class TargetStudyTest extends AbstractAssayTest
         log("** Test the TargetStudy renderer resolved all studies");
         clickAndWait(Locator.linkWithText(TEST_RUN1));
         // all target study values should render as either [None] or the name of the study
-        assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1);
-        assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2);
-        assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3);
+        assertTextNotPresent(
+                "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1,
+                "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2,
+                "/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY3);
 
         DataRegionTable table = new DataRegionTable("Data", this);
         assertEquals(_study1Label, table.getDataAsText(0, "Target Study"));

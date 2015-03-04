@@ -65,7 +65,6 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE3_WEBPART_TEST = "Best Gene Name";
     private static final String WIKI_NAVTREE_TITLE = "NavTree";
     private static final String WIKI_TERMS_TITLE = "Terms of Use";
-    private static final int MAX_AJAX_WAIT_CYCLES = 10;
     private static final String WIKI_SEARCH_TERM = "okapi";
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
@@ -151,7 +150,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("full-text search"));
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
-        beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10*defaultWaitForPage);
+        beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);
 
         clickProject(PROJECT2_NAME);
         goToFolderManagement();
@@ -219,9 +218,9 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         setFormElement(Locator.name("title"), WIKI_PAGE3_ALTTITLE);
         String wikiPage3ContentEdited =
-            "<b>Some HTML content</b><br>\n" +
-            "<b>More HTML content</b><br>\n" +
-            "<a href='" + WebTestHelper.getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
+                "<b>Some HTML content</b><br>\n" +
+                "<b>More HTML content</b><br>\n" +
+                "<a href='" + WebTestHelper.getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
         _wikiHelper.setWikiBody(wikiPage3ContentEdited);
         _wikiHelper.saveWikiPage();
 
@@ -305,8 +304,7 @@ public class WikiLongTest extends BaseWebDriverTest
                 RESP1_BODY);
         clickButton("Delete Message");
         clickButton("Delete");
-        assertTextNotPresent(DISC1_TITLE);
-        assertTextNotPresent(DISC1_BODY);
+        assertTextNotPresent(DISC1_TITLE, DISC1_BODY);
 
         log("test navTree and header");
         _wikiHelper.createNewWikiPage("RADEOX");
@@ -373,16 +371,8 @@ public class WikiLongTest extends BaseWebDriverTest
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         log("set container and page");
 
-        //page names are now fetched via AJAX, so wait for them to be populated
-        int waitCycles = 0;
-        while(!isTextPresent(WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")") && waitCycles < MAX_AJAX_WAIT_CYCLES)
-        {
-            log("Waiting for page names to be populated...");
-            sleep(500);
-            ++waitCycles;
-        }
-        if(waitCycles == MAX_AJAX_WAIT_CYCLES)
-            fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
+        //page names are fetched via AJAX, so wait for them to be populated
+        waitForText(WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
 
         selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         sleep(500);
@@ -432,15 +422,7 @@ public class WikiLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
 
         //page names are now fetched via AJAX, so wait for them to be populated
-        waitCycles = 0;
-        while(!isTextPresent(WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")") && waitCycles < MAX_AJAX_WAIT_CYCLES)
-        {
-            log("Waiting for page names to be populated...");
-            sleep(500);
-            ++waitCycles;
-        }
-        if(waitCycles == MAX_AJAX_WAIT_CYCLES)
-            fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
+        waitForText(WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
 
         selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         submit();

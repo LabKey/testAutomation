@@ -71,7 +71,7 @@ public class ExpTest extends BaseWebDriverTest
     public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });
+        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment", "Query"});
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Data Pipeline");
         portalHelper.addWebPart("Run Groups");
@@ -100,8 +100,7 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Graph Summary View"));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE));
-        assertTextPresent("CAexample_mini.mzXML");
-        assertTextPresent("Not available on disk");
+        assertTextPresent("CAexample_mini.mzXML", "Not available on disk");
 
         // Write a simple custom query that wraps the data table
         clickTab("Query");
@@ -141,8 +140,7 @@ public class ExpTest extends BaseWebDriverTest
         clickButton("Edit Source");
         sleep(1000);
         _extHelper.clickExtTab("XML Metadata");
-        assertTextPresent("<columnTitle>editedCreated</columnTitle>");
-        assertTextPresent("<formatString>ddd MMM dd yyyy</formatString>");
+        assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddd MMM dd yyyy</formatString>");
 
         // Run it and see if we used the format correctly
         _extHelper.clickExtTab("Data");

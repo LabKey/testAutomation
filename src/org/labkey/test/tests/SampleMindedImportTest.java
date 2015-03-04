@@ -78,16 +78,16 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
         clickButton("Create Study");
-        setFormElement(Locator.name("startDate"),"2011-01-01");
+        setFormElement(Locator.name("startDate"), "2011-01-01");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
         clickButton("Create Study");
 
         clickAndWait(Locator.linkWithText("manage visits"));
         clickAndWait(Locator.linkWithText("create new visit"));
-        setFormElement(Locator.name("label"),"Visit SE");
-        setFormElement(Locator.name("sequenceNumMin"),"999.0000");
-        setFormElement(Locator.name("sequenceNumMax"),"999.9999");
-        selectOptionByValue(Locator.name("sequenceNumHandling"),"logUniqueByDate");
+        setFormElement(Locator.name("label"), "Visit SE");
+        setFormElement(Locator.name("sequenceNumMin"), "999.0000");
+        setFormElement(Locator.name("sequenceNumMax"), "999.9999");
+        selectOptionByValue(Locator.name("sequenceNumHandling"), "logUniqueByDate");
         clickAndWait(Locator.linkWithText("save"));
 
         // "overview" is a dumb place for this link
@@ -109,21 +109,17 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("P1000001"), 6);
         assertElementPresent(Locator.linkWithText("P2000001"), 3);
         assertElementPresent(Locator.linkWithText("P20043001"), 5);
-        assertTextPresent("20045467");
-        assertTextPresent("45627879");
-        assertTextPresent("1000001-21");
+        assertTextPresent("20045467", "45627879", "1000001-21");
 
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("NewSpecimenType"));
         clickAndWait(Locator.linkWithText("NewSpecimenType"));
-        assertTextPresent("EARL (003)");
-        assertTextPresent("REF-A Cytoplasm Beaker");
+        assertTextPresent("EARL (003)", "REF-A Cytoplasm Beaker");
 
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("BAL"));
         clickAndWait(Locator.linkWithText("BAL"));
-        assertTextPresent("BAL Supernatant");
-        assertTextPresent("FREE (007)");
+        assertTextPresent("BAL Supernatant", "FREE (007)");
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
         assertEquals("Incorrect number of vials.", "Count:  5", specimenTable.getTotal("Global Unique Id"));
 

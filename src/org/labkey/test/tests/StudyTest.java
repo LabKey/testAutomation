@@ -570,7 +570,7 @@ public class StudyTest extends StudyBaseTest
             return;
         }
 
-        if(!isManualTest)
+        if (!isManualTest)
             verifyAlternateIDs();
 
         verifyHiddenVisits();
@@ -598,8 +598,7 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent("1234_B");
         _extHelper.clickMenuButton("QC State", "All data");
         clickButton("QC State", 0);
-        assertTextPresent("unknown QC");
-        assertTextPresent("1234_B");
+        assertTextPresent("unknown QC", "1234_B");
 
         // Issue 21234: Dataset import no longer merges rows during import
         clickButton("Import Data");
@@ -864,13 +863,11 @@ public class StudyTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
         clickAndWait(Locator.linkWithText("24"));
-        assertTextPresent(DEMOGRAPHICS_DESCRIPTION);
-        assertTextPresent("Male");
-        assertTextPresent("African American or Black");
+        assertTextPresent(DEMOGRAPHICS_DESCRIPTION, "Male", "African American or Black");
         clickAndWait(Locator.linkWithText("999320016"));
         waitAndClick(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextPresent("right deltoid");
-        
+
         verifyDemoCustomizeOptions();
         verifyDatasetExport();
     }
@@ -959,8 +956,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         clickAndWait(Locator.linkWithText("489"));
-        assertTextPresent("ESIdt");
-        assertTextPresent("Form Completion Date");
+        assertTextPresent("ESIdt", "Form Completion Date");
         assertTableCellTextEquals("details", 4, 1, "false");     // "Demographics Data" should be false
 
         // Verify that "Demographics Data" is checked and description is set
@@ -1014,8 +1010,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.id("tsv"), replaceMapping);
         clickButton("Submit");
         assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number Mapping"));
-        assertTextNotPresent("Cycle 10");
-        assertTextNotPresent("All Done");
+        assertTextNotPresent("Cycle 10", "All Done");
 
         assertEquals("Incorrect number of gray cells", 54, countTableCells(null, true));
         assertEquals("Incorrect number of non-gray \"Int. Vis. %{S.1.1} .%{S.2.1}\" cells", 1, countTableCells("Int. Vis. %{S.1.1} .%{S.2.1}", false));
@@ -1089,8 +1084,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("24"));
 
         // verify that cohorts are working
-        assertTextPresent("999320016");
-        assertTextPresent("999320518");
+        assertTextPresent("999320016", "999320518");
 
         _extHelper.clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
         assertTextPresent("999320016");
@@ -1104,7 +1098,7 @@ public class StudyTest extends StudyBaseTest
         DataRegionTable drt = new DataRegionTable("Dataset", this);
         drt.setSort("MouseId", SortDirection.ASC);
         clickAndWait(Locator.linkWithText("999320518"));
-        if(!isManualTest)
+        if (!isManualTest)
             assertTextPresent("b: 888209407"); //Alternate ID
         click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertElementNotPresent(Locator.tagContainingText("td", "Group 1"));
