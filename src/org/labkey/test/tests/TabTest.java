@@ -65,10 +65,10 @@ public class TabTest extends SimpleModuleTest
         portalHelper.enableTabEditMode();
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.LEFT); // Nothing should happen.
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.RIGHT);
-        assertTrue("Tab 2".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")))); // Verify Mice is in the first position.
-        assertTrue("Tab 1".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")))); // Verify Overview is in the second.
+        assertEquals("Mice tab not in the first position", "Tab 2", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")));
+        assertEquals("Overview tab not in the second position", "Tab 1", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")));
         portalHelper.moveTab("Assay Container", PortalHelper.Direction.RIGHT); // Nothing should happen.
-        assertTrue("Assay Container".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[4]//a[1]")))); // Verify Assay did not swap with +
+        assertEquals("'Move Right' moved rightmost tab", "Assay Container", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[4]//a[1]")));
 
         // Remove tab
         portalHelper.hideTab("Tab 2");

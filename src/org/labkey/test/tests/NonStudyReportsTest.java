@@ -30,6 +30,7 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
@@ -227,7 +228,7 @@ public class NonStudyReportsTest extends ReportTest
 
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
-        assertTrue("Locked".equals(getFormElement(statusElement)));
+        assertEquals("Locked", getFormElement(statusElement));
         clickButton("Cancel");
         waitForText(ATTACHMENT_REPORT3_NAME);
     }

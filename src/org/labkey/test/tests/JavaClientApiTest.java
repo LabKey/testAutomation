@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for the Java Client API library. This test is written in
@@ -254,7 +255,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         Filter filter = cmdFromResp.getFilters().get(0);
         assertTrue(filter != selCmd.getFilters().get(0)); //ensure the filter is a copy of the original
-        assertTrue("FirstName".equals(filter.getColumnName()));
+        assertEquals("FirstName", filter.getColumnName());
         assertTrue("Fred".equals(filter.getValue()));
         assertTrue(Filter.Operator.STARTS_WITH == filter.getOperator());
 

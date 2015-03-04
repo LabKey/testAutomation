@@ -513,7 +513,7 @@ public class SecurityTest extends BaseWebDriverTest
         String relUrl = getCurrentRelativeURL();
         boolean newSchool = relUrl.contains("project-");
         String baseUrl = removeUrlParameters(getCurrentRelativeURL()).replaceAll("/project/", "/login/");
-        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/')+1);
+        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
         if (newSchool)
             baseUrl += "login-";
         // Attempt to verify bogus token -- should result in failure
@@ -522,7 +522,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
 
         String email = getUrlParam("labkeyEmail", true);
         String emailName;
@@ -536,14 +536,14 @@ public class SecurityTest extends BaseWebDriverTest
         {
             emailName = email;
         }
-        assertTrue(emailName.equals(userName));
+        assertEquals(userName, emailName);
         String token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
         // Should fail now
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
@@ -552,10 +552,10 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertEquals("Redirected to wrong URL", homePageUrl, removeUrlParameters(getURL().toString()));
 
         email = getUrlParam("labkeyEmail", true);
-        assertTrue(email.equals(NORMAL_USER));
+        assertEquals("Wrong email", NORMAL_USER, email);
         token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 15);

@@ -218,7 +218,7 @@ public class SurveyTest extends BaseWebDriverTest
         impersonate(EDITOR);
         popLocation();
         waitForText("Survey Label*");
-        assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
+        assertEquals("edit by admin after submit", getFormElement(Locator.name("txtareafield")));
         assertTextPresent("Submitted by");
         assertTextNotPresent("You are allowed to make changes to this form");
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
@@ -353,7 +353,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.clickGridRowText("field1", 0);
         clickButton("Edit Selected", 0);
         _extHelper.waitForExtDialog("Edit Record");
-        assertTrue(getFormElement(Locator.name("field1")).equals(val1));
+        assertEquals("Wrong value for 'field1'", val1, getFormElement(Locator.name("field1")));
         setFormElement(Locator.name("field2"), val2);
         clickButton("Update", 0);
 
