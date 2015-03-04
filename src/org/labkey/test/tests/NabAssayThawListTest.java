@@ -229,18 +229,18 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         assertElementPresent(Locator.tagContainingText("font", "missing required column(s)"));
 
         log("Verify import with datatype mismatch for visitId fails.");
+        waitForElement(Locator.css(".query-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), THAW_LIST_BAD_DATATYPES);
         clickButton("Save Defaults");
         importData(iob.resetDefaults(true).assayId(THAW_LIST_ASSAY_ID + " Bad Datatype").build());
-        assertTextPresent("Can not convert VisitId value: 1x to double for specimenId: 1");
-        assertTextPresent("Can not convert VisitId value: 4x to double for specimenId: 4");
+        assertTextPresent("Can not convert VisitId value: 1x to double for specimenId: 1",
+                "Can not convert VisitId value: 4x to double for specimenId: 4");
 
         log("Verify import with unresolved specimens fails.");
         setDefaultThawList(THAW_LIST_MISSING_ROWS);
         importData(iob.assayId(THAW_LIST_ASSAY_ID + " Missing thaw list rows").build());
-        assertTextPresent("Can not resolve thaw list entry for specimenId: 4");
-        assertTextPresent("Can not resolve thaw list entry for specimenId: 5");
-
+        assertTextPresent("Can not resolve thaw list entry for specimenId: 4",
+                "Can not resolve thaw list entry for specimenId: 5");
     }
 
     private void setDefaultThawList(String listName)
@@ -249,6 +249,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("manage assay design"), false, "set default values", TEST_ASSAY_NAB + " Batch Fields");
+        waitForElement(Locator.css(".query-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), listName);
         clickButton("Save Defaults");
     }
