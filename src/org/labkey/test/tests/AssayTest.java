@@ -698,11 +698,12 @@ public class AssayTest extends AbstractAssayTest
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Timepoints"));
-        assertTrue(isTextPresent("Day 0 - 7"));
-        assertTrue(isTextPresent("Day 32 - 39"));
-        assertTrue(isTextPresent("Day 90 - 95"));
-        assertTrue(isTextPresent("Day 120 - 127"));
-        assertTrue(isTextPresent("Day 152 - 159"));
+        assertTextPresent(
+                "Day 0 - 7",
+                "Day 32 - 39",
+                "Day 90 - 95",
+                "Day 120 - 127",
+                "Day 152 - 159");
     } //publishDataToDateBasedStudy()
 
 
@@ -767,15 +768,15 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Re-Validate");
 
         //validate timepoints:
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td/a[text()='AAA07XMC-02']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td/a[text()='AAA07XMC-04']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td/a[text()='AAA07XSF-02']]")));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td/a[text()='AAA07XMC-02']]"));
+        assertElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td/a[text()='AAA07XMC-04']]"));
+        assertElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td/a[text()='AAA07XSF-02']]"));
 
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-09']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-08']]")));
-        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-11']]")));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-09']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-08']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-11']]"));
 
         clickButton("Copy to Study");
 
@@ -799,12 +800,13 @@ public class AssayTest extends AbstractAssayTest
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
-        assertTrue(isTextPresent("Test Visit1"));
-        assertTrue(isTextPresent("6.0-13.0"));
-        assertTrue(isTextPresent("Test Visit2"));
-        assertTrue(isTextPresent("50.0-70.0"));
-        assertTrue(isTextPresent("Test Visit3"));
-        assertTrue(isTextPresent("302.0-303.0"));
+        assertTextPresent(
+                "Test Visit1",
+                "6.0-13.0",
+                "Test Visit2",
+                "50.0-70.0",
+                "Test Visit3",
+                "302.0-303.0");
     } //publishDataToVisitBasedStudy()
 
     /**
