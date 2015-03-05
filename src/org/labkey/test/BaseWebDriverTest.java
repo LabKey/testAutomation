@@ -3492,15 +3492,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      * @return null = yes, present in this order
      * otherwise returns out of order string and explanation of error
      */
-    public String isPresentInThisOrder(Object... text)
+    public String isPresentInThisOrder(String... text)
     {
         String source = getBodyText();
         int previousIndex = -1;
         String previousString = null;
 
-        for (Object o : text)
+        for (String s : text)
         {
-            String s = o.toString();
             int index = source.indexOf(s);
 
             if(index == -1)
@@ -3514,7 +3513,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     // Searches only the displayed text in the body of the page, not the HTML source.
-    public void assertTextPresentInThisOrder(Object... text)
+    public void assertTextPresentInThisOrder(String... text)
     {
         String success = isPresentInThisOrder(text);
         assertTrue(success, success==null);
