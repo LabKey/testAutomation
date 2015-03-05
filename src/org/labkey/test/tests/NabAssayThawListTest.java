@@ -188,9 +188,11 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         log("Verify Delete and Re-import doesn't autofill SpecimenId");
         navToRunDetails();
         click(Locator.linkWithText("Delete and Re-import"));
-        Assert.assertEquals("Wrong participant visit resolver selected", "List",
-                Locator.checkedRadioInGroup("ThawListType").findElement(getDriver()).getAttribute("value"));
-        // TODO: verify its the NabThawList thats selected
+        Assert.assertEquals("Wrong participant visit resolver selected",
+                "Lookup", Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
+        Assert.assertEquals("Wrong participant visit resolver selected",
+                "List", Locator.checkedRadioInGroup("ThawListType").findElement(getDriver()).getAttribute("value"));
+        waitForFormElementToEqual(Locator.tagWithName("input", "ThawListList-QueryName"), "NabThawList");
         clickButton("Next");
         assertElementPresent(Locator.input("specimen1_SpecimenID").withAttribute("value", ""));
         // Let's make sure *some* of the last enetered values did get auto-filled.
