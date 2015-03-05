@@ -179,14 +179,14 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //verify row was inserted and data comes back the same
         SelectRowsCommand selectCmd = new SelectRowsCommand("lists", LIST_NAME);
         SelectRowsResponse selResp = selectCmd.execute(cn, PROJECT_NAME);
-        assertEquals(1, selResp.getRowCount().intValue());
-        rowMap = selResp.getRows().get(0);
-        assertTrue("first to be inserted".equals(rowMap.get("FirstName")));
-        assertTrue("last to be inserted".equals(rowMap.get("LastName")));
-        assertTrue(rowMap.get("Birthdate") instanceof Date);
-        assertTrue(new Double(4.2).equals(rowMap.get("GooAmount")));
-        assertTrue(rowMap.get("Crazy") instanceof Boolean);
-        assertEquals(null, rowMap.get("Notes"));
+        assertEquals("Wrong number of rows returned", 1, selResp.getRowCount().intValue());
+        Map<String, Object> responseRow = selResp.getRows().get(0);
+        assertEquals("Wrong FirstName in response", "first to be inserted", responseRow.get("FirstName"));
+        assertEquals("Wrong LastName in response", "last to be inserted", responseRow.get("LastName"));
+        assertEquals("Wrong type for Birthdate in response", Date.class, responseRow.get("Birthdate").getClass());
+        assertEquals("Wrong GooAmount in response", 4.2, (Double)responseRow.get("GooAmount"), 0.001);
+        assertEquals("Wrong type for 'Crazy' in response", Boolean.class, responseRow.get("Crazy").getClass());
+        assertNull("Unexpected 'Notes' in response", responseRow.get("Notes"));
 
         //refresh the list in the browser and make sure it appears there too
         refresh();
@@ -206,9 +206,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //verify that row was updated
         selectCmd.addFilter("Key", key, Filter.Operator.EQUAL);
         selResp = selectCmd.execute(cn, PROJECT_NAME);
-        rowMap = selResp.getRows().get(0);
-        assertTrue("UPDATED first name".equals(rowMap.get("FirstName")));
-        assertTrue(new Double(5.5).equals(rowMap.get("GooAmount")));
+        responseRow = selResp.getRows().get(0);
+        assertEquals("UPDATED first name", responseRow.get("FirstName"));
+        assertEquals(5.5, (Double)responseRow.get("GooAmount"), 0.001);
 
         //verify that it's updated in the browser as well
         refresh();
@@ -247,16 +247,16 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //verify that the command we get back from the response object is a copy
         //yet has the same settings
         SelectRowsCommand cmdFromResp = (SelectRowsCommand) resp.getSourceCommand();
-        assertTrue(cmdFromResp != selCmd);
+        assertNotSame(selCmd, cmdFromResp);
         assertEquals(2, cmdFromResp.getMaxRows());
-        assertEquals(9.1, cmdFromResp.getRequiredVersion());
-        assertTrue(null != cmdFromResp.getFilters());
-        assertTrue(cmdFromResp.getFilters().size() > 0);
+        assertEquals(9.1, cmdFromResp.getRequiredVersion(), 0.001);
+        assertNotNull(cmdFromResp.getFilters());
+        assertEquals(1, cmdFromResp.getFilters().size());
 
         Filter filter = cmdFromResp.getFilters().get(0);
-        assertTrue(filter != selCmd.getFilters().get(0)); //ensure the filter is a copy of the original
+        assertNotSame(selCmd.getFilters().get(0), filter);
         assertEquals("FirstName", filter.getColumnName());
-        assertTrue("Fred".equals(filter.getValue()));
+        assertEquals("Fred", filter.getValue());
         assertEquals(Filter.Operator.STARTS_WITH, filter.getOperator());
 
         log("Completed testing the copy command to response functionality.");
