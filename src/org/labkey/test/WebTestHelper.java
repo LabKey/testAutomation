@@ -187,12 +187,6 @@ public class WebTestHelper
         return getServerProperty("databaseVersion");
     }
 
-    public static boolean isGroupConcatSupported()
-    {
-        return  getDatabaseType() == DatabaseType.PostgreSQL ||
-                getDatabaseType() == DatabaseType.MicrosoftSQLServer && !"2005".equals(getDatabaseVersion());
-    }
-
     public static String getBaseURL()
     {
         String portPortion = 80 == getWebPort() ? "" : ":" + getWebPort();
