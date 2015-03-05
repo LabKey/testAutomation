@@ -105,7 +105,7 @@ public class CustomizeViewsHelper
      */
     public void saveCustomView(@Nullable String name)
     {
-        saveCustomView(name, false);
+        saveCustomView(name, false, false);
     }
 
     /**
@@ -115,13 +115,29 @@ public class CustomizeViewsHelper
      */
     public void saveCustomView(String name, boolean shared)
     {
+        saveCustomView(name, shared, false);
+    }
+
+    /**
+     * Save a custom view
+     * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
+     * @param shared if false the report will not be shared, otherwise will mark the view as shared.
+     */
+    public void saveCustomView(String name, boolean shared, boolean inherit)
+    {
         _test.scrollIntoView(_test.getButtonLocator("Save"));
         _test.clickButton("Save", 0);
 
         _test._extHelper.waitForExtDialog("Save Custom View");
         
-        if(shared)
+        if (shared)
             _test.checkCheckbox(Locator.checkboxByName("saveCustomView_shared"));
+
+        if (inherit)
+        {
+            _test.checkCheckbox(Locator.checkboxByName("saveCustomView_inherit"));
+            // TODO: select folder to save custom view into
+        }
 
         if (name != null)
         {
