@@ -282,7 +282,7 @@ public class AuditLogTest extends BaseWebDriverTest
             instance.waitForPageToLoad();
         }
 
-        assertTrue(columns.size() == msgs.size());
+        assertEquals(columns.size(), msgs.size());
         for (int i = 0; i < columns.size(); i += 1)
             verifyAuditQueryEvent(instance, columns.get(i), msgs.get(i), rowsToSearch);
     }

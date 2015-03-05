@@ -459,7 +459,7 @@ public class MS1Test extends BaseWebDriverTest
         String urlCur = getURL().toString();
         String base = urlCur.substring(0, urlCur.indexOf("showFeatureDetails.view"));
         beginAt(base + src.substring(src.indexOf("showChart.view?")));
-        assertTrue(200 == getResponseCode());
+        assertEquals(200, getResponseCode());
         popLocation();
     }
 

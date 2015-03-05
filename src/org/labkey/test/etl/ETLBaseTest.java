@@ -39,6 +39,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -587,10 +588,10 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assertTrue(_columns.length == drt.getColumnCount());
-            assertTrue(_data.size() == drt.getDataRowCount());
+            assertEquals(_columns.length, drt.getColumnCount());
+            assertEquals(_data.size(), drt.getDataRowCount());
 
-            for (int row = 0; row < _data.size(); row ++)
+            for (int row = 0; row < _data.size(); row++)
             {
                 for (int col = 0; col < _columns.length; col++)
                 {
@@ -749,8 +750,8 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assertTrue("column length mismatch for data region " + getDataRegionName() ,_columns.length == drt.getColumnCount());
-            assertTrue(1 == drt.getDataRowCount());
+            assertTrue("column length mismatch for data region " + getDataRegionName(), _columns.length == drt.getColumnCount());
+            assertEquals(1, drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));
         }
