@@ -303,14 +303,11 @@
         <antcall target="clean" />
         <antcall target="prepare" />
 
-        <!-- Note: Setting source="${ant.java.version}" is a workaround that allows AspectJ to compile on Java 8.
-             TODO: Remove this (return to source="1.7") once we upgrade to a version of AspectJ that fixes this
-             cross-compilation issue. See #20054. -->
         <iajc
             destdir="${test.build.home}/classes"
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
-            source="${ant.java.version}"
+            source="1.7"
             classpathref="full.test.build.classpath">
             <src path="${test.src.home}"/>
             <src refid="module.test.src.dirs"/>
