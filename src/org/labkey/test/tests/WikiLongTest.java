@@ -804,7 +804,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER1);
+        deleteUsersIfPresent(USER1);
         deleteProject(PROJECT2_NAME, afterTest);
         deleteProject(PROJECT_NAME, afterTest);
         deleteProject(PROJECT3_NAME, afterTest);

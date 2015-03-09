@@ -252,7 +252,7 @@ public class StudySecurityTest extends StudyBaseTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        deleteUsers(afterTest, READER, EDITOR, LIMITED, NONE);
+        deleteUsersIfPresent(READER, EDITOR, LIMITED, NONE);
     }
 
     @Override

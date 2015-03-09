@@ -97,7 +97,7 @@ public class IssuesTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER1, USER2);
+        deleteUsersIfPresent(USER1, USER2);
         deleteProject(getProjectName(), afterTest);
     }
 

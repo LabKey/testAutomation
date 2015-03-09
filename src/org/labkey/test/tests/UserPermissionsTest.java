@@ -78,7 +78,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         log(this.getClass().getName() + " Cleaning Up");
         deleteProject(PERM_PROJECT_NAME, afterTest);
 
-        deleteUsers(afterTest, GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER);
+        deleteUsersIfPresent(GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER);
     }
 
     @Test

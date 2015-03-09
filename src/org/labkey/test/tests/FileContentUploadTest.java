@@ -83,7 +83,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
-        deleteUsers(afterTest, TEST_USER);
+        deleteUsersIfPresent(TEST_USER);
     }
 
     private void doSetupSteps()

@@ -142,8 +142,8 @@ public class ClientAPITest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, EMAIL_RECIPIENTS);
-        deleteUsers(afterTest, AUTOCOMPLETE_USER);
+        deleteUsersIfPresent(EMAIL_RECIPIENTS);
+        deleteUsersIfPresent(AUTOCOMPLETE_USER);
         deleteProject(PROJECT_NAME, afterTest);
         deleteProject(OTHER_PROJECT, afterTest);
     }

@@ -381,7 +381,7 @@ public class SurveyTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, EDITOR);
+        deleteUsersIfPresent(EDITOR);
         super.doCleanup(afterTest);
     }
 

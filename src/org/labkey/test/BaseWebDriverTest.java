@@ -5869,6 +5869,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    public void deleteUsersIfPresent(String... userEmails)
+    {
+        deleteUsers(false, userEmails);
+    }
+
     @LogMethod
     public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
     {
@@ -5899,6 +5904,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             if (failIfNotFound)
                 assertTrue(userEmail + " was not present", isPresent);
+            else
+                log("Unable to delete non-existent user: " + userEmail);
 
             if (isPresent)
             {

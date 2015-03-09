@@ -62,7 +62,7 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.deleteGroup(SIMPLE_GROUP, afterTest);
         _permissionsHelper.deleteGroup(BAD_GROUP, afterTest);
         _permissionsHelper.deleteGroup(CHILD_GROUP, afterTest);
-        deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
+        deleteUsersIfPresent(TEST_USERS_FOR_GROUP);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
     }

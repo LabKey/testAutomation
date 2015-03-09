@@ -82,7 +82,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         deleteProject(getProjectName(), afterTest);
 
-        deleteUsers(afterTest, ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,SITE_ADMIN_USER);
+        deleteUsersIfPresent(ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,SITE_ADMIN_USER);
         if (!afterTest)
             deleteUsers(false, TO_BE_DELETED_USER); // Only needed for pre-clean. Should be deleted during test
     }

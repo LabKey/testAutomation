@@ -50,7 +50,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     {
         super.doCleanup(afterTest);
 
-        deleteUsers(afterTest, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
+        deleteUsersIfPresent(IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
         _permissionsHelper.deleteGroup(TEST_GROUP, afterTest);
     }
 

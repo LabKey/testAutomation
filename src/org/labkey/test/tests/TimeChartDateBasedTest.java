@@ -715,7 +715,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER1, USER2);
+        deleteUsersIfPresent(USER1, USER2);
         super.doCleanup(afterTest);
     }
 }

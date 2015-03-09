@@ -36,7 +36,7 @@ public class ReportSecurityTest extends ReportTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, TEST_USER);
+        deleteUsersIfPresent(TEST_USER);
         super.doCleanup(afterTest);
     }
 

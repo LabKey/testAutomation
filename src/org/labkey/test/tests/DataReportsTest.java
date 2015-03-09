@@ -118,7 +118,7 @@ public class DataReportsTest extends ReportTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, R_USER, AUTHOR_USER);
+        deleteUsersIfPresent(R_USER, AUTHOR_USER);
         super.doCleanup(afterTest);
     }
 

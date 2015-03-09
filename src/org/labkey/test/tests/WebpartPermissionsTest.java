@@ -175,7 +175,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
         deleteProject(DUMMY_PROJECT_NAME, false); // Project should be deleted during test
 
-        deleteUsers(afterTest, users);
+        deleteUsersIfPresent(users);
     }
 
     @Override

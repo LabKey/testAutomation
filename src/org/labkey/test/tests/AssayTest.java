@@ -117,7 +117,7 @@ public class AssayTest extends AbstractAssayTest
         deleteProject(TEST_ASSAY_PRJ_SECURITY, afterTest); //should also delete the groups
 
         //delete user accounts
-        deleteUsers(afterTest, TEST_ASSAY_USR_PI1, TEST_ASSAY_USR_TECH1);
+        deleteUsersIfPresent(TEST_ASSAY_USR_PI1, TEST_ASSAY_USR_TECH1);
     } //doCleanup()
 
     /**

@@ -60,7 +60,7 @@ public class NonStudyReportsTest extends ReportTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, ATTACHMENT_USER);
+        deleteUsersIfPresent(ATTACHMENT_USER);
         super.doCleanup(afterTest);
     }
 

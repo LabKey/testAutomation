@@ -113,7 +113,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER1, USER2, USER3, RESPONDER, user);
+        deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, user);
         deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
     }
 

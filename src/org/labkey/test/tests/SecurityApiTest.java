@@ -66,6 +66,6 @@ public class SecurityApiTest extends SimpleApiTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(PROJECT_NAME, afterTest);
-        deleteUsers(afterTest, USER_1, USER_2, "api-created-user@securityapi.test");
+        deleteUsersIfPresent(USER_1, USER_2, "api-created-user@securityapi.test");
     }
 }
