@@ -218,7 +218,7 @@ public class StudyProtectedExportTest extends StudyExportTest
             {
                 foundClinics++;
                 assertEquals("Clinic Location name was not masked", "Clinic", query.getDataAsText(i, labelCol));
-                assertEquals("Clinic Labware Lab Code was not masked", "", query.getDataAsText(i, labCodeCol));
+                assertEquals("Clinic Labware Lab Code was not masked", "", query.getDataAsText(i, labCodeCol).trim());
             }
             else // non-clinic
             {
