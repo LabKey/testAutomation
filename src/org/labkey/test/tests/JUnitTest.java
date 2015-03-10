@@ -24,6 +24,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
@@ -44,7 +45,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Category({DRT.class, BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
@@ -211,8 +211,9 @@ public class JUnitTest extends TestSuite
             try (CloseableHttpClient client = WebTestHelper.getHttpClientBuilder()
                     .setDefaultRequestConfig(requestConfig).build())
             {
-                String url = WebTestHelper.getBaseURL() + "/junit/go.view?testCase=" + _remoteClass;
-                HttpGet method = new HttpGet(url);
+                URIBuilder builder = new URIBuilder(WebTestHelper.getBaseURL() + "/junit/go.view");
+                builder.addParameter("testCase", _remoteClass);
+                HttpGet method = new HttpGet(builder.build());
                 long startTime = System.currentTimeMillis();
                 response = client.execute(method, context);
                 int status = response.getStatusLine().getStatusCode();
