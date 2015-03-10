@@ -188,7 +188,7 @@ public class JUnitTest extends TestSuite
         private final int _timeout;
 
         /** Stash and reuse so that we can keep using the same session instead of re-authenticating with every request */
-        private HttpContext context = WebTestHelper.getBasicHttpContext();
+        private static final HttpContext context = WebTestHelper.getBasicHttpContext();
 
         public RemoteTest(String remoteClass, int timeout)
         {
