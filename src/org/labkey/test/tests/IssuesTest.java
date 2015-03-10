@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import com.google.common.base.Function;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +39,8 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -917,6 +920,257 @@ public class IssuesTest extends BaseWebDriverTest
 
         // TODO: extend test to check validate full user selection list based on group selection...
         // TODO: compare user dropdown list between admin and new issues page
+    }
+
+    @Test
+    public void testAdminSettingInheritance()
+    {
+        final String subFolderA = "Folder_A"; //a folder to inherit from
+        final String pathToA = String.format("/%s/%s", getProjectName(), subFolderA);
+
+        final String subFolderA1 = "Folder_A1";
+        final String pathToA1 = String.format("/%s/%s", getProjectName(), subFolderA1);
+
+        final String subFolderB = "Folder_B"; //folder that will inherit settings from Folder_A
+        final String pathToB = String.format("/%s/%s", getProjectName(), subFolderB);
+
+        final String subFolderC = "Folder_C"; //folder that will not have an option to inherit from Folder_B, since Folder_B inherits from Folder_A
+        final String pathToC = String.format("/%s/%s", getProjectName(), subFolderC);
+
+        _containerHelper.createSubfolder(getProjectName(), subFolderA, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolderA1, null); // Folder of related issues list
+        _containerHelper.createSubfolder(getProjectName(), subFolderB, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolderC, null);
+
+        /** Start: go to Folder_A, and set admin settings**/
+        goToProjectHome(getProjectName());
+        clickFolder(subFolderA);
+        goToModule("Issues");
+        clickButton("Admin");
+
+        // Singular item name
+        setFormElement(Locator.name("entrySingularName"), "Issue w/Folder_A Admin");
+
+        // Plural items name
+        setFormElement(Locator.name("entryPluralName"), "Issues w/Folder_A Admin");
+
+        // Comment sort direction
+        selectOptionByValue(Locator.name("direction"), "DESC");
+
+        // Populate the assigned to list from:
+        selectOptionByText(Locator.name("assignedToGroup"), "Site:Users");
+
+        // Set default assigned to user:
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "NoDefaultUser"));
+
+        // Inherit Admin Setting from folder:
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "DoNotInheritFromContainer"));
+
+        // Set move to folder:
+        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "NoMoveToContainer"));
+
+        // Set folder of related issues list
+        setFormElement(Locator.name("relatedIssuesList"), pathToA1);
+
+        // set Custom Fields
+        setFormElement(Locator.name("type"), "Bugs");
+        setFormElement(Locator.name("area"), "Dev Area");
+        setFormElement(Locator.name("priority"), "Prioritah");
+        setFormElement(Locator.name("int1"), "Contract Number");
+        setFormElement(Locator.name("string1"), "Development Sprint");
+        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
+        selectOptionByValue(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[12]/td[3]/select"), "insert");
+        clickButton("Update");
+
+        // add keywords
+        addKeywordsAndVerify("type", "Bugs", "Bad", "Not so Bad");
+        addKeywordsAndVerify("area", "Dev Area", "UI", "Server", "Database");
+        addKeywordsAndVerify("string1", "Development Sprint", "15.1", "15.2", "15.3", "15.4");
+
+        // set Required Fields
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Type"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Area"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Priority"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Int1"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String1"));
+
+        clickButton("Update");
+
+        //store option values, to later compare with inheritor's values
+        List<WebElement> typeOptionsParent = Locator.xpath("//*[@id=\"formtype\"]//td[1]").findElements(getDriver());
+        List<String> typeOptionsParentList = getTexts(typeOptionsParent);
+
+        List<WebElement> string1OptionsParent = Locator.xpath("//*[@id=\"formstring1\"]").findElements(getDriver());
+        List<String> string1OptionsParentList = getTexts(string1OptionsParent);
+
+        /***** End: go to Folder_A, and set admin settings *****/
+
+        /** Start: go to Folder_B, and inherit settings from Folder_A **/
+        goToProjectHome(getProjectName());
+        clickFolder(subFolderB);
+        goToModule("Issues");
+        clickButton("Admin");
+
+        //inheriting from an empty folder
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
+        setFormElement(Locator.name("inheritFromContainerSelect"), "");
+        clickButton("Update");
+
+        assertTextPresent("The Inherit Admin Setting's 'Choose Folder' option was selected with a blank.");
+        clickAndWait(Locator.linkWithText("back"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "DoNotInheritFromContainer"));
+
+        //Add caption to custom field 'Type', 'String1', and 'String2'
+        setFormElement(Locator.name("type"), "Probs");
+        setFormElement(Locator.name("string1"), "Folder_B_Str1");
+        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
+        setFormElement(Locator.name("string2"), "Folder_B_Str2");
+        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string2"));
+        selectOptionByValue(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[13]/td[3]/select"), "admin");
+        clickButton("Update");
+
+        //Add Options to string2
+        addKeywordsAndVerify("string2", "Folder_B_Str2", "B_1", "B_2", "B_3");
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String2"));
+
+        goToProjectHome(getProjectName());//REmove
+        clickFolder(subFolderB);
+        goToModule("Issues");
+        clickButton("Admin");
+
+        /** inherit from Folder_A - test for 'Cancel' to inherit **/
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
+        setFormElement(Locator.name("inheritFromContainerSelect"), pathToA);
+
+        //On update, check for a popup message: "Custom Fields of current folder will get overridden".
+
+        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                click(Locator.linkWithText("Update"));
+                assertEquals("Custom Fields of current folder will get overridden.", cancelAlert());
+                return null;
+            }
+        });
+
+        //Test that no changes were made to the current folder since we Cancelled to inherit.
+        assertFormElementEquals(Locator.name("type"), "Probs");
+        assertFormElementEquals(Locator.name("string1"), "Folder_B_Str1");
+        assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
+        assertFormElementEquals(Locator.name("string2"), "Folder_B_Str2");
+        assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string2"));
+
+        assertOptionEquals(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[13]/td[3]/select"), "Admin");
+
+        /** inherit from Folder_A - test for 'OK' to inherit **/
+
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
+        setFormElement(Locator.name("inheritFromContainerSelect"), pathToA);
+
+
+        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                click(Locator.linkWithText("Update"));
+                assertAlert("Custom Fields of current folder will get overridden.");
+                return null;
+            }
+        });
+
+        //check if all the inherited fields are populated and are disabled.
+        assertFormElementEquals(Locator.name("type"), "Bugs");
+        WebElement inputType = Locator.input("type").findElement(getDriver());
+        assertFalse(inputType.getText() + " should be disabled.", inputType.isEnabled());
+
+        assertFormElementEquals(Locator.name("area"), "Dev Area");
+        WebElement inputArea = Locator.input("type").findElement(getDriver());
+        assertFalse(inputArea.getText() + " should be disabled.", inputArea.isEnabled());
+
+        assertFormElementEquals(Locator.name("priority"), "Prioritah");
+        WebElement inputPri = Locator.input("type").findElement(getDriver());
+        assertFalse(inputPri.getText() + " should be disabled.", inputPri.isEnabled());
+
+        assertFormElementEquals(Locator.name("int1"), "Contract Number");
+        WebElement inputInt1 = Locator.input("type").findElement(getDriver());
+        assertFalse(inputInt1.getText() + " should be disabled.", inputInt1.isEnabled());
+
+        assertFormElementEquals(Locator.name("string1"), "Development Sprint");
+        WebElement inputString1 = Locator.input("type").findElement(getDriver());
+        assertFalse(inputString1.getText() + " should be disabled.", inputString1.isEnabled());
+
+        //check if inherited options are the same as the "parent"
+        List<WebElement> typeOptions = Locator.xpath("//*[@id=\"formtype\"]//td[1]").findElements(getDriver());
+        List<String> typeOptionsList = getTexts(typeOptions);
+        assertEquals("Inherited 'type' options does not match the current options.", typeOptionsParentList, typeOptionsList);
+
+        List<WebElement> string1Options = Locator.xpath("//*[@id=\"formstring1\"]").findElements(getDriver());
+        List<String> string1OptionsList = getTexts(string1Options);
+        assertEquals("Inherited 'string1' options does not match the current options.", string1OptionsParentList, string1OptionsList);
+
+        //check if inherited options are not modifiable or are not modified
+//        addKeyword("type", "Bugs", "can wait"); //TODO: should check for if it's disabled ("option/keyword" fields are not disabled in the current implementation)
+//        addKeyword("string1", "Development Sprint", "15.5");//TODO: should check for if it's disabled ("option/keyword" fields are not disabled in the current implementation)
+
+        //Check if non-inherited field still exists.
+        assertFormElementEquals(Locator.name("string2"), "Folder_B_Str2");
+        WebElement inputString2 = Locator.input("string2").findElement(getDriver());
+        assertTrue(inputString2.getText() + " is not enabled.", inputString2.isEnabled());
+
+        //check if non-inherited options are modifiable
+        addKeyword("string2", "Folder_B_Str2", "B_4");
+        WebElement str2Option = Locator.xpath("//*[@id='formstring2']/table/tbody/tr[4]/td[1]").findElement(getDriver());
+        assertTrue("Element B_4 not found.", "B_4".equals(str2Option.getText()));
+
+        /***** End: go to Folder_B, and inherit settings from Folder_A *****/
+
+        /***** Start: Test for a message effecting inheritors in Folder_A *****/
+
+        //go to Folder_A, Add caption to an empty custom field of Folder_A
+        goToProjectHome(getProjectName());
+        clickFolder("Folder_A");
+        goToModule("Issues");
+        clickButton("Admin");
+        setFormElement(Locator.name("milestone"), "milestone_A");
+
+        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                click(Locator.linkWithText("Update"));
+                assertAlert("Found one or more folders with settings inherited from the current folder: Adding new Custom Fields will override Custom Fields of inheriting folders.");
+                return null;
+            }
+        });
+
+        //check if the inheritor sees the update
+        goToProjectHome(getProjectName());
+        clickFolder("Folder_B");
+        goToModule("Issues");
+        clickButton("Admin");
+
+        assertFormElementEquals(Locator.name("milestone"), "milestone_A");
+        WebElement inputMilestone = Locator.input("milestone").findElement(getDriver());
+        assertFalse(inputMilestone.getText() + " should be disabled.", inputMilestone.isEnabled());
+
+        /***** End: Test for a message effecting inheritors in Folder_A *****/
+
+        /***** Start: Test for chaining - which is disallowed *****/
+        goToProjectHome(getProjectName());
+        clickFolder("Folder_C");
+        goToModule("Issues");
+        clickButton("Admin");
+
+        //Under Inherit From Container: Choose Folder : Folders that have inherited settings from a different folder shouldn't be listed, in this case, Folder_B.
+        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
+        assertFormElementNotEquals(Locator.name("inheritFromContainerSelect"), pathToB);
+
+        /***** End: Test for chaining - which is disallowed *****/
+
     }
 
     // NOTE: returning string here to avoid extra casting
