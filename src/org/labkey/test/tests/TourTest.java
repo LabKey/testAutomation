@@ -132,7 +132,7 @@ public class TourTest extends BaseWebDriverTest
         TourNavigator tourNavigator = new TourNavigator();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
-        click(Locator.linkWithText("Edit"));
+        clickAndWait(Locator.linkWithText("Edit"));
         TourEditor tourEditor = new TourEditor(this);
         String tourJSON = tourEditor.export();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER2 + "/begin.view");
@@ -156,7 +156,7 @@ public class TourTest extends BaseWebDriverTest
     {
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
-        click(Locator.linkWithText("Edit"));
+        clickAndWait(Locator.linkWithText("Edit"));
         TourEditor tourEditor = new TourEditor(this);
         tourEditor.setMode(TourEditor.TourMode.RUNALWAYS);
         tourEditor.save();
@@ -173,7 +173,7 @@ public class TourTest extends BaseWebDriverTest
         TourNavigator tourNavigator = new TourNavigator();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
-        click(Locator.linkWithText("Edit"));
+        clickAndWait(Locator.linkWithText("Edit"));
         TourEditor tourEditor = new TourEditor(this);
         tourEditor.setMode(TourEditor.TourMode.OFF);
         tourEditor.save();
