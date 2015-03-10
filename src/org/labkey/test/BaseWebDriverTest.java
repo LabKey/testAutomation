@@ -59,6 +59,8 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.SideWebPart;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
@@ -206,7 +208,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
-    public PortalHelper _portalHelper = new PortalHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -1336,6 +1337,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             assertTextNotPresent("Retype Password");
             assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
+
+            // Tests hit this page a lot. Make it loads as fast as possible
+            PortalHelper portalHelper = new PortalHelper(this);
+            for (BodyWebPart webPart : portalHelper.getBodyWebParts())
+                webPart.delete();
+            for (SideWebPart webPart : portalHelper.getSideWebParts())
+                webPart.delete();
         }
 
         if (bootstrapped || isTitleEqual("Sign In"))
@@ -1547,12 +1555,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
         getDriver().switchTo().window(windows.get(index));
-    }
-
-    public void switchToNewestWindow()
-    {
-        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(windows.get(windows.size() - 1));
     }
 
     @LogMethod
@@ -4060,16 +4062,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         applyAndWaitForPageToLoad(func);
     }
 
-    public Locator findButton(String name)
-    {
-        // Note: we do not use inputs anymore, but instead links spans inside
-        Locator l = Locator.tagWithName("a", name);
-        if (isElementPresent(l))
-            return l;
-
-        return null;
-    }
-
     public boolean isElementPresent(Locator loc)
     {
         return loc.findElements(getDriver()).size() > 0;
@@ -4672,12 +4664,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         checkRadioButton(Locator.radioButtonById("pipeOptionSiteDefault"));
         clickButton("Save");
         log("Finished setting pipeline to default based on the site-level root");
-    }
-
-    // Returns true if any status value is "ERROR"
-    public boolean hasError(List<String> statusValues)
-    {
-        return statusValues.contains("ERROR");
     }
 
     // Returns count of "COMPLETE"
@@ -5394,19 +5380,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _listHelper.setColumnName(newFieldIndex, name);
         _listHelper.setColumnLabel(newFieldIndex, label);
         _listHelper.setColumnType(newFieldIndex, type);
-    }
-
-    public void setFormElementAndVerify(final Locator element, final String text)
-    {
-        setFormElement(element, text);
-
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return getFormElement(element).replace("\r", "").trim().equals(text.replace("\r", "").trim()); // Ignore carriage-returns, which are present in IE but absent in firefox
-            }
-        }, "Form element was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
     public void assertButtonPresent(String buttonText)
@@ -6461,7 +6434,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             fail("Some queries did not pass validation. See error log for more details.");
         }
     }
-
 
     public void pressTab(Locator l)
     {
