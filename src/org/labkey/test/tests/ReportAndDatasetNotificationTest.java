@@ -400,12 +400,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
     protected void collapseCategory(String category)
     {
-        // TODO: I took this from DataViewsTest, but had to comment out assert because there's a <span> around the text, so I didn't combine uses.
         Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
         int dataViewCount = getElementCount(dataViewRow);
-        //       _test.assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
+        assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
         click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
         waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), WAIT_FOR_JAVASCRIPT);
     }
-
 }
