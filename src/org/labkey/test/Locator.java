@@ -136,16 +136,6 @@ public abstract class Locator
 
     public abstract By toBy();
 
-    private void turnOnImplicitWait(WebDriver driver)
-    {
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    }
-
-    private void turnOffImplicitWait(WebDriver driver)
-    {
-        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-    }
-
     public WebElement findElement(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
