@@ -177,7 +177,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         saveReport(false);
 
         openReport(R_NAME);
-        _ext4Helper.clickExt4Tab("Source");
+        waitAndClick(Ext4Helper.Locators.tab("Source"));
         String script = _extHelper.getCodeMirrorValue("script-report-editor");
         setCodeEditorValue("script-report-editor", script + "     #an edit");
         clickButton("Save");
@@ -254,7 +254,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         saveReport(false);
 */
         openReport(R_NAME);
-        _ext4Helper.clickExt4Tab("Source");
+        waitAndClick(Ext4Helper.Locators.tab("Source"));
         _ext4Helper.checkCheckbox("Show source tab to all users");
         clickButton("Save");
 
