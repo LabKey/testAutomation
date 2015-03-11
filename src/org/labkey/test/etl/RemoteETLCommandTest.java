@@ -34,8 +34,7 @@ import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @Category({DailyB.class, Data.class})
 public class RemoteETLCommandTest extends ETLTest
@@ -87,16 +86,18 @@ public class RemoteETLCommandTest extends ETLTest
     {
         verifyBaseTransformResponse(response);
 
+        String status = response.getStatus().toLowerCase();
+
         if (noWork)
         {
-          assertTrue("status should be 'no work'", response.getStatus().equalsIgnoreCase("no work"));
-          assertTrue("expect no pipeline job", null == response.getPipelineURL());
-          assertTrue("expect no pipeline job", null == response.getJobId());
+            assertEquals("Wrong response status", "no work", status);
+            assertNull("expect no pipeline job", response.getPipelineURL());
+            assertNull("expect no pipeline job", response.getJobId());
         }
         else
         {
-            assertTrue("job id should not be null", response.getJobId() != null);
-            assertFalse("status should not be error", response.getStatus().equalsIgnoreCase("error"));
+            assertNotNull("job id should not be null", response.getJobId());
+            assertNotEquals("status should not be error", "error", status);
             assertTrue("pipeline url should be valid\n" +
                     "Expected substring: " + getPipelineURLFragment(response.getJobId()) + "\n" +
                     "Actual: " + response.getPipelineURL(),
