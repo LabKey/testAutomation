@@ -1337,13 +1337,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             assertTextNotPresent("Retype Password");
             assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
-
-            // Tests hit this page a lot. Make it loads as fast as possible
-            PortalHelper portalHelper = new PortalHelper(this);
-            for (BodyWebPart webPart : portalHelper.getBodyWebParts())
-                webPart.delete();
-            for (SideWebPart webPart : portalHelper.getSideWebParts())
-                webPart.delete();
         }
 
         if (bootstrapped || isTitleEqual("Sign In"))
@@ -1413,8 +1406,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
             }
 
-            // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx
-            clickAndWait(Locator.linkWithText("Home"));
+            // Tests hit this page a lot. Make it loads as fast as possible
+            PortalHelper portalHelper = new PortalHelper(this);
+            for (BodyWebPart webPart : portalHelper.getBodyWebParts())
+                webPart.delete();
+            for (SideWebPart webPart : portalHelper.getSideWebParts())
+                webPart.delete();
         }
     }
 
