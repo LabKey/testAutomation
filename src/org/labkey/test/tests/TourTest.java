@@ -119,10 +119,12 @@ public class TourTest extends BaseWebDriverTest
     {
         TourNavigator tourNavigator = new TourNavigator();
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         assertBasicTour();
         //tour should only run once
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
@@ -144,10 +146,12 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.setTitle(TOUR_NAME);
         tourEditor.save();
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER2);
         assertBasicTour();
         //tour should only run once
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
@@ -161,9 +165,11 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.setMode(TourEditor.TourMode.RUNALWAYS);
         tourEditor.save();
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         assertBasicTour();
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         assertBasicTour();
     }
@@ -178,6 +184,7 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.setMode(TourEditor.TourMode.OFF);
         tourEditor.save();
         goToProjectHome();
+        sleep(WAIT);
         clickFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
