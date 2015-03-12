@@ -110,7 +110,7 @@ public class ETLErrorTest extends ETLBaseTest
         runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
         errors.clear();
 
-        errors.add("contains value not castable to a date:");
+        errors.add("contains value not castable to a date");
         runETLandCheckErrors(TRANSFORM_BADCAST, false, true, errors);
         errors.clear();
 
