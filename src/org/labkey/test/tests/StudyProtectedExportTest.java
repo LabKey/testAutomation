@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
@@ -207,8 +208,14 @@ public class StudyProtectedExportTest extends StudyExportTest
         selectQuery("study", "Location");
         waitAndClickAndWait(Locator.linkWithText("view data"));
         DataRegionTable query = new DataRegionTable("query", this);
+        Assert.assertTrue("Lab Code column should not be in default view", query.getColumn("LabwareLabCode") == -1);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("LabwareLabCode");
+        _customizeViewsHelper.applyCustomView();
+
+        query = new DataRegionTable("query", this); // reset column index cache
         int labelCol = query.getColumn("Label");
-        int labCodeCol = query.getColumn("Labware Lab Code");
+        int labCodeCol = query.getColumn("LabwareLabCode");
         int clinicCol = query.getColumn("Clinic");
         int rowCount = query.getDataRowCount();
         int foundClinics = 0;
@@ -222,7 +229,7 @@ public class StudyProtectedExportTest extends StudyExportTest
             }
             else // non-clinic
             {
-                assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                assertNotEquals("Non-clinic Location name was masked", "Clinic", query.getDataAsText(i, labelCol));
                 nonClinics.add(query.getDataAsText(i, labelCol));
             }
         }
