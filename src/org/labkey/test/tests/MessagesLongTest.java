@@ -192,9 +192,12 @@ public class MessagesLongTest extends BaseWebDriverTest
                 EXPIRES2,
                 RESP1_BODY);
 
-        log("Add second response, make sure it was entered and recognized");
+        log("Add second response with attachment, make sure it was entered and recognized");
         clickButton("Respond");
         setFormElement(Locator.id("body"), RESP2_BODY);
+        click(Locator.linkContainingText("Attach a file"));
+        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
+        setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Submit");
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
@@ -318,6 +321,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
         assertElementNotPresent(Locator.linkWithText(MSG2_TITLE));
+
+        log("Check attachment linked in emailed message");
+        click(Locator.linkWithText("RE: " + MSG1_TITLE, 0));
+        assertTextPresent("common.properties");
+        assertElementPresent(Locator.linkWithText("common.properties"));
+
+
     }
 
     private void verifyAdmin()
