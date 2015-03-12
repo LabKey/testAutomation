@@ -121,7 +121,7 @@ public class FileBrowserHelper
                 public boolean check()
                 {
                     _test.click(folderTreeNode);
-                    return _test.isElementPresent(folderTreeNodeSelected);
+                    return _test.waitForElement(folderTreeNodeSelected, 100, false);
                 }
             }, "Failed to select tree node: " + nodeId, WAIT_FOR_JAVASCRIPT);
             _test._ext4Helper.waitForMaskToDisappear();
