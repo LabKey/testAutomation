@@ -15,10 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
@@ -51,7 +53,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 {
     private final String ID_PREFIX = "PUBLISHED-";
     private final int ID_DIGITS = 8;
-    private final File PROTOCOL_DOC = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
+    private final File PROTOCOL_DOC = TestFileUtils.getSampleData("study/Protocol.txt");
     private final String STUDY_LABEL = "Original Study";
     private final String STUDY_INVESTIGATOR = "Original Investigator";
     private final String STUDY_GRANT = "Original Grant";
@@ -93,7 +95,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String CUSTOM_VIEW2 = "Private Custom View";
     private final String[] CUSTOM_VIEW_PTIDS2 = {};
 
-    private final File LIST_ARCHIVE = new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
+    private final File LIST_ARCHIVE = TestFileUtils.getSampleData("study/searchTest.lists.zip");
     private final String[] LISTS = {"CustomIndexing", "Indexed as one doc", "List To Delete", "List1", "List2", "MetaDataSet"};
 
     private final String PUB1_NAME = "PublishedStudy";
@@ -299,16 +301,21 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
-        assertElementPresent("Wrong number of WebParts", Locator.xpath("//table[@name='webpart']"), 8);
-        waitForText("Test Wiki Title");
-        //assertTextPresent("Test Wiki Title");
+        List<String> expectedWebParts = Arrays.asList(
+                "Study Overview",
+                "Data Pipeline",
+                "Datasets",
+                "Specimens",
+                "Views",
+                "Test Wiki Title",
+                "Lists",
+                "snapshot"
+        );
+        List<String> webPartTitles = (new PortalHelper(this)).getWebPartTitles();
+        Assert.assertEquals("Wrong webparts", expectedWebParts, webPartTitles);
 
         //assert the added module is present
-        waitForElement(Locator.xpath("//span[@id='adminMenuPopupText']"));
-        click(Locator.xpath("//span[@id='adminMenuPopupText']"));
-        waitForElement(Locator.xpath("//span[text()='Go To Module']"));
-        mouseOver(Locator.xpath("//span[text()='Go To Module']"));
-        waitForElement(Locator.xpath("//span[text()='List']"));
+        _ext4Helper.clickExt4MenuButton(false, Locators.ADMIN_MENU, true, "Go To Module", "List");
 
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
@@ -789,19 +796,20 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard page 2 : Mice
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Mice']"));
         waitForElement(Locator.css(".studyWizardParticipantList"));
-        verifyPublishWizardSelectedCheckboxes("studyWizardParticipantList", "Group 1");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardParticipantList, GROUP1_NAME + " (" + GROUP1_PTIDS.length + " mice)");
         clickButton("Next", 0);
 
         // Wizard page 3 : Datasets
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
         waitForElement(Locator.css(".studyWizardDatasetList"));
-        verifyPublishWizardSelectedCheckboxes("studyWizardDatasetList", DATASETS);
+        // TODO: Issue 22787: Study republish includes unselected datasets
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardDatasetList, ArrayUtils.addAll(DATASETS, PUB1_DEPENDENT_DATASETS));
         clickButton("Next", 0);
 
         // Wizard page 4 : Visits
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Visits']"));
         waitForElement(Locator.css(".studyWizardVisitList"));
-        verifyPublishWizardSelectedCheckboxes("studyWizardVisitList", "Screening", "Grp1:F/U/Grp2:V#2", "G1: V#2/G2: V#3");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardVisitList, "Screening", "Grp1:F/U/Grp2:V#2", "G1: V#2/G2: V#3");
         clickButton("Next", 0);
 
         // Wizard page 5 : Specimens
@@ -811,38 +819,38 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard Page 6 : Study Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
-        verifyPublishWizardSelectedCheckboxes("studyObjects", "Assay Schedule", "Cohort Settings", "Custom Participant View", "Participant Comment Settings", "Protocol Documents", "Specimen Settings", "Treatment Data");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyObjects, "Assay Schedule", "Cohort Settings", "Custom Participant View", "Participant Comment Settings", "Protocol Documents", "Specimen Settings", "Treatment Data");
         clickButton("Next", 0);
 
         // Wizard page 7 : Lists
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
         waitForElement(Locator.css(".studyWizardListList"));
-        verifyPublishWizardSelectedCheckboxes("studyWizardListList", "CustomIndexing", "Indexed as one doc", "List To Delete", "List1");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardListList, "CustomIndexing", "Indexed as one doc", "List To Delete", "List1");
         clickButton("Next", 0);
 
         // Wizard page 8 : Views
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
         waitForElement(Locator.css(".studyWizardViewList"));
-        verifyPublishWizardSelectedCheckboxes("studyWizardViewList", "Shared Custom View");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardViewList, "Shared Custom View");
         clickButton("Next", 0);
 
         // Wizard Page 9 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
         waitForElement(Locator.css(".studyWizardReportList"));
         waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
-        verifyPublishWizardSelectedCheckboxes("studyWizardReportList", "Shared Mouse Report", "Shared Time Chart");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardReportList, "Shared Mouse Report", "Shared Time Chart");
         clickButton("Next", 0);
 
         // Wizard page 10 : Folder Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        verifyPublishWizardSelectedCheckboxes("folderObjects", "Container specific module properties", "Experiments and runs", "External schema definitions", "Folder type and active modules", "Full-text search settings", "Missing value indicators", "Notification settings", "Webpart properties and layout", "Wikis and their attachments");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.folderObjects, "Container specific module properties", "Experiments and runs", "External schema definitions", "Folder type and active modules", "Full-text search settings", "Missing value indicators", "Notification settings", "Webpart properties and layout", "Wikis and their attachments");
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList"));
         waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
-        verifyPublishWizardSelectedCheckboxes("studyWizardPublishOptionsList", "Use Alternate Mouse IDs", "Shift Mouse Dates", "Remove Protected Columns");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.studyWizardPublishOptionsList, "Use Alternate Mouse IDs", "Shift Mouse Dates", "Remove Protected Columns");
         //goToProjectHome();
     }
 
@@ -1209,11 +1217,39 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
     }
 
-    private void verifyPublishWizardSelectedCheckboxes(String marker, String... expectedCheckboxes)
+    private void verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid grid, String... expectedCheckboxes)
     {
-        Locator checkedCheckboxLocator = Locator.xpath("//div[contains(@class,'" + marker + "')]//div[contains(@class,'x-grid3-row-selected')]//span[@class='labkey-link']");
-        List<WebElement> checkboxes = checkedCheckboxLocator.findElements(getDriver());
-        List<String> checkboxLabels = getTexts(checkboxes);
-        assertEquals("Wizard has wrong checkboxes checked", Arrays.asList(expectedCheckboxes), checkboxLabels);
+        Locator.CssLocator gridLoc = Locator.css("div." + grid.name());
+        WebElement columnHeader = gridLoc.append(Locator.css("tr.x-grid3-hd-row > td")).withText(grid.getLabelColumn()).findElement(getDriver());
+        Integer colIndex = getElementIndex(columnHeader);
+        Locator selectedLabelLoc = gridLoc.append(Locator.css("div.x-grid3-row-selected div.x-grid3-col-" + colIndex));
+        List<WebElement> selectedRows = selectedLabelLoc.findElements(getDriver());
+        Set<String> selectedLabels = new HashSet<>(getTexts(selectedRows));
+        assertEquals("Wizard has wrong checkboxes checked", new HashSet<>(Arrays.asList(expectedCheckboxes)), selectedLabels);
+    }
+
+    private enum StudyPublishWizardGrid
+    {
+        studyWizardParticipantList("Mouse Group"),
+        studyWizardDatasetList("Label"),
+        studyWizardVisitList("Label"),
+        studyObjects("Name"),
+        studyWizardListList("Name"),
+        studyWizardViewList("Name"),
+        studyWizardReportList("Name"),
+        folderObjects("Name"),
+        studyWizardPublishOptionsList("Name");
+
+        private String labelColumn;
+
+        StudyPublishWizardGrid(String labelColumn)
+        {
+            this.labelColumn = labelColumn;
+        }
+
+        public String getLabelColumn()
+        {
+            return labelColumn;
+        }
     }
 }
