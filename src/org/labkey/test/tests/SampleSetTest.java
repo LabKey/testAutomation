@@ -89,14 +89,11 @@ public class SampleSetTest extends BaseWebDriverTest
 
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
-        setFormElement(Locator.name("data"), "KeyCol\tIntCol\tStringCol\tDateCol\tBoolCol\n" +
-                "SampleSetBVT1\t100\ta\t1/1/2000\tTRUE\n" +
-                "SampleSetBVT2\t200\tb\t2/2/2000\tFALSE\n" +
-                "SampleSetBVT3\t300\tc\t3/3/2000\tTRUE\n" +
-                "SampleSetBVT4\t400\td\t4/4/2000\tFALSE");
+        setFormElement(Locator.tagWithName("input", "upload-run-field"), TestFileUtils.getSampleData("sampleSet.tsv").getAbsolutePath());
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
+        // TODO: why is the webpart being added multiple times?
         portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), FOLDER_SAMPLE_SET_NAME);
