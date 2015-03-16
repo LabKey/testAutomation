@@ -184,14 +184,14 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
         // Change user setting TEST_USER -> No Email
         DataRegionTable table = new DataRegionTable("Users", this);
-        checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
+        table.checkCheckbox(table.getRow("Email", TEST_USER));
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON)));
         _ext4Helper.clickExt4MenuButton(false, Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON), false, MessagesLongTest.FILES_MENU_ITEM);
         waitForElement(Ext4Helper.Locators.window("Update User Settings For Files"));
         _ext4Helper.selectComboBoxItem(MessagesLongTest.NEW_SETTING_LABEL, "No Email");
         clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
-        waitForText("Are you sure");
-        clickButton("Yes");
+        waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes"));
+        waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
 
         assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
