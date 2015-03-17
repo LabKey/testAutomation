@@ -37,7 +37,7 @@ import java.util.Date;
 import static org.junit.Assert.*;
 
 @Category({DailyB.class, Data.class})
-public class RemoteETLCommandTest extends ETLTest
+public class ETLClientApiCommandTest extends ETLTest
 {
     private static final String TRANSFORM_NOTFOUND = "{simpletest}/notfound";
 
@@ -51,7 +51,7 @@ public class RemoteETLCommandTest extends ETLTest
     public void testSteps()
     {
         super.runInitialSetup(true);
-        verifyRemoteApi();
+        verifyClientApi();
     }
 
     private void verifyBaseTransformResponse(BaseTransformResponse response)
@@ -110,7 +110,7 @@ public class RemoteETLCommandTest extends ETLTest
         return "/pipeline-status/" + getProjectName() + "/details.view?rowId=" + jobId;
     }
 
-    private void verifyRemoteApi()
+    private void verifyClientApi()
     {
         //create a new connection, specifying base URL,
         //user email, and password

@@ -298,39 +298,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
 
     protected void _runETL(String transformId, boolean hasWork, boolean hasCheckerError)
     {
-        log("running " + transformId + " job");
-        goToModule("DataIntegration");
-
-        if (hasWork && !hasCheckerError)
-        {
-            // pipeline job will run
-            waitAndClickAndWait(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
-            waitFor(new Checker()
-            {
-                @Override
-                public boolean check()
-                {
-                    if (isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
-                        return true;
-                    else if (isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText("COMPLETE"))))
-                        return true;
-                    else
-                        refresh();
-
-                    return false;
-                }
-            }, "ETL did not finish", WAIT_FOR_JAVASCRIPT);
-        }
-        else
-        {
-            // pipeline job does not run
-            waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
-            _ext4Helper.clickWindowButton(hasCheckerError ? "Error" : "Success", "OK", 0, 0);
-        }
+        _runETL_NoNav(transformId, hasWork, hasCheckerError);
 
         log("returning to project home");
         goToProjectHome();
@@ -349,7 +317,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         if (hasWork && !hasCheckerError)
         {
             // pipeline job will run
-            waitAndClickAndWait(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+            waitAndClickAndWait(findRunNowButton(transformId));
             waitFor(new Checker()
             {
                 @Override
@@ -373,9 +341,15 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         else
         {
             // pipeline job does not run
-            waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+            waitAndClick(findRunNowButton(transformId));
             _ext4Helper.clickWindowButton(hasCheckerError ? "Error" : "Success", "OK", 0, 0);
         }
+    }
+
+    private Locator.XPathLocator findRunNowButton(String transformId)
+    {
+        return Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a").withDescendant(Locator.xpath("span")).withText("run now");
+
     }
 
     protected RunTransformResponse runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError) throws Exception
