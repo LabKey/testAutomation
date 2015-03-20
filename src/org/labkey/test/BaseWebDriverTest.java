@@ -150,6 +150,7 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
+import static org.labkey.test.WebTestHelper.getHttpPostResponse;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.stripContextPath;
@@ -232,7 +233,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
 
     protected boolean isPerfTest = false;
-
 
     public BaseWebDriverTest()
     {
@@ -877,12 +877,32 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             assertElementPresent(Locator.tagWithName("form", "login"));
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
+            acceptTermsOfUse(null, false);
             clickButton("Sign In");
+            // If there are site-wide terms, you will have to do this again and accept the terms that are now displayed.
+            if (isElementPresent(Locator.id("approvedTermsOfUse")))
+            {
+                if (isElementPresent(Locator.name("password")))
+                {
+                    setFormElement(Locator.name("email"), PasswordUtil.getUsername());
+                    setFormElement(Locator.name("password"), PasswordUtil.getPassword());
+                    acceptTermsOfUse(null, false);
+                    clickButton("Sign In");
+                }
+                else // just need to accept the terms that are now displayed
+                {
+                    acceptTermsOfUse(null, true);
+                }
+            }
+
+//            acceptTermsOfUse(null, true); // if there are site-wide terms, it will appear after you log in
 
             if (isTextPresent("The e-mail address and password you entered did not match any accounts on file."))
                 throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
-            if (isTextPresent("Your password does not meet the complexit requirements; please choose a new password."))
+            if (isTextPresent("Your password does not meet the complexity requirements; please choose a new password."))
                 throw new IllegalStateException("Password complexity requirement was left on by a previous test");
+            if (isTextPresent("log in and approve the terms of use."))
+                throw new IllegalStateException("Terms of use not accepted at login");
         }
 
         assertSignOutAndMyAccountPresent();
@@ -2035,6 +2055,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
+            deleteSiteWideTermsOfUsePage();
+        }
+        catch (Exception e)
+        {
+            log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
+        }
+
+        try
+        {
             resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
         }
         catch (Exception e)
@@ -2092,6 +2121,40 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 FileUtils.deleteDirectory(getDownloadDir());
             }
             catch (IOException ignore) { }
+        }
+    }
+
+    public void deleteSiteWideTermsOfUsePage()
+    {
+        signIn();
+        try
+        {
+            log("Removing site-wide terms of use page");
+            getHttpPostResponse(getBaseURL() + "/wiki/delete.view?name=_termsOfUse");
+        }
+        catch (IOException e)
+        {
+            log("Problem removing site-wide terms of use page.  Perhaps it does not exist.");
+        }
+    }
+
+    protected void acceptTermsOfUse(@Nullable String text, Boolean doAgree)
+    {
+        try
+        {
+            checkCheckbox(Locator.id("approvedTermsOfUse"));
+            if (null != text)
+            {
+                assertTextPresent(text);
+            }
+            if (doAgree)
+                clickButton("Agree");
+
+        }
+        catch (NoSuchElementException e)
+        {
+            if (null != text) // terms were expected but the element was not found
+                fail("Expected terms of use with text '" + text + "' but found no such element");
         }
     }
 
@@ -3064,7 +3127,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         WebElement projectLink = Locator.linkWithText(project).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
         if (assertDestination)
+        {
+            acceptTermsOfUse(null, true);
             waitForElement(Locator.id("folderBar").withText(project));
+        }
     }
 
     public void hoverFolderBar()
@@ -6172,15 +6238,26 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
 
+
+
     @LogMethod
-    public void signOut()
+    public void signOut(@Nullable String termsText)
     {
         log("Signing out");
         beginAt("/login/logout.view");
+
+        acceptTermsOfUse(termsText, true);
+
         final Locator.XPathLocator signInButtonOrLink = Locator.xpath("//a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
         if (!isElementPresent(signInButtonOrLink)) // Sign-out action stopped impersonation
             beginAt("/login/logout.view");
         waitForElement(signInButtonOrLink);
+    }
+
+    @LogMethod
+    public void signOut()
+    {
+        signOut(null);
     }
 
     public void signOutHTTP()

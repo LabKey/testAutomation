@@ -554,6 +554,7 @@ src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TabTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
+src/org/labkey/test/tests/TermsOfUseTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartImportTest.java -text
