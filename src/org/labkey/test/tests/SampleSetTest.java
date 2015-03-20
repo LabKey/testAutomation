@@ -89,7 +89,9 @@ public class SampleSetTest extends BaseWebDriverTest
 
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
-        setFormElement(Locator.tagWithName("input", "upload-run-field"), TestFileUtils.getSampleData("sampleSet.tsv").getAbsolutePath());
+        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
+        setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
+        waitForAlert("Successfully parsed 4 rows from the data file.", 10000);
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
