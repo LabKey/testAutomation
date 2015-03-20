@@ -80,9 +80,9 @@ public class TermsOfUseTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         createProjectsWithTermsOfUse();
-//        goToHome();
-//        createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", null);
-//        pushLocation(); // For attempting to bypass Terms of Use
+        goToHome();
+        createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", null);
+        pushLocation(); // For attempting to bypass Terms of Use
 
         log("Create project" + NON_PUBLIC_NO_TERMS_PROJECT_NAME);
         _containerHelper.createProject(NON_PUBLIC_NO_TERMS_PROJECT_NAME, null);
@@ -207,19 +207,26 @@ public class TermsOfUseTest extends BaseWebDriverTest
     }
 
     // test that the console link exists and directs to a page for adding terms when it doesn't exist
-//    @Test
+    @Test
     public void createTermsAdminConsoleLinkTest()
     {
-        // TODO check Locator.id("labkey-nav-trail-current-page") perhaps<span class="labkey-nav-page-header" id="labkey-nav-trail-current-page" style="visibility: visible;">Edit</span>
-        // or may be better to check if the delete page button is disabled
-        //<a class="labkey-disabled-button" onclick="if (this.className.indexOf('labkey-disabled-button') != -1){ return false; }this.form = document.getElementById('1e159d96-b093-1032-a938-01a67b296794').form; if (isTrueOrUndefined(function(){return false;}.call(this))) {submitForm(document.getElementById('1e159d96-b093-1032-a938-01a67b296794').form); return false;}" id="wiki-input-button-delete"><span>Delete Page</span></a>
+        deleteSiteWideTermsOfUsePage();
+        goToAdminConsole();
+        Locator.XPathLocator link = Locator.linkContainingText("site-wide terms of use");
+        assertElementPresent(link);
+        clickAndWait(link);
+        Locator.CssLocator button = Locator.css(".labkey-disabled-button");
+        assertElementContains(button, "DELETE PAGE");
     }
 
     // test that the admin console link directs to a page for editing when page has already been created.
-//    @Test
+    @Test
     public void editTermsAdminConsoleLinkTest()
     {
-        // TODO
+        assureSiteWideTermsOfUsePage();
+        goToAdminConsole();
+        clickAndWait(Locator.linkContainingText("site-wide terms of use"));
+        assertElementContains(Locator.id("labkey-nav-trail-current-page"), "Edit");
     }
 
     protected void assureSiteWideTermsOfUsePage()
@@ -338,6 +345,16 @@ public class TermsOfUseTest extends BaseWebDriverTest
         acceptSiteWideTerms(true);
         clickProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
         assertTextPresent(PROJECT_TERMS_SNIPPET);
+        acceptTermsOfUse(PROJECT_TERMS_SNIPPET, true);
+        // now go home and make sure we don't see the site-wide terms again
+        goToHome();
+        assertTextNotPresent(SITE_WIDE_TERMS_TEXT);
+        // go back to the project with terms and should not see terms there either
+        clickProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
+        assertTextNotPresent(PROJECT_TERMS_SNIPPET);
+        // go to separate project with terms
+        clickProject(PUBLIC_TERMS_PROJECT_NAME, false);
+        assertTextPresent(PROJECT_TERMS_SNIPPET);
     }
 
     // Accept site-wide terms logging in.  Go to non-public project without terms and should not show terms.
@@ -351,6 +368,14 @@ public class TermsOfUseTest extends BaseWebDriverTest
     }
 
     // TODO failed login test.  Should show terms of use again.
+    @Test
+    public void testFailedLoginNoAccept()
+    {
+
+    }
+
+    // TODO failed login bad password test.
+
 
     protected void deleteWikiPage()
     {
