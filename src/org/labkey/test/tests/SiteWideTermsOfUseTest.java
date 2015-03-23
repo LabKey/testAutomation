@@ -2,12 +2,18 @@ package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.util.PasswordUtil;
+
+import java.io.IOException;
 
 /**
  * Created by susanh on 3/19/15.
  */
+@Category({InDevelopment.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
@@ -80,7 +86,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void editTermsAdminConsoleLinkTest()
     {
-        assureSiteWideTermsOfUsePage();
+
         goToAdminConsole();
         clickAndWait(Locator.linkContainingText("site-wide terms of use"));
         assertElementContains(Locator.id("labkey-nav-trail-current-page"), "Edit");
@@ -95,7 +101,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void siteWideTermsOfUseLogOutTest()
     {
-        assureSiteWideTermsOfUsePage();
         signOut(SITE_WIDE_TERMS_TEXT);
     }
 
@@ -103,7 +108,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptSiteWideTermsOfUseOnlyOnceTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(false);
         goToProjectHome();
         assertTextNotPresent(SITE_WIDE_TERMS_TEXT);
@@ -113,7 +117,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void siteWideTermsAtProjectLevelTest()
     {
-        assureSiteWideTermsOfUsePage();
         doNotAcceptSiteWideTerms();
         goToProjectBegin(PUBLIC_NO_TERMS_PROJECT_NAME);
         assertTextPresent(SITE_WIDE_TERMS_TEXT);
@@ -124,7 +127,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void showProjectTermsAtProjectLevelWithSiteTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         doNotAcceptSiteWideTerms();
         goToProjectBegin(PUBLIC_TERMS_PROJECT_NAME);
         assertTextPresent(PROJECT_TERMS_SNIPPET);
@@ -134,7 +136,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void nonPublicProjectWithSiteWideWithProjectTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         doNotAcceptSiteWideTerms();
         goToProjectBegin(NON_PUBLIC_TERMS_PROJECT_NAME);
         assertTextPresent(PROJECT_TERMS_SNIPPET);
@@ -144,7 +145,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void nonPublicProjectSiteWideWithoutProjectTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         doNotAcceptSiteWideTerms();
         goToProjectBegin(NON_PUBLIC_NO_TERMS_PROJECT_NAME);
         assertTextPresent(SITE_WIDE_TERMS_TEXT);
@@ -154,7 +154,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideWithProjectLevelTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(false);
         log("Going to project page");
         clickProject(PUBLIC_TERMS_PROJECT_NAME, false);
@@ -165,7 +164,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideWithoutProjectLevelTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(false);
         log("Going to project page");
         goToProjectBegin(PUBLIC_NO_TERMS_PROJECT_NAME);
@@ -177,7 +175,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideWithNonPublicProjectLevelTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(false);
         goToProjectBegin(NON_PUBLIC_TERMS_PROJECT_NAME);
         assertTextPresent(PROJECT_TERMS_SNIPPET);
@@ -187,7 +184,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideNonPublicNoProjectLevelTermsLoggedInTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(false);
         log("Going to project page");
         goToProjectBegin(NON_PUBLIC_NO_TERMS_PROJECT_NAME);
@@ -198,7 +194,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideLoggedInWithProjectLevelTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(true);
         clickProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
         assertTextPresent(PROJECT_TERMS_SNIPPET);
@@ -218,20 +213,45 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void acceptedSiteWideLoggedInWithoutProjectLevelTermsTest()
     {
-        assureSiteWideTermsOfUsePage();
         acceptSiteWideTerms(true);
         clickProject(NON_PUBLIC_NO_TERMS_PROJECT_NAME, false);
         assertTextNotPresent(PROJECT_TERMS_SNIPPET);
     }
 
-    // TODO failed login test.  Should show terms of use again.
-    @Test
+    // Attempt to log in without accepting site-wide terms.  Should show terms of use again.
+//    @Test
     public void testFailedLoginNoAccept()
     {
-
+        signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
+        try
+        {
+            PasswordUtil.ensureCredentials();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to ensure credentials", e);
+        }
+        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "agree ");
     }
 
-    // TODO failed login bad password test.
+    // Attempt to log in with bad password.  Should show the terms of use again.
+//    @Test
+    public void testFailedLoginBadPassword()
+    {
+        // TODO the expected behavior here is not entirely clear.  It could be that we always show the terms on a second page.
+        // This test will always fail now, though because of the creation of many sessions.
+        signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
+        try
+        {
+            PasswordUtil.ensureCredentials();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Unable to ensure credentials", e);
+        }
+        signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "agree ");
+        assertTextPresent(SITE_WIDE_TERMS_TEXT); // should show
+    }
 
     protected void signOutWithSiteWideTerms(String termsText, boolean acceptTerms)
     {
