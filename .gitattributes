@@ -409,6 +409,7 @@ src/org/labkey/test/tests/AncillaryStudyTest.java -text
 src/org/labkey/test/tests/AssayResultsExportTest.java -text
 src/org/labkey/test/tests/AssayTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
+src/org/labkey/test/tests/BaseTermsOfUseTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
@@ -496,6 +497,7 @@ src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
+src/org/labkey/test/tests/ProjectTermsOfUseTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
@@ -520,6 +522,7 @@ src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
+src/org/labkey/test/tests/SiteWideTermsOfUseTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text
 src/org/labkey/test/tests/SpecimenCustomizeTest.java -text
 src/org/labkey/test/tests/SpecimenExportTest.java -text
@@ -554,7 +557,6 @@ src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TabTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
-src/org/labkey/test/tests/TermsOfUseTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartImportTest.java -text
