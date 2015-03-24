@@ -2037,6 +2037,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         dismissAllAlerts();
+        checkJsErrors();
 
         try
         {
