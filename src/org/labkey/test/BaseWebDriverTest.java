@@ -2036,6 +2036,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             e.printStackTrace();
         }
 
+        dismissAllAlerts();
+
         try
         {
             // Get DB back in a good state after failed pipeline tools test.
@@ -2126,7 +2128,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void deleteSiteWideTermsOfUsePage()
     {
-        signIn();
+        simpleSignIn();
         try
         {
             log("Removing site-wide terms of use page");
