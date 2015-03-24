@@ -19,6 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.List;
 
 /**
  * Created by cnathe on 2/4/2015.
@@ -89,15 +93,25 @@ public class TimeChartWizard
 
     public void checkFilterGridRow(String label)
     {
+        List<WebElement> svgs = Locator.css("svg").findElements(_test.getDriver());
         _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
         _test._ext4Helper.checkGridRowCheckbox(label);
+        if (svgs.size() > 0)
+        {
+            _test.shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
+        }
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
     public void uncheckFilterGridRow(String label)
     {
+        List<WebElement> svgs = Locator.css("svg").findElements(_test.getDriver());
         _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
         _test._ext4Helper.uncheckGridRowCheckbox(label);
+        if (svgs.size() > 0)
+        {
+            _test.shortWait().until(ExpectedConditions.stalenessOf(svgs.get(0)));
+        }
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
