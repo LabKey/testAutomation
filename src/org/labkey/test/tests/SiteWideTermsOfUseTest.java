@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PasswordUtil;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 /**
  * Created by susanh on 3/19/15.
  */
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
@@ -86,7 +87,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void editTermsAdminConsoleLinkTest()
     {
-
         goToAdminConsole();
         clickAndWait(Locator.linkContainingText("site-wide terms of use"));
         assertElementContains(Locator.id("labkey-nav-trail-current-page"), "Edit");
@@ -219,7 +219,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     }
 
     // Attempt to log in without accepting site-wide terms.  Should show terms of use again.
-//    @Test
+    @Test
     public void testFailedLoginNoAccept()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
@@ -231,15 +231,13 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         {
             throw new RuntimeException("Unable to ensure credentials", e);
         }
-        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "agree ");
+        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "check the box to approve ");
     }
 
     // Attempt to log in with bad password.  Should show the terms of use again.
-//    @Test
+    @Test
     public void testFailedLoginBadPassword()
     {
-        // TODO the expected behavior here is not entirely clear.  It could be that we always show the terms on a second page.
-        // This test will always fail now, though because of the creation of many sessions.
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
         try
         {

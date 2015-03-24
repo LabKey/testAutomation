@@ -13,7 +13,6 @@ import org.labkey.test.util.WikiHelper;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({InDevelopment.class})
 public class BaseTermsOfUseTest extends BaseWebDriverTest
 {
     protected static final String PUBLIC_NO_TERMS_PROJECT_NAME = "Public No Terms Project";
@@ -110,7 +109,8 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
             setFormElement(Locator.name("name"), TERMS_OF_USE_NAME);
             setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
             setFormElement(Locator.name("body"), body);
-            _wikiHelper.saveWikiPage();
+            _wikiHelper.saveWikiPage();;
+            acceptTermsOfUse(null, true);
         }
     }
 

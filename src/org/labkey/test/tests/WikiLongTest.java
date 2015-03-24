@@ -41,8 +41,6 @@ public class WikiLongTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
-    private static final String PROJECT3_NAME = "WikiLong Public Project";
-    private static final String PROJECT4_NAME = "WikiLong Fourth Project";
     private static final String WIKI_PAGE1_TITLE = "Page 1 Wiki Title";
     private static final String WIKI_PAGE1_NAME= "Page 1 Wiki Name";
     private static final String WIKI_PAGE2_NAME = "Page 2 Wiki Name";
@@ -354,7 +352,6 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("More HTML content",
                 WIKI_PAGE3_ALTTITLE);
 
-        termsOfUseTest();
 
         log("test copy wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
@@ -543,117 +540,6 @@ public class WikiLongTest extends BaseWebDriverTest
         clickButton("Delete");
     }
 
-    private void termsOfUseTest()
-    {
-        log("Create user for terms of use checks");
-        clickProject(PROJECT_NAME);
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.clickManageGroup(USERS_GROUP);
-        setFormElement("names", USER2);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
-
-        log("Test terms of use");
-        goToModule("Wiki");
-        _wikiHelper.createNewWikiPage("RADEOX");
-        setFormElement(Locator.name("name"), "_termsOfUse");
-        setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
-        setFormElement("body", "The first rule of fight club is do not talk about fight club.");
-        _wikiHelper.saveWikiPage();
-        pushLocation(); // For attempting to bypass Terms of Use (1 pop)
-
-        _containerHelper.createProject(PROJECT3_NAME, null); // Public project
-        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
-        goToModule("Wiki");
-        _wikiHelper.createNewWikiPage("RADEOX");
-        setFormElement(Locator.name("name"), "_termsOfUse");
-        setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
-        setFormElement("body", "The second rule of fight club is do not talk about fight club.");
-        _wikiHelper.saveWikiPage();
-        pushLocation(); // For attempting to bypass Terms of Use (2 pops)
-
-        _containerHelper.createProject(PROJECT4_NAME, null);
-        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
-        goToModule("Wiki");
-        _wikiHelper.createNewWikiPage("RADEOX");
-        setFormElement(Locator.name("name"), "_termsOfUse");
-        setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
-        setFormElement("body", "The third rule of fight club is do not talk about fight club.");
-        _wikiHelper.saveWikiPage();
-        pushLocation(); // For attempting to bypass Terms of Use (3 pops)
-        createSubfolder(PROJECT4_NAME, "subfolder", null);
-        pushLocation(); // For attempting to bypass Terms of Use (4 pops)
-
-        log("Terms don't come into play until you log out");
-        clickProject(PROJECT_NAME);
-        assertTextNotPresent("fight club");
-        signOut();
-
-        log("Access project with guest user");
-        clickProject(PROJECT3_NAME, false);
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-        goToHome();
-        clickProject(PROJECT3_NAME);
-        assertTextNotPresent("fight club");         
-
-        signIn();
-        log("Attempt to bypass terms with saved URLs");
-        popLocation();
-        assertTextPresent("fight club"); // PROJECT_NAME
-        popLocation();
-        assertTextPresent("fight club"); // PROJECT3_NAME
-        popLocation();
-        assertTextPresent("fight club"); // PROJECT4_NAME
-        popLocation();
-        assertTextPresent("fight club"); // PROJECT4_NAME/subfolder
-
-        goToHome();
-        clickProject(PROJECT_NAME, false);
-        assertTextPresent("fight club");
-        log("Submit without agreeing");
-        clickButton("Agree");
-
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-
-        clickProject(PROJECT4_NAME, false);
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-
-        log("Check terms with impersonated user");
-        clickProject(PROJECT_NAME, false);
-        impersonate(USER2);
-
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-        clickProject(PROJECT3_NAME, false);
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-        clickProject(PROJECT4_NAME, false);
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-
-        stopImpersonating();            
-        clickProject(PROJECT3_NAME, false);
-        assertTextPresent("fight club");
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        clickButton("Agree");
-
-        clickProject(PROJECT_NAME);
-        clickTab("Wiki");
-        clickAndWait(Locator.linkWithText("Edit"));
-        deleteWikiPage();
-        assertTextNotPresent(WIKI_TERMS_TITLE);
-    }
-
     //
     // Verify a wiki page can be indexed and unindexed via create, edit, and manage
     // functionality.
@@ -807,8 +693,6 @@ public class WikiLongTest extends BaseWebDriverTest
         deleteUsersIfPresent(USER1);
         deleteProject(PROJECT2_NAME, afterTest);
         deleteProject(PROJECT_NAME, afterTest);
-        deleteProject(PROJECT3_NAME, afterTest);
-        deleteProject(PROJECT4_NAME, afterTest);
     }
 
     @Override
