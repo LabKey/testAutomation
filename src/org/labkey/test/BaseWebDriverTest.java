@@ -2129,7 +2129,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void deleteSiteWideTermsOfUsePage()
     {
-        simpleSignIn();
         try
         {
             log("Removing site-wide terms of use page");
