@@ -355,7 +355,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         if (null == expected)
             assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
         else
-            assertTrue("Thumbnail wasn't persisted correctly", StringUtils.getLevenshteinDistance(expected, thumbnailData) < 2); // Might be slightly different
+            assertTrue("Thumbnail wasn't persisted correctly", expected.equals(thumbnailData) ||
+                    StringUtils.getLevenshteinDistance(expected.substring(0, 5000), thumbnailData.substring(0, 5000)) <= 1); // Might be slightly different
 
         THUMBNAIL_DATA = thumbnailData;
     }
