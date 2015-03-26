@@ -38,6 +38,20 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="dummyNlpPipeline"/>
+                    <property name="description" value="Dummy NLP invocation"/>
+                    <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
+                    <property name="protocolName" value="Dummy NLP invocation"/>
+                    <property name="protocolFactoryName" value="dummyNlpinvocation"/>
+                    <property name="initialInputExt" ref="nlpTsvFileType"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="dummyNlpEngineCommand"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
     </bean>
@@ -102,5 +116,51 @@
             </list>
         </property>
     </bean>
+
+
+    <bean id="dummyNlpEngineCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="dummyNlpEngine"/>
+        <property name="statusName" value="RUN NLP ENGINE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpTsvFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputPaths">
+            <map>
+                <entry key="output">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpJsonFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="mv"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="../../../uiTest.nlp.json"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="."/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="nlpTsvFileType" class="org.labkey.api.util.FileType">
+        <constructor-arg value=".nlp.tsv"/>
+    </bean>
+
+    <bean id="nlpJsonFileType" class="org.labkey.api.util.FileType">
+        <constructor-arg value=".nlp.json"/>
+    </bean>
+
 
 </beans>
