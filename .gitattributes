@@ -278,6 +278,7 @@ src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Locators.java -text
 src/org/labkey/test/ModulePropertyValue.java -text
 src/org/labkey/test/Runner.java -text
+src/org/labkey/test/SecondaryAuthenticationTest.java -text
 src/org/labkey/test/SortDirection.java -text
 src/org/labkey/test/SuiteBuilder.java -text
 src/org/labkey/test/TestConfig.java -text
