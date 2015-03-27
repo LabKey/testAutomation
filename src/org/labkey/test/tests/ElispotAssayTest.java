@@ -492,7 +492,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         selectOptionByText(Locator.name("plateReader"), "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
         DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
-        assertTextPresent("AID_0161456 W8.txt");
+        assertTextPresent("AID_0161456 W8");
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
@@ -564,7 +564,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
     public void testMeanAndMedian()
     {
-        clickAndWait(Locator.linkWithText("AID_TNTC.txt"));
+        clickAndWait(Locator.linkContainingText("AID_TNTC"));
 
 //        DataRegionTable table = new DataRegionTable("AntigenStats", this);
 //        assertEquals("TNTC", table.getDataAsText());
