@@ -52,6 +52,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -5121,7 +5122,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             executeScript("arguments[0].setAttribute('class', '');", el);
         }
 
-        el.sendKeys(file.getAbsolutePath());
+        el.sendKeys(FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath());
 
         if (!cssString.isEmpty())
         {
