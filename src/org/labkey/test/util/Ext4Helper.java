@@ -313,6 +313,15 @@ public class Ext4Helper extends AbstractHelper
         _test.executeScript(script, markerCls);
     }
 
+    public boolean isGridRowSelected(String cellText, int index) {
+        WebElement gridRow = Locators.getGridRow(cellText, index).findElement(_test.getDriver());
+        if (gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void selectGridItem(String columnVal, String markerCls)
     {
         WebElement gridRow = Locators.getGridRow(columnVal, markerCls).findElement(_test.getDriver());
