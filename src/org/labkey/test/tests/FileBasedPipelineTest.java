@@ -93,7 +93,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
             "sample-taskInfo.tsv", Collections.<String>emptySet(),
             "sample.xxx", Collections.<String>emptySet());
 
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
@@ -122,7 +122,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         outputFiles.put("sample.log", Collections.<String>emptySet());
         outputFiles.put("sample.xxx", Collections.<String>emptySet());
 
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
@@ -167,7 +167,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         outputFiles.put("sample.log", Collections.<String>emptySet());
         outputFiles.put("sample.tsv", Collections.<String>emptySet());
 
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
 
         // Create a target assay
         createAssay("General", "myassay");
@@ -193,7 +193,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
                 "protocolName", protocolName,
                 "protocolDescription", "");
 
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
         _containerHelper.disableModules("pipelinetest");
 
         goToModule("FileContent");
@@ -221,7 +221,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         outputFiles.put("relative-to-analysis/sample.xxx", Collections.<String>emptySet());
         outputFiles.put("/relative-to-root/sample.xxx", Collections.<String>emptySet());
 
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 

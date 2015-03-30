@@ -24,7 +24,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.support.ui.Select;
 
@@ -181,9 +180,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
         deleteLogFiles(".");
         deleteLogFiles("datasets");
-        deleteDir(new File(getPipelinePath(), "assaydata"));
-        deleteDir(new File(getPipelinePath(), "reports_temp"));
-        deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
+        TestFileUtils.deleteDir(new File(getPipelinePath(), "assaydata"));
+        TestFileUtils.deleteDir(new File(getPipelinePath(), "reports_temp"));
+        TestFileUtils.deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 
     private void deleteLogFiles(String directoryName)

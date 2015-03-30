@@ -80,7 +80,8 @@ public class RlabkeyTest extends BaseWebDriverTest
         clickButton("New Issue");
         setFormElement(Locator.name("title"), ISSUE_TITLE_0);
         clickButton("Save");
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
+        String[] tabsToAdd = new String[0];
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, tabsToAdd);
 
         clickFolder(FOLDER_NAME);
         portalHelper.addWebPart("Issues List");

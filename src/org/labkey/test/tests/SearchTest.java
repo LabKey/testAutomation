@@ -120,10 +120,10 @@ public class SearchTest extends StudyTest
     protected void doVerifySteps()
     {
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
-        renameFolder(getProjectName(), getFolderName(), FOLDER_C, true);
+        _containerHelper.renameFolder(getProjectName(), getFolderName(), FOLDER_C, true);
         FOLDER_NAME = FOLDER_C;
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
-        moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
+        _containerHelper.moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
         alterListsAndReSearch();
 
         verifySyntaxErrorMessages();

@@ -32,7 +32,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     public void createSubfolder(String parentPath, String child, String foldertype)
     {
         String[] ancestors = parentPath.split("/");
-        _test.createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
+        createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
     }
 
     @Override

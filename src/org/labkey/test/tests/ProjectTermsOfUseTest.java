@@ -6,7 +6,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.categories.InDevelopment;
 
 @Category({DailyB.class})
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
@@ -51,7 +50,7 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         pushLocation();
 
         goToHome();
-        createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", null);
+        _containerHelper.createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", (String[]) null);
         pushLocation(); // For attempting to bypass Terms of Use
 
         log("Terms don't come into play until you log out");

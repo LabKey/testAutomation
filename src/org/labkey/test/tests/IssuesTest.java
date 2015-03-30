@@ -508,7 +508,7 @@ public class IssuesTest extends BaseWebDriverTest
                 "NotifyList", "Customer Name", "Contract Number"};
         Set<String> expectedErrors = new HashSet<>();
 
-        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolder);
 
         goToModule("Issues");
         clickButton("Admin");
@@ -654,7 +654,7 @@ public class IssuesTest extends BaseWebDriverTest
         // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[0], "priority", "2", "comment", "a bright flash of light"));
 
-        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolder);
         (new PortalHelper(this)).addWebPart("Issues List");
 
 
@@ -716,7 +716,7 @@ public class IssuesTest extends BaseWebDriverTest
         final String displayName = getDisplayName();
         final String path = String.format("/%s/%s", getProjectName(), subFolder);
 
-        _containerHelper.createSubfolder(getProjectName(), subFolder, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolder);
 
         goToProjectHome();
         goToModule("Issues");
@@ -937,10 +937,10 @@ public class IssuesTest extends BaseWebDriverTest
         final String subFolderC = "Folder_C"; //folder that will not have an option to inherit from Folder_B, since Folder_B inherits from Folder_A
         final String pathToC = String.format("/%s/%s", getProjectName(), subFolderC);
 
-        _containerHelper.createSubfolder(getProjectName(), subFolderA, null);
-        _containerHelper.createSubfolder(getProjectName(), subFolderA1, null); // Folder of related issues list
-        _containerHelper.createSubfolder(getProjectName(), subFolderB, null);
-        _containerHelper.createSubfolder(getProjectName(), subFolderC, null);
+        _containerHelper.createSubfolder(getProjectName(), subFolderA);
+        _containerHelper.createSubfolder(getProjectName(), subFolderA1); // Folder of related issues list
+        _containerHelper.createSubfolder(getProjectName(), subFolderB);
+        _containerHelper.createSubfolder(getProjectName(), subFolderC);
 
         /** Start: go to Folder_A, and set admin settings**/
         goToProjectHome(getProjectName());

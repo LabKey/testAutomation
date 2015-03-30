@@ -185,7 +185,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<>();
-    private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
     protected static Boolean _anyTestCaseFailed = false;
     protected boolean _testTimeout = false;
@@ -2192,7 +2191,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             // The following checks verify that the test deleted all projects and folders that it created.
             hoverFolderBar();
-            for (WebTestHelper.FolderIdentifier folder : _createdFolders)
+            for (WebTestHelper.FolderIdentifier folder : _containerHelper.getCreatedFolders())
                 assertElementNotPresent(Locator.linkWithText(folder.getFolderName()));
 
             hoverProjectBar();
@@ -2354,7 +2353,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             checked.add(projectName);
         }
 
-        for (WebTestHelper.FolderIdentifier folderId : _createdFolders)
+        for (WebTestHelper.FolderIdentifier folderId : _containerHelper.getCreatedFolders())
         {
             String project = folderId.getProjectName();
             String folder = folderId.getFolderName();
@@ -2885,229 +2884,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
-    public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToSkip)
-    {
-        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, null, false);
-    }
-
-
-    public void createSubfolder(String project, String child, String[] tabsToAdd)
-    {
-        // create a child of the top-level project folder:
-        createSubfolder(project, project, child, "None", tabsToAdd);
-    }
-
-
-    public void createSubfolder(String project, String child, String folderType, String[] tabsToAdd)
-    {
-        // create a child of the top-level project folder:
-        createSubfolder(project, project, child, folderType, tabsToAdd);
-    }
-
-
+    /**
+     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#createSubfolder(String, String, String, String, String, String[], String[], boolean)}
+     */
+    @Deprecated
     public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
     {
-        createSubfolder(project, parent, child, folderType, tabsToAdd, false);
+        _containerHelper.createSubfolder(project, parent, child, folderType, tabsToAdd);
     }
 
-    private  void startCreateFolder(String project, String parent, String child)
-    {
-        clickProject(project);
-        if (!parent.equals(project))
-        {
-            clickFolder(parent);
-        }
-        hoverFolderBar();
-        if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
-            throw new IllegalArgumentException("Folder: " + child + " already exists in project: " + project);
-        log("Creating subfolder " + child + " under " + parent);
-        clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
-        waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("name"), child);
-    }
-
+    /**
+     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#createSubfolder(String, String, String, String, String[], boolean)}
+     */
+    @Deprecated
     public void createSubfolder(String project, String parent, String child, @Nullable String folderType, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
-        createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
-    }
-
-    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
-    {
-        createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions);
-    }
-    /**
-     *
-     * @param project project in which to create new folder
-     * @param parent immediate parent of the new folder (project, if it's a top level subfolder)
-     * @param child name of folder to create
-     * @param folderType type of folder (null for custom)
-     * @param templateFolder if folderType = "create from Template Folder", this is the template folder used.  Otherwise, ignored
-     * @param tabsToAdd module tabs to add iff foldertype=null,  or the copy related checkboxes iff foldertype=create from template
-     * @param inheritPermissions should folder inherit permissions from parent?
-     */
-    @LogMethod
-    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
-    {
-        startCreateFolder(project, parent, child);
-        if (null != folderType && !folderType.equals("None"))
-        {
-            click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
-            if(folderType.equals("Create From Template Folder"))
-            {
-                log("create from template");
-                click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
-                _ext4Helper.waitForMaskToDisappear();
-                _ext4Helper.selectComboBoxItem(Locator.xpath("//div").withClass("labkey-wizard-header").withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
-                _ext4Helper.checkCheckbox("Include Subfolders");
-                if (templatePartsToUncheck != null)
-                {
-                    for(String part : templatePartsToUncheck)
-                    {
-                        click(Locator.xpath("//td[label[text()='" +  part + "']]/input"));
-                    }
-                }
-            }
-        }
-        else {
-            click(Locator.xpath("//td[./label[text()='Custom']]/input[@type='button' and contains(@class, 'radio')]"));
-
-
-            if (tabsToAdd != null)
-            {
-                for (String tabname : tabsToAdd)
-                    waitAndClick(Locator.xpath("//td[./label[text()='"+tabname+"']]/input[@type='button' and contains(@class, 'checkbox')]"));
-            }
-        }
-
-        clickButton("Next", defaultWaitForPage);
-        _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
-
-        //second page of the wizard
-        waitForElement(Locator.css(".labkey-nav-page-header").withText("Users / Permissions"));
-        if (!inheritPermissions)
-        {
-            waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
-        }
-
-        clickButton("Finish", defaultWaitForPage);
-        waitForElement(Locator.id("folderBar").withText(project));
-
-        //unless we need addtional tabs, we end here.
-        if (null == tabsToAdd || tabsToAdd.length == 0)
-            return;
-
-
-        if (null != folderType && !folderType.equals("None")) // Added in the wizard for custom folders
-        {
-            goToFolderManagement();
-            clickAndWait(Locator.linkWithText("Folder Type"));
-
-            for (String tabname : tabsToAdd)
-                checkCheckbox(Locator.checkboxByTitle(tabname));
-
-            submit();
-            if ("None".equals(folderType))
-            {
-                for (String tabname : tabsToAdd)
-                    assertElementPresent(Locator.folderTab(tabname));
-            }
-
-            // verify that there's a link to our new folder:
-            assertElementPresent(Locator.linkWithText(child));
-        }
-    }
-
-    protected void deleteDir(File dir)
-    {
-        log("Deleting from filesystem: " + dir.toString());
-        if (!dir.exists())
-            return;
-
-        try
-        {
-            FileUtils.deleteDirectory(dir);
-            log("Deletion successful.");
-        }
-        catch (IOException e)
-        {
-            log("WARNING: Exception deleting directory -- " + e.getMessage());
-        }
-    }
-
-    @LogMethod
-    public void deleteFolder(String project, @LoggedParam String folderName)
-    {
-        log("Deleting folder " + folderName + " under project " + project);
-        clickProject(project);
-        clickFolder(folderName);
-        ensureAdminMode();
-        goToFolderManagement();
-        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
-        clickButton("Delete");
-        // confirm delete subfolders if present
-        if(isTextPresent("This folder has subfolders."))
-            clickButton("Delete All Folders");
-        // confirm delete:
-        clickButton("Delete");
-        // verify that we're not on an error page with a check for a project link:
-        assertElementPresent(Locator.currentProject().withText(project));
-        hoverFolderBar();
-        assertElementNotPresent(Locator.linkWithText(folderName));
-    }
-
-    @LogMethod
-    public void renameFolder(String project, @LoggedParam String folderName, @LoggedParam String newFolderName, boolean createAlias)
-    {
-        log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        clickProject(project);
-        clickFolder(folderName);
-        ensureAdminMode();
-        goToFolderManagement();
-        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName).notHidden());
-        clickButton("Rename");
-        setFormElement(Locator.name("name"), newFolderName);
-        if (createAlias)
-            checkCheckbox(Locator.name("addAlias"));
-        else
-            uncheckCheckbox(Locator.name("addAlias"));
-        // confirm rename:
-        clickButton("Rename");
-        _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
-        _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        assertElementPresent(Locator.currentProject().withText(project));
-        hoverFolderBar();
-        waitForElement(Locator.linkWithText(newFolderName));
-        assertElementNotPresent(Locator.linkWithText(folderName));
-    }
-
-    @LogMethod
-    public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
-    {
-        log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        clickProject(projectName);
-        clickFolder(folderName);
-        ensureAdminMode();
-        goToFolderManagement();
-        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
-        clickButton("Move");
-        if (createAlias)
-            checkCheckbox(Locator.name("addAlias"));
-        else
-            uncheckCheckbox(Locator.name("addAlias"));
-        // Select Target
-        waitForElement(Locator.permissionsTreeNode(newParent), 10000);
-        sleep(1000); // TODO: what is the right way to wait for the tree expanding animation to complete?
-        selectFolderTreeItem(newParent);
-        // move:
-        clickButton("Confirm Move");
-
-        // verify that we're not on an error page with a check for folder link:
-        assertElementPresent(Locator.currentProject().withText(projectName));
-        hoverFolderBar();
-        waitForElement(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
-        String newProject = getText(Locator.currentProject());
-        _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
-        _createdFolders.add(new WebTestHelper.FolderIdentifier(newProject, folderName));
+        _containerHelper.createSubfolder(project, parent, child, folderType, tabsToAdd, inheritPermissions);
     }
 
     public void hoverProjectBar()
@@ -3155,22 +2947,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void waitForFolderNavigationReady()
     {
         waitForHoverNavigationReady();
-        waitFor(new Checker(){
+        waitFor(new Checker()
+        {
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
+                return (Boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
             }
         }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForHoverNavigationReady()
     {
-        waitFor(new Checker(){
+        waitFor(new Checker()
+        {
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (window.HoverNavigation) return true; else return false;");
+                return (Boolean) executeScript("if (window.HoverNavigation) return true; else return false;");
             }
         }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
@@ -3192,13 +2986,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * Delete specified project during test
-     * @param project Project display name
-     * @param failIfFail if false, silently ignore any failures (if the project doesn't exist, for example)
+     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#deleteProject(String, boolean)}
      */
+    @Deprecated
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(project, failIfFail, 120000); // Wait 2 minutes for project deletion
+        _containerHelper.deleteProject(project, failIfFail);
     }
 
     @LogMethod (quiet = true)

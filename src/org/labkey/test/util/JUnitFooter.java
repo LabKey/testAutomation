@@ -44,7 +44,9 @@ public class JUnitFooter extends BaseWebDriverTest
         PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
         pipelineToolsHelper.resetPipelineToolsDirectory();
 
-        try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
+        try{
+            _containerHelper.deleteFolder("Shared", "_junit");
+        }catch(Throwable e){/*ignore*/}
 
         waitForSystemMaintenanceCompletion();
     }

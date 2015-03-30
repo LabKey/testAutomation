@@ -89,7 +89,7 @@ public class SurveyTest extends BaseWebDriverTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupSubfolder()
     {
-        _containerHelper.createSubfolder(getProjectName(), folderName, null);
+        _containerHelper.createSubfolder(getProjectName(), folderName);
 
         log("Create survey disign at the subfolder level");
         _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));

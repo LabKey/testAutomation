@@ -157,7 +157,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init.enableEmailRecorder();
 
-        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
 
         init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 

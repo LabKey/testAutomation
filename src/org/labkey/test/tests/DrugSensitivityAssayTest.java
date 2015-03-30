@@ -69,7 +69,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         //setup a pipeline for it
         setupPipeline(getProjectName());
 
-        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1, null);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1);
         portalHelper.addWebPart("Study Overview");
         clickButton("Create Study");
         click(Locator.radioButtonById("dateTimepointType"));

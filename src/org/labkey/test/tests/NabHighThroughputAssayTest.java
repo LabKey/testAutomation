@@ -85,7 +85,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         clickButton("Save & Close");
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
-        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB, null);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
     }
 

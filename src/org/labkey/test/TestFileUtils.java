@@ -15,10 +15,12 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.util.FileUtil;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -171,5 +173,22 @@ public abstract class TestFileUtils
     {
         File buildDir = new File(getLabKeyRoot(), "build");
         return new File(buildDir, "testTemp");
+    }
+
+    public static void deleteDir(File dir)
+    {
+        TestLogger.log("Deleting from filesystem: " + dir.toString());
+        if (!dir.exists())
+            return;
+
+        try
+        {
+            FileUtils.deleteDirectory(dir);
+            TestLogger.log("Deletion successful.");
+        }
+        catch (IOException e)
+        {
+            TestLogger.log("WARNING: Exception deleting directory -- " + e.getMessage());
+        }
     }
 }

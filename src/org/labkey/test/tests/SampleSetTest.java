@@ -82,7 +82,7 @@ public class SampleSetTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment"});
 
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Sample Sets");

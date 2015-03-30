@@ -331,7 +331,7 @@ public class TabTest extends SimpleModuleTest
         clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         assertTextPresent("Assay List", EXTRA_ASSAY_WEBPART);
 
-        deleteFolder(getProjectName(), COLLAB_FOLDER);
+        _containerHelper.deleteFolder(getProjectName(), COLLAB_FOLDER);
     }
 
     private void assertTreeButtonHidden(String buttonText, boolean hidden)

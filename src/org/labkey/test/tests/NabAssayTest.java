@@ -214,7 +214,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // create a study so we can test copy-to-study later:
         clickProject(TEST_ASSAY_PRJ_NAB);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Study Overview");
@@ -223,7 +223,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickButton("Create Study");
 
         //add the Assay List web part so we can create a new nab assay
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         portalHelper.addWebPart("Assay List");
@@ -506,7 +506,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     private void moveAssayFolderTest()
     {
         log("rename assay folder and verify source file still findable");
-        renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
+        _containerHelper.renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_NAB_RENAME));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkContainingText("run details"));

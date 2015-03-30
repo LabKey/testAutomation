@@ -60,8 +60,8 @@ public class TourTest extends BaseWebDriverTest
     {
         TourTest initTest = (TourTest)getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Collaboration");
-        initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER1, null);
-        initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER2, null);
+        initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER1);
+        initTest._containerHelper.createSubfolder(initTest.getProjectName(), SUBFOLDER2);
         initTest.setupBasicTour();
     }
 

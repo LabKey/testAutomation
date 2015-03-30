@@ -86,7 +86,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         PortalHelper portalHelper = new PortalHelper(this);
 
 
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
 
         clickProject(TEST_ASSAY_PRJ_NAB);
 

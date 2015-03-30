@@ -152,7 +152,7 @@ public class PipelineFolder
     {
         try
         {
-            _test.deleteFolder(_test.getProjectName(), _folderName);
+            _test._containerHelper.deleteFolder(_test.getProjectName(), _folderName);
         }
         catch (Throwable ignored)
         {}

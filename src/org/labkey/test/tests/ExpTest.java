@@ -71,7 +71,7 @@ public class ExpTest extends BaseWebDriverTest
     public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment", "Query"});
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Experiment", "Query"});
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Data Pipeline");
         portalHelper.addWebPart("Run Groups");

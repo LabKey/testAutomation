@@ -82,7 +82,6 @@ public class StudyDataspaceTest extends StudyBaseTest
     @Override
     protected void doCreateSteps()
     {
-        doCleanup(false);
         initializeFolder();
         setPipelineRoot(getPipelinePath());
     }

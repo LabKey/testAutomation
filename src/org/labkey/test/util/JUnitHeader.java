@@ -48,7 +48,9 @@ public class JUnitHeader extends BaseWebDriverTest
         PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
         pipelineToolsHelper.setToolsDirToTestDefault(); // Point to extra tools if present (currently only sequeneanalysis tools)
 
-        try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
+        try{
+            _containerHelper.deleteFolder("Shared", "_junit");
+        }catch(Throwable e){/*ignore*/}
 
         startSystemMaintenance();
 

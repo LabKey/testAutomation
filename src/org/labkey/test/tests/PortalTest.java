@@ -64,7 +64,7 @@ public class PortalTest extends BaseWebDriverTest
     {
         String folderName = "webpartTest";
 
-        createSubfolder(getProjectName(), folderName, new String[] {"Messages", "Wiki", "MS2"});
+        _containerHelper.createSubfolder(getProjectName(), folderName, new String[] {"Messages", "Wiki", "MS2"});
         portalHelper.addWebPart("Messages");
         assertElementPresent(Locator.linkWithText("Messages"));
         portalHelper.addWebPart("Wiki");

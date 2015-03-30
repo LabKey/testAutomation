@@ -298,7 +298,7 @@ public class FilterTest extends BaseWebDriverTest
         projectIssue2.put("priority", "2");
         issuesHelper.addIssue(projectIssue2);
 
-        _containerHelper.createSubfolder(getProjectName(), "subfolder", null);
+        _containerHelper.createSubfolder(getProjectName(), "subfolder");
         clickProject(getProjectName());
         clickFolder("subfolder");
 

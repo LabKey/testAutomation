@@ -155,7 +155,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     {
         log("** Create project: " + PROJECT_NAME);
         _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
     }
 
     void ensureExternalSchema(String containerPath)

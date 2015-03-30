@@ -459,11 +459,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void setupProject()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
+        _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
         _containerHelper.enableModule("linkedschematest");
 
-        _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
+        _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -506,7 +506,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.importListArchive(SOURCE_FOLDER, lists);
 
         //Create second folder that should be not visible to linked schemas and import lists again
-        _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER, null);
+        _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER);
         _listHelper.importListArchive(OTHER_FOLDER, lists);
     }
 

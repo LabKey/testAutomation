@@ -98,7 +98,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCreateFolderFromTemplate()
     {
-        createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[] {"Reports"});
+        _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[] {"Reports"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(3, true);
         verifyFolderExportAsExpected(folderFromTemplate);
@@ -132,7 +132,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyImportFromZip()
     {
-        _containerHelper.createSubfolder(getProjectName(), folderFromZip, null);
+        _containerHelper.createSubfolder(getProjectName(), folderFromZip);
         // create one of the subfolders, to be imported, to test merge on import of subfolders
         _containerHelper.createSubfolder(getProjectName() + "/" + folderFromZip, "Subfolder1", "Collaboration");
 

@@ -22,6 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
@@ -141,7 +142,7 @@ public class StudySimpleExportTest extends StudyBaseTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        deleteDir(new File(getPipelinePath() + "export"));
+        TestFileUtils.deleteDir(new File(getPipelinePath() + "export"));
     }
 
     @Test

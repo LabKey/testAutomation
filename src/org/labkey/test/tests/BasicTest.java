@@ -109,7 +109,7 @@ public class BasicTest extends BaseWebDriverTest
     public void testFolderAndRole()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "FileContent"});
         _permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
         _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
@@ -118,7 +118,7 @@ public class BasicTest extends BaseWebDriverTest
         clickButton("Save and Finish");
         log("Test folder aliasing");
         pushLocation();
-        renameFolder(PROJECT_NAME, FOLDER_NAME, FOLDER_RENAME, true);
+        _containerHelper.renameFolder(PROJECT_NAME, FOLDER_NAME, FOLDER_RENAME, true);
         popLocation();
         assertTextPresent(FOLDER_RENAME);
 

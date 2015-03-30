@@ -29,7 +29,6 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
@@ -44,7 +43,6 @@ import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
-import org.openqa.selenium.Keys;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1094,7 +1092,7 @@ public class SequenceTest extends BaseWebDriverTest
         {
             if (file.isDirectory() &&
                     (file.getName().startsWith("sequenceAnalysis_") || file.getName().equals("illuminaImport") || file.getName().equals(".labkey")))
-                deleteDir(file);
+                TestFileUtils.deleteDir(file);
             if (file.getName().startsWith("SequenceImport"))
                 file.delete();
         }

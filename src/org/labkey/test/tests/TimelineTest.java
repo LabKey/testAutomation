@@ -115,7 +115,7 @@ public class TimelineTest extends BaseWebDriverTest
     public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});
 
         clickFolder(FOLDER_NAME);
 

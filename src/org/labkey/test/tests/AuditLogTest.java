@@ -154,7 +154,7 @@ public class AuditLogTest extends BaseWebDriverTest
         log("testing CanSeeAuditLog permission");
         simpleSignIn();
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
-        _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER, null);
+        _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
         createList(AUDIT_TEST_PROJECT, "Parent List");
         createList(AUDIT_TEST_SUBFOLDER, "Child List");
 

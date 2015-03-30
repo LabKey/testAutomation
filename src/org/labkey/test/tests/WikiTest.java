@@ -131,7 +131,7 @@ public class WikiTest extends BaseWebDriverTest
         doTestInlineEditor();
 
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
-        createSubfolder(getProjectName(), getSubolderName(), new String[]{});
+        _containerHelper.createSubfolder(getProjectName(), getSubolderName(), new String[]{});
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
