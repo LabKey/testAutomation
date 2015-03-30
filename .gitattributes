@@ -141,7 +141,6 @@ modules/scriptpad/resources/web/input_data.tsv -text
 modules/scriptpad/scriptpad.iml -text
 modules/simpletest/module.properties -text
 modules/simpletest/resources/config/module.xml -text
-modules/simpletest/resources/etls/SProcBadMissingTransformRunIdParm.xml -text
 modules/simpletest/resources/etls/SProcBadModifiedSinceWithBadSource.xml -text
 modules/simpletest/resources/etls/SProcBadNonZeroReturnCode.xml -text
 modules/simpletest/resources/etls/SProcBadProcedureName.xml -text
@@ -158,9 +157,11 @@ modules/simpletest/resources/etls/SimpleETLCausesKeyConstraintViolation.xml -tex
 modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/SleepTask.xml -text
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
+modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
 modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
@@ -220,6 +221,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.20-13.30.sq
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-13.30-14.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.00-15.01.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1.00.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-12.10.sql -text
@@ -240,6 +242,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.20-13.30.sql
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-13.30-14.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.00-15.01.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
 modules/simpletest/resources/scripts/simpletest/ScriptValidationExports.js -text
@@ -305,6 +308,7 @@ src/org/labkey/test/categories/DailyA.java -text
 src/org/labkey/test/categories/DailyB.java -text
 src/org/labkey/test/categories/Data.java -text
 src/org/labkey/test/categories/Disabled.java -text
+src/org/labkey/test/categories/ETL.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
@@ -339,9 +343,8 @@ src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLBaseTest.java -text
 src/org/labkey/test/etl/ETLClientApiCommandTest.java -text
-src/org/labkey/test/etl/ETLErrorTest.java -text
-src/org/labkey/test/etl/ETLMultipleTransactionsTest.java -text
-src/org/labkey/test/etl/ETLStoredProcedureTest.java -text
+src/org/labkey/test/etl/ETLHelper.java -text
+src/org/labkey/test/etl/ETLRemoteSourceTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text

@@ -16,13 +16,16 @@
 package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.di.RunTransformResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-
-import java.util.Arrays;
+import org.labkey.test.categories.ETL;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -30,13 +33,17 @@ import static org.junit.Assert.assertTrue;
 /**
  * User: tgaluhn
  * Date: 7/25/2014
+ *
+ * Keeping this as a separate class b/c it only needs a subset of the main setup
  */
-@Category({DailyB.class, Data.class})
+@Category({DailyB.class, Data.class, ETL.class})
 public class ETLTaskRefTaskTest extends ETLBaseTest
 {
     private static final String PROJECT_NAME = "ETLTaskRefTaskProject";
     private static final String ETL = "{simpletest}/TaskRefTask";
     public static final String LOG_MESSAGE = "Log from test task";
+    private static final String TRANSFORM_SLEEP = "{simpletest}/SleepTask";
+    private static final String TRANSFORM_SLEEP_NAME = "SleepTask";
 
     @Nullable
     @Override
@@ -45,32 +52,67 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
         return PROJECT_NAME;
     }
 
-    @Test
-    public void testSteps() throws Exception
+    @BeforeClass
+    public static void setupProject()
     {
-        runInitialSetup();
-        verifyTask();
-        checkExpectedErrors(_expectedErrors);
+        ETLTaskRefTaskTest init = (ETLTaskRefTaskTest) getCurrentTest();
+
+        init.doSetup();
     }
 
-    private void verifyTask() throws Exception
+    @Override
+    protected void doSetup()
     {
-        RunTransformResponse rtr = runETL_API(ETL);
+        _etlHelper.doBasicSetup();
+    }
+
+    @Before
+    public void preTest() throws Exception
+    {
+        _etlHelper.resetCounts();
+    }
+
+    @After
+    public void postTest()
+    {
+        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
+    }
+
+    @Test
+    public void testTaskRefTask() throws Exception
+    {
+        RunTransformResponse rtr = _etlHelper.runETL_API(ETL);
         assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
-        assertInEtlLogFile(rtr.getJobId(), LOG_MESSAGE);
+        _etlHelper.assertInEtlLogFile(rtr.getJobId(), LOG_MESSAGE);
 
         // "setting1" in the xml has a value of "anything". TaskrefTestTask sets it to "test" to be persisted in TransformState
         assertTrue("Setting1 was not presisted with a value of 'test'.", _diHelper.getTransformState(ETL).contains("\"setting1\":\"test\""));
     }
 
-    private void runInitialSetup()
-    {
-        doCleanup(false);
-        log("running setup");
-        _containerHelper.createProject(getProjectName(), null);
-        _expectedErrors = 0;
-        _jobsComplete = 0;
+    // Include this here b/c it only needs basic setup
+//    @Test
+//    public void testBlockDoubleQueue() throws Exception
+//    {
+//        goToProjectHome();
+//        clickTab("DataIntegration");
+//        int jobCount = getJobCount();
+//        _etlHelper.runETL_API(TRANSFORM_SLEEP, false); // sleeps for 15 second during run
+//        sleep(50);
+//        _etlHelper.enableScheduledRun(TRANSFORM_SLEEP_NAME); // this one gets queued while the other is sleeping during its run
+//        sleep(3000); // runs on a 1 sec schedule, so should be trying to queue additional instances
+//        int newJobCount = getJobCount();
+//        assertEquals("Incorrect number of pipeline jobs- if actual > expected, we didn't block double queuing the job", jobCount + 2, newJobCount);
+//        RunTransformResponse rtr = _etlHelper.runETL_API(TRANSFORM_SLEEP, false);
+//        assertEquals("Not queuing job because ETL is already pending.", rtr.getStatus());
+//        refresh();
+//        assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_SLEEP, "RUNNING", true));
+//        _etlHelper.disableScheduledRun(TRANSFORM_SLEEP_NAME);
+//    }
 
-        _containerHelper.enableModules(Arrays.asList("DataIntegration", "simpletest"));
+    private int getJobCount() throws Exception
+    {
+        String query = "SELECT COUNT(*) as jobCount FROM pipeline.Job";
+        SelectRowsResponse response = _diHelper.executeQuery("/" + getProjectName(), "pipeline", query);
+        return Integer.parseInt(response.getRows().get(0).get("jobCount").toString());
     }
 }

@@ -15,91 +15,110 @@
  */
 package org.labkey.test.etl;
 
+import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.Nullable;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.di.RunTransformResponse;
+import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RemoteConnectionHelper;
+import org.labkey.test.categories.ETL;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class, Data.class})
+@Category({DailyB.class, Data.class, ETL.class})
 public class ETLTest extends ETLBaseTest
 {
-    //
-    // expected results for transform UI testing
-    //
-    protected static final String TRANSFORM_APPEND = "{simpletest}/append";
     private static final String TRANSFORM_APPEND_DESC = "Append Test";
-    protected static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
     private static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
     private static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
-    private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
-    private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
-    private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
-    private static final File TRANSFORM_REMOTE_STUDY = new File(TestFileUtils.getSampledataPath(), "dataintegration/ETLTestStudy.zip");
-    private static final File TransformXMLdest = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/simpletest/ETLs");
-    private static final File TransformXMLsrc = new File(TestFileUtils.getLabKeyRoot(), "build/deploy/modules/ETLtest/ETLs");
+    public static final String APPEND_WITH_ROWVERSION = "appendWithRowversion";
+    public static final String APPEND = "append";
 
+
+    @Nullable
     @Override
     protected String getProjectName()
     {
         return "ETLTestProject";
     }
 
-    protected void doCleanup() throws Exception
+    @BeforeClass
+    public static void setupProject()
     {
-        super.doCleanup(true);
+        ETLTest init = (ETLTest) getCurrentTest();
+
+        init.doSetup();
+    }
+
+    @Before
+    public void preTest() throws Exception
+    {
+        _etlHelper.resetCounts();
+        _etlHelper.cleanupTestTables();
+        goToProjectHome();
+    }
+
+    @After
+    public void postTest()
+    {
+        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
     }
 
     @Test
-    public void testSteps() throws Exception
+    public void testSimpleTransforms()
     {
-        runInitialSetup(false);
+        // TODO: There was a check here purporting to test container filter on transform summary, but it was a false negative. (it
+        // erroneously assumed results from a previous ETL test would still be in the database). Removed it, but would be good
+        // to get coverage... explicitly create another folder, run an ETL into it, then show that history doesn't show in the
+        // original container.
 
-        // verify we don't show any rows for this newly created
-        // project (test container filter)
-        verifyTransformSummary();
+         //append into empty target
+        _etlHelper.insertSourceRow("0", "Subject 0", null);
 
-        //append into empty target
-        insertSourceRow("0", "Subject 0", null);
-
-        runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
-        assertInTarget1("Subject 0");
+        _etlHelper.runETL(APPEND);
+        _etlHelper.addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
+        _etlHelper.assertInTarget1("Subject 0");
         //checkRun();
-        verifyTransformSummary();
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
+        _etlHelper.verifyTransformSummary();
+        _etlHelper.verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         //append into populated target
-        insertSourceRow("1", "Subject 1", null);
-        runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
-        checkRun();
-        assertInTarget1("Subject 0", "Subject 1");
+        _etlHelper.insertSourceRow("1", "Subject 1", null);
+        _etlHelper.runETL(APPEND);
+        _etlHelper.addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
+        _etlHelper.checkRun();
+        _etlHelper.assertInTarget1("Subject 0", "Subject 1");
 
         // verify transform summary should only have the most recent entry (i.e., doesn't change)
-        verifyTransformSummary();
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
+        _etlHelper.verifyTransformSummary();
+        _etlHelper.verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         // rerun append and verify that no work is done
-        runETL_NoWork(TRANSFORM_APPEND);
+        _etlHelper.runETL_NoWork(TRANSFORM_APPEND);
 
         // verify only two pipeline jobs existed since the "no work" one should not
         // have fired off a pipeline job
-        checkRun();
+        _etlHelper.checkRun();
 
         // verify transform summary should only have the most recent entry since
         // it should filter out "no work" rows
-        verifyTransformSummary();
+        _etlHelper.verifyTransformSummary();
         // summary should be where it was as well
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
+        _etlHelper.verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
 
 /*
@@ -114,41 +133,284 @@ UNDONE: need to fix the merge case
 
         remove insert below when merge case is fixed
 */
-        insertSourceRow("2", "Subject 2", null);
+        _etlHelper.insertSourceRow("2", "Subject 2", null);
         //truncate into populated target
-        deleteSourceRow("0", "1");
-        runETL("truncate");
+        _etlHelper.deleteSourceRow("0", "1");
+        _etlHelper.runETL("truncate");
         // add a row for the 'truncate' etl - this should show up in our summary view
-        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "1");
-        assertInTarget1("Subject 2");
-        assertNotInTarget1("Subject 0", "Subject 1");
-        verifyTransformSummary();
-        verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC);
+        _etlHelper.addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "1");
+        _etlHelper.assertInTarget1("Subject 2");
+        _etlHelper.assertNotInTarget1("Subject 0", "Subject 1");
+        _etlHelper.verifyTransformSummary();
+        _etlHelper.verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC);
 
         //identify by run into populated target
-        insertSourceRow("3", "Subject 3", "42");
-        insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
-        runETL("appendIdByRun");
-        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "1");
-        assertInTarget1("Subject 2", "Subject 3");
+        _etlHelper.insertSourceRow("3", "Subject 3", "42");
+        _etlHelper.insertTransferRow("42", _etlHelper.getDate(), _etlHelper.getDate(), "new transfer", "added by test automation", "pending");
+        _etlHelper.runETL("appendIdByRun");
+        _etlHelper.addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "1");
+        _etlHelper.assertInTarget1("Subject 2", "Subject 3");
 
-        // run tests over remote transform types
-        verifyRemoteTransform();
-        log("XML Dest: " + TransformXMLdest);
+        // verify the Last Status values and links to job logs
+        goToModule("DataIntegration");
+        assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_APPEND, "NO WORK", false));
+        click(_etlHelper.findLastStatusCell(TRANSFORM_BYRUNID, "COMPLETE", true));
+        assertTextPresent("transformrun = 42");
+    }
+
+    @Test
+    public void testDeleteRows() throws Exception
+    {
+
+        final String PREFIX = "Subject For Delete Test ";
+        _etlHelper.insertSourceRow("500", PREFIX + "1", null);
+        _etlHelper.insertSourceRow("501", PREFIX + "2", null);
+        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
+        _etlHelper.assertInTarget1(PREFIX + "1", PREFIX + "2");
+        // Add one of them to the deleted rows source query
+        _etlHelper.insertDeleteSourceRow("500", PREFIX + "1", null);
+        // Filter column for the append is a rowversion; for the delete is a datetime
+        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
+        _etlHelper.assertNotInTarget1(PREFIX + "1");
+        _etlHelper.assertInTarget1(PREFIX + "2");
+
+        // Now flip which column is which datatype. Filter column for append is a datetime, delete is a rowversion
+        _etlHelper.cleanupTestTables();
+        _etlHelper.insertSourceRow("502", PREFIX + "3", null);
+        _etlHelper.insertSourceRow("503", PREFIX + "4", null);
+        _etlHelper.runETL(APPEND);
+        _etlHelper.assertInTarget1(PREFIX + "3", PREFIX + "4");
+        // Add one of them to the deleted rows source query
+        _etlHelper.insertDeleteSourceRow("503", PREFIX + "4", null);
+        _etlHelper.runETL(APPEND);
+        _etlHelper.assertNotInTarget1(PREFIX + "4");
+        _etlHelper.assertInTarget1(PREFIX + "3");
+    }
+
+    @Test
+    public void testRowversionIncremental()
+    {
+        // Test using a rowversion column as incremental filter
+        final String PREFIX = "Subject By Rowversion ";
+        _etlHelper.insertSourceRow("400", PREFIX + "1", null);
+        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
+        _etlHelper.assertInTarget1(PREFIX + "1");
+        _etlHelper.insertSourceRow("401", PREFIX + "2", null);
+        // This will throw a constraint error if the filter doesn't work
+        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
+        _etlHelper.assertInTarget1(PREFIX + "2");
+    }
+
+    @Test
+    public void testMultipleTransactions() throws Exception // Migrated from ETLMultipleTransactionsTest
+    {
+        final String ETL = "{simpletest}/multipleTransactions";
+        String jobId = _etlHelper.runETL_API(ETL).getJobId();
+        _etlHelper.incrementExpectedErrorCount();
+
+        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
+        {
+            // See issue 22213; we don't support specifying a transaction size on Postgres when source
+            // and target are the same datasource. Make sure the error message happens.
+            // Note: it will actually work for small datasets like that used in this test, but larger datasets will give
+            // errors from pg and leave the target in a bad state.
+            _etlHelper.assertInEtlLogFile(jobId, "not supported on Postgres");
+        }
+        else
+        {
+            _etlHelper.assertInEtlLogFile(jobId, "Target transactions will be committed every 2 rows", "Could not convert 'uhoh' for field rowid");
+            goToProjectHome();
+            _etlHelper.assertInTarget2("xact1 1", "xact1 2");
+        }
+    }
+
+    @Test
+    public void testErrors() // Migrated from ETLErrorTest
+    {
+        final String TRANSFORM_KEYCONSTRAINT_ERROR = "{simpletest}/SimpleETLCausesKeyConstraintViolation";
+        final String TRANSFORM_QUERY_ERROR = "{simpletest}/SimpleETLqueryDoesNotExist";
+        final String TRANSFORM_NOCOL_ERROR = "{simpletest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
+        final String TRANSFORM_BADCAST = "{simpletest}/badCast";
+        final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
+
+        goToProjectHome();
+        clickTab("DataIntegration");
+        assertTextNotPresent("Should not have loaded invalid transform xml", "Error Missing Source");
+        _etlHelper.insertSourceRow("0", "Subject 0", null);
+
+        List<String> errors = new ArrayList<>();
+        errors.add("AK_etltarget");
+        errors.add("duplicate");
+        errors.add("ERROR: Error running executeCopy");
+        errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
+        _etlHelper.runETLandCheckErrors(TRANSFORM_KEYCONSTRAINT_ERROR, true, false, errors);
+        errors.clear();
+
+        errors.add("Could not find table: vehicle.etl_source_cheeseburger");
+        _etlHelper.runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
+
+        _etlHelper._runETL_NoNav(TRANSFORM_NOCOL_ERROR, false, true);
+        assertTextPresent("Column not found: etl_source.monkeys");
+        errors.clear();
+
+        errors.add("contains value not castable to a date");
+        _etlHelper.runETLandCheckErrors(TRANSFORM_BADCAST, false, true, errors);
+        errors.clear();
+
+        errors.add("Table not found:");
+        waitForElement(Locator.xpath(".//*[@id='bodypanel']"));
+        _etlHelper.runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
+        errors.clear();
+
+        clickTab("DataIntegration");
+        _etlHelper.enableScheduledRun("Error Bad Source Schema");
+        //schedule for job is 15 seconds
+        sleep(15000);
+        _etlHelper.disableScheduledRun("Error Bad Source Schema");
+        clickTab("Portal");
+        Assert.assertTrue(countText("java.lang.IllegalArgumentException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
+        //no way of knowing error count due to scheduled job running unkown number of times
+        pushLocation();
+        resetErrors();
+        popLocation();
+    }
+
+    @Test
+    public void testStoredProcTransforms() throws Exception // Migrated from ETLStoredProcedureTest
+    {
+        final String TRANSFORM_NORMAL_OPERATION_SP = "{simpletest}/SProcNormalOperation";
+        final String TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP = "{simpletest}/SProcBadNonZeroReturnCode";
+        final String TRANSFORM_BAD_PROCEDURE_NAME_SP = "{simpletest}/SProcBadProcedureName";
+        final String TRANSFORM_BAD_THROW_ERROR_SP = "{simpletest}/SProcBadThrowError";
+        final String TRANSFORM_PERSISTED_PARAMETER_SP = "{simpletest}/SProcPersistedParameter";
+        final String TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP = "{simpletest}/SProcOverridePersistedParameter";
+        final String TRANSFORM_RUN_FILTER_SP = "{simpletest}/SProcRunFilter";
+        final String TRANSFORM_MODIFIED_FILTER_NO_SOURCE_SP = "{simpletest}/SProcModifiedSinceNoSource";
+        final String TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP = "{simpletest}/SProcModifiedSinceWithSource";
+        final String TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP = "{simpletest}/SProcBadModifiedSinceWithBadSource";
+
+        /*
+        Test modes as mapped in the proc etlTest
+        1	normal operation
+        2	return code > 0
+        3	raise error
+        4	input/output parameter persistence
+        5	override of persisted input/output parameter
+        6	Run filter strategy, require @filterRunId
+        7   Modified since filter strategy, no source, require @filterStartTimeStamp & @filterEndTimeStamp,
+            populated from output of previous run
+        8	Modified since filter strategy with source, require @filterStartTimeStamp & @filterEndTimeStamp
+            populated from the filter strategy IncrementalStartTime & IncrementalEndTime
+        */
+
+        // All tests use the API
+        RunTransformResponse rtr;
+
+        // test mode 1, Normal operation
+        rtr = _etlHelper.runETL_API(TRANSFORM_NORMAL_OPERATION_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        _etlHelper.assertInEtlLogFile(rtr.getJobId(), "Test print statement logging", "Test returnMsg logging");
+
+        // test mode 2, return code > 0, should be an error
+        rtr = _etlHelper.runETL_API(TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP);
+        assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
+        _etlHelper.incrementExpectedErrorCount();
+        // That should have an error ERROR: Error: Sproc exited with return code 1
+
+        // try to run a non-existent proc
+        rtr = _etlHelper.runETL_API(TRANSFORM_BAD_PROCEDURE_NAME_SP);
+        assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
+        _etlHelper.incrementExpectedErrorCount(false);
+        // Error on missing procedure; over api that didn't create a job
+
+        // test mode 3, raise an error inside the sproc
+        rtr = _etlHelper.runETL_API(TRANSFORM_BAD_THROW_ERROR_SP);
+        assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
+        _etlHelper.incrementExpectedErrorCount(false);
+
+        // test mode 4, parameter persistance. Run twice. First time, the value of the in/out parameter supplied in the xml file
+        // is changed in the sproc, which should be persisted into the transformConfiguration.state variable map.
+        // The second time, the proc doublechecks the changed value was persisted and passed in; errors if not.
+        _etlHelper.runETL_API(TRANSFORM_PERSISTED_PARAMETER_SP);
+        rtr = _etlHelper.runETL_API(TRANSFORM_PERSISTED_PARAMETER_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        // verify no error
+
+        // test mode 5, override of persisted parameter. Run twice. First time, the value of the in/out parameter supplied in the xml file
+        // is changed in the sproc, which should be persisted into the transformConfiguration.state variable map.
+        // However, the parameter is set to override=true in the xml, so on the second run the persisted value should be ignored
+        // and original value used instead. The proc verifies this and errors if value has changed.
+        _etlHelper.runETL_API(TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP);
+        rtr = _etlHelper.runETL_API(TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        // verify no error
+
+        // test mode 6, RunFilterStrategy specified in the xml. Require filterRunId input parameter to be populated
+        _etlHelper.insertTransferRow("142", _etlHelper.getDate(), _etlHelper.getDate(), "new transfer", "added by test automation", "pending");
+        rtr = _etlHelper.runETL_API(TRANSFORM_RUN_FILTER_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        // run again, should be No Work. response status should be 'No Work'
+        rtr = _etlHelper.runETL_API(TRANSFORM_RUN_FILTER_SP);
+        assertEquals("No work", rtr.getStatus());
+        // insert new transfer and run again to test filterRunId was persisted properly for next run
+        _etlHelper.insertTransferRow("143", _etlHelper.getDate(), _etlHelper.getDate(), "new transfer", "added by test automation", "pending");
+        rtr = _etlHelper.runETL_API(TRANSFORM_RUN_FILTER_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+
+        // test mode 7, ModifiedSinceFilterStrategy specified in the xml. Require filterStart & End timestamp input parameters to be populated
+        rtr = _etlHelper.runETL_API(TRANSFORM_MODIFIED_FILTER_NO_SOURCE_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        // run again to test filterStartTimeStamp & filterEndTimeStamp was persisted properly for next run
+        rtr = _etlHelper.runETL_API(TRANSFORM_MODIFIED_FILTER_NO_SOURCE_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+
+        // Now test Modified where source is specified
+        _etlHelper.insertSourceRow("111", "Sproc Subject 1", "142");
+        rtr = _etlHelper.runETL_API(TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+        // run again, should be no work
+        rtr = _etlHelper.runETL_API(TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP);
+        assertEquals("No work", rtr.getStatus());
+        // insert another source row, should have work
+        _etlHelper.insertSourceRow("112", "Sproc Subject 2", "143");
+        rtr = _etlHelper.runETL_API(TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP);
+        assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
+
+        // Bad source name
+        try
+        {
+            _etlHelper.runETL_API(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP);
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Incorrect exception message on bad source: ", e.getMessage().startsWith("Could not find table"));
+            assertEquals("ERROR", _diHelper.getTransformStatusByTransformId(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP));
+        }
 
         //Stored proc result set ETL
-        runETL("SProcResultSet");
-        assertInTarget2("Subject 2", "Subject 3");
+        _etlHelper.runETL("SProcResultSet");
+        _etlHelper.assertInTarget2("Sproc Subject 1", "Sproc Subject 2");
+    }
 
+    @Test
+    public void testPipelineFileAnalysisTask() throws Exception
+    {
+        _etlHelper.insertSourceRow("2", "Subject 2", null);
+        _etlHelper.insertSourceRow("3", "Subject 3", null);
         //file ETL output and external pipeline test
         File dir = TestFileUtils.getTestTempDir();
+        FileUtils.deleteDirectory(dir);
+        //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
         setPipelineRoot(dir.getAbsolutePath());
-        runETL("targetFile");
+        _etlHelper.runETL("targetFile");
         File etlFile = new File(dir, "etlOut/report.testIn.tsv");
         String fileContents = TestFileUtils.getFileContents(etlFile);
         String[] rows = fileContents.split("[\\n\\r]+");
-        assertEquals("ETL output file did not contain header", "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified", rows[0]);
+        String expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
+                "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified"
+                : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified";
+        assertEquals("ETL output file did not contain header", expected, rows[0]);
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
         assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
         //file created by external pipeline
@@ -157,88 +419,5 @@ UNDONE: need to fix the merge case
         rows = fileContents.split("[\\n\\r]+");
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
         assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
-        // be sure to check for all expected errors here so that the test won't fail on exit
-        checkExpectedErrors(_expectedErrors);
-    }
-
-    protected void runInitialSetup(boolean remoteOnly)
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-        log("running setup");
-        _containerHelper.createProject(getProjectName(), null);
-        _expectedErrors = 0;
-        _jobsComplete = 0;
-
-        _containerHelper.enableModules(Arrays.asList("DataIntegration", "simpletest"));
-
-        if(!remoteOnly)
-            _containerHelper.enableModule("Study");
-
-        portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
-        portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);
-        portalHelper.addQueryWebPart("Target2", "vehicle", "etl_target2", null);
-
-        if (remoteOnly)
-            return;
-
-        portalHelper.addQueryWebPart("Transfers", "vehicle", "transfer", null);
-
-        // UNDONE: remove when we finalize casing of table names versus views across pg and mssql
-        String transformRun =  (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ?
-                "transformrun" : "TransformRun";
-
-        portalHelper.addQueryWebPart("TransformRun", "dataintegration", transformRun, null);
-        portalHelper.addQueryWebPart("TransformHistory", "dataintegration", "TransformHistory", null);
-        portalHelper.addQueryWebPart("TransformSummary", "dataintegration", "TransformSummary", null);
-        portalHelper.addWebPart("Data Transform Jobs");
-        // make sure the webpart has the 'scheduler' button on it
-        clickButton("Scheduler");
-        waitForText("View Processed Jobs");
-        goBack();
-
-        //
-        // import our study (used by the remote transform tests).  This study is a continuous time point
-        // study to use the same type of ETL source and target that one of our customer uses.
-        //
-        clickTab("Study");
-        importStudyFromZip(TRANSFORM_REMOTE_STUDY, true /*ignore query validation*/);
-        // bump our pipeline job count since we used the pipeline to import the study
-        _jobsComplete++;
-        //copy etl files from simpleTest module
-        copyETLfiles(TransformXMLsrc, TransformXMLdest);
-    }
-
-    //
-    // test a "remote" ETL that transfers data into datasets (instead of just base tables)
-    //
-    protected void verifyRemoteTransform()
-    {
-        //
-        // prepare our "remote" source dataset
-        //
-        gotoDataset("ETL Source");
-        for (int i = 1; i < 4; i++)
-        {
-            insertDatasetRow(String.valueOf(i), "Subject " + String.valueOf(i));
-        }
-        clickTab("Portal");
-
-        //
-        // create our remote connection
-        //
-        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
-        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
-
-        //
-        // run the remote transform again.  At the end of this we should have one summary entry for the
-        // most recently run transform and then two history entries (1 error, 1 complete)
-        //
-        runETL(TRANSFORM_REMOTE);
-        // note we do expect an error in the pipeline log from the above failure
-        checkRun(true /*expect error*/);
-        addTransformResult(TRANSFORM_REMOTE, "1", "COMPLETE", "3");
-        assertInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
-        verifyTransformSummary();
-        verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }
 }

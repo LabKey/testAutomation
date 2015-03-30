@@ -16,6 +16,7 @@
 package org.labkey.test.etl;
 
 import org.json.simple.JSONObject;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
@@ -30,27 +31,48 @@ import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
+import org.labkey.test.categories.ETL;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-@Category({DailyB.class, Data.class})
-public class ETLClientApiCommandTest extends ETLTest
+/**
+ * Keep these test cases separate from ETLTest as they only need a subset of the setup
+ */
+@Category({DailyB.class, Data.class, ETL.class})
+public class ETLClientApiCommandTest extends ETLBaseTest
 {
     private static final String TRANSFORM_NOTFOUND = "{simpletest}/notfound";
 
     @Override
     protected String getProjectName()
     {
-        return "RemoteETLCommandTestProject";
+        return "ETLClientApiCommandTestProject";
+    }
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        ETLClientApiCommandTest init = (ETLClientApiCommandTest) getCurrentTest();
+
+        init.doSetup();
+    }
+
+    @Override
+    protected void doSetup()
+    {
+        _etlHelper.doExtendedSetup(false);
     }
 
     @Test
     public void testSteps()
     {
-        super.runInitialSetup(true);
         verifyClientApi();
     }
 
@@ -70,9 +92,9 @@ public class ETLClientApiCommandTest extends ETLTest
 
         // verify the accessors now (which look at the returned JSON data anyway)
         assertTrue("response.enabled should equal command.enabled",
-                command.getEnabled() == null ? true : response.getEnabled() == command.getEnabled());
+                command.getEnabled() == null || response.getEnabled() == command.getEnabled());
         assertTrue("response.verbose should equal command.verbose",
-                command.getVerboseLogging() == null ? true : response.getVerboseLogging() == command.getVerboseLogging());
+                command.getVerboseLogging() == null || response.getVerboseLogging() == command.getVerboseLogging());
         assertTrue("response.description should equal truncation description",
                 response.getDescriptionId().equalsIgnoreCase(command.getTransformId()));
     }
@@ -119,13 +141,14 @@ public class ETLClientApiCommandTest extends ETLTest
         // expect error with missing transform
         invokeCommand(new RunTransformCommand(TRANSFORM_NOTFOUND), cn, TRANSFORM_NOTFOUND);
 
-        insertSourceRow("0", "Subject 0", null);
+        goToProjectHome();
+        _etlHelper.insertSourceRow("0", "Subject 0", null);
         // this should succeed
         RunTransformResponse rtr = (RunTransformResponse) invokeCommand(new RunTransformCommand(TRANSFORM_APPEND), cn);
-        _jobsComplete++;
+        _etlHelper.incrementJobsCompleteCount();
         verifyRunTransformResponse(rtr, false /*no work*/);
         // verify transform happened
-        assertInTarget1("Subject 0");
+        _etlHelper.assertInTarget1("Subject 0");
 
         // run again - but the checker should return no work
         rtr = (RunTransformResponse) invokeCommand(new RunTransformCommand(TRANSFORM_APPEND), cn);
@@ -141,10 +164,10 @@ public class ETLClientApiCommandTest extends ETLTest
         // the transform was run.  The pipeline url will take you to the error status, however.
         rtr = (RunTransformResponse) invokeCommand(new RunTransformCommand(TRANSFORM_APPEND), cn);
         verifyRunTransformResponse(rtr, false);
-        _jobsComplete++;
+        _etlHelper.incrementJobsCompleteCount();
         // verify we had two runs complete (one success, one error)
-        checkRun(true);
-        incrementExpectedErrorCount();
+        _etlHelper.checkRun(true);
+        _etlHelper.incrementExpectedErrorCount();
 
         // not found
         invokeCommand(new UpdateTransformConfigurationCommand(TRANSFORM_NOTFOUND), cn, TRANSFORM_NOTFOUND);
@@ -163,7 +186,7 @@ public class ETLClientApiCommandTest extends ETLTest
         verifyUpdateTransformConfigurationResponse(utcr, utcc);
 
         // be sure to check for all expected errors here so that the test won't fail on exit
-        checkExpectedErrors(_expectedErrors);
+        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
     }
 
     private CommandResponse invokeCommand(BaseTransformCommand cmd, Connection cn)

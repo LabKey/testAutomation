@@ -259,6 +259,7 @@
       <column columnName="id"/>
       <column columnName="name"/>
       <column columnName="transformrun"/>
+      <column columnName="rowversion"/>
     </columns>
   </table>
 
@@ -305,4 +306,16 @@
         </columns>
     </table>
 
+    <table tableName="etl_delete" tableDbType="TABLE">
+        <columns>
+            <column columnName="RowId"/>
+            <column columnName="container"/>
+            <column columnName="created"/>
+            <column columnName="modified"/>
+            <column columnName="id"/>
+            <column columnName="name"/>
+            <column columnName="TransformRun"/>
+            <column columnName="rowversion"/>
+        </columns>
+    </table>
 </tables>
