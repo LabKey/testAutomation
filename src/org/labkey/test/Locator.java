@@ -434,9 +434,9 @@ public abstract class Locator
         return xpath("(//a/img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
     }
 
-    public static LinkLocator linkWithText(String text)
+    public static XPathLocator linkWithText(String text)
     {
-        return new LinkLocator(text);
+        return tagWithText("a", text);
     }
 
     public static XPathLocator linkWithText(String text, Integer index)
