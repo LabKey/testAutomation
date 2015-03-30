@@ -74,7 +74,10 @@ public class AssayImporter
         }
 
         if (options.isResetDefaults())
+        {
             test.clickButton("Reset Default Values");
+            test._ext4Helper.waitForMaskToDisappear(); // Wait for sample list combo boxes to load
+        }
 
         test.clickButton("Next");
 
