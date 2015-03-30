@@ -7,7 +7,7 @@
             <taskref ref="org.labkey.di.steps.TestTaskRefTask">
                 <settings>
                     <setting name="setting1" value="anything"/>
-                    <setting name="sleep" value="true"/>
+                    <setting name="sleep" value="10"/>
                 </settings>
             </taskref>
         </transform>
