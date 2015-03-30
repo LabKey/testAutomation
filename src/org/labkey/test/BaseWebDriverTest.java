@@ -2030,6 +2030,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (_testTimeout)
                 getArtifactCollector().dumpThreads(this);
         }
+        catch (UnreachableBrowserException abort)
+        {
+            doTearDown();
+            return;
+        }
         catch (Exception e)
         {
             System.err.println("Unable to dump failure information");
