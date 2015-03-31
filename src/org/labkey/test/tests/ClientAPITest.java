@@ -158,14 +158,14 @@ public class ClientAPITest extends BaseWebDriverTest
         init.enableEmailRecorder();
 
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
-
-        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
-
-        init.clickFolder(FOLDER_NAME);
-
-        init.createWiki();
-
-        init.createLists();
+//
+//        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+//
+//        init.clickFolder(FOLDER_NAME);
+//
+//        init.createWiki();
+//
+//        init.createLists();
 
         init.createUsers();
     }
@@ -788,10 +788,9 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTrue("No autocompletion entries returned" + errMsg, entries.size() > 0);
         boolean testPassed = false;
         String displayName = displayNameFromEmail(AUTOCOMPLETE_USER);
-        for (int i = 0 ; i < entries.size() ; i++)
+        for (JSONObject entry : (List<JSONObject>)entries)
         {
             // The order in the response isn't guaranteed. Loop to find one we know should be in the list.
-            JSONObject entry = (JSONObject)entries.get(0);
             String responseValue = (String)entry.get("value");
             if (StringUtils.startsWith(responseValue, displayName))
             {
