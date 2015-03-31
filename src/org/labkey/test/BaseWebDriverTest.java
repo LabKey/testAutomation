@@ -1624,7 +1624,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }, "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
     }
 
-    public void populateLastPageInfo()
+    private void populateLastPageInfo()
     {
         _lastPageTitle = getLastPageTitle();
         _lastPageURL = getLastPageURL();
@@ -1648,18 +1648,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return _lastPageText != null ? _lastPageText : getDriver().getPageSource();
     }
 
-    public boolean isPageEmpty()
-    {
-        //IE and Firefox have different notions of empty.
-        //IE returns html for all pages even empty text...
-        String text = getDriver().getPageSource();
-        if (null == text || text.trim().length() == 0)
-            return true;
-
-        text = getBodyText();
-        return null == text || text.trim().length() == 0;
-    }
-
     public URL getLastPageURL()
     {
         try
@@ -1670,6 +1658,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             return null;
         }
+    }
+
+    public boolean isPageEmpty()
+    {
+        //IE and Firefox have different notions of empty.
+        //IE returns html for all pages even empty text...
+        String text = getDriver().getPageSource();
+        if (null == text || text.trim().length() == 0)
+            return true;
+
+        text = getBodyText();
+        return null == text || text.trim().length() == 0;
     }
 
     /**
@@ -1973,111 +1973,109 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
-        {
-            _driver = null;
-            return;
-        }
-
-        if (error instanceof TestTimeoutException)
-        {
-            _testTimeout = true;
-        }
-
         try
         {
-            populateLastPageInfo();
-
-            if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
+            if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
             {
-                try
-                {
-                    // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
-                    String lastPage = _lastPageURL.toString();
-                    URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
-                    log("Re-invoking last action with _debug parameter set: " + url.toString());
-                    url.getContent();
-                }
-                catch (IOException t)
-                {
-                    System.err.println("Unable to re-invoke last page");
-                    t.printStackTrace();
-                }
+                _driver = null;
+                return;
             }
-        }
-        catch (Exception e)
-        {
-            System.err.println("Unable to determine information about the last page");
-            e.printStackTrace();
-        }
 
-        try
-        {
-            getArtifactCollector().dumpPageSnapshot(testName, null);
-            if (isTestRunningOnTeamCity())
+            if (error instanceof TestTimeoutException)
             {
-                getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
-                getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"), new FileFilter()
+                _testTimeout = true;
+            }
+
+            try
+            {
+                populateLastPageInfo();
+
+                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
                 {
-                    @Override
-                    public boolean accept(File pathname)
+                    try
                     {
-                        return pathname.getName().endsWith(".log");
+                        // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
+                        String lastPage = _lastPageURL.toString();
+                        URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
+                        log("Re-invoking last action with _debug parameter set: " + url.toString());
+                        url.getContent();
                     }
-                });
-                getArtifactCollector().dumpPipelineFiles();
+                    catch (IOException t)
+                    {
+                        System.err.println("Unable to re-invoke last page");
+                        t.printStackTrace();
+                    }
+                }
             }
-            if (_testTimeout)
-                getArtifactCollector().dumpThreads(this);
-        }
-        catch (UnreachableBrowserException abort)
-        {
-            doTearDown();
-            return;
-        }
-        catch (Exception e)
-        {
-            System.err.println("Unable to dump failure information");
-            e.printStackTrace();
-        }
+            catch (Exception e)
+            {
+                System.err.println("Unable to determine information about the last page");
+                e.printStackTrace();
+            }
 
-        dismissAllAlerts();
-        checkJsErrors();
+            try
+            {
+                getArtifactCollector().dumpPageSnapshot(testName, null);
+                if (isTestRunningOnTeamCity())
+                {
+                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
+                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"), new FileFilter()
+                    {
+                        @Override
+                        public boolean accept(File pathname)
+                        {
+                            return pathname.getName().endsWith(".log");
+                        }
+                    });
+                    getArtifactCollector().dumpPipelineFiles();
+                }
+                if (_testTimeout)
+                    getArtifactCollector().dumpThreads(this);
+            }
+            catch (Exception e)
+            {
+                System.err.println("Unable to dump failure information");
+                e.printStackTrace();
+            }
 
-        try
-        {
-            // Get DB back in a good state after failed pipeline tools test.
-            PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-            pipelineToolsHelper.resetPipelineToolsDirectory();
-        }
-        catch (Exception e)
-        {
-            // Assure that this failure is noticed
-            // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
-            log("**************************ERROR*******************************");
-            log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-            log("** Server may be in a bad state.                            **");
-            log("** Set tools directory manually or bootstrap to fix.        **");
-            log("**************************ERROR*******************************");
-        }
+            dismissAllAlerts();
+            checkJsErrors();
 
-        try
-        {
-            deleteSiteWideTermsOfUsePage();
-        }
-        catch (Exception e)
-        {
-            log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
-        }
+            try
+            {
+                // Get DB back in a good state after failed pipeline tools test.
+                PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+                pipelineToolsHelper.resetPipelineToolsDirectory();
+            }
+            catch (Exception e)
+            {
+                // Assure that this failure is noticed
+                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
+                log("**************************ERROR*******************************");
+                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+                log("** Server may be in a bad state.                            **");
+                log("** Set tools directory manually or bootstrap to fix.        **");
+                log("**************************ERROR*******************************");
+            }
 
-        try
-        {
-            resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
-        }
-        catch (Exception e)
-        {
-            log("Failed to reset DB login config after test failure");
-            getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
+            try
+            {
+                deleteSiteWideTermsOfUsePage();
+            }
+            catch (Exception e)
+            {
+                log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
+            }
+
+            try
+            {
+                resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
+            }
+            catch (Exception e)
+            {
+                log("Failed to reset DB login config after test failure");
+                getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
+            }
         }
         finally
         {
