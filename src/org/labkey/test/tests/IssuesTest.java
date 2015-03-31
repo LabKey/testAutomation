@@ -40,7 +40,6 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -263,7 +262,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
 
         // find issueId - parse the text from first space to :
-        String issueId = getLastPageIssueId();
+        String issueId = getIssueId();
 
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + issueTitle,
@@ -689,10 +688,10 @@ public class IssuesTest extends BaseWebDriverTest
     public void duplicatesTest()
     {
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This Is some Issue -- let's say A"));
-        String issueIdA = getLastPageIssueId();
+        String issueIdA = getIssueId();
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This is another issue -- let's say B"));
-        String issueIdB = getLastPageIssueId();
+        String issueIdB = getIssueId();
 
         clickAndWait(Locator.linkWithText("Resolve"));
         selectOptionByText(Locator.id("resolution"), "Duplicate");
@@ -775,11 +774,11 @@ public class IssuesTest extends BaseWebDriverTest
 
         String issueTitleA = "Multi-Issue Move A";
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
-        String issueIdA = getLastPageIssueId();
+        String issueIdA = getIssueId();
 
         String issueTitleB = "Multi-Issue Move B";
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleB));
-        String issueIdB = getLastPageIssueId();
+        String issueIdB = getIssueId();
 
         goToModule("Issues");
 
@@ -803,13 +802,13 @@ public class IssuesTest extends BaseWebDriverTest
         Locator relatedLocator = Locator.name("related");
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "A is for Apple"));
-        String issueIdA = getLastPageIssueId();
+        String issueIdA = getIssueId();
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "B is for Baking"));
-        String issueIdB = getLastPageIssueId();
+        String issueIdB = getIssueId();
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "C is for Cat"));
-        String issueIdC = getLastPageIssueId();
+        String issueIdC = getIssueId();
 
         // related C to A
         updateIssue();
@@ -1174,10 +1173,9 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     // NOTE: returning string here to avoid extra casting
-    public String getLastPageIssueId()
+    public String getIssueId()
     {
-        String title = getLastPageTitle();
+        String title = getDriver().getTitle();
         return title.substring(title.indexOf(' '), title.indexOf(':')).trim();
     }
-
 }
