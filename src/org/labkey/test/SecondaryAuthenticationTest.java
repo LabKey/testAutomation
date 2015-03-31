@@ -11,7 +11,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.Row;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PasswordUtil;
 import org.testng.Assert;
 
@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-@Category({InDevelopment.class})
+@Category({DailyA.class})
 public class SecondaryAuthenticationTest extends BaseWebDriverTest
 {
 
