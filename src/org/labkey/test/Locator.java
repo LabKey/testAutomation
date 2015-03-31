@@ -436,12 +436,12 @@ public abstract class Locator
 
     public static XPathLocator linkWithText(String text)
     {
-        return tagWithText("a", text);
+        return new LinkLocator(text);
     }
 
     public static XPathLocator linkWithText(String text, Integer index)
     {
-        return xpath("//a").withText(text).index(index);
+        return tagWithText("a", text).index(index);
     }
 
     public static XPathLocator linkContainingText(String text)
@@ -1114,10 +1114,10 @@ public abstract class Locator
     {
         private String _linkText;
 
-        public LinkLocator(String loc)
+        public LinkLocator(String linkText)
         {
-            super(xpath("//a").withText(loc).toXpath());
-            _linkText = loc;
+            super(tag("a").withText(linkText).toXpath());
+            _linkText = linkText;
         }
 
         @Override
@@ -1128,11 +1128,6 @@ public abstract class Locator
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;
-        }
-
-        public XPathLocator toXPathLocator()
-        {
-            return xpath(_loc);
         }
 
         @Override
