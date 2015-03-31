@@ -1,11 +1,12 @@
 package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -60,21 +61,33 @@ public class ETLRemoteSourceTest extends ETLBaseTest
         //
         clickTab("Study");
         importStudyFromZip(TRANSFORM_REMOTE_STUDY, true /*ignore query validation*/);
-        // bump our pipeline job count since we used the pipeline to import the study
-        _etlHelper.incrementJobsCompleteCount();
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    @Before
+    public void preTest() throws Exception
     {
-        // remove the remote connection we created; it's okay to call this if
-        // no connection was created
-        if (afterTest)
-        {
-            RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
-            rconnHelper.deleteConnection(TRANSFORM_REMOTE_CONNECTION);
-        }
-        super.doCleanup(afterTest);
+        deleteRemoteConnection();
+        _etlHelper.cleanupTestTables();
+        goToProjectHome();
+    }
+
+    @After
+    public void postTest()
+    {
+        deleteRemoteConnection();
+        resetErrors();
+    }
+
+    private void createRemoteConnection()
+    {
+        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
+        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+    }
+
+    private void deleteRemoteConnection()
+    {
+        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
+        rconnHelper.deleteConnection(TRANSFORM_REMOTE_CONNECTION);
     }
 
     //
@@ -83,6 +96,8 @@ public class ETLRemoteSourceTest extends ETLBaseTest
     @Test
     public void verifyRemoteTransform()
     {
+        // bump our pipeline job count since we used the pipeline to import the study
+        _etlHelper.incrementJobsCompleteCount();
         //
         // prepare our "remote" source dataset
         //
@@ -91,13 +106,11 @@ public class ETLRemoteSourceTest extends ETLBaseTest
         {
             _etlHelper.insertDatasetRow(String.valueOf(i), "Subject " + String.valueOf(i));
         }
-        clickTab("Portal");
 
         //
         // create our remote connection
         //
-        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
-        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+        createRemoteConnection();
 
         //
         // run the remote transform again.  At the end of this we should have one summary entry for the
@@ -123,8 +136,7 @@ public class ETLRemoteSourceTest extends ETLBaseTest
         errors.clear();
 
         // create our remote connection
-        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
-        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+        createRemoteConnection();
         errors.add("ERROR: Target schema not found: study_buddy");
         errors.add("Error running executeCopy");
         _etlHelper.runETLandCheckErrors(TRANSFORM_REMOTE_BAD_DEST, true, false, errors);
@@ -142,5 +154,4 @@ public class ETLRemoteSourceTest extends ETLBaseTest
         _etlHelper.runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
         errors.clear();
     }
-
 }
