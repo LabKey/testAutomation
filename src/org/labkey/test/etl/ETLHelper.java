@@ -259,7 +259,7 @@ public class ETLHelper
     }
 
     // The summary table should only have one row per transform sorted by transform id so make sure
-    // our expectred results match that
+    // our expected results match that
     protected void addTransformSummary(String[] newSummary)
     {
         String newTransformId = newSummary[0];
@@ -316,7 +316,6 @@ public class ETLHelper
     protected void insertQueryRow(String id, String name, String RunId, String query)
     {
         _test.log("inserting " + query + " row " + name);
-        //goToProjectHome();
         _test.clickTab("Portal");
         _test.click(new Locator.LinkLocator(StringUtils.capitalize(query)));
         _test.waitAndClick(Locator.xpath("//span[text()='Insert New']"));
@@ -329,7 +328,6 @@ public class ETLHelper
         }
         _test.clickButton("Submit");
         _test.log("returning to project home");
-        //goToProjectHome();
         _test.clickTab("Portal");
     }
 
@@ -358,7 +356,6 @@ public class ETLHelper
         _test.setFormElement(Locator.name("quf_status"), status);
         _test.clickButton("Submit");
         _test.log("returning to project home");
-        //goToProjectHome();
         _test.clickTab("Portal");
     }
 
@@ -380,18 +377,13 @@ public class ETLHelper
 
     protected void _runETL(String transformId, boolean hasWork, boolean hasCheckerError)
     {
-        _runETL_NoNav(transformId, hasWork, hasCheckerError);
+        runETLNoNav(transformId, hasWork, hasCheckerError);
 
         _test.log("returning to project home");
         _test.goToProjectHome();
     }
 
-    protected void runETL_NoNav(String transformId, boolean hasWork, boolean hasCheckerError)
-    {
-        _runETL_NoNav(transformId, hasWork, hasCheckerError);
-    }
-
-    protected void _runETL_NoNav(String transformId, boolean hasWork, boolean hasCheckerError)
+    protected void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError)
     {
         _test.log("running " + transformId + " job");
         _test.goToModule("DataIntegration");
@@ -480,7 +472,6 @@ public class ETLHelper
             }
         });
         _test.log("returning to project home");
-        //goToProjectHome();
         _test.clickTab("Portal");
     }
 
@@ -588,7 +579,6 @@ public class ETLHelper
 
     protected void checkRun(boolean expectError)
     {
-        //goToProjectHome();
         _test.clickTab("Portal");
         _test.goToModule("Pipeline");
         _test.waitForPipelineJobsToComplete(_jobsComplete, "ETL Job", expectError);
@@ -626,7 +616,7 @@ public class ETLHelper
 
     protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
     {
-        _runETL_NoNav(ETLName, hasWork, hasCheckerError);
+        runETLNoNav(ETLName, hasWork, hasCheckerError);
         if(!hasCheckerError)
         {
             _test.refresh(); // log webpart may not yet be present

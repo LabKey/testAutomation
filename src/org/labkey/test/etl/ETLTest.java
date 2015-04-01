@@ -249,7 +249,7 @@ UNDONE: need to fix the merge case
         errors.add("Could not find table: vehicle.etl_source_cheeseburger");
         _etlHelper.runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
 
-        _etlHelper._runETL_NoNav(TRANSFORM_NOCOL_ERROR, false, true);
+        _etlHelper.runETLNoNav(TRANSFORM_NOCOL_ERROR, false, true);
         assertTextPresent("Column not found: etl_source.monkeys");
         errors.clear();
 
