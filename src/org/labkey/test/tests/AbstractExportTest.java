@@ -30,6 +30,7 @@ import org.labkey.test.util.ExcelHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -212,7 +213,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             exportedColumn.add(row.split("\t")[getTestColumnIndex()]);
         }
 
-        assertEquals("Wrong rows exported", expectedExportColumn, exportedColumn);
+        assertColumnContentsEqual(expectedExportColumn, exportedColumn);
     }
 
     protected final void assertExcelExportContents(File exportedFile, int expectedDataRowCount)
@@ -234,12 +235,32 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedDataRowCount, sheet.getLastRowNum());
 
             List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
-            assertEquals("Wrong rows exported", expectedExportColumn, exportedColumn);
+            assertColumnContentsEqual(expectedExportColumn, exportedColumn);
         }
         catch (IOException | InvalidFormatException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    private final void assertColumnContentsEqual(List<String> expectedColumnContents, List<String> actualColumnContents)
+    {
+        if (expectSortedExport())
+        {
+            assertEquals("Wrong rows exported", expectedColumnContents, actualColumnContents);
+        }
+        else
+        {
+            assertEquals("Wrong column header", expectedColumnContents.get(0), actualColumnContents.get(0));
+            assertEquals("Wrong rows exported",
+                    new HashSet<>(expectedColumnContents.subList(1, expectedColumnContents.size())),
+                    new HashSet<>(actualColumnContents.subList(1, actualColumnContents.size())));
+        }
+    }
+
+    protected boolean expectSortedExport()
+    {
+        return true;
     }
 
     @Override

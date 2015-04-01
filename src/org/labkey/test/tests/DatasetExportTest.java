@@ -68,6 +68,12 @@ public class DatasetExportTest extends AssayResultsExportTest
         return "Dataset";
     }
 
+    @Override
+    protected boolean expectSortedExport()
+    {
+        return false;
+    }
+
     @BeforeClass
     public static void doSetup() throws Exception
     {
