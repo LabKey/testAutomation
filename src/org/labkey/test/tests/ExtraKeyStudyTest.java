@@ -17,17 +17,20 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+
+import java.io.File;
 
 import static org.junit.Assert.*;
 
 @Category({DailyB.class, Study.class})
 public class ExtraKeyStudyTest extends StudyBaseTest
 {
-    static String studyFolder = "/ExtraKeyStudy/folder.xml";
+    private static final File studyFolder = TestFileUtils.getSampleData("studies/ExtraKeyStudy");
 
     String[] datasets = {
             "P_One",
@@ -82,9 +85,9 @@ public class ExtraKeyStudyTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         initializeFolder();
-        initializePipeline();
+        initializePipeline(studyFolder.getAbsolutePath());
 
-        importFolderFromPipeline(studyFolder);
+        importFolderFromPipeline("folder.xml");
     }
 
     @Override

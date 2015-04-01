@@ -29,7 +29,7 @@ import java.util.List;
 @Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
 {
-    private static final String STUDY_ZIP = "/sampledata/pipelineCancel/LabkeyDemoStudy.zip";
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("pipelineCancel/LabkeyDemoStudy.zip");
     @Override
     protected String getProjectName()
     {
@@ -40,7 +40,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     public void testSteps()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        startImportStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
+        startImportStudyFromZip(STUDY_ZIP);
 
         log("Cancel import");
         waitForText("Delaying import");

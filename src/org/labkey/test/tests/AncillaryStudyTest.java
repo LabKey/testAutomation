@@ -51,8 +51,8 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
                                                      PTIDS[0] + "\t"+SEQ_NUMBER+"\n" +
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
-    private final File PROTOCOL_DOC = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
-    private final File PROTOCOL_DOC2 = new File( TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/Protocol2.txt");
+    private final File PROTOCOL_DOC = TestFileUtils.getSampleData("study/Protocol.txt");
+    private final File PROTOCOL_DOC2 = TestFileUtils.getSampleData("study/Protocol2.txt");
 
     @Override
     protected BrowserType bestBrowser()

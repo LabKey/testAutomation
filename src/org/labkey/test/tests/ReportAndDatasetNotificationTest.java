@@ -52,7 +52,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickFolder(getFolderName());
 
         log("Import study with reports and datasets");
-        importFolderFromPipeline("ReportDatasetNotifyTest.folder.zip");
+        importFolderFromZip(TestFileUtils.getSampleData("studies/ReportDatasetNotifyTest.folder.zip"));
     }
 
     @Override

@@ -28,7 +28,7 @@ import java.io.File;
 @Category({Study.class, Specimen.class})
 public class TruncationTest extends StudyBaseTest
 {
-    private final File LIST_ARCHIVE = new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
+    private final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/searchTest.lists.zip");
     private final String STUDY_NAME = "Study 001";
 
     @Override

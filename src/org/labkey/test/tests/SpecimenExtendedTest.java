@@ -55,7 +55,7 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
         initializeFolder();
         _containerHelper.enableModule("nPOD");
 
-        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
 
         setPipelineRoot(getPipelinePath());
 

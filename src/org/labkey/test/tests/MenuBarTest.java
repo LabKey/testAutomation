@@ -37,7 +37,7 @@ public class MenuBarTest extends BaseWebDriverTest
     private static final String WIKI_PAGE_TITLE = "A Wiki Menu" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String WIKI_PAGE_CONTENT = "This is a fancy wiki";
 
-    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
     private static final String STUDY_FOLDER = "StudyFolder";
 
@@ -143,7 +143,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         // Another custom menu with links to Participant Report
         createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
-        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(STUDY_ZIP);
 
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));

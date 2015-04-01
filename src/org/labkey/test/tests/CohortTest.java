@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 public class CohortTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Cohort Test Project";
-    private static final String COHORT_STUDY_ZIP = "/sampledata/study/CohortStudy.zip";
+    private static final File COHORT_STUDY_ZIP = TestFileUtils.getSampleData("studies/CohortStudy.zip");
     private static final String XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE = "//td[@id='bodypanel']/div[2]/div[1]/table";
     private static final String XPATH_SPECIMEN_REPORT_TABLE_POSITIVE = "//td[@id='bodypanel']/div[2]/div[2]/table";
     private static final String XPATH_SPECIMEN_REPORT_TABLE_UNASSIGNED = "//td[@id='bodypanel']/div[2]/div[3]/table";
@@ -75,7 +75,7 @@ public class CohortTest extends BaseWebDriverTest
     {
         log("Check advanced cohort features.");
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), COHORT_STUDY_ZIP));
+        importStudyFromZip(COHORT_STUDY_ZIP);
         clickProject(PROJECT_NAME);
         addWebPart("Specimens");
         // Check all cohorts after initial import.

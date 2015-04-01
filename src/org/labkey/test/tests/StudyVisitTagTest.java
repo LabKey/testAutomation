@@ -102,7 +102,7 @@ public class StudyVisitTagTest extends StudyBaseTest
 
     protected void importStudies()
     {
-        String visitTagsPath = TestFileUtils.getSampledataPath() + "/study/VisitTags";
+        String visitTagsPath = TestFileUtils.getSampledataPath() + "/VisitTags";
         goToProjectHome();
         startImportStudyFromZip(new File(visitTagsPath, PARENT_FOLDER_STUDY + ".folder.zip"), false, false);
         goToProjectHome();

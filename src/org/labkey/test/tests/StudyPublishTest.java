@@ -95,7 +95,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String CUSTOM_VIEW2 = "Private Custom View";
     private final String[] CUSTOM_VIEW_PTIDS2 = {};
 
-    private final File LIST_ARCHIVE = TestFileUtils.getSampleData("study/searchTest.lists.zip");
+    private final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/searchTest.lists.zip");
     private final String[] LISTS = {"CustomIndexing", "Indexed as one doc", "List To Delete", "List1", "List2", "MetaDataSet"};
 
     private final String PUB1_NAME = "PublishedStudy";

@@ -212,7 +212,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickFolder(getFolderName());
 
         log("Import new study with alt-ID");
-        importFolderFromPipeline("AltIdStudy.folder.zip");
+        importFolderFromZip(TestFileUtils.getSampleData("studies/AltIdStudy.folder.zip"));
     }
 
     protected void exportStudy(boolean zipFile)

@@ -43,9 +43,9 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ReportThumbnailTest";
     private static final String PROJECT_NAME_ROUNDTRIP = "ReportThumbnailTest_Roundtrip";
-    private static final File TEST_STUDY = new File(TestFileUtils.getSampledataPath(), "study/LabkeyDemoStudyWithCharts.folder.zip");
-    private static final File TEST_THUMBNAIL = new File(TestFileUtils.getSampledataPath(), "Microarray/test1.jpg");
-    private static final File TEST_ICON = new File(TestFileUtils.getSampledataPath(), "icemr/piggy.JPG");
+    private static final File TEST_STUDY = TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip");
+    private static final File TEST_THUMBNAIL = TestFileUtils.getSampleData("Microarray/test1.jpg");
+    private static final File TEST_ICON = TestFileUtils.getSampleData("icemr/piggy.JPG");
     private static final String BOX_PLOT = "Example Box Plot";
     private static final String SCATTER_PLOT = "Example Scatter Plot";
     private static final String R_PARTICIPANT_VIEWS = "R Participant Views: Physical Exam";

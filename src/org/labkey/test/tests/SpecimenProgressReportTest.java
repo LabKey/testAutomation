@@ -88,7 +88,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _assayHelper = new UIAssayHelper(this);
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), studyFolder, "Study");
-        importFolderFromZip(new File(STUDY_PIPELINE_ROOT, "Study.folder.zip"));
+        importFolderFromZip(TestFileUtils.getSampleData("specimenprogressreport/Study.folder.zip"));
 
         // set the label for the unscheduled visit
         goToManageStudy();

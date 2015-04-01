@@ -33,7 +33,7 @@ public abstract class TimeChartTest extends ReportTest
     private static final String PROJECT_NAME =  "TimeChartTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String FOLDER_NAME =  "Demo Study";
     protected static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
-    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     public static final String TEST_DATA_API_PATH = "server/test/data/api";
 
     protected static final String ADD_MEASURE_DIALOG = "Add Measure...";
@@ -83,7 +83,7 @@ public abstract class TimeChartTest extends ReportTest
             _containerHelper.createProject(getProjectName(), null);
 
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
-        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(STUDY_ZIP);
     }
 
     @LogMethod protected void configureVisitStudy()

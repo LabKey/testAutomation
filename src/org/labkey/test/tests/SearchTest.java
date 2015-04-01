@@ -100,7 +100,7 @@ public class SearchTest extends StudyTest
     {
         clickTab("Overview");
         portalHelper.addWebPart("Lists");
-        _listHelper.importListArchive(FOLDER_A, new File(TestFileUtils.getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
+        _listHelper.importListArchive(FOLDER_A, TestFileUtils.getSampleData("lists/searchTest.lists.zip"));
 
         clickAndWait(Locator.linkWithText(listToDelete));
         _listHelper.deleteList();

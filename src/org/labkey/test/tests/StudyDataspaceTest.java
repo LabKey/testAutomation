@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
@@ -38,7 +39,6 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyB.class, Study.class})
 public class StudyDataspaceTest extends StudyBaseTest
 {
-
     protected final String FOLDER_STUDY1 = "Study 1";
     protected final String FOLDER_STUDY2 = "Study 2";
     protected final String FOLDER_STUDY5 = "Study 5";
@@ -65,11 +65,6 @@ public class StudyDataspaceTest extends StudyBaseTest
     protected String getFolderName()
     {
         return FOLDER_STUDY1;
-    }
-
-    protected String getDataspaceSampledataPath()
-    {
-        return getPipelinePath() + "Dataspace";
     }
 
     @LogMethod
@@ -115,7 +110,7 @@ public class StudyDataspaceTest extends StudyBaseTest
         // Import first study
         log("Import first study and verify");
         clickFolder(FOLDER_STUDY1);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study1B.zip"), true, false);
+        startImportStudyFromZip(TestFileUtils.getSampleData("/studies/Dataspace/DataspaceStudyTest-Study1B.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
         clickTab("Overview");
         assertTextPresent("tracks data in", "over 97 time points", "Data is present for 8 Participants");
@@ -143,7 +138,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         // Import second study
         clickFolder(FOLDER_STUDY2);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study2B.zip"), true, false);
+        startImportStudyFromZip(TestFileUtils.getSampleData("studies/Dataspace/DataspaceStudyTest-Study2B.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
         clickTab("Overview");
         assertTextPresent("tracks data in", "over 103 time points", "Data is present for 8 Participants");
@@ -167,7 +162,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         // Import third study
         clickFolder(FOLDER_STUDY5);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study5.zip"), true, false);
+        startImportStudyFromZip(TestFileUtils.getSampleData("studies/Dataspace/DataspaceStudyTest-Study5.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
 
         log("Verify Product rows added");

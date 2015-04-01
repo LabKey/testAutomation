@@ -49,7 +49,7 @@ import java.util.List;
 @Category({DailyB.class, Reports.class, Charting.class})
 public class TimeChartImportTest extends StudyBaseTest
 {
-    private static final String MULTI_FOLDER_ZIP = "/sampledata/study/TimeChartTesting.folder.zip";
+    private static final File MULTI_FOLDER_ZIP = TestFileUtils.getSampleData("studies/TimeChartTesting.folder.zip");
     private static final String EXPORT_TEST_FOLDER = "exportTestFolder";
     private static ArrayList<TimeChartInfo> EXPORTED_CHARTS;
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
@@ -63,7 +63,7 @@ public class TimeChartImportTest extends StudyBaseTest
         TimeChartImportTest initTest = (TimeChartImportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-        initTest.importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest.importFolderFromZip(MULTI_FOLDER_ZIP);
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
         initTest.populateChartConfigs();
     }

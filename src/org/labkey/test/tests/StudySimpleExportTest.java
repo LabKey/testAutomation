@@ -263,7 +263,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         log("Query Validation: import study folder zip without query validation enabled");
         goToProjectHome();
         createSubfolder(getProjectName(), getProjectName(), "Query Validation", "Collaboration", null, true);
-        importFolderFromZip(new File(getPipelinePath(), "LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
+        importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
         goToModule("FileContent");
         doubleClick(Locator.tag("div").startsWith("folder_load_"));
         switchToWindow(1);

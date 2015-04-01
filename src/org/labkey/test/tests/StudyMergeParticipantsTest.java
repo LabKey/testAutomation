@@ -31,7 +31,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
     private static final String PROJECT_NAME =  "Merge Participants Test Project";
     private static final String STUDY_NAME = "Merge Participants Test Study";
     private static final String FOLDER_NAME =  "Merge Participants Test Folder";
-    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String SUBJECT_NOUN = "Participant";
     private static final String SUBJECT_NOUN_PLURAL = "Participants";
     private static final String SUBJECT_COLUMN = SUBJECT_NOUN + "Id";
@@ -78,7 +78,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
         initializeFolder();
         clickFolder(getFolderName());
         log("Import LabkeyDemoStudy");
-        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(STUDY_ZIP);
     }
 
     @Override

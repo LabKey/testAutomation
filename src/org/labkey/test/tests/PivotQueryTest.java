@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 @Category({DailyB.class, Data.class})
 public class PivotQueryTest extends BaseWebDriverTest
 {
-    private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
 
     @Override
     public List<String> getAssociatedModules()
@@ -51,7 +51,7 @@ public class PivotQueryTest extends BaseWebDriverTest
     protected void setupProject()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        importStudyFromZip(new File(TestFileUtils.getLabKeyRoot(), STUDY_ZIP));
+        importStudyFromZip(STUDY_ZIP);
     }
 
     @Test

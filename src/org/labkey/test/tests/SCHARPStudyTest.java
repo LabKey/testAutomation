@@ -37,7 +37,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
 
     private String _labkeyRoot = TestFileUtils.getLabKeyRoot();
     private String _pipelinePathMain = new File(_labkeyRoot, "/sampledata/study").getPath();
-    private String _zipFilePath = new File(_labkeyRoot, "/sampledata/study/studyshell.zip").getPath();
+    private File _studyZipFile = TestFileUtils.getSampleData("studies/studyshell.zip");
 
     protected static class StatusChecker extends Checker
     {
@@ -84,9 +84,9 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
 
     protected void importStudy()
     {
-        log("Importing study from " + _zipFilePath + "...");
+        log("Importing study from " + _studyZipFile + "...");
         clickButton("Import Study");
-        setFormElement(Locator.name("folderZip"), _zipFilePath);
+        setFormElement(Locator.name("folderZip"), _studyZipFile);
         clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("This file does not appear to be a valid .zip file");
 

@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Reports.class, Charting.class})
 public class GenericMeasurePickerTest extends BaseWebDriverTest
 {
-    private static final File STUDY_ZIP = TestFileUtils.getSampleData("study/LabkeyDemoStudy.zip");
+    private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String DATASET = "HIV Test Results";
 
     private static final String TAGGED_MEASURE = "Viral Load Quantified (copies/ml)";

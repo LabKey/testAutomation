@@ -55,7 +55,7 @@ public class ListPublishTest extends BaseWebDriverTest
         initializePtids("249318596", "249320107", "249320127", "249320489", "249320897", "249325717");
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
         goToProjectHome();
         setUpLists();
         setListIds();

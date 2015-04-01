@@ -47,7 +47,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
         goToProjectHome();
         hideDatasets();
 

@@ -24,12 +24,12 @@ import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
-/**
- * Created by davebradlee on 10/21/14.
- */
 @Category({DailyA.class})
 public class StudyDatasetReloadTest extends StudyBaseTest
 {
+    private static final File STUDY_WITH_BIT = TestFileUtils.getSampleData("studies/StudyWithDemoBit.folder.zip");
+    private static final File STUDY_WITHOUT_BIT = TestFileUtils.getSampleData("studies/StudyWithoutDemoBit.folder.zip");
+
     protected String getProjectName()
     {
         return "StudyDatasetReloadProject";
@@ -49,14 +49,14 @@ public class StudyDatasetReloadTest extends StudyBaseTest
         clickFolder(getFolderName());
 
         log("Import study with Demographics bit set on dataset");
-        importFolderFromZip(new File(getPipelinePath(), "StudyWithDemoBit.folder.zip"));
+        importFolderFromZip(STUDY_WITH_BIT);
     }
 
     @Override
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        reloadStudyFromZip(new File(getPipelinePath(), "StudyWithoutDemoBit.folder.zip"));
+        reloadStudyFromZip(STUDY_WITHOUT_BIT);
 
         // Check changes
         clickFolder(getFolderName());
@@ -72,7 +72,7 @@ public class StudyDatasetReloadTest extends StudyBaseTest
 
         goToManageStudy();
         clickButton("Reload Study");
-        setFormElement(Locator.name("folderZip"), new File(getPipelinePath(), "StudyWithDemoBit.folder.zip"));
+        setFormElement(Locator.name("folderZip"), STUDY_WITH_BIT);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(3, "Study Reload", false);
 
