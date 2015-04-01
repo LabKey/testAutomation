@@ -264,21 +264,15 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("AntigenStats", this);
         String[] expectedMeans = new String[]{"15555.6", "8888.9", "122222.2", "46666.7"};
         String[] expectedMedians = new String[]{"13333.3", "13333.3", "126666.7", "40000.0"};
-/*
-TODO: we'll need to check CrossTab something like this:
---        String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
---        assertTableRowsEqual("report", 3, new String[][] {row3});
 
         int row = 0;
         for (String mean : expectedMeans)
-//            assertEquals(mean, table.getDataAsText(row++, "Atg1CMean"));
-            assertEquals(mean, table.getDataAsText(row++, "PCTAGG__Antigen_1_AVG_Mean"));
+            assertEquals(mean, table.getDataAsText(row++, 2));
 
         row = 0;
         for (String median : expectedMedians)
-//            assertEquals(median, table.getDataAsText(row++, "Atg1CMedian"));
-            assertEquals(median, table.getDataAsText(row++, "PCTAGG__Antigen_1_AVG_Median"));
-*/
+            assertEquals(median, table.getDataAsText(row++, 3));
+
         // verify customization of the run details view is possible
 /*
         TODO: uncomment once issue 22960 has been fixed
@@ -459,15 +453,17 @@ TODO: we'll need to check CrossTab something like this:
 
         DataRegionTable table = new DataRegionTable("AntigenStats", this, true, true);
 //        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);      // TODO: we're not showing by default now
-/*                                                                                      // TODO: different: crossstab table
-        Iterator<String> means = Arrays.asList("0.0", "2271111.1", "1111.1", "4444.4").iterator();
-        for (String mean : table.getColumnDataAsText("Atg1AMean"))
-            assertEquals(means.next(), mean);
 
-        Iterator<String> medians = Arrays.asList("0.0", "2376666.7", "3333.3", "6666.7").iterator();
-        for (String median : table.getColumnDataAsText("Atg1AMedian"))
-            assertEquals(medians.next(), median);
-*/
+        int row = 0;
+        String[] expectedMeans = new String[]{"0.0", "2271111.1", "1111.1", "4444.4"};
+        for (String mean : expectedMeans)
+            assertEquals(mean, table.getDataAsText(row++, 2));
+
+        row = 0;
+        String[] expectedMedians = new String[]{"0.0", "2376666.7", "3333.3", "6666.7"};
+        for (String median : expectedMedians)
+            assertEquals(median, table.getDataAsText(row++, 3));
+
         //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
