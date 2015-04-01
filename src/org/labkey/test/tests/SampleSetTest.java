@@ -91,7 +91,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
-        waitForAlert("Successfully parsed 4 rows from the data file.", 10000);
+        waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
