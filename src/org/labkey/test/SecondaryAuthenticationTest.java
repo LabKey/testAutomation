@@ -4,109 +4,59 @@ package org.labkey.test;
  * Created by Binal Patel on 3/18/15.
  */
 
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.Row;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 
 @Category({DailyA.class})
 public class SecondaryAuthenticationTest extends BaseWebDriverTest
 {
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        SecondaryAuthenticationTest init = (SecondaryAuthenticationTest) getCurrentTest();
-        init.doSetup();
-    }
-
-    private void doSetup()
-    {
-        _containerHelper.createProject(getProjectName(), "Secondary Authentication");
-    }
-
-    @Before
-    public void preTest()
-    {
-        goToProjectHome();
-    }
-
     @Test
     /* This test assumes that the Duo 2-Factor is Disabled */
     public void testSecondaryAuthentication()
     {
-        Date date = new Date(); //get today's date
-
-        //Sign In
-        signIn();
-
-        //Go to Admin
-        goToAdminConsole();
-
-        //Go to Authenticate
-        clickAndWait(Locator.linkWithText("authentication"));
+        Date currentDate = new Date(); //get today's date
 
         //Enable 'Test Secondary Authentication Provider'
-        click(Locator.linkWithHref("/labkey/login/enable.view?name=Test%20Secondary%20Authentication"));
+        enableSecondaryAuthentication();
 
-        //Click Done
-        clickAndWait(Locator.linkWithSpan("Done"));
+        /** Test audit log **/
 
-            /** Test audit log **/
+        //get all the rows that are greater than or equal to today's date
+        SelectRowsResponse selectRowsResponse = getLatestAuditEntries();
 
-            //create a filter for dates that are greater than equal to today's date
-            Filter dateFilter = new Filter("Date", date, Filter.Operator.DATE_GTE);
-            List<Filter> dateFilterList = new LinkedList<>();
-            dateFilterList.add(dateFilter);
+        Map<String, Object> row = selectRowsResponse.getRows().get(0);
 
-            //get all the rows that are greater than or equal to today's date
-            SelectRowsResponse selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", ContainerFilter.CurrentAndSubfolders, "/", dateFilterList, true);
+        String commentColVal = (String) row.get("Comment"); //get a value from Comment column
+        Date auditDate = (Date)row.get("Created"); //get a value from Created ('Date' in the UI) column
 
-        boolean hasUpdatedAuditRow = false;
+        //compare time stamp of the audit log
+        assertFalse("No audit entry for enabled Secondary Authentication", auditDate.before(DateUtils.truncate(currentDate, Calendar.SECOND)));
 
-            for (Row row : selectRowsResponse.getRowset())
-            {
-                String commentColVal = (String) row.getValue("Comment"); //get a value from Comment column
-                Date dateTime = (Date)row.getValue("Created"); //get a value from Created ('Date' in the UI) column
-
-                //compare time stamp of the audit log
-                if(dateTime.after(date))
-                {
-                    //compare 'Comment' value of the last/latest audit log
-                    assertEquals("Latest audit log for Authentication provider should read: Test Secondary Authentication provider was enabled",
-                            "Test Secondary Authentication provider was enabled", commentColVal);
-
-                    hasUpdatedAuditRow = true;
-                    break;
-                }
-            }
-            assertTrue("Updated audit row not found.", hasUpdatedAuditRow);
+        //compare 'Comment' value of the last/latest audit log
+        assertEquals("Latest audit log for Authentication provider should read: Test Secondary Authentication provider was enabled",
+                "Test Secondary Authentication provider was enabled", commentColVal);
 
         //Sign Out
         signOut();
 
-        date = new Date();
+        currentDate= new Date();
 
         //URL before User Signs In
         String relativeURLBeforeSignIn = getCurrentRelativeURL();
@@ -133,7 +83,7 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             checkRadioButton(Locator.radioButtonByNameAndValue("valid", "1"));
 
             //Click on button 'TestSecondary'
-            click(Locator.input("TestSecondary"));
+            clickAndWait(Locator.input("TestSecondary"));
 
             //get current relative URL after Sign In
             String relativeURLAfterSignIn = getCurrentRelativeURL();
@@ -144,36 +94,45 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
 
         /* Disable Test Secondary Authentication */
 
-        goToAdminConsole();
-
-        //Go to Authenticate
-        clickAndWait(Locator.linkWithText("authentication"));
-
         //Disable 'Test Secondary Authentication Provider'
-        click(Locator.linkWithHref("/labkey/login/disable.view?name=Test%20Secondary%20Authentication"));
+        disableSecondaryAuthentication();
 
-            /** Test audit log - same as above **/
+        /** Test audit log - same as above **/
 
-            dateFilter = new Filter("Date", date, Filter.Operator.DATE_GTE);
-            dateFilterList = new LinkedList<>();
-            dateFilterList.add(dateFilter);
+        selectRowsResponse = getLatestAuditEntries();
+        row = selectRowsResponse.getRows().get(0);
 
-            selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", dateFilterList, true);
+        commentColVal = (String) row.get("Comment"); //get a value from Comment column
+        auditDate = (Date)row.get("Created"); //get a value from Created ('Date' in the UI) column
 
-            for (Row row : selectRowsResponse.getRowset())
-            {
-                String commentColVal = (String) row.getValue("Comment");
-                Date dateTime = (Date)row.getValue("Created");
+        //compare time stamp of the audit log
+        assertFalse("No audit entry for disabled Secondary Authentication", auditDate.before(DateUtils.truncate(currentDate, Calendar.SECOND)));
 
-                if(dateTime.after(date))
-                {
-                    assertEquals( "Latest audit log for Authentication provider should read: Test Secondary Authentication provider was disabled",
-                            "Test Secondary Authentication provider was disabled", commentColVal);
-                    break;
-                }
-            }
+        //compare 'Comment' value of the last/latest audit log
+        assertEquals("Latest audit log for Authentication provider should read: Test Secondary Authentication provider was disabled",
+                "Test Secondary Authentication provider was disabled", commentColVal);
 
-        signOut();
+    }
+
+    protected SelectRowsResponse getLatestAuditEntries()
+    {
+        Connection cn = createDefaultConnection(true);
+        SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "AuthenticationProviderConfiguration");
+        selectCmd.setSorts(Arrays.asList(new Sort("Created", Sort.Direction.DESCENDING)));
+        selectCmd.setMaxRows(1);
+        selectCmd.setColumns(Arrays.asList("*"));
+
+        SelectRowsResponse selectResp = null;
+        try
+        {
+            selectResp = selectCmd.execute(cn, "/");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return selectResp;
     }
 
     @Override
@@ -185,7 +144,7 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "SecondaryAuthenticationTest Project";
+        return null;
     }
 
     @Override

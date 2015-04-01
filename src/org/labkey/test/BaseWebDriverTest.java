@@ -879,6 +879,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
             clickButton("Sign In");
+            confirmSecondaryAuthentication();
+
             // If there are site-wide terms, you will have to do this again and accept the terms that are now displayed.
             if (isElementPresent(Locator.id("approvedTermsOfUse")))
             {
@@ -2076,6 +2078,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 log("Failed to reset DB login config after test failure");
                 getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
             }
+            try
+            {
+                disableSecondaryAuthentication();
+            }
+            catch(Exception e)
+            {
+                log("Failed to reset Secondary Authentication after test failure");
+            }
         }
         finally
         {
@@ -2140,6 +2150,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         catch (IOException e)
         {
             log("Problem removing site-wide terms of use page.  Perhaps it does not exist.");
+        }
+    }
+
+    protected void confirmSecondaryAuthentication()
+    {
+        try
+        {
+            //Select radio Yes
+            checkRadioButton(Locator.radioButtonByNameAndValue("valid", "1"));
+
+            //Click on button 'TestSecondary'
+            clickAndWait(Locator.input("TestSecondary"));
+
+            disableSecondaryAuthentication();
+        }
+        catch (NoSuchElementException ignored)
+        {
+
         }
     }
 
@@ -2575,7 +2603,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         catch (Exception e)
         {
-            fail(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         return selectResp;
@@ -3013,6 +3041,36 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             throw new RuntimeException("Failed to enable email recorder", e);
         }
+    }
+
+    @LogMethod(quiet = true)
+    public void enableSecondaryAuthentication()
+    {
+        try
+        {
+            assertEquals("Failed to enable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/enable.view?name=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to enable Secondary Authentication", e);
+        }
+    }
+
+    @LogMethod(quiet = true)
+    public void disableSecondaryAuthentication()
+    {
+//        try
+//        {
+//            assertEquals("Failed to disable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/disable.view?name=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+//        }
+//        catch (IOException e)
+//        {
+//            throw new RuntimeException("Failed to disable Secondary Authentication", e);
+//        }
+        pushLocation();
+        beginAt("/login/disable.view?name=Test%20Secondary%20Authentication");
+        popLocation();
+
     }
 
     /**
