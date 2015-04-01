@@ -2548,12 +2548,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName,  @Nullable List<Filter> filters)
     {
-        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), filters);
+        return executeSelectRowCommand(schemaName, queryName, filters, false);
     }
 
-    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, @Nullable List<Filter> filters, boolean reuseSession)
     {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), filters, reuseSession);
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters, boolean reuseSession)
+    {
+        Connection cn = createDefaultConnection(reuseSession);
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);

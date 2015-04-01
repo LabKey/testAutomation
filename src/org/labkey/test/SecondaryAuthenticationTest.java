@@ -8,17 +8,20 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.Row;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PasswordUtil;
-import org.testng.Assert;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @Category({DailyA.class})
@@ -78,7 +81,9 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             dateFilterList.add(dateFilter);
 
             //get all the rows that are greater than or equal to today's date
-            SelectRowsResponse selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", null, null, dateFilterList);
+            SelectRowsResponse selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", ContainerFilter.CurrentAndSubfolders, "/", dateFilterList, true);
+
+        boolean hasUpdatedAuditRow = false;
 
             for (Row row : selectRowsResponse.getRowset())
             {
@@ -89,11 +94,14 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
                 if(dateTime.after(date))
                 {
                     //compare 'Comment' value of the last/latest audit log
-                    Assert.assertEquals("Test Secondary Authentication provider was enabled", commentColVal,
-                            "Latest audit log for Authentication provider should read: Test Secondary Authentication provider was enabled");
+                    assertEquals("Latest audit log for Authentication provider should read: Test Secondary Authentication provider was enabled",
+                            "Test Secondary Authentication provider was enabled", commentColVal);
+
+                    hasUpdatedAuditRow = true;
                     break;
                 }
             }
+            assertTrue("Updated audit row not found.", hasUpdatedAuditRow);
 
         //Sign Out
         signOut();
@@ -131,8 +139,8 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             String relativeURLAfterSignIn = getCurrentRelativeURL();
 
             //user should be redirected to the same URL they were on, before Sign In.
-            Assert.assertEquals(relativeURLBeforeSignIn, relativeURLAfterSignIn,
-                    "After successful secondary authentication, user should be redirected to the same URL they were on before Sign In");
+            assertEquals("After successful secondary authentication, user should be redirected to the same URL they were on before Sign In",
+                    relativeURLBeforeSignIn, relativeURLAfterSignIn);
 
         /* Disable Test Secondary Authentication */
 
@@ -150,7 +158,7 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             dateFilterList = new LinkedList<>();
             dateFilterList.add(dateFilter);
 
-            selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", null, null, dateFilterList);
+            selectRowsResponse = executeSelectRowCommand("auditLog", "AuthenticationProviderConfiguration", dateFilterList, true);
 
             for (Row row : selectRowsResponse.getRowset())
             {
@@ -159,8 +167,8 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
 
                 if(dateTime.after(date))
                 {
-                    Assert.assertEquals("Test Secondary Authentication provider was disabled", commentColVal,
-                            "Latest audit log for Authentication provider should read: Test Secondary Authentication provider was disabled");
+                    assertEquals( "Latest audit log for Authentication provider should read: Test Secondary Authentication provider was disabled",
+                            "Test Secondary Authentication provider was disabled", commentColVal);
                     break;
                 }
             }
