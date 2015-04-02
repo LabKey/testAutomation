@@ -64,13 +64,13 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
         //Sign In - Primary Authentication
         attemptSignIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-        //Secondary Authentication
+            /* Secondary Authentication */
 
             //'Sign In' link shouldn't be present
             assertElementNotPresent(Locator.linkContainingText("Sign In"));
 
             //User should be still recognized as guest until secondary authentication is successful.
-            assertTextPresent("Is guest really you?");
+            assertTextPresent("Is " + PasswordUtil.getUsername() +" really you?");
 
             //Select Radio button No
             checkRadioButton(Locator.radioButtonByNameAndValue("valid", "0"));
@@ -92,12 +92,10 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
             assertEquals("After successful secondary authentication, user should be redirected to the same URL they were on before Sign In",
                     relativeURLBeforeSignIn, relativeURLAfterSignIn);
 
-        /* Disable Test Secondary Authentication */
-
         //Disable 'Test Secondary Authentication Provider'
         disableSecondaryAuthentication();
 
-        /** Test audit log - same as above **/
+         /** Test audit log **/
 
         selectRowsResponse = getLatestAuditEntries();
         row = selectRowsResponse.getRows().get(0);
