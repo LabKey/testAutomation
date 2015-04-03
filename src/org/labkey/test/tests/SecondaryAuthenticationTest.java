@@ -1,8 +1,4 @@
-package org.labkey.test;
-
-/**
- * Created by Binal Patel on 3/18/15.
- */
+package org.labkey.test.tests;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
@@ -11,6 +7,8 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PasswordUtil;
 
@@ -22,7 +20,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-
 
 @Category({DailyA.class})
 public class SecondaryAuthenticationTest extends BaseWebDriverTest

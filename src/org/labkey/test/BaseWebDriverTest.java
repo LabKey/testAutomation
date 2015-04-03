@@ -873,7 +873,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
             clickButton("Sign In");
-            confirmSecondaryAuthentication();
+            bypassSecondaryAuthentication();
 
             // If there are site-wide terms, you will have to do this again and accept the terms that are now displayed.
             if (isElementPresent(Locator.id("approvedTermsOfUse")))
@@ -2051,54 +2051,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             dismissAllAlerts();
             checkJsErrors();
-
-            try
-            {
-                // Get DB back in a good state after failed pipeline tools test.
-                PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-                pipelineToolsHelper.resetPipelineToolsDirectory();
-            }
-            catch (Exception e)
-            {
-                // Assure that this failure is noticed
-                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
-                log("**************************ERROR*******************************");
-                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-                log("** Server may be in a bad state.                            **");
-                log("** Set tools directory manually or bootstrap to fix.        **");
-                log("**************************ERROR*******************************");
-            }
-
-            try
-            {
-                deleteSiteWideTermsOfUsePage();
-            }
-            catch (Exception e)
-            {
-                log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
-            }
-
-            try
-            {
-                resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
-            }
-            catch (Exception e)
-            {
-                log("Failed to reset DB login config after test failure");
-                getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
-            }
-
-            try
-            {
-                disableSecondaryAuthentication();
-            }
-            catch(Exception e)
-            {
-                log("Failed to reset Secondary Authentication after test failure");
-            }
         }
         finally
         {
+            TestScrubber scrubber = new TestScrubber(createNewWebDriver(null));
+            scrubber.cleanSiteSettings();
+
             doTearDown();
         }
     }
@@ -2163,7 +2121,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    protected void confirmSecondaryAuthentication()
+    protected void bypassSecondaryAuthentication()
     {
         try
         {
