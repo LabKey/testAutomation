@@ -313,58 +313,62 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod
     public void setUp()
     {
-        Boolean reusingDriver = false;
-
         if (_testFailed)
         {
             // In case the previous test failed so catastrophically that it couldn't clean up after itself
             doTearDown();
         }
 
+        _driver = createNewWebDriver(getDriver());
+
+        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
+        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+        _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
+        _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
+
+        getDriver().manage().window().setSize(new Dimension(1280, 1024));
+    }
+
+    private WebDriver createNewWebDriver(WebDriver oldWebDriver)
+    {
+        WebDriver newWebDriver = null;
+
         switch (BROWSER_TYPE)
         {
             case IE: //experimental
             {
-                if(_driver != null && !(_driver instanceof InternetExplorerDriver))
+                if(oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
                 {
-                    _driver.quit();
-                    _driver = null;
+                    oldWebDriver.quit();
+                    oldWebDriver = null;
                 }
-                if(_driver == null)
+                if(oldWebDriver == null)
                 {
-                    _driver = new InternetExplorerDriver();
-                }
-                else
-                {
-                    reusingDriver = true;
+                    newWebDriver = new InternetExplorerDriver();
                 }
                 break;
             }
             case HTML: //experimental
             {
-                if(_driver != null && !(_driver instanceof HtmlUnitDriver))
+                if(oldWebDriver != null && !(oldWebDriver instanceof HtmlUnitDriver))
                 {
-                    _driver.quit();
-                    _driver = null;
+                    oldWebDriver.quit();
+                    oldWebDriver = null;
                 }
-                if(_driver == null)
+                if(oldWebDriver == null)
                 {
-                    _driver = new HtmlUnitDriver(true);
-                }
-                else
-                {
-                    reusingDriver = true;
+                    newWebDriver = new HtmlUnitDriver(true);
                 }
                 break;
             }
-            case CHROME: //experimental
+            case CHROME:
             {
-                if(_driver != null && !(_driver instanceof ChromeDriver))
+                if(oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
                 {
-                    _driver.quit();
-                    _driver = null;
+                    oldWebDriver.quit();
+                    oldWebDriver = null;
                 }
-                if(_driver == null)
+                if(oldWebDriver == null)
                 {
                     TestProperties.ensureChromedriverExeProperty();
                     ChromeOptions options = new ChromeOptions();
@@ -386,22 +390,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
                     _jsErrorChecker = new ChromeJSErrorChecker();
-                    _driver = new ChromeDriver(capabilities);
-                }
-                else
-                {
-                    reusingDriver = true;
+                    newWebDriver = new ChromeDriver(capabilities);
                 }
                 break;
             }
             case FIREFOX:
             {
-                if(_driver != null && !(_driver instanceof FirefoxDriver))
+                if(oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
                 {
-                    _driver.quit();
-                    _driver = null;
+                    oldWebDriver.quit();
+                    oldWebDriver = null;
                 }
-                if (_driver == null)
+                if (oldWebDriver == null)
                 {
                     final FirefoxProfile profile = new FirefoxProfile();
                     profile.setPreference("app.update.auto", false);
@@ -442,18 +442,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     if (browserPath.length() > 0)
                     {
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
-                        _driver = new FirefoxDriver(binary, profile);
+                        newWebDriver = new FirefoxDriver(binary, profile);
                     }
                     else
                     {
-                        _driver = new FirefoxDriver(profile);
+                        newWebDriver = new FirefoxDriver(profile);
                     }
 
                     _jsErrorChecker = new FirefoxJSErrorChecker();
-                }
-                else
-                {
-                    reusingDriver = true;
                 }
                 break;
             }
@@ -461,20 +457,18 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 throw new IllegalArgumentException("Browser not yet implemented: " + BROWSER_TYPE);
         }
 
-        if (!reusingDriver)
+        if (newWebDriver != null)
         {
-            Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
+            Capabilities caps = ((RemoteWebDriver) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
             log("Browser: " + browserName + " " + browserVersion);
+            return newWebDriver;
         }
-
-        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-        getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
-        _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
-        _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
-
-        getDriver().manage().window().setSize(new Dimension(1280, 1024));
+        else
+        {
+            return oldWebDriver;
+        }
     }
 
     public Object executeScript(String script, Object... arguments)
@@ -1776,7 +1770,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             if (currentTest != null)
             {
-                currentTest.handleFailure(e, pseudoTestName);
+                try
+                {
+                    currentTest.handleFailure(e, pseudoTestName);
+                }
+                catch (Exception secondary)
+                {
+                    System.err.println("Error while collecting failure data");
+                    secondary.printStackTrace();
+                }
             }
         }
 
@@ -1872,7 +1874,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         protected void failed(Throwable e, Description description)
         {
             Ext4Helper.resetCssPrefix();
-            handleFailure(e, description.getMethodName());
+            try
+            {
+                handleFailure(e, description.getMethodName());
+            }
+            catch (Exception secondary)
+            {
+                System.err.println("Error while collecting failure data");
+                secondary.printStackTrace();
+            }
         }
 
         @Override
@@ -2078,6 +2088,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 log("Failed to reset DB login config after test failure");
                 getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
             }
+
             try
             {
                 disableSecondaryAuthentication();
