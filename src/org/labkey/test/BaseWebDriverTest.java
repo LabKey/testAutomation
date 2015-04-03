@@ -1776,8 +1776,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 catch (Exception secondary)
                 {
-                    System.err.println("Error while collecting failure data");
-                    secondary.printStackTrace();
+                    TestLogger.log("Error while collecting failure data");
+                    secondary.printStackTrace(System.out);
                 }
             }
         }
@@ -1880,8 +1880,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             catch (Exception secondary)
             {
-                System.err.println("Error while collecting failure data");
-                secondary.printStackTrace();
+                log("Error while collecting failure data");
+                secondary.printStackTrace(System.out);
             }
         }
 
@@ -1989,7 +1989,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
             {
-                _driver = null;
                 return;
             }
 
@@ -2014,15 +2013,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     }
                     catch (IOException t)
                     {
-                        System.err.println("Unable to re-invoke last page");
-                        t.printStackTrace();
+                        log("Unable to re-invoke last page");
+                        t.printStackTrace(System.out);
                     }
                 }
             }
             catch (Exception e)
             {
-                System.err.println("Unable to determine information about the last page");
-                e.printStackTrace();
+                log("Unable to determine information about the last page");
+                e.printStackTrace(System.out);
             }
 
             try
@@ -2046,8 +2045,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             catch (Exception e)
             {
-                System.err.println("Unable to dump failure information");
-                e.printStackTrace();
+                log("Unable to dump failure information");
+                e.printStackTrace(System.out);
             }
 
             dismissAllAlerts();
@@ -2705,7 +2704,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
             return null;
         }
     }
