@@ -315,6 +315,8 @@ public class FileBrowserHelper
     @LogMethod
     public void uploadFile(@LoggedParam final File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
+        waitForFileGridReady();
+
         openUploadPanel();
 
         _test.waitFor(new BaseWebDriverTest.Checker()
