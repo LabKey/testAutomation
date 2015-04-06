@@ -80,6 +80,11 @@ public class TestScrubber extends BaseWebDriverTest
         }
     }
 
+    @Override
+    public void pauseJsErrorChecker(){}
+    @Override
+    public void resumeJsErrorChecker(){}
+
     @Nullable
     @Override
     protected String getProjectName()
