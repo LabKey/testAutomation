@@ -144,7 +144,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private static final String PUBLISH_SUB_FOLDER_ADMIN = "publishsub_admin@study.test";
 
 
-
     // enum to help determine the study publish location
     public enum PublishLocation
     {
@@ -156,11 +155,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-
-        deleteUsers(false, PUBLISH_FOLDER_ADMIN);
-        deleteUsers(false, PUBLISH_SUB_FOLDER_ADMIN);
-
         _containerHelper.deleteProject(PUB2_NAME, afterTest, 1000000);
+
+        deleteUsers(false, PUBLISH_FOLDER_ADMIN, PUBLISH_SUB_FOLDER_ADMIN);
     }
 
     @Override
@@ -227,11 +224,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doVerifySteps()
     {
         verifyPipelineJobLinks(PUB3_NAME, PUB2_NAME, PUB1_NAME);
+        // published with specimens
         verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
-        //rePublishStudy(PUB1_NAME, PUB1_REPUBLISH_NAME);
-        //verifyPublishedStudy(PUB1_REPUBLISH_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS-1);
-        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
-        //rePublishStudy(PUB2_NAME, PUB2_REPUBLISH_NAME);
+        // publish without specimens
         verifyPublishedStudy(PUB2_NAME, PUB2_NAME, PTIDS_WITHOUT_SPECIMENS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
         // concat group 2 and group 3 ptids for the last publisehd study ptid list
         ArrayList<String> group2and3ptids = new ArrayList<>();
@@ -278,15 +273,26 @@ public class StudyPublishTest extends StudyProtectedExportTest
                                         final boolean includeSpecimens, final boolean refreshSpecimens, final int expectedSpecimenCount,
                                         final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs, final boolean maskClinicNames)
     {
-        SearchHelper searchHelper = new SearchHelper(this);
-        // Verify alternate IDs (or lack thereof)
-        for (String ptid : ptids)
+        if (alternateIDs)
         {
-            searchHelper.searchForSubjects(ptid);
-            if (alternateIDs)
+            goToQueryView("study", "participant", false);
+            DataRegionTable participantTable = new DataRegionTable("query", this);
+            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("ParticipantId"));
+            assertEquals("Wrong number of participants in published study", ptids.length, participants.size());
+
+            SearchHelper searchHelper = new SearchHelper(this);
+            for (String ptid : ptids)
+            {
+                searchHelper.searchForSubjects(ptid);
                 assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
-            else
-                assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
+            }
+        }
+        else
+        {
+            goToQueryView("study", "participant", false);
+            DataRegionTable participantTable = new DataRegionTable("query", this);
+            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("ParticipantId"));
+            assertEquals("Wrong participants in published study", new HashSet<>(Arrays.asList(ptids)), participants);
         }
 
         // Go to published study
