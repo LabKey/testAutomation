@@ -192,6 +192,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Save");
         _ext4Helper.waitForMaskToDisappear();
+        waitForElementToDisappear(Ext4Helper.Locators.window("Saved"));
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");
