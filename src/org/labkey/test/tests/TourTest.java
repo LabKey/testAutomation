@@ -76,17 +76,17 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.setTitle("Test Tour");
         tourEditor.setMode(TourEditor.TourMode.RUNONCE);
         tourEditor.setDescription(TOUR_DESC);
-        tourEditor.setSelector(1, "span#adminMenuPopupText");
+        tourEditor.setSelector(1, "select");
         tourEditor.setStep(1, "{\n" +
-                "        placement: \"left\",\n" +
-                "        title: \"This is the admin menu.\",\n" +
-                "        content: \"Click here to perform administrative tasks.\",\n" +
-                "}");
-        tourEditor.setSelector(2, "select");
-        tourEditor.setStep(2, "{\n" +
                 "        placement: \"right\",\n" +
                 "        title: \"This is a webpart.\",\n" +
                 "        content: \"What can't you do in a webpart!\",\n" +
+                "}");
+        tourEditor.setSelector(2, "span#adminMenuPopupText");
+        tourEditor.setStep(2, "{\n" +
+                "        placement: \"left\",\n" +
+                "        title: \"This is the admin menu.\",\n" +
+                "        content: \"Click here to perform administrative tasks.\",\n" +
                 "}");
         tourEditor.setSelector(3, "span#helpMenuPopupText");
         tourEditor.setStep(3, "{\n" +
@@ -192,10 +192,10 @@ public class TourTest extends BaseWebDriverTest
     private void assertBasicTour()
     {
         TourNavigator tourNavigator = new TourNavigator();
-        tourNavigator.assertTourBubble("1", "This is the admin menu.", "Click here to perform administrative tasks.");
+        tourNavigator.assertTourBubble("1", "This is a webpart.", "What can't you do in a webpart!");
         tourNavigator.nextTourBubble();
         tourNavigator.waitForTourBubble("2");
-        tourNavigator.assertTourBubble("2", "This is a webpart.", "What can't you do in a webpart!");
+        tourNavigator.assertTourBubble("2", "This is the admin menu.", "Click here to perform administrative tasks.");
         tourNavigator.nextTourBubble();
         tourNavigator.waitForTourBubble("3");
         tourNavigator.assertTourBubble("3", "This is the help menu.", "Click here for tutorials and various help tasks.");
