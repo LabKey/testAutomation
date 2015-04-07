@@ -116,6 +116,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         // List the peptides in the the 'CAP85' Peptide Group. We expect there to be 8 of them.
         clickFolder(FOLDER_NAME);
         getDriver().findElement(By.linkText("Search for Peptides by Criteria")).click();
+        waitForText("Search for Peptides using different criteria : ");
         new Select(getDriver().findElement(By.id("queryKey"))).selectByVisibleText("Peptide Group");
         new Select(getDriver().findElement(By.id("queryValue"))).selectByVisibleText("CAP85");
         getDriver().findElement(By.name("action_type")).click();
@@ -132,8 +133,8 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         // List the peptides to be made and make sure #71 is no longer in the list.
         getDriver().findElement(By.linkText("List Peptides to be Made")).click();
         assertTrue(getDriver().findElement(By.cssSelector("BODY")).getText().matches("^[\\s\\S]*" + pepString(70) + "\\s*LHIDCNESGGTSGTQQPQ\\s*n\n" + pepString(72) + "\\s*LHIDCSESSGTSGTQPSQ\\s*n[\\s\\S]*$"));
-        getDriver().findElement(By.cssSelector("a[name=\"null\"] > span")).click();
-
+        // Return to the main Peptide DB menu
+        clickAndWait(Locator.linkWithText("Peptide DB"));
         // Search for a single, newly-uploaded peptide, #75, and verify it displays as expected.
         getDriver().findElement(By.name("peptideId")).clear();
         getDriver().findElement(By.name("peptideId")).sendKeys(Integer.toString(peptideStartIndex + 75));
@@ -142,7 +143,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         clickButton("Peptide Home");
 
         // TODO
-        // Another useful test would be to verify that newly uploaded peptides get assgined to the appropriate
+        // Another useful test would be to verify that newly uploaded peptides get assigned to the appropriate
         // Peptide pools.
     }
 
@@ -186,18 +187,30 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
     void ensureExternalSchema(String containerPath)
     {
         log("** Ensure ExternalSchema: " + USER_SCHEMA_NAME);
-        beginAt("/query/" + containerPath + "/begin.view");
-        _extHelper.clickExtButton("Schema Administration");
-        assertTextPresent("new external schema");
-        log("** Creating ExternalSchema: " + USER_SCHEMA_NAME);
-        clickAndWait(Locator.linkWithText("new external schema"));
-        checkCheckbox(Locator.name("includeSystem"));
-        setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
-        setFormElement(Locator.name("sourceSchemaName"), USER_SCHEMA_NAME);
-        checkCheckbox(Locator.name("editable"));
-        uncheckCheckbox(Locator.name("indexable"));
-        clickButton("Create");
+
+
+        //beginAt("/query/" + containerPath + "/begin.view");
+        //_extHelper.clickExtButton("Schema Administration");
+        // _ext4Helper.clickWindowButton(null, "Schema Administration",0,1);
+
+        beginAt("/query/" + containerPath + "/admin.view");
+
+        if (!isTextPresent("reload"))
+        {
+            assertTextPresent("new external schema");
+            log("** Creating ExternalSchema: " + USER_SCHEMA_NAME);
+            clickAndWait(Locator.linkWithText("new external schema"));
+            checkCheckbox(Locator.name("includeSystem"));
+            setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
+            setFormElement(Locator.name("sourceSchemaName"), USER_SCHEMA_NAME);
+            checkCheckbox(Locator.name("editable"));
+            uncheckCheckbox(Locator.name("indexable"));
+            clickButton("Create");
+        }
+        assertTextPresent(USER_SCHEMA_NAME);
+        assertTextNotPresent("reload all schemas");  // Present only for external schemas > 1
     }
+
     // Identify the index at which our peptide IDs start.
     private void findPeptideStartIndex() throws IOException
     {
