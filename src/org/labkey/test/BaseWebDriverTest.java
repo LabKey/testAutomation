@@ -642,6 +642,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 getDriver().quit();
             }
         }
+        catch (UnreachableBrowserException ignore) {}
         finally
         {
             _driver = null;
