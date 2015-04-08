@@ -79,7 +79,8 @@ public class ListHelper extends AbstractHelper
         _test.waitForElement(Locator.css(".labkey-error").containing(error));
     }
 
-    public void importDataFromFile(File inputFile)
+    @LogMethod
+    public void importDataFromFile(@LoggedParam File inputFile)
     {
         clickImportData();
         _test.click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
