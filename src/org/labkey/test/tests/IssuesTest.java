@@ -375,12 +375,9 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @Test
-    public void emailTest()
+    public void testEmailTemplate()
     {
-        goToModule("Dumbster");
-        assertTextPresent("No email recorded.");
-
-        // CustomizeEmailAction 
+        // CustomizeEmailAction
         goToModule("Issues");
         clickButton("Admin");
         clickButton("Customize Email Template");
@@ -392,10 +389,17 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
         assertTextNotPresent("Invalid template");
         assertFormElementEquals("emailSubject", subject); // regression check for issue #11389
-        goToModule("Portal");
+    }
+
+    @Test
+    public void emailTest()
+    {
+        goToModule("Dumbster");
+        assertTextPresent("No email recorded."); // No other test should trigger notification
+
+        goToModule("Issues");
 
         // EmailPrefsAction
-        clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         checkCheckbox(Locator.checkboxByNameAndValue("emailPreference", "8")); // self enter/edit an issue
         clickButton("Update");
@@ -423,7 +427,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
         updateIssue();
         clickButton("Cancel");
-        assertTextPresent(ISSUE_TITLE_2);
+        assertTitleContains(ISSUE_TITLE_2);
 
         goToModule("Dumbster");
         pushLocation();
@@ -440,28 +444,6 @@ public class IssuesTest extends BaseWebDriverTest
         assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
 
         assertTextNotPresent("This line shouldn't appear");
-
-        impersonate(USER1);
-        clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
-        clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
-        updateIssue();
-        selectOptionByText(Locator.name("priority"), "0");
-        setFormElement(Locator.name("notifyList"), USER3);
-        setFormElement(Locator.name("comment"), "Oh Noez!");
-        clickButton("Save");
-        stopImpersonating();
-
-        popLocation();
-
-        emailTable = new EmailRecordTable(this);
-        message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
-
-        // issue 17637 : inactive users as well as users not in the system should not receive emails
-        //assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
-        //        USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
-        assertTrue("User did not receive updated issue notification",
-                PasswordUtil.getUsername().equals(emailTable.getDataAsText(0, "To")) || PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
     }
 
     private void updateIssue()
