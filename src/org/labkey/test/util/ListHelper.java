@@ -82,10 +82,16 @@ public class ListHelper extends AbstractHelper
     @LogMethod
     public void importDataFromFile(@LoggedParam File inputFile)
     {
+        importDataFromFile(inputFile, BaseWebDriverTest.WAIT_FOR_PAGE * 5);
+    }
+
+    @LogMethod
+    public void importDataFromFile(@LoggedParam File inputFile, int wait)
+    {
         clickImportData();
         _test.click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
         _test.setFormElement(Locator.name("file"), inputFile);
-        _test.clickButton("Submit", BaseWebDriverTest.WAIT_FOR_PAGE * 5);
+        _test.clickButton("Submit", wait);
     }
 
     /**
