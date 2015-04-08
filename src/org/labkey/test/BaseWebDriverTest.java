@@ -1727,7 +1727,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static int testCount;
     private static int currentTestNumber;
 
-    @ClassRule
     public static TestWatcher testClassWatcher = new TestWatcher()
     {
         @Override
@@ -1844,10 +1843,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    @ClassRule
     public static Timeout globalTimeout = new Timeout(2400000); // 40 minutes
 
-    @Rule
+    @ClassRule
+    public static RuleChain classRuleChain = RuleChain.outerRule(testClassWatcher).around(globalTimeout);
+
     public Timeout testTimeout = new Timeout(1800000); // 30 minutes
 
     private TestWatcher _watcher = new TestWatcher()
@@ -1975,7 +1975,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     };
 
     @Rule
-    public RuleChain _ruleChain = RuleChain.outerRule(_logger).around(_watcher);
+    public RuleChain _ruleChain = RuleChain.outerRule(_logger).around(_watcher).around(testTimeout);
 
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
