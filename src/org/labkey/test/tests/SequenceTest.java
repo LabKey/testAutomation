@@ -72,6 +72,7 @@ public class SequenceTest extends BaseWebDriverTest
     protected final String _sequencePipelineLoc = TestFileUtils.getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
     protected final String _illuminaPipelineLoc = TestFileUtils.getLabKeyRoot() + "/sampledata/sequenceAnalysis";
     protected final String _readsetPipelineName = "Import sequence data";
+    protected final String _alignmentImportPipelineName = "Import Alignment(s)";
 
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";
     private Integer _readsetCt = 0;
@@ -95,7 +96,12 @@ public class SequenceTest extends BaseWebDriverTest
         readsetFeaturesTest();
         analysisPanelTest();
         readsetPanelTest();
+
+        alignmentImportPanelTest();
         readsetImportTest();
+
+        //TODO
+        //analyzeAlignmentPanelTest();
 
         //will also verify UI + pipeline jobs
         createReferenceGenome(this, _startedPipelineJobs);
@@ -697,6 +703,61 @@ public class SequenceTest extends BaseWebDriverTest
 
         _fileBrowserHelper.selectImportDataAction(importAction);
 
+    }
+
+    /**
+     * The intent of this method is to perform additional tests of this AlignmentImportPanel,
+     * with the goal of exercising all UI options, but not actually running the pipeline job since this runs remotely.
+     */
+    private void alignmentImportPanelTest() throws IOException
+    {
+        log("Verifying AlignmentImportPanel UI");
+
+        goToProjectHome();
+        setPipelineRoot(_sequencePipelineLoc);
+
+        File inputBam = new File(_sequencePipelineLoc, "test.bam");
+        if (!inputBam.exists())
+        {
+            FileUtils.copyFile(new File(TestFileUtils.getLabKeyRoot(), "/externalModules/labModules/SequenceAnalysis/resources/sampleData/test.bam"), inputBam);
+        }
+
+        initiatePipelineJob(_alignmentImportPipelineName, Arrays.asList(inputBam.getName()));
+        waitForText("Job Name");
+
+        Ext4FieldRef.getForLabel(this, "Job Name").setValue("AlignmentTest_" + System.currentTimeMillis());
+
+        waitForElement(Locator.linkContainingText(inputBam.getName()));
+
+        Ext4FieldRef treatmentField = Ext4FieldRef.getForLabel(this, "Treatment of Input Files");
+        Assert.assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
+
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
+        waitForElement(Locator.tagContainingText("div", "There are 4 errors.  Please review the cells highlighted in red."));
+        click(Ext4Helper.Locators.ext4Button("OK"));
+
+        Ext4GridRef readsetGrid = _ext4Helper.queryOne("#sampleGrid", Ext4GridRef.class);
+        readsetGrid.setGridCell(1, "readsetname", "Readset1");
+        readsetGrid.setGridCell(1, "platform", "ILLUMINA");
+        readsetGrid.setGridCell(1, "application", "DNA Sequencing (Genome)");
+
+        waitAndClick(Ext4Helper.Locators.ext4Button("Add Step"));
+        Locator.XPathLocator win = Ext4Helper.Locators.window("Add Steps");
+        waitForElement(win);
+
+        List<Ext4CmpRef> btns = _ext4Helper.componentQuery("window ldk-linkbutton[text='Add']", Ext4CmpRef.class);
+        for (Ext4CmpRef btn : btns)
+        {
+            waitAndClick(Locator.id(btn.getId()).append(Locator.tag("a")));
+        }
+
+        waitAndClick(Ext4Helper.Locators.ext4Button("Done"));
+        waitForElementToDisappear(Ext4Helper.Locators.window("Add Steps"));
+
+        //TODO: check JSON
+
+        goToProjectHome();
     }
 
     /**

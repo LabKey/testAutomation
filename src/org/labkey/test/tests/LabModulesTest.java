@@ -661,7 +661,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private void dataSourcesTest()
     {
         goToAdminConsole();
-        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("discvr admin"));
         waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
         waitForText("You are currently editing the data and demographics sources for the Shared project");  //proxy for data loading
 
@@ -761,7 +761,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //now validate site-summary reports
         goToAdminConsole();
-        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("discvr admin"));
         waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
 
         waitAndClick(Ext4Helper.Locators.ext4Button("View Summary of Data Sources"));
@@ -948,7 +948,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         log("Testing Site Settings");
         goToAdminConsole();
-        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("discvr admin"));
 
         waitForText("Reference Sequences"); //proxy for page load
 
