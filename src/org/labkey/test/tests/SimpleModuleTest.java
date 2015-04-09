@@ -911,7 +911,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.xpath("//input[@type='radio' and @value='" + RESTRICTED_FOLDER_TYPE + "']"));
 
         log("folder admin without restricted permission cannot import restricted folder");
-        createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
         clickFolder(NEW_FOLDER_NAME);
         importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);

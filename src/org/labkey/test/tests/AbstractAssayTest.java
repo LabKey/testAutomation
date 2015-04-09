@@ -124,14 +124,14 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //add folder structure
         log("Setting up folder structure and folder permissions");
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, "None", null, true);
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, "None", null, true);
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, TEST_ASSAY_FLDR_LAB1, "None", null, true);
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY1, "Study", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, "None", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, "None", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LABS, TEST_ASSAY_FLDR_LAB1, "None", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY1, "Study", null, true);
         createDefaultStudy();
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY2, "Study", null, true);
         createDefaultStudy();
-        createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDIES, TEST_ASSAY_FLDR_STUDY3, "Study", null, true);
         clickButton("Create Study");
         //use date-based study
         click(Locator.xpath("(//input[@name='timepointType'])[1]"));

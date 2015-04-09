@@ -110,7 +110,7 @@ public class SpecimenMergeTest extends BaseWebDriverTest
 
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
+        _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "Study", null);
         clickButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
         clickButton("Create Study");

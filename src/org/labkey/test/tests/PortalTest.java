@@ -115,7 +115,7 @@ public class PortalTest extends BaseWebDriverTest
                 "Messages",
                 "Pages");
 
-        createSubfolder(getProjectName(), getProjectName(), folderName, "Microarray", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Microarray", null);
 
         List<String> currentPreferredWebparts;
 

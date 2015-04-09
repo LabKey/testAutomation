@@ -159,7 +159,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
 
-        init.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
+        init._containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null);
 
         init.clickFolder(FOLDER_NAME);
 

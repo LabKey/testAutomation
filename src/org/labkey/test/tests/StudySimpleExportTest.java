@@ -262,7 +262,7 @@ public class StudySimpleExportTest extends StudyBaseTest
     {
         log("Query Validation: import study folder zip without query validation enabled");
         goToProjectHome();
-        createSubfolder(getProjectName(), getProjectName(), "Query Validation", "Collaboration", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), "Query Validation", "Collaboration", null, true);
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
         goToModule("FileContent");
         doubleClick(Locator.tag("div").startsWith("folder_load_"));
@@ -920,7 +920,7 @@ public class StudySimpleExportTest extends StudyBaseTest
 
     private void createSubfolderAndImportStudyFromPipeline(String subfolderName)
     {
-        createSubfolder(getProjectName(), getProjectName(), subfolderName, "Collaboration", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), subfolderName, "Collaboration", null, true);
         clickFolder(subfolderName);
         setPipelineRoot(getPipelinePath());
         importFolderFromPipeline("/export/folder.xml");

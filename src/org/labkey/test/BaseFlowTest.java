@@ -97,7 +97,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         }
 
         _containerHelper.createProject(getProjectName(), null);
-        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Flow", null);
 
         setPipelineRoot(PIPELINE_PATH.getAbsolutePath());
     }

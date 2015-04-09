@@ -82,7 +82,7 @@ public abstract class TimeChartTest extends ReportTest
         if (!isElementPresent(Locator.linkWithText(getProjectName())))
             _containerHelper.createProject(getProjectName(), null);
 
-        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null);
         importStudyFromZip(STUDY_ZIP);
     }
 
@@ -92,7 +92,7 @@ public abstract class TimeChartTest extends ReportTest
         if (!isElementPresent(Locator.linkWithText(getProjectName())))
             _containerHelper.createProject(getProjectName(), null);
 
-        createSubfolder(getProjectName(), getProjectName(), VISIT_FOLDER_NAME, "Study", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), VISIT_FOLDER_NAME, "Study", null);
         initializePipeline();
 
         clickFolder(VISIT_FOLDER_NAME);

@@ -110,7 +110,7 @@ public class MenuBarTest extends BaseWebDriverTest
         hoverMenu("Assays");
         waitForElement(Locator.linkWithText("Test Assay"));
 
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
+        _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
         clickProject(getProjectName());
 
@@ -142,7 +142,7 @@ public class MenuBarTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//div[@id='CustomMenu7-Header_menu']").containing("TEXT_WITH_LINKS"));
 
         // Another custom menu with links to Participant Report
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
+        _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
         importStudyFromZip(STUDY_ZIP);
 
         goToProjectSettings();

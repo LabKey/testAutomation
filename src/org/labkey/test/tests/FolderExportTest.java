@@ -119,7 +119,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyImportFromPipeline(String fileImport, String folderName, int subfolderIndex)
     {
 
-        createSubfolder(getProjectName(), getProjectName(), folderName, "Collaboration", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Collaboration", null);
         setPipelineRoot(dataDir.getAbsolutePath());
         importFolderFromPipeline( "" + fileImport);
 

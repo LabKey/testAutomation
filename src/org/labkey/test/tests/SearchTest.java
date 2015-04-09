@@ -198,7 +198,7 @@ public class SearchTest extends StudyTest
     private void addSearchableContainers()
     {
         clickProject(getProjectName());
-        createSubfolder(getProjectName(), getProjectName(), FOLDER_B, "None", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), FOLDER_B, "None", null);
     }
 
     private void addSearchableStudy()

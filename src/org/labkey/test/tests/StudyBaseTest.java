@@ -136,7 +136,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
             _containerHelper.createProject(getProjectName(), null);
         }
 
-        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
     }
 
     // Start importing the specimen archive.  This can load in the background while executing the first set of

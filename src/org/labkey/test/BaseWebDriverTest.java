@@ -2889,24 +2889,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#createSubfolder(String, String, String, String, String, String[], String[], boolean)}
-     */
-    @Deprecated
-    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
-    {
-        _containerHelper.createSubfolder(project, parent, child, folderType, tabsToAdd);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#createSubfolder(String, String, String, String, String[], boolean)}
-     */
-    @Deprecated
-    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, @Nullable String[] tabsToAdd, boolean inheritPermissions)
-    {
-        _containerHelper.createSubfolder(project, parent, child, folderType, tabsToAdd, inheritPermissions);
-    }
-
     public void hoverProjectBar()
     {
         Locator.IdLocator projectBar = Locator.id("projectBar");

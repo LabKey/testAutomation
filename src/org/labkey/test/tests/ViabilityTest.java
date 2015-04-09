@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
@@ -280,7 +279,7 @@ public class ViabilityTest extends AbstractViabilityTest
     protected void runTargetStudyTest()
     {
         log("** Create Study2");
-        createSubfolder(getProjectName(), getProjectName(), STUDY2_NAME, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY2_NAME, "Study", null, true);
         clickButton("Create Study");
         clickButton("Create Study");
 

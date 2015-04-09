@@ -102,8 +102,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
         createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME, false);
 
-        createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
-        createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
+        _containerHelper.createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
+        _containerHelper.createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
         addWebPart("Messages");
         assertElementPresent(Locator.linkWithText("Messages"));
         addWebPart("Wiki");

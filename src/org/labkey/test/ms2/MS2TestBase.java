@@ -76,7 +76,7 @@ abstract public class MS2TestBase extends BaseWebDriverTest
     protected void createProjectAndFolder()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
+        _containerHelper.createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "MS2", new String[] { });
 
         log("Setup pipeline.");
         clickButton("Setup");

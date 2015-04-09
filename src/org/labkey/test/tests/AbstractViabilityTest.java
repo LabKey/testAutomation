@@ -57,8 +57,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         log("** Initialize Folder");
         _containerHelper.createProject(getProjectName(), null);
-        createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
-        
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
+
         log("** Create Study");
         clickFolder(getFolderName());
         clickButton("Create Study");

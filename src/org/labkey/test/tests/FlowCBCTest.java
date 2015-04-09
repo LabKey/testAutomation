@@ -28,8 +28,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
-import java.io.File;
-
 import static org.junit.Assert.*;
 
 /**
@@ -63,7 +61,7 @@ public class FlowCBCTest extends BaseFlowTest
     private void initializeAssayFolder()
     {
         log("** Initialize CBC Assay");
-        createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
 
         clickFolder(CBC_FOLDER);
         if (!isElementPresent(Locator.linkWithText("Assay List")))
@@ -90,7 +88,7 @@ public class FlowCBCTest extends BaseFlowTest
     private void initializeStudyFolder()
     {
         log("** Initialize Study Folder");
-        createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
         importFolderFromZip(TestFileUtils.getSampleData("flow/FlowStudy.folder.zip"), false, 1);       //Issue 16697: dataset ignored when importing study archive
     }
 

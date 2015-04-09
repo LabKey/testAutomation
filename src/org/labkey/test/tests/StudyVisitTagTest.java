@@ -88,15 +88,15 @@ public class StudyVisitTagTest extends StudyBaseTest
         _containerHelper.createProject(getProjectName(), "Study");
         for(String Study : DATE_BASED_STUDIES)
         {
-            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+            _containerHelper.createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
         }
         for(String Study : VISIT_BASED_STUDIES)
         {
-            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+            _containerHelper.createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
         }
         for(String Study : SINGLE_USE_TAG_ERRORS)
         {
-            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+            _containerHelper.createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
         }
     }
 

@@ -30,7 +30,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,9 +84,9 @@ public class StudyDataspaceTest extends StudyBaseTest
     protected void initializeFolder()
     {
         _containerHelper.createProject(getProjectName(), "Dataspace");
-        createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY1, "Study", null, true);
-        createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY2, "Study", null, true);
-        createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY5, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY1, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY2, "Study", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), FOLDER_STUDY5, "Study", null, true);
     }
 
     @Override
@@ -183,7 +182,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         // Load study in another folder
         _fileBrowserHelper.selectFileBrowserItem("export/study/study.xml");
-        createSubfolder(getProjectName(), getProjectName(), "SubFolder 5", "Collaboration", null, true);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), "SubFolder 5", "Collaboration", null, true);
         clickFolder("SubFolder 5");
         setPipelineRoot(getPipelinePath());
         importFolderFromPipeline("/export/folder.xml", 1, false);
