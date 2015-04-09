@@ -238,11 +238,11 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         clickFolder(folder);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        setFormElement("newLabel", "Approved");
-        setFormElement("newDescription", "We all like approval.");
+        setFormElement(Locator.name("newLabel"), "Approved");
+        setFormElement(Locator.name("newDescription"), "We all like approval.");
         clickButton("Save");
-        setFormElement("newLabel", "Pending Review");
-        setFormElement("newDescription", "No one likes to be reviewed.");
+        setFormElement(Locator.name("newLabel"), "Pending Review");
+        setFormElement(Locator.name("newDescription"), "No one likes to be reviewed.");
         click(Locator.checkboxByName("newPublicData"));
         clickButton("Save");
         selectOptionByText(Locator.name("defaultAssayQCState"), "Pending Review");
