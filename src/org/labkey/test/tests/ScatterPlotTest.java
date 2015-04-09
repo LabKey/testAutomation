@@ -56,7 +56,7 @@ public class ScatterPlotTest extends GenericChartsTest
     }
 
     private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
-    private static final String SCATTER_PLOT_MV_2 = "Mice A\nNot in Cat Mice Let\nMice B\nMice C\n32.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
+    private static final String SCATTER_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Cat Mice Let\n32.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod

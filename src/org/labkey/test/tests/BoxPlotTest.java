@@ -39,7 +39,7 @@ public class BoxPlotTest extends GenericChartsTest
     }
 
     private static final String BOX_PLOT_MV_1 = "Group 1\nGroup 2\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0\nRCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measure\nCohort\n4c.Induration 1st measure";
-    private static final String BOX_PLOT_MV_2 = "Mice A\nMice B\nNot in Cat Mice Let\nMice C\n37.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
+    private static final String BOX_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Cat Mice Let\n37.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
@@ -110,7 +110,7 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
     }
 
-    private static final String BOX_PLOT_DR_1 = "Group 2\nGroup 1\n36.6\n36.7\n36.8\n36.9\n37.0\n37.1\n37.2\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature";
+    private static final String BOX_PLOT_DR_1 = "Group 1\nGroup 2\n36.6\n36.7\n36.8\n36.9\n37.0\n37.1\n37.2\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature";
     private static final String BOX_PLOT_DR_2 = "Group 1\nGroup 2\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature";
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
