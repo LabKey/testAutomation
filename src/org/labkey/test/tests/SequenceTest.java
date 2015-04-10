@@ -852,7 +852,7 @@ public class SequenceTest extends BaseWebDriverTest
         readsetGrid.clickTbarButton("Bulk Edit");
         waitForElement(Ext4Helper.Locators.window("Bulk Edit").notHidden());
         Ext4FieldRef.waitForField(this, "Select Field");
-        sleep(200);
+        sleep(500);
 
         _ext4Helper.selectComboBoxItem("Select Field:", Ext4Helper.TextMatchTechnique.CONTAINS, "Application");
         Ext4ComboRef.waitForField(this, "Application");

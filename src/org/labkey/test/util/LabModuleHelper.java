@@ -249,7 +249,7 @@ public class LabModuleHelper
 
         if (expectedColumns != null)
         {
-            Ext4CmpRef win = _test._ext4Helper.queryOne("window", Ext4CmpRef.class);
+            Ext4CmpRef win = _test._ext4Helper.queryOne("window[title=Spreadsheet Import]", Ext4CmpRef.class);
             _test.sleep(1000);
             String fields = (String)win.getEval("getFieldsInTemplateTest()");
             String[] fieldArray = fields.split(";");
