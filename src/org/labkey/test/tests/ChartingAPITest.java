@@ -231,8 +231,8 @@ public class ChartingAPITest extends BaseWebDriverTest
 
     protected static final String SCATTER_ONE_TEXT = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter Plot One\nCD4+ (cells/mm3)\nLymphs (cells/mm3)";
     protected static final String SCATTER_TWO_TEXT = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter Plot Two (Custom)\nCD4\nLymphs\nFemales\nMales";
-    protected static final String BOX_ONE_TEXT = "Males\nFemales\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nBox Plot One\nGender\nLymphs (cells/mm3)";
-    protected static final String BOX_TWO_TEXT = "Males\nFemales\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nBox Plot Two (Custom)\nGender\nCD4\nFemales";
+    protected static final String BOX_ONE_TEXT = "Females\nMales\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nBox Plot One\nGender\nLymphs (cells/mm3)";
+    protected static final String BOX_TWO_TEXT = "Females\nMales\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nBox Plot Two (Custom)\nGender\nCD4\nFemales";
 
     @Test
     public void genericChartHelperTest()
