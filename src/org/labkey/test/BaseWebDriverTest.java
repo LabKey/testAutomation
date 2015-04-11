@@ -2999,7 +2999,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         try
         {
-            assertEquals("Failed to enable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/enable.view?name=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+            assertEquals("Failed to enable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/enable.view?provider=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
         }
         catch (IOException e)
         {
@@ -3012,14 +3012,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
 //        try
 //        {
-//            assertEquals("Failed to disable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/disable.view?name=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+//            assertEquals("Failed to disable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/disable.view?provider=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
 //        }
 //        catch (IOException e)
 //        {
 //            throw new RuntimeException("Failed to disable Secondary Authentication", e);
 //        }
         pushLocation();
-        beginAt("/login/disable.view?name=Test%20Secondary%20Authentication");
+        beginAt("/login/disable.view?provider=Test%20Secondary%20Authentication");
         popLocation();
 
     }
