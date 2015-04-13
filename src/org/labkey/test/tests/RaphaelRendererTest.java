@@ -242,8 +242,8 @@ public class RaphaelRendererTest extends BaseWebDriverTest
     private static final String BOX_POINTCLICKFN_NAME = "Box Plot - PointClickFn";
 
     private static final String BOX_DEFAULT = "Not in Cohort\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature";
-    private static final String BOX_ALL_POINTS_COLORED = "Mice A\nMice B\nNot in Cat Mice Let\nMice C\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCat Mice Let\n2.Body temperature\nn/a";
-    private static final String BOX_NO_POINTS_LINE_WIDTH_COLOR = "Mice A\nMice B\nNot in Cat Mice Let\nMice C\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCat Mice Let\n2.Body temperature";
+    private static final String BOX_ALL_POINTS_COLORED = "Mice A\nMice B\nMice C\nNot in Cat Mice Let\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCat Mice Let\n2.Body temperature\nn/a";
+    private static final String BOX_NO_POINTS_LINE_WIDTH_COLOR = "Mice A\nMice B\nMice C\nNot in Cat Mice Let\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCat Mice Let\n2.Body temperature";
     private static final String BOX_POINTCLICKFN = "Not in Cohort\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature";
     private static final String BOX_EXPORTED = "Not in Cohort\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nCohort\n2.Body temperature\n999320557\n999320565\n999320671\n999320719\n999321033";
 
