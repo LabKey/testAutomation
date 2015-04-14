@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 
 import java.util.List;
 
@@ -315,5 +316,32 @@ public class StudyHelper extends AbstractHelper
         _test._extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         _test.clickButton("Finish");
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
+    }
+
+    public DatasetDomainEditor defineDataset(@LoggedParam String name, String containerPath)
+    {
+        return defineDataset(name, containerPath, null);
+    }
+
+    @LogMethod
+    public DatasetDomainEditor defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
+    {
+        _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
+
+        _test.setFormElement(Locator.name("typeName"), name);
+
+        if (id != null)
+        {
+            _test.uncheckCheckbox(Locator.name("autoDatasetId"));
+            _test.setFormElement(Locator.id("datasetId"), id);
+        }
+        else
+        {
+            _test.checkCheckbox(Locator.name("autoDatasetId"));
+        }
+
+        _test.clickButton("Next");
+
+        return new DatasetDomainEditor(_test);
     }
 }

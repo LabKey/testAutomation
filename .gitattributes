@@ -277,6 +277,7 @@ src/org/labkey/remoteapi/olap/MdxResponse.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
+src/org/labkey/test/CachingLocator.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/LabKeyJDBCTest.java -text
 src/org/labkey/test/Locator.java -text
@@ -337,6 +338,7 @@ src/org/labkey/test/categories/Weekly.java -text
 src/org/labkey/test/categories/Wiki.java -text
 src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/components/BodyWebPart.java -text
+src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/D3PieChart.java -text
 src/org/labkey/test/components/InsertPage.java -text
 src/org/labkey/test/components/SideWebPart.java -text
