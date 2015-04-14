@@ -6061,10 +6061,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         acceptTermsOfUse(termsText, true);
 
-        final Locator.XPathLocator signInButtonOrLink = Locator.xpath("//a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
-        if (!isElementPresent(signInButtonOrLink)) // Sign-out action stopped impersonation
+        if (!isElementPresent(Locators.signInButtonOrLink)) // Sign-out action stopped impersonation
             beginAt("/login/logout.view");
-        waitForElement(signInButtonOrLink);
+        waitForElement(Locators.signInButtonOrLink);
     }
 
     @LogMethod
