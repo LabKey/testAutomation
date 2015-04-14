@@ -48,12 +48,11 @@ import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -423,7 +422,7 @@ public class Runner extends TestSuite
 
             if (test == null)
             {
-                Class interfaces[] = testClass.getInterfaces();
+                List<Class<?>> interfaces = ClassUtils.getAllInterfaces(testClass);
                 String databaseType = System.getProperty("databaseType");
                 String databaseVersion = System.getProperty("databaseVersion");
                 String osName = System.getProperty("os.name");
