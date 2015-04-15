@@ -7,6 +7,7 @@ import org.apache.http.HttpException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -104,6 +105,18 @@ public class SSOwithCASTest extends BaseWebDriverTest
         testCAS(false);
     }
 
+    @Test @Ignore
+    public void testBogusTicket()
+    {
+
+    }
+
+    @Test @Ignore
+    public void testCASUnreachable()
+    {
+
+    }
+
     private void testCAS(boolean loginPage)
     {
         signOut();
@@ -124,10 +137,10 @@ public class SSOwithCASTest extends BaseWebDriverTest
         assertEquals("After successful SSO with CAS, user should be redirected to the same URL they were on before Sign In",
                 relativeURLBeforeSignIn, relativeURLAfterSignIn);
 
-        //User should be 'labkeytest1'.
-        assertEquals("User should be signed in with CAS userId", getDisplayName(), "labkeytest1");
+        //User should be CAS user
+        assertEquals("User should be signed in with CAS userId", getDisplayName(), "");
 
-        //Sign out user 'labkeytest1', should sign out from Labkey, but should remained Sign In into CAS.
+        //Sign out CAS user, should sign out from Labkey, but should remained Sign In into CAS.
         signOut();
 
         String relativeURLBeforeSignIn2 = getCurrentRelativeURL();
@@ -143,8 +156,8 @@ public class SSOwithCASTest extends BaseWebDriverTest
         assertEquals("User should be redirected to the same URL they were previously on after Signing In via CAS link",
                 relativeURLBeforeSignIn2, relativeURLAfterSignIn2);
 
-        //User should be 'labkeytest1'.
-        assertEquals("User should be still signed in with CAS userId", getDisplayName(), "labkeytest1");
+        //User should be CAS user
+        assertEquals("User should be still signed in with CAS userId", getDisplayName(), "");
 
         //Sign out
         signOut();
@@ -178,8 +191,8 @@ public class SSOwithCASTest extends BaseWebDriverTest
 
     private void casLogin()
     {
-        setFormElement(Locator.input("username"), "labkeytest1");
-        setFormElement(Locator.input("password"), "labkeytest1");
+        setFormElement(Locator.input("username"), "");
+        setFormElement(Locator.input("password"), "");
         clickAndWait(Locator.input("submit"));
     }
 
@@ -189,15 +202,12 @@ public class SSOwithCASTest extends BaseWebDriverTest
         {
             String httpGetResponseBody = WebTestHelper.getHttpGetResponseBody("https://testauth.epi.usf.edu/cas/logout");
         }
-        catch (HttpException e)
+        catch (HttpException | IOException e)
         {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+            throw new RuntimeException(e) ;
         }
     }
+
 
     @After
     public void postTest()
