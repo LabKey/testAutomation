@@ -41,6 +41,16 @@ public abstract class TestProperties
         }
     }
 
+    public static String getCASUserID()
+    {
+        return "";
+    }
+
+    public static String getCASUserPassword()
+    {
+        return "";
+    }
+
     public static boolean isTestCleanupSkipped()
     {
         return "false".equals(System.getProperty("clean", "false"));
