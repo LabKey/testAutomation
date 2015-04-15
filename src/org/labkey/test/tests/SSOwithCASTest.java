@@ -14,6 +14,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestProperties;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.LogMethod;
@@ -34,6 +36,13 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private static final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
     private static final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+
+        deleteUsersIfPresent(TestProperties.getCASUserID());
+    }
 
     @BeforeClass
     public static void setupProject()
@@ -89,8 +98,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
         //Save
         clickButton("Save");
 
-        //Signout
-        signOut();
+        //TODO: Verify logo deletion
     }
 
     @Test
@@ -158,9 +166,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
 
         //User should be CAS user
         assertEquals("User should be still signed in with CAS userId", getDisplayName(), "");
-
-        //Sign out
-        signOut();
     }
 
     @LogMethod(quiet = true)
@@ -208,7 +213,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
         }
     }
 
-
     @After
     public void postTest()
     {
@@ -231,6 +235,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("authentication");
     }
 }
