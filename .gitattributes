@@ -517,6 +517,7 @@ src/org/labkey/test/tests/ReportThumbnailTest.java -text
 src/org/labkey/test/tests/ResourceEncodingTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text
 src/org/labkey/test/tests/SCHARPStudyTest.java -text
+src/org/labkey/test/tests/SSOwithCASTest.java -text
 src/org/labkey/test/tests/SampleMindedImportTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
 src/org/labkey/test/tests/ScatterPlotTest.java -text
