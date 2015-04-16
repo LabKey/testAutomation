@@ -632,14 +632,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void doTearDown()
+    private static void doTearDown()
     {
         try
         {
             boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
-            if ((!skipTearDown || isTestRunningOnTeamCity()) && getDriver() != null)
+            if ((!skipTearDown || isTestRunningOnTeamCity()) && _driver != null)
             {
-                getDriver().quit();
+                _driver.quit();
             }
         }
         catch (UnreachableBrowserException ignore) {}
@@ -1786,10 +1786,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override
         protected void finished(Description description)
         {
-            if (currentTest != null)
-            {
-                currentTest.doTearDown();
-            }
+            doTearDown();
 
             TestLogger.resetLogger();
             TestLogger.log("\\\\ AfterClass Complete //");
