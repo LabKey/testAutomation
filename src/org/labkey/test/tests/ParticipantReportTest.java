@@ -57,7 +57,7 @@ public class ParticipantReportTest extends ReportTest
     private static final String[] SPEC_PTID_TWO = {"999320518"};
     private static final String PARTICIPANT_REPORT5_NAME = "Demographic Participant Report";
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         enableEmailRecorder();
@@ -83,7 +83,7 @@ public class ParticipantReportTest extends ReportTest
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         doParticipantGroupCategoriesTest();

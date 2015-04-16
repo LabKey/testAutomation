@@ -47,7 +47,7 @@ public class MS2Test extends AbstractMS2ImportTest
     protected static final String RUN_GROUP3_NAME = "Test Run Group 3";
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupMS2()
     {
         super.setupMS2();
@@ -55,7 +55,7 @@ public class MS2Test extends AbstractMS2ImportTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void verifyMS2()
     {
         verifyFirstRun();

@@ -48,7 +48,7 @@ public class ParticipantListTest extends StudyBaseTest
                                            "999320036","999320038", "999321033", "999321029", "999320981"};
     protected static final String REFRESH_DATE = "2012-03-01";
 
-    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
+    @Override @LogMethod
     protected void doCreateSteps()
     {
         RReportHelper _reportHelperWD = new RReportHelper(this);
@@ -65,7 +65,7 @@ public class ParticipantListTest extends StudyBaseTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_THREE, "Mouse", PTIDS[0]);
     }
 
-    @Override @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @Override @LogMethod
     protected void doVerifySteps()
     {
         doParticipantListWebPartTest();

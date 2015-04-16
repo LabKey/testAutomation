@@ -69,14 +69,14 @@ public class ListImportFieldsTest extends BaseWebDriverTest
     }
 
     @BeforeClass
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     public static void doSetup() throws Exception
     {
         ListImportFieldsTest initTest = (ListImportFieldsTest)getCurrentTest();
         initTest.setupProject();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void setupProject()
     {
         _containerHelper.createProject(getProjectName(), null);

@@ -26,13 +26,13 @@ public class SchemaHelper extends AbstractHelper
         super(test);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     public void createLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
         _editLinkedSchema(true, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     public void updateLinkedSchema(String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
         _editLinkedSchema(false, projectName, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);

@@ -135,7 +135,7 @@ public class TargetStudyTest extends AbstractAssayTest
         waitForText("General Study Settings");
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupAssay()
     {
         PortalHelper portalHelper = new PortalHelper(this);

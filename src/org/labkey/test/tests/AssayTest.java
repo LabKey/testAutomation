@@ -149,7 +149,7 @@ public class AssayTest extends AbstractAssayTest
         goBack();
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifyRunDeletionRecallsDatasetRows()
     {
         clickProject(getProjectName());
@@ -186,7 +186,7 @@ public class AssayTest extends AbstractAssayTest
 
     }
 
-    @LogMethod(category = LogMethod.MethodType.MIXEDPURPOSE)
+    @LogMethod
     private void editResults()
     {
         // Verify that the results aren't editable by default
@@ -245,7 +245,7 @@ public class AssayTest extends AbstractAssayTest
     /**
      * Defines an test assay at the project level for the security-related tests
      */
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void defineAssay()
     {
         log("Defining a test assay at the project level");
@@ -320,7 +320,7 @@ public class AssayTest extends AbstractAssayTest
      * @param folder    name of the folder into which we should upload
      * @param asUser    the user to impersonate before uploading
      */
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void uploadRuns(String folder, String asUser)
     {
         log("Uploading runs into folder " + folder + " as user " + asUser);
@@ -486,7 +486,7 @@ public class AssayTest extends AbstractAssayTest
      * This will also verify that the PI cannot publish to studies for which
      * the PI does not have Editor permissions.
      */
-    @LogMethod(category = LogMethod.MethodType.MIXEDPURPOSE)
+    @LogMethod
     private void publishData()
     {
         log("Prepare visit map to check PTID counts in study navigator.");
@@ -614,7 +614,7 @@ public class AssayTest extends AbstractAssayTest
      * this will create 1 pre-existing timepoint, and when copying data this timepoint should be
      * chosen for appropriate records.
      */
-    @LogMethod(category = LogMethod.MethodType.MIXEDPURPOSE)
+    @LogMethod
     private void publishDataToDateBasedStudy()
     {
         log("Prepare visit map to check PTID counts in study navigator.");
@@ -713,7 +713,7 @@ public class AssayTest extends AbstractAssayTest
      * this will create 1 pre-existing timepoint, and when copying data this timepoint should be
      * chosen for appropriate records.
      */
-    @LogMethod(category = LogMethod.MethodType.MIXEDPURPOSE)
+    @LogMethod
     private void publishDataToVisitBasedStudy()
     {
         log("Prepare visit map to check PTID counts in study navigator.");
@@ -812,7 +812,7 @@ public class AssayTest extends AbstractAssayTest
     /**
      * Tests editing of an existing assay definition
      */
-    @LogMethod(category = LogMethod.MethodType.MIXEDPURPOSE)
+    @LogMethod
     private void editAssay()
     {
         log("Testing edit and delete and assay definition");
@@ -838,7 +838,7 @@ public class AssayTest extends AbstractAssayTest
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.ASSAY_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "were copied to a study from the assay: " + TEST_ASSAY, 5);
     } //editAssay()
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void viewCrossFolderData()
     {
         log("Testing cross-folder data");
@@ -920,7 +920,7 @@ public class AssayTest extends AbstractAssayTest
         portalHelper.addWebPart("Assay List");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifyStudyList()
     {
         clickFolder(TEST_ASSAY_FLDR_STUDIES);

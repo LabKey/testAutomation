@@ -47,7 +47,7 @@ public class DataViewsTest extends ParticipantListTest
 
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
-    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
+    @Override @LogMethod
     protected void doCreateSteps()
     {
         RReportHelper reportHelper = new RReportHelper(this);

@@ -29,7 +29,7 @@ import org.labkey.test.util.LogMethod;
 public class MS2GZTest extends AbstractMS2ImportTest
 {
     @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupMS2()
     {
         super.setupMS2();
@@ -38,7 +38,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void verifyMS2()
     {
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);

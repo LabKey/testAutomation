@@ -79,7 +79,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         init.setupProject();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void setupProject()
     {
         RReportHelper rReportHelper = new RReportHelper(this);

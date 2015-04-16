@@ -106,7 +106,7 @@ public class FilterTest extends BaseWebDriverTest
         containerFilterFacetTest();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void setupProject()
     {
         RReportHelper _RReportHelper = new RReportHelper(this);
@@ -115,7 +115,7 @@ public class FilterTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void createList()
     {
         StringBuilder testDataFull = new StringBuilder();
@@ -147,7 +147,7 @@ public class FilterTest extends BaseWebDriverTest
         _customizeViewsHelper.createRView(null, R_VIEW);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void createList2()
     {
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
@@ -169,7 +169,7 @@ public class FilterTest extends BaseWebDriverTest
      * important they be consistent.  To that end, this test will hit various URLs directly
      * and virify the appropriate data is displayed
      */
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void directUrlTest()
     {
         List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
@@ -181,7 +181,7 @@ public class FilterTest extends BaseWebDriverTest
         }
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void facetedFilterTest()
     {
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
@@ -379,7 +379,7 @@ public class FilterTest extends BaseWebDriverTest
         assertEquals("Unexpected filter options", Arrays.asList(expectedOptions), actualOptions);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void filterTest()
     {
         validFiltersGenerateCorrectResultsTest();

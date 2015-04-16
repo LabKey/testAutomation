@@ -253,7 +253,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         return Arrays.asList("study");
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doSetup()
     {
         getCurrentCoreRevNumber();
@@ -311,7 +311,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void setThumbnailSRC(String chart)
     {
         waitForElement(Locator.linkWithText(chart));
@@ -328,13 +328,13 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         }
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void assertNewThumbnail(String chart)
     {
         verifyThumbnail(chart, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void verifyThumbnail(String chart, String expected)
     {
         goToDataViews();
@@ -361,7 +361,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         THUMBNAIL_DATA = thumbnailData;
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void assignCustomThumbnail(String chart, File thumbnail, int currentRevNum, int nextRevNum)
     {
         // NOTE: the checkRevisionNumber here makes an assumption about this being a new thumbnail with no previous thumbnails.
@@ -418,7 +418,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         return false;
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void setIconSRC(String chart)
     {
         waitForElement(Locator.linkWithText(chart));
@@ -440,13 +440,13 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForTextToDisappear("Saving...");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void assertNewIcon(String chart)
     {
         verifyIcon(chart, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void verifyIcon(String chart, String expected)
     {
         goToDataViews();
@@ -477,7 +477,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForTextToDisappear("Saving...");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void assignCustomIcon(String chart, File icon, int currentRevNum, int nextRevNum)
     {
         goToDataViews();
@@ -500,7 +500,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForTextToDisappear("Saving...");
     }
 
-    /*@LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    /*@LogMethod
     protected File getExportFolderZip()
     {
         goToProjectHome();
@@ -521,7 +521,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         return exportFiles[0];
     }*/
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void importFolder(File importZip)
     {
         _containerHelper.createProject(PROJECT_NAME_ROUNDTRIP, "Study");
@@ -529,7 +529,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         importStudyFromZip(importZip);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void testThumbnailRoundtrip()
     {
         // export

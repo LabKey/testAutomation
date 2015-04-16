@@ -41,7 +41,7 @@ public class StudyDatasetReloadTest extends StudyBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         initializeFolder();
@@ -53,7 +53,7 @@ public class StudyDatasetReloadTest extends StudyBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         reloadStudyFromZip(STUDY_WITHOUT_BIT);

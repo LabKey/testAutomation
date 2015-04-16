@@ -49,7 +49,7 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         initializeFolder();

@@ -28,16 +28,4 @@ public @interface LogMethod
     // but are not complex enough to warrant logging both their entrance and exit
     // Such marked methods will only be logged upon returning
     boolean quiet() default false;
-
-    MethodType category() default MethodType.UNSPECIFIED;
-
-    public static enum MethodType
-    {
-        BEFORE,
-        SETUP,
-        VERIFICATION,
-        MIXEDPURPOSE,
-        UNSPECIFIED,
-        AFTER
-    }
 }

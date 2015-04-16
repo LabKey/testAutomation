@@ -34,7 +34,7 @@ import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.labkey.api.reader.UTF8Reader;
 import org.labkey.api.writer.UTF8PrintWriter;
-import org.labkey.test.aspects.MethodPerfAspect;
+import org.labkey.test.aspects.TestPerfAspect;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
@@ -43,7 +43,6 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
@@ -289,7 +288,7 @@ public class Runner extends TestSuite
 
         long testTimeMs = System.currentTimeMillis() - startTimeMs;
         saveTestDuration(test, testTimeMs);
-        MethodPerfAspect.savePerfStats(test);
+        TestPerfAspect.savePerfStats(test);
 
         if (_remainingTests.isEmpty())
         {
@@ -630,7 +629,7 @@ public class Runner extends TestSuite
 
             System.out.println(getFixedWidthString(testName, durationAndPercent, width));
 
-            for (Map.Entry<LogMethod.MethodType, Long> stats : MethodPerfAspect.getPerfStats(testName).entrySet())
+            for (Map.Entry<TestPerfAspect.TestSection, Long> stats : TestPerfAspect.getPerfStats(testName).entrySet())
             {
                 System.out.println("\t" + stats.getKey() + "\t" + formatDuration(stats.getValue()));
             }

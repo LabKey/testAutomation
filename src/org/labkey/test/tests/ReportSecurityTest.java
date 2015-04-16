@@ -40,7 +40,7 @@ public class ReportSecurityTest extends ReportTest
         super.doCleanup(afterTest);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         enableEmailRecorder();
@@ -55,7 +55,7 @@ public class ReportSecurityTest extends ReportTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     public void doVerifySteps()
     {
         // additional report and security tests

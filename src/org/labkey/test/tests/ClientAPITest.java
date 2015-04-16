@@ -222,7 +222,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return data.toString();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void createLists()
     {
         createPeopleList();

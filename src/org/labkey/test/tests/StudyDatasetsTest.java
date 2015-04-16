@@ -65,7 +65,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         importStudy();
@@ -79,7 +79,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         createDataset("A");
@@ -227,7 +227,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifySideFilter()
     {
         clickProject(getProjectName());

@@ -76,7 +76,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         log("Create Project");
@@ -117,7 +117,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         clickButton("Submit");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         importRun();

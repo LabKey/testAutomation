@@ -64,7 +64,7 @@ public class NonStudyReportsTest extends ReportTest
         super.doCleanup(afterTest);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         enableEmailRecorder();
@@ -75,7 +75,7 @@ public class NonStudyReportsTest extends ReportTest
         rReportHelper.ensureRConfig();
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         doAttachmentReportTest();

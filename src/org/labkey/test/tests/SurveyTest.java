@@ -74,7 +74,7 @@ public class SurveyTest extends BaseWebDriverTest
         verifySurveyContainerPermissions();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void setupProjectFolder()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -86,7 +86,7 @@ public class SurveyTest extends BaseWebDriverTest
         createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA");
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     private void setupSubfolder()
     {
         _containerHelper.createSubfolder(getProjectName(), folderName);
@@ -121,7 +121,7 @@ public class SurveyTest extends BaseWebDriverTest
         createSurveyDesign(designName, description, schemaName, queryName, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifySurveyFromProject()
     {
         // add a survey webpart to the subfolder using the project survey design
@@ -163,7 +163,7 @@ public class SurveyTest extends BaseWebDriverTest
         //setFormElement(Locator.name(inputName), new File(getLabKeyRoot() + fileName));
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifyEditSurvey()
     {
         log("Edit the survey in the specified folder");
@@ -183,7 +183,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifySubmitSurvey()
     {
         // TODO: add a required field to the survey and verify the submit button disables when it doesn't have a value
@@ -227,7 +227,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickProject(getProjectName());
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifySurveyFromSubfolder()
     {
         WikiHelper wikiHelper = new WikiHelper(this);
@@ -324,7 +324,7 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText("Surveys: " + surveyDesignName);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     private void verifySurveyContainerPermissions()
     {
         log("Verify survey designs (current and parent container)");

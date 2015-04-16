@@ -30,7 +30,7 @@ public class StudyReloadTest extends StudyBaseTest
 {
     @Override
     //disabled for 14569
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void doCreateSteps()
     {
         initializeFolder();
@@ -38,7 +38,7 @@ public class StudyReloadTest extends StudyBaseTest
     }
 
     @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         reloadStudyFromZip(new File(TestFileUtils.getSampledataPath(), "/studyreload/edited.zip"));

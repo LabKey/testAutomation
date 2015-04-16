@@ -296,8 +296,8 @@ src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/aspects/MethodLoggingAspect.java -text
-src/org/labkey/test/aspects/MethodPerfAspect.java -text
 src/org/labkey/test/aspects/StaleElementRetryAspect.java -text
+src/org/labkey/test/aspects/TestPerfAspect.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/Base.java -text

@@ -455,7 +455,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         verifyLinkedSchemaTemplateOverride();
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void setupProject()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -466,7 +466,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void createList()
     {
         log("** Importing some data...");
@@ -499,7 +499,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void importListData()
     {
         File lists = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
@@ -510,7 +510,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.importListArchive(OTHER_FOLDER, lists);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void createLinkedSchema()
     {
         log("** Creating linked schema APeople without template");
@@ -532,7 +532,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     void verifyLinkedSchema()
     {
         goToSchemaBrowser();
@@ -609,7 +609,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.disableModules("linkedschematest");
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void createLinkedSchemaUsingTemplate()
     {
         log("** Creating linked schema BPeople using BPeopleTemplate");
@@ -617,7 +617,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     void verifyLinkedSchemaUsingTemplate()
     {
         goToSchemaBrowser();
@@ -635,7 +635,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertTrue("Expected details url to contain other.view, got '" + detailsUrl + "'", detailsUrl.contains("other.view"));
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     void createLinkedSchemaTemplateOverride()
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
@@ -643,7 +643,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     void verifyLinkedSchemaTemplateOverride()
     {
         goToSchemaBrowser();

@@ -86,7 +86,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         waitForPipelineJobsToComplete(totalJobCount, "Waiting for upload to complete", false);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupMS2()
     {
         log("Verifying that pipeline files were cleaned up properly");
@@ -165,6 +165,6 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         clickButton("Save View");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected abstract void verifyMS2();
 }

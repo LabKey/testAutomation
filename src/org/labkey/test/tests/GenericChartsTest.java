@@ -41,7 +41,7 @@ public abstract class GenericChartsTest extends ReportTest
         return BrowserType.CHROME;
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     final protected void doCreateSteps()
     {
         // import study and wait; no specimens needed
@@ -54,7 +54,7 @@ public abstract class GenericChartsTest extends ReportTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_C, "Mouse", MOUSE_GROUP_CATEGORY, false, true, "999320624,999320646,999320652,999320671");
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     protected void doVerifySteps()
     {
         testPlots();

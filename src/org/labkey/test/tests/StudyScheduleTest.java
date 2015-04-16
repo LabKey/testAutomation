@@ -71,7 +71,7 @@ public class StudyScheduleTest extends StudyBaseTest
         return BrowserType.CHROME;
     }
 
-    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
+    @Override @LogMethod
     protected void doCreateSteps()
     {
         importStudy();
@@ -103,7 +103,7 @@ public class StudyScheduleTest extends StudyBaseTest
         waitForElement(Locator.xpath("//div[.='ECI-1: Eligibility Criteria']/../../..//div[@class='checked']"));
     }
 
-    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     public void basicTest()
     {
         log("Study Schedule Test");
@@ -145,7 +145,7 @@ public class StudyScheduleTest extends StudyBaseTest
         waitForText(dataset);
     }
 
-    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     public void linkDatasetTest()
     {
         goToStudySchedule();
@@ -204,7 +204,7 @@ public class StudyScheduleTest extends StudyBaseTest
         assertTextPresent("Dataset:", GHOST_DATASET_3);
     }
 
-    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     public void linkFromDatasetDetailsTest()
     {
         goToStudySchedule();
@@ -389,7 +389,7 @@ public class StudyScheduleTest extends StudyBaseTest
         }
     }
 
-    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
+    @LogMethod
     public void datasetStatusTest()
     {
         log("Testing status settings for datasets");
