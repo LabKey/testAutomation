@@ -233,7 +233,7 @@ function init() {
     formInit();
 }
 
-LABKEY.requiresExt3ClientAPI(true, function() {
+LABKEY.requiresExt3ClientAPI(function() {
     LABKEY.requiresVisualization(function() {
         Ext.onReady(init);
     });

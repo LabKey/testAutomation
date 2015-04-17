@@ -108,7 +108,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final int PAGE_SIZE = 4;
 
     public static final String SRC_PREFIX = "<script type=\"text/javascript\">\n" +
-            "    LABKEY.requiresClientAPI(true, function() {\n" +
+            "    LABKEY.requiresClientAPI(true /* left on purpose to test old signature */, function() {\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
             "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
             "        return {\n" +
