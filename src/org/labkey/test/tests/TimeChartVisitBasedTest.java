@@ -161,7 +161,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
         waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
-        click(Locator.tagWithText("span", "999320016"));
+        click(Locator.tagWithText("div", "999320016"));
         waitForText(WAIT_FOR_JAVASCRIPT, "4 wk Post-V#2/V#3"); // last visit from ptid 999320016
         // TODO: Not accurate anymore. Shows up around 30 times now, which doesnt make sense since it only shows up 9
         // times per SVG and there are 2 SVG's on the page. I'm unable to locate the other 12 occurances of it on the page.
