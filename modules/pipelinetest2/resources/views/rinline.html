@@ -38,7 +38,7 @@
 var path = null;
 var files = [];
 
-LABKEY.requiresExt3ClientAPI(true, function() {
+LABKEY.requiresExt3ClientAPI(function() {
     Ext.onReady(function () {
 
         path = LABKEY.ActionURL.getParameter("path");

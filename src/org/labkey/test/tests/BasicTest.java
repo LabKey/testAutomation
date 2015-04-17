@@ -35,7 +35,7 @@ import org.openqa.selenium.WebElement;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({Base.class, DRT.class, BVT.class, DailyA.class})
+//@Category({Base.class, DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";
