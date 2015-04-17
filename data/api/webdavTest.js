@@ -7,7 +7,7 @@
 // Designed to be run by JavaScriptExecutor#executeAsyncScript
 var callback = arguments[arguments.length - 1]; // See WebDriver documentation
 
-LABKEY.requiresExt3ClientAPI(function()
+LABKEY.requiresExt3ClientAPI(true, function()
 {
     window.result = '';
 

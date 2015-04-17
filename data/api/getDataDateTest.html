@@ -284,7 +284,7 @@
         });
     }
 
-    LABKEY.requiresExt3ClientAPI(function() {
+    LABKEY.requiresExt3ClientAPI(true, function() {
         LABKEY.requiresVisualization(function() {
             Ext.onReady(init);
         });
