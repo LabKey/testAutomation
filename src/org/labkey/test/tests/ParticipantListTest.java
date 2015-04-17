@@ -156,8 +156,8 @@ public class ParticipantListTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 1);
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-south')]"), 2); //twice, one for south and one for southeast
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-southeast')]"), 1);
-        assertElementPresent(Locator.xpath("//span[contains(@class, 'lk-filter-panel-label')]"), 9); // 3 Cohorts + 3 participant groups and 3 not in any group
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'lk-filter-panel-label')]"), 4); // 4 cohort/ptid group category labels
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'group-label')]"), 9); // 3 Cohorts + 3 participant groups and 3 not in any group
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'category-label')]"), 4); // 4 cohort/ptid group category labels
 
         // compare the height of a non text-wrapped group grid cell to a wrapped one
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_THREE);

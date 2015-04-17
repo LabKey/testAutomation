@@ -486,7 +486,7 @@ public class Ext4Helper extends AbstractHelper
         _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
         Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '" + cellText + "']"));
+        _test.click(rowLoc.append("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'group-label')][normalize-space() = '" + cellText + "']"));
     }
 
     /**
