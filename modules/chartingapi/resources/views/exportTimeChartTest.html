@@ -162,7 +162,7 @@
         renderChart(chartConfig);
     };
 
-    LABKEY.requiresScript('/vis/timeChart/timeChartHelper.js', true, function(){
+    LABKEY.requiresScript('/vis/timeChart/timeChartHelper.js', function(){
         LABKEY.vis.TimeChartHelper.loadVisDependencies(function(){
             renderChart(charts[chartIdx]);
         });

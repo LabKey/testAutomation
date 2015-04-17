@@ -495,7 +495,7 @@
                         });
                     };
 
-                    LABKEY.requiresExt4Sandbox(true, LABKEY.requiresScript('/vis/SVGConverter.js', true, function(){ LABKEY.requiresVisualization(beginTest);}));
+                    LABKEY.requiresExt4Sandbox(LABKEY.requiresScript('/vis/SVGConverter.js', function(){ LABKEY.requiresVisualization(beginTest);}));
                 }
             }
         }();
