@@ -340,7 +340,6 @@ src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/components/BodyWebPart.java -text
 src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/D3PieChart.java -text
-src/org/labkey/test/components/InsertPage.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
@@ -382,8 +381,10 @@ src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_0.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_1.java -text
 src/org/labkey/test/pages/AssayDomainEditor.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
+src/org/labkey/test/pages/DatasetInsertPage.java -text
 src/org/labkey/test/pages/DomainEditor.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
+src/org/labkey/test/pages/InsertPage.java -text
 src/org/labkey/test/pages/IssueDetailsPage.java -text
 src/org/labkey/test/pages/LabKeyPage.java -text
 src/org/labkey/test/pages/OlapTestJson.java -text

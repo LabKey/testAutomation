@@ -1,8 +1,3 @@
-package org.labkey.test.components;
-
-import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-
 /*
  * Copyright (c) 2014 LabKey Corporation
  *
@@ -18,6 +13,12 @@ import org.labkey.test.Locator;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.labkey.test.pages;
+
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+
 public class InsertPage
 {
     protected BaseWebDriverTest _test;
@@ -30,10 +31,10 @@ public class InsertPage
         waitForReady();
     }
 
-
-    // consider getTitle here...
-
-    protected void waitForReady() {}
+    protected void waitForReady()
+    {
+        _test.waitForElement(elements().title.withText(_title));
+    }
 
     protected Elements elements()
     {
