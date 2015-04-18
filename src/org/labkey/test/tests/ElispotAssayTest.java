@@ -57,6 +57,14 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
     private static final String PLATE_TEMPLATE_NAME = "ElispotAssayTest Template";
 
+    protected static final String TEST_ASSAY_FLUOROSPOT = "TestAssayFluorospot";
+    protected static final String TEST_ASSAY_FLUOROSPOT_DESC = "Description for Fluorospot assay";
+
+    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME1 = "AID_out2.xlsx";
+    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_out4.xlsx";
+    protected final String TEST_ASSAY_FLUOROSPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME1;
+    protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");
@@ -149,14 +157,25 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         runTransformTest();
         doBackgroundSubtractionTest();
         testTNTCdata();
+
+        testFluorospotAssay();
     }
 
+    protected void uploadFluorospotFile(String filePath, String uniqueifier, String finalButton)
+    {
+        uploadFile(filePath, uniqueifier, finalButton, false, false, true);
+    }
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
     {
         uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, false);
     }
 
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground)
+    {
+        uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, subtractBackground, false);
+    }
+
+    protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground, boolean fluorospot)
     {
         if(subtractBackground)
             checkCheckbox(Locator.checkboxByName("subtractBackground"));
@@ -191,6 +210,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             setFormElement(Locator.name("antigen" + (i + 1) + "_CellWell"), "150");
         }
 
+        if (fluorospot)
+            clickButton("Next");
         clickButton(finalButton);
     }
 
@@ -642,5 +663,81 @@ public class ElispotAssayTest extends AbstractQCAssayTest
                 "Atg6FMedian"));
 
         assertEquals(expectedRows, actualRows);       */
+    }
+
+    protected static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
+    @LogMethod
+    protected void testFluorospotAssay()
+    {
+        //create a new fluorospot assay
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
+        clickButton("Next");
+
+        log("Setting up Fluorospot assay");
+
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
+        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
+        assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
+        assayDesigner.setDetectionMethod(FLUOROSPOT_DETECTION_METHOD);
+        assayDesigner.saveAndClose();
+
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLUOROSPOT));
+
+        log("Uploading Fluorospot Runs");
+        clickButton("Import Data");
+        clickButton("Next");
+        selectOptionByText(Locator.name("plateReader"), "AID");
+        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
+        assertTextPresent("Upload successful.");
+
+        selectOptionByText(Locator.name("plateReader"), "AID");
+        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE2, "F2", "Save and Finish");
+
+        clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME1));
+
+        assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
+
+        List<String> expectedSpotCount = Arrays.asList("4.0","0.0","0.0","2.0","0.0","0.0","0.0","0.0","1.0","1.0","1.0" ,"3.0" ,"3.0");
+        List<String> expectedActivity = Arrays.asList ("2.0","0.0"," "  ,"0.0","0.0"," "  ," "  ,"0.0","0.0"," "  ,"25.0","7.0" ,"13.0");
+        List<String> expectedIntesity = Arrays.asList ("7.0","0.0"," "  ,"5.0","0.0"," "  ," "  ,"0.0","5.0"," "  ,"84.0","11.0","23.0");
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity);
+
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME2));
+
+        assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
+
+        List<String> expectedSpotCount2 = Arrays.asList("0.0","5.0","0.0","0.0","36.0","0.0","0.0","53.0" ,"0.0","0.0","46.0","0.0","0.0");
+        List<String> expectedActivity2 = Arrays.asList ("0.0","4.0"," "  ,"0.0","47.0"," "  ," "  ,"149.0","0.0"," "  ,"95.0","0.0","0.0");
+        List<String> expectedIntesity2 = Arrays.asList ("0.0","8.0"," "  ,"0.0","7.0" ," "  ," "  ,"9.0"  ,"0.0"," "  ,"9.0" ,"0.0","0.0");
+        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2);
+    }
+
+    private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntesity)
+    {
+        DataRegionTable dataTable = new DataRegionTable("Data", this);
+        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
+        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
+        List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
+        List<String> activity = dataTable.getColumnDataAsText("Activity");
+        List<String> intensity = dataTable.getColumnDataAsText("Intensity");
+
+        assert expectedSpotCount.size() == expectedActivity.size();
+        assert expectedSpotCount.size() == expectedIntesity.size();
+        assert expectedSpotCount.size() <= spotCount.size();
+        assert expectedSpotCount.size() <= activity.size();
+        assert expectedSpotCount.size() <= intensity.size();
+        for (int i = 0; i < expectedSpotCount.size(); i++)
+        {
+            assertEquals(expectedSpotCount.get(i), spotCount.get(i));
+            assertEquals(expectedActivity.get(i), activity.get(i));
+            assertEquals(expectedIntesity.get(i), intensity.get(i));
+        }
     }
 }

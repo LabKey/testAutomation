@@ -85,6 +85,11 @@ public class AssayDomainEditor extends DomainEditor
         _test.selectOptionByText(Locator.id("plateTemplate"), template);
     }
 
+    public void setDetectionMethod(String method)
+    {
+        _test.selectOptionByText(Locator.id("detectionMethod"), method);
+    }
+
     public void setMetaDataInputFormat(MetadataInputFormat format)
     {
         _test.selectOptionByValue(Locator.id("metadataInputFormat"), format.name());
