@@ -60,8 +60,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_FLUOROSPOT = "TestAssayFluorospot";
     protected static final String TEST_ASSAY_FLUOROSPOT_DESC = "Description for Fluorospot assay";
 
-    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME1 = "AID_out2.xlsx";
-    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_out4.xlsx";
+    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME1 = "AID_fluoro2.xlsx";
+    protected final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_fluoro5.xlsx";
     protected final String TEST_ASSAY_FLUOROSPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME1;
     protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
 
@@ -706,24 +706,25 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         List<String> expectedSpotCount = Arrays.asList("4.0","0.0","0.0","2.0","0.0","0.0","0.0","0.0","1.0","1.0","1.0" ,"3.0" ,"3.0");
         List<String> expectedActivity = Arrays.asList ("2.0","0.0"," "  ,"0.0","0.0"," "  ," "  ,"0.0","0.0"," "  ,"25.0","7.0" ,"13.0");
         List<String> expectedIntesity = Arrays.asList ("7.0","0.0"," "  ,"5.0","0.0"," "  ," "  ,"0.0","5.0"," "  ,"84.0","11.0","23.0");
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity);
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, SortDirection.ASC);
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME2));
 
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
 
-        List<String> expectedSpotCount2 = Arrays.asList("0.0","5.0","0.0","0.0","36.0","0.0","0.0","53.0" ,"0.0","0.0","46.0","0.0","0.0");
-        List<String> expectedActivity2 = Arrays.asList ("0.0","4.0"," "  ,"0.0","47.0"," "  ," "  ,"149.0","0.0"," "  ,"95.0","0.0","0.0");
-        List<String> expectedIntesity2 = Arrays.asList ("0.0","8.0"," "  ,"0.0","7.0" ," "  ," "  ,"9.0"  ,"0.0"," "  ,"9.0" ,"0.0","0.0");
-        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2);
+        List<String> expectedSpotCount2 = Arrays.asList("0.0","0.0","18.0" ,"0.0","0.0","0.0","77.0" ,"0.0","0.0","41.0" ,"0.0","44.0" ,"0.0");
+        List<String> expectedActivity2 = Arrays.asList ("0.0"," "  ,"141.0"," "  ," "  ," "  ,"607.0","0.0"," "  ,"366.0"," "  ,"266.0"," ");
+        List<String> expectedIntesity2 = Arrays.asList (" "  ," "  ," "    ," "  ," "  ," "  ," "    ," "  ," "  ," "    ," "  ," "    ," ");
+        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, SortDirection.DESC);
     }
 
-    private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntesity)
+    private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity,
+                                        List<String> expectedIntesity, SortDirection locationSortDirection)
     {
         DataRegionTable dataTable = new DataRegionTable("Data", this);
         dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
-        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
+        dataTable.setSort("WellgroupLocation", locationSortDirection);
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> activity = dataTable.getColumnDataAsText("Activity");
         List<String> intensity = dataTable.getColumnDataAsText("Intensity");
