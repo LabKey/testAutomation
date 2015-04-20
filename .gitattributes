@@ -590,6 +590,7 @@ src/org/labkey/test/tests/XTandemShortTest.java -text
 src/org/labkey/test/tests/XTandemTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
+src/org/labkey/test/unsupported/PepDBModuleTest.java -text
 src/org/labkey/test/unsupported/PeptideModuleTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
