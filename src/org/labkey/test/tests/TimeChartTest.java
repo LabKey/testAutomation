@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
@@ -115,7 +116,6 @@ public abstract class TimeChartTest extends ReportTest
     protected void clickChooseInitialMeasure()
     {
         // TODO: migrate usage to TimeChartWizard.chooseInitialMeasure
-        waitForElement(getButtonLocator("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
         _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
@@ -239,7 +239,7 @@ public abstract class TimeChartTest extends ReportTest
     {
         clickButton("Measures", 0);
         waitForText("Divide data into Series");
-        waitForElement(getButtonLocator("Add Measure"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Add Measure"));
     }
 
     protected void openSaveMenu()
@@ -276,13 +276,13 @@ public abstract class TimeChartTest extends ReportTest
     protected void goToGroupingTab()
     {
         clickButton("Grouping", 0);
-        waitForElement(getButtonLocator("Cancel"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
     }
 
     protected void goToDeveloperTab()
     {
         clickButton("Developer", 0);
-        waitForElement(getButtonLocator("Cancel"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
     }
 
     protected void applyChanges()
