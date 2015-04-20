@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
@@ -703,9 +704,21 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
 
-        List<String> expectedSpotCount = Arrays.asList("4.0","0.0","0.0","2.0","0.0","0.0","0.0","0.0","1.0","1.0","1.0" ,"3.0" ,"3.0");
-        List<String> expectedActivity = Arrays.asList ("2.0","0.0"," "  ,"0.0","0.0"," "  ," "  ,"0.0","0.0"," "  ,"25.0","7.0" ,"13.0");
-        List<String> expectedIntesity = Arrays.asList ("7.0","0.0"," "  ,"5.0","0.0"," "  ," "  ,"0.0","5.0"," "  ,"84.0","11.0","23.0");
+        List<String> expectedSpotCount;
+        List<String> expectedActivity;
+        List<String> expectedIntesity;
+        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
+        {
+            expectedSpotCount = Arrays.asList("4.0", "0.0", "0.0", "2.0", "0.0", "0.0", "0.0", "0.0", "1.0", "1.0", "1.0" , "3.0" , "3.0");
+            expectedActivity = Arrays.asList ("2.0", "0.0", " "  , "0.0", "0.0", " "  , " ", "0.0", "0.0"  , " "  , "25.0", "7.0" , "13.0");
+            expectedIntesity = Arrays.asList ("7.0", "0.0", " "  , "5.0", "0.0", " "  , " ", "0.0", "5.0"  , " "  , "84.0", "11.0", "23.0");
+        }
+        else
+        {
+            expectedSpotCount = Arrays.asList("0.0", "4.0", "0.0", "0.0", "2.0", "0.0", "1.0", "0.0", "0.0", "3.0" , "1.0", "1.0" , "0.0");
+            expectedActivity = Arrays.asList (" "  , "2.0", "0.0", " "  , "0.0", "0.0", "0.0", " "  , "0.0", "7.0" , " "  , "25.0", " ");
+            expectedIntesity = Arrays.asList (" "  , "7.0", "0.0", " "  , "5.0", "0.0", "5.0", " "  , "0.0", "11.0", " "  , "84.0", " ");
+        }
         checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, SortDirection.ASC);
 
         clickAndWait(Locator.linkWithText("view runs"));
@@ -713,9 +726,21 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
 
-        List<String> expectedSpotCount2 = Arrays.asList("0.0","0.0","18.0" ,"0.0","0.0","0.0","77.0" ,"0.0","0.0","41.0" ,"0.0","44.0" ,"0.0");
-        List<String> expectedActivity2 = Arrays.asList ("0.0"," "  ,"141.0"," "  ," "  ," "  ,"607.0","0.0"," "  ,"366.0"," "  ,"266.0"," ");
-        List<String> expectedIntesity2 = Arrays.asList (" "  ," "  ," "    ," "  ," "  ," "  ," "    ," "  ," "  ," "    ," "  ," "    ," ");
+        List<String> expectedSpotCount2;
+        List<String> expectedActivity2;
+        List<String> expectedIntesity2;
+        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
+        {
+            expectedSpotCount2 = Arrays.asList("0.0", "0.0", "18.0" , "0.0", "0.0", "0.0", "77.0" , "0.0", "0.0", "41.0" , "0.0", "44.0" , "0.0");
+            expectedActivity2 = Arrays.asList ("0.0", " "  , "141.0", " "  , " "  , " "  , "607.0", "0.0", " "  , "366.0", " "  , "266.0", " ");
+            expectedIntesity2 = Arrays.asList (" "  , " "  , " "    , " "  , " "  , " "  , " "    , " "  , " "  , " "    , " "  , " "    , " ");
+        }
+        else
+        {
+            expectedSpotCount2 = Arrays.asList("18.0" , "0.0", "0.0", "0.0", "77.0" , "0.0", "0.0", "41.0" , "0.0", "44.0" , "0.0", "0.0", "0.0");
+            expectedActivity2 = Arrays.asList ("141.0", " "  , " "  , " "  , "607.0", "0.0", " "  , "366.0", " "  , "266.0", " "  , " "  , "0.0");
+            expectedIntesity2 = Arrays.asList (" "    , " "  , " "  , " "  , " "    , " "  , " "  , " "    , " "  , " "    , " "  , " "  , " ");
+        }
         checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, SortDirection.DESC);
     }
 
