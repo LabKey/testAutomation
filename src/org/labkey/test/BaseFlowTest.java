@@ -424,7 +424,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 break;
 
             default:
-                fail();
+                throw new IllegalArgumentException("Unknown method for selecting FCS files: " + selectFCSFilesOption);
         }
         waitFor(new Checker() {
             @Override
