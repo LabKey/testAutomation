@@ -83,7 +83,7 @@ public class RReportHelper extends AbstractHelper
         _test.log("execute script");
 
         // running a saved script
-        _test._ext4Helper.clickTabContainingText("Source");
+        _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
 
         _test.setCodeEditorValue("script-report-editor", script);
         _test._ext4Helper.clickTabContainingText("View");
