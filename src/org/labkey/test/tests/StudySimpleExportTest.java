@@ -528,8 +528,8 @@ public class StudySimpleExportTest extends StudyBaseTest
 
         log("Cohort Properties: verify display of cohorts in subjects webpart");
         waitAndClickAndWait(Locator.linkWithText("Participants"));
-        waitForElement(Locator.tagWithClass("span", "lk-filter-panel-label").withText(cohort1label));
-        assertElementPresent(Locator.tagWithClass("span", "lk-filter-panel-label").withText(cohort2label));
+        waitForElement(Locator.tagWithClass("div", "lk-filter-panel-label").withText(cohort1label));
+        assertElementPresent(Locator.tagWithClass("div", "lk-filter-panel-label").withText(cohort2label));
 
         log("Cohort Properties: clean up cohorts");
         clickFolder(getFolderName());
