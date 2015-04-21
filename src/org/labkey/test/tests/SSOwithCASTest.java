@@ -13,8 +13,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.TestCredentials;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.InDevelopment;
@@ -35,13 +35,14 @@ public class SSOwithCASTest extends BaseWebDriverTest
 {
     private static final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
     private static final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
+    private static final String credentialKey = "CAS";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
 
-        deleteUsersIfPresent(TestProperties.getCASUserID());
+        deleteUsersIfPresent(TestCredentials.getUsername(credentialKey));
     }
 
     @BeforeClass
@@ -56,7 +57,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
     {
         //Configure CAS
         beginAt("cas/configure.view?");
-        setFormElement(Locator.name("serverUrl"), "https://testauth.epi.usf.edu/cas");
+        setFormElement(Locator.name("serverUrl"), TestCredentials.getHost(credentialKey));
         clickButton("Save");
     }
 
@@ -146,7 +147,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
                 relativeURLBeforeSignIn, relativeURLAfterSignIn);
 
         //User should be CAS user
-        assertEquals("User should be signed in with CAS userId", getDisplayName(), "");
+        assertEquals("User should be signed in with CAS userId", TestCredentials.getUsername(credentialKey), getDisplayName());
 
         //Sign out CAS user, should sign out from Labkey, but should remained Sign In into CAS.
         signOut();
@@ -165,7 +166,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
                 relativeURLBeforeSignIn2, relativeURLAfterSignIn2);
 
         //User should be CAS user
-        assertEquals("User should be still signed in with CAS userId", getDisplayName(), "");
+        assertEquals("User should be still signed in with CAS userId", TestCredentials.getUsername(credentialKey), getDisplayName());
     }
 
     @LogMethod(quiet = true)
@@ -196,8 +197,8 @@ public class SSOwithCASTest extends BaseWebDriverTest
 
     private void casLogin()
     {
-        setFormElement(Locator.input("username"), "");
-        setFormElement(Locator.input("password"), "");
+        setFormElement(Locator.input("username"), TestCredentials.getUsername(credentialKey));
+        setFormElement(Locator.input("password"), TestCredentials.getPassword(credentialKey));
         clickAndWait(Locator.input("submit"));
     }
 
@@ -205,7 +206,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
     {
         try
         {
-            String httpGetResponseBody = WebTestHelper.getHttpGetResponseBody("https://testauth.epi.usf.edu/cas/logout");
+            String httpGetResponseBody = WebTestHelper.getHttpGetResponseBody(TestCredentials.getHost(credentialKey) + "/logout");
         }
         catch (HttpException | IOException e)
         {

@@ -15,12 +15,16 @@
  */
 package org.labkey.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SystemUtils;
 import org.labkey.api.reader.UTF8Reader;
+import org.labkey.test.credentials.Credentials;
+import org.labkey.test.credentials.Server;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class TestProperties
@@ -37,18 +41,9 @@ public abstract class TestProperties
         }
         catch (IOException ignore)
         {
-            TestLogger.log("Failed to load test.properties file");
+            TestLogger.log("Failed to load test.properties file. Running with hard-coded defaults");
+            ignore.printStackTrace(System.out);
         }
-    }
-
-    public static String getCASUserID()
-    {
-        return "";
-    }
-
-    public static String getCASUserPassword()
-    {
-        return "";
     }
 
     public static boolean isTestCleanupSkipped()
