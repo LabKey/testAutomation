@@ -31,8 +31,6 @@ import org.labkey.test.util.WikiHelper;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 @Category({DailyA.class, Wiki.class})
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
@@ -87,7 +85,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         waitForText("Display Name");
 
         String rViewName = TRICKY_CHARACTERS + "new R view";
-        _customizeViewsHelper.createRView(null, rViewName);
+        _customizeViewsHelper.createRView(rViewName);
 
         waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
 

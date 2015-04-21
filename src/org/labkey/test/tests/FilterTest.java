@@ -144,7 +144,7 @@ public class FilterTest extends BaseWebDriverTest
         _listHelper.submitTsvData(testDataFull.toString());
         listUrl = getCurrentRelativeURL();
 
-        _customizeViewsHelper.createRView(null, R_VIEW);
+        _customizeViewsHelper.createRView(R_VIEW);
     }
 
     @LogMethod

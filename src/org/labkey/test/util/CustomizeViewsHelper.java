@@ -691,29 +691,24 @@ public class CustomizeViewsHelper
      * pre-conditions:  at page with grid for which you would like an R view (grid should be only
      *      or at least first element on page)
      * post-conditions:  grid has R view of name name
-     * @param view   string to enter in view box (null for default) - Unimplemented
      * @param name name to give new R view
      */
-    public void createRView(String view, String name)
+    public void createRView(String name)
     {
-        createRView(view, name, false);
+        createRView(name, false);
     }
 
     /**
      * pre-conditions:  at page with grid for which you would like an R view (grid should be only
      *      or at least first element on page)
      * post-conditions:  grid has R view of name name
-     * @param view   string to enter in view box (null for default) - Unimplemented
      * @param name name to give new R view
      * @param shareView should this view be available to all users
      */
-    public void createRView(String view, String name, boolean shareView)
+    public void createRView(String name, boolean shareView)
     {
         _test.waitForText(("Views"));
         _test._extHelper.clickMenuButton("Views", "Create", "R View");
-
-        if(view!=null)
-            fail("Unimplemented");
 
         if (shareView)
             _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
