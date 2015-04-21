@@ -408,9 +408,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 break;
 
             case Included:
-                fail("Not yet implemented");
+                throw new UnsupportedOperationException("FCS files 'Included' option not yet implemented");
                 //clickRadioButtonById("Included");
-                break;
 
             case Previous:
                 checkRadioButton(Locator.radioButtonById("Previous"));
