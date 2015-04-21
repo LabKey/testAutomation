@@ -56,7 +56,7 @@ public class ResetTracker
     {
         if(searchBoxEntry==null)
         {
-            fail("search box was not iniitalized to wait for refresh");
+            throw new IllegalStateException("search box was not initialized to wait for refresh");
         }
         String searchBoxContents = test.getFormElement(Locator.id(searchBoxId));
         return !searchBoxContents.equals(searchBoxEntry);

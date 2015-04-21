@@ -369,7 +369,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         }
         catch (ParseException e)
         {
-            fail("Date parsing error");
+            throw new RuntimeException(e);
         }
     }
 

@@ -130,7 +130,7 @@ public class SearchHelper extends AbstractHelper
 
                 if ( crawlResults )
                 {
-                    fail("Search result crawling not yet implemented");
+                    throw new IllegalArgumentException("Search result crawling not yet implemented");
                 }
             }
         }

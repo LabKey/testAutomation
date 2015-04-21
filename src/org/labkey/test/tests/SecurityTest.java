@@ -287,8 +287,8 @@ public class SecurityTest extends BaseWebDriverTest
         switch (changeType)
         {
             case CHANGE_PASSWORD:
-                fail("unsupported use of change password type");
-                break;
+                throw new IllegalArgumentException("unsupported use of change password type");
+
             case RESET_PASSWORD:
                 setFormElement(Locator.id("password"), passwords[0]);
                 String password2 = passwords[1];
