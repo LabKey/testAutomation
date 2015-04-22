@@ -15,6 +15,8 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
+import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
@@ -118,6 +120,8 @@ public class PermissionsHelper
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         String role = toRole(permissionSetting);
         if ("security.roles.NoPermissionsRole".equals(role))
         {
@@ -133,12 +137,23 @@ public class PermissionsHelper
 
     public void checkInheritedPermissions()
     {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         _test._ext4Helper.checkCheckbox("Inherit permissions from parent");
     }
 
     public void uncheckInheritedPermissions()
     {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         _test._ext4Helper.uncheckCheckbox("Inherit permissions from parent");
+    }
+
+    public void assertPermissionsInherited()
+    {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
+        _test.assertElementPresent(Locator.css("table#inheritedCheckbox.x4-form-cb-checked"));
     }
 
     public void savePermissions()
@@ -222,8 +237,11 @@ public class PermissionsHelper
 
     public void removePermission(String groupName, String permissionString)
     {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+            enterPermissionsUI();
         _removePermission(groupName, permissionString, "pGroup");
     }
+
 
     public void _removePermission(String groupName, String permissionString, String className)
     {
@@ -381,12 +399,12 @@ public class PermissionsHelper
 
     public void assertGroupDoesNotExist(String groupName, String projectName)
     {
-        _test.log("asserting that group " + groupName + " exists in project " + projectName + "...");
+        _test.log("asserting that group " + groupName + " does not exist in project " + projectName + "...");
         if (doesGroupExist(groupName, projectName))
             fail("group " + groupName + " exists in project " + projectName);
     }
 
-    public boolean isUserInGroup(String email, String groupName, String projectName)
+    public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
     {
         _test.ensureAdminMode();
         _test.clickProject(projectName);
@@ -395,23 +413,27 @@ public class PermissionsHelper
         _test.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         _test._extHelper.waitForExtDialog(groupName + " Information");
-        boolean ret = _test.isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[starts-with(text(), '" + email + "')]"));
+        boolean ret;
+        if (principalType == PrincipalType.USER)
+            ret = _test.isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[starts-with(text(), '" + user + "')]"));
+        else
+            ret = _test.isElementPresent(Locator.linkContainingText(user));
         _test.clickButton("Done", 0);
         _test._extHelper.waitForExtDialogToDisappear(groupName + " Information");
         return ret;
     }
 
-    public void assertUserInGroup(String email, String groupName, String projectName)
+    public void assertUserInGroup(String email, String groupName, String projectName, PrincipalType principalType)
     {
         _test.log("asserting that user " + email + " is in group " + projectName + "/" + groupName + "...");
-        if (!isUserInGroup(email, groupName, projectName))
+        if (!isUserInGroup(email, groupName, projectName, principalType))
             fail("user " + email + " was not in group " + projectName + "/" + groupName);
     }
 
-    public void assertUserNotInGroup(String email, String groupName, String projectName)
+    public void assertUserNotInGroup(String email, String groupName, String projectName, PrincipalType principalType)
     {
         _test.log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
-        if (isUserInGroup(email, groupName, projectName))
+        if (isUserInGroup(email, groupName, projectName, principalType))
             fail("user " + email + " was found in group " + projectName + "/" + groupName);
     }
 

@@ -3391,7 +3391,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertTextPresentInThisOrder(String... text)
     {
         String success = isPresentInThisOrder(text);
-        assertTrue(success, success==null);
+        assertTrue(success, success == null);
     }
 
     public void assertTextBefore(String text1, String text2)
@@ -3554,20 +3554,51 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Export to Text");
     }
 
-    protected void exportFolderAsZip()
+    protected void selectSecurityGroupsExport()
     {
+        checkCheckbox(Locator.checkboxByNameAndValue("types", "Project-level groups and user->group and group->group assignments"));
+    }
+
+    protected void selectRoleAssignmentsExport()
+    {
+        checkCheckbox(Locator.checkboxByNameAndValue("types", "Role assignments for users and groups"));
+    }
+
+    @LogMethod
+    protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, int locationIndex)
+    {
+
+        if (folderName != null)
+            clickFolder(folderName);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
-        checkRadioButton(Locator.radioButtonByName("location").index(1));
+        if (exportSecurityGroups)
+            selectSecurityGroupsExport();
+        if (exportRoleAssignments)
+            selectRoleAssignmentsExport();
+        if (includeSubfolders)
+            click(Locator.name("includeSubfolders"));
+        checkRadioButton(Locator.name("location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
+    }
+
+    @LogMethod
+    protected void exportFolderAsIndividualFiles(String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders)
+    {
+        // first locator with this name is "Pipeline root export directory, as individual files
+        prepareForFolderExport(folderName, exportSecurityGroups, exportRoleAssignments, includeSubfolders, 0);
+        clickButton("Export");
+    }
+
+
+    protected void exportFolderAsZip(boolean exportSecurityGroups, boolean exportRoleAssignments)
+    {
+        prepareForFolderExport(null, exportSecurityGroups, exportRoleAssignments, false, 1);
         clickButton("Export");
     }
 
     protected File exportFolderToBrowserAsZip()
     {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Export"));
-        checkRadioButton(Locator.radioButtonByName("location").index(2));
-
+        prepareForFolderExport(null, false, false, false, 2);
         return clickAndWaitForDownload(Locator.extButton("Export"));
     }
 
@@ -5750,7 +5781,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             if (failIfNotFound)
                 assertTrue(userEmail + " was not present", isPresent);
-            else
+            else if (!isPresent)
                 log("Unable to delete non-existent user: " + userEmail);
 
             if (isPresent)

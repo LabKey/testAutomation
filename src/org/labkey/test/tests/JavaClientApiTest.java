@@ -15,9 +15,9 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
@@ -98,7 +98,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cmdAddMem.addPrincipalId(userId);
         cmdAddMem.execute(cn, PROJECT_NAME);
 
-        _permissionsHelper.assertUserInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertUserInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME, PrincipalType.USER);
 
         //remove user from that group and verify
         log("removing user from group...");
@@ -106,7 +106,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cmdRemMem.addPrincipalId(userId);
         cmdRemMem.execute(cn, PROJECT_NAME);
 
-        _permissionsHelper.assertUserNotInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertUserNotInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME, PrincipalType.USER);
 
         //delete group and verify
         log("deleting project group...");
