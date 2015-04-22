@@ -7,7 +7,6 @@ import org.apache.http.HttpException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -114,16 +113,47 @@ public class SSOwithCASTest extends BaseWebDriverTest
         testCAS(false);
     }
 
-    @Test @Ignore
+    @Test
     public void testBogusTicket()
     {
+        signOut();
 
+        clickAndWait(Locators.signInButtonOrLink);//Go to Labkey Sign-in page
+        String relativeURLSignInPage = getCurrentRelativeURL();
+
+        beginAt("/cas/validate.view?&ticket=randomstringforbogusticket");
+
+        assertTextPresent("Invalid ticket");
     }
 
-    @Test @Ignore
+    @Test
     public void testCASUnreachable()
     {
+        signOut();
 
+        signIn();
+
+        //Configure CAS with "wrong" url
+        beginAt("cas/configure.view?");
+        setFormElement(Locator.name("serverUrl"), "www.labkey.org/cas"); //adding "/cas" in the end otherwise it doesn't allow me to save. Also, cannot save empty strings if configured previously.
+        clickButton("Save");
+
+        signOut();
+
+        String beforeClickingOnCASLink = getCurrentRelativeURL();
+
+        //Click on CAS link - nothing happens and user stays on the same page.
+        click(Locator.linkWithHref("/labkey/login/ssoRedirect.view?provider=CAS"));
+
+        String afterClickingOnCASLink = getCurrentRelativeURL();
+
+        assertEquals("CAS server is configured properly. This test is to check mis-configured server address", beforeClickingOnCASLink, afterClickingOnCASLink);
+
+        signIn();
+
+        configureCAS();//configure CAS correctly for the other tests to run.
+
+        signOut();
     }
 
     private void testCAS(boolean loginPage)
@@ -193,6 +223,14 @@ public class SSOwithCASTest extends BaseWebDriverTest
         {
             throw new RuntimeException("Failed to disable SSO with CAS", e);
         }
+    }
+
+    private void configureCAS()
+    {
+        //Configure CAS
+        beginAt("cas/configure.view?");
+//        setFormElement(Locator.name("serverUrl"), CAS_TEST_SERVER_URL );
+        clickButton("Save");
     }
 
     private void casLogin()
