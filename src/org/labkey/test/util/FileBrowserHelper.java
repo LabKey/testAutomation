@@ -294,6 +294,7 @@ public class FileBrowserHelper
     public void openUploadPanel()
     {
         Locator.XPathLocator uploadPanel = Locator.tagWithClass("div", "upload-files-panel").notHidden();
+        _test.waitForElement(BrowserAction.UPLOAD.button());
         if (_test.isElementPresent(uploadPanel))
         {
             _test.log("Upload panel visible");
