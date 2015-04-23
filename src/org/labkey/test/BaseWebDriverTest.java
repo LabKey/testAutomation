@@ -4548,14 +4548,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         clickButton("Save");
 
-        getArtifactCollector().addArtifactLocation(new File(rootPath), new FileFilter()
-        {
-            @Override
-            public boolean accept(File pathname)
-            {
-                return pathname.getName().endsWith(".log");
-            }
-        });
+        getArtifactCollector().addArtifactLocation(new File(rootPath));
 
         log("Finished setting pipeline to: " + rootPath);
     }
