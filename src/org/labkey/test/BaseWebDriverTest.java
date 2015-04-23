@@ -2028,14 +2028,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 if (isTestRunningOnTeamCity())
                 {
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"), new FileFilter()
-                    {
-                        @Override
-                        public boolean accept(File pathname)
-                        {
-                            return pathname.getName().endsWith(".log");
-                        }
-                    });
+                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
                     getArtifactCollector().dumpPipelineFiles();
                 }
                 if (_testTimeout)
