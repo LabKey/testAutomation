@@ -161,11 +161,9 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
         waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
-        click(Locator.tagWithText("div", "999320016"));
+        _ext4Helper.clickParticipantFilterGridRowText("999320016", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "4 wk Post-V#2/V#3"); // last visit from ptid 999320016
-        // TODO: Not accurate anymore. Shows up around 30 times now, which doesnt make sense since it only shows up 9
-        // times per SVG and there are 2 SVG's on the page. I'm unable to locate the other 12 occurances of it on the page.
-//        assertTextPresent("2. Body Temp: ", 6); // hover text label (3 for chart and 3 for thumbnail in save dialog)
+        assertTextPresent("2. Body Temp: ", 12); // hover text label (6 for chart (twice for each data point) and 6 for thumbnail in save dialog)
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(9));
         assertTextNotPresent("801.0", "G1: 6wk/G2: 2wk"); // sequenceNum filtered out by default view filter
