@@ -853,6 +853,16 @@ public class DataRegionTable
             return facetRow(category).withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(group));
         }
 
+        public static Locator.XPathLocator faceRowCheckbox(String category)
+        {
+            return facetRow(category).append(Locator.tag("div").withClass("x4-grid-row-checker"));
+        }
+
+        public static Locator.XPathLocator faceRowCheckbox(String category, String group)
+        {
+            return facetRow(category, group).append(Locator.tag("div").withClass("x4-grid-row-checker"));
+        }
+
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
             return Locator.tagWithAttribute("td", "column-name", regionName + ":" + fieldName);

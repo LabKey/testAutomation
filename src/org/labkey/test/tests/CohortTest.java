@@ -621,9 +621,8 @@ public class CohortTest extends BaseWebDriverTest
     {
         if (toggleAll)
         {
-            Locator all = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//b[contains(@class, 'filter-description') and contains(text(), 'All')]/../../../..//div[contains(@class, 'x4-grid-row-checker')]");
-            waitForElement(all);
-            click(all);
+            Locator all = DataRegionTable.Locators.faceRowCheckbox("All");
+            waitAndClick(all);
         }
 
         if (previousCohort != null)
