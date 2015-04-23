@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import com.google.common.base.Function;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -23,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,17 +61,37 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         ensureAdminMode();
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("protein databases"));
-        assertTextNotPresent(UNIPROT_FILENAME);
+
+        boolean alreadyLoaded = isTextPresent(UNIPROT_FILENAME);
+
+        final DataRegionTable annotInsertions = new DataRegionTable("AnnotInsertions", this);
+        if (alreadyLoaded)
+        {
+            annotInsertions.setFilter("FileName", "Contains", UNIPROT_FILENAME);
+            annotInsertions.checkAll();
+            applyAndWaitForPageToLoad(new Function<Void, Void>()
+            {
+                @Override
+                public Void apply(Void aVoid)
+                {
+                    annotInsertions.clickHeaderButtonByText("Delete");
+                    getAlert();
+                    return null;
+                }
+            });
+        }
 
         clickButton("Load New Annot File");
         setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
         selectOptionByText(Locator.name("fileType"), "uniprot");
+        if (alreadyLoaded) checkCheckbox(Locator.name("clearExisting"));
         clickButton("Load Annotations");
 
-        setFilter("AnnotInsertions", "FileName", "Contains", UNIPROT_FILENAME);
-        setFilter("AnnotInsertions", "CompletionDate", "Is Not Blank");
+        waitForRunningPipelineJobs(60000);
 
-        waitForTextWithRefresh(60000, UNIPROT_FILENAME);
+        annotInsertions.setFilter("FileName", "Contains", UNIPROT_FILENAME);
+        annotInsertions.setFilter("CompletionDate", "Is Not Blank", null);
+        assertElementPresent(Locator.tag("a").withAttributeContaining("href", "showAnnotInsertDetails"));
 
         _containerHelper.createProject(PROJECT_NAME, "MS2");
         clickProject(PROJECT_NAME);

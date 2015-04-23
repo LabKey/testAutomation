@@ -6548,6 +6548,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
+            statusValues.removeAll(Arrays.asList("COMPLETE", "ERROR"));
         }
 
         assertTrue("Running pipeline jobs were found.  Timeout:" + wait, statusValues.size() == 0);
