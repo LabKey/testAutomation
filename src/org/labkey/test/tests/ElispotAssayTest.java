@@ -704,52 +704,34 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
 
-        List<String> expectedSpotCount;
-        List<String> expectedActivity;
-        List<String> expectedIntesity;
-        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
-        {
-            expectedSpotCount = Arrays.asList("4.0", "0.0", "0.0", "2.0", "0.0", "0.0", "0.0", "0.0", "1.0", "1.0", "1.0" , "3.0" , "3.0");
-            expectedActivity = Arrays.asList ("2.0", "0.0", " "  , "0.0", "0.0", " "  , " ", "0.0", "0.0"  , " "  , "25.0", "7.0" , "13.0");
-            expectedIntesity = Arrays.asList ("7.0", "0.0", " "  , "5.0", "0.0", " "  , " ", "0.0", "5.0"  , " "  , "84.0", "11.0", "23.0");
-        }
-        else
-        {
-            expectedSpotCount = Arrays.asList("0.0", "4.0", "0.0", "0.0", "2.0", "0.0", "1.0", "0.0", "0.0", "3.0" , "1.0", "1.0" , "0.0");
-            expectedActivity = Arrays.asList (" "  , "2.0", "0.0", " "  , "0.0", "0.0", "0.0", " "  , "0.0", "7.0" , " "  , "25.0", " ");
-            expectedIntesity = Arrays.asList (" "  , "7.0", "0.0", " "  , "5.0", "0.0", "5.0", " "  , "0.0", "11.0", " "  , "84.0", " ");
-        }
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, SortDirection.ASC);
+        List<String> expectedSpotCount = Arrays.asList("4.0", "0.0", "2.0", "0.0", "0.0", "0.0", "1.0", "1.0",  "3.0" );
+        List<String> expectedActivity = Arrays.asList ("2.0", "0.0", "0.0", "0.0", " ",   "0.0",  " ",  "25.0", "13.0");
+        List<String> expectedIntesity = Arrays.asList ("7.0", "0.0", "5.0", "0.0", " ",   "0.0",  " ",  "84.0", "23.0");
+
+        DataRegionTable dataTable = new DataRegionTable("Data", this);
+        dataTable.setFilter("AntigenLsid/AntigenName", "Is Not Blank", "");
+        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
+        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, dataTable);
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME2));
 
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
 
-        List<String> expectedSpotCount2;
-        List<String> expectedActivity2;
-        List<String> expectedIntesity2;
-        if (WebTestHelper.getDatabaseType().equals(WebTestHelper.DatabaseType.PostgreSQL))
-        {
-            expectedSpotCount2 = Arrays.asList("0.0", "0.0", "18.0" , "0.0", "0.0", "0.0", "77.0" , "0.0", "0.0", "41.0" , "0.0", "44.0" , "0.0");
-            expectedActivity2 = Arrays.asList ("0.0", " "  , "141.0", " "  , " "  , " "  , "607.0", "0.0", " "  , "366.0", " "  , "266.0", " ");
-            expectedIntesity2 = Arrays.asList (" "  , " "  , " "    , " "  , " "  , " "  , " "    , " "  , " "  , " "    , " "  , " "    , " ");
-        }
-        else
-        {
-            expectedSpotCount2 = Arrays.asList("18.0" , "0.0", "0.0", "0.0", "77.0" , "0.0", "0.0", "41.0" , "0.0", "44.0" , "0.0", "0.0", "0.0");
-            expectedActivity2 = Arrays.asList ("141.0", " "  , " "  , " "  , "607.0", "0.0", " "  , "366.0", " "  , "266.0", " "  , " "  , "0.0");
-            expectedIntesity2 = Arrays.asList (" "    , " "  , " "  , " "  , " "    , " "  , " "  , " "    , " "  , " "    , " "  , " "  , " ");
-        }
-        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, SortDirection.DESC);
+        List<String> expectedSpotCount2 = Arrays.asList("18.0" , "0.0", "0.0", "0.0", "77.0" , "41.0" , "0.0", "44.0",  "0.0", "0.0", "290.0");
+        List<String> expectedActivity2 = Arrays.asList ("141.0", " ",   " ",   " ",   "607.0", "366.0", " ",   "266.0", " ",   " ",   "2801.0");
+        List<String> expectedIntesity2 = Arrays.asList (" ",     " ",   " ",   " ",   " ",     " ",     " ",   " ",     " ",   " ",   " ");
+
+        DataRegionTable dataTable2 = new DataRegionTable("Data", this);
+        dataTable.setFilter("AntigenLsid/AntigenName", "Is Blank", "");
+        dataTable.setSort("WellgroupLocation", SortDirection.DESC);
+        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, dataTable2);
     }
 
     private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity,
-                                        List<String> expectedIntesity, SortDirection locationSortDirection)
+                                        List<String> expectedIntesity, DataRegionTable dataTable)
     {
-        DataRegionTable dataTable = new DataRegionTable("Data", this);
-        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
-        dataTable.setSort("WellgroupLocation", locationSortDirection);
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> activity = dataTable.getColumnDataAsText("Activity");
         List<String> intensity = dataTable.getColumnDataAsText("Intensity");
