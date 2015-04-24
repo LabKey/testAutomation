@@ -16,12 +16,17 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
+import org.labkey.api.util.XmlBeansUtil;
+import org.labkey.folder.xml.FolderDocument;
+import org.labkey.security.xml.GroupsType;
+import org.labkey.security.xml.roleAssignment.RoleAssignmentsType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -79,7 +84,13 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String[] importedGroups = new String[]{submitterGroup, superTesterGroup, parentGroup, groupGroup};
     private static final String[] notImportedGroups = new String[]{emptyGroup};
 
-    private static final String importProject = "FolderImportTest";
+    private static final String[] importProjects = new String[]{
+            "FolderImportTest 1",
+            "FolderImportTest 2",
+            "FolderImportTest 3",
+            "FolderImportTest 4",
+            "FolderImportTest 5",
+            "FolderImportTest 6"};
 
 
     public FolderExportTest()
@@ -125,23 +136,22 @@ public class FolderExportTest extends BaseWebDriverTest
         verifyCreateFolderFromTemplate();
 
         createUsersAndGroupsWithPermissions();
-        verifyProjectExportWithGroups();
+
         verifyProjectExportWithRoleAssignments();
+        verifyProjectExportWithGroups();
         verifyProjectExportWithGroupsAndRoleAssignments();
         verifySubfolderExportWithRoleAssignments();
         verifySubfolderExportWithInheritance();
-
     }
 
     @Test
     public void testImportProjectWithoutUsers()
     {
 //        test project import with users that do not exist
-        _containerHelper.deleteProject(importProject, false);
         deleteUsersIfPresent(testUsers);
-        _containerHelper.createProject(importProject, null);
-        importFolder(importProject, projectPermsZip);
-        verifyProjectGroups(importProject, notImportedGroups, importedGroups, false);
+        _containerHelper.createProject(importProjects[0], null);
+        importFolder(importProjects[0], projectPermsZip);
+        verifyProjectGroups(importProjects[0], notImportedGroups, importedGroups, false);
         verifyRoleAssignments(false, true, false);
     }
 
@@ -149,43 +159,40 @@ public class FolderExportTest extends BaseWebDriverTest
     public void testImportProjectWithUsersNoGroups()
     {
         // test project import with groups that do not exist
-        _containerHelper.deleteProject(importProject, false);
-        _containerHelper.createProject(importProject, null);
+        _containerHelper.createProject(importProjects[1], null);
         createUsers(testUsers);
-        importFolder(importProject, projectPermsZip);
-        verifyProjectGroups(importProject, notImportedGroups, importedGroups, true);
+        importFolder(importProjects[1], projectPermsZip);
+        verifyProjectGroups(importProjects[1], notImportedGroups, importedGroups, true);
         verifyRoleAssignments(true, true, false);
     }
 
     @Test
     public void testImportProjectWithExistingUsersAndGroups()
     {
-        _containerHelper.deleteProject(importProject, false);
         // test project import with all users and some groups existing
         createUsers(testUsers);
-        _containerHelper.createProject(importProject, null);
-        createProjectGroups(true, importProject);
-        importFolder(importProject, projectPermsZip);
-        verifyProjectGroups(importProject, notImportedGroups, importedGroups, true);
+        _containerHelper.createProject(importProjects[2], null);
+        createProjectGroups(true, importProjects[2]);
+        importFolder(importProjects[2], projectPermsZip);
+        verifyProjectGroups(importProjects[2], notImportedGroups, importedGroups, true);
         verifyRoleAssignments(true, true, false);
         // existing group should be overwritten by imported group
-        _permissionsHelper.assertUserNotInGroup(testUser4, submitterGroup, importProject, PrincipalType.USER);
+        _permissionsHelper.assertUserNotInGroup(testUser4, submitterGroup, importProjects[2], PrincipalType.USER);
     }
 
     @Test
     public void testImportProjectToSubfolder()
     {
-        _containerHelper.deleteProject(importProject, false);
         // test folder import of project export
         createUsers(testUsers);
-        _containerHelper.deleteProject(importProject, false);
-        _containerHelper.createProject(importProject, null);
-        _containerHelper.createSubfolder(importProject, "Project as Subfolder");
+        _containerHelper.deleteProject(importProjects[3], false);
+        _containerHelper.createProject(importProjects[3], null);
+        _containerHelper.createSubfolder(importProjects[3], "Project as Subfolder");
         importFolder("Project as Subfolder", projectSubfolderPermsZip);
         // groups should not be created when importing a subfolder
         for (String group : importedGroups)
         {
-            _permissionsHelper.assertGroupDoesNotExist(group, importProject);
+            _permissionsHelper.assertGroupDoesNotExist(group, importProjects[3]);
         }
         clickFolder("Project as Subfolder");
         verifyRoleAssignments(true, false, true);
@@ -194,11 +201,10 @@ public class FolderExportTest extends BaseWebDriverTest
     @Test
     public void testImportSubfolderWithRolesToSubfolder()
     {
-        _containerHelper.deleteProject(importProject, false);
         createUsers(testUsers);
         // test folder import of folder export
-        _containerHelper.createProject(importProject, null);
-        _containerHelper.createSubfolder(importProject, "Subfolder as Subfolder");
+        _containerHelper.createProject(importProjects[4], null);
+        _containerHelper.createSubfolder(importProjects[4], "Subfolder as Subfolder");
         importFolder("Subfolder as Subfolder", subfolderPermsZip);
         clickFolder("Subfolder as Subfolder");
         _permissionsHelper.assertPermissionSetting(testUser1, "Reader");
@@ -207,9 +213,8 @@ public class FolderExportTest extends BaseWebDriverTest
     @Test
     public void testImportSubfolderWithInheritedRoles()
     {
-        _containerHelper.deleteProject(importProject, false);
-        _containerHelper.createProject(importProject, null);
-        _containerHelper.createSubfolder(importProject, "Inherited Imported Subfolder");
+        _containerHelper.createProject(importProjects[5], null);
+        _containerHelper.createSubfolder(importProjects[5], "Inherited Imported Subfolder");
         importFolder("Inherited Imported Subfolder", inheritedPermsZip);
         clickFolder("Inherited Imported Subfolder");
         _permissionsHelper.assertPermissionsInherited();
@@ -249,7 +254,6 @@ public class FolderExportTest extends BaseWebDriverTest
 
     private void verifyProjectGroups(String projectName, @Nullable String[] groupsNotExpected, @Nullable String[] expectedGroups, boolean usersExist)
     {
-
         if (expectedGroups != null)
         {
             log("Verifying existence of groups");
@@ -269,21 +273,21 @@ public class FolderExportTest extends BaseWebDriverTest
         if (usersExist)
         {
             log("Verifying existence of users in groups");
-            _permissionsHelper.assertUserInGroup(testUser3, parentGroup, importProject, PrincipalType.USER);
-            _permissionsHelper.assertUserInGroup(testUser1, submitterGroup, importProject, PrincipalType.USER);
-            _permissionsHelper.assertUserInGroup(testUser2, superTesterGroup, importProject, PrincipalType.USER);
+            _permissionsHelper.assertUserInGroup(testUser3, parentGroup, projectName, PrincipalType.USER);
+            _permissionsHelper.assertUserInGroup(testUser1, submitterGroup, projectName, PrincipalType.USER);
+            _permissionsHelper.assertUserInGroup(testUser2, superTesterGroup, projectName, PrincipalType.USER);
         }
         else
         {
             log("Verifying absence of users in groups");
-            _permissionsHelper.assertUserNotInGroup(testUser3, parentGroup, importProject, PrincipalType.USER);
-            _permissionsHelper.assertUserNotInGroup(testUser1, submitterGroup, importProject, PrincipalType.USER);
-            _permissionsHelper.assertUserNotInGroup(testUser2, superTesterGroup, importProject, PrincipalType.USER);
+            _permissionsHelper.assertUserNotInGroup(testUser3, parentGroup, projectName, PrincipalType.USER);
+            _permissionsHelper.assertUserNotInGroup(testUser1, submitterGroup, projectName, PrincipalType.USER);
+            _permissionsHelper.assertUserNotInGroup(testUser2, superTesterGroup, projectName, PrincipalType.USER);
         }
         log ("Verifying existence of groups in groups");
-        _permissionsHelper.assertUserInGroup(submitterGroup, groupGroup, importProject, PrincipalType.GROUP);
-        _permissionsHelper.assertUserInGroup(superTesterGroup, parentGroup, importProject, PrincipalType.GROUP);
-        _permissionsHelper.assertUserInGroup(submitterGroup, superTesterGroup, importProject, PrincipalType.GROUP);
+        _permissionsHelper.assertUserInGroup(submitterGroup, groupGroup, projectName, PrincipalType.GROUP);
+        _permissionsHelper.assertUserInGroup(superTesterGroup, parentGroup, projectName, PrincipalType.GROUP);
+        _permissionsHelper.assertUserInGroup(submitterGroup, superTesterGroup, projectName, PrincipalType.GROUP);
     }
 
     @LogMethod
@@ -400,42 +404,34 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyProjectExportWithGroups()
     {
         clickFolder(getProjectName());
-        String groupXml = getExpectedXML("groupsExport.xml");
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, groupXml, null, true);
+        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("groupsFolder.xml"), true, true, false);
     }
 
     @LogMethod
     private void verifyProjectExportWithRoleAssignments()
     {
         clickFolder(getProjectName());
-        String assignmentsXml = getExpectedXML("roleAssignmentsExport.xml");
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, null, assignmentsXml, true);
+        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesFolder.xml"), true, false, true);
     }
 
     @LogMethod
     private void verifyProjectExportWithGroupsAndRoleAssignments()
     {
         clickFolder(getProjectName());
-        String groupXml = getExpectedXML("groupsExport.xml");
-        String assignmentsXml = getExpectedXML("roleAssignmentsExport.xml");
-        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, groupXml, assignmentsXml, true);
+        verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesAndGroupsFolder.xml"), true, true, true);
     }
 
     @LogMethod
     private void verifySubfolderExportWithRoleAssignments()
     {
         clickFolder(folderWithPermissions);
-
-        String assignmentsXml = getExpectedXML("subfolderRoleAssignmentsExport.xml");
-        verifyFolderExportWithPermissionsAsExpected(folderWithPermissions, true, null, assignmentsXml, false);
+        verifyFolderExportWithPermissionsAsExpected(folderWithPermissions, true, getExpectedXML("subfolderRoleAssignmentsExport.xml"), false, false, true);
     }
 
     private void  verifySubfolderExportWithInheritance()
     {
         clickFolder(folderInheritingPermissions);
-
-        String assignmentsXml = "<roleAssignments inherited=\"true\"/>";
-        verifyFolderExportWithPermissionsAsExpected(folderInheritingPermissions, true, null, assignmentsXml, false);
+        verifyFolderExportWithPermissionsAsExpected(folderInheritingPermissions, true, getExpectedXML("subfolderInheritedAssignments.xml"), false, false, true);
     }
 
     private String getExpectedXML(String fileName)
@@ -484,11 +480,10 @@ public class FolderExportTest extends BaseWebDriverTest
         _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
     }
 
-
     @LogMethod
-    private void verifyFolderExportWithPermissionsAsExpected(@NotNull String folderName, boolean isSubfolder, @Nullable String expectedGroups, @Nullable String expectedRoleAssignments, boolean includeSubfolders)
+    private void verifyFolderExportWithPermissionsAsExpected(@NotNull String folderName, boolean isSubfolder, @Nullable String expectedXml, boolean includeSubfolders, boolean exportGroups, boolean exportAssignments)
     {
-        exportFolderAsIndividualFiles(folderName, expectedGroups != null, expectedRoleAssignments != null, includeSubfolders);
+        exportFolderAsIndividualFiles(folderName, exportGroups, exportAssignments, includeSubfolders);
 
         // verify some of the folder export items by selecting them in the file browser
         _fileBrowserHelper.selectFileBrowserItem("export/folder.xml");
@@ -498,32 +493,51 @@ public class FolderExportTest extends BaseWebDriverTest
         else
             fileRoot = TestFileUtils.getDefaultFileRoot(folderName);
         File folderXmlFile = new File(fileRoot, "export" + File.separator + "folder.xml");
-        String folderXml = null;
+        FolderDocument exportedFolderDocument = null;
         try
         {
-            folderXml = FileUtils.readFileToString(folderXmlFile);
+            exportedFolderDocument = FolderDocument.Factory.parse(folderXmlFile, XmlBeansUtil.getDefaultParseOptions());
+        }
+        catch (XmlException e)
+        {
+            fail("Problem parsing exported folder XML file " + folderXmlFile + ": " + e.getMessage());
         }
         catch (IOException e)
         {
-            fail("Problem reading file: " + folderXmlFile);
+            fail("Problem reading exported folder XML file " + folderXmlFile + ": " + e.getMessage());
         }
 
-        if (expectedGroups == null)
+        FolderDocument expectedFolderDocument = null;
+        try
         {
-            Assert.assertFalse("Exported groups present when not expected", folderXml.contains("<groups>"));
+            expectedFolderDocument = FolderDocument.Factory.parse(expectedXml, XmlBeansUtil.getDefaultParseOptions());
+        }
+        catch (XmlException e)
+        {
+            fail("Problem parsing string for expected groups string");
+        }
+
+        if (!exportGroups)
+        {
+            Assert.assertNull("Exported groups present when not expected", exportedFolderDocument.getFolder().getGroups());
         }
         else
         {
-            Assert.assertTrue("Exported groups XML not as expected", folderXml.contains(expectedGroups));
+            GroupsType exportedGroups = exportedFolderDocument.getFolder().getGroups();
+            Assert.assertNotNull(exportedGroups);
+            Assert.assertTrue("Exported role assignments not as expected", expectedFolderDocument.getFolder().getGroups().valueEquals(exportedGroups));
         }
 
-        if (expectedRoleAssignments == null)
+        if (!exportAssignments)
         {
-            Assert.assertFalse("Exported role assignments present when not expected", folderXml.contains("<roleAssignments>"));
+            Assert.assertNull("Exported role assignments present when not expected", exportedFolderDocument.getFolder().getRoleAssignments());
         }
         else
         {
-            Assert.assertTrue("Exported role assignments XML not as expected", folderXml.contains(expectedRoleAssignments));
+            RoleAssignmentsType exportedAssignments = exportedFolderDocument.getFolder().getRoleAssignments();
+            Assert.assertNotNull(exportedAssignments);
+
+            Assert.assertTrue("Exported role assignments not as expected", expectedFolderDocument.getFolder().getRoleAssignments().valueEquals(exportedAssignments));
         }
     }
 
@@ -635,7 +649,10 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES, false);
         _containerHelper.deleteProject(getProjectName(), false);
-        _containerHelper.deleteProject(importProject, false);
+        for (String importProject : importProjects)
+        {
+            _containerHelper.deleteProject(importProject, false);
+        }
         deleteUsersIfPresent(testUsers);
     }
 
