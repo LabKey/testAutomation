@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 
@@ -67,19 +68,9 @@ public class StudySecurityTest extends StudyBaseTest
         createUser(READER, null);
         createUser(EDITOR, null);
         createUser(LIMITED, null);
+        createUser(NONE, null);
         clickProject(getProjectName());
-
-        //create groups for dataset reader, writer, and no-access
-        _permissionsHelper.createPermissionsGroup(GROUP_READERS, READER);
-        _permissionsHelper.createPermissionsGroup(GROUP_EDITORS, EDITOR);
-        _permissionsHelper.createPermissionsGroup(GROUP_LIMITED, LIMITED);
-        _permissionsHelper.createPermissionsGroup(GROUP_NONE, NONE);
-
-        _permissionsHelper.setPermissions(GROUP_READERS, "Reader");
-        _permissionsHelper.setPermissions(GROUP_EDITORS, "Editor");
-        _permissionsHelper.setPermissions(GROUP_LIMITED, "Reader");
-        _permissionsHelper.setPermissions(GROUP_NONE, "Reader");
-        _permissionsHelper.exitPermissionsUI();
+        importFolderFromZip(TestFileUtils.getSampleData("studies/StudySecurityProject.folder.zip"));
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Files"));
