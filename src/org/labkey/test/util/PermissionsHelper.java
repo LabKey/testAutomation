@@ -144,8 +144,6 @@ public class PermissionsHelper
 
     public void uncheckInheritedPermissions()
     {
-        if (!_test.isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
         _test._ext4Helper.uncheckCheckbox("Inherit permissions from parent");
     }
 

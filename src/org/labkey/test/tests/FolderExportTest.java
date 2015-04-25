@@ -391,7 +391,6 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), folderWithPermissions);
 //         stop inheriting permissions from the parent project and set specific permissions in the subfolder
 
-        _permissionsHelper.uncheckInheritedPermissions(); // this doesn't seem to be necessary for some reason
         _permissionsHelper.setUserPermissions(testUser1, "Reader");
         clickButton("Save and Finish");
         _containerHelper.createSubfolder(getProjectName() + "/" + folderWithPermissions, "Subfolder5", "Collaboration");
