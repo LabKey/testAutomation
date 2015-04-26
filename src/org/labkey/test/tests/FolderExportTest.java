@@ -207,6 +207,7 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(importProjects[4], "Subfolder as Subfolder");
         importFolder("Subfolder as Subfolder", subfolderPermsZip);
         clickFolder("Subfolder as Subfolder");
+        _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.assertPermissionSetting(testUser1, "Reader");
     }
 
@@ -233,6 +234,7 @@ public class FolderExportTest extends BaseWebDriverTest
         if (groupsExist)
         {
             log("Verifying role assignments to groups");
+            _permissionsHelper.enterPermissionsUI();
             _permissionsHelper.assertPermissionSetting(groupGroup, "Reader");
             _permissionsHelper.assertPermissionSetting(superTesterGroup, "Author");
             _permissionsHelper.assertPermissionSetting(groupGroup, "Author");
@@ -243,6 +245,7 @@ public class FolderExportTest extends BaseWebDriverTest
         if (usersExist)
         {
             log("Verifying role assignments to users");
+            _permissionsHelper.enterPermissionsUI();
             _permissionsHelper.assertPermissionSetting(testUser3, "Author");
             if (!isSubfolder)
                 _permissionsHelper.assertPermissionSetting(testUser3, "Project Administrator");

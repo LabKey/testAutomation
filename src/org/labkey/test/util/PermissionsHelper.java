@@ -120,8 +120,8 @@ public class PermissionsHelper
 
     public void assertPermissionSetting(String groupName, String permissionSetting)
     {
-        if (!_test.isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
+//        if (!_test.isElementPresent(Locator.permissionRendered()))
+//            enterPermissionsUI();
         String role = toRole(permissionSetting);
         if ("security.roles.NoPermissionsRole".equals(role))
         {
@@ -235,8 +235,8 @@ public class PermissionsHelper
 
     public void removePermission(String groupName, String permissionString)
     {
-        if (!_test.isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
+//        if (!_test.isElementPresent(Locator.permissionRendered()))
+//            enterPermissionsUI();
         _removePermission(groupName, permissionString, "pGroup");
     }
 
