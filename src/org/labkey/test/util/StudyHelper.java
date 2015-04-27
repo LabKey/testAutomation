@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
+import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -65,7 +66,8 @@ public class StudyHelper extends AbstractHelper
         if( !_test.isElementPresent(Locator.xpath("//span[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
             _test.clickProject(projectName);
-            _test.clickFolder(studyFolder);
+            if (!projectName.equals(studyFolder))
+                _test.clickFolder(studyFolder);
             _test.clickTab("Manage");
             _test.click(Locator.linkWithText("Manage " + participantString + " Groups"));
             _test.waitForText("groups allow");
@@ -343,5 +345,21 @@ public class StudyHelper extends AbstractHelper
         _test.clickButton("Next");
 
         return new DatasetDomainEditor(_test);
+    }
+
+    @LogMethod
+    public void importDataset(@LoggedParam String name, String containerPath, String id, File datasetFile)
+    {
+        _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
+
+        _test.setFormElement(Locator.name("typeName"), name);
+        _test.uncheckCheckbox(Locator.name("autoDatasetId"));
+        _test.setFormElement(Locator.id("datasetId"), id);
+        _test.checkCheckbox(Locator.name("fileImport"));
+        _test.clickButton("Next");
+
+        _test.waitForElement(Locator.name("uploadFormElement"));
+        _test.setFormElement(Locator.name("uploadFormElement"), datasetFile);
+        _test.clickButton("Import");
     }
 }

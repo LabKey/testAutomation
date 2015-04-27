@@ -161,6 +161,11 @@ public class PermissionsHelper
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
+    public void saveAndFinish()
+    {
+        _test.clickButton("Save and Finish");
+    }
+
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
@@ -295,7 +300,7 @@ public class PermissionsHelper
     public void exitPermissionsUI()
     {
         _test._ext4Helper.clickTabContainingText("Permissions");
-        _test.clickButton("Save and Finish");
+        saveAndFinish();
     }
 
     public void deleteGroup(String groupName)

@@ -341,6 +341,7 @@ src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/components/BodyWebPart.java -text
 src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/D3PieChart.java -text
+src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/credentials/Credentials.java -text
