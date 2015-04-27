@@ -3549,7 +3549,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void selectSecurityGroupsExport()
     {
-        checkCheckbox(Locator.checkboxByNameAndValue("types", "Project-level groups and user->group and group->group assignments"));
+        checkCheckbox(Locator.checkboxByNameAndValue("types", "Project-level groups and members"));
     }
 
     protected void selectRoleAssignmentsExport()
