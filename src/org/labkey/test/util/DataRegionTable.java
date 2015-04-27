@@ -207,7 +207,7 @@ public class DataRegionTable
 
     public String getTotal(int columnIndex)
     {
-        return _test.getText(Locator.css("#" + getHtmlName() + " tr.labkey-col-total > td:nth-of-type("+(columnIndex +(_selectors?2:1))+")"));
+        return _test.getText(Locator.css("#" + getHtmlName() + " tr.labkey-col-total > td:nth-of-type(" + (columnIndex + (_selectors ? 2 : 1)) + ")"));
     }
 
     /**
@@ -372,12 +372,25 @@ public class DataRegionTable
         }
 
         return columnText;
-
     }
+
     public List<String> getColumnDataAsText(String name)
     {
         int col = getColumn(name);
         return getColumnDataAsText(col);
+    }
+
+    public List<String> getRowDataAsText(int row)
+    {
+        final int colCount = getColumnCount();
+        List<String> rowText = new ArrayList<>();
+
+        for (int col = 0; col < colCount; col++)
+        {
+            rowText.add(getDataAsText(row, col));
+        }
+
+        return rowText;
     }
 
     /**
