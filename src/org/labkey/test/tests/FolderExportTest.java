@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +42,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -287,7 +289,7 @@ public class FolderExportTest extends BaseWebDriverTest
             _permissionsHelper.assertUserNotInGroup(testUser1, submitterGroup, projectName, PrincipalType.USER);
             _permissionsHelper.assertUserNotInGroup(testUser2, superTesterGroup, projectName, PrincipalType.USER);
         }
-        log ("Verifying existence of groups in groups");
+        log("Verifying existence of groups in groups");
         _permissionsHelper.assertUserInGroup(submitterGroup, groupGroup, projectName, PrincipalType.GROUP);
         _permissionsHelper.assertUserInGroup(superTesterGroup, parentGroup, projectName, PrincipalType.GROUP);
         _permissionsHelper.assertUserInGroup(submitterGroup, superTesterGroup, projectName, PrincipalType.GROUP);
@@ -468,18 +470,31 @@ public class FolderExportTest extends BaseWebDriverTest
         verifyFolderExportAsExpected(folderFromZip);
     }
 
-
     @LogMethod
     private void verifyFolderExportAsExpected(String folderName)
     {
+        File exportDir = new File(dataDir, "export");
+
+        exportDir.delete();
+
         exportFolderAsIndividualFiles(folderName, false, false, true);
 
-        // verify some of the folder export items by selecting them in the file browser
-        _fileBrowserHelper.selectFileBrowserItem("export/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
+        String[] expectedExportItems = {
+                "folder.xml",
+                "subfolders/subfolders.xml",
+                "subfolders/Subfolder1/folder.xml",
+                "subfolders/Subfolder1/subfolders/_hidden/folder.xml",
+                "subfolders/Subfolder2/folder.xml"};
+
+        List<String> missingFiles = new ArrayList<>();
+        for (String expectedItem : expectedExportItems)
+        {
+            File itemFile = new File(exportDir, expectedItem);
+            if (!itemFile.exists())
+                missingFiles.add(expectedItem);
+        }
+
+        Assert.assertTrue("File(s) not found in export of " + folderName + ": [" + StringUtils.join(missingFiles, ", ") +"]", missingFiles.isEmpty());
     }
 
     @LogMethod
@@ -500,23 +515,19 @@ public class FolderExportTest extends BaseWebDriverTest
         {
             exportedFolderDocument = FolderDocument.Factory.parse(folderXmlFile, XmlBeansUtil.getDefaultParseOptions());
         }
-        catch (XmlException e)
+        catch (XmlException | IOException e)
         {
-            fail("Problem parsing exported folder XML file " + folderXmlFile + ": " + e.getMessage());
-        }
-        catch (IOException e)
-        {
-            fail("Problem reading exported folder XML file " + folderXmlFile + ": " + e.getMessage());
+            throw new RuntimeException("Problem reading exported folder XML file", e);
         }
 
-        FolderDocument expectedFolderDocument = null;
+        FolderDocument expectedFolderDocument;
         try
         {
             expectedFolderDocument = FolderDocument.Factory.parse(expectedXml, XmlBeansUtil.getDefaultParseOptions());
         }
         catch (XmlException e)
         {
-            fail("Problem parsing string for expected groups string");
+            throw new RuntimeException("Problem parsing string for expected groups string", e);
         }
 
         if (!exportGroups)
