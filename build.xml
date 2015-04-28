@@ -90,14 +90,15 @@
         <echo message="mascot             run Mascot tests" />
         <echo message="sequest            run Sequest tests" />
         <echo message="test               runs UI for selecting and running specific tests" />
-
         <echo message="usage              displays this message"/>
         <echo message=""/>
-        <echo message="To specify individual tests to be run or cleaned, add:"/>
+        <echo message="To specify individual tests classes to be run, add:"/>
         <echo message="    -Dtest=&quot;{name}[,{name}]&quot;"/>
         <echo message="{name} is the name of any test class, optionally dropping a trailing"/>
-        <echo message="'Test' from the name.  For MS2Test.java, valid test names include"/>
-        <echo message="MS2, ms2, and MS2Test."/>
+        <echo message="'Test' from the name."/>
+        <echo message="  e.g. MS2, ms2, and MS2Test would all run the tests in MS2Test.java"/>
+        <echo message="{name} may also contain any number of test methods, separated by dots; method names are case-sensitive"/>
+        <echo message="  e.g. BasicTest.testSearch.testCredits"/>
         <echo message=""/>
         <echo message="To specify a named test suite (e.g., Flow, Wiki, IE) to be run or cleaned, use:"/>
         <echo message="    ant test -Dsuite={name}"/>
@@ -126,8 +127,7 @@
         <echo message="    -Dlabkey.contextpath={contextpath}"/>
         <echo message=""/>
         <echo message="For extra coverage, the harness can crawl all new links after each test, checking for"/>
-        <echo message="404 and 500 errors.  This provides extra safely, but adds time.  The BVT checks links"/>
-        <echo message="by default. To enable link checking:"/>
+        <echo message="404 and 500 errors.  This provides extra safely, but adds time.  To enable link checking:"/>
         <echo message="    -DlinkCheck=true"/>
         <echo message=""/>
         <echo message="Add javascript injection testing:"/>
@@ -139,7 +139,7 @@
         <echo message="The leak checker is run by default for DRT and BVT tests.  To disable mem checking:"/>
         <echo message="    -DmemCheck=false"/>
         <echo message=""/>
-        <echo message="Disable javascript error checking (firefox only):"/>
+        <echo message="Disable javascript error checking:"/>
         <echo message="    -DscriptCheck=false"/>
         <echo message=""/>
         <echo message="Create a new WebDriver instance for each test:"/>
