@@ -275,9 +275,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         if (alternateIDs)
         {
-            goToQueryView("study", "participant", false);
+            goToQueryView("study", "Mouse", false);
             DataRegionTable participantTable = new DataRegionTable("query", this);
-            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("ParticipantId"));
+            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("MouseId"));
             assertEquals("Wrong number of participants in published study", ptids.length, participants.size());
 
             SearchHelper searchHelper = new SearchHelper(this);
@@ -289,9 +289,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         else
         {
-            goToQueryView("study", "participant", false);
+            goToQueryView("study", "Mouse", false);
             DataRegionTable participantTable = new DataRegionTable("query", this);
-            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("ParticipantId"));
+            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("MouseId"));
             assertEquals("Wrong participants in published study", new HashSet<>(Arrays.asList(ptids)), participants);
         }
 
