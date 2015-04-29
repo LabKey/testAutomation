@@ -1,7 +1,4 @@
 package org.labkey.test.tests;
-/**
- * Created by binalpatel on 4/13/15.
- */
 
 import org.apache.http.HttpException;
 import org.junit.After;
@@ -16,7 +13,7 @@ import org.labkey.test.TestCredentials;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
@@ -29,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 
-@Category({InDevelopment.class})
+@Category({DailyA.class})
 public class SSOwithCASTest extends BaseWebDriverTest
 {
     private static final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
@@ -54,10 +51,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        //Configure CAS
-        beginAt("cas/configure.view?");
-        setFormElement(Locator.name("serverUrl"), TestCredentials.getHost(credentialKey));
-        clickButton("Save");
+        configureCASServer();
     }
 
     @Before
@@ -129,10 +123,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
     @Test
     public void testCASUnreachable()
     {
-        signOut();
-
-        signIn();
-
         //Configure CAS with "wrong" url
         beginAt("cas/configure.view?");
         setFormElement(Locator.name("serverUrl"), "www.labkey.org/cas"); //adding "/cas" in the end otherwise it doesn't allow me to save. Also, cannot save empty strings if configured previously.
@@ -151,9 +141,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
 
         signIn();
 
-        configureCAS();//configure CAS correctly for the other tests to run.
-
-        signOut();
+        configureCASServer();//configure CAS correctly for the other tests to run.
     }
 
     private void testCAS(boolean loginPage)
@@ -225,11 +213,10 @@ public class SSOwithCASTest extends BaseWebDriverTest
         }
     }
 
-    private void configureCAS()
+    private void configureCASServer()
     {
-        //Configure CAS
         beginAt("cas/configure.view?");
-//        setFormElement(Locator.name("serverUrl"), CAS_TEST_SERVER_URL );
+        setFormElement(Locator.name("serverUrl"), TestCredentials.getHost(credentialKey));
         clickButton("Save");
     }
 
