@@ -273,26 +273,15 @@ public class StudyPublishTest extends StudyProtectedExportTest
                                         final boolean includeSpecimens, final boolean refreshSpecimens, final int expectedSpecimenCount,
                                         final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs, final boolean maskClinicNames)
     {
-        if (alternateIDs)
+        SearchHelper searchHelper = new SearchHelper(this);
+        // Verify alternate IDs (or lack thereof)
+        for (String ptid : ptids)
         {
-            goToQueryView("study", "Mouse", false);
-            DataRegionTable participantTable = new DataRegionTable("query", this);
-            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("MouseId"));
-            assertEquals("Wrong number of participants in published study", ptids.length, participants.size());
-
-            SearchHelper searchHelper = new SearchHelper(this);
-            for (String ptid : ptids)
-            {
-                searchHelper.searchForSubjects(ptid);
+            searchHelper.searchForSubjects(ptid);
+            if (alternateIDs)
                 assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
-            }
-        }
-        else
-        {
-            goToQueryView("study", "Mouse", false);
-            DataRegionTable participantTable = new DataRegionTable("query", this);
-            Set<String> participants = new HashSet<>(participantTable.getColumnDataAsText("MouseId"));
-            assertEquals("Wrong participants in published study", new HashSet<>(Arrays.asList(ptids)), participants);
+            else
+                assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
         }
 
         // Go to published study
