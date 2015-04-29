@@ -21,6 +21,8 @@ import org.apache.xmlbeans.XmlException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
@@ -38,6 +40,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -59,13 +62,14 @@ public class FolderExportTest extends BaseWebDriverTest
 
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = new File(TestFileUtils.getSampledataPath(), "FolderExport");
-    private final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
-    private final String folderFromPipelineZip = "2 Folder From Pipeline Zip";
-    private final String folderFromPipelineExport = "3 Folder From Pipeline Export";
+    private static final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
+    private static final String folderFromPipelineZip = "2 Folder From Pipeline Zip";
+    private static final String folderFromPipelineExport = "3 Folder From Pipeline Export";
     private static final String folderFromTemplate = "4 Folder From Template";
     private static final String folderWithPermissions = "5 Folder From Zip With Permissions";
     private static final String folderInheritingPermissions = "6 Inheriting";
-    private static final String folderZip = "SampleWithSubfolders.folder.zip";
+    private static final String folderArchive = "SampleWithSubfolders.folder";
+    private static final String folderZip = folderArchive + ".zip";
     private static final String projectPermsZip = "ProjectWithPerms.folder.zip";
     private static final String projectSubfolderPermsZip = "ProjectWithSubfoldersAndPerms.folder.zip";
     private static final String subfolderPermsZip = "SubfolderWithPerms.folder.zip";
@@ -120,30 +124,44 @@ public class FolderExportTest extends BaseWebDriverTest
         return folders;
     }
 
-    @Test
-    public void testSteps()
+    @BeforeClass
+    public static void setupProject()
+    {
+        FolderExportTest init = (FolderExportTest) getCurrentTest();
+
+        init.doSetup();
+    }
+
+    private void doSetup()
     {
         // we are using the simpletest module to test Container Tab import/export
         goToAdminConsole();
-        assertTextPresent("simpletest");
+        assertElementPresent(Locator.tagWithClass("tr", "labkey-header").containing("simpletest"));
 
         RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
 
+        createUsersAndGroupsWithPermissions();
+    }
+
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+    }
+
+    @Test
+    public void testImport() throws IOException
+    {
+        new File(dataDir, folderZip).delete();
+        ZipUtil zipFolder = new ZipUtil(new File(dataDir, folderArchive), dataDir);
+        zipFolder.zipIt();
+
         verifyImportFromZip();
         verifyImportFromPipelineZip();
-        //Issue 13881
         verifyImportFromPipelineExpanded();
         verifyCreateFolderFromTemplate();
-
-        createUsersAndGroupsWithPermissions();
-
-        verifyProjectExportWithRoleAssignments();
-        verifyProjectExportWithGroups();
-        verifyProjectExportWithGroupsAndRoleAssignments();
-        verifySubfolderExportWithRoleAssignments();
-        verifySubfolderExportWithInheritance();
     }
 
     @Test
@@ -311,8 +329,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
     private void verifyImportFromPipelineExpanded()
     {
-        // test importing the folder archive that we exported from the verifyFolderExportAsExpected method
-        verifyImportFromPipeline("export/folder.xml", folderFromPipelineExport, 2);
+        verifyImportFromPipeline(folderArchive + "/folder.xml", folderFromPipelineExport, 2);
     }
 
     @LogMethod
@@ -320,9 +337,9 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), folderName, "Collaboration", null);
         setPipelineRoot(dataDir.getAbsolutePath());
-        importFolderFromPipeline("" + fileImport);
+        importFolderFromPipeline(fileImport);
 
-
+        setPipelineRootToDefault(); // Export to default location
         clickFolder(folderName);
         verifyFolderImportAsExpected(subfolderIndex);
         verifyFolderExportAsExpected(folderName);
@@ -404,35 +421,33 @@ public class FolderExportTest extends BaseWebDriverTest
         clickButton("Save and Finish");
     }
 
-    @LogMethod
-    private void verifyProjectExportWithGroups()
+    @Test
+    public void verifyProjectExportWithGroups()
     {
-        clickFolder(getProjectName());
         verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("groupsFolder.xml"), true, true, false);
     }
 
-    @LogMethod
-    private void verifyProjectExportWithRoleAssignments()
+    @Test
+    public void verifyProjectExportWithRoleAssignments()
     {
-        clickFolder(getProjectName());
         verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesFolder.xml"), true, false, true);
     }
 
-    @LogMethod
-    private void verifyProjectExportWithGroupsAndRoleAssignments()
+    @Test
+    public void verifyProjectExportWithGroupsAndRoleAssignments()
     {
-        clickFolder(getProjectName());
         verifyFolderExportWithPermissionsAsExpected(getProjectName(), false, getExpectedXML("rolesAndGroupsFolder.xml"), true, true, true);
     }
 
-    @LogMethod
-    private void verifySubfolderExportWithRoleAssignments()
+    @Test
+    public void verifySubfolderExportWithRoleAssignments()
     {
         clickFolder(folderWithPermissions);
         verifyFolderExportWithPermissionsAsExpected(folderWithPermissions, true, getExpectedXML("subfolderRoleAssignmentsExport.xml"), false, false, true);
     }
 
-    private void  verifySubfolderExportWithInheritance()
+    @Test
+    public void verifySubfolderExportWithInheritance()
     {
         clickFolder(folderInheritingPermissions);
         verifyFolderExportWithPermissionsAsExpected(folderInheritingPermissions, true, getExpectedXML("subfolderInheritedAssignments.xml"), false, false, true);
@@ -473,7 +488,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyFolderExportAsExpected(String folderName)
     {
-        File exportDir = new File(dataDir, "export");
+        File exportDir = new File(TestFileUtils.getDefaultFileRoot(getProjectName() + "/" + folderName), "export");
 
         exportDir.delete();
 
@@ -494,7 +509,7 @@ public class FolderExportTest extends BaseWebDriverTest
                 missingFiles.add(expectedItem);
         }
 
-        Assert.assertTrue("File(s) not found in export of " + folderName + ": [" + StringUtils.join(missingFiles, ", ") +"]", missingFiles.isEmpty());
+        Assert.assertTrue("File(s) not found in export of " + folderName + " to " + exportDir.getAbsolutePath() + ":\n[" + StringUtils.join(missingFiles, ", ") +"]", missingFiles.isEmpty());
     }
 
     @LogMethod
@@ -660,7 +675,6 @@ public class FolderExportTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(getProjectName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES, false);
         _containerHelper.deleteProject(getProjectName(), false);
         for (String importProject : importProjects)
         {
