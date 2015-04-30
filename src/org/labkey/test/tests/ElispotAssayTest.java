@@ -16,30 +16,29 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.collections15.Bag;
-import org.apache.commons.collections15.bag.HashBag;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class, Assays.class})
 public class ElispotAssayTest extends AbstractQCAssayTest
@@ -65,6 +64,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_FLUOROSPOT_FILENAME2 = "AID_fluoro5.xlsx";
     protected final String TEST_ASSAY_FLUOROSPOT_FILE1 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME1;
     protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
+    private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
     public List<String> getAssociatedModules()
     {
@@ -83,34 +83,26 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         return BrowserType.CHROME;
     }
 
+    @BeforeClass
+    public static void initProject()
+    {
+        ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
+        init.setupFolder();
+    }
+
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+    }
+
     /**
-     * Performs Luminex designer/upload/publish.
+     * Performs ELISpot designer/upload/publish.
      */
     @Test
-    public void runUITests()
+    public void elispotTests()
     {
         log("Starting Elispot Assay BVT Test");
-
-        //revert to the admin user
-        ensureSignedInAsAdmin();
-
-        log("Testing Elispot Assay Designer");
-
-        // set up a scripting engine to run a java transform script
-        prepareProgrammaticQC();
-
-        //create a new test project
-        _containerHelper.createProject(TEST_ASSAY_PRJ_ELISPOT, null);
-
-        //setup a pipeline for it
-        setupPipeline(TEST_ASSAY_PRJ_ELISPOT);
-
-        //add the Assay List web part so we can create a new elispot assay
-        clickProject(TEST_ASSAY_PRJ_ELISPOT);
-        addWebPart("Assay List");
-
-        //create a new elispot template
-        createTemplate();
 
         //create a new elispot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -158,14 +150,106 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         runTransformTest();
         doBackgroundSubtractionTest();
         testTNTCdata();
+    }
 
-        testFluorospotAssay();
+    @Test @LogMethod
+    public void fluorospotTests()
+    {
+        //create a new fluorospot assay
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
+        clickButton("Next");
+
+        log("Setting up Fluorospot assay");
+
+        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
+        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
+        assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
+        assayDesigner.setDetectionMethod(FLUOROSPOT_DETECTION_METHOD);
+        assayDesigner.saveAndClose();
+
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLUOROSPOT));
+
+        log("Uploading Fluorospot Runs");
+        clickButton("Import Data");
+        clickButton("Next");
+        selectOptionByText(Locator.name("plateReader"), "AID");
+        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
+        assertTextPresent("Upload successful.");
+
+        selectOptionByText(Locator.name("plateReader"), "AID");
+        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE2, "F2", "Save and Finish");
+
+        clickAndWait(Locator.linkContainingText("AID_fluoro2"));
+
+        assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
+
+        List<String> expectedSpotCount = Arrays.asList("0.0", "4.0", "0.0", "0.0", "0.0", "2.0", "1.0", "0.0",  "0.0", "1.0" );
+        List<String> expectedActivity = Arrays.asList (" ", "2.0", "0.0", " ", "0.0", "0.0", "0.0", " ", "0.0", "25.0");
+        List<String> expectedIntesity = Arrays.asList (" ", "7.0", "0.0", " ", "0.0", "5.0", "5.0", " ", "0.0", "84.0");
+
+        DataRegionTable dataTable = new DataRegionTable("Data", this);
+
+        log("add the analyte field to the table");
+        CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(dataTable);
+        cvHelper.openCustomizeViewPanel();
+        cvHelper.addCustomizeViewColumn("Analyte");
+        cvHelper.applyCustomView();
+
+        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
+        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, dataTable);
+
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkContainingText("AID_fluoro5"));
+
+        assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
+
+        List<String> expectedSpotCount2 = Arrays.asList("77.0" , "0.0", "0.0", "0.0", "0.0", "18.0", "0.0", "41.0", "0.0", "0.0", "0.0");
+        List<String> expectedActivity2 = Arrays.asList ("607.0", " ", " ", "0.0", " ", "141.0", " ", "366.0", " ", " ", " ");
+        List<String> expectedIntesity2 = Arrays.asList (" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ");
+
+        DataRegionTable dataTable2 = new DataRegionTable("Data", this);
+        dataTable.setSort("WellgroupLocation", SortDirection.DESC);
+        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, dataTable2);
+    }
+
+    @LogMethod
+    protected void setupFolder()
+    {
+        //revert to the admin user
+        ensureSignedInAsAdmin();
+
+        log("Testing Elispot Assay Designer");
+
+        // set up a scripting engine to run a java transform script
+        prepareProgrammaticQC();
+
+        //create a new test project
+        _containerHelper.createProject(TEST_ASSAY_PRJ_ELISPOT, null);
+
+        //setup a pipeline for it
+        setupPipeline(TEST_ASSAY_PRJ_ELISPOT);
+
+        //add the Assay List web part so we can create a new elispot assay
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
+        addWebPart("Assay List");
+
+        //create a new elispot template
+        createTemplate();
+
     }
 
     protected void uploadFluorospotFile(String filePath, String uniqueifier, String finalButton)
     {
         uploadFile(filePath, uniqueifier, finalButton, false, false, true);
     }
+
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation)
     {
         uploadFile(filePath, uniqueifier, finalButton, testPrepopulation, false);
@@ -664,69 +748,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
                 "Atg6FMedian"));
 
         assertEquals(expectedRows, actualRows);       */
-    }
-
-    protected static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
-    @LogMethod
-    protected void testFluorospotAssay()
-    {
-        //create a new fluorospot assay
-        clickProject(TEST_ASSAY_PRJ_ELISPOT);
-        clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
-        clickButton("Next");
-
-        log("Setting up Fluorospot assay");
-
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
-        assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
-        assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
-        assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
-        assayDesigner.setDetectionMethod(FLUOROSPOT_DETECTION_METHOD);
-        assayDesigner.saveAndClose();
-
-        clickProject(TEST_ASSAY_PRJ_ELISPOT);
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLUOROSPOT));
-
-        log("Uploading Fluorospot Runs");
-        clickButton("Import Data");
-        clickButton("Next");
-        selectOptionByText(Locator.name("plateReader"), "AID");
-        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
-        assertTextPresent("Upload successful.");
-
-        selectOptionByText(Locator.name("plateReader"), "AID");
-        uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE2, "F2", "Save and Finish");
-
-        clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME1));
-
-        assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
-
-        List<String> expectedSpotCount = Arrays.asList("4.0", "0.0", "2.0", "0.0", "0.0", "0.0", "1.0", "1.0",  "3.0" );
-        List<String> expectedActivity = Arrays.asList ("2.0", "0.0", "0.0", "0.0", " ",   "0.0",  " ",  "25.0", "13.0");
-        List<String> expectedIntesity = Arrays.asList ("7.0", "0.0", "5.0", "0.0", " ",   "0.0",  " ",  "84.0", "23.0");
-
-        DataRegionTable dataTable = new DataRegionTable("Data", this);
-        dataTable.setFilter("AntigenLsid/AntigenName", "Is Not Blank", "");
-        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
-        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, dataTable);
-
-        clickAndWait(Locator.linkWithText("view runs"));
-        clickAndWait(Locator.linkContainingText(TEST_ASSAY_FLUOROSPOT_FILENAME2));
-
-        assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
-
-        List<String> expectedSpotCount2 = Arrays.asList("18.0" , "0.0", "0.0", "0.0", "77.0" , "41.0" , "0.0", "44.0",  "0.0", "0.0", "290.0");
-        List<String> expectedActivity2 = Arrays.asList ("141.0", " ",   " ",   " ",   "607.0", "366.0", " ",   "266.0", " ",   " ",   "2801.0");
-        List<String> expectedIntesity2 = Arrays.asList (" ",     " ",   " ",   " ",   " ",     " ",     " ",   " ",     " ",   " ",   " ");
-
-        DataRegionTable dataTable2 = new DataRegionTable("Data", this);
-        dataTable.setFilter("AntigenLsid/AntigenName", "Is Blank", "");
-        dataTable.setSort("WellgroupLocation", SortDirection.DESC);
-        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, dataTable2);
     }
 
     private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity,
