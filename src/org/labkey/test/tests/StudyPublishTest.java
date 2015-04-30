@@ -1097,6 +1097,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         _pipelineJobs = 0;
         publishStudy(SUB_FOLDER_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, new String[0], new String[0], new String[0], false, false, false, false, false, false);
         clickFolder(getFolderName());
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
+        _permissionsHelper.saveAndFinish();
     }
 
     /**
@@ -1148,7 +1151,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickFolder(getFolderName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
-        clickButton("Save and Finish", defaultWaitForPage);
+        _permissionsHelper.savePermissions();
         _permissionsHelper.setUserPermissions(PUBLISH_FOLDER_ADMIN, "Folder Administrator");
         _permissionsHelper.setUserPermissions(PUBLISH_SUB_FOLDER_ADMIN, "Reader");
         impersonate(PUBLISH_FOLDER_ADMIN);
@@ -1203,12 +1206,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         DataRegionTable drtTable = new DataRegionTable("query", this);
         for (Map.Entry<String, String[]> entry : columnsToCheck.entrySet())
         {
-            int i=0;
-            Assert.assertTrue(drtTable.getDataRowCount() == entry.getValue().length);
-            for (String value : drtTable.getColumnDataAsText(entry.getKey()))
-            {
-                assertEquals(value, entry.getValue()[i++]);
-            }
+            assertEquals("Wrong data for column: " + entry.getKey(), Arrays.asList(entry.getValue()), drtTable.getColumnDataAsText(entry.getKey()));
         }
     }
 
