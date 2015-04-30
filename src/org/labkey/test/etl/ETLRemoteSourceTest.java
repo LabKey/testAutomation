@@ -143,7 +143,7 @@ public class ETLRemoteSourceTest extends ETLBaseTest
     @Test
     public void RemoteTransformErrorTest()
     {
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         //run remote etl without remote connection configured
         errors.add("ERROR: The remote connection EtlTest_RemoteConnection has not yet been setup in the remote connection manager.  You may configure a new remote connection through the schema browser.");
         errors.add("ERROR: Error running executeCopy");

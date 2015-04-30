@@ -16,6 +16,7 @@
 package org.labkey.test.etl;
 
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
@@ -33,6 +34,7 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,8 @@ public class ETLTest extends ETLBaseTest
     private static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
     public static final String APPEND_WITH_ROWVERSION = "appendWithRowversion";
     public static final String APPEND = "append";
+    public static final String APPEND_SELECT_ALL = "appendSelectAll";
+    final String TRANSFORM_BAD_THROW_ERROR_SP = "{simpletest}/SProcBadThrowError";
 
 
     @Nullable
@@ -281,7 +285,6 @@ UNDONE: need to fix the merge case
         final String TRANSFORM_NORMAL_OPERATION_SP = "{simpletest}/SProcNormalOperation";
         final String TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP = "{simpletest}/SProcBadNonZeroReturnCode";
         final String TRANSFORM_BAD_PROCEDURE_NAME_SP = "{simpletest}/SProcBadProcedureName";
-        final String TRANSFORM_BAD_THROW_ERROR_SP = "{simpletest}/SProcBadThrowError";
         final String TRANSFORM_PERSISTED_PARAMETER_SP = "{simpletest}/SProcPersistedParameter";
         final String TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP = "{simpletest}/SProcOverridePersistedParameter";
         final String TRANSFORM_RUN_FILTER_SP = "{simpletest}/SProcRunFilter";
@@ -395,15 +398,13 @@ UNDONE: need to fix the merge case
     @Test
     public void testPipelineFileAnalysisTask() throws Exception
     {
-        _etlHelper.insertSourceRow("2", "Subject 2", null);
-        _etlHelper.insertSourceRow("3", "Subject 3", null);
-        //file ETL output and external pipeline test
-        File dir = TestFileUtils.getTestTempDir();
-        FileUtils.deleteDirectory(dir);
-        //noinspection ResultOfMethodCallIgnored
-        dir.mkdirs();
-        setPipelineRoot(dir.getAbsolutePath());
+        File dir = setupPipelineFileAnalysis();
         _etlHelper.runETL("targetFile");
+        validatePipelineFileAnalysis(dir);
+    }
+
+    private void validatePipelineFileAnalysis(File dir)
+    {
         File etlFile = new File(dir, "etlOut/report.testIn.tsv");
         String fileContents = TestFileUtils.getFileContents(etlFile);
         String[] rows = fileContents.split("[\\n\\r]+");
@@ -420,4 +421,84 @@ UNDONE: need to fix the merge case
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
         assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
     }
+
+    @NotNull
+    private File setupPipelineFileAnalysis() throws IOException
+    {
+        _etlHelper.insertSourceRow("2", "Subject 2", null);
+        _etlHelper.insertSourceRow("3", "Subject 3", null);
+        //file ETL output and external pipeline test
+        File dir = TestFileUtils.getTestTempDir();
+        FileUtils.deleteDirectory(dir);
+        //noinspection ResultOfMethodCallIgnored
+        dir.mkdirs();
+        setPipelineRoot(dir.getAbsolutePath());
+        return dir;
+    }
+
+    /**
+     *
+     * Test that jobs are serialized correctly so they can be requeued. Using "retry" as standin for requeue on server
+     * restart, as it is the same mechanism. For each case, deliberated create an error condition (key violation, etc),
+     * and then retry the job. If the same error occurs, the job requeued successfully. (Check the initial error now appears twice
+     * in log.)
+     *
+     */
+    @Test
+    public void testRequeueJobs() throws Exception
+    {
+        String FILTER_ERROR_MESSAGE = "Violation of UNIQUE KEY constraint";
+        _etlHelper.insertSourceRow("2", "Subject 2", "1042");
+
+        // SelectAllFilter
+        _etlHelper.runETL_API(APPEND_SELECT_ALL);
+        tryAndRetry(APPEND_SELECT_ALL, FILTER_ERROR_MESSAGE, true);
+
+        // ModifiedSinceFilter
+        tryAndRetry(APPEND, FILTER_ERROR_MESSAGE, true);
+
+        //RunFilter
+        _etlHelper.insertTransferRow("1042", _etlHelper.getDate(), _etlHelper.getDate(), "new transfer", "added by test automation", "pending");
+        tryAndRetry(TRANSFORM_BYRUNID, FILTER_ERROR_MESSAGE, true);
+
+        //StoredProc
+        tryAndRetry(TRANSFORM_BAD_THROW_ERROR_SP, "ERROR: Intentional SQL Exception From Inside Proc", false);
+
+        // Remote Source
+        tryAndRetry("remoteInvalidDestinationSchemaName", "ERROR: Target schema not found: study_buddy", true);
+
+        // TaskRef (serialization failure only occurred when taskref task had not yet started)
+        tryAndRetry("appendAndTaskRefTask", FILTER_ERROR_MESSAGE, true);
+    }
+
+    /**
+     * Test requeuing an etl job with a pipeline task in it. Doing this one a little differently than other requeue tests.
+     * Cancel the job while it's running, and then on retry verify the job ran to completion.
+     *
+     */
+    @Test
+    public void testRequeuePipelineTask() throws IOException
+    {
+        File dir = setupPipelineFileAnalysis();
+        _etlHelper.runETLNoNavNoWait("targetFileWithSleep", true, false);
+        refresh();
+        clickButton("Cancel");
+        _etlHelper.clickRetryButton();
+        _etlHelper.waitForEtl();
+        validatePipelineFileAnalysis(dir);
+    }
+
+    private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
+    {
+        _etlHelper.runETLNoNav(transformId, true, false);
+        refresh();
+        assertTextPresent(expectedError);
+        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
+        _etlHelper.clickRetryButton();
+        refresh();
+        assertTextPresent(expectedError, 2);
+        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
+    }
+
+
 }

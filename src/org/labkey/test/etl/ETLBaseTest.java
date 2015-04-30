@@ -20,7 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.tests.SimpleModuleTest;
 import org.labkey.test.util.DataIntegrationHelper;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ETLBaseTest extends BaseWebDriverTest
@@ -43,7 +43,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("dataintegration");
+        return Collections.singletonList("dataintegration");
     }
 
     @Override

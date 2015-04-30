@@ -160,7 +160,9 @@ modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=un
 modules/simpletest/resources/etls/SleepTask.xml -text
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/appendAndTaskRefTask.xml -text
 modules/simpletest/resources/etls/appendIdByRun.xml -text
+modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
@@ -169,6 +171,7 @@ modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/targetFileWithSleep.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/truncate.xml -text
 modules/simpletest/resources/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text

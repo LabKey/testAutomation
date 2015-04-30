@@ -15,7 +15,6 @@
  */
 package org.labkey.test.etl;
 
-import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,8 +32,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 import org.labkey.test.util.PasswordUtil;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -85,10 +82,10 @@ public class ETLClientApiCommandTest extends ETLBaseTest
     {
         verifyBaseTransformResponse(response);
         // just verify this method doesn't choke
-        JSONObject obj = response.getResult();
+        response.getResult();
         // currently not filled in, verify the methods don't choke
-        Date d = response.getLastChecked();
-        obj = response.getState();
+        response.getLastChecked();
+        response.getState();
 
         // verify the accessors now (which look at the returned JSON data anyway)
         assertTrue("response.enabled should equal command.enabled",

@@ -16,7 +16,6 @@
 package org.labkey.test.etl;
 
 import com.google.common.base.Function;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.RunTransformResponse;
@@ -32,8 +31,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -385,6 +382,16 @@ public class ETLHelper
 
     protected void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError)
     {
+        runETLNoNav(transformId, hasWork, hasCheckerError, true);
+    }
+
+    protected void runETLNoNavNoWait(String transformId, boolean hasWork, boolean hasCheckerError)
+    {
+        runETLNoNav(transformId, hasWork, hasCheckerError, false);
+    }
+
+    protected void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError, boolean wait)
+    {
         _test.log("running " + transformId + " job");
         _test.goToModule("DataIntegration");
 
@@ -392,25 +399,10 @@ public class ETLHelper
         {
             // pipeline job will run
             _test.waitAndClickAndWait(findRunNowButton(transformId));
-            _test.waitFor(new BaseWebDriverTest.Checker()
+            if (wait)
             {
-                @Override
-                public boolean check()
-                {
-                    if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
-                        return true;
-                    else if (_test.isElementPresent(Locator.tag("tr")
-                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                            .withPredicate(Locator.xpath("td").withText("COMPLETE"))))
-                        return true;
-                    else
-                        _test.refresh();
-
-                    return false;
-                }
-            }, "ETL did not finish", _test.WAIT_FOR_JAVASCRIPT);
+                waitForEtl();
+            }
         }
         else
         {
@@ -420,8 +412,32 @@ public class ETLHelper
         }
     }
 
+    protected void waitForEtl()
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                if (_test.isElementPresent(Locator.tag("tr")
+                        .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                        .withPredicate(Locator.xpath("td").withText("ERROR"))))
+                    return true;
+                else if (_test.isElementPresent(Locator.tag("tr")
+                        .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                        .withPredicate(Locator.xpath("td").withText("COMPLETE"))))
+                    return true;
+                else
+                    _test.refresh();
+
+                return false;
+            }
+        }, "ETL did not finish", BaseWebDriverTest.WAIT_FOR_PAGE);
+    }
+
     private Locator.XPathLocator findTransformConfigCell(String transformId, boolean isLink)
     {
+        transformId = ensureFullIdString(transformId);
         Locator.XPathLocator baseCell = Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td");
         return (isLink) ? baseCell.child("a") : baseCell;
     }
@@ -439,16 +455,39 @@ public class ETLHelper
     protected RunTransformResponse runETL_API(String transformId, boolean wait) throws Exception
     {
         _test.log("running " + transformId + " job");
+        transformId = ensureFullIdString(transformId);
+        return wait ? _diHelper.runTransformAndWait(transformId, 30000) : _diHelper.runTransform(transformId);
+    }
+
+    private String ensureFullIdString(String transformId)
+    {
         if (!StringUtils.startsWith(transformId, "{"))
         {
             transformId = "{simpletest}/" + transformId;
         }
-        return wait ? _diHelper.runTransformAndWait(transformId, 30000) : _diHelper.runTransform(transformId);
+        return transformId;
     }
 
     protected RunTransformResponse runETL_API(String transformId) throws Exception
     {
         return runETL_API(transformId, true);
+    }
+
+    protected void clickRetryButton()
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            public boolean check()
+            {
+                if (null == _test.getButtonLocator("Retry"))
+                {
+                    _test.refresh();
+                    return false;
+                }
+                return true;
+            }
+        }, "Retry button did not appear.", BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.clickButton("Retry");
     }
 
     protected void deleteSourceRow(String... ids)
@@ -596,22 +635,6 @@ public class ETLHelper
         _test.click(Locator.xpath("//a[.='" + transformName + "']//..//..//a[.='ERROR']"));
 
         _test.assertTextPresent(errors);
-    }
-
-    protected void copyETLfiles(File sourceDir, File destinationDir)
-    {
-        File[] files = sourceDir.listFiles();
-        try
-        {
-            for(File file : files)
-            {
-                FileUtils.copyFileToDirectory(file, destinationDir);
-            }
-        }
-        catch(IOException e)
-        {
-            throw new RuntimeException("Transform xml file copy failed", e);
-        }
     }
 
     protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
