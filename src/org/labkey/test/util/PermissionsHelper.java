@@ -181,10 +181,7 @@ public class PermissionsHelper
     @LogMethod
     public void setUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
-        _test.log(new Date().toString());
         _setPermissions(userName, permissionString, "pUser");
-
-        _test.log(new Date().toString());
     }
 
     @LogMethod

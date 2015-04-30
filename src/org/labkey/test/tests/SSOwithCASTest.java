@@ -29,6 +29,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.credentials.Login;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
@@ -47,13 +49,16 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private static final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
     private static final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
     private static final String credentialKey = "CAS";
+    private static final String CAS_HOST = TestCredentials.getHost(credentialKey);
+    private static final Login EXISTING_USER_LOGIN = TestCredentials.getLogins(credentialKey).get(0);
+    private static final Login NEW_USER_LOGIN = TestCredentials.getLogins(credentialKey).get(1);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
 
-        deleteUsersIfPresent(TestCredentials.getUsername(credentialKey));
+        deleteUsersIfPresent(EXISTING_USER_LOGIN.getEmail(), NEW_USER_LOGIN.getEmail());
     }
 
     @BeforeClass
@@ -67,12 +72,29 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private void doSetup()
     {
         configureCASServer();
+        createUser(EXISTING_USER_LOGIN.getEmail(), null);
     }
 
     @Before
     public void preTest()
     {
         enableCAS();
+    }
+
+    @Test
+    public void testNewUserSSO()
+    {
+        signOut();
+
+        //Click on CAS link
+        clickAndWait(Locator.linkWithHref("/labkey/login/ssoRedirect.view?provider=CAS"));
+
+        casLogin(NEW_USER_LOGIN);
+
+        assertTrue("Not on customize user page after new user CAS login", getDriver().getCurrentUrl().contains("/user/showUpdate.view"));
+        assertEquals("Wrong email for new user.", NEW_USER_LOGIN.getEmail(), getText(Locator.css(".labkey-nav-page-header")));
+        String displayName = getFormElement(Locator.name("quf_DisplayName"));
+        assertEquals("Wrong display name for new user.", displayNameFromEmail(NEW_USER_LOGIN.getEmail()), displayName);
     }
 
     @Test
@@ -163,6 +185,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
     {
         signOut();
 
+        clickFolder("support");
         String relativeURLBeforeSignIn = getCurrentRelativeURL();
 
         if(loginPage)
@@ -172,7 +195,10 @@ public class SSOwithCASTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithHref("/labkey/login/ssoRedirect.view?provider=CAS"));
 
         //CAS login page - Sign in using CAS
-        casLogin();
+        casLogin(EXISTING_USER_LOGIN);
+
+        if (getDriver().getCurrentUrl().contains("/user/showUpdate.view")) // Redirects to customize user on first login
+            clickButton("Submit");
 
         //Should be re-directed the page user was previously on
         String relativeURLAfterSignIn = getCurrentRelativeURL();
@@ -180,7 +206,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
                 relativeURLBeforeSignIn, relativeURLAfterSignIn);
 
         //User should be CAS user
-        assertEquals("User should be signed in with CAS userId", TestCredentials.getUsername(credentialKey), getDisplayName());
+        assertEquals("User should be signed in with CAS userId", displayNameFromEmail(EXISTING_USER_LOGIN.getEmail()), getDisplayName());
 
         //Sign out CAS user, should sign out from Labkey, but should remained Sign In into CAS.
         signOut();
@@ -199,7 +225,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
                 relativeURLBeforeSignIn2, relativeURLAfterSignIn2);
 
         //User should be CAS user
-        assertEquals("User should be still signed in with CAS userId", TestCredentials.getUsername(credentialKey), getDisplayName());
+        assertEquals("User should be still signed in with CAS userId", displayNameFromEmail(EXISTING_USER_LOGIN.getEmail()), getDisplayName());
     }
 
     @LogMethod(quiet = true)
@@ -231,27 +257,20 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private void configureCASServer()
     {
         beginAt("cas/configure.view?");
-        setFormElement(Locator.name("serverUrl"), TestCredentials.getHost(credentialKey));
+        setFormElement(Locator.name("serverUrl"), CAS_HOST);
         clickButton("Save");
     }
 
-    private void casLogin()
+    private void casLogin(Login login)
     {
-        setFormElement(Locator.input("username"), TestCredentials.getUsername(credentialKey));
-        setFormElement(Locator.input("password"), TestCredentials.getPassword(credentialKey));
+        setFormElement(Locator.input("username"), login.getUsername());
+        setFormElement(Locator.input("password"), login.getPassword());
         clickAndWait(Locator.input("submit"));
     }
 
     private void casLogout()
     {
-        try
-        {
-            String httpGetResponseBody = WebTestHelper.getHttpGetResponseBody(TestCredentials.getHost(credentialKey) + "/logout");
-        }
-        catch (HttpException | IOException e)
-        {
-            throw new RuntimeException(e) ;
-        }
+        getDriver().navigate().to(CAS_HOST + "/logout");
     }
 
     @After

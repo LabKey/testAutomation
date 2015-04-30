@@ -15,7 +15,9 @@
  */
 package org.labkey.test.credentials;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import java.util.HashMap;
@@ -63,7 +65,11 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = false)
 public class Credentials
 {
+    @JsonProperty(required = true)
     private List<Server> servers;
+
+    @JsonIgnore
+    private Map<String, Server> credentials;
 
     public List<Server> getServers()
     {
@@ -72,12 +78,7 @@ public class Credentials
 
     public void setServers(List<Server> servers)
     {
-        this.servers = servers;
-    }
-
-    public Map<String, Server> getCredentials()
-    {
-        Map<String, Server> credentials = new HashMap<>();
+        credentials = new HashMap<>();
 
         for (Server server : servers)
         {
@@ -85,6 +86,11 @@ public class Credentials
                 throw new RuntimeJsonMappingException("Duplicate server key in credentials file: " + server.getKey());
         }
 
+        this.servers = servers;
+    }
+
+    public Map<String, Server> getCredentials()
+    {
         return credentials;
     }
 }

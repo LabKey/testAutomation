@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Bean for an individual server's credentials
  */
-@JsonIgnoreProperties(ignoreUnknown = false)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Server
 {
     @JsonProperty(required = true) private String key;
@@ -58,13 +58,5 @@ public class Server
     public void setLogins(List<Login> logins)
     {
         this.logins = logins;
-    }
-
-    /**
-     * Multiple logins are not currently necessary, just use this for now.
-     */
-    public Login getLogin()
-    {
-        return getLogins().get(0);
     }
 }
