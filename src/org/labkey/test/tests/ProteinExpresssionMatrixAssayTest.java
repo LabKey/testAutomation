@@ -13,32 +13,30 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
 {
     private static final String ASSAY_NAME = "Test Protein Expression Matrix";
-    private static final String FASTA_FILENAME = "Bovine_mini.fasta";
     private static final String FOLDER_TYPE_MS2 = "MS2";
     private static final String FOLDER_NAME = "ProteinExpressionMatrixFolder";
 
-    private static final String PATH_TO_DATA_DIR = "/ms2/matrix/";
-    private static final String FASTA_FILE_LOCATION = "/sampledata/xarfiles/ms2pipe/databases/";
-
-    private static final String TSV_FILE_NAME = "MatchesFasta.tsv";
-    private static final String EXCEL_FILE_NAME = "MatchesFasta.xlsx";
-    private static final String TSV_FILE_NAME_BAD_DATA = "DoesNotMatchFasta.tsv";
-    private static final String EXCEL_FILE_NAME_BAD_DATA = "DoesNotMatchFasta.xlsx";
-    private static final String TSV_FILE_NAME_DUPLICATE = "Duplicates.tsv";
-    private static final String EXCEL_FILE_NAME_DUPLICATE = "Duplicates.xlsx";
+    private static final File FASTA_FILE = new File("/sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta");
+    private static final File TSV_FILE = new File("/ms2/matrix/MatchesFasta.tsv");
+    private static final File EXCEL_FILE = new File("/ms2/matrix/MatchesFasta.xlsx");
+    private static final File TSV_FILE_BAD_DATA = new File("/ms2/matrix/DoesNotMatchFasta.tsv");
+    private static final File EXCEL_FILE_BAD_DATA = new File("/ms2/matrix/DoesNotMatchFasta.xlsx");
+    private static final File TSV_FILE_DUPLICATE = new File("/ms2/matrix/Duplicates.tsv");
+    private static final File EXCEL_FILE_DUPLICATE = new File("/ms2/matrix/Duplicates.xlsx");
 
     private static final List<String> SAMPLE_IDS = Arrays.asList("Condition B", "Condition D", "Condition E", "Condition F", "Condition G", "Condition H");
 
@@ -48,12 +46,12 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     {
         super.doCleanup(afterTest);
 
-        //remove protein database
+        //delete record of the import
         beginAt("ms2/showProteinAdmin.view?"); //go to Protein Database Admin
 
         final DataRegionTable annotInsertions = new DataRegionTable("AnnotInsertions", this);
 
-        annotInsertions.setFilter("FileName", "Contains", FASTA_FILENAME);
+        annotInsertions.setFilter("FileName", "Contains", FASTA_FILE.getName());
         List<String> fileNames = annotInsertions.getColumnDataAsText("FileName");
         if(fileNames.size() > 0)
         {
@@ -87,7 +85,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         beginAt("ms2/showProteinAdmin.view?");
 
         clickButton("Load New Annot File");
-        setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + FASTA_FILE_LOCATION + FASTA_FILENAME);
+        setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + FASTA_FILE);
         selectOptionByText(Locator.name("fileType"), "fasta");
         clickButton("Load Annotations");
 
@@ -111,115 +109,118 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     @Test
     public void testTSVImport()
     {
-        importProteinExpressionData("testingTSV", TSV_FILE_NAME);
+        importProteinExpressionData("testingTSV", TSV_FILE);
     }
 
     @Test
     public void testExcelImport()
     {
-        importProteinExpressionData("testingExcel", EXCEL_FILE_NAME);
+        importProteinExpressionData("testingExcel", EXCEL_FILE);
     }
 
     @Test
     public void testBadDataInTSV()
     {
-        importProteinExpressionWithBadData(TSV_FILE_NAME_BAD_DATA);
+        importProteinExpressionWithBadData(TSV_FILE_BAD_DATA);
     }
 
     @Test
     public void testBadDataInExcel()
     {
-        importProteinExpressionWithBadData(EXCEL_FILE_NAME_BAD_DATA);
+        importProteinExpressionWithBadData(EXCEL_FILE_BAD_DATA);
     }
 
     @Test
     public void testDuplicatesInTSV()
     {
-        importProteinExpressionWithDuplicates(TSV_FILE_NAME_DUPLICATE);
+        importProteinExpressionWithDuplicates(TSV_FILE_DUPLICATE);
     }
 
     @Test
     public void testDuplicatesInExcel()
     {
-        importProteinExpressionWithDuplicates(EXCEL_FILE_NAME_DUPLICATE);
+        importProteinExpressionWithDuplicates(EXCEL_FILE_DUPLICATE);
     }
 
-
-    private void importProteinExpressionData(String assayId, String exprDataFileName)
+    @Test
+    public void testCorrectLookupType()
     {
-        click(Locator.linkContainingText(ASSAY_NAME));
-        click(Locator.linkWithSpan("Import Data"));
-        setFormElement(Locator.name("name"), assayId);
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE_LOCATION + FASTA_FILENAME);
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(PATH_TO_DATA_DIR + exprDataFileName));
-        click(Locator.linkWithSpan("Save and Finish"));
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        _assayHelper.clickEditAssayDesign();
+        assertTextPresent("protein.FastaFiles");
+        clickAndWait(Locator.linkWithSpan("Cancel"));
+    }
 
-        testCorrectLookupType();
+    private void importProteinExpressionData(String assayId, File exprDataFile)
+    {
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithSpan("Import Data"));
+        setFormElement(Locator.name("name"), assayId);
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprDataFile.getPath()));
+        clickAndWait(Locator.linkWithSpan("Save and Finish"));
+
         testLinks(assayId);
         ensureEmptyConditionValuesHandled(assayId); //test empty conditions are handled properly
     }
 
-    private void importProteinExpressionWithBadData(String exprBadDataFileName)
+    private void importProteinExpressionWithBadData(File exprBadDataFile)
     {
         pushLocation();
 
-        click(Locator.linkContainingText(ASSAY_NAME));
-        click(Locator.linkWithSpan("Import Data"));
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE_LOCATION + FASTA_FILENAME);
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(PATH_TO_DATA_DIR + exprBadDataFileName));
-        click(Locator.linkWithSpan("Save and Finish"));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithSpan("Import Data"));
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprBadDataFile.getPath()));
+        clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
         assertTextPresent("Unable to find Protein '30S_ribosomal_pro_NotInFasta' in the selected Fasta/Uniprot file.");
 
         popLocation();
     }
 
-    private void importProteinExpressionWithDuplicates(String exprDataWithDuplicates)
+    private void importProteinExpressionWithDuplicates(File exprDataWithDuplicates)
     {
         pushLocation();
 
-        click(Locator.linkContainingText(ASSAY_NAME));
-        click(Locator.linkWithSpan("Import Data"));
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE_LOCATION + FASTA_FILENAME);
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(PATH_TO_DATA_DIR + exprDataWithDuplicates));
-        click(Locator.linkWithSpan("Save and Finish"));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithSpan("Import Data"));
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprDataWithDuplicates.getPath()));
+        clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
         assertTextPresent("duplicate key value violates unique constraint"); //TODO: This error message may change. Change this error message accordingly.
 
         popLocation();
     }
 
-    private void testCorrectLookupType()
-    {
-        _assayHelper.clickEditAssayDesign();
-        assertTextPresent("protein.FastaFiles");
-        click(Locator.linkWithSpan("Cancel"));
-    }
-
     private void testLinks(String assayId)
     {
-        click(Locator.linkContainingText(assayId));
+        clickAndWait(Locator.linkWithText(assayId));
 
         String currentRelativeURL1 = getCurrentRelativeURL();
         pushLocation();
-        click(Locator.linkContainingText(assayId));
+        clickAndWait(Locator.linkWithText(assayId));
         String currentRelativeURL2 = getCurrentRelativeURL();
         assertNotEquals(assayId + " in Run column is not a link.", currentRelativeURL1, currentRelativeURL2);
+        assertTextPresent("Standard Properties");
         popLocation();
 
         currentRelativeURL1 = getCurrentRelativeURL();
         pushLocation();
-        assertTextPresent("gi|18071135|gb|AAL58190.1|");
-        click(Locator.linkContainingText("gi|18071135|gb|AAL58190.1|"));
+        clickAndWait(Locator.linkWithText("gi|18071135|gb|AAL58190.1|"));
         currentRelativeURL2 = getCurrentRelativeURL();
         assertNotEquals("'gi|18071135|gb|AAL58190.1|' in Protein column is not a link.", currentRelativeURL1, currentRelativeURL2);
+        assertTextPresent("Protein Sequence");
         popLocation();
 
         currentRelativeURL1 = getCurrentRelativeURL();
         pushLocation();
-        click(Locator.linkContainingText("Condition G"));
+        clickAndWait(Locator.linkWithText("Condition G"));
         currentRelativeURL2 = getCurrentRelativeURL();
         assertNotEquals("'Condition G' in Sample Id column is not a link.", currentRelativeURL1, currentRelativeURL2);
+        assertTextPresent("Sample Condition G");
         popLocation();
     }
 
