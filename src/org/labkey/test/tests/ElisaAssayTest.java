@@ -21,16 +21,15 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Assays.class})
-public class ElisaAssayTest extends ElispotAssayTest
+public class ElisaAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_ELISA = "ELISA Test Verify Project";
     private final static String TEST_ASSAY_FLDR_NAB = "ELISA";
@@ -108,7 +107,7 @@ public class ElisaAssayTest extends ElispotAssayTest
 
         clickButton("Save", 0);
         waitForText(20000, "Save successful.");
-//
+
         clickProject(TEST_ASSAY_PRJ_ELISA);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISA));
