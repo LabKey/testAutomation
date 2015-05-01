@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.http.HttpException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -103,7 +102,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
         //set logos
         beginAt("login/pickAuthLogo.view?provider=CAS");
 
-        setFormElement(Locator.name("auth_header_logo_file"), HEADER_LOGO_FILE );
+        setFormElement(Locator.name("auth_header_logo_file"), HEADER_LOGO_FILE);
         setFormElement(Locator.name("auth_login_page_logo_file"), LOGIN_LOGO_FILE);
         clickButton("Save");
 
@@ -129,7 +128,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
         //Save
         clickButton("Save");
 
-        //TODO: Verify logo deletion
+        verifyLogoDeletion();
     }
 
     @Test
@@ -150,7 +149,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
         signOut();
 
         clickAndWait(Locators.signInButtonOrLink);//Go to Labkey Sign-in page
-        String relativeURLSignInPage = getCurrentRelativeURL();
 
         beginAt("/cas/validate.view?&ticket=randomstringforbogusticket");
 
@@ -271,6 +269,15 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private void casLogout()
     {
         getDriver().navigate().to(CAS_HOST + "/logout");
+    }
+
+    private void verifyLogoDeletion()
+    {
+        String auth_header_logo_file = getFormElement(Locator.name("auth_header_logo_file"));
+        assertEquals("Header logo not deleted.", "", auth_header_logo_file.trim());
+
+        String auth_login_page_logo_file = getFormElement(Locator.name("auth_login_page_logo_file"));
+        assertEquals("Login Page logo not deleted.", "", auth_login_page_logo_file.trim());
     }
 
     @After
