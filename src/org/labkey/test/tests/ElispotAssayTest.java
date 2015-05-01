@@ -187,36 +187,39 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkContainingText("AID_fluoro2"));
 
-        assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "atg_2F1", "atg_3F1", "atg_4F1");
-
-        List<String> expectedSpotCount = Arrays.asList("0.0", "4.0", "0.0", "0.0", "0.0", "2.0", "1.0", "0.0",  "0.0", "1.0" );
-        List<String> expectedActivity = Arrays.asList (" ", "2.0", "0.0", " ", "0.0", "0.0", "0.0", " ", "0.0", "25.0");
-        List<String> expectedIntesity = Arrays.asList (" ", "7.0", "0.0", " ", "0.0", "5.0", "5.0", " ", "0.0", "84.0");
-
-        DataRegionTable dataTable = new DataRegionTable("Data", this);
-
-        log("add the analyte field to the table");
-        CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(dataTable);
-        cvHelper.openCustomizeViewPanel();
-        cvHelper.addCustomizeViewColumn("Analyte");
-        cvHelper.applyCustomView();
-
-        dataTable.setSort("AntigenLsid/AntigenName", SortDirection.ASC);
-        dataTable.setSort("WellgroupLocation", SortDirection.ASC);
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntesity, dataTable);
+        verifyDataRegion(new DataRegionTable("Data", this), "Ascending",
+                Arrays.asList("0.0", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "2.0",  "0.0", "0.0"),       // spot count
+                Arrays.asList("0.0", "25.0", "0.0", "22.0", "0.0", "0.0", "0.0", "48.0",  "0.0", "0.0"),    // activity
+                Arrays.asList("0.0", "84.0", "0.0", "68.0", "0.0", "0.0", "0.0", "74.0",  "0.0", "0.0"));   // intensity
+        assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "Antigen 7", "Antigen 8", "Cy3", "FITC");
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText("AID_fluoro5"));
 
-        assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "atg_1F2", "atg_2F2", "atg_3F2", "atg_4F2");
+        verifyDataRegion(new DataRegionTable("Data", this), "Descending",
+                Arrays.asList("0.0", "1.0", "0.0", "0.0", "2.0", "0.0", "0.0", "3.0", "3.0", "0.0"),        // spot count
+                Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),                            // activity
+                Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "));                           // intensity
+        assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "Antigen 5", "Antigen 6", "Cy3", "FITC");
+    }
 
-        List<String> expectedSpotCount2 = Arrays.asList("77.0" , "0.0", "0.0", "0.0", "0.0", "18.0", "0.0", "41.0", "0.0", "0.0", "0.0");
-        List<String> expectedActivity2 = Arrays.asList ("607.0", " ", " ", "0.0", " ", "141.0", " ", "366.0", " ", " ", " ");
-        List<String> expectedIntesity2 = Arrays.asList (" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ");
+    private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity)
+    {
+        log("add the analyte field to the table and adding sorts");
+        CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(table);
+        cvHelper.openCustomizeViewPanel();
+        cvHelper.addCustomizeViewColumn("Analyte");
 
-        DataRegionTable dataTable2 = new DataRegionTable("Data", this);
-        dataTable.setSort("WellgroupLocation", SortDirection.DESC);
-        checkFluorospotRunData(expectedSpotCount2, expectedActivity2, expectedIntesity2, dataTable2);
+        cvHelper.removeCustomizeViewSort("AntigenLsid/antigenname");
+        cvHelper.removeCustomizeViewSort("Analyte");
+        cvHelper.removeCustomizeViewSort("WellgroupLocation");
+
+        cvHelper.addCustomizeViewSort("AntigenLsid/antigenname", "AntigenName", sortDir);
+        cvHelper.addCustomizeViewSort("Analyte", "Analyte", sortDir);
+        cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);
+        cvHelper.applyCustomView();
+
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntensity, table);
     }
 
     @LogMethod
