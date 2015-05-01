@@ -72,6 +72,7 @@ public class ETLTest extends ETLBaseTest
     public void preTest() throws Exception
     {
         _etlHelper.resetCounts();
+        resetErrors();
         _etlHelper.cleanupTestTables();
         goToProjectHome();
     }
@@ -447,7 +448,17 @@ UNDONE: need to fix the merge case
     @Test
     public void testRequeueJobs() throws Exception
     {
-        String FILTER_ERROR_MESSAGE = "Violation of UNIQUE KEY constraint";
+        String FILTER_ERROR_MESSAGE;
+        String SPROC_ERROR_MESSAGE = "ERROR: ";
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            FILTER_ERROR_MESSAGE = "violates unique constraint";
+            SPROC_ERROR_MESSAGE += "ERROR: ";
+        }
+        else
+            FILTER_ERROR_MESSAGE = "Violation of UNIQUE KEY constraint";
+        SPROC_ERROR_MESSAGE += "Intentional SQL Exception From Inside Proc";
+
         _etlHelper.insertSourceRow("2", "Subject 2", "1042");
 
         // SelectAllFilter
@@ -462,7 +473,7 @@ UNDONE: need to fix the merge case
         tryAndRetry(TRANSFORM_BYRUNID, FILTER_ERROR_MESSAGE, true);
 
         //StoredProc
-        tryAndRetry(TRANSFORM_BAD_THROW_ERROR_SP, "ERROR: Intentional SQL Exception From Inside Proc", false);
+        tryAndRetry(TRANSFORM_BAD_THROW_ERROR_SP, SPROC_ERROR_MESSAGE, false);
 
         // Remote Source
         tryAndRetry("remoteInvalidDestinationSchemaName", "ERROR: Target schema not found: study_buddy", true);
@@ -491,13 +502,13 @@ UNDONE: need to fix the merge case
     private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
     {
         _etlHelper.runETLNoNav(transformId, true, false);
+        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
         refresh();
         assertTextPresent(expectedError);
-        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
         _etlHelper.clickRetryButton();
+        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
         refresh();
         assertTextPresent(expectedError, 2);
-        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
     }
 
 

@@ -438,7 +438,7 @@ public class ETLHelper
     private Locator.XPathLocator findTransformConfigCell(String transformId, boolean isLink)
     {
         transformId = ensureFullIdString(transformId);
-        Locator.XPathLocator baseCell = Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td");
+        Locator.XPathLocator baseCell = Locator.xpath("//tr[@transformid='" + transformId + "']/td");
         return (isLink) ? baseCell.child("a") : baseCell;
     }
 
