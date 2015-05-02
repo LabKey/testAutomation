@@ -190,7 +190,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprDataWithDuplicates.getPath()));
         clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
-        assertTextPresent("duplicate key value violates unique constraint"); //TODO: This error message may change. Change this error message accordingly.
+        assertTextPresent("SQLException"); //TODO: Issue 23232: Provide a useful and user readable error message while importing protein expression data with duplicate IDs.
 
         popLocation();
     }
