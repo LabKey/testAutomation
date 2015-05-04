@@ -81,7 +81,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
             });
         }
 
-        clickButton("Load New Annot File");
+        clickButton("Import Data");
         setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
         selectOptionByText(Locator.name("fileType"), "uniprot");
         if (alreadyLoaded) checkCheckbox(Locator.name("clearExisting"));

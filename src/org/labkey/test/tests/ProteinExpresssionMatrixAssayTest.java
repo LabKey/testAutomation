@@ -84,7 +84,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         //load sample protein database
         beginAt("ms2/showProteinAdmin.view?");
 
-        clickButton("Load New Annot File");
+        clickButton("Import Data");
         setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + FASTA_FILE);
         selectOptionByText(Locator.name("fileType"), "fasta");
         clickButton("Load Annotations");
@@ -175,7 +175,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprBadDataFile.getPath()));
         clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
-        assertTextPresent("Unable to find Protein '30S_ribosomal_pro_NotInFasta' in the selected Fasta/Uniprot file.");
+        assertTextPresent("Unable to find protein '30S_ribosomal_pro_NotInFasta' in the selected FASTA file.");
 
         popLocation();
     }
