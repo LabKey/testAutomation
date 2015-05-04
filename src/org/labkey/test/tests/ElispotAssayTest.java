@@ -431,10 +431,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         Locator.css(".gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
 
-        //Saving once here avoids when templates are not completely saved because of the test refreshing the page.
         setFormElement(nameField, PLATE_TEMPLATE_NAME);
-        pressTab(nameField);
-        clickButton("Save", 0);
+        fireEvent(nameField, SeleniumEvent.change);
 
         click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
         Locator.css(".x-combo-list-item").withText("Background Wells").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
@@ -457,6 +455,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         setFormElement(groupField, "other control group");
 
         clickButton("Create", 0);
+        waitForElement(Locator.css("input[type=radio][name=wellGroup] + label").withText("other control group"));
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
     }
