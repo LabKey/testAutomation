@@ -1094,12 +1094,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // create one more sub folder published study
         clickFolder(PUB1_NAME);
-        _pipelineJobs = 0;
-        publishStudy(SUB_FOLDER_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, new String[0], new String[0], new String[0], false, false, false, false, false, false);
-        clickFolder(getFolderName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         _permissionsHelper.saveAndFinish();
+        _pipelineJobs = 0;
+        publishStudy(SUB_FOLDER_NAME, PUB1_DESCRIPTION, PublishLocation.folder, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, new String[0], new String[0], new String[0], false, false, false, false, false, false);
     }
 
     /**
