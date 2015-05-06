@@ -508,12 +508,13 @@ public class ListHelper extends AbstractHelper
 
     private void selectLookupTableComboItem(String table, int attempt)
     {
+        final String comboSubstring = table.contains("(") ? table : table + " ("; // Deal with overlapping table names unless caller specifies a type (e.g. 'SampleSet (Integer)')
         _test.log("Select lookup table combo item '" + table + "', attempt=" + attempt);
         String fieldName = "table";
         _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
         try
         {
-            _test.waitAndClick(500*attempt, Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"), 0);
+            _test.waitAndClick(500*attempt, Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), 0);
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
