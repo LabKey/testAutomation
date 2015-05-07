@@ -54,6 +54,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.UTF8PrintWriter;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -1728,7 +1729,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static int currentTestNumber;
 
     @ClassRule
-    public static TestWatcher testClassWatcher = new TestWatcher()
+    public static TestWatcher testClassWatcher() {return new TestWatcher()
     {
         @Override
         public Statement apply(Statement base, Description description)
@@ -1791,7 +1792,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             TestLogger.resetLogger();
             TestLogger.log("\\\\ AfterClass Complete //");
         }
-    };
+    };}
 
     public static Class getCurrentTestClass()
     {
@@ -1808,6 +1809,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         signIn();
         enableEmailRecorder();
+        disableMiniProfiler();
         resetErrors();
 
         if (isSystemMaintenanceDisabled())
@@ -1842,7 +1844,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @ClassRule
-    public static Timeout globalTimeout = new Timeout(2400000); // 40 minutes
+    public static Timeout globalTimeout()
+    {
+        return new Timeout(2400000); // 40 minutes
+    }
 
     @Rule
     public Timeout testTimeout = new Timeout(1800000); // 30 minutes
@@ -2969,6 +2974,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
         _containerHelper.deleteProject(project, failIfFail);
+    }
+
+    @LogMethod (quiet = true)
+    public void disableMiniProfiler()
+    {
+        Connection cn = createDefaultConnection(true);
+        Command command = new Command("mini-profiler", "setEnabled");
+        command.setParameters(new HashMap<String, Object>(Maps.of("enabled", "false")));
+        try
+        {
+            command.execute(cn, null);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to disable mini-profiler", e);
+        }
+
     }
 
     @LogMethod (quiet = true)
