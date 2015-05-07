@@ -210,11 +210,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         cvHelper.openCustomizeViewPanel();
         cvHelper.addCustomizeViewColumn("Analyte");
 
-        cvHelper.removeCustomizeViewSort("AntigenLsid/antigenname");
+        cvHelper.removeCustomizeViewSort("AntigenLsid/AntigenName");
         cvHelper.removeCustomizeViewSort("Analyte");
         cvHelper.removeCustomizeViewSort("WellgroupLocation");
 
-        cvHelper.addCustomizeViewSort("AntigenLsid/antigenname", "AntigenName", sortDir);
+        cvHelper.addCustomizeViewSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
         cvHelper.addCustomizeViewSort("Analyte", "Analyte", sortDir);
         cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
