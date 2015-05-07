@@ -49,7 +49,7 @@ public class APIUserHelper extends AbstractUserHelper
             catch (Exception e)
             {
                 if(verifySuccess)
-                    fail("Error while creating user: " + e.getMessage());
+                    throw new RuntimeException("Error while creating user", e);
                 return null;
             }
     }

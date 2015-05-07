@@ -605,10 +605,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
         catch (Exception e)
         {
-            log("Failure attempting to retrieve " + relativeUrl);
-            log(e.getMessage());
-            fail("Failure attempting to retrieve " + relativeUrl);
-            return null;
+            throw new RuntimeException("Failure attempting to retrieve " + relativeUrl, e);
         }
     }
 

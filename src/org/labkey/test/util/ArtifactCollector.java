@@ -109,13 +109,12 @@ public class ArtifactCollector
         {
             File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
             threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
+            baseWebDriverTest.log("Threads dumped to standard labkey log file");
         }
         catch (Exception e)
         {
             baseWebDriverTest.log("Error dumping threads: " + e.getMessage());
         }
-
-        baseWebDriverTest.log("Threads dumped to standard labkey log file");
     }
 
     public void dumpPageSnapshot(String testName, @Nullable String subdir)

@@ -56,7 +56,7 @@ public class SearchHelper extends AbstractHelper
         }
         catch (Exception e)
         {
-            fail("WaitForIndexer action failed" + e.getMessage());
+            throw new RuntimeException("WaitForIndexer action failed", e);
         }
     }
 

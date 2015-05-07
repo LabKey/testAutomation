@@ -845,7 +845,7 @@ public class StudyTest extends StudyBaseTest
         }
         catch (Exception e)
         {
-            fail("Error when attempting to verify audit trail: " + e.getMessage());
+            throw new RuntimeException("Error when attempting to verify audit trail", e);
         }
         return selectResp;
     }

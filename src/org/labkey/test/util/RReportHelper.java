@@ -289,9 +289,9 @@ public class RReportHelper extends AbstractHelper
         }
         catch(IOException ex)
         {
-            if (versionOutput.length() > 0) _test.log("R --version > " + versionOutput);
-            fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
-            return null; // Unreachable
+            if (versionOutput.length() > 0)
+                _test.log("R --version > " + versionOutput);
+            throw new RuntimeException("Unable to determine R version: " + r.getAbsolutePath(), ex);
         }
     }
 

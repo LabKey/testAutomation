@@ -105,9 +105,8 @@ public class APITestHelper
         }
         catch (Exception e)
         {
-            fail("An unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException("An unexpected error occurred", e);
         }
-        return Collections.emptyList();
     }
 
     private static ApiTestCase parseTestCase(TestCaseType element)
@@ -174,11 +173,11 @@ public class APITestHelper
                 jsonHelper.assertEquals("FAILED: test " + name, expectedResponse, responseBody);
             }
             else
-                fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, responseBody != null ? "\n" + responseBody : ""));
+                fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, "\n" + responseBody));
         }
         catch (IOException e)
         {
-            fail("Test failed requesting the URL: " + e.getMessage());
+            throw new RuntimeException("Test failed requesting the URL,", e);
         }
         finally
         {
