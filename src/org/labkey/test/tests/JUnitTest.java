@@ -203,6 +203,7 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest() throws Throwable
         {
+            long startTime = System.currentTimeMillis();
             RequestConfig requestConfig = RequestConfig.custom()
                     .setSocketTimeout(_timeout * 1000)
                     .build();
@@ -214,7 +215,6 @@ public class JUnitTest extends TestSuite
                 URIBuilder builder = new URIBuilder(WebTestHelper.getBaseURL() + "/junit/go.view");
                 builder.addParameter("testCase", _remoteClass);
                 HttpGet method = new HttpGet(builder.build());
-                long startTime = System.currentTimeMillis();
                 response = client.execute(method, context);
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
@@ -233,7 +233,7 @@ public class JUnitTest extends TestSuite
             }
             catch (IOException ioe)
             {
-                throw new RuntimeException("failed to run remote junit test " + _remoteClass + ": ", ioe);
+                throw new RuntimeException(getLogTestString("failed", startTime), ioe);
             }
             finally
             {
