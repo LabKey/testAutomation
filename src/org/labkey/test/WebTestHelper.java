@@ -44,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.UTF8Reader;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
+import org.seleniumhq.jetty7.util.URIUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -239,7 +240,7 @@ public class WebTestHelper
         if (containerPath != null)
         {
             url.append("/");
-            url.append(containerPath);
+            url.append(URIUtil.encodePath(containerPath));
         }
 
         url.append("/");

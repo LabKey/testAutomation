@@ -21,6 +21,7 @@ import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -1825,7 +1826,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             checkLeaksAndErrors();
         }
 
-        doCleanup(false);
+        cleanup(false);
     }
 
     @Before
@@ -2076,7 +2077,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (!isTestCleanupSkipped())
             {
                 goToHome();
-                doCleanup(true);
+                cleanup(true);
             }
             else
             {
@@ -2160,6 +2161,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         signOut();
         simpleSignIn();
+    }
+
+    private final void cleanup(boolean afterTest) throws TestTimeoutException
+    {
+        if(!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest)this).needsSetup())
+            doCleanup(afterTest);
     }
 
     // Standard cleanup: delete the project
