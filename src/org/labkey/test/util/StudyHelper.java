@@ -23,7 +23,7 @@ import org.labkey.test.WebTestHelper;
 import java.io.File;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class StudyHelper extends AbstractHelper
 {
@@ -361,5 +361,22 @@ public class StudyHelper extends AbstractHelper
         _test.waitForElement(Locator.name("uploadFormElement"));
         _test.setFormElement(Locator.name("uploadFormElement"), datasetFile);
         _test.clickButton("Import");
+    }
+
+    public void setupRequestStatuses()
+    {
+        _test.clickTab("Manage");
+        _test.clickAndWait(Locator.linkWithText("Manage Request Statuses"));
+        _test.setFormElement(Locator.name("newLabel"), "New Request");
+        _test.clickButton("Save");
+        _test.setFormElement(Locator.name("newLabel"), "Processing");
+        _test.clickButton("Save");
+        _test.setFormElement(Locator.name("newLabel"), "Completed");
+        _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
+        _test.clickButton("Save");
+        _test.setFormElement(Locator.name("newLabel"), "Rejected");
+        _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
+        _test.uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
+        _test.clickButton("Done");
     }
 }
