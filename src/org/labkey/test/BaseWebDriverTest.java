@@ -56,6 +56,7 @@ import org.junit.runners.model.Statement;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -2993,11 +2994,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             command.execute(cn, null);
         }
-        catch (Exception e)
+        catch (IOException | CommandException e)
         {
             throw new RuntimeException("Failed to disable mini-profiler", e);
         }
-
     }
 
     @LogMethod (quiet = true)
@@ -3016,11 +3016,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod(quiet = true)
     public void enableSecondaryAuthentication()
     {
+        Connection cn = createDefaultConnection(true);
+        Command command = new Command("login", "enable");
+        command.setParameters(new HashMap<String, Object>(Maps.of("provider", "Test Secondary Authentication")));
         try
         {
-            assertEquals("Failed to enable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/enable.view?provider=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
+            command.execute(cn, null);
         }
-        catch (IOException e)
+        catch (IOException | CommandException e)
         {
             throw new RuntimeException("Failed to enable Secondary Authentication", e);
         }
@@ -3029,18 +3032,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod(quiet = true)
     public void disableSecondaryAuthentication()
     {
-//        try
-//        {
-//            assertEquals("Failed to disable Secondary Authentication", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/disable.view?provider=Test%20Secondary%20Authentication", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
-//        }
-//        catch (IOException e)
-//        {
-//            throw new RuntimeException("Failed to disable Secondary Authentication", e);
-//        }
-        pushLocation();
-        beginAt("/login/disable.view?provider=Test%20Secondary%20Authentication");
-        popLocation();
-
+        Connection cn = createDefaultConnection(true);
+        Command command = new Command("login", "disable");
+        command.setParameters(new HashMap<String, Object>(Maps.of("provider", "Test Secondary Authentication")));
+        try
+        {
+            command.execute(cn, null);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to disable Secondary Authentication", e);
+        }
     }
 
     /**
