@@ -376,11 +376,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         int row = 0;
         for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, 6));
+            assertEquals(mean, table.getDataAsText(row++, 8));
 
         row = 0;
         for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, 7));
+            assertEquals(median, table.getDataAsText(row++, 9));
 
         // verify customization of the run details view is possible
 /*
@@ -565,12 +565,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         int row = 0;
         String[] expectedMeans = new String[]{"0.0", "2271111.1", "1111.1", "4444.4"};
         for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, 6));
+            assertEquals(mean, table.getDataAsText(row++, 8));
 
         row = 0;
         String[] expectedMedians = new String[]{"0.0", "2376666.7", "3333.3", "6666.7"};
         for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, 7));
+            assertEquals(median, table.getDataAsText(row++, 9));
 
         //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
