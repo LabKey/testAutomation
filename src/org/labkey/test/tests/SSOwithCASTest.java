@@ -263,7 +263,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
     {
         setFormElement(Locator.input("username"), login.getUsername());
         setFormElement(Locator.input("password"), login.getPassword());
-        clickAndWait(Locator.input("submit"));
+        clickButton("Sign In");
     }
 
     private void casLogout()
