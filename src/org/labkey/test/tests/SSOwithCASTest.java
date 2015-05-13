@@ -78,6 +78,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
     public void preTest()
     {
         enableCAS();
+        casLogout();
     }
 
     @Test
@@ -284,7 +285,6 @@ public class SSOwithCASTest extends BaseWebDriverTest
     public void postTest()
     {
         disableCAS();
-        casLogout();
     }
 
     @Override
