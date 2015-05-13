@@ -117,6 +117,9 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Override
+    public void checkLinks(){} // too many folders
+
+    @Override
     protected Set<String> excludeFromViewCheck()
     {
         Set<String> folders = new HashSet<>();
