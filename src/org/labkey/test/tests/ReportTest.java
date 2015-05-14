@@ -65,8 +65,8 @@ public abstract class ReportTest extends StudyBaseTest
         {
             goToManageViews();
         }
-        waitForElement(Locator.linkContainingText(reportName), WAIT_FOR_JAVASCRIPT);
-        return Locator.linkContainingText(reportName);
+        waitForElement(Locator.linkWithText(reportName), WAIT_FOR_JAVASCRIPT);
+        return Locator.linkWithText(reportName);
     }
 
     protected void clickReportGridLink(String reportName, boolean isAdmin)
