@@ -80,6 +80,7 @@ import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -332,7 +333,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         getDriver().manage().window().setSize(new Dimension(1280, 1024));
     }
 
-    private WebDriver createNewWebDriver(WebDriver oldWebDriver)
+    protected WebDriver createNewWebDriver(WebDriver oldWebDriver)
     {
         WebDriver newWebDriver = null;
 
@@ -441,16 +442,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                     profile.setEnableNativeEvents(useNativeEvents());
 
+                    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+                    capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+
                     String browserPath = System.getProperty("selenium.browser.path", "");
                     if (browserPath.length() > 0)
                     {
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
-                        newWebDriver = new FirefoxDriver(binary, profile);
+                        capabilities.setCapability(FirefoxDriver.BINARY, binary);
                     }
-                    else
-                    {
-                        newWebDriver = new FirefoxDriver(profile);
-                    }
+                    newWebDriver = new FirefoxDriver(capabilities);
 
                     _jsErrorChecker = new FirefoxJSErrorChecker();
                 }
@@ -895,14 +896,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
             }
 
-//            acceptTermsOfUse(null, true); // if there are site-wide terms, it will appear after you log in
+            if (!isElementPresent(Locator.id("userMenuPopupLink")))
+            {
+                String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
-            if (isTextPresent("The e-mail address and password you entered did not match any accounts on file."))
-                throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
-            if (isTextPresent("Your password does not meet the complexity requirements; please choose a new password."))
-                throw new IllegalStateException("Password complexity requirement was left on by a previous test");
-            if (isTextPresent("log in and approve the terms of use."))
-                throw new IllegalStateException("Terms of use not accepted at login");
+                if (errors.contains("The e-mail address and password you entered did not match any accounts on file."))
+                    throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                else if (errors.contains("Your password does not meet the complexity requirements; please choose a new password."))
+                    throw new IllegalStateException("Password complexity requirement was left on by a previous test");
+                else if (errors.contains("log in and approve the terms of use."))
+                    throw new IllegalStateException("Terms of use not accepted at login");
+                else
+                    throw new IllegalStateException("Unexpected error(s) during login." + errors);
+            }
         }
 
         assertSignOutAndMyAccountPresent();
@@ -1992,7 +1998,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
-            if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || _driver == null)
+            if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || getDriver() == null)
             {
                 return;
             }
@@ -2000,6 +2006,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (error instanceof TestTimeoutException)
             {
                 _testTimeout = true;
+            }
+            else if (error instanceof UnhandledAlertException)
+            {
+                dismissAllAlerts();
             }
 
             try
@@ -2052,8 +2062,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         finally
         {
-            TestScrubber scrubber = new TestScrubber(createNewWebDriver(null));
-            scrubber.cleanSiteSettings();
+            try(TestScrubber scrubber = new TestScrubber())
+            {
+                scrubber.cleanSiteSettings();
+            }
 
             doTearDown();
         }
@@ -6601,11 +6613,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void reloadStudyFromZip(File studyFile)
     {
-//        goToManageStudy();
-//        clickButton("Reload Study");
-//        setFormElement(Locator.name("folderZip"), studyFile);
-//        clickButton("Reload Study From Local Zip Archive");
-//        waitForPipelineJobsToComplete(2, "Study Reload", false);
         reloadStudyFromZip(studyFile, true, 2);
     }
 

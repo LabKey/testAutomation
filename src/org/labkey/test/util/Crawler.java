@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeyWebDriverWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.UnhandledAlertException;
@@ -68,6 +69,7 @@ public class Crawler
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
     private boolean _injectionCheckEnabled = false;
+    private List<String> _projects;
 
     public Crawler(BaseWebDriverTest test)
     {
@@ -76,11 +78,21 @@ public class Crawler
 
     public Crawler(BaseWebDriverTest test, int crawlTime)
     {
+        this(test, test.getContainerHelper().getCreatedProjects(), crawlTime);
+    }
+
+    public Crawler(BaseWebDriverTest test, List<String> projects, int crawlTime)
+    {
         _test = test;
+        _projects = projects;
         _maxCrawlTime = crawlTime;
         _forbiddenWords = getForbiddenWords();
         _excludedActions = getDefaultExcludedActions();
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
+        for (String project : projects)
+        {
+            _urlsToCheck.add(new UrlToCheck(null, "/project/" + EscapeUtil.encode(project) + "/begin.view?", 0));
+        }
     }
 
     protected Set<String> getForbiddenWords()
@@ -580,7 +592,7 @@ public class Crawler
         if (StringUtils.isEmpty(currentProject))
             return false;
 
-        for (String createdProject : _test.getContainerHelper().getCreatedProjects())
+        for (String createdProject : _projects)
         {
             if (currentProject.equals(createdProject))
                 return true;
@@ -610,14 +622,13 @@ public class Crawler
         assertEquals("_webdav", c.getController());
         }
 
-        _test.log("Starting crawl...");
-        _test.beginAt(_test.getProjectUrl());
+        TestLogger.log("Starting crawl...");
 
         // Breadth first search
         int newPages = crawl();
         saveCrawlStats(_test, _urlToCheck.getDepth(), newPages, _actionsVisited.size(), _crawlTime);
 
-        _test.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
+        TestLogger.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
     }
 
 
@@ -626,12 +637,6 @@ public class Crawler
         // Breadth first crawl
         long startTime = System.currentTimeMillis();
         int linkCount = 0;
-
-        // Initialize list to links present at start page
-        URL startPageURL = _test.getURL();
-        String[] linkAddresses = _test.getLinkAddresses();
-        for (String url : linkAddresses)
-            _urlsToCheck.add(new UrlToCheck(startPageURL, url, 1));
 
         // Loop through links in list until its empty or time runs out
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
@@ -693,7 +698,8 @@ public class Crawler
             currentPageUrl = _test.getURL();
 
             // Find all the links at the site
-            if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)_test.hoverFolderBar();
+            if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)
+                _test.hoverFolderBar();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
@@ -706,25 +712,26 @@ public class Crawler
 
             // Check that there was no error
             int code = _test.getResponseCode();
-            if (code == 404 || code == 500)
+            if (code >= 400)
                 fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
         }
-        catch (RuntimeException |
-               AssertionError rethrow) {
+        catch (RuntimeException | AssertionError rethrow)
+        {
             // Collect origin page snapshot for failure and rethrow original failure
-            try
+
+            if (origin != null)
             {
-                if (origin != null){
-                    _test.log("Crawl failure: collecting origin page info.");
-                    _test.pushLocation();
-                    String originUrl = origin.toString();
-                    int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                    _test.beginAt(originUrl.substring(relativeURLStart));
-                    _test.getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
-                    _test.popLocation();
+                TestLogger.log("Crawl failure: collecting origin page info.");
+                String originUrl = origin.toString();
+                int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
+                try (LabKeyWebDriverWrapper originBrowser = new LabKeyWebDriverWrapper())
+                {
+                    originBrowser.simpleSignIn();
+                    originBrowser.beginAt(originUrl.substring(relativeURLStart));
+                    originBrowser.getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
                 }
+                catch (Exception ignore) {}
             }
-            catch (Exception ignore) {}
 
             throw rethrow;
         }
@@ -745,7 +752,7 @@ public class Crawler
             //loop through forbidden words#BLOCKED
             for (String word : _forbiddenWords)
             {
-                if (responseText.indexOf(word.toLowerCase()) > 0)
+                if (responseText.contains(word.toLowerCase()))
                 {
                     fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
                 }
@@ -846,7 +853,7 @@ public class Crawler
             {
                 _test.beginAt(urlMalicious);
                 if (_test.isAlertPresent())
-                    throw new UnhandledAlertException("", _test.getAlert());
+                    throw new UnhandledAlertException("Injected script generated alert.", _test.getAlert());
                 return null;
             }
         };
