@@ -1810,6 +1810,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @BeforeClass
     public static void preamble()
     {
+        currentTest.getContainerHelper().clearCreatedProjects();
         currentTest.doPreamble();
     }
 
@@ -2202,16 +2203,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             signIn();
             doCleanup(false);   // User requested cleanup... could be before or after tests have run (or some intermediate state). False generally means ignore errors.
 
-            beginAt("");
-
-            // The following checks verify that the test deleted all projects and folders that it created.
-            hoverFolderBar();
-            for (WebTestHelper.FolderIdentifier folder : _containerHelper.getCreatedFolders())
-                assertElementNotPresent(Locator.linkWithText(folder.getFolderName()));
-
-            hoverProjectBar();
-            for (String projectName : _containerHelper.getCreatedProjects())
-                assertElementNotPresent(Locator.linkWithText(projectName));
             log("========= " + getClass().getSimpleName() + " cleanup complete =========");
         }
         finally

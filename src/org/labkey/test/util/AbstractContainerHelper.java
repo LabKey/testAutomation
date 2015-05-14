@@ -31,12 +31,22 @@ import static org.junit.Assert.*;
 
 public abstract class AbstractContainerHelper extends AbstractHelper
 {
-    private List<String> _createdProjects = new ArrayList<>();
+    private static List<String> _createdProjects = new ArrayList<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
 
     public AbstractContainerHelper(BaseWebDriverTest test)
     {
         super(test);
+    }
+
+    public List<String> getCreatedProjects()
+    {
+        return _createdProjects;
+    }
+
+    public void clearCreatedProjects()
+    {
+        _createdProjects.clear();
     }
 
     public Set<WebTestHelper.FolderIdentifier> getCreatedFolders()
@@ -59,14 +69,8 @@ public abstract class AbstractContainerHelper extends AbstractHelper
     }
 
     public abstract void createSubfolder(String parentPath, String folderName, String folderType);
-
     protected abstract void doCreateProject(String projectName, String folderType);
     protected abstract void doCreateFolder(String projectName, String folderType, String path);
-
-    public List<String> getCreatedProjects()
-    {
-        return _createdProjects;
-    }
 
     // Projects might be created by other means
     public void addCreatedProject(String projectName)

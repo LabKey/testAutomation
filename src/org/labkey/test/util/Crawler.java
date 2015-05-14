@@ -93,6 +93,7 @@ public class Crawler
         {
             _urlsToCheck.add(new UrlToCheck(null, "/project/" + EscapeUtil.encode(project) + "/begin.view?", 0));
         }
+        _urlsToCheck.add(new UrlToCheck(null, "/project/begin.view?", 0));
     }
 
     protected Set<String> getForbiddenWords()
