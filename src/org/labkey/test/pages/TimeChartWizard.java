@@ -24,9 +24,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
-/**
- * Created by cnathe on 2/4/2015.
- */
 public class TimeChartWizard
 {
     private BaseWebDriverTest _test;
@@ -93,7 +90,7 @@ public class TimeChartWizard
 
     public void checkFilterGridRow(String label)
     {
-        List<WebElement> svgs = Locator.css("svg").findElements(_test.getDriver());
+        List<WebElement> svgs = Locator.css("div.x4-container svg").findElements(_test.getDriver());
         _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
         _test._ext4Helper.checkGridRowCheckbox(label);
         if (svgs.size() > 0)
