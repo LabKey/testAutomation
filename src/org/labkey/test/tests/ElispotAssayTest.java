@@ -22,15 +22,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.testng.Assert;
 
 import java.io.File;
 import java.util.Arrays;
@@ -190,7 +191,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         verifyDataRegion(new DataRegionTable("Data", this), "Ascending",
                 Arrays.asList("0.0", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "2.0",  "0.0", "0.0"),       // spot count
                 Arrays.asList("0.0", "25.0", "0.0", "22.0", "0.0", "0.0", "0.0", "48.0",  "0.0", "0.0"),    // activity
-                Arrays.asList("0.0", "84.0", "0.0", "68.0", "0.0", "0.0", "0.0", "74.0",  "0.0", "0.0"));   // intensity
+                Arrays.asList("0.0", "84.0", "0.0", "68.0", "0.0", "0.0", "0.0", "74.0",  "0.0", "0.0"),   // intensity
+                Arrays.asList("Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1","Cytokine 1")); //cytokines
         assertTextPresent("ptid 1 F1", "ptid 2 F1", "ptid 3 F1", "ptid 4 F1", "atg_1F1", "Antigen 7", "Antigen 8", "Cy3", "FITC");
 
         clickAndWait(Locator.linkWithText("view runs"));
@@ -199,11 +201,23 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         verifyDataRegion(new DataRegionTable("Data", this), "Descending",
                 Arrays.asList("0.0", "1.0", "0.0", "0.0", "2.0", "0.0", "0.0", "3.0", "3.0", "0.0"),        // spot count
                 Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),                            // activity
-                Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "));                           // intensity
+                Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),                           // intensity
+                Arrays.asList(" "," "," "," "," "," "," "," "," "," ")); //cytokines
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "Antigen 5", "Antigen 6", "Cy3", "FITC");
+        click(Locator.linkWithText("view runs"));
+        waitAndClick(Locator.linkWithText("run details"));
+        PlateSummary plateSummary = new PlateSummary(this, 1);
+        assertEquals(Arrays.asList(new String[]{"244.0","544.0","210.0","449.0","333.0","429.0","393.0","689.0","400.0","159.0","130.0","94.0"}), plateSummary.getRowValues(5));
+        plateSummary.selectMeasurement(PlateSummary.Measurement.ACTIVITY);
+        assertEquals(Arrays.asList(new String[]{"668.0","1610.0","1464.0","3945.0","3781.0","3703.0","8713.0","2222.0","2856.0","1208.0","880.0","1006.0"}), plateSummary.getRowValues(7));
+        click(Locator.linkWithText("view runs"));
+        waitAndClick(Locator.linkWithText("view results"));
+        DataRegionTable results = new DataRegionTable("Data", this);
+        results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
+        Assert.assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ", null}), results.getRowDataAsText(0));
     }
 
-    private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity)
+    private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
         log("add the analyte field to the table and adding sorts");
         CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(table);
@@ -219,7 +233,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
 
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntensity, table);
+        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntensity, expectedCytokine, table);
     }
 
     @LogMethod
@@ -299,7 +313,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         }
 
         if (fluorospot)
+        {
             clickButton("Next");
+            setFormElement(Locator.input("cy3_CytokineName"), "Cytokine 1");
+            setFormElement(Locator.input("FITC_CytokineName"), "Cytokine 2");
+            setFormElement(Locator.input("FITCCy3_CytokineName"), "Cytokine 3");
+        }
         clickButton(finalButton);
     }
 
@@ -381,6 +400,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         row = 0;
         for (String median : expectedMedians)
             assertEquals(median, table.getDataAsText(row++, 9));
+        PlateSummary plateSummary = new PlateSummary(this, 1);
+        assertEquals(Arrays.asList(new String[]{"0.0","5.0","2.0","2.0","1.0","0.0","689.0","641.0","726.0","746.0","621.0","727.0"}), plateSummary.getRowValues(1));
 
         // verify customization of the run details view is possible
 /*
@@ -571,7 +592,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         String[] expectedMedians = new String[]{"0.0", "2376666.7", "3333.3", "6666.7"};
         for (String median : expectedMedians)
             assertEquals(median, table.getDataAsText(row++, 9));
-
+        PlateSummary plateSummary = new PlateSummary(this, 1);
+        assertEquals(Arrays.asList(new String[]{"809.0","859.0","821.0","924.0","799.0","833.0","805.0","781.0","782.0","673.0","303.0","TNTC"}), plateSummary.getRowValues(3));
         //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
@@ -594,6 +616,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             "F\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n0.0\n266.5\n0.0\n0.0\n0.0\n0.0\n\n" +
             "G\n15.0\n11.0\n12.0\n12.0\n9.0\n7.0\n61.0\n680.0\n0.0\n0.0\n0.0\n0.0\n\n" +
             "H\n6.0\n4.0\n11.0\n20.0\n26.0\n12.0\n46.0\n576.0\n0.0\n0.0\n0.0\n0.0";
+
     protected void verifyBackgroundSubtractionOnNewRun()
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
@@ -628,6 +651,9 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             int row = detailsTable.getRow("Participant ID", ptid);
 //            assertEquals("Incorrect background value for " + ptid, expectedBackgroundMedian, detailsTable.getDataAsText(row, "Background Median"));   // TODO: crosstab
         }
+
+        PlateSummary plateSummary = new PlateSummary(this, 1);
+        assertEquals(Arrays.asList(new String[]{"10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"}), plateSummary.getRowValues(5));
     }
 
     protected void highlightWell(String type, String group, String cell)
@@ -753,11 +779,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     }
 
     private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity,
-                                        List<String> expectedIntesity, DataRegionTable dataTable)
+                                        List<String> expectedIntesity, List<String> expectedCytokine, DataRegionTable dataTable)
     {
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> activity = dataTable.getColumnDataAsText("Activity");
         List<String> intensity = dataTable.getColumnDataAsText("Intensity");
+        List<String> cytokine = dataTable.getColumnDataAsText("Cytokine");
 
         assert expectedSpotCount.size() == expectedActivity.size();
         assert expectedSpotCount.size() == expectedIntesity.size();
@@ -769,6 +796,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             assertEquals(expectedSpotCount.get(i), spotCount.get(i));
             assertEquals(expectedActivity.get(i), activity.get(i));
             assertEquals(expectedIntesity.get(i), intensity.get(i));
+            assertEquals(expectedCytokine.get(i), cytokine.get(i));
         }
     }
 }
