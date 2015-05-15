@@ -117,6 +117,7 @@ public class Crawler
             new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
+            new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("assay", "template"),
