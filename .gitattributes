@@ -399,6 +399,7 @@ src/org/labkey/test/pages/IssueDetailsPage.java -text
 src/org/labkey/test/pages/LabKeyPage.java -text
 src/org/labkey/test/pages/OlapTestJson.java -text
 src/org/labkey/test/pages/Permissions.java -text
+src/org/labkey/test/pages/PermissionsEditor.java -text
 src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text

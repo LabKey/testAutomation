@@ -1,0 +1,372 @@
+package org.labkey.test.pages;
+
+import org.labkey.api.security.PrincipalType;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.interactions.Actions;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by RyanS on 4/22/2015.
+ */
+public class PermissionsEditor
+{
+    protected BaseWebDriverTest _test;
+
+    public PermissionsEditor(BaseWebDriverTest test)
+    {
+        _test = test;
+        test.waitForElement(Locator.permissionRendered());
+    }
+
+    public void selectFolder(String folderName)
+    {
+        _test.click(Locator.linkWithText(folderName));
+    }
+
+    public void createPermissionsGroup(String groupName)
+    {
+        _test.log("Creating permissions group " + groupName);
+        _test._ext4Helper.clickTabContainingText("Project Groups");
+        _test.setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
+        _test.clickButton("Create New Group", 0);
+        _test._extHelper.waitForExtDialog(groupName + " Information");
+        _test.assertTextPresent("Group " + groupName);
+        _test.click(Ext4Helper.Locators.ext4Button("Done"));
+        _test.waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public String toRole(String perm)
+    {
+        String R = "security.roles.";
+        if ("No Permissions".equals(perm))
+            return R + "NoPermissionsRole";
+        if ("Project Administrator".equals(perm))
+            return R + "ProjectAdminRole";
+        else if (!perm.contains("."))
+            return R + perm + "Role";
+        return perm;
+    }
+
+    public void checkInheritedPermissions()
+    {
+        _test._ext4Helper.checkCheckbox("Inherit permissions from parent");
+    }
+
+    public void uncheckInheritedPermissions()
+    {
+        _test._ext4Helper.uncheckCheckbox("Inherit permissions from parent");
+    }
+
+    public void savePermissions()
+    {
+        _test.clickButton("Save", 0);
+        _test.waitForElement(Locator.permissionRendered(), _test.defaultWaitForPage);
+        _test._ext4Helper.waitForMaskToDisappear();
+    }
+
+    @LogMethod
+    public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
+    {
+        _setPermissions(groupName, permissionString, "pGroup");
+    }
+
+    @LogMethod
+    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
+    {
+        _setPermissions(groupName, permissionString, "pSite");
+    }
+
+    @LogMethod
+    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    {
+        _test.log(new Date().toString());
+        _setPermissions(userName, permissionString, "pUser");
+
+        _test.log(new Date().toString());
+    }
+
+//    @LogMethod
+//    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+//    {
+//        _test.log(new Date().toString());
+//        _test.goToSiteAdmins();
+//        _test.clickAndWait(Locator.linkContainingText("Permissions"));
+//        _test._ext4Helper.clickTabContainingText("Permissions");
+//        _selectPermission(userName, userName, permissionString);
+//        _test.log(new Date().toString());
+//    }
+
+    public void _setPermissions(String userOrGroupName, String permissionString, String className)
+    {
+        String role = toRole(permissionString);
+        if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
+        {
+            throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
+        }
+        else
+        {
+            _test.log("Setting permissions for group " + userOrGroupName + " to " + role);
+//
+//            if (!_test.isElementPresent(Locator.permissionRendered()))
+//                enterPermissionsUI();
+            _test._ext4Helper.clickTabContainingText("Permissions");
+
+            String group = userOrGroupName;
+            if (className.equals("pSite"))
+                group = "Site: " + group;
+            _selectPermission(userOrGroupName, group, permissionString);
+        }
+    }
+
+    public void _selectPermission(String userOrGroupName, String group, String permissionString)
+    {
+        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
+        _test.waitForElement(roleCombo);
+        _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
+        _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
+        String oldId = _test.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
+        savePermissions();
+        _test._ext4Helper.waitForMaskToDisappear();
+        _test.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
+    }
+
+    public void removeSiteGroupPermission(String groupName, String permissionString)
+    {
+        _removePermission(groupName, permissionString, "pSite");
+    }
+
+    public void removePermission(String groupName, String permissionString)
+    {
+        _removePermission(groupName, permissionString, "pGroup");
+    }
+
+    public void _removePermission(String groupName, String permissionString, String className)
+    {
+        Locator close = Locator.closePermissionButton(groupName, permissionString);
+        if (_test.isElementPresent(close))
+        {
+            _test.click(close);
+            _test.waitForElementToDisappear(close);
+            savePermissions();
+        }
+    }
+
+//    public void addUserToSiteGroup(String userName, String groupName)
+//    {
+//        _test.goToHome();
+//        _test.goToSiteGroups();
+//        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
+//        _test.waitForElement(groupLoc, _test.defaultWaitForPage);
+//        _test.click(groupLoc);
+//        _test.clickAndWait(Locator.linkContainingText("manage group"));
+//        _test.addUserToGroupFromGroupScreen(userName);
+//    }
+
+    /**
+     * Adds a new or existing user to an existing group within an existing project
+     *
+     * @param userName    new or existing user name
+     * @param projectName existing project name
+     * @param groupName   existing group within the project to which we should add the user
+     */
+    public void addUserToProjGroup(String userName, String projectName, String groupName)
+    {
+        exitPermissionsUI();
+        _test.clickProject(projectName);
+        enterPermissionsUI();
+        clickManageGroup(groupName);
+        _test.addUserToGroupFromGroupScreen(userName);
+    } //addUserToProjGroup()
+
+    public void enterPermissionsUI()
+    {
+        if (!_test.isElementPresent(Locator.permissionRendered()))
+        {
+            _test.clickAdminMenuItem("Folder", "Permissions");
+            _test.waitForElement(Locator.permissionRendered());
+        }
+    }
+
+    public void exitPermissionsUI()
+    {
+        _test._ext4Helper.clickTabContainingText("Permissions");
+        _test.clickButton("Save and Finish");
+    }
+
+    public void deleteGroup(String groupName)
+    {
+        deleteGroup(groupName, false);
+    }
+
+    public void deleteAllUsersFromGroup()
+    {
+        Locator.XPathLocator l = Locator.xpath("//td/a/span[text()='remove']");
+
+        while (_test.isElementPresent(l))
+        {
+            int i = _test.getElementCount(l) - 1;
+            _test.click(l);
+            _test.waitForElementToDisappear(l.index(i), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    @LogMethod(quiet = true)
+    public void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound)
+    {
+        _test.log("Attempting to delete group: " + groupName);
+        if (selectGroup(groupName, failIfNotFound))
+        {
+            _test.assertElementPresent(Locator.css(".x4-grid-cell-first").withText(groupName));
+            deleteAllUsersFromGroup();
+            _test.click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
+            _test.waitForElementToDisappear(Locator.css(".x4-grid-cell-first").withText(groupName), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
+    public void removeUserFromGroup(String groupName, String userName)
+    {
+        if (!_test.isTextPresent("Group " + groupName))
+            selectGroup(groupName);
+
+        Locator l = Locator.xpath("//td[text()='" + userName + "']/..//td/a/span[text()='remove']");
+        _test.click(l);
+    }
+
+    public void addUserToGroup(String groupName, String userName)
+    {
+        if (!_test.isTextPresent("Group " + groupName))
+            selectGroup(groupName);
+        String dialogTitle = groupName + " Information";
+
+        _test._ext4Helper.selectComboBoxItem(Locator.xpath(_test._extHelper.getExtDialogXPath(dialogTitle) + "//table[contains(@id, 'labkey-principalcombo')]"), userName);
+        Locator.css(".userinfo td").withText(userName).waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test._extHelper.clickExtButton(dialogTitle, "Done", 0);
+        _test._extHelper.waitForExtDialogToDisappear(dialogTitle);
+
+        _test.clickButton("Done");
+    }
+
+    public boolean selectGroup(String groupName, boolean failIfNotFound)
+    {
+        if (!_test.isElementPresent(Locator.css(".x4-tab-active").withText("Site Groups")))
+            _test.goToSiteGroups();
+
+        _test.waitForElement(Locator.css(".groupPicker .x4-grid-body"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        if (_test.isElementPresent(Locator.xpath("//div[text()='" + groupName + "']")))
+        {
+            _test.click(Locator.xpath("//div[text()='" + groupName + "']"));
+            _test._extHelper.waitForExtDialog(groupName + " Information");
+            return true;
+        }
+        else if (failIfNotFound)
+            throw new NoSuchElementException("Group not found:" + groupName);
+
+        return false;
+    }
+
+    public void openGroupPermissionsDisplay(String groupName)
+    {
+        _test._ext4Helper.clickTabContainingText("Project Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        ref.eval("getSelectionModel().select(" + idx + ")");
+    }
+
+    public void clickManageGroup(String groupName)
+    {
+        openGroupPermissionsDisplay(groupName);
+        _test.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
+        _test.waitForElement(Locator.name("names"));
+    }
+
+    public void clickManageSiteGroup(String groupName)
+    {
+        _test._ext4Helper.clickTabContainingText("Site Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        ref.eval("getSelectionModel().select(" + idx + ")");
+        _test.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
+        _test.waitForElement(Locator.name("names"));
+    }
+
+    public void createPermissionsGroup(String groupName, String... memberNames)
+    {
+        createPermissionsGroup(groupName);
+        clickManageGroup(groupName);
+
+        StringBuilder namesList = new StringBuilder();
+        for(String member : memberNames)
+        {
+            namesList.append(member).append("\n");
+        }
+
+        _test.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _test.addUserToGroupFromGroupScreen(namesList.toString());
+
+        enterPermissionsUI();
+    }
+
+    @LogMethod(quiet = true)
+    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole, BaseWebDriverTest _test)
+    {
+        Actions builder = new Actions(_test.getDriver());
+        builder
+                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(_test.getDriver()))
+                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(_test.getDriver()))
+                .release()
+                .build().perform();
+
+        _test.waitForElementToDisappear(Locator.permissionButton(group, srcRole), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.permissionButton(group, destRole));
+    }
+
+    public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
+    {
+        _test._ext4Helper.clickTabContainingText("Project Groups");
+        _test.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
+        _test._extHelper.waitForExtDialog(groupName + " Information");
+        boolean ret;
+        if (principalType == PrincipalType.USER)
+            ret = _test.isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[starts-with(text(), '" + user + "')]"));
+        else
+            ret = _test.isElementPresent(Locator.linkContainingText(user));
+        _test.clickButton("Done", 0);
+        _test._extHelper.waitForExtDialogToDisappear(groupName + " Information");
+        return ret;
+    }
+
+    public boolean selectGroup(String groupName)
+    {
+        return selectGroup(groupName, false);
+    }
+
+    public boolean doesGroupExist(String groupName, String projectName)
+    {
+        _test._ext4Helper.clickTabContainingText("Project Groups");
+        _test.waitForText("Member Groups");
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        exitPermissionsUI();
+        return (idx >= 0);
+    }
+
+    public boolean doesPermissionExist(String groupName, String permissionSetting)
+    {
+        _test.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        return _test.waitForElement(Locator.permissionButton(groupName, permissionSetting), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
+    }
+}
