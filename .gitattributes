@@ -349,6 +349,7 @@ src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
+src/org/labkey/test/components/study/StudyOverviewWebPart.java -text
 src/org/labkey/test/credentials/Credentials.java -text
 src/org/labkey/test/credentials/Login.java -text
 src/org/labkey/test/credentials/Server.java -text
