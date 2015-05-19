@@ -54,9 +54,13 @@ public abstract class LabKeyExpectedConditions
                     secondDimension = el.getSize();
                     secondPosition = el.getLocation();
                 }
-                catch (InterruptedException | StaleElementReferenceException | NoSuchElementException recheck)
+                catch (StaleElementReferenceException | NoSuchElementException recheck)
                 {
                     return false;
+                }
+                catch (InterruptedException fail)
+                {
+                    throw new IllegalStateException(fail);
                 }
 
                 return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);
@@ -93,9 +97,9 @@ public abstract class LabKeyExpectedConditions
                     secondDimension = el.getSize();
                     secondPosition = el.getLocation();
                 }
-                catch (InterruptedException recheck)
+                catch (InterruptedException fail)
                 {
-                    return false;
+                    throw new IllegalStateException(fail);
                 }
 
                 return secondPosition.equals(firstPosition) && secondDimension.equals(firstDimension);

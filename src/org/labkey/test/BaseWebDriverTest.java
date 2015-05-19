@@ -611,8 +611,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             Thread.sleep(ms);
         }
-        catch (InterruptedException ignore)
+        catch (InterruptedException e)
         {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -1396,17 +1397,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         for (int i = 0; i < 5; i++)
                         {
                             goToHome();
-                            Thread.sleep(200);
+                            sleep(200);
                             waitMs -= 200;
                         }
-                        Thread.sleep(2000);
+                        sleep(2000);
                         waitMs -= 2000;
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
                             throw new RuntimeException("A startup failure occurred.");
-                    }
-                    catch (InterruptedException e)
-                    {
-                        log(e.getMessage());
                     }
                     catch (SeleniumException e)
                     {
@@ -1999,6 +1996,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
+            error.printStackTrace(System.out);
+
             if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || getDriver() == null)
             {
                 return;
@@ -2576,7 +2575,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             selectResp = selectCmd.execute(cn, path);
         }
-        catch (Exception e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException(e);
         }
@@ -4203,11 +4202,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             // Locator.findElement likely didn't return the element we wanted due to timing problem. Wait and try again.
             // Ideally we'd decorate WebElement to know its locator and encapsulate the retry.
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException ignored) {}
+            sleep(500);
             el = l.findElement(getDriver());
             clickAndWait(el, pageTimeoutMs);
         }
@@ -4238,11 +4233,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 {
                     if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
                     {
-                        try
-                        {
-                            Thread.sleep(2500);
-                        }
-                        catch (InterruptedException ignored) {}
+                        sleep(2500);
                         el.click();
                     }
                     else
@@ -4854,11 +4845,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             // Locator.findElement likely didn't return the element we wanted due to timing problem. Wait and try again.
             // Ideally we'd decorate WebElement to know its locator and encapsulate the retry.
-            try
-            {
-                Thread.sleep(500);
-            }
-            catch (InterruptedException ignored) {}
+            sleep(500);
             el = l.findElement(getDriver());
             clickAndWait(el, waitForPageToLoad);
         }

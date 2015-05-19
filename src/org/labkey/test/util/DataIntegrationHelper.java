@@ -189,8 +189,9 @@ public class DataIntegrationHelper
         {
             Thread.sleep(ms);
         }
-        catch (InterruptedException ignore)
+        catch (InterruptedException fail)
         {
+            throw new IllegalStateException(fail);
         }
     }
 

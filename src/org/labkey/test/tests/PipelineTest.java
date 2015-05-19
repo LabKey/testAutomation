@@ -184,7 +184,7 @@ public class PipelineTest extends PipelineWebTestBase
         // Wait up to 15 seconds for the email to be sent and show up in the table
         while (emailTable.getDataRowCount() < countExpect && sleepCount < 3)
         {
-            try { Thread.sleep(5000); } catch (InterruptedException e) {}
+            sleep(5000);
             refresh();
             sleepCount++;
         }
