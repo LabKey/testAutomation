@@ -19,12 +19,17 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebElement;
 
-public abstract class WebPart
+public abstract class WebPart extends Component
 {
     protected BaseWebDriverTest _test;
     protected WebElement _componentElement;
     protected String _title;
     protected String _id;
+
+    public WebElement getComponentElement()
+    {
+        return _componentElement;
+    }
 
     protected abstract void waitForReady();
 
@@ -40,11 +45,6 @@ public abstract class WebPart
     }
 
     public abstract String getTitle();
-
-    protected Elements elements()
-    {
-        return new Elements();
-    }
 
     public abstract void delete();
 
@@ -65,6 +65,11 @@ public abstract class WebPart
     public void clickMenuItem(boolean wait, String... items)
     {
         _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + _title.toLowerCase() + "']"), items);
+    }
+
+    protected Elements elements()
+    {
+        return new Elements();
     }
 
     protected class Elements

@@ -107,11 +107,6 @@ public class BodyWebPart extends WebPart
         return _id.hashCode();
     }
 
-    public WebElement getComponentElement()
-    {
-        return _componentElement;
-    }
-
     public static Locator locator()
     {
         return Locator.css(".labkey-side-panel > table[name=webpart]");

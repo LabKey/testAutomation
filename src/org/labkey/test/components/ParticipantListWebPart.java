@@ -15,15 +15,19 @@
  */
 package org.labkey.test.components;
 
+import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ParticipantListWebPart extends BodyWebPart
 {
     private final String _participantNounSingular;
     private final String _participantNounPlural;
+    private final String _participantNounRegex;
 
     public ParticipantListWebPart(BaseWebDriverTest test)
     {
@@ -35,6 +39,7 @@ public class ParticipantListWebPart extends BodyWebPart
         super(test, participantNounSingular + " List");
         _participantNounSingular = participantNounSingular;
         _participantNounPlural = participantNounPlural;
+        _participantNounRegex = String.format("(%s|%s)", _participantNounSingular, _participantNounPlural);
         waitForBody();
     }
 
@@ -50,6 +55,52 @@ public class ParticipantListWebPart extends BodyWebPart
 
     public List<String> getParticipants()
     {
-        return _test.getTexts(Locator.css("li.ptid").findElements(_test.getDriver()));
+        return _test.getTexts(Locator.css("li.ptid").findElements(getComponentElement()));
+    }
+
+    public Integer getParticipantCount()
+    {
+        Pair<Integer, Integer> count = getFilteredParticipantCount();
+        if (count.getKey() == null)
+            return count.getValue();
+        else
+            return count.getKey();
+    }
+
+    /**
+     * Parses status message to get filtered participant count
+     * @return {x,y} -- Fount x participants of y.
+     * {0, null} if no participants are matched by current filter
+     * {null, y} if all participants are shown
+     */
+    public Pair<Integer, Integer> getFilteredParticipantCount()
+    {
+        String message = findElement(elements().statusMessage).getText();
+
+        if (message.equals(String.format("No matching %s.", _participantNounPlural))||
+                message.startsWith(String.format("No %s IDs contain", _participantNounSingular)))
+            return new Pair<>(0, null);
+
+        Pattern messagePattern = Pattern.compile("Found (\\d+) " + _participantNounRegex + " of (\\d+)");
+        Matcher messageMatcher = messagePattern.matcher(message);
+        if (messageMatcher.find())
+            return new Pair<>(Integer.parseInt(messageMatcher.group(1)), Integer.parseInt(messageMatcher.group(3)));
+
+        messagePattern = Pattern.compile("Showing all (\\d+) " + _participantNounRegex);
+        messageMatcher = messagePattern.matcher(message);
+        if (messageMatcher.find())
+            return new Pair<>(null, Integer.parseInt(messageMatcher.group(1)));
+
+        throw new IllegalStateException("Unable to parse participant count: \n" + message);
+    }
+
+    public Elements elements()
+    {
+        return new Elements();
+    }
+
+    protected class Elements extends WebPart.Elements
+    {
+        public Locator.XPathLocator statusMessage = webPart.append(Locator.id(_id + ".status"));
     }
 }
