@@ -45,7 +45,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
-import org.openqa.selenium.Alert;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -1435,9 +1434,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         btn.waitForEnabled();
         prepForPageLoad();
         waitAndClick(Locator.id(btn.getId() + "-btnEl"));
-
-        Alert alert = getDriver().switchTo().alert();
-        alert.accept();
+        getAlert();
         waitForPageToLoad();
         waitForText(WAIT_FOR_PAGE, LabModuleHelper.LAB_HOME_TEXT);
     }
