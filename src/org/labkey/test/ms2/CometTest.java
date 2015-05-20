@@ -24,13 +24,13 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
-import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.File;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.fail;
 
 @Category({MS2.class, BVT.class, FileBrowser.class})
-public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnlyTest
+public class CometTest extends AbstractMS2SearchEngineTest
 {
     protected static final String SEARCH_BUTTON = "Comet";
     protected static final String SEARCH_TYPE = "comet";
