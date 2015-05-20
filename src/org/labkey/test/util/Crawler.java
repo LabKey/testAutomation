@@ -185,14 +185,23 @@ public class Crawler
                 new ControllerActionId("flow-attribute", "details"),
                 new ControllerActionId("flow-attribute", "edit"),
                 new ControllerActionId("flow-attribute", "summary"),
-                new ControllerActionId("flow-editscript", "gateEditor"), // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
-                new ControllerActionId("flow-run", "showRuns"),
-                new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
-                new ControllerActionId("study-designer", "designer"), // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
-                new ControllerActionId("study-samples", "samples") // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
+                new ControllerActionId("flow-run", "showRuns")
         );
 
         return list;
+    }
+
+    protected Map<ControllerActionId, List<String>> getExcludedParametersFromInjection()
+    {
+        Map<ControllerActionId, List<String>> map = new HashMap<>();
+        map.put(new ControllerActionId("assay", "assayResults"), Collections.singletonList("Data.Run/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
+        map.put(new ControllerActionId("assay", "assayRuns"), Collections.singletonList("Data.Batch/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
+        map.put(new ControllerActionId("flow-editscript", "gateEditor"), Collections.singletonList("scriptId")); // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
+        map.put(new ControllerActionId("idri", "formulationDetails"), Collections.singletonList("rowId")); // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
+        map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
+        map.put(new ControllerActionId("study-samples", "samples"), Collections.singletonList("AtRepository")); // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
+
+        return map;
     }
 
     public void addExcludedActions(Collection<ControllerActionId> action)
@@ -693,7 +702,6 @@ public class Crawler
         {
             // Go to the site
             long loadTime = _test.beginAt(relativeURL);
-            try{ _test.acceptAllAlerts(); } catch(SeleniumException ignore){}
 
             int depth = urlToCheck.getDepth();
             origin = urlToCheck.getOrigin();
@@ -782,7 +790,7 @@ public class Crawler
 
             while (test.isAlertPresent())
             {
-                if (test.getAlert().startsWith(injectedAlert))
+                if (test.cancelAlert().startsWith(injectedAlert))
                     msg = " malicious script executed";
             }
 
@@ -802,7 +810,7 @@ public class Crawler
         {
             String alertText = ex.getAlertText();
             if (alertText == null)
-                alertText = test.getAlert();
+                alertText = test.cancelAlert();
 
             if (alertText.startsWith(injectedAlert))
                 msg = " malicious script executed";
@@ -854,17 +862,20 @@ public class Crawler
             public Void apply(String urlMalicious)
             {
                 _test.beginAt(urlMalicious);
-                if (_test.isAlertPresent())
-                    throw new UnhandledAlertException("Injected script generated alert.", _test.getAlert());
+                _test.executeScript("return;"); // Trigger UnhandledAlertException
                 return null;
             }
         };
 
+        ControllerActionId actionId = new ControllerActionId(base);
+        List<String> excludedParams = getExcludedParametersFromInjection().get(actionId);
         String[] parts = StringUtils.split(query,'&');
         for (int i=0 ; i<parts.length ; i++)
         {
+            if (excludedParams != null && excludedParams.contains(parts[i].split("=")[0]))
+                continue;
             String save = parts[i];
-            parts[i] = save + ( save.indexOf('=') == -1 ? "=" : "") + injectString;
+            parts[i] = save + ( save.contains("=") ? "" : "=") + injectString;
             String queryMalicious = StringUtils.join(parts, '&');
             parts[i] = save;
 
