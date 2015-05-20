@@ -838,7 +838,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard page 10 : Folder Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.folderObjects, "Container specific module properties", "Experiments and runs", "External schema definitions", "Folder type and active modules", "Full-text search settings", "Missing value indicators", "Notification settings", "Webpart properties and layout", "Wikis and their attachments");
+        verifyPublishWizardSelectedCheckboxes(StudyPublishWizardGrid.folderObjects, "Container specific module properties", "External schema definitions", "Folder type and active modules", "Full-text search settings", "Missing value indicators", "Notification settings", "Role assignments for users and groups", "Webpart properties and layout", "Wikis and their attachments");
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
