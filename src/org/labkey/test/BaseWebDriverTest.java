@@ -74,6 +74,7 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -93,7 +94,6 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -463,7 +463,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         if (newWebDriver != null)
         {
-            Capabilities caps = ((RemoteWebDriver) newWebDriver).getCapabilities();
+            Capabilities caps = ((HasCapabilities) newWebDriver).getCapabilities();
             String browserName = caps.getBrowserName();
             String browserVersion = caps.getVersion();
             log("Browser: " + browserName + " " + browserVersion);
@@ -504,9 +504,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     private interface JSErrorChecker
     {
-        public void pause();
-        public void resume();
-        public @NotNull List<String> ignored();
+        void pause();
+        void resume();
+        @NotNull List<String> ignored();
     }
 
     private class FirefoxJSErrorChecker implements JSErrorChecker
@@ -2176,7 +2176,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         simpleSignIn();
     }
 
-    private final void cleanup(boolean afterTest) throws TestTimeoutException
+    private void cleanup(boolean afterTest) throws TestTimeoutException
     {
         if(!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest)this).needsSetup())
             doCleanup(afterTest);
@@ -2568,9 +2568,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if (filters != null)
             selectCmd.setFilters(filters);
 
-        SelectRowsResponse selectResp = null;
+        SelectRowsResponse selectResp;
 
-//        selectCmd.setQueryName(subQuery);
         try
         {
             selectResp = selectCmd.execute(cn, path);
@@ -3458,7 +3457,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }, "Page failed to load", millis);
         _testTimeout = false;
-//        waitForExtOnReady(); // TODO: Removing temporarily. This might be causing more timeouts than its worth.
         _preppedForPageLoad = false;
     }
 
@@ -5280,19 +5278,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    /**
-     * From the assay design page, add a field with the given name, label, and type
-     */
-    public void addRunField(String name, String label, ListHelper.ListColumnType type)
-    {
-        String xpath = ("//input[starts-with(@name, 'ff_name");
-        int newFieldIndex = getElementCount(Locator.xpath(xpath + "')]"));
-        clickButtonByIndex("Add Field", 1, 0);
-        _listHelper.setColumnName(newFieldIndex, name);
-        _listHelper.setColumnLabel(newFieldIndex, label);
-        _listHelper.setColumnType(newFieldIndex, type);
-    }
-
     public void assertButtonPresent(String buttonText)
     {
         assertTrue("Button '" + buttonText + "' was not present", isButtonPresent(buttonText));
@@ -5305,7 +5290,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     /**
      * @deprecated Use {@link org.labkey.test.util.DataRegionTable#pageFirst()}
-     * @param dataRegionName
      */
     @Deprecated
     public void dataRegionPageFirst(String dataRegionName)
@@ -5661,13 +5645,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         if (!newDisplayName.equals(defaultDisplayName))
             usersAndDisplayNames.put(email, newDisplayName);
-    }
-
-    protected void resetDisplayName(String email)
-    {
-        String defaultDisplayName = getDefaultDisplayName(email);
-
-        setDisplayName(email, defaultDisplayName);
     }
 
     // assumes there are not collisions in the database causing unique numbers to be appended
@@ -6153,7 +6130,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         searchFor(projectName, searchFor, expectedResults, null);
     }
-
 
     public void assertAttributeEquals(Locator locator, String attributeName, String value)
     {
