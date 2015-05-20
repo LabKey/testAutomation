@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,14 +84,14 @@ public class RelativeUrl
 
     private String encodeContainerPath()
     {
-        String[] splitPath = _containerPath.split("/");
+        List<String> encodedPath = new ArrayList<>();
 
-        for (String node : splitPath)
+        for (String node : _containerPath.split("/"))
         {
-            node = EscapeUtil.encode(node);
+            encodedPath.add(EscapeUtil.encode(node));
         }
 
-        return StringUtils.join(splitPath, "/");
+        return StringUtils.join(encodedPath, "/");
     }
 
     public void addParameter(String param)
