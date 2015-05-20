@@ -243,7 +243,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Not Yet Submitted");
         prepForPageLoad();
         clickButton("Submit", 0);
-        getAlert(); // TODO: add check for expected alert text
+        acceptAlert(); // TODO: add check for expected alert text
         waitForPageToLoad();
         waitAndClickAndWait(Locator.linkWithText("Specimen Requests"));
         assertButtonNotPresent("Submit");
@@ -330,7 +330,7 @@ public class StudyExportTest extends StudyManualTest
         checkAllOnPage("SpecimenDetail");
         prepForPageLoad();
         _extHelper.clickMenuButton(false, "Comments and QC", "Clear Vial Comments for Selected");
-        getAlert(); // TODO: add check for expected alert text
+        acceptAlert(); // TODO: add check for expected alert text
         waitForPageToLoad();
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "MouseId");
@@ -391,7 +391,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("WARNING: Missing Specimens");
         prepForPageLoad();
         clickButton("Delete missing specimens", 0);
-        getAlert(); // TODO: add check for expected alert text
+        acceptAlert(); // TODO: add check for expected alert text
         waitForPageToLoad();
         assertTextPresent("Duke University",
                 "An Assay Plan",
@@ -443,7 +443,7 @@ public class StudyExportTest extends StudyManualTest
         checkCheckbox(Locator.xpath("//input[contains(@value, '999320529')]"));
         prepForPageLoad();
         clickButton("Delete", 0);
-        getAlert(); // TODO: add check for expected alert text
+        acceptAlert(); // TODO: add check for expected alert text
         waitForPageToLoad();
         assertTextNotPresent("999320529");
 

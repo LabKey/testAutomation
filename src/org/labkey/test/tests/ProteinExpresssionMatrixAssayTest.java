@@ -77,7 +77,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
                 public Void apply(Void aVoid)
                 {
                     annotInsertions.clickHeaderButtonByText("Delete");
-                    getAlert();
+                    acceptAlert();
                     return null;
                 }
             });

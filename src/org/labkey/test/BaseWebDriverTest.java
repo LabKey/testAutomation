@@ -2839,7 +2839,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public String getAlert()
+    public String acceptAlert()
     {
         Alert alert = getDriver().switchTo().alert();
         String text = alert.getText();

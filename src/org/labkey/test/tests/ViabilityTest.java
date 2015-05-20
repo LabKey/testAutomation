@@ -107,7 +107,7 @@ public class ViabilityTest extends AbstractViabilityTest
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getAlert();
+        String actualConfirmation = acceptAlert();
         log("** Got confirmation: " + actualConfirmation);
         waitForPageToLoad();
 
@@ -186,7 +186,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         prepForPageLoad();
         clickButton("Save and Finish", 0);
-        String actualConfirmation = getAlert();
+        String actualConfirmation = acceptAlert();
         log("** Got confirmation: " + actualConfirmation);
         waitForPageToLoad();
 
@@ -261,7 +261,7 @@ public class ViabilityTest extends AbstractViabilityTest
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getAlert();
+        String actualConfirmation = acceptAlert();
         log("** Got confirmation: " + actualConfirmation);
         waitForPageToLoad();
 
@@ -339,7 +339,7 @@ public class ViabilityTest extends AbstractViabilityTest
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getAlert();
+        String actualConfirmation = acceptAlert();
         log("** Got confirmation: " + actualConfirmation);
         waitForPageToLoad();
 

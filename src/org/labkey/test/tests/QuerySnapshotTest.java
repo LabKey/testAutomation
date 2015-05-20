@@ -210,7 +210,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
         waitForText(10000, "Dataset: Custom Query Snapshot");
 
@@ -341,7 +341,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     {
         prepForPageLoad();
         clickButton("Delete Snapshot", 0);
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
     }
 }

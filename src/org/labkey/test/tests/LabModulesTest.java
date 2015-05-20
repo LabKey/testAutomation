@@ -1434,7 +1434,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         btn.waitForEnabled();
         prepForPageLoad();
         waitAndClick(Locator.id(btn.getId() + "-btnEl"));
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
         waitForText(WAIT_FOR_PAGE, LabModuleHelper.LAB_HOME_TEXT);
     }

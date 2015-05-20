@@ -202,7 +202,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("APX-1"));
         clickButton("Delete Dataset", 0);
-        assertTrue(getAlert().contains("Are you sure you want to delete this dataset?"));
+        assertTrue(acceptAlert().contains("Are you sure you want to delete this dataset?"));
         waitForText("The study schedule defines"); // text on the Manage Datasets page
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         waitForText(VISIT_REPORT_NAME);

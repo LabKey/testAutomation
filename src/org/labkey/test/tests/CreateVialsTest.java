@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
@@ -109,7 +108,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run1", false);
         prepForPageLoad();
         clickButton("Save and Finish", 0);
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
         clickAndWait(Locator.linkContainingText("run1"));
 
@@ -144,7 +143,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         addSpecimenIds("_pool_B01_0_SpecimenIDs", "vial1");
         prepForPageLoad();
         clickButton("Save and Finish", 0);
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
 
         clickAndWait(Locator.linkContainingText("run2"));

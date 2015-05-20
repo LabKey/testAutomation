@@ -810,7 +810,7 @@ public class StudyTest extends StudyBaseTest
         _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         prepForPageLoad();
         _extHelper.clickMenuButton(false, "Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
         setFormElement(Locator.name("quf_" + COMMENT_FIELD_NAME), "Moved PTID Comment");
         clickButton("Submit");

@@ -506,7 +506,7 @@ public class ETLHelper
             {
                 _test.click(Locator.xpath("//span[text()='Delete']"));
                 // eat the alert without spewing to the log file
-                _test.getAlert();
+                _test.acceptAlert();
                 return null;
             }
         });

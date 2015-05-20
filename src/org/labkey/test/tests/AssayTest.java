@@ -594,7 +594,7 @@ public class AssayTest extends AbstractAssayTest
         checkCheckbox(Locator.checkboxByName(".toggle"));
         prepForPageLoad();
         clickButton("Recall Rows", 0);
-        getAlert();
+        acceptAlert();
         waitForPageToLoad();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
