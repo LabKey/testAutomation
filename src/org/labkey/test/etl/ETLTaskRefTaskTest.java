@@ -21,11 +21,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -132,7 +135,7 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
                         return false;
                     }
                 }
-                catch (Exception e)
+                catch (CommandException | IOException e)
                 {
                     throw new RuntimeException("Exception thrown checking job status", e);
                 }

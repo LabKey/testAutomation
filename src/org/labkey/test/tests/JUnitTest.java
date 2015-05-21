@@ -88,7 +88,7 @@ public class JUnitTest extends TestSuite
             helper.signIn();
             helper.unfail();
         }
-        catch (Exception | AssertionError e)
+        catch (RuntimeException | AssertionError e)
         {
             helper.handleFailure(e, "fetchJUnitTestList");
             throw e;
@@ -254,10 +254,7 @@ public class JUnitTest extends TestSuite
             {
                 json = (Map<String, Object>)JSONValue.parse(response);
             }
-            catch (Exception e)
-            {
-                // ignore
-            }
+            catch (RuntimeException ignore) { }
 
             if (json == null)
                 return response;

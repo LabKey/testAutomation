@@ -42,6 +42,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.UTF8Reader;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
 import org.seleniumhq.jetty7.util.URIUtil;
@@ -261,7 +262,7 @@ public class WebTestHelper
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
-    public static void logToServer(String message) throws Exception
+    public static void logToServer(String message) throws IOException, CommandException
     {
         try(CloseableHttpClient client = (CloseableHttpClient)getHttpClient())
         {
@@ -269,7 +270,7 @@ public class WebTestHelper
         }
     }
 
-    public static void logToServer(String message, HttpClient client, HttpContext context) throws Exception
+    public static void logToServer(String message, HttpClient client, HttpContext context) throws CommandException, IOException
     {
         if (message.contains("\n"))
         {
@@ -298,7 +299,7 @@ public class WebTestHelper
                 EntityUtils.consumeQuietly(response.getEntity());
         }
         if (responseCode != HttpStatus.SC_OK)
-            throw new Exception("Contacting server at URL " + encodedUrl + " failed: " + responseStatusLine);
+            throw new CommandException("Contacting server at URL " + encodedUrl + " failed: " + responseStatusLine);
     }
 
     private static String encodeURI(String parameter)

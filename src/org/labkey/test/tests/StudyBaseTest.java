@@ -25,10 +25,12 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -129,7 +131,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         try{
             response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + WebTestHelper.stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));
         }
-        catch(Exception e){/*No link or bad response*/}
+        catch (NoSuchElementException | IOException ignore){/*No link or bad response*/}
 
         if (HttpStatus.SC_OK != response)
         {

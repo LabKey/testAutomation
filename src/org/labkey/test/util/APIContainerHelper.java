@@ -89,7 +89,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         {
             return command.execute(connection, path);
         }
-        catch (Exception e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException(e);
         }

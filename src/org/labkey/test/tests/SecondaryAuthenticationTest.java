@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -27,6 +28,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PasswordUtil;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -137,7 +139,7 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
         {
             selectResp = selectCmd.execute(cn, "/");
         }
-        catch (Exception e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException(e);
         }

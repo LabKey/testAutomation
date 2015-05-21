@@ -547,9 +547,9 @@ public class TestHelper
             objectOut.flush();
             objectOut.close();
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            System.out.println(e.getStackTrace());
+            e.printStackTrace(System.out);
         }
     }
 
@@ -591,9 +591,9 @@ public class TestHelper
                 objectIn.close();
             }
         }
-        catch (Exception e)
+        catch (IOException | ClassNotFoundException e)
         {
-            System.out.println(e.getStackTrace());
+            e.printStackTrace(System.out);
         }
         return savedConfigs;
     }

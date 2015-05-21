@@ -16,8 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
@@ -73,10 +71,12 @@ public class APIAssayHelper extends AbstractAssayHelper
         {
             alr = alc.execute(_test.createDefaultConnection(false), "/" + projectPath);
         }
-        catch (Exception e)
+        catch (CommandException | IOException e)
         {
             if(e.getMessage().contains("Not Found"))
-                fail("Assay or project not found");
+                throw new AssertionError("Assay or project not found", e);
+            else
+                throw new RuntimeException(e);
         }
 
         if(alr.getDefinition(assayName)==null)

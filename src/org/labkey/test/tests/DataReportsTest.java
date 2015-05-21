@@ -123,7 +123,7 @@ public class DataReportsTest extends ReportTest
     }
 
     @BeforeClass
-    public static void doSetup() throws Exception
+    public static void doSetup()
     {
         DataReportsTest initTest = (DataReportsTest)getCurrentTest();
 

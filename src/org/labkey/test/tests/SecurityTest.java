@@ -31,6 +31,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -603,7 +604,7 @@ public class SecurityTest extends BaseWebDriverTest
 
             return sb.toString();
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             throw new RuntimeException("Failure attempting to retrieve " + relativeUrl, e);
         }

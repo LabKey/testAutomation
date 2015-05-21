@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -40,6 +41,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -843,7 +845,7 @@ public class StudyTest extends StudyBaseTest
         {
             selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
         }
-        catch (Exception e)
+        catch (CommandException | IOException e)
         {
             throw new RuntimeException("Error when attempting to verify audit trail", e);
         }

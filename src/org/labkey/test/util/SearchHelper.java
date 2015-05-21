@@ -23,13 +23,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class SearchHelper extends AbstractHelper
 {
@@ -54,7 +54,7 @@ public class SearchHelper extends AbstractHelper
             int response = WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("search", "waitForIndexer"));
             assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             throw new RuntimeException("WaitForIndexer action failed", e);
         }

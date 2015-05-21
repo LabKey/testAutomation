@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -105,16 +106,9 @@ public class ArtifactCollector
         if (!isLocalServer())
             return;
 
-        try
-        {
-            File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
-            threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
-            baseWebDriverTest.log("Threads dumped to standard labkey log file");
-        }
-        catch (Exception e)
-        {
-            baseWebDriverTest.log("Error dumping threads: " + e.getMessage());
-        }
+        File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
+        threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
+        baseWebDriverTest.log("Threads dumped to standard labkey log file");
     }
 
     public void dumpPageSnapshot(String testName, @Nullable String subdir)
@@ -142,26 +136,22 @@ public class ArtifactCollector
             return;
         if ( _test.isGuestModeTest() )
             return;
-        _test.pushLocation();
-        try
-        {
-            // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
-            _test.beginAt("/admin/dumpHeap.view");
-            File destDir = ensureDumpDir();
-            String dumpMsg = Locator.css("#bodypanel > div").findElement(_test.getDriver()).getText();
-            String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
-            File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
-            File destFile = new File(destDir, filename);
 
-            if ( heapDump.renameTo(destFile) )
-                publishArtifact(destFile);
-            else
-                _test.log("Unable to move HeapDump file to test logs directory.");
-        }
-        catch (Exception e)
-        {
-            _test.log("Error dumping heap: " + e.getMessage());
-        }
+        _test.pushLocation();
+
+        // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
+        _test.beginAt("/admin/dumpHeap.view");
+        File destDir = ensureDumpDir();
+        String dumpMsg = Locator.css("#bodypanel > div").findElement(_test.getDriver()).getText();
+        String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
+        File heapDump = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", filename);
+        File destFile = new File(destDir, filename);
+
+        if ( heapDump.renameTo(destFile) )
+            publishArtifact(destFile);
+        else
+            _test.log("Unable to move HeapDump file to test logs directory.");
+
         _test.popLocation(); // go back to get screenshot if needed.
     }
 
@@ -197,7 +187,7 @@ public class ArtifactCollector
 
                 return screenFile;
             }
-            catch (Exception e)
+            catch (AWTException | IOException e)
             {
                 _test.log("Failed to take full screenshot: " + e.getMessage());
             }

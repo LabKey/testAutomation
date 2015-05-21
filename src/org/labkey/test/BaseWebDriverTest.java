@@ -1781,7 +1781,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 {
                     currentTest.handleFailure(e, pseudoTestName);
                 }
-                catch (Exception secondary)
+                catch (RuntimeException | Error secondary)
                 {
                     TestLogger.log("Error while collecting failure data");
                     secondary.printStackTrace(System.out);
@@ -1887,7 +1887,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 handleFailure(e, description.getMethodName());
             }
-            catch (Exception secondary)
+            catch (RuntimeException | Error secondary)
             {
                 log("Error while collecting failure data");
                 secondary.printStackTrace(System.out);
@@ -2033,7 +2033,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     }
                 }
             }
-            catch (Exception e)
+            catch (RuntimeException | Error e)
             {
                 log("Unable to determine information about the last page");
                 e.printStackTrace(System.out);
@@ -2051,7 +2051,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 if (_testTimeout)
                     getArtifactCollector().dumpThreads(this);
             }
-            catch (Exception e)
+            catch (RuntimeException | Error e)
             {
                 log("Unable to dump failure information");
                 e.printStackTrace(System.out);
@@ -3789,9 +3789,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 locator.waitForElement(getDriver(), elementTimeout);
             }
-            catch(Exception e)
+            catch(NoSuchElementException e)
             {
-                /*ignore*/
                 return false;
             }
         }
@@ -4618,7 +4617,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 values.add(getTableCellText(Locator.id(tableName), i, column));
             }
-            catch(Exception ignore) {}
+            catch(NoSuchElementException ignore) {}
         }
 
         return values;

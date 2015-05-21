@@ -15,8 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.collections15.Bag;
-import org.apache.commons.collections15.bag.HashBag;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
@@ -268,7 +266,7 @@ public class DataRegionTable
             while (getDataAsText(rows, 0) != null)
                 rows += div;
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             // Throws an exception, if row is out of bounds.
         }
@@ -404,7 +402,7 @@ public class DataRegionTable
 
         if (moreThanOnePage)
         {
-            clickHeaderButton("Page Size", "Show All");
+            showAll();
         }
 
         List<List<String>> columns = new ArrayList<>();
@@ -415,7 +413,7 @@ public class DataRegionTable
 
         if (moreThanOnePage)
         {
-            clickHeaderButton("Page Size", "100 per page");
+            setPageSize(100);
         }
 
         return columns;
@@ -479,7 +477,7 @@ public class DataRegionTable
                 row += 1;
             }
         }
-        catch (Exception e)
+        catch (RuntimeException ignore)
         {
             // Throws an exception, if row is out of bounds.
         }
@@ -506,7 +504,7 @@ public class DataRegionTable
         {
             ret = _test.getTableCellText(getHtmlName(), row, column);
         }
-        catch(Exception ignore) {}
+        catch (NoSuchElementException ignore) {}
 
         return ret;
     }
@@ -729,12 +727,12 @@ public class DataRegionTable
 
     public void showAll()
     {
-        _test.clickAndWait(Locator.linkWithText("Show All"));
+        clickHeaderButton("Page Size", "Show All");
     }
 
     public void setPageSize(int size)
     {
-        _test.clickAndWait(Locator.linkWithText(size + " per page"));
+        clickHeaderButton("Page Size", size + " per page");
     }
 
     /**

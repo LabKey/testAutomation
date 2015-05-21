@@ -18,6 +18,7 @@ package org.labkey.test.etl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.BaseTransformCommand;
@@ -32,6 +33,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 import org.labkey.test.util.PasswordUtil;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -198,7 +201,7 @@ public class ETLClientApiCommandTest extends ETLBaseTest
         {
             response = cmd.execute(cn, getProjectName());
         }
-        catch(Exception e)
+        catch (CommandException | IOException e)
         {
             if (null == expectedError)
                 throw new RuntimeException(e);

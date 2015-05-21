@@ -31,7 +31,7 @@ public class TestScrubber extends LabKeyWebDriverWrapper
             PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
             pipelineToolsHelper.resetPipelineToolsDirectory();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             // Assure that this failure is noticed
             // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
@@ -46,7 +46,7 @@ public class TestScrubber extends LabKeyWebDriverWrapper
         {
             deleteSiteWideTermsOfUsePage();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             log("Failed to remove site-wide terms of use. This will likely cause other tests to fail.");
         }
@@ -55,7 +55,7 @@ public class TestScrubber extends LabKeyWebDriverWrapper
         {
             resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             log("Failed to reset DB login config after test failure");
         }
@@ -64,7 +64,7 @@ public class TestScrubber extends LabKeyWebDriverWrapper
         {
             disableSecondaryAuthentication();
         }
-        catch (Exception e)
+        catch (RuntimeException e)
         {
             log("Failed to reset Secondary Authentication after test failure");
         }

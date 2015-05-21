@@ -15,10 +15,13 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -46,7 +49,7 @@ public class APIUserHelper extends AbstractUserHelper
                 }
                 return response;
             }
-            catch (Exception e)
+            catch (CommandException | IOException e)
             {
                 if(verifySuccess)
                     throw new RuntimeException("Error while creating user", e);

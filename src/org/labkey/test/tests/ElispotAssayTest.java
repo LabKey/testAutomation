@@ -481,11 +481,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitForText(PLATE_TEMPLATE_NAME);
     }
 
-
-    /**
-     * Cleanup entry point.
-     * @param afterTest
-     */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
@@ -494,8 +489,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         {
             deleteEngine();
         }
-        catch(Exception ignore) {}
-    } //doCleanup()
+        catch (RuntimeException ignore) {}
+    }
 
     protected void runTransformTest()
     {

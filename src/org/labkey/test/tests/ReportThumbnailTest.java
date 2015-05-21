@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,6 +30,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -322,7 +324,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             THUMBNAIL_DATA = WebTestHelper.getHttpGetResponseBody(getAttribute(thumbnail, "src"));
         }
-        catch(Exception ex)
+        catch (HttpException | IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -347,7 +349,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             thumbnailData = WebTestHelper.getHttpGetResponseBody(getAttribute(thumbnail, "src"));
         }
-        catch(Exception ex)
+        catch (HttpException | IOException ex)
         {
             throw new RuntimeException(ex);
         }
@@ -432,7 +434,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             ICON_DATA = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
         }
-        catch (Exception e)
+        catch (HttpException | IOException e)
         {
             throw new RuntimeException(e);
         }
@@ -462,7 +464,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             iconData = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
         }
-        catch (Exception e)
+        catch (HttpException | IOException e)
         {
             throw new RuntimeException(e);
         }

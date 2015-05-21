@@ -25,6 +25,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.apache.xmlbeans.XmlException;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
@@ -35,7 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -103,7 +103,7 @@ public class APITestHelper
             }
             return tests;
         }
-        catch (Exception e)
+        catch (IOException | XmlException e)
         {
             throw new RuntimeException("An unexpected error occurred", e);
         }

@@ -42,7 +42,7 @@ public class JavaQC
                 writeError("A Generic Error Occurred", "runDataFile");
                 writeError("A Second Generic Error Occurred", "runDataFile");
             }
-            catch (Exception e)
+            catch (IOException e)
             {
                 throw new RuntimeException(e);
             }
@@ -85,7 +85,7 @@ public class JavaQC
             }
             return props;
         }
-        catch (Exception e)
+        catch (IOException e)
         {
             throw new RuntimeException(e);
         }

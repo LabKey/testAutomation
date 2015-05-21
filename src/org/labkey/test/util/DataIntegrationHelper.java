@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.ResetTransformStateCommand;
 import org.labkey.remoteapi.di.ResetTransformStateResponse;
@@ -58,7 +59,7 @@ public class DataIntegrationHelper
         _baseUrl = baseUrl;
     }
 
-    public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement) throws Exception
+    public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement) throws IOException, CommandException
     {
         SelectRowsResponse exRsp = null;
         Connection cn = new Connection(_baseUrl, _username, _password);
@@ -77,7 +78,7 @@ public class DataIntegrationHelper
         return response;
     }
 
-    public RunTransformResponse runTransform(String transformId) throws Exception
+    public RunTransformResponse runTransform(String transformId) throws CommandException, IOException
     {
         RunTransformResponse response;
         Connection cn = new Connection(_baseUrl, _username, _password);
@@ -87,7 +88,7 @@ public class DataIntegrationHelper
     }
 
     @LogMethod
-    public RunTransformResponse runTransformAndWait(@LoggedParam String transformId, int msTimeout) throws Exception
+    public RunTransformResponse runTransformAndWait(@LoggedParam String transformId, int msTimeout) throws CommandException, IOException
     {
         RunTransformResponse response;
         response = runTransform(transformId);
@@ -109,12 +110,12 @@ public class DataIntegrationHelper
         return response;
     }
 
-    public String getTransformStatus(String jobId) throws Exception
+    public String getTransformStatus(String jobId) throws CommandException, IOException
     {
         return getTransformRunFieldByJobId(jobId, "Status");
     }
 
-    public String getTransformStatusByTransformId(String transformId) throws Exception
+    public String getTransformStatusByTransformId(String transformId) throws CommandException, IOException
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT Status FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
@@ -127,7 +128,7 @@ public class DataIntegrationHelper
         return getTransformRunFieldByJobId(jobId, "ExpRunId");
     }
 
-    public String getTransformRunFieldByJobId(String jobId, String fieldName) throws Exception
+    public String getTransformRunFieldByJobId(String jobId, String fieldName) throws CommandException, IOException
     {
         // TODO: Proper handling of null jobId
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
@@ -135,48 +136,34 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get(fieldName).toString();
     }
 
-    public String getTransformState(String transformId) throws Exception
+    public String getTransformState(String transformId) throws CommandException, IOException
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
         return response.getRows().get(0).get("TransformState").toString();
     }
-    public ResetTransformStateResponse resetTransformState(String transformId)
+
+    public ResetTransformStateResponse resetTransformState(String transformId) throws CommandException, IOException
     {
         Connection cn = new Connection(_baseUrl, _username, _password);
         ResetTransformStateResponse response = null;
         ResetTransformStateCommand rcmd = new ResetTransformStateCommand(transformId);
-        try
-        {
-            response = rcmd.execute(cn, _folderPath);
-        }
-        catch(Exception e)
-        {
-            TestLogger.log("ResetTransformStateResponse failed: " + e.getMessage());
-        }
-        return response;
+        return rcmd.execute(cn, _folderPath);
     }
 
-    private UpdateTransformConfigurationResponse UpdateTransformConfiguration(String transformId, Boolean verbose, Boolean enabled)
+    private UpdateTransformConfigurationResponse UpdateTransformConfiguration(String transformId, Boolean verbose, Boolean enabled) throws CommandException, IOException
     {
         Connection cn = new Connection(_baseUrl, _username, _password);
         UpdateTransformConfigurationResponse response = null;
         UpdateTransformConfigurationCommand command = new UpdateTransformConfigurationCommand(transformId);
         command.setVerboseLogging(verbose);
         command.setEnabled(enabled);
-        try
-        {
-            response = command.execute(cn, _diSchema);
-        }
-        catch(Exception e)
-        {
-            TestLogger.log("UpdateTransformConfiguration failed: " + e.getMessage());
-        }
+        response = command.execute(cn, _diSchema);
         return response;
     }
 
-    private String getContainerForFolder(String folderName) throws Exception
+    private String getContainerForFolder(String folderName) throws CommandException, IOException
     {
         String query = "select EntityID from Containers where Name = '" + folderName + "'";
         SelectRowsResponse response = executeQuery("/" + folderName, "core", query);
@@ -195,7 +182,7 @@ public class DataIntegrationHelper
         }
     }
 
-    public String getEtlLogFile(String jobId) throws Exception
+    public String getEtlLogFile(String jobId) throws CommandException, IOException
     {
         String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
         SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
@@ -214,7 +201,7 @@ public class DataIntegrationHelper
         }
     }
 
-    public void assertInEtlLogFile(String jobId, String... logStrings) throws Exception
+    public void assertInEtlLogFile(String jobId, String... logStrings) throws CommandException, IOException
     {
         final String etlLogFile = getEtlLogFile(jobId);
 
@@ -222,7 +209,7 @@ public class DataIntegrationHelper
             assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
     }
 
-    public void assertNotInEtlLogFile(String jobId, String... logStrings) throws Exception
+    public void assertNotInEtlLogFile(String jobId, String... logStrings) throws CommandException, IOException
     {
         final String etlLogFile = getEtlLogFile(jobId);
 
