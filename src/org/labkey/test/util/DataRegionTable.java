@@ -261,15 +261,8 @@ public class DataRegionTable
     public int getDataRowCount(int div)
     {
         int rows = 0;
-        try
-        {
-            while (getDataAsText(rows, 0) != null)
-                rows += div;
-        }
-        catch (RuntimeException e)
-        {
-            // Throws an exception, if row is out of bounds.
-        }
+        while (getDataAsText(rows, 0) != null)
+            rows += div;
 
         if (rows == 1 && "No data to show.".equals(getDataAsText(0, 0)))
             rows = 0;
@@ -477,7 +470,7 @@ public class DataRegionTable
                 row += 1;
             }
         }
-        catch (RuntimeException ignore)
+        catch (NoSuchElementException ignore)
         {
             // Throws an exception, if row is out of bounds.
         }

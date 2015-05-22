@@ -77,22 +77,14 @@ public class JUnitTest extends TestSuite
     }
 
     // Use WebDriver to ensure we're upgraded
-    private static void upgradeHelper() throws Exception
+    private static void upgradeHelper()
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
         JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
-        try
-        {
-            helper.setUp();
-            // sign in performs upgrade if necessary
-            helper.signIn();
-            helper.unfail();
-        }
-        catch (RuntimeException | AssertionError e)
-        {
-            helper.handleFailure(e, "fetchJUnitTestList");
-            throw e;
-        }
+        helper.setUp();
+        // sign in performs upgrade if necessary
+        helper.signIn();
+        helper.unfail();
     }
 
     public static TestSuite suite() throws Exception
@@ -249,12 +241,7 @@ public class JUnitTest extends TestSuite
 
         static String dump(String response, boolean dumpFailures)
         {
-            Map<String, Object> json = null;
-            try
-            {
-                json = (Map<String, Object>)JSONValue.parse(response);
-            }
-            catch (RuntimeException ignore) { }
+            Map<String, Object> json = (Map<String, Object>)JSONValue.parse(response);
 
             if (json == null)
                 return response;

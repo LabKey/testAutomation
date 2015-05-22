@@ -67,7 +67,7 @@ public class OlapTestJson
                     if (Double.parseDouble(expected) == Double.parseDouble(actual))
                         continue;
                 }
-                catch (RuntimeException ignore){}
+                catch (NumberFormatException ignore){}
                 assertEquals(expected,actual);
             }
         }

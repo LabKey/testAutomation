@@ -31,7 +31,7 @@ import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.testng.Assert;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -214,7 +214,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
         results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
-        Assert.assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ", null}), results.getRowDataAsText(0));
+        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ", null}), results.getRowDataAsText(0));
     }
 
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
@@ -489,7 +489,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         {
             deleteEngine();
         }
-        catch (RuntimeException ignore) {}
+        catch (NoSuchElementException ignore) {}
     }
 
     protected void runTransformTest()
