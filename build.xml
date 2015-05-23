@@ -177,7 +177,7 @@
         </fileset>
         <fileset dir="${external.lib.home}">
             <include name="annotations.jar"/>
-            <include name="commons-lang3-3.3.2.jar" />
+            <include name="commons-lang3-3.4.jar" />
             <include name="collections-generic-4.01.jar" />
             <include name="junit-4.11.jar"/>
             <include name="tika-app-1.5.jar"/>

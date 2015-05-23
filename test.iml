@@ -44,13 +44,13 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.3.2.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.4.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.3.2-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.4-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.3.2-src.zip!/commons-lang3-3.3.2-src/src/main/java" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-lang3-3.4-src.zip!/commons-lang3-3.4-src/src/main/java" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -136,4 +136,3 @@
     <orderEntry type="module" module-name="API" />
   </component>
 </module>
-
