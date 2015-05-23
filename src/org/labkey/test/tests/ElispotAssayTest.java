@@ -206,7 +206,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "Antigen 5", "Antigen 6", "Cy3", "FITC");
         click(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("run details"));
-        PlateSummary plateSummary = new PlateSummary(this, 1);
+        PlateSummary plateSummary = new PlateSummary(this, 4);
         assertEquals(Arrays.asList(new String[]{"244.0","544.0","210.0","449.0","333.0","429.0","393.0","689.0","400.0","159.0","130.0","94.0"}), plateSummary.getRowValues(5));
         plateSummary.selectMeasurement(PlateSummary.Measurement.ACTIVITY);
         assertEquals(Arrays.asList(new String[]{"668.0","1610.0","1464.0","3945.0","3781.0","3703.0","8713.0","2222.0","2856.0","1208.0","880.0","1006.0"}), plateSummary.getRowValues(7));
