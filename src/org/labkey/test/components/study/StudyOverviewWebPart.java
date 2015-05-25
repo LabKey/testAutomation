@@ -18,6 +18,8 @@ package org.labkey.test.components.study;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.pages.study.OverviewPage;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,19 +49,22 @@ public class StudyOverviewWebPart extends BodyWebPart
             throw new IllegalStateException("Unable to get participant count from Study Overview webpart");
     }
 
-    public void clickStudyNavigator()
+    public OverviewPage clickStudyNavigator()
     {
         _test.clickAndWait(elements().linkStudyNavigator);
+        return new OverviewPage(_test);
     }
 
-    public void clickManageStudy()
+    public LabKeyPage clickManageStudy()
     {
         _test.clickAndWait(elements().linkManageStudy);
+        return new LabKeyPage(_test);
     }
 
-    public void clickManageFiles()
+    public LabKeyPage clickManageFiles()
     {
         _test.clickAndWait(elements().linkManageFiles);
+        return new LabKeyPage(_test);
     }
 
     @Override
