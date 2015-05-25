@@ -25,8 +25,8 @@ public class CachingLocator extends Locator
 {
     private Locator _locator;
 
-    private WebElement cachedWebElement;
     private List<WebElement> cachedWebElements;
+    private SearchContext cachedContext;
 
     public CachingLocator(Locator locator)
     {
@@ -37,7 +37,6 @@ public class CachingLocator extends Locator
     private void clearCache()
     {
         cachedWebElements = null;
-        cachedWebElement = null;
     }
 
     @Override
@@ -79,8 +78,11 @@ public class CachingLocator extends Locator
     @Override
     public List<WebElement> findElements(SearchContext context)
     {
-        if (cachedWebElements == null || cachedWebElements.isEmpty())
+        if (cachedWebElements == null || cachedWebElements.isEmpty() || context != cachedContext)
+        {
             cachedWebElements = _locator.findElements(context);
+            cachedContext = context;
+        }
 
         return cachedWebElements;
     }
@@ -88,9 +90,6 @@ public class CachingLocator extends Locator
     @Override
     public WebElement findElement(SearchContext context)
     {
-        if (cachedWebElement == null)
-            cachedWebElement = _locator.findElement(context);
-
-        return cachedWebElement;
+        return findElements(context).get(0);
     }
 }

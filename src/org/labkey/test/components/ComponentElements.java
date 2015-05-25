@@ -15,7 +15,11 @@
  */
 package org.labkey.test.components;
 
+import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class ComponentElements
 {
@@ -24,5 +28,15 @@ public class ComponentElements
     protected ComponentElements(SearchContext context)
     {
         this.context = context;
+    }
+
+    protected WebElement findElement(Locator locator)
+    {
+        return locator.findElement(context);
+    }
+
+    protected List<WebElement> findElements(Locator locator)
+    {
+        return locator.findElements(context);
     }
 }

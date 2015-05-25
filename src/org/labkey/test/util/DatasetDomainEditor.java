@@ -106,12 +106,12 @@ public class DatasetDomainEditor extends DomainEditor
 
         public WebElement getDemographicCheckbox()
         {
-            return demographicCheckbox.findElement(context);
+            return findElement(demographicCheckbox);
         }
 
         public WebElement getSharedBy()
         {
-            return sharedBy.findElement(context);
+            return findElement(sharedBy);
         }
     }
 }
