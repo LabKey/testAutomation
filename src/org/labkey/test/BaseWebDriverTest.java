@@ -1994,15 +1994,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _testFailed = true;
         _anyTestCaseFailed = true;
 
+        error.printStackTrace(System.out);
+
+        if (error instanceof InterruptedException)
+            return;
+
         try
         {
-            error.printStackTrace(System.out);
-
-            if (error instanceof UnreachableBrowserException || error instanceof InterruptedException || getDriver() == null)
+            if (error instanceof UnreachableBrowserException || getDriver() == null ||
+                    error.getStackTrace()[0].getLineNumber() == -2 || // Line -2 indicates a native method. Probably failed due to timeout
+                    error.getCause() != null && error.getCause().getStackTrace()[0].getLineNumber() == -2) // API timeouts might wrap the native method exception
             {
                 return;
             }
-
             if (error instanceof TestTimeoutException)
             {
                 _testTimeout = true;
