@@ -33,7 +33,7 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
-import org.labkey.api.reader.UTF8Reader;
+import org.labkey.api.reader.Readers;
 import org.labkey.api.writer.UTF8PrintWriter;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.aspects.TestPerfAspect;
@@ -138,7 +138,7 @@ public class Runner extends TestSuite
         {
             String line = null;
 
-            try(BufferedReader reader = new BufferedReader(new UTF8Reader(file)))
+            try (BufferedReader reader = Readers.getReader(file))
             {
                 while ((line = reader.readLine()) != null)
                     if (null != StringUtils.trimToNull(line))
@@ -963,7 +963,7 @@ public class Runner extends TestSuite
 
         if (changelistFile.exists())
         {
-            try(BufferedReader reader = new BufferedReader(new UTF8Reader(changelistFile)))
+            try (BufferedReader reader = Readers.getReader(changelistFile))
             {
                 String line;
 

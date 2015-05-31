@@ -17,14 +17,15 @@ package org.labkey.test.studysampler;
 
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
+import org.apache.commons.io.IOUtils;
+import org.labkey.api.reader.Readers;
+import org.labkey.api.writer.UTF8PrintWriter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,9 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import org.apache.commons.io.IOUtils;
-import org.labkey.api.reader.UTF8Reader;
-import org.labkey.api.writer.UTF8PrintWriter;
 
 
 /**
@@ -140,7 +138,7 @@ public class Runner
 
         FillerFactory() throws IOException
         {
-            BufferedReader reader = new BufferedReader(new UTF8Reader(new File("words.txt")));
+            BufferedReader reader = Readers.getReader(new File("words.txt"));
             words = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null)
@@ -226,7 +224,7 @@ public class Runner
         {
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
-            CSVReader reader = new CSVReader(new UTF8Reader(inFile), '\t');
+            CSVReader reader = new CSVReader(Readers.getReader(inFile), '\t');
             CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t');
 
             // read (and write) the field names.
@@ -296,7 +294,7 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            CSVReader reader = new CSVReader(new UTF8Reader(inFile), '\t');
+            CSVReader reader = new CSVReader(Readers.getReader(inFile), '\t');
             CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
 
             // read (and write) the field names.
@@ -345,7 +343,7 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            try (BufferedReader input = new BufferedReader(new UTF8Reader(inFile));
+            try (BufferedReader input = Readers.getReader(inFile);
                  BufferedWriter output = new BufferedWriter(new UTF8PrintWriter(outFile)))
             {
                 //Copy column headers only.
@@ -380,7 +378,7 @@ public class Runner
         String line;
         subjectIds = newStringSet();
 
-        try (BufferedReader reader = new BufferedReader(new UTF8Reader(subjectListFile)))
+        try (BufferedReader reader = Readers.getReader(subjectListFile))
         {
             random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
 

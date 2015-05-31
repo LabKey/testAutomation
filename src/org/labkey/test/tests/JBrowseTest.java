@@ -19,13 +19,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.labkey.api.reader.UTF8Reader;
+import org.labkey.api.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.External;
-import org.labkey.test.categories.LabModule;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -40,7 +37,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -174,7 +170,7 @@ public class JBrowseTest extends BaseWebDriverTest
         {
             p = pb.start();
 
-            try (BufferedReader procReader = new BufferedReader(new UTF8Reader(p.getInputStream())))
+            try (BufferedReader procReader = Readers.getReader(p.getInputStream()))
             {
                 String line;
                 while ((line = procReader.readLine()) != null)
