@@ -265,7 +265,9 @@ public class StudySimpleExportTest extends StudyBaseTest
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), "Query Validation", "Collaboration", null, true);
         importFolderFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
         goToModule("FileContent");
-        doubleClick(Locator.tag("div").startsWith("folder_load_"));
+        Locator.XPathLocator fileLoc = Locator.tag("div").startsWith("folder_load_");
+        waitForElement(fileLoc);
+        doubleClick(fileLoc);
         switchToWindow(1);
         assertTextPresentInThisOrder("Loading folder properties (folder type, settings and active modules)", " queries imported", "Skipping query validation.");
         getDriver().close();
