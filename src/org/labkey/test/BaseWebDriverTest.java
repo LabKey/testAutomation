@@ -18,6 +18,7 @@ package org.labkey.test;
 
 //TODO: Use java.lang.function.Function once Java 8 migration is complete
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
@@ -65,6 +66,8 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
+import org.labkey.test.components.search.SearchSideWebPart;
+import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
@@ -4209,6 +4212,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    public void clickAndWait(WebElement el)
+    {
+        clickAndWait(el, getDefaultWaitForPage());
+    }
+
     public void clickAndWait(final WebElement el, int pageTimeoutMs)
     {
         Function<Void, Void> func = new Function<Void, Void>()
@@ -6100,38 +6108,38 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     /*
      * This assumes that you have added the "search" webpart to your project
      */
-    public void searchFor(String projectName, String searchFor, int expectedResults, @Nullable String titleName)
+    public void searchFor(final String projectName, String searchFor, final Integer expectedResults, @Nullable final String titleName)
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
         clickProject(projectName);
-        assertElementPresent(Locator.name("q"));
-        setFormElement(Locator.id("query"), searchFor);
-        clickButton("Search");
-        long wait = 0;
-        while (wait < 5*defaultWaitForPage)
+        final SearchResultsPage searchResults = new SearchSideWebPart(this).searchForm().searchFor(searchFor);
+
+        try
         {
-            if ((titleName == null && isTextPresent("Found " + expectedResults + " result")) ||
-                    (titleName != null && isElementPresent(Locator.linkContainingText(titleName))))
-                break;
-            sleep(500);
-            wait += 500;
-            refresh();
+            longWait().until(new Predicate<WebDriver>()
+            {
+                @Override
+                public boolean apply(@Nullable WebDriver webDriver)
+                {
+                    if (titleName == null && searchResults.getResultCount().equals(expectedResults) ||
+                            titleName != null && isElementPresent(Locator.linkContainingText(titleName)))
+                        return true;
+                    else
+                        refresh();
+                    return false;
+                }
+            });
         }
-        if (titleName == null)
-        {
-            assertTextPresent("Found " + expectedResults + " result");
-            log("found \"" + expectedResults + "\" result of " + searchFor);
-        }
-        else
+        catch (TimeoutException ignore) {}
+
+        assertEquals(String.format("Found wrong number of search results for '%s'", searchFor), expectedResults, searchResults.getResultCount());
+        if (titleName != null)
         {
             clickAndWait(Locator.linkContainingText(titleName));
+            if (searchFor.startsWith("\""))
+                searchFor = searchFor.substring(1, searchFor.length() - 1);
             assertTextPresent(searchFor);
         }
-    }
-
-    public void searchFor(String projectName, String searchFor, int expectedResults)
-    {
-        searchFor(projectName, searchFor, expectedResults, null);
     }
 
     public void assertAttributeEquals(Locator locator, String attributeName, String value)
@@ -6210,6 +6218,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             //first load of schemas might a few seconds
             waitForElement(loc, 30000);
             shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
+            click(Locator.css("body")); // Dismiss tooltip
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try{

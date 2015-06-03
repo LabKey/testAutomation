@@ -184,7 +184,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Welcome"));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
 
-        searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
+        searchFor(PROJECT_NAME, "\"Page AAA\"", 1, WIKI_PAGE2_TITLE);
 
         log("test html wiki containing malformed javascript entities... we should allow this, see #12268");
         _wikiHelper.createNewWikiPage();

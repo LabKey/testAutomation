@@ -24,7 +24,6 @@ import java.util.List;
 
 public class BodyWebPart extends WebPart
 {
-
     public BodyWebPart(BaseWebDriverTest test, WebElement webPartElement)
     {
         _test = test;

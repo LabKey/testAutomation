@@ -44,12 +44,12 @@ public class SearchHelper extends AbstractHelper
         _searchQueue.clear();
         deleteIndex();
     }
-        
-    private void waitForIndexer()
+
+    @LogMethod(quiet = true)
+    public static void waitForIndexer()
     {
         try
         {
-            _test.log("Waiting for indexer");
             // Invoke a special server action that waits until all previous indexer tasks are complete
             int response = WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("search", "waitForIndexer"));
             assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);

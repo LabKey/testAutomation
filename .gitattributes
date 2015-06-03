@@ -350,6 +350,9 @@ src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
+src/org/labkey/test/components/search/SearchBodyWebPart.java -text
+src/org/labkey/test/components/search/SearchForm.java -text
+src/org/labkey/test/components/search/SearchSideWebPart.java -text
 src/org/labkey/test/components/study/StudyOverviewWebPart.java -text
 src/org/labkey/test/credentials/Credentials.java -text
 src/org/labkey/test/credentials/Login.java -text
@@ -404,6 +407,7 @@ src/org/labkey/test/pages/PermissionsEditor.java -text
 src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
+src/org/labkey/test/pages/search/SearchResultsPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
