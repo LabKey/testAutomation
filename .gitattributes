@@ -502,6 +502,7 @@ src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
 src/org/labkey/test/tests/ListPublishTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
+src/org/labkey/test/tests/LookupToSampleIDTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
 src/org/labkey/test/tests/MS2ExportTest.java -text
 src/org/labkey/test/tests/MS2GZTest.java -text
