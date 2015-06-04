@@ -88,38 +88,45 @@ public class PermissionsEditor
     }
 
     @LogMethod
-    public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
+    public void setPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
-        _setPermissions(groupName, permissionString, "pGroup");
+        _test.log(new Date().toString());
+        for(String permissionString : permissionStrings)
+        {
+            _setPermissions(groupName, permissionString, "pGroup");
+        }
+        _test.log(new Date().toString());
+        savePermissions();
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
-    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
+    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String... permissionStrings)
     {
-        _setPermissions(groupName, permissionString, "pSite");
+        _test.log(new Date().toString());
+        for(String permissionString : permissionStrings)
+        {
+            _setPermissions(groupName, permissionString, "pSite");
+        }
+        _test.log(new Date().toString());
+        savePermissions();
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
-    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String... permissionsStrings)
     {
         _test.log(new Date().toString());
-        _setPermissions(userName, permissionString, "pUser");
-
+        for(String permissionString : permissionsStrings)
+        {
+            _setPermissions(userName, permissionString, "pUser");
+        }
         _test.log(new Date().toString());
+        savePermissions();
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
-//    @LogMethod
-//    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
-//    {
-//        _test.log(new Date().toString());
-//        _test.goToSiteAdmins();
-//        _test.clickAndWait(Locator.linkContainingText("Permissions"));
-//        _test._ext4Helper.clickTabContainingText("Permissions");
-//        _selectPermission(userName, userName, permissionString);
-//        _test.log(new Date().toString());
-//    }
-
-    public void _setPermissions(String userOrGroupName, String permissionString, String className)
+    private void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -129,9 +136,6 @@ public class PermissionsEditor
         else
         {
             _test.log("Setting permissions for group " + userOrGroupName + " to " + role);
-//
-//            if (!_test.isElementPresent(Locator.permissionRendered()))
-//                enterPermissionsUI();
             _test._ext4Helper.clickTabContainingText("Permissions");
 
             String group = userOrGroupName;
@@ -141,16 +145,16 @@ public class PermissionsEditor
         }
     }
 
-    public void _selectPermission(String userOrGroupName, String group, String permissionString)
+    private void _selectPermission(String userOrGroupName, String group, String permissionString)
     {
         Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
         _test.waitForElement(roleCombo);
         _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-        String oldId = _test.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
-        savePermissions();
-        _test._ext4Helper.waitForMaskToDisappear();
-        _test.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
+//        String oldId = _test.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
+//        savePermissions();
+//        _test._ext4Helper.waitForMaskToDisappear();
+//        _test.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
     }
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
