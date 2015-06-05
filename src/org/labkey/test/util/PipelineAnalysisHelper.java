@@ -136,12 +136,12 @@ public class PipelineAnalysisHelper
                 String actualFileContents = TestFileUtils.getFileContents(actualFile);
                 for (String fileContent : fileContents)
                 {
-                    assertTrue("File didn't contain expected text:" + fileContent, actualFileContents.contains(fileContent));
+                    assertTrue("File '" + actualFile + "' didn't contain expected text:" + fileContent, actualFileContents.contains(fileContent));
                 }
             }
             else
             {
-                assertTrue(actualFile.exists());
+                assertTrue("Expected file doesn't exist: " + actualFile, actualFile.exists());
             }
         }
     }

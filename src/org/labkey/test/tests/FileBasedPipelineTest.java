@@ -137,7 +137,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         assertEquals("Cannot redefine an existing protocol", getText(Ext4Helper.Locators.windowBody("Error")));
         clickButton("OK", 0);
 
-        // Delete the job, including any refernced runs
+        // Delete the job, including any referenced runs
         deletePipelineJob(jobDescription, true);
 
         // Verify the analysis dir was deleted
@@ -220,13 +220,29 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         outputFiles.put("with-output-location.xml", Collections.<String>emptySet());
         outputFiles.put("relative-to-analysis/sample.xxx", Collections.<String>emptySet());
         outputFiles.put("/relative-to-root/sample.xxx", Collections.<String>emptySet());
+        outputFiles.put("/sample.xxx", Collections.<String>emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
+        final String jobDescription = "@files/sample (with_output_location)";
+
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, null, fileRoot, outputFiles);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, null, jobDescription, fileRoot, outputFiles);
+
+        // Delete the job, including any referenced runs
+        deletePipelineJob(jobDescription, true);
+
+        // Verify the analysis dir was deleted
+        verifyPipelineAnalysisDeleted(pipelineName, protocolName);
+
+        // Issue 22587: Verify output files outside of the analysis directory were also deleted
+        _fileBrowserHelper.selectFileBrowserRoot();
+        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId("sample.xxx"));
+        _fileBrowserHelper.selectFileBrowserItem("/relative-to-root");
+        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId("relative-to-root/sample.xxx"));
+
     }
 
     @LogMethod
