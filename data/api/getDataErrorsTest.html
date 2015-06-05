@@ -54,7 +54,7 @@ LABKEY.requiresExt3(function() {
     configs.push({title: 'Empty Measure Array', measures: []});
     configs.push({title: 'Missing Measure Property', measures: [{}]});
     configs.push({title: 'Bad Sorts Property', measures: [Ext.applyIf({} , measureWithDimension)], sorts: [{"schemaName":"study"}]});
-    configs.push({title: 'Unexpected Time Property', measures: [Ext.applyIf({"time": {}} , measureWithDimension)]});
+//    configs.push({title: 'Unexpected Time Property', measures: [Ext.applyIf({"time": {}} , measureWithDimension)]});
     configs.push({title: 'Unknown Time Property', measures: [Ext.applyIf({"time": "test"} , measureWithDimension)]});
 
     var dateOptionsClone = Ext4.applyIf({"interval":"Weeks"}, measureWithDimension.dateOptions);
