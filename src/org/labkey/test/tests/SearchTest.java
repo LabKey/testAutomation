@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -123,7 +124,14 @@ public class SearchTest extends StudyTest
         _containerHelper.renameFolder(getProjectName(), getFolderName(), FOLDER_C, true);
         FOLDER_NAME = FOLDER_C;
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
-        _containerHelper.moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
+        try
+        {
+            _containerHelper.moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
+        }
+        catch (CommandException fail)
+        {
+            throw new RuntimeException(fail);
+        }
         alterListsAndReSearch();
 
         verifySyntaxErrorMessages();

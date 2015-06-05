@@ -16,8 +16,11 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONObject;
+import org.labkey.api.util.Path;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
@@ -27,7 +30,7 @@ import org.labkey.test.TestTimeoutException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class APIContainerHelper extends AbstractContainerHelper
 {
@@ -134,6 +137,45 @@ public class APIContainerHelper extends AbstractContainerHelper
         catch (IOException e)
         {
             throw new RuntimeException("Failed to delete container", e);
+        }
+    }
+
+    @Override
+    public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, final boolean createAlias) throws CommandException
+    {
+        Connection connection = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        if (!projectName.startsWith("/"))
+            projectName = "/" + projectName;
+        if (!newParent.startsWith("/"))
+            newParent = "/" + newParent;
+        final Path containerPath = new Path(projectName, folderName);
+        final Path newParentPath = new Path(newParent);
+        PostCommand command = new PostCommand("core", "moveContainer")
+        {
+            @Override
+            public JSONObject getJsonObject()
+            {
+                JSONObject result = super.getJsonObject();
+                if (result == null)
+                {
+                    result = new JSONObject();
+                }
+                result.put("container", containerPath.toString());
+                result.put("parent", newParentPath.toString());
+                result.put("addAlias", createAlias);
+                setJsonObject(result);
+                return result;
+            }
+        };
+
+        try
+        {
+            command.execute(connection, null);
+        }
+        catch (IOException fail)
+        {
+            throw new RuntimeException(fail);
         }
     }
 }

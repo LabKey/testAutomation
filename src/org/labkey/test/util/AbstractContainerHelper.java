@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -319,7 +320,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
     }
 
     @LogMethod
-    public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, boolean createAlias)
+    public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, boolean createAlias) throws CommandException
     {
         _test.log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
         _test.clickProject(projectName);
