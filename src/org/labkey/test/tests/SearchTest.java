@@ -126,7 +126,7 @@ public class SearchTest extends StudyTest
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         try
         {
-            _containerHelper.moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
+            _containerHelper.moveFolder(getProjectName(), getFolderName(), getProjectName() + "/" + FOLDER_B, true);
         }
         catch (CommandException fail)
         {
