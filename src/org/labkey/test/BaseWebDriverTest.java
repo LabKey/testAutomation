@@ -6052,17 +6052,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
-    protected void importFolderFromPipeline(String folderFile)
+    public void importFolderFromPipeline(String folderFile)
     {
         importFolderFromPipeline(folderFile, 1, true);
     }
 
-    protected void importFolderFromPipeline(String folderFile, int completedJobsExpected)
+    public void importFolderFromPipeline(String folderFile, int completedJobsExpected)
     {
         importFolderFromPipeline(folderFile, completedJobsExpected, true);
     }
 
-    protected void importFolderFromPipeline(String folderFile, int completedJobsExpected, boolean validateQueries)
+    public void importFolderFromPipeline(String folderFile, int completedJobsExpected, boolean validateQueries)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
