@@ -16,13 +16,12 @@ package org.labkey.test.util;
  * limitations under the License.
  */
 
-import org.labkey.api.writer.UTF8PrintWriter;
+import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -101,7 +100,7 @@ public class QCAssayScriptHelper
 
             if (!netrcFile.exists())
             {
-                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new UTF8PrintWriter(netrcFile))))
+                try (PrintWriter pw = PrintWriters.getPrintWriter(netrcFile))
                 {
                     pw.append("machine localhost:8080");
                     pw.append('\n');

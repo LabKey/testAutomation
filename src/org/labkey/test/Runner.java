@@ -34,7 +34,7 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.labkey.api.reader.Readers;
-import org.labkey.api.writer.UTF8PrintWriter;
+import org.labkey.api.writer.PrintWriters;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.aspects.TestPerfAspect;
 import org.labkey.test.categories.Continue;
@@ -51,7 +51,6 @@ import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -119,7 +118,7 @@ public class Runner extends TestSuite
 
     private static void writeClasses(List<String> tests, File file)
     {
-        try(PrintWriter pw = new PrintWriter(new BufferedWriter(new UTF8PrintWriter(file))))
+        try(PrintWriter pw = PrintWriters.getPrintWriter(file))
         {
             for (String test : tests)
                 pw.println(test);

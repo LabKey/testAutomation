@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 //TODO: Use java.lang.function.Function once Java 8 migration is complete
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.thoughtworks.selenium.SeleniumException;
@@ -55,7 +56,7 @@ import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.labkey.api.util.FileUtil;
-import org.labkey.api.writer.UTF8PrintWriter;
+import org.labkey.api.writer.PrintWriters;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -2640,7 +2641,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         // TODO: Create static class for managing teamcity-info.xml file.
         File xmlFile = new File(TestFileUtils.getLabKeyRoot(), "teamcity-info.xml");
-        try (Writer writer = new UTF8PrintWriter(xmlFile))
+        try (Writer writer = PrintWriters.getPrintWriter(xmlFile))
         {
             xmlFile.createNewFile();
 
@@ -2667,7 +2668,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         File tsvFile = new File(dir, fileName);
 
-        try(Writer writer = new UTF8PrintWriter(tsvFile))
+        try(Writer writer = PrintWriters.getPrintWriter(tsvFile))
         {
             writer.write(contents);
             return tsvFile;
@@ -6663,7 +6664,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             getArtifactCollector().dumpScreen(svgDir, baseName);
 
-            try(Writer writer = new UTF8PrintWriter(svgFile))
+            try(Writer writer = PrintWriters.getPrintWriter(svgFile))
             {
                 writer.write("Expected:\n");
                 writer.write(expectedSvgText.replace("\\", "\\\\").replace("\n", "\\n"));

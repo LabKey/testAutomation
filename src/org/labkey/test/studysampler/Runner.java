@@ -19,14 +19,14 @@ import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.io.IOUtils;
 import org.labkey.api.reader.Readers;
-import org.labkey.api.writer.UTF8PrintWriter;
+import org.labkey.api.writer.PrintWriters;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -225,7 +225,7 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
             CSVReader reader = new CSVReader(Readers.getReader(inFile), '\t');
-            CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t');
+            CSVWriter writer = new CSVWriter(PrintWriters.getPrintWriter(outFile), '\t');
 
             // read (and write) the field names.
             String[] row = reader.readNext();
@@ -295,7 +295,7 @@ public class Runner
             outFile.getParentFile().mkdirs();
 
             CSVReader reader = new CSVReader(Readers.getReader(inFile), '\t');
-            CSVWriter writer = new CSVWriter(new UTF8PrintWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
+            CSVWriter writer = new CSVWriter(PrintWriters.getPrintWriter(outFile), '\t'); // Excel format escapes quotes with quotes; manually remove such rows.
 
             // read (and write) the field names.
             String[] row = reader.readNext();
@@ -344,7 +344,7 @@ public class Runner
             outFile.getParentFile().mkdirs();
 
             try (BufferedReader input = Readers.getReader(inFile);
-                 BufferedWriter output = new BufferedWriter(new UTF8PrintWriter(outFile)))
+                 PrintWriter output = PrintWriters.getPrintWriter(outFile))
             {
                 //Copy column headers only.
                 String line = input.readLine();
