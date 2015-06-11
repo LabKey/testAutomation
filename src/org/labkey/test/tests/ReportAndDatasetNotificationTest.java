@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import static org.junit.Assert.*;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -29,6 +28,8 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class, Reports.class})
 public class ReportAndDatasetNotificationTest extends StudyBaseTest
@@ -187,6 +188,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Options", "Plot Options");
         _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
         clickButton("OK", 0);
+        _ext4Helper.waitForMaskToDisappear();
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
