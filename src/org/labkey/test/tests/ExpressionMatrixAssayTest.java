@@ -104,6 +104,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     private int createFeatureSet(@LoggedParam String name, String vendor, File featureSetData)
     {
         clickButton("Import Feature Annotation Set");
+        waitForElement(Locator.name("name"));
         setFormElement(Locator.name("name"), name);
         setFormElement(Locator.name("vendor"), vendor);
         setFormElement(Locator.name("annotationFile"), featureSetData);

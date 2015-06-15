@@ -527,6 +527,7 @@ public class FileBrowserHelper
     public void openFolderTree()
     {
         Locator collapsedTreePanel = Locator.css("div.fbrowser .treenav-panel.x4-collapsed");
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css("div.fbrowser .treenav-panel")));
         if (_test.isElementPresent(collapsedTreePanel))
         {
             WebElement rootNode = Locator.css("div.fbrowser .treenav-panel tr[data-recordindex = '0']").findElement(_test.getDriver());
