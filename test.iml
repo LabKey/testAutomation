@@ -54,7 +54,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../remoteapi/java/lib/json_simple-1.1.jar!/" />
@@ -86,13 +86,13 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.44.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.46.0.jar!/" />
         </CLASSES>
         <JAVADOC>
           <root url="http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/selenium-server-2.44.0-srcs.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/selenium-server-2.46.0-srcs.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -133,6 +133,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="API" />
+    <orderEntry type="module" module-name="API" exported="" />
   </component>
 </module>
