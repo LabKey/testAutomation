@@ -77,10 +77,19 @@ public class EmailRecordTable extends DataRegionTable
         assertTrue("Error setting email recorder: " + error, StringUtils.trimToNull(error) == null);
     }
 
+    /**
+     * Call this before getting the message if you want to capture the body of the message as well
+     * @param subject the text of the subject that will appear in the message table
+     */
+    public void clickSubject(String subject)
+    {
+        _test.click(Locator.linkWithText(subject));
+        _test.sleep(100);   // Should be pretty quick
+    }
+
     public void clickMessage(EmailMessage message)
     {
-        _test.click(Locator.linkWithText(message.getSubject()));
-        _test.sleep(100);   // Should be pretty quick
+        clickSubject(message.getSubject());
     }
 
     public EmailMessage getMessage(String subjectPart)
@@ -112,7 +121,7 @@ public class EmailRecordTable extends DataRegionTable
                     }
                     em.setTo(to);
                     em.setSubject(subjectLine);
-                    em.setBody(StringUtils.join(lines, "\n", 1, lines.length - 1));
+                    em.setBody(StringUtils.join(lines, "\n", 1, lines.length));
                     return em;
                 }
             }
