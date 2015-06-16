@@ -18,11 +18,13 @@ package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
@@ -35,8 +37,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
@@ -46,7 +49,7 @@ import static org.junit.Assert.*;
  * verification steps.
  */
 @Deprecated
-public abstract class StudyBaseTest extends SimpleApiTest
+public abstract class StudyBaseTest extends BaseWebDriverTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
@@ -163,14 +166,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
         _specimenImporter.setExpectError(expected);
     }
 
-    @Override
     protected void runUITests() throws Exception
     {
         doCreateSteps();
         doVerifySteps();
     }
 
-    @Override
     protected File[] getTestFiles()
     {
         return new File[0]; 
@@ -397,6 +398,41 @@ public abstract class StudyBaseTest extends SimpleApiTest
         Locator dataRegionLoc = Locator.tagWithName("table", "webpart").withPredicate(Locator.tagWithAttribute("th", "title", QWPTitle)).append(Locator.tagWithClass("table", "labkey-data-region").append("/../.."));
         return DataRegionTable.Locators.headerButton(dataRegionLoc.findElement(getDriver()).getAttribute("id"), buttonText);
     }
+
+    // TODO Dan Duffek: The following function are in here temporarily. They have been added as part of the goal of removing the SimpleApiTest.java module
+    protected void ensureConfigured()
+    {
+
+    }
+
+    protected void cleanUp()
+    {
+
+    }
+
+    protected Pattern[] getIgnoredElements()
+    {
+        return new Pattern[0];
+    }
+
+    public void runApiTests() throws Exception
+    {
+        APITestHelper apiTester = new APITestHelper(this);
+        apiTester.setTestFiles(getTestFiles());
+        apiTester.setIgnoredElements(getIgnoredElements());
+        apiTester.runApiTests();
+    }
+
+    @Test
+    public void testSteps() throws Exception
+    {
+        ensureConfigured();
+        runUITests();
+        runApiTests();
+        cleanUp();
+    }
+
+    // TODO Dan Duffek: End of the inserted functions.
 
     public class VisitTag
     {

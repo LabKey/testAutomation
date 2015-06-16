@@ -552,7 +552,6 @@ src/org/labkey/test/tests/SecurityShortTest.java -text
 src/org/labkey/test/tests/SecurityTest.java -text
 src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
-src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SiteWideTermsOfUseTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text

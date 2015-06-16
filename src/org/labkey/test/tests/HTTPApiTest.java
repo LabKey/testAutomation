@@ -15,11 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -28,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class})
-public class HTTPApiTest extends SimpleApiTest
+public class HTTPApiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";
@@ -69,13 +73,21 @@ public class HTTPApiTest extends SimpleApiTest
         return Arrays.asList("query");
     }
 
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
-    protected void runUITests() throws Exception
+    @BeforeClass
+    public static void initTest() throws Exception
     {
+        HTTPApiTest init = (HTTPApiTest)getCurrentTest();
+        init.createTestData();
+    }
+
+    public void createTestData(){
+
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         clickProject(PROJECT_NAME);
@@ -93,8 +105,15 @@ public class HTTPApiTest extends SimpleApiTest
         log("Upload data");
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
-        
-        clickProject(PROJECT_NAME);
-        portalHelper.addQueryWebPart("lists");
+
     }
+
+    @Test
+    public void testQueryTestLists() throws Exception
+    {
+        APITestHelper apiTester = new APITestHelper(this);
+        apiTester.setTestFiles(getTestFiles());
+        apiTester.runApiTests();
+    }
+
 }

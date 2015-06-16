@@ -64,6 +64,11 @@ public class APITestHelper
 
     public void runApiTests() throws Exception
     {
+        runApiTests(null, null);
+    }
+
+    public void runApiTests(String username, String password) throws Exception
+    {
         if (testFiles != null && testFiles.length > 0)
         {
             if (jsonHelper == null)
@@ -78,7 +83,7 @@ public class APITestHelper
                     {
                         tests++;
                         test.log("Starting new test case: \"" + StringUtils.trimToEmpty(testCase.getName()) + "\" in file " + testFile.getPath());
-                        sendRequestDirect(testFile.getName(), testCase.getUrl(), testCase.getType(), testCase.getFormData(), testCase.getReponse(), testCase.isFailOnMatch(), null, null, false);
+                        sendRequestDirect(testFile.getName(), testCase.getUrl(), testCase.getType(), testCase.getFormData(), testCase.getReponse(), testCase.isFailOnMatch(), username, password, false);
                         test.log("test case completed");
                     }
                 }
