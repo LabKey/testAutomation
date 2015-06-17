@@ -213,8 +213,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         click(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
-        results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
-        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ", null}), results.getRowDataAsText(0));
+        results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
+        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " ", null}), results.getRowDataAsText(0));
     }
 
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
