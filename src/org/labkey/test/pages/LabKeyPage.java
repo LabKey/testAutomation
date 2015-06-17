@@ -41,7 +41,7 @@ public class LabKeyPage
 
     protected void waitForPage() {}
 
-    public static class Locators
+    public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
     }

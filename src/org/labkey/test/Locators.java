@@ -21,4 +21,9 @@ public abstract class Locators
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.CssLocator labkeyError = Locator.css(".labkey-error");
     public static final Locator signInButtonOrLink = Locator.tag("a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
+
+    public static Locator.XPathLocator pageSignal(String signalName)
+    {
+        return Locator.id("testSignals").child(Locator.tagWithName("div", signalName));
+    }
 }

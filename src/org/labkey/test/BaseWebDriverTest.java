@@ -3468,7 +3468,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _preppedForPageLoad = false;
     }
 
-    public void waitForExtOnReady()
+    public void waitForExtReady()
     {
         ((JavascriptExecutor) getDriver()).executeAsyncScript(
                 "var callback = arguments[arguments.length - 1];" +
@@ -3516,9 +3516,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return System.currentTimeMillis() - startTime;
     }
 
-    public void waitForExtReady()
+    /**
+     * Wait for signaling element created by LABKEY.Utils.signalWebDriverTest
+     * If signal element is already present, this will wait for it to become stale and be recreated
+     * @param func Function that will trigger the desired signal to appear on the page
+     * @param signalName Should match the signal name defined in LABKEY.Utils.signalWebDriverTest
+     */
+    public void applyAndWaitForPageSignal(Function<Void, Void> func, String signalName)
     {
-        waitForElement(Locator.id("seleniumExtReady"), defaultWaitForPage);
+        List<WebElement> signal = Locators.pageSignal(signalName).findElements(getDriver());
+
+        func.apply(null);
+
+        if (!signal.isEmpty())
+            shortWait().until(ExpectedConditions.stalenessOf(signal.get(0)));
+
+        waitForElement(Locators.pageSignal(signalName));
     }
 
     /**

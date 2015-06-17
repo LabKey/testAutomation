@@ -39,7 +39,7 @@ public class ParticipantListWebPart extends BodyWebPart
         super(test, participantNounSingular + " List");
         _participantNounSingular = participantNounSingular;
         _participantNounPlural = participantNounPlural;
-        _participantNounRegex = String.format("(%s|%s)", _participantNounSingular, _participantNounPlural);
+        _participantNounRegex = String.format("(%s|%s)", _participantNounSingular.toLowerCase(), _participantNounPlural.toLowerCase());
         waitForBody();
     }
 
@@ -101,6 +101,6 @@ public class ParticipantListWebPart extends BodyWebPart
 
     protected class Elements extends WebPart.Elements
     {
-        public Locator.XPathLocator statusMessage = webPart.append(Locator.id(_id + ".status"));
+        public Locator.XPathLocator statusMessage = Locator.id("participantsDiv1.status");
     }
 }
