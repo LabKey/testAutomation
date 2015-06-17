@@ -58,7 +58,6 @@ public class ParticipantListTest extends StudyBaseTest
 
         // wait for study and specimens to finish loading
         waitForSpecimenImport();
-        setStudyRedesign();
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
@@ -77,7 +76,7 @@ public class ParticipantListTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Change Properties"));
 
-        int dsCount = getElementCount(Locator.xpath("//input[@name='extraData']"));
+        int dsCount = getElementCount(Locator.xpath("//tr[@data-datasetid]"));
         assertEquals("Unexpected number of Datasets.", datasetCount, dsCount);
 
         // create new categories, then assign them out
@@ -100,7 +99,9 @@ public class ParticipantListTest extends StudyBaseTest
             Locator.XPathLocator combo = Locator.xpath("//div[contains(@id, '-viewcategory')]//table").withClass("x4-form-item").index(i);
             _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
         }
-        uncheckCheckbox(Locator.name("visible").index(dsCount - 1)); // Set last dataset to not be visible.
+
+        // Set last dataset to not be visible. (ignore the hidden inputs starting with '@')
+        uncheckCheckbox(Locator.xpath("//input[not(starts-with(@name, '@')) and contains(@name, 'visible')]").index(dsCount-1));
         clickButton("Save");
     }
 

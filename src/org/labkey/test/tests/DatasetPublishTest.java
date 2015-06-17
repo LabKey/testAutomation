@@ -159,6 +159,6 @@ public class DatasetPublishTest extends BaseWebDriverTest
 
     protected Locator getDatasetCheckboxLocator(String datasetLabel)
     {
-        return Locator.xpath("//tr[./td/input[@value='" + datasetLabel + "']]/td/input[@name='visible']");
+        return Locator.xpath("//tr[./td/input[@value='" + datasetLabel + "']]/td/input[contains(@name,'.visible')]");
     }
 }
