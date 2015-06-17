@@ -22,6 +22,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 
 import static org.junit.Assert.*;
 
@@ -303,7 +305,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Create Snapshot");
     }
 
-    private void changeDatasetLabel(String datasetName, String newLabel)
+    @LogMethod
+    private void changeDatasetLabel(@LoggedParam String datasetName, @LoggedParam String newLabel)
     {
         goToManageDatasets();
         waitAndClick(Locator.linkContainingText(datasetName));
@@ -314,7 +317,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Save");
     }
 
-    private void changeDatasetName(String datasetName, String newName)
+    @LogMethod
+    private void changeDatasetName(@LoggedParam String datasetName, @LoggedParam String newName)
     {
         goToManageDatasets();
         waitAndClick(Locator.linkContainingText(datasetName));
@@ -325,7 +329,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Save");
     }
 
-    private void waitForSnapshotUpdate(String text)
+    @LogMethod
+    private void waitForSnapshotUpdate(@LoggedParam String text)
     {
         int time = 0;
         while (!isTextPresent(text) && time < defaultWaitForPage)
