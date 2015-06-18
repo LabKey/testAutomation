@@ -16,21 +16,35 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public abstract class Component
+public abstract class Component implements SearchContext
 {
     public abstract WebElement getComponentElement();
 
     public WebElement findElement(Locator locator)
     {
-        return locator.findElement(getComponentElement());
+        return locator.findElement(this);
     }
 
     public List<WebElement> findElements(Locator locator)
     {
-        return locator.findElements(getComponentElement());
+        return locator.findElements(this);
+    }
+
+    @Override
+    public WebElement findElement(By by)
+    {
+        return getComponentElement().findElement(by);
+    }
+
+    @Override
+    public List<WebElement> findElements(By by)
+    {
+        return getComponentElement().findElements(by);
     }
 }

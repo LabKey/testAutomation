@@ -16,12 +16,11 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -83,7 +82,7 @@ public class DataRegionTable
 
     public static DataRegionTable findDataRegion(BaseWebDriverTest test, int index)
     {
-        return findDataRegionWithin(test, null, index);
+        return findDataRegionWithin(test, test.getDriver(), index);
     }
 
     public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, WebElement parent)
@@ -91,12 +90,10 @@ public class DataRegionTable
         return findDataRegionWithin(test, parent, 0);
     }
 
-    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, @Nullable WebElement parent, int index)
+    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, SearchContext context, int index)
     {
         Locator.CssLocator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
-        List<WebElement> dataRegions = parent == null ?
-                dataRegionLoc.findElements(test.getDriver()):
-                parent.findElements(By.cssSelector(dataRegionLoc.getLocatorString()));
+        List<WebElement> dataRegions = dataRegionLoc.findElements(context);
         if (dataRegions.size() > index)
             return new DataRegionTable(dataRegions.get(index).getAttribute("id").replace("dataregion_", ""), test);
         else
@@ -156,17 +153,6 @@ public class DataRegionTable
         List<WebElement> headerButtons = allButtonsLoc.findElements(_test.getDriver());
 
         return headerButtons;
-    }
-
-    public List<String> getHeaderButtonTexts()
-    {
-        List<WebElement> headerButtons = getHeaderButtons();
-        List<String> headerButtonTexts = new ArrayList<>();
-        for(WebElement button : headerButtons)
-        {
-            headerButtonTexts.add(button.getText());
-        }
-        return headerButtonTexts;
     }
 
     public int getDataRowCount()

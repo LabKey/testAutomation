@@ -21,7 +21,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ComponentElements
+public abstract class ComponentElements
 {
     protected SearchContext context;
 
