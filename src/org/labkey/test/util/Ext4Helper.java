@@ -140,7 +140,7 @@ public class Ext4Helper extends AbstractHelper
         }
     }
 
-    private void closeComboList(Locator.XPathLocator comboBox)
+    public void closeComboList(Locator.XPathLocator comboBox)
     {
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
 

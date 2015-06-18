@@ -36,7 +36,7 @@ public class D3PieChart
         _parentDivXpath = "//div[@class='" + divClass + "']";
     }
 
-    public List<String> getSegmentOuterLabels()
+    public List<String> getSegmentInnerLabels()
     {
         List<String> labels = new ArrayList<>();
         Locator.XPathLocator outerLabelXpath = Locator.xpath(_parentDivXpath + "//*[contains(@class,'labelGroup-inner')]//*");
@@ -48,7 +48,7 @@ public class D3PieChart
         return labels;
     }
 
-    public List<String> getSegmentInnerLabels()
+    public List<String> getSegmentOuterLabels()
     {
         List<String> labels = new ArrayList<>();
         Locator.XPathLocator outerLabelXpath = Locator.xpath(_parentDivXpath + "//*[contains(@class,'labelGroup-outer')]//*");
