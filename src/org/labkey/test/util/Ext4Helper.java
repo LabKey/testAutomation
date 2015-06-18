@@ -22,7 +22,6 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -108,12 +107,12 @@ public class Ext4Helper extends AbstractHelper
         if (!_test.waitForElement(comboBox.withDescendant(Locator.tag("td").withClass(_cssPrefix + "pickerfield-open")), 1000, false))
             _test.click(arrowTrigger); // try again if combo-box doesn't open
 
-        _test.waitForElement(Locator.css("." + _cssPrefix + "boundlist-item"));
+        _test.waitForElement(Locators.comboListItem);
     }
 
     private void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
     {
-        Locator.XPathLocator listItem = Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden();
+        Locator.XPathLocator listItem = Locators.comboListItem;
 
         switch (matchTechnique)
         {
@@ -149,12 +148,12 @@ public class Ext4Helper extends AbstractHelper
             _test.click(arrowTrigger);
 
         // menu should disappear
-        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("." + _cssPrefix + "boundlist-item")));
+        _test.waitForElementToDisappear(Locators.comboListItem);
     }
 
     private boolean isOpenComboBoxMultiSelect()
     {
-        return _test.isElementPresent(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().append("/span").withClass(_cssPrefix + "combo-checker"));
+        return _test.isElementPresent(Locators.comboListItem.append("/span").withClass(_cssPrefix + "combo-checker"));
     }
 
     @LogMethod(quiet = true)
@@ -169,9 +168,7 @@ public class Ext4Helper extends AbstractHelper
 
         try
         {
-            WebElement comboBoxEl = comboBox.findElement(_test.getDriver());
-
-            for (WebElement element : comboBoxEl.findElements(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().toBy()))
+            for (WebElement element : Locators.comboListItem.findElements(_test.getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
@@ -180,9 +177,7 @@ public class Ext4Helper extends AbstractHelper
         }
         catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
         {
-            WebElement comboBoxEl = comboBox.findElement(_test.getDriver());
-
-            for (WebElement element : comboBoxEl.findElements(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().toBy()))
+            for (WebElement element : Locators.comboListItem.findElements(_test.getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
@@ -213,11 +208,26 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public List<String> getComboBoxOptions(String label)
+    public List<String> getComboBoxOptions(@LoggedParam String label)
     {
-        return getComboBoxOptions(Ext4Helper.Locators.formItemWithLabel(label));
+        return getComboBoxOptions(Locators.formItemWithLabel(label));
     }
 
+//TODO: Use this once deprecated method has been removed
+//    @LogMethod(quiet=true)
+//    public List<String> getComboBoxOptions(Locator.XPathLocator comboBoxLocator)
+//    {
+//        openComboList(comboBoxLocator);
+//        List<String> options = _test.getTexts(Locators.comboListItem.findElements(_test.getDriver()));
+//        closeComboList(comboBoxLocator);
+//        return options;
+//    }
+
+    /**
+     * @deprecated TODO Remove after June sprint. Retaining to not break feature branches
+     * Only works because of unintended result of comboBowEl.findElements
+     */
+    @Deprecated
     @LogMethod(quiet=true)
     public List<String> getComboBoxOptions(Locator loc)
     {
@@ -670,6 +680,8 @@ public class Ext4Helper extends AbstractHelper
 
     public static class Locators
     {
+        public static Locator.XPathLocator comboListItem = Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden();
+
         public static Locator.XPathLocator checkbox(BaseWebDriverTest test, String label)
         {
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'" + _cssPrefix + "form-checkbox')][../label[text()='" + label + "']]");
