@@ -973,7 +973,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     protected void setInitialPassword(String user, String password)
     {
         // Get setPassword URL from notification email.
-        goToModule("Dumbster");
+        beginAt("/dumbster/begin.view?");
 
         //the name of the installation can vary, so we need to infer the email subject
         WebElement link = null;

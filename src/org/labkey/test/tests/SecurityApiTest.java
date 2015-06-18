@@ -19,10 +19,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.APITestHelper;
 
 import java.io.File;
@@ -30,16 +29,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-// This test was moved to "InDevelopment" 2013-01-07.
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class SecurityApiTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Security API Test Project";
     private static final String USER_1 = "testuser1@securityapi.test";
-    private static final String USER_1_PWD = "Password";
     private static final String USER_2 = "testuser2@securityapi.test";
     private static final String GROUP_1 = "testgroup1";
     private static final String GROUP_2 = "testgroup2";
+    private static final String ADMIN_USER = "security-api@clientapi.test";
+    private static final String ADMIN_USER_PWD = "Pa$$w0rd";
+    private static final String USER_CREATED_BY_API = "api-created-user@securityapi.test"; // This email value is found in the security-api.xml file for the "create new user" test.
 
     protected File[] getTestFiles()
     {
@@ -78,8 +78,10 @@ public class SecurityApiTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(GROUP_2, "Reader");
         _permissionsHelper.exitPermissionsUI();
 
-        // Set the password for the first test users. The API test will run with this users credentials.
-        adminPasswordResetTest(USER_1, USER_1_PWD);
+        // Create the admin user that will be used to call the APIs.
+        createUserAndNotify(ADMIN_USER, null);
+        setInitialPassword(ADMIN_USER, ADMIN_USER_PWD);
+        _permissionsHelper.addUserToSiteGroup(ADMIN_USER, "Site Administrators");
 
     }
 
@@ -87,24 +89,7 @@ public class SecurityApiTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _containerHelper.deleteProject(PROJECT_NAME, afterTest);
-        deleteUsersIfPresent(USER_1, USER_2);
-    }
-
-    private void adminPasswordResetTest(String username, String password)
-    {
-        goToSiteUsers();
-        clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
-        prepForPageLoad();
-        clickButtonContainingText("Reset Password", 0);
-        acceptAlert();
-        waitForPageToLoad();
-        clickButton("Done");
-
-        String url = getPasswordResetUrl(username);
-
-
-        resetPassword(url, username, password);
-
+        deleteUsersIfPresent(USER_1, USER_2, ADMIN_USER, USER_CREATED_BY_API);
     }
 
     protected Pattern[] getIgnoredElements()
@@ -118,7 +103,7 @@ public class SecurityApiTest extends BaseWebDriverTest
         APITestHelper apiTester = new APITestHelper(this);
         apiTester.setTestFiles(getTestFiles());
         apiTester.setIgnoredElements(getIgnoredElements());
-        apiTester.runApiTests(USER_1, USER_1_PWD);
+        apiTester.runApiTests(ADMIN_USER, ADMIN_USER_PWD);
     }
 
     public List<String> getAssociatedModules()
