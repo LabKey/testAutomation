@@ -4015,6 +4015,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return loc.findElements(getDriver()).size() > 0;
     }
 
+    public boolean isElementVisible(Locator loc)
+    {
+        return loc.findElement(getDriver()).isDisplayed();
+    }
+
     public void assertElementPresent(Locator loc)
     {
         assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
@@ -4350,7 +4355,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         Actions builder = new Actions(getDriver());
-        builder.clickAndHold(fromEl).moveToElement(toEl, 1, y).release().build().perform();
+        builder.clickAndHold(fromEl).moveToElement(toEl, toEl.getSize().getWidth()/2, y).release().build().perform();
     }
 
     public void dragAndDrop(Locator el, int xOffset, int yOffset)
