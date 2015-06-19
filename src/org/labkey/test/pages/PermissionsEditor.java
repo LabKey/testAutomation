@@ -97,7 +97,6 @@ public class PermissionsEditor
         }
         _test.log(new Date().toString());
         savePermissions();
-        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
@@ -110,7 +109,6 @@ public class PermissionsEditor
         }
         _test.log(new Date().toString());
         savePermissions();
-        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     @LogMethod
@@ -123,7 +121,6 @@ public class PermissionsEditor
         }
         _test.log(new Date().toString());
         savePermissions();
-        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     private void _setPermissions(String userOrGroupName, String permissionString, String className)
@@ -151,10 +148,6 @@ public class PermissionsEditor
         _test.waitForElement(roleCombo);
         _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-//        String oldId = _test.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
-//        savePermissions();
-//        _test._ext4Helper.waitForMaskToDisappear();
-//        _test.waitForElementToDisappear(Locator.id(oldId), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
     }
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
@@ -178,17 +171,6 @@ public class PermissionsEditor
         }
     }
 
-//    public void addUserToSiteGroup(String userName, String groupName)
-//    {
-//        _test.goToHome();
-//        _test.goToSiteGroups();
-//        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
-//        _test.waitForElement(groupLoc, _test.defaultWaitForPage);
-//        _test.click(groupLoc);
-//        _test.clickAndWait(Locator.linkContainingText("manage group"));
-//        _test.addUserToGroupFromGroupScreen(userName);
-//    }
-
     /**
      * Adds a new or existing user to an existing group within an existing project
      *
@@ -203,7 +185,7 @@ public class PermissionsEditor
         enterPermissionsUI();
         clickManageGroup(groupName);
         _test.addUserToGroupFromGroupScreen(userName);
-    } //addUserToProjGroup()
+    }
 
     public void enterPermissionsUI()
     {
