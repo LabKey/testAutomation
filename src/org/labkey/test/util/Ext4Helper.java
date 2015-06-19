@@ -107,12 +107,12 @@ public class Ext4Helper extends AbstractHelper
         if (!_test.waitForElement(comboBox.withDescendant(Locator.tag("td").withClass(_cssPrefix + "pickerfield-open")), 1000, false))
             _test.click(arrowTrigger); // try again if combo-box doesn't open
 
-        _test.waitForElement(Locators.comboListItem);
+        _test.waitForElement(Locators.comboListItem());
     }
 
     private void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
     {
-        Locator.XPathLocator listItem = Locators.comboListItem;
+        Locator.XPathLocator listItem = Locators.comboListItem();
 
         switch (matchTechnique)
         {
@@ -148,12 +148,12 @@ public class Ext4Helper extends AbstractHelper
             _test.click(arrowTrigger);
 
         // menu should disappear
-        _test.waitForElementToDisappear(Locators.comboListItem);
+        _test.waitForElementToDisappear(Locators.comboListItem());
     }
 
     private boolean isOpenComboBoxMultiSelect()
     {
-        return _test.isElementPresent(Locators.comboListItem.append("/span").withClass(_cssPrefix + "combo-checker"));
+        return _test.isElementPresent(Locators.comboListItem().append("/span").withClass(_cssPrefix + "combo-checker"));
     }
 
     @LogMethod(quiet = true)
@@ -168,7 +168,7 @@ public class Ext4Helper extends AbstractHelper
 
         try
         {
-            for (WebElement element : Locators.comboListItem.findElements(_test.getDriver()))
+            for (WebElement element : Locators.comboListItem().findElements(_test.getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
@@ -177,7 +177,7 @@ public class Ext4Helper extends AbstractHelper
         }
         catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
         {
-            for (WebElement element : Locators.comboListItem.findElements(_test.getDriver()))
+            for (WebElement element : Locators.comboListItem().findElements(_test.getDriver()))
             {
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (isOpenComboBoxMultiSelect() && elementAlreadySelected)
@@ -218,7 +218,7 @@ public class Ext4Helper extends AbstractHelper
 //    public List<String> getComboBoxOptions(Locator.XPathLocator comboBoxLocator)
 //    {
 //        openComboList(comboBoxLocator);
-//        List<String> options = _test.getTexts(Locators.comboListItem.findElements(_test.getDriver()));
+//        List<String> options = _test.getTexts(Locators.comboListItem().findElements(_test.getDriver()));
 //        closeComboList(comboBoxLocator);
 //        return options;
 //    }
@@ -680,7 +680,10 @@ public class Ext4Helper extends AbstractHelper
 
     public static class Locators
     {
-        public static Locator.XPathLocator comboListItem = Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden();
+        public static Locator.XPathLocator comboListItem()
+        {
+            return Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden();
+        }
 
         public static Locator.XPathLocator checkbox(BaseWebDriverTest test, String label)
         {
