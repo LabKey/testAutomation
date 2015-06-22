@@ -386,13 +386,11 @@ public class SequenceTest extends BaseWebDriverTest
         String url = window.getEval("getURL()").toString();
         assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
         assertTrue("Improper URL to download sequences", url.contains("exportSequenceFiles.view?"));
-        assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
         _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
         _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRef.class).setChecked(true);
 
         url = window.getEval("getURL()").toString();
-        assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
         File exportFile = clickAndWaitForDownload(Ext4Helper.Locators.ext4Button("Submit"));
