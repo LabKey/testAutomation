@@ -202,8 +202,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
     }
 
-    // TODO: Issue: 22587: Delete all run outputs when you delete a run
-    //@Test
+    @Test
     public void testWithOutputLocation()
     {
         final String folderName = "withOutputLocation";
