@@ -107,6 +107,13 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     @LogMethod
     public void createAssayWithDefaults(String type, String name)
     {
+        createAssayAndEdit(type, name).saveAndClose();
+
+        _test.waitForElement(Locator.id("AssayList"));
+    }
+
+    public AssayDomainEditor createAssayAndEdit(String type, String name)
+    {
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
@@ -114,9 +121,8 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         AssayDomainEditor assayDesigner = new AssayDomainEditor(_test);
         assayDesigner.setName(name);
         assayDesigner.save();
-        assayDesigner.saveAndClose();
 
-        _test.waitForElement(Locator.id("AssayList"));
+        return assayDesigner;
     }
 
     public AssayDomainEditor clickEditAssayDesign()

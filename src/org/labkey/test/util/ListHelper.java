@@ -458,7 +458,7 @@ public class ListHelper extends AbstractHelper
             else
                 _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
 
-            selectLookupTableComboItem(lookup.getTable());
+            selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
         }
 
         _test.clickButton("Apply", 0);
@@ -501,14 +501,17 @@ public class ListHelper extends AbstractHelper
         }
     }
 
-    private void selectLookupTableComboItem(String table)
+    private void selectLookupTableComboItem(String table, String tableType)
     {
-        selectLookupTableComboItem(table, 1);
+        selectLookupTableComboItem(table, tableType, 1);
     }
 
-    private void selectLookupTableComboItem(String table, int attempt)
+    private void selectLookupTableComboItem(String table, String tableType, int attempt)
     {
-        final String comboSubstring = table.contains("(") ? table : table + " ("; // Deal with overlapping table names unless caller specifies a type (e.g. 'SampleSet (Integer)')
+        final String comboSubstring =
+                null == tableType || tableType.isEmpty() ?
+                        table + " (" :
+                        String.format("%s (%s)", table, tableType);
         _test.log("Select lookup table combo item '" + table + "', attempt=" + attempt);
         String fieldName = "table";
         _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
@@ -523,7 +526,7 @@ public class ListHelper extends AbstractHelper
                 throw retry;
 
             _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
-            selectLookupTableComboItem(table, attempt + 1);
+            selectLookupTableComboItem(table, tableType, attempt + 1);
         }
         _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
     }
@@ -730,6 +733,7 @@ public class ListHelper extends AbstractHelper
         private String _folder;
         private String _schema;
         private String _table;
+        private String _tableType;
 
         public LookupInfo(@Nullable String folder, String schema, String table)
         {
@@ -756,6 +760,17 @@ public class ListHelper extends AbstractHelper
         {
             return _table;
         }
+
+        public String getTableType()
+        {
+            return _tableType;
+        }
+
+        public void setTableType(String tableType)
+        {
+            _tableType = tableType;
+        }
+
     }
 
     public static abstract class FieldValidator
