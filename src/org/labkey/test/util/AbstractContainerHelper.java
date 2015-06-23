@@ -303,14 +303,14 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _test.ensureAdminMode();
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName).notHidden());
-        _test.clickButton("Rename");
+        _test.clickButton("Change Name Settings");
         _test.setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
             _test.checkCheckbox(Locator.name("addAlias"));
         else
             _test.uncheckCheckbox(Locator.name("addAlias"));
         // confirm rename:
-        _test.clickButton("Rename");
+        _test.clickButton("Save");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
         _test.assertElementPresent(Locator.currentProject().withText(project));
