@@ -17,15 +17,15 @@ package org.labkey.test.tests;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -33,7 +33,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class LookupToSampleIDTest extends BaseWebDriverTest
 {
     private static final String FOLDER_NAME = "TestingGPATAssay";
@@ -94,14 +94,17 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         testAssay(assayName); //test links
     }
 
-    @Test
+    @Test @Ignore //This test is incomplete. Out of scope of the story (Spec 22999: Have result row in the assay have a lookup to the sample.) for which this Automated Test file was created.
     public void testIntegerTableLookupValue()
     {
         String assayName = "LookupAssay_Integer";
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "Integer");
-        importDataInAssay(assayName); //import data into assay
-        testAssay(assayName); //test links
+        //select rows using SelectRowsCommand
+        //get rowids for each sample
+
+        //        importDataInAssay(assayName); //import data into assay
+        //        testAssay(assayName); //test links
     }
 
     private void createAssay(String type, String name, String lookupTableValue, String lookupTableType)
