@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
+import com.google.common.base.Function;
 import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -34,7 +34,7 @@ import static org.junit.Assert.fail;
  */
 public class PermissionsHelper
 {
-    private BaseWebDriverTest _test;
+    protected BaseWebDriverTest _test;
 
     public PermissionsHelper(BaseWebDriverTest test)
     {
@@ -100,39 +100,35 @@ public class PermissionsHelper
         _test.waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public String toRole(String perm)
+    public static String toRole(String perm)
     {
-        String R = "security.roles.";
-        if ("No Permissions".equals(perm))
-            return R + "NoPermissionsRole";
-        if ("Project Administrator".equals(perm))
-            return R + "ProjectAdminRole";
-        else if (!perm.contains("."))
-            return R + perm + "Role";
-        return perm;
+        if (perm.contains("."))
+            return perm;
+
+        String prefix = "org.labkey.api.security.roles.";
+        String roleClassName = perm.replace(" ", "").replace("Administrator", "Admin") + "Role";
+        return prefix + roleClassName;
     }
 
-    public void assertNoPermission(String groupName, String permissionSetting)
+    public void assertNoPermission(String userOrGroupName, String permissionSetting)
     {
         _test.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElementToDisappear(Locator.permissionButton(groupName, permissionSetting), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.permissionButton(userOrGroupName, permissionSetting), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void assertPermissionSetting(String groupName, String permissionSetting)
+    public void assertPermissionSetting(String userOrGroupName, String permissionSetting)
     {
-//        if (!_test.isElementPresent(Locator.permissionRendered()))
-//            enterPermissionsUI();
         String role = toRole(permissionSetting);
-        if ("security.roles.NoPermissionsRole".equals(role))
+        if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
-            assertNoPermission(groupName, "Reader");
-            assertNoPermission(groupName, "Editor");
-            assertNoPermission(groupName, "Project Administrator");
+            assertNoPermission(userOrGroupName, "Reader");
+            assertNoPermission(userOrGroupName, "Editor");
+            assertNoPermission(userOrGroupName, "Project Administrator");
             return;
         }
-        _test.log("Checking permission setting for group " + groupName + " equals " + role);
+        _test.log("Checking permission setting for group " + userOrGroupName + " equals " + role);
         _test.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.permissionButton(groupName, permissionSetting));
+        _test.assertElementPresent(Locator.permissionButton(userOrGroupName, permissionSetting));
     }
 
     public void checkInheritedPermissions()
@@ -156,8 +152,15 @@ public class PermissionsHelper
 
     public void savePermissions()
     {
-        _test.clickButton("Save", 0);
-        _test.waitForElement(Locator.permissionRendered(), _test.defaultWaitForPage);
+        _test.applyAndWaitForPageSignal(new Function<Void, Void>()
+        {
+            @Override
+            public Void apply(Void aVoid)
+            {
+                _test.clickButton("Save", 0);
+                return null;
+            }
+        }, "policyRendered");
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
@@ -204,7 +207,7 @@ public class PermissionsHelper
         }
         else
         {
-            _test.log("Setting permissions for group " + userOrGroupName + " to " + role);
+            _test.log("Setting permissions for " + userOrGroupName + " to " + role);
 
             if (!_test.isElementPresent(Locator.permissionRendered()))
                 enterPermissionsUI();
@@ -237,11 +240,8 @@ public class PermissionsHelper
 
     public void removePermission(String groupName, String permissionString)
     {
-//        if (!_test.isElementPresent(Locator.permissionRendered()))
-//            enterPermissionsUI();
         _removePermission(groupName, permissionString, "pGroup");
     }
-
 
     public void _removePermission(String groupName, String permissionString, String className)
     {

@@ -35,11 +35,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.WebElement;
 
@@ -59,7 +59,6 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
-
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = new File(TestFileUtils.getSampledataPath(), "FolderExport");
     private static final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
@@ -101,7 +100,8 @@ public class FolderExportTest extends BaseWebDriverTest
 
     public FolderExportTest()
     {
-        setContainerHelper(new UIContainerHelper(this));
+        super();
+        _permissionsHelper = new ApiPermissionsHelper(this);
     }
 
     @Override
@@ -230,7 +230,6 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(importProjects[4], "Subfolder as Subfolder");
         importFolder("Subfolder as Subfolder", subfolderPermsZip);
         clickFolder("Subfolder as Subfolder");
-        _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.assertPermissionSetting(testUser1, "Reader");
     }
 
@@ -257,7 +256,6 @@ public class FolderExportTest extends BaseWebDriverTest
         if (groupsExist)
         {
             log("Verifying role assignments to groups");
-            _permissionsHelper.enterPermissionsUI();
             _permissionsHelper.assertPermissionSetting(groupGroup, "Reader");
             _permissionsHelper.assertPermissionSetting(superTesterGroup, "Author");
             _permissionsHelper.assertPermissionSetting(groupGroup, "Author");
@@ -268,7 +266,6 @@ public class FolderExportTest extends BaseWebDriverTest
         if (usersExist)
         {
             log("Verifying role assignments to users");
-            _permissionsHelper.enterPermissionsUI();
             _permissionsHelper.assertPermissionSetting(testUser3, "Author");
             if (!isSubfolder)
                 _permissionsHelper.assertPermissionSetting(testUser3, "Project Administrator");

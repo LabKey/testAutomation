@@ -620,6 +620,7 @@ src/org/labkey/test/util/AbstractContainerHelper.java -text
 src/org/labkey/test/util/AbstractHelper.java -text
 src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
+src/org/labkey/test/util/ApiPermissionsHelper.java -text
 src/org/labkey/test/util/ArtifactCollector.java -text
 src/org/labkey/test/util/AssayImportOptions.java -text
 src/org/labkey/test/util/AssayImporter.java -text

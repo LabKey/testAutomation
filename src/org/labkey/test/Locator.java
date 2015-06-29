@@ -16,14 +16,17 @@
 
 package org.labkey.test;
 
+import com.google.common.base.Function;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.text.DecimalFormat;
@@ -199,31 +202,57 @@ public abstract class Locator
         }
     }
 
-    public WebElement waitForElement(final WebDriver driver, final int msTimeout)
+    public List<WebElement> waitForElements(final WebDriver driver, final int msTimeout)
     {
-        long secTimeout = msTimeout / 1000;
-        secTimeout = secTimeout > 0 ? secTimeout : 1;
-        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
-
-        return waitForElement(driver, wait);
+        waitForElement(driver, msTimeout);
+        return findElements(driver);
     }
 
-    public WebElement waitForElement(final SearchContext context, WebDriverWait wait)
+    public List<WebElement> waitForElements(FluentWait<? extends SearchContext> wait)
     {
         try
         {
-            return wait.until(new ExpectedCondition<WebElement>()
+            return wait.ignoring(NotFoundException.class).until(new Function<SearchContext, List<WebElement>>()
             {
                 @Override
-                public WebElement apply(WebDriver d)
+                public List<WebElement> apply(SearchContext context)
+                {
+                    return findElements(context);
+                }
+            });
+        }
+        catch (TimeoutException notFound)
+        {
+            throw new NoSuchElementException(getLoggableDescription(), notFound);
+        }
+    }
+
+    public WebElement waitForElement(final SearchContext context, final int msTimeout)
+    {
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
+
+        return waitForElement(wait);
+    }
+
+    /**
+     * @deprecated Use {@link Locator#waitForElement(FluentWait)}
+     */
+    @Deprecated
+    public WebElement waitForElement(final SearchContext context, FluentWait<? extends SearchContext> wait)
+    {
+        return waitForElement(wait);
+    }
+
+    public WebElement waitForElement(FluentWait<? extends SearchContext> wait)
+    {
+        try
+        {
+            return wait.ignoring(NotFoundException.class).until(new Function<SearchContext, WebElement>()
+            {
+                @Override
+                public WebElement apply(SearchContext context)
                 {
                     return findElement(context);
-                }
-
-                @Override
-                public String toString()
-                {
-                    return "waiting for element: " + getLoggableDescription();
                 }
             });
         }
@@ -281,12 +310,6 @@ public abstract class Locator
         {
             fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
         }
-    }
-
-    public List<WebElement> waitForElements(final WebDriver driver, final int msTimeout)
-    {
-        waitForElement(driver, msTimeout);
-        return findElements(driver);
     }
 
     public static IdLocator id(String id)
@@ -607,7 +630,7 @@ public abstract class Locator
 
     public static XPathLocator permissionRendered()
     {
-        return xpath("//input[@id='policyRendered']");
+        return Locators.pageSignal("policyRendered");
     }
 
     public static XPathLocator permissionButton(String groupName, String role)
@@ -954,6 +977,11 @@ public abstract class Locator
         {
             super(loc.length() > 0 ? "//*[@id = " + xq(loc) + "]" : "");
             _id = loc;
+        }
+
+        public CssLocator append(CssLocator locator)
+        {
+            return toCssLocator().append(locator);
         }
 
         public By toBy()
