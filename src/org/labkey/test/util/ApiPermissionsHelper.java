@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.api.security.PrincipalType;
 import org.labkey.remoteapi.Command;
@@ -48,7 +49,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         else
             roles.addAll(getGroupRoles(container, userOrGroupName));
 
-        Assert.assertFalse(String.format("%s had role: %s\nFound: %s", userOrGroupName, permissionSetting, String.join("\n", roles)),
+        Assert.assertFalse(String.format("%s had role: %s\nFound: %s", userOrGroupName, permissionSetting, StringUtils.join("\n", roles)),
                 roles.contains(toRole(permissionSetting)));
     }
 
@@ -63,7 +64,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         else
             roles.addAll(getGroupRoles(container, userOrGroupName));
 
-        Assert.assertTrue(String.format("%s did not have role: %s\nFound: %s", userOrGroupName, permissionSetting, String.join("\n", roles)),
+        Assert.assertTrue(String.format("%s did not have role: %s\nFound: %s", userOrGroupName, permissionSetting, StringUtils.join("\n", roles)),
                 roles.contains(expectedRole) || "No Permissions".equals(permissionSetting) && roles.size() > 0);
     }
 
