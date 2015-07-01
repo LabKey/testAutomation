@@ -164,20 +164,23 @@ public class SSOwithCASTest extends BaseWebDriverTest
         setFormElement(Locator.name("serverUrl"), "www.labkey.org/cas"); //adding "/cas" in the end otherwise it doesn't allow me to save. Also, cannot save empty strings if configured previously.
         clickButton("Save");
 
+        assertTextPresent("Enter a valid HTTP URL to your Apereo CAS server (e.g., https://test.org/cas)");
+
+        setFormElement(Locator.name("serverUrl"), "https://www.labkey.org/cas");
+        clickButton("Save");
+
         signOut();
 
-        String beforeClickingOnCASLink = getCurrentRelativeURL();
-
-        //Click on CAS link - nothing happens and user stays on the same page.
         click(Locator.linkWithHref("/labkey/login/ssoRedirect.view?provider=CAS"));
 
-        String afterClickingOnCASLink = getCurrentRelativeURL();
-
-        assertEquals("CAS server is configured properly. This test is to check mis-configured server address", beforeClickingOnCASLink, afterClickingOnCASLink);
+        assertEquals("invalid configured serverUrl, should get a 404 response", 404, getResponseCode()); //check for 404
 
         signIn();
 
-        configureCASServer();//configure CAS correctly for the other tests to run.
+        //configure CAS correctly for the other tests to run. Could add this part in Before method, but this is the only
+        //test that requires re-configuring CAS Server correctly (since it is already configured once in BeforeClass method)
+        configureCASServer();
+
     }
 
     private void testCAS(boolean loginPage)
