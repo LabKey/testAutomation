@@ -29,6 +29,7 @@ public class Server
     @JsonProperty(required = true) private String key;
     private String host;
     private List<Login> logins;
+    private List<ApiKey> apiKeys;
 
     public String getKey()
     {
@@ -58,5 +59,15 @@ public class Server
     public void setLogins(List<Login> logins)
     {
         this.logins = logins;
+    }
+
+    public List<ApiKey> getApiKeys()
+    {
+        return apiKeys;
+    }
+
+    public void setApiKeys(List<ApiKey> apiKeys)
+    {
+        this.apiKeys = apiKeys;
     }
 }

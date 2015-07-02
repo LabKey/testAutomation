@@ -16,21 +16,21 @@
 package org.labkey.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.labkey.api.util.FileUtil;
 import org.labkey.test.credentials.Credentials;
-import org.labkey.test.credentials.Login;
 import org.labkey.test.credentials.Server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class TestCredentials
 {
     private static final Map<String, Server> credentials;
+    private static final File credentialsFile;
     static
     {
-        File credentialsFile = new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json"));
+        credentialsFile = FileUtil.getAbsoluteCaseSensitiveFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json")));
         ObjectMapper mapper = new ObjectMapper();
         try
         {
@@ -43,13 +43,13 @@ public class TestCredentials
         }
     }
 
-    public static String getHost(String serverKey)
+    public static Server getServer(String serverKey)
     {
-        return credentials.get(serverKey).getHost();
-    }
-
-    public static List<Login> getLogins(String serverKey)
-    {
-        return credentials.get(serverKey).getLogins();
+        Server server = credentials.get(serverKey);
+        if (null == server)
+        {
+            throw new RuntimeException(String.format("No server named '%s' found in credentials file. [%s]", serverKey, credentialsFile.getAbsolutePath()));
+        }
+        return server;
     }
 }
