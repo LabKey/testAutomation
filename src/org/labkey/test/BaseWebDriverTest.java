@@ -3727,6 +3727,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         File[] newFiles = downloadDir.listFiles(newFileFilter);
         assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
 
+        log("File(s) downloaded to " + downloadDir);
         for (File newFile : newFiles)
         {
             log("File downloaded: " + newFile.getName());
