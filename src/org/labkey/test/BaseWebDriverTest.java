@@ -144,6 +144,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.getDumpDir;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
@@ -2099,6 +2100,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 goToHome();
                 cleanup(true);
+
+                if (getDumpDir().exists())
+                {
+                    try{
+                        FileUtils.deleteDirectory(getDumpDir());
+                    }
+                    catch (IOException ignore) { }
+                }
             }
             else
             {
@@ -2115,14 +2124,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         else
         {
             log("Skipping post-test checks because a test case failed.");
-        }
-
-        if (!_anyTestCaseFailed && getDownloadDir().exists())
-        {
-            try{
-                FileUtils.deleteDirectory(getDownloadDir());
-            }
-            catch (IOException ignore) { }
         }
     }
 
