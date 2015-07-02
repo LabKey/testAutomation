@@ -17,10 +17,9 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.CachingLocator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.DomainEditor;
-import org.openqa.selenium.SearchContext;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -56,17 +55,17 @@ public class DatasetDomainEditor extends DomainEditor
 
     public void checkDemographicData()
     {
-        _test.checkCheckbox(elements().getDemographicCheckbox());
+        _test.checkCheckbox(elements().demographicCheckbox);
     }
 
     public void uncheckDemographicData()
     {
-        _test.uncheckCheckbox(elements().getDemographicCheckbox());
+        _test.uncheckCheckbox(elements().demographicCheckbox);
     }
 
     public void shareDemographics(ShareDemographicsBy by)
     {
-        _test.selectOptionByValue(elements().getSharedBy(), by.toString());
+        _test.selectOptionByValue(elements().sharedBy, by.toString());
     }
 
     public void inferFieldsFromFile(File file)
@@ -96,22 +95,12 @@ public class DatasetDomainEditor extends DomainEditor
 
     private class Elements extends ComponentElements
     {
-        private CachingLocator demographicCheckbox = new CachingLocator(Locator.name("demographicData"));
-        private CachingLocator sharedBy = new CachingLocator(Locator.name("demographicsSharedBy"));
+        private WebElement demographicCheckbox = new LazyWebElement(Locator.name("demographicData"), context);
+        private WebElement sharedBy = new LazyWebElement(Locator.name("demographicsSharedBy"), context);
 
         Elements()
         {
             super(_test.getDriver());
-        }
-
-        public WebElement getDemographicCheckbox()
-        {
-            return findElement(demographicCheckbox);
-        }
-
-        public WebElement getSharedBy()
-        {
-            return findElement(sharedBy);
         }
     }
 }

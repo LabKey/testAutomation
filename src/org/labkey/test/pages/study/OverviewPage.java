@@ -21,6 +21,7 @@ import org.labkey.test.CachingLocator;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class OverviewPage extends LabKeyPage
 
     public boolean isParticipantCountShown()
     {
-        return _test.isChecked(elements().participantCountCheckbox);
+        return elements().participantCountCheckbox.isSelected();
     }
 
     public OverviewPage showParticipantCounts()
@@ -64,7 +65,7 @@ public class OverviewPage extends LabKeyPage
 
     public boolean isRowCountShown()
     {
-        return _test.isChecked(elements().rowCountCheckbox);
+        return elements().rowCountCheckbox.isSelected();
     }
 
     public OverviewPage showRowCounts()
@@ -188,9 +189,10 @@ public class OverviewPage extends LabKeyPage
     
     private class Elements extends ComponentElements
     {
-        private final Locator participantCountCheckbox = new CachingLocator(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"));
-        private final Locator rowCountCheckbox = new CachingLocator(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
-        private final Locator studyOverview = new CachingLocator(Locator.tagWithId("table", "studyOverview"));
+        public final WebElement participantCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"), context);
+        public final WebElement rowCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"), context);
+        public final WebElement studyOverview = new LazyWebElement(Locator.tagWithId("table", "studyOverview"), context);
+
         private final Locator studyOverviewRow = new CachingLocator(Locator.CssLocator.union(Locator.css(".labkey-row"), Locator.css(".labkey-alternate-row")));
 
         private Elements()
@@ -200,7 +202,7 @@ public class OverviewPage extends LabKeyPage
 
         public List<WebElement> getStudyOverviewRows()
         {
-            return studyOverviewRow.findElements(findElement(studyOverview));
+            return studyOverviewRow.findElements(studyOverview);
         }
     }
 
