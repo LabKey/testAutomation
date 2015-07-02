@@ -234,15 +234,6 @@ public abstract class Locator
         return waitForElement(wait);
     }
 
-    /**
-     * @deprecated Use {@link Locator#waitForElement(FluentWait)}
-     */
-    @Deprecated
-    public WebElement waitForElement(final SearchContext context, FluentWait<? extends SearchContext> wait)
-    {
-        return waitForElement(wait);
-    }
-
     public WebElement waitForElement(FluentWait<? extends SearchContext> wait)
     {
         try

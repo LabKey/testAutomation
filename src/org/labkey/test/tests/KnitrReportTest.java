@@ -362,7 +362,7 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         for (Locator contains : reportContains)
         {
-            contains.waitForElement(reportDiv, longWait());
+            contains.waitForElement(reportDiv, BaseWebDriverTest.WAIT_FOR_PAGE);
         }
 
         String reportText = reportDiv.getText();

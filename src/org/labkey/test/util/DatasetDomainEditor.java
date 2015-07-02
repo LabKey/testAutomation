@@ -75,7 +75,7 @@ public class DatasetDomainEditor extends DomainEditor
         WebElement dialog =
                 Locator.tagWithClass("div", "gwt-DialogBox")
                 .withDescendant(Locator.tagWithClass("div", "Caption").withText("Infer Fields from File"))
-                .waitForElement(_test.getDriver(), _test.shortWait());
+                .waitForElement(_test.shortWait());
         WebElement radio = Locator.radioButtonByNameAndValue("source", "file").findElement(dialog);
         radio.click();
         WebElement fileField = Locator.tagWithName("input", "uploadFormElement").findElement(dialog);
