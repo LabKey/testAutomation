@@ -48,6 +48,9 @@
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
 
+    <!-- All java compilation tasks should use this property when specifying source and target version. -->
+    <property name="java.source.and.target" value="1.7" />
+
     <property name="test.compile.debug" value="true"/>
     <property name="test.compile.deprecation" value="false"/>
     <property name="test.compile.optimize" value="true"/>
@@ -311,7 +314,7 @@
             destdir="${test.build.home}/classes"
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
-            source="1.7"
+            source="${java.source.and.target}"
             classpathref="full.test.build.classpath">
             <src path="${test.src.home}"/>
             <src refid="module.test.src.dirs"/>
@@ -609,7 +612,7 @@
             deprecation="${test.compile.deprecation}"
             debug="true"
             optimize="${test.compile.optimize}"
-            source="1.7"
+            source="${java.source.and.target}"
             classpathref="shutdown.build.classpath"
             includeantruntime="false" />
         <java classname="org.labkey.test.debug.ThreadDumpAndKill" failonerror="false">
@@ -1112,7 +1115,7 @@
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
             optimize="${test.compile.optimize}"
-            source="1.7"
+            source="${java.source.and.target}"
             classpathref="test.build.classpath"
             includeantruntime="false" >
         </javac>
