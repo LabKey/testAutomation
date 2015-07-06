@@ -83,7 +83,7 @@ public class WebTestHelper
         InstallCert.install("localhost", _webPort, keystorePassword.toCharArray());
     }
 
-    public static Boolean isLocalServer()
+    public static boolean isLocalServer()
     {
         return getTargetServer().contains("localhost") || getTargetServer().contains("127.0.0.1");
     }

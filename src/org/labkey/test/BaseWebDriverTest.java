@@ -16,9 +16,7 @@
 
 package org.labkey.test;
 
-//TODO: Use java.lang.function.Function once Java 8 migration is complete
-
-import com.google.common.base.Function;
+import com.google.common.base.Function; //TODO: Use java.lang.function.Function once Java 8 migration is complete
 import com.google.common.base.Predicate;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
@@ -144,7 +142,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestProperties.getDumpDir;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
@@ -195,7 +192,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<>();
     protected static boolean _testFailed = false;
-    protected static Boolean _anyTestCaseFailed = false;
+    protected static boolean _anyTestCaseFailed = false;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
@@ -1725,7 +1722,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void resetErrors()
     {
-        if ( isGuestModeTest() )
+        if (isGuestModeTest())
             return;
         if (isLocalServer())
             beginAt("/admin/resetErrorMark.view");
@@ -1977,7 +1974,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         }
 
-        private String getElapsedString(Long elapsed)
+        private String getElapsedString(long elapsed)
         {
             return String.format("%dm %d.%ds",
                     TimeUnit.MILLISECONDS.toMinutes(elapsed),
@@ -2101,10 +2098,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 goToHome();
                 cleanup(true);
 
-                if (getDumpDir().exists())
+                if (getDownloadDir().exists())
                 {
                     try{
-                        FileUtils.deleteDirectory(getDumpDir());
+                        FileUtils.deleteDirectory(getDownloadDir());
                     }
                     catch (IOException ignore) { }
                 }
@@ -2158,7 +2155,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    protected void acceptTermsOfUse(@Nullable String text, Boolean doAgree)
+    protected void acceptTermsOfUse(@Nullable String text, boolean doAgree)
     {
         try
         {
@@ -2441,7 +2438,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                 Locator.XPathLocator expandedReport = Locator.tag("div").withClass("x-grid3-row-expanded");
 
-                String reportType = getAttribute(expandedReport.append("//div").withClass("x-grid3-col-1").append("/img"), "alt");
+                //String reportType = getAttribute(expandedReport.append("//div").withClass("x-grid3-col-1").append("/img"), "alt");
                 String schemaName = getText(expandedReport.append("//td[normalize-space()='schema name']/following-sibling::td"));
                 String queryName = getText(expandedReport.append("//td[normalize-space()='query name']/following-sibling::td"));
                 String viewString = viewName + " of " + schemaName + "." + queryName;
@@ -2952,7 +2949,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return (Boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
+                return (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
             }
         }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
@@ -2964,7 +2961,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return (Boolean) executeScript("if (window.HoverNavigation) return true; else return false;");
+                return (boolean) executeScript("if (window.HoverNavigation) return true; else return false;");
             }
         }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
@@ -3433,7 +3430,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTextPresentInThisOrder(text1, text2);
     }
 
-    private Boolean _preppedForPageLoad = false;
+    private boolean _preppedForPageLoad = false;
 
     /**
      * @deprecated Use {@link #applyAndWaitForPageToLoad(com.google.common.base.Function)}
@@ -3461,7 +3458,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             public boolean check()
             {
                 // Wait for marker to disappear
-                return (Boolean) executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
+                return (boolean) executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
                         "catch(e) {return false;}");
             }
         }, "Page failed to load", millis);
@@ -3542,7 +3539,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public boolean waitFor(Checker checker, int wait)
     {
-        Long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         do
         {
             if( checker.check() )
