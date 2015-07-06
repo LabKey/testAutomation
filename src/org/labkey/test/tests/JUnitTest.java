@@ -195,6 +195,9 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest() throws Throwable
         {
+            // Need to clear request config to change socket timeout
+            context.setAttribute("http.request-config", null);
+
             long startTime = System.currentTimeMillis();
             RequestConfig requestConfig = RequestConfig.custom()
                     .setSocketTimeout(_timeout * 1000)
