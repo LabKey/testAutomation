@@ -516,15 +516,7 @@ public class DataReportsTest extends ReportTest
 
     private void resaveReport()
     {
-        applyAndWaitForPageToLoad(new Function<Void, Void>()
-        {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                saveReport(null);
-                return null;
-            }
-        });
+        doAndWaitForPageToLoad(() -> saveReport(null));
         _ext4Helper.waitForMaskToDisappear();
     }
 

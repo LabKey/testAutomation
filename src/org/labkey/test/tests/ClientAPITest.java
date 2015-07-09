@@ -249,17 +249,11 @@ public class ClientAPITest extends BaseWebDriverTest
         final DataRegionTable list = new DataRegionTable("query", this);
         list.checkAll();
 
-        Function<Void, Void> func = new Function<Void, Void>()
+        doAndWaitForPageToLoad(() ->
         {
-            @Override
-            public Void apply(Void o)
-            {
-                list.clickHeaderButtonByText("Delete");
-                assertAlertContains("Are you sure you want to delete the selected rows?");
-                return null;
-            }
-        };
-        applyAndWaitForPageToLoad(func);
+            list.clickHeaderButtonByText("Delete");
+            assertAlertContains("Are you sure you want to delete the selected rows?");
+        });
 
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);

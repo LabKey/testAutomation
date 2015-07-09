@@ -499,16 +499,11 @@ public class ETLHelper
             _test.log("deleting source row id " + id);
             _test.click(Locator.xpath("//a[text()='" + id + "']/../../td/input[@type='checkbox']"));
         }
-        _test.applyAndWaitForPageToLoad(new Function<Void, Void>()
+        _test.doAndWaitForPageToLoad(() ->
         {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                _test.click(Locator.xpath("//span[text()='Delete']"));
-                // eat the alert without spewing to the log file
-                _test.acceptAlert();
-                return null;
-            }
+            _test.click(Locator.xpath("//span[text()='Delete']"));
+            // eat the alert without spewing to the log file
+            _test.acceptAlert();
         });
         _test.log("returning to project home");
         _test.clickTab("Portal");

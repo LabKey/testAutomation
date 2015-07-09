@@ -69,15 +69,10 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         {
             annotInsertions.setFilter("FileName", "Contains", UNIPROT_FILENAME);
             annotInsertions.checkAll();
-            applyAndWaitForPageToLoad(new Function<Void, Void>()
+            doAndWaitForPageToLoad(() ->
             {
-                @Override
-                public Void apply(Void aVoid)
-                {
-                    annotInsertions.clickHeaderButtonByText("Delete");
-                    acceptAlert();
-                    return null;
-                }
+                annotInsertions.clickHeaderButtonByText("Delete");
+                acceptAlert();
             });
         }
 

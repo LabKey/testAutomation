@@ -71,15 +71,10 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         if(fileNames.size() > 0)
         {
             annotInsertions.checkAll();
-            applyAndWaitForPageToLoad(new Function<Void, Void>()
+            doAndWaitForPageToLoad(() ->
             {
-                @Override
-                public Void apply(Void aVoid)
-                {
-                    annotInsertions.clickHeaderButtonByText("Delete");
-                    acceptAlert();
-                    return null;
-                }
+                annotInsertions.clickHeaderButtonByText("Delete");
+                acceptAlert();
             });
         }
     }

@@ -1025,15 +1025,10 @@ public class IssuesTest extends BaseWebDriverTest
 
         //On update, check for a popup message: "Custom Fields of current folder will get overridden".
 
-        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        doAndWaitForPageToLoad(() ->
         {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                click(Locator.linkWithText("Update"));
-                assertEquals("Custom Fields of current folder will get overridden.", cancelAlert());
-                return null;
-            }
+            click(Locator.linkWithText("Update"));
+            assertEquals("Custom Fields of current folder will get overridden.", cancelAlert());
         });
 
         //Test that no changes were made to the current folder since we Cancelled to inherit.
@@ -1051,15 +1046,10 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("inheritFromContainerSelect"), pathToA);
 
 
-        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        doAndWaitForPageToLoad(() ->
         {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                click(Locator.linkWithText("Update"));
-                assertAlert("Custom Fields of current folder will get overridden.");
-                return null;
-            }
+            click(Locator.linkWithText("Update"));
+            assertAlert("Custom Fields of current folder will get overridden.");
         });
 
         //check if all the inherited fields are populated and are disabled.
@@ -1117,15 +1107,10 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Admin");
         setFormElement(Locator.name("milestone"), "milestone_A");
 
-        applyAndWaitForPageToLoad(new Function<Void, Void>()
+        doAndWaitForPageToLoad(() ->
         {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                click(Locator.linkWithText("Update"));
-                assertAlert("Found one or more folders with settings inherited from the current folder: Adding new Custom Fields will override Custom Fields of inheriting folders.");
-                return null;
-            }
+            click(Locator.linkWithText("Update"));
+            assertAlert("Found one or more folders with settings inherited from the current folder: Adding new Custom Fields will override Custom Fields of inheriting folders.");
         });
 
         //check if the inheritor sees the update

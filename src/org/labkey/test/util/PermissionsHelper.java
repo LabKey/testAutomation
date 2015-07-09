@@ -152,15 +152,7 @@ public class PermissionsHelper
 
     public void savePermissions()
     {
-        _test.applyAndWaitForPageSignal(new Function<Void, Void>()
-        {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                _test.clickButton("Save", 0);
-                return null;
-            }
-        }, "policyRendered");
+        _test.doAndWaitForPageSignal(() -> _test.clickButton("Save", 0), "policyRendered");
         _test._ext4Helper.waitForMaskToDisappear();
     }
 

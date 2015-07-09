@@ -93,15 +93,7 @@ public class BasicTest extends BaseWebDriverTest
     {
         final Locator.IdLocator headerSearch = Locator.id("search-input");
         setFormElement(headerSearch, "labkey");
-        applyAndWaitForPageToLoad(new Function<Void, Void>()
-        {
-            @Override
-            public Void apply(Void aVoid)
-            {
-                pressEnter(headerSearch);
-                return null;
-            }
-        });
+        doAndWaitForPageToLoad(() -> pressEnter(headerSearch));
         assertElementPresent(Locator.id("searchResults")); // just make sure we get the results page
     }
 
