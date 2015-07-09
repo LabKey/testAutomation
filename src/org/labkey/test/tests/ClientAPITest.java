@@ -311,29 +311,8 @@ public class ClientAPITest extends BaseWebDriverTest
     @Test
     public void maxRowsTest()
     {
-        beginAt(WebTestHelper.buildURL("wiki", getProjectName() + "/" + FOLDER_NAME, "edit"));
-        setFormElement(Locator.name("name"), "maxRows Test");
-        setFormElement(Locator.name("title"), "maxRows Test");
-        _wikiHelper.setWikiBody("<script type=\"text/javascript\">\n" +
-                "    var _grid, _store;\n" +
-                "    Ext.onReady(function(){ _store = new LABKEY.ext.Store({\n" +
-                "            schemaName: 'lists',\n" +
-                "            sql: 'SELECT People.FirstName, People.LastName, People.Age FROM People',\n" +
-                "            maxRows: 2\n" +
-                "        });    \n" +
-                "        _grid = new LABKEY.ext.EditorGridPanel({\n" +
-                "            store: _store,\n" +
-                "            renderTo: 'grid',\n" +
-                "            width: 800,\n" +
-                "            autoHeight: true,\n" +
-                "            title: 'Example',\n" +
-                "            editable: true\n" +
-                "        });\n" +
-                "});\n" +
-                "</script>\n" +
-                "<div id='grid'/>");
-
-        _wikiHelper.saveWikiPage();
+        setSourceFromFile("maxRows.js");
+        waitForText (5000, "maxRows Test");
         assertTextPresent("Janeson");
         assertTextNotPresent("Johnson");
 
