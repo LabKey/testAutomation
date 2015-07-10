@@ -371,7 +371,7 @@ public class DataRegionTable
     }
 
     /**
-     * Get values for all specifed columns for all pages of the table
+     * Get values for all specified columns for all pages of the table
      * preconditions:  must be on start page of table
      * postconditions:  at start of table
      */
