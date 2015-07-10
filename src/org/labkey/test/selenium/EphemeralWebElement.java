@@ -15,8 +15,8 @@ public class EphemeralWebElement extends LazyWebElement
     }
 
     @Override
-    protected WebElement getElement()
+    public WebElement getWrappedElement()
     {
-        return super.getElement();
+        return super.getWrappedElement();
     }
 }

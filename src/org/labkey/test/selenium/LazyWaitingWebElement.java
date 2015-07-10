@@ -13,7 +13,7 @@ public class LazyWaitingWebElement extends LazyWebElement
     }
 
     @Override
-    protected WebElement getElement()
+    public WebElement getWrappedElement()
     {
         if (null == _webElement)
             _webElement = getLocator().waitForElement(new FluentWait<>(getSearchContext()));

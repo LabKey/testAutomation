@@ -6,6 +6,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsElement;
 
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class LazyWebElement extends WebElementWrapper
         _searchContext = searchContext;
     }
 
-    protected WebElement getElement()
+    @Override
+    public WebElement getWrappedElement()
     {
         if (null == _webElement)
             _webElement = getLocator().findElement(getSearchContext());
