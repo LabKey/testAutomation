@@ -111,7 +111,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         long startTime = System.currentTimeMillis();
         // confirm delete:
         _test.log("Starting delete of project '" + project + "'...");
-        _test.clickButton("Delete", _test.longWaitForPage);
+        _test.clickButton("Delete", wait);
 
         if (_test.isElementPresent(Locator.linkWithText(project)))
         {
