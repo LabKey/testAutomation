@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -62,20 +63,20 @@ public abstract class Locator
     }
 
     /**
-     * Uses the provided WebDriverWait to wait for an element located by any one of the provided Locators
+     * Wait for a single element located by any one of the provided Locators
      * @return The first element found
      */
-    public static WebElement waitForAnyElement(WebDriverWait wait, final Locator... locators)
+    public static WebElement waitForAnyElement(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new ExpectedCondition<WebElement>()
+        return wait.until(new Function<SearchContext, WebElement>()
         {
             @Override
-            public WebElement apply(WebDriver driver)
+            public WebElement apply(SearchContext context)
             {
                 for (Locator loc : locators)
                 {
                     List<WebElement> els;
-                    els = loc.findElements(driver);
+                    els = loc.findElements(context);
                     if (els.size() > 0)
                         return els.get(0);
                 }
@@ -86,20 +87,20 @@ public abstract class Locator
     }
 
     /**
-     * Uses the provided WebDriverWait to wait for elements located by any one of the provided Locators
+     * Wait for elements located by any one of the provided Locators
      * @return All elements matching any of the provided Locators
      */
-    public static List<WebElement> waitForAnyElements(WebDriverWait wait, final Locator... locators)
+    public static List<WebElement> waitForAnyElements(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
-        return wait.until(new ExpectedCondition<List<WebElement>>()
+        return wait.until(new Function<SearchContext, List<WebElement>>()
         {
             @Override
-            public List<WebElement> apply(WebDriver driver)
+            public List<WebElement> apply(SearchContext context)
             {
                 List<WebElement> els = new ArrayList<>();
                 for (Locator loc : locators)
                 {
-                    els.addAll(loc.findElements(driver));
+                    els.addAll(loc.findElements(context));
                 }
 
                 if (els.size() > 0)
@@ -202,10 +203,10 @@ public abstract class Locator
         }
     }
 
-    public List<WebElement> waitForElements(final WebDriver driver, final int msTimeout)
+    public List<WebElement> waitForElements(final SearchContext context, final int msTimeout)
     {
-        waitForElement(driver, msTimeout);
-        return findElements(driver);
+        waitForElement(context, msTimeout);
+        return findElements(context);
     }
 
     public List<WebElement> waitForElements(FluentWait<? extends SearchContext> wait)
@@ -253,15 +254,29 @@ public abstract class Locator
         }
     }
 
-    public void waitForElementToDisappear(final WebDriver driver, final int msTimeout)
+    public void waitForElementToDisappear(final SearchContext context, final int msTimeout)
     {
-        long secTimeout = msTimeout / 1000;
-        secTimeout = secTimeout > 0 ? secTimeout : 1;
-        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
 
-        waitForElementToDisappear(driver, wait);
+        waitForElementToDisappear(wait);
     }
 
+    public void waitForElementToDisappear(FluentWait<? extends SearchContext> wait)
+    {
+        wait.ignoring(NotFoundException.class).until(new Function<SearchContext, Boolean>()
+        {
+            @Override
+            public Boolean apply(SearchContext context)
+            {
+                return findElements(context).size() == 0;
+            }
+        });
+    }
+
+    /**
+     * @deprecated Use {@link #waitForElementToDisappear(SearchContext, int)}
+     */
+    @Deprecated
     public void waitForElementToDisappear(final SearchContext context, WebDriverWait wait)
     {
         try
@@ -281,25 +296,24 @@ public abstract class Locator
         }
     }
 
-    public void waitForElementToHaveValue(final WebDriver driver, final int msTimeout, final String value)
+    public void waitForElementToHaveValue(final SearchContext context, final int msTimeout, final String value)
     {
-        long secTimeout = msTimeout / 1000;
-        secTimeout = secTimeout > 0 ? secTimeout : 1;
-        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
+
         try
         {
-            wait.until(new ExpectedCondition<Boolean>()
+            wait.ignoring(NotFoundException.class).until(new Function<SearchContext, Boolean>()
             {
                 @Override
-                public Boolean apply(WebDriver d)
+                public Boolean apply(SearchContext context)
                 {
-                    return findElement(driver).getText().contains(value);
+                    return findElement(context).getText().contains(value);
                 }
             });
         }
         catch (TimeoutException ex)
         {
-            fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
+            Assert.assertEquals("Element did not contain expected text", value, findElement(context).getText());
         }
     }
 
