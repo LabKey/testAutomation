@@ -158,7 +158,10 @@ UNDONE: need to fix the merge case
 
         // verify the Last Status values and links to job logs
         goToModule("DataIntegration");
-        assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_APPEND, "NO WORK", false));
+        // TODO: We've now suppressed displaying the NO WORK status, so don't need this check
+        // assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_APPEND, "NO WORK", false));
+        // However, Josh has reported cases in a client system of the status being incorrect; fixing that will be part of the 15.3.1
+        // sprint and we should put additional test coverage around here.
         click(_etlHelper.findLastStatusCell(TRANSFORM_BYRUNID, "COMPLETE", true));
         assertTextPresent("transformrun = 42");
     }
