@@ -356,7 +356,7 @@ public class ETLHelper
         _test.clickTab("Portal");
     }
 
-    protected void runETL(String transformId)
+    public void runETL(String transformId)
     {
         _runETL(transformId, true, false);
         _jobsComplete++;
@@ -367,7 +367,7 @@ public class ETLHelper
         _runETL(transformId, true, true);
     }
 
-    protected void runETL_NoWork(String transformId)
+    public void runETL_NoWork(String transformId)
     {
         _runETL(transformId, false, false);
     }
