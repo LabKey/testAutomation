@@ -210,7 +210,7 @@ public class CustomizeViewsHelper
     }
 
     /**
-     * add a column to an already open customize view gried
+     * add a column to an already open customize view grid
      *
      * @param column_name Name of the column.  If your column is nested, should be of the form
      *          "nodename/nodename/lastnodename", where nodename is not the displayed text of a node
