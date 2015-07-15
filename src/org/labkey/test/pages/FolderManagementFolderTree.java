@@ -17,10 +17,16 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * org.labkey.core.admin.FolderManagementAction -- ?tabId=folderTree
- * TODO: Most methods here are broken for the Ext4 UI
  */
 public class FolderManagementFolderTree
 {
@@ -94,83 +100,79 @@ public class FolderManagementFolderTree
     {
         for (String folder : folders)
         {
-            _test.assertElementPresent(Locator.xpath("//tr[./td/a[text()='" + folder + "']]/td[@class='labkey-nav-tree-node']/a"));
-            if(_test.isElementPresent(Locator.xpath("//tr[./td/a[text()='" + folder + "']]/td[@class='labkey-nav-tree-node']/a/img[contains(@src, 'plus')]")))
-                _test.click(Locator.xpath("//tr[./td/a[text()='" + folder + "']]/td[@class='labkey-nav-tree-node']/a"));
+            if (! isFolderExpanded(folder))
+            expandFolderNode(folder);
+            _test.sleep(500);
         }
     }
 
-    private void collapseFolderNode(String folder)
+    public void deselectFolder(String folder)
     {
-        if(_test.getAttribute(Locator.xpath("//div[./a/span[text()='" + folder + "']]/img[contains(@class, 'x4-tree-elbow')]"), "class").contains("x4-tree-elbow-minus"))
-        {
-            _test.click(Locator.xpath("//div[./a/span[text()='" + folder + "']]/img[contains(@class, 'x4-tree-elbow')]"));
-            _test.waitForElement(Locator.xpath("//div[./a/span[text()='" + folder + "']]/img[contains(@class, 'x4-tree-elbow-plus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        }
+        Actions builder = new Actions(_test.getDriver());
+        builder.keyDown(Keys.CONTROL).click(Locator.xpath("//span[text()='"+ folder +"']").findElement(_test.getDriver())).keyUp(Keys.CONTROL).build().perform();
     }
 
-    private void expandFolders(String... folders)
+    public void expandFolderNode(String... folders)
     {
-        for (String folder : folders)
+        for(String folder : folders)
         {
-            String folderRowXpath = "//li[@class='x4-tree-node']/div[./a/span[text()='"+folder+"']]";
-            _test.waitForElement(Locator.xpath(folderRowXpath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if(_test.getAttribute(Locator.xpath(folderRowXpath + "/img[contains(@class, 'x4-tree-elbow')]"), "class").contains("plus"))
+            if (!isFolderExpanded(folder))
             {
-                _test.click(Locator.xpath(folderRowXpath + "/img[contains(@class, 'x4-tree-elbow')]"));
-                _test.waitForElement(Locator.xpath(folderRowXpath + "/img[not(contains(@class, 'plus'))]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                _test.longWait().until(ExpectedConditions.elementToBeClickable(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander")).toBy()));
+                _test.sleep(500);
+                _test.click(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander")));
+                _test.waitForElement(Locator.xpath("//tr[contains(@class,'x4-grid-tree-node-expanded')]/td/div/span[text()='" + folder + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
             }
         }
     }
 
-    // Specific to this test's folder naming scheme. Digs to requested folder. Adds brackets.
-    public void expandFolderNode(String folder)
+    public void collapseFolderNode(String folder)
     {
-        _test.waitForElement(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        if(_test.getAttribute(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "/div/img[contains(@class, 'x4-tree-elbow')]"), "class").contains("x4-tree-elbow-plus"))
+        if(isFolderExpanded(folder))
         {
-            _test.click(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "/div/img[contains(@class, 'x4-tree-elbow')]"));
-            _test.waitForElementToDisappear(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "/div/img[contains(@class, 'x4-tree-elbow-plus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.xpath("//span[.='" + folder + "']/../img[contains(@class,'x4-tree-expander')]"));
+            _test.click(Locator.xpath("//span[text()='" + folder + "']/../img[contains(@class,'x4-tree-expander')]"));
+            _test.waitForElement(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander")));
         }
-
-        for (int i = 1; i <= folder.length(); i++ )
-        {
-            String folderRowXpath = "//li[@class='x4-tree-node' and ./div/a/span[text()='"+ _projectName +"']]" + "//li[@class='x4-tree-node']/div[./a/span[text()='["+folder.substring(0, i)+"]']]";
-            _test.waitForElement(Locator.xpath(folderRowXpath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if(_test.getAttribute(Locator.xpath(folderRowXpath + "/img[contains(@class, 'x4-tree-elbow')]"), "class").contains("plus"))
-            {
-                _test.click(Locator.xpath(folderRowXpath + "/img[contains(@class, 'x4-tree-elbow')]"));
-                _test.waitForElement(Locator.xpath(folderRowXpath + "/img[not(contains(@class, 'plus'))]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            }
-        }
-        _test.sleep(500);
     }
 
-    public void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple)
+    public boolean isFolderExpanded(String folder)
     {
-        moveFolder(folder, targetFolder, successExpected, multiple, true);
+        return _test.isElementPresent(Locator.xpath("//tr[contains(@class,'expanded')]/td/div/span[text()='" + folder + "']"));
     }
 
-    public void moveFolder(String folder, String targetFolder, boolean successExpected, boolean multiple, boolean confirmMove)
+    public void moveFolder(String folder, String targetFolder, String hoverText, String confirmationText, boolean successExpected, boolean multiple)
+    {
+        moveFolder(folder, targetFolder, hoverText,confirmationText, successExpected, multiple, true);
+    }
+
+    public void moveFolder(String folder, String targetFolder, String hoverText, String confirmationText, boolean successExpected, boolean multiple, boolean confirmMove)
     {
         _test.log("Move folder: '" + folder + "' into '" + targetFolder + "'");
-        _test.waitForElement(Locator.xpath("//div/a/span[text()='" + folder + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//tr[contains(@id,'treeview')]/td/div/span[text()='" + folder +"']/../img[contains(@class,'x4-tree-icon-parent')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         _test.sleep(1000); //TODO: Figure out what to wait for
 
-        _test.dragAndDrop(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "//div/a/span[text()='" + folder + "']"), Locator.xpath("//div/a/span[text()='" + targetFolder + "']"), BaseWebDriverTest.Position.middle);
+        dragAndDrop(Locator.xpath("//tr[contains(@id,'treeview')]/td/div/span[text()='" + folder + "']/../img[contains(@class,'x4-tree-icon-parent')]"), Locator.xpath("//tr[contains(@id,'treeview')]/td/div/span[text()='"+ targetFolder +"']/../img[contains(@class,'x4-tree-icon-parent')]"), BaseWebDriverTest.Position.middle, hoverText);
+
         if(successExpected)
         {
-            _test._extHelper.waitForExtDialog("Move Folder");
-            if (multiple)
-                _test.assertTextPresent("You are moving multiple folders.");
-            else
-                _test.assertTextPresent("You are moving folder '" + folder + "'");
+            _test._extHelper.waitForExtDialog(confirmationText);
+            _test.assertTextPresent("You are moving folder '" + folder + "'");
             if(confirmMove)
             {
                 _test.clickButton("Confirm Move", 0);
-                if (multiple) _test._extHelper.waitForExtDialog("Moving Folders");
-                _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                _test.sleep(500);
+                if (multiple)
+                {
+                    boolean dialogPresent = _test.isElementVisible(Locator.tagContainingText("div", "Are you sure you would like to move this folder?"));
+                    while(dialogPresent)
+                    {
+                        _test.clickButton("Confirm Move", 0);
+                        _test.sleep(500);
+                        dialogPresent = _test.isElementVisible(Locator.tagContainingText("div", "Are you sure you would like to move this folder?"));
+                    }
+                }
             }
             else
             {
@@ -179,20 +181,81 @@ public class FolderManagementFolderTree
         }
     }
 
-    public void reorderFolder(String folder, String targetFolder, Reorder order, boolean successExpected)
+    private void dragAndDrop(Locator el, int xOffset, int yOffset)
+    {
+        WebElement fromEl = el.findElement(_test.getDriver());
+        Actions builder = new Actions(_test.getDriver());
+        builder.clickAndHold(fromEl).build().perform();
+        _test.sleep(1000); //TODO: Figure out what to wait for
+        builder.moveByOffset(xOffset, yOffset).build().perform();
+        _test.sleep(1000); //TODO: Figure out what to wait for
+        builder.release().build().perform();
+    }
+
+    private void dragAndDrop(Locator from, Locator to, BaseWebDriverTest.Position pos, String hoverText)
+    {
+        WebElement fromEl = from.findElement(_test.getDriver());
+        WebElement toEl = to.findElement(_test.getDriver());
+        int fromElY = fromEl.getLocation().getY();
+        int toElY = toEl.getLocation().getY();
+        int offset = 0;
+        int tries = 0;
+        if(fromElY - toElY > 0) offset = -1;
+        if(fromElY - toElY < 0) offset = 1;
+        int y;
+        switch (pos)
+        {
+            case top:
+                y = 1;
+                break;
+            case bottom:
+                y = toEl.getSize().getHeight() - 1;
+                break;
+            case middle:
+                y = toEl.getSize().getHeight() / 2;
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected position: " + pos.toString());
+        }
+
+        Actions builder = new Actions(_test.getDriver());
+        builder.clickAndHold(fromEl).build().perform();
+        _test.sleep(1000); //TODO: Figure out what to wait for
+        builder.moveToElement(toEl, toEl.getSize().getWidth()/2, y).build().perform();
+        while(! _test.isElementPresent(Locator.tagContainingText("div", hoverText)) && tries < 50)
+        {
+            builder.moveByOffset(0, offset).build().perform();
+            _test.sleep(250);
+            tries++;
+        }
+        builder.release().build().perform();
+    }
+
+    public void reorderFolder(String folder, String targetFolder, String hoverText, Reorder order, boolean successExpected)
     {
         _test.log("Reorder folder: '" + folder + "' " + toString() + " '" + targetFolder + "'");
-        _test.waitForElement(Locator.xpath("//div/a/span[text()='" + folder + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
+        _test.waitForElement(Locator.xpath("//tr/td/div/span[text()='" + folder +"']/../img[contains(@class,'x4-tree-icon-parent')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.sleep(1000); //TODO: Figure out what to wait for
+        dragAndDrop(Locator.xpath("//tr/td/div/span[text()='"+ folder + "']/../img[contains(@class,'x4-tree-icon-parent')]"),Locator.xpath("//tr/td/div/span[text()='"+ targetFolder + "']/../img[contains(@class,'x4-tree-icon-parent')]"), order == Reorder.preceding ? BaseWebDriverTest.Position.top : BaseWebDriverTest.Position.bottom, hoverText);
 
-        _test.dragAndDrop(Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "//div/a/span[text()='" + folder + "']"), Locator.xpath("//li[@class='x4-tree-node' and ./div/a/span[text()='" + _projectName + "']]" + "//div/a/span[text()='" + targetFolder + "']"), order == Reorder.preceding ? BaseWebDriverTest.Position.top : BaseWebDriverTest.Position.bottom);
         if(successExpected)
         {
             _test._extHelper.waitForExtDialog("Change Display Order");
-            _test.clickButton("Confirm Reorder", 0);
+            _test.clickButton("Yes", 0);
         }
+        _test.sleep(500);
         //TODO: else {confirm failure}
+    }
+
+    private List<String> getDisplayedFolderNames()
+    {
+        List<String> names = new ArrayList<>();
+        List<WebElement> folderEls = _test.getDriver().findElements(Locator.xpath("//div[@class='x4-grid-cell-inner x4-grid-cell-inner-treecolumn']/span").toBy());
+        for(WebElement el : folderEls)
+        {
+            names.add(el.getText());
+        }
+        return names;
     }
     
     public enum Reorder {following, preceding}

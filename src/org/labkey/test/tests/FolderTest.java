@@ -17,26 +17,26 @@ package org.labkey.test.tests;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.FolderManagementFolderTree;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 
-import java.io.File;
 import java.util.List;
 
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
-    private static final File FOLDER_CREATION_SCRIPT = new File(TestFileUtils.getLabKeyRoot(), "server/test/data/api/folderTest.js");
     public final FolderManagementFolderTree folderManagement = new FolderManagementFolderTree(this, getProjectName());
+    private static String secondProject = "FolderTestProject2";
 
     @Override
     public List<String> getAssociatedModules()
@@ -47,7 +47,7 @@ public class FolderTest extends BaseWebDriverTest
     @Override
     public String getProjectName()
     {
-        return "FolderTest#Project";
+        return "FolderTestProject";
     }
 
     @Override
@@ -57,23 +57,22 @@ public class FolderTest extends BaseWebDriverTest
     @Override
     public void checkLinks(){} // too many folders
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(secondProject, afterTest);
+    }
+
     @BeforeClass
     public static void testSetup()
     {
         FolderTest init = (FolderTest)getCurrentTest();
-
         init._containerHelper.createProject(init.getProjectName(), null);
+        init._containerHelper.createProject(secondProject, null);
+        init.goToProjectHome();
+        init.importFolderFromZip(TestFileUtils.getSampleData("FolderTest/FolderTestProject.folder.zip"));
         init.moveTestProjectToTop();
-        init.createFolders();
-    }
-
-    @LogMethod
-    private void createFolders()
-    {
-        clickProject(getProjectName());
-
-        JavascriptExecutor exec = (JavascriptExecutor) getDriver();
-        exec.executeAsyncScript(TestFileUtils.getFileContents(FOLDER_CREATION_SCRIPT));
     }
 
     @LogMethod
@@ -91,6 +90,13 @@ public class FolderTest extends BaseWebDriverTest
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+ getProjectName() +"']")) > 0; i++)
             clickButton("Move Up", 0);
         clickButton("Save");
+
+        clickButton("Change Display Order");
+        checkCheckbox(Locator.radioButtonByNameAndValue("resetToAlphabetical", "false"));
+        selectOptionByText(Locator.name("items"), secondProject);
+        for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+ secondProject +"']")) > 0; i++)
+            clickButton("Move Up", 0);
+        clickButton("Save");
     }
 
     @Before
@@ -100,70 +106,146 @@ public class FolderTest extends BaseWebDriverTest
         goToFolderManagement();
     }
 
-    @Test @Ignore("Test and helpers need update for Ext4 UI")
+    @Test //@Ignore("Test and helpers need update for Ext4 UI")
     public void testMoveFolder()
     {
         log("Reorder folders test");
+        folderManagement.expandFolderNode("A");
         folderManagement.expandFolderNode("AB");
-        folderManagement.reorderFolder("[ABB]", "[ABA]", FolderManagementFolderTree.Reorder.preceding, true);
-        sleep(500); // Wait for folder move to complete.
-        refresh();
-        folderManagement.expandNavFolders("[A]", "[AB]", "[AB]");
-        assertTextBefore("[ABB]", "[ABA]");
 
+        folderManagement.reorderFolder("ABB", "ABA","Change Display Order", FolderManagementFolderTree.Reorder.preceding, true);
+        refresh();
+        folderManagement.expandNavFolders("A", "AB");
+        assertTextBefore("ABB", "ABA");
         log("Illegal folder move test: Project demotion");
-        folderManagement.moveFolder(getProjectName(), "home", false, false);
-        _extHelper.waitForExtDialog("Change Display Order");  // it should only give option to reorder projects
-        clickButton("Cancel", 0);
+        folderManagement.moveFolder(getProjectName(), "home", "Cannot move one Project into another", "", false, false);
 
         log("Move folder test");
-        sleep(500); // wait for failed move ghost to disappear.
         folderManagement.expandFolderNode("ABB");
-        folderManagement.moveFolder("[ABBA]", "[ABA]", true, false);
-        sleep(500); // Wait for folder move to complete.
+        assertTextPresent("ABBA");
+        folderManagement.moveFolder("ABBA", "ABA", "Move Folder", "Move Folder", true, false);
         refresh();
-        folderManagement.expandNavFolders("[A]", "[AB]", "[ABA]");
-        assertTextBefore("[ABB]", "[ABBA]");
-
+        folderManagement.expandNavFolders("A", "AB", "ABA");
+        assertTextBefore("ABB", "ABBA");
 
         //Issue 12762: Provide way to cancel a folder move
         log("Cancel folder move test");
-        sleep(500); // wait for failed move ghost to disappear.
         folderManagement.expandFolderNode("ABA");
-        folderManagement.moveFolder("[ABBA]", "[F]", true, false, false);
-        sleep(500); // Wait for folder move to complete.
+        folderManagement.moveFolder("ABBA", "E","Move Folder","Move Folder", true, false, false);
         refresh();
-        folderManagement.expandNavFolders("[A]", "[AB]", "[ABA]", "[F]");
-        assertTextBefore("[ABB]", "[ABBA]");
+        folderManagement.expandNavFolders("A", "AB", "ABA", "E");
+        assertTextBefore("ABB", "ABBA");
 
         log("Illegal multiple folder move: non-siblings");
         folderManagement.expandFolderNode("A");
         folderManagement.expandFolderNode("B");
-        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/[A]/[AA]", false);
-        sleep(100);
-        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/[B]/[BA]", true);
-        sleep(500);
-        folderManagement.moveFolder("[AA]", "[C]", false, true);
+        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/A/AA", false);
+        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BA", true);
+        folderManagement.moveFolder("AA", "C", "Move Folder", "Move Folder", false, true);
         _ext4Helper.waitForMaskToDisappear(); // shouldn't be a confirmation dialog.
 
         log("Move multiple folders");
+        folderManagement.deselectFolder(getProjectName());
+        folderManagement.deselectFolder("AA");
         sleep(500); // wait for failed move ghost to disappear.
-        folderManagement.expandFolderNode("AB");
-        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/[D]", false);
-        sleep(100);
-        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/[E]", true);
-        sleep(100);
-        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/[F]", true);
+        folderManagement.expandFolderNode("A");
+        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BA", false);
+        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BB", true);
+        folderManagement.selectFolderManagementTreeItem(getProjectName() + "/B/BC", true);
+        folderManagement.moveFolder("BA", "A", "Move Folder", "Move Folder",true, true);
+
+        log("verify folder contents");
+        String[] folders = {"AA", "AB", "AC", "BA", "BB", "BC", "ABB", "ABA", "ABBA"};
+        for(String currentFolder : folders)
+        {
+            verifyFolderContents(currentFolder, getProjectName());
+        }
+
+        log("verify folder move between projects");
+        goToFolderManagement();
+        folderManagement.moveFolder("AB", secondProject, "Move Folder","Change Project", true, false);
+        goToProjectHome(secondProject);
+        String[] proj2Folders = {"AB","ABB", "ABA", "ABBA"};
+        for(String currentFolder : proj2Folders)
+        {
+            verifyFolderContents(currentFolder, secondProject);
+        }
+    }
+
+    private void verifyFolderContents(String folder, String project)
+    {
+        goToProjectHome(project);
+        clickFolder(folder);
+        waitAndClick(Locator.linkWithText("12 datasets"));
+        pushLocation();
+        waitAndClick(Locator.linkWithText("LuminexAssay"));
+        waitForText("Contains up to one row of LuminexAssay data for each Participant/Date/RowId combination.");
+        assertElementPresent(Locator.linkWithText("249318596"));
+        popLocation();
+        pushLocation();
+        waitAndClick(Locator.linkWithText("Participation and Genetic Consent"));
+        waitForText("Contains up to one row of Participation and Genetic Consent data for each Participant combination.");
+        assertElementPresent(Locator.linkWithText("249325717"));
+        popLocation();
+        pushLocation();
+        waitAndClick(Locator.linkWithText("Demographics"));
+        waitForText("Contains up to one row of Demographics data for each Participant combination.", "Group 1: Accute HIV-1", "Group 2: HIV-1 Negative");
+        popLocation();
+        pushLocation();
+        click(Locator.linkWithText("Status Assessment"));
+        waitForText("Contains up to one row of Status Assessment data for each Participant/Date combination.");
+        assertElementPresent(Locator.linkWithText("249320107"));
+        assertElementPresent(Locator.linkWithText("249320127"));
+        assertElementPresent(Locator.linkWithText("249320489"));
+        popLocation();
+        pushLocation();
+        waitAndClick(Locator.linkWithText("HIV Test Results"));
+        waitForText("Contains up to one row of HIV Test Results data for each Participant/Date combination.", "Positive", "Negative");
+        popLocation();
+        pushLocation();
+        goToManageLists();
+        waitAndClick(Locator.tagWithText("span", "Views"));
+        mouseOver(Locator.tagWithText("span", "Folder Filter"));
+        waitAndClick(Locator.tagWithText("span", "Current folder and subfolders"));
         sleep(500);
-        folderManagement.moveFolder("[D]", "[AB]", true, true);
-        sleep(500);
-        refresh();
-        folderManagement.expandNavFolders("[A]", "[AB]");
-        assertTextBefore("[AB]" ,"[D]");
-        assertTextBefore("[D]" ,"[E]");
-        assertTextBefore("[E]" ,"[F]");
-        assertTextBefore("[F]" ,"[AC]");
-        assertTextBefore("[F]" ,"[C]");
+        testLinksWithText("Lab Machines", "Reagents", "Technicians");
+    }
+
+    //Just make sure the list loaded in a DRT without error
+    private void testLinksWithText(String... texts)
+    {
+        for(String text : texts)
+        {
+            List<WebElement> links = getLinksWithText(text);
+            for(int i = 0; i < links.size(); i++)
+            {
+                pushLocation();
+                getLinksWithText(text).get(i).click();
+                waitForElement(Locator.tagWithText("span", "Views"));
+                assertElementPresent(Locator.tagWithText("span", "Charts"));
+                assertElementPresent(Locator.tagWithText("span", "View Design"));
+                assertElementPresent(Locator.linkWithText("edit"));
+                assertElementPresent(Locator.linkWithText("details"));
+                popLocation();
+            }
+        }
+    }
+
+    private List<WebElement> getLinksWithText(String text)
+    {
+        return this.getDriver().findElements(Locator.linkWithText(text).toBy());
+    }
+
+    public String getNameForQueryWebpart(String title)
+    {
+        Locator l = Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + ":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]");
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
+        return getAttribute(l, "id").substring(11);
+    }
+
+    public DataRegionTable getDrForQueryWebpart(String title)
+    {
+        return new DataRegionTable(getNameForQueryWebpart(title), this);
     }
 
     private void reorderProjects(String project, String targetProject, FolderManagementFolderTree.Reorder order, boolean successExpected)
