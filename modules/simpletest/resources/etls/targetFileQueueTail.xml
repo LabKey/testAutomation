@@ -16,8 +16,4 @@
         </taskref>
     </transform>
 </transforms>
-<!--<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />-->
-    <schedule>
-        <poll interval="31s"/>
-    </schedule>
 </etl>
