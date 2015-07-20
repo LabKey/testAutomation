@@ -36,7 +36,7 @@ public class BodyWebPart extends WebPart
     {
         _test = test;
         _title = title;
-        List<WebElement> webparts = PortalHelper.Locators.webPart(title).findElements(test.getDriver());
+        List<WebElement> webparts = PortalHelper.Locators.webPart(title).waitForElements(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _componentElement = webparts.get(index);
         _id = _componentElement.getAttribute("id");
         waitForReady();
@@ -50,7 +50,7 @@ public class BodyWebPart extends WebPart
     public BodyWebPart(BaseWebDriverTest test, int index)
     {
         _test = test;
-        List<WebElement> webparts = PortalHelper.Locators.webPart.findElements(test.getDriver());
+        List<WebElement> webparts = PortalHelper.Locators.webPart.waitForElements(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _id = webparts.get(index).getAttribute("id");
         waitForReady();
     }
