@@ -144,6 +144,12 @@ public class BasicTest extends BaseWebDriverTest
         assertTextNotPresent("WARNING:");
     }
 
+    @Test
+    public void testFooter()
+    {
+        assertTextPresent("Powered by LabKey Software");
+    }
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core");
