@@ -91,7 +91,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         goToDataset("Demographics");
         waitAndClick(Locator.xpath("//span[text()='Insert New']"));
         waitForElement(Locator.name("quf_ParticipantId"));
-        setFormElement(Locator.name("quf_ParticipantId"), "67676");
+        setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
         setFormElement(Locator.name("quf_date"), "1/1/2001");
         setFormElement(Locator.name("quf_Comments"), "Comment on added participant");
         clickButton("Submit");
@@ -112,7 +112,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         refreshDataset("Demographics");
         assertTextPresent("Comment on added participant");
         //ID should be masked on new participant
-        assertTextNotPresent("67676");
+        assertTextNotPresent("addedParticipant67676");
     }
 
     @LogMethod
