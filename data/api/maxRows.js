@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+ */
 window.gridView = new LABKEY.ext.EditorGridPanel({
     store: new LABKEY.ext.Store({
         schemaName : 'lists',
