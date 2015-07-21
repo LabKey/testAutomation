@@ -35,12 +35,8 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(BaseWebDriverTest test, String title, int index)
     {
-        _test = test;
+        this(test, PortalHelper.Locators.webPart(title).index(index).waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
         _title = title;
-        List<WebElement> webparts = PortalHelper.Locators.webPart(title).findElements(test.getDriver());
-        _componentElement = webparts.get(index);
-        _id = _componentElement.getAttribute("id");
-        waitForReady();
     }
 
     public SideWebPart(BaseWebDriverTest test, String title)
@@ -50,10 +46,7 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(BaseWebDriverTest test, int index)
     {
-        _test = test;
-        List<WebElement> webparts = PortalHelper.Locators.webPart.findElements(test.getDriver());
-        _id = webparts.get(index).getAttribute("id");
-        waitForReady();
+        this(test, PortalHelper.Locators.webPart.index(index).waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
     @Override
