@@ -20,7 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.List;
@@ -459,7 +461,7 @@ public class ParticipantReportTest extends ReportTest
     private void clickSaveParticipantReport()
     {
         clickButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.className("report-config-panel"))); // Edit panel should be hidden
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.waitForExtDialogToDisappear("Saved");
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
