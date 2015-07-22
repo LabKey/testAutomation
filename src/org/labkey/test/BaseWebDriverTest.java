@@ -3156,23 +3156,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         TextSearcher searcher = new TextSearcher(this);
 
-        searcher.setSearchTransformer(new Function<String, String> ()
-        {
-            @Override
-            public String apply(String text)
-            {
-                return encodeText(text).toLowerCase();
-            }
-        });
+        searcher.setSearchTransformer((text) -> encodeText(text).toLowerCase());
 
-        searcher.setSourceTransformer(new Function<String, String>()
-        {
-            @Override
-            public String apply(String text)
-            {
-                return text.toLowerCase();
-            }
-        });
+        searcher.setSourceTransformer(String::toLowerCase);
 
         assertTextPresent(searcher, texts);
     }
@@ -3325,14 +3311,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertTextNotPresent(String... texts)
     {
         TextSearcher searcher = new TextSearcher(this);
-        searcher.setSearchTransformer(new Function<String, String>()
-        {
-            @Override
-            public String apply(String text)
-            {
-                return encodeText(text).replace("&nbsp;", " ");
-            }
-        });
+        searcher.setSearchTransformer((text) -> encodeText(text).replace("&nbsp;", " "));
 
         assertTextNotPresent(searcher, texts);
     }
