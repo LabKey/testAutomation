@@ -25,7 +25,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.FolderManagementFolderTree;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -35,7 +34,6 @@ import java.util.List;
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
-    public final FolderManagementFolderTree folderManagement = new FolderManagementFolderTree(this, getProjectName());
     private static String secondProject = "FolderTestProject2";
 
     @Override
@@ -51,11 +49,10 @@ public class FolderTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void checkQueries() // skip query validation
-    { /* Too many folder to check queries. */ }
+    protected void checkQueries() { /* Too many folder to check queries. */ }
 
     @Override
-    public void checkLinks(){} // too many folders
+    public void checkLinks() { /* too many folders */ }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -106,9 +103,11 @@ public class FolderTest extends BaseWebDriverTest
         goToFolderManagement();
     }
 
-    @Test //@Ignore("Test and helpers need update for Ext4 UI")
+    @Test
     public void testMoveFolder()
     {
+        final FolderManagementFolderTree folderManagement = new FolderManagementFolderTree(this, getProjectName());
+
         log("Reorder folders test");
         folderManagement.expandFolderNode("A");
         folderManagement.expandFolderNode("AB");
@@ -216,11 +215,11 @@ public class FolderTest extends BaseWebDriverTest
     {
         for(String text : texts)
         {
-            List<WebElement> links = getLinksWithText(text);
+            List<WebElement> links = Locator.linkWithText(text).findElements(getDriver());
             for(int i = 0; i < links.size(); i++)
             {
                 pushLocation();
-                getLinksWithText(text).get(i).click();
+                Locator.linkWithText(text).findElements(getDriver()).get(i).click();
                 waitForElement(Locator.tagWithText("span", "Views"));
                 assertElementPresent(Locator.tagWithText("span", "Charts"));
                 assertElementPresent(Locator.tagWithText("span", "View Design"));
@@ -228,46 +227,6 @@ public class FolderTest extends BaseWebDriverTest
                 assertElementPresent(Locator.linkWithText("details"));
                 popLocation();
             }
-        }
-    }
-
-    private List<WebElement> getLinksWithText(String text)
-    {
-        return this.getDriver().findElements(Locator.linkWithText(text).toBy());
-    }
-
-    public String getNameForQueryWebpart(String title)
-    {
-        Locator l = Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + ":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]");
-        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
-        return getAttribute(l, "id").substring(11);
-    }
-
-    public DataRegionTable getDrForQueryWebpart(String title)
-    {
-        return new DataRegionTable(getNameForQueryWebpart(title), this);
-    }
-
-    private void reorderProjects(String project, String targetProject, FolderManagementFolderTree.Reorder order, boolean successExpected)
-    {
-        log("Reorder project: '" + project + "' " + order.toString() + " '" + targetProject + "'");
-//        getXpathCount(Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+project+"']/.."));
-        Locator p = Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+project+"']/..");
-        Locator t = Locator.xpath("//div[contains(@class, 'x4-unselectable') and text()='"+targetProject+"']/..");
-
-//        Locator p = Locator.xpath("//div/a/span[text()='"+project+"']");
-//        Locator t = Locator.xpath("//div/a/span[text()='"+targetProject+"']");
-
-        waitForElement(p, WAIT_FOR_JAVASCRIPT);
-        waitForElement(t, WAIT_FOR_JAVASCRIPT);
-
-        sleep(1000); //TODO: Figure out what to wait for
-
-        dragAndDrop(p, t, order == FolderManagementFolderTree.Reorder.preceding ? Position.top : Position.bottom);
-        if(successExpected)
-        {
-            _extHelper.waitForExtDialog("Change Display Order");
-            clickButton("Confirm Reorder", 0);
         }
     }
 
