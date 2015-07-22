@@ -18,21 +18,17 @@ package org.labkey.test.tests;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
-import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Category({MS2.class, DailyA.class})
 public class MS2ExportTest extends AbstractMS2ImportTest
@@ -64,10 +60,9 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
         clickButton("Compare");
-        assert (getCompExcelExportRowCount()==114);
-
-
+        Assert.assertEquals("Wrong number of rows in exported Excel file", 114, getCompExcelExportRowCount());
     }
+
     private int getCompExcelExportRowCount()
     {
         File export = compExcelExport();
@@ -82,6 +77,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
             throw new RuntimeException("Error reading exported grid file", fail);
         }
     }
+
     private int getBulkExcelExportRowCount()
     {
         File export = bulkExcelExport();
@@ -96,7 +92,6 @@ public class MS2ExportTest extends AbstractMS2ImportTest
             throw new RuntimeException("Error reading exported grid file", fail);
         }
     }
-
 
     private File bulkExcelExport()
     {
@@ -113,8 +108,6 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         return clickAndWaitForDownload(Locator.lkButton("Export to Excel"), 1)[0];
     }
 
-
-
     private void validateBulkExport()
     {
         log("Test export 2 runs together");
@@ -123,8 +116,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         clickButton("MS2 Export");
 
         assertTextPresent("BiblioSpec");
-        //int rc = getExcelExportRowCount();
-        assert (getBulkExcelExportRowCount()==116);
+        Assert.assertEquals("Wrong number of rows in exported Excel file", 116, getBulkExcelExportRowCount());
 
         Runnable tsvPeptideValidator = new Runnable()
         {
