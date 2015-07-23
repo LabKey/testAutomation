@@ -435,6 +435,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                                     "text/x-script.perl," +
                                     "text/tab-separated-values," +
                                     "text/csv");
+                    profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
                     if (isScriptCheckEnabled())
                     {
                         try
@@ -480,8 +481,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public Object executeScript(String script, Object... arguments)
     {
-        JavascriptExecutor exec = (JavascriptExecutor) getDriver();
-        return exec.executeScript(script, arguments);
+        return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
 
     public void pauseJsErrorChecker()
@@ -2850,16 +2850,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript(
+        executeScript(""+
                 "var element = arguments[0];" +
-                        "var eventType = arguments[1];" +
-                        "var myEvent = document.createEvent('UIEvent');\n" +
-                        "myEvent.initEvent(\n" +
-                        "   eventType      // event type\n" +
-                        "   ,true      // can bubble?\n" +
-                        "   ,true      // cancelable?\n" +
-                        ");\n" +
-                        "element.dispatchEvent(myEvent);", el, event.toString());
+                "var eventType = arguments[1];" +
+                "var myEvent = document.createEvent('UIEvent');" +
+                "myEvent.initEvent(" +
+                "   eventType, /* event type */" +
+                "   true,      /* can bubble? */" +
+                "   true       /* cancelable? */" +
+                ");" +
+                "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
     public void hoverProjectBar()
@@ -3461,17 +3461,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      * If signal element is already present, this will wait for it to become stale and be recreated
      * @param func Function that will trigger the desired signal to appear on the page
      * @param signalName Should match the signal name defined in LABKEY.Utils.signalWebDriverTest
+     * @return The 'value' of the signal, if any
      */
-    public void doAndWaitForPageSignal(Runnable func, String signalName)
+    public String doAndWaitForPageSignal(Runnable func, String signalName)
     {
-        List<WebElement> signal = Locators.pageSignal(signalName).findElements(getDriver());
+        List<WebElement> previousSignal = Locators.pageSignal(signalName).findElements(getDriver());
 
         func.run();
 
-        if (!signal.isEmpty())
-            shortWait().until(ExpectedConditions.stalenessOf(signal.get(0)));
+        if (!previousSignal.isEmpty())
+            shortWait().until(ExpectedConditions.stalenessOf(previousSignal.get(0)));
 
-        waitForElement(Locators.pageSignal(signalName));
+        WebElement newSignal = waitForElement(Locators.pageSignal(signalName));
+        return newSignal.getAttribute("value");
     }
 
     /**
