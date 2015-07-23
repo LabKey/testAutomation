@@ -60,7 +60,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
         clickButton("Compare");
-        Assert.assertEquals("Wrong number of rows in exported Excel file", 114, getCompExcelExportRowCount());
+        Assert.assertEquals("Wrong number of rows in exported Excel file", 111, getCompExcelExportRowCount());
     }
 
     private int getCompExcelExportRowCount()
@@ -70,7 +70,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         {
             Workbook wb = ExcelHelper.create(export);
             Sheet sheet = wb.getSheetAt(0);
-            return sheet.getLastRowNum(); // +1 for zero-based, -1 for header row
+            return sheet.getLastRowNum() - 1; // +1 for zero-based, -2 for header rows
         }
         catch (IOException | InvalidFormatException fail)
         {
