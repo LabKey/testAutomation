@@ -5,16 +5,13 @@
     <transforms>
         <transform id="step1" type="StoredProcedure">
             <procedure schemaName="vehicle" procedureName="etlTest" useTransaction="false">
-                <parameter name="@testMode" value="4"/>
+                <parameter name="@testMode" value="4" scope="global"/>
                 <parameter name="@testInOutParam" value="before" scope="global"/>
                 <parameter name="@runCount" value="0" scope="global"/>
             </procedure>
         </transform>
         <transform id="step2" type="StoredProcedure">
             <procedure schemaName="vehicle" procedureName="etlTest" useTransaction="false">
-                <parameter name="@testMode" value="4"/>
-                <parameter name="@testInOutParam" scope="global"/>
-                <parameter name="@runCount" scope="global"/>
             </procedure>
         </transform>
     </transforms>

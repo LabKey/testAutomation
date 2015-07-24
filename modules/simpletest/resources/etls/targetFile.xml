@@ -6,7 +6,7 @@
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
         <source schemaName="vehicle" queryName="etl_source" />
-        <destination type="file" dir="etlOut" fileBaseName="report" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
     </transform>
     <transform id="TestETLPipeline" type="ExternalPipelineTask" externalTaskId="org.labkey.api.pipeline.cmd.CommandTask:simpleTestTailCommand"/>
 </transforms>

@@ -146,12 +146,13 @@ modules/simpletest/resources/etls/SProcBadModifiedSinceWithBadSource.xml -text
 modules/simpletest/resources/etls/SProcBadNonZeroReturnCode.xml -text
 modules/simpletest/resources/etls/SProcBadProcedureName.xml -text
 modules/simpletest/resources/etls/SProcBadThrowError.xml -text
+modules/simpletest/resources/etls/SProcGate.xml -text
+modules/simpletest/resources/etls/SProcGlobalParameters.xml -text
 modules/simpletest/resources/etls/SProcModifiedSinceNoSource.xml -text
 modules/simpletest/resources/etls/SProcModifiedSinceWithSource.xml -text
 modules/simpletest/resources/etls/SProcNoWork.xml -text
 modules/simpletest/resources/etls/SProcNormalOperation.xml -text
 modules/simpletest/resources/etls/SProcOverridePersistedParameter.xml -text
-modules/simpletest/resources/etls/SProcPersistedGlobalParameter.xml -text
 modules/simpletest/resources/etls/SProcPersistedParameter.xml -text
 modules/simpletest/resources/etls/SProcResultSet.xml -text
 modules/simpletest/resources/etls/SProcRunFilter.xml -text
@@ -164,6 +165,7 @@ modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendAndTaskRefTask.xml -text
 modules/simpletest/resources/etls/appendIdByRun.xml -text
+modules/simpletest/resources/etls/appendMappedColumns.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
@@ -172,6 +174,7 @@ modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#ap
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/saveStateMidJobWithSleep.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/tailFile.xml -text
 modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/targetFileQueueTail.xml -text
@@ -231,6 +234,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-14.30-15.10.sq
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.00-15.01.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.10-15.20.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.20-15.21.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1.00.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
@@ -254,6 +258,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-14.30-15.10.sql
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.00-15.01.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.20.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.20-15.21.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
 modules/simpletest/resources/scripts/simpletest/ScriptValidationExports.js -text
@@ -370,6 +375,7 @@ src/org/labkey/test/etl/ETLBaseTest.java -text
 src/org/labkey/test/etl/ETLClientApiCommandTest.java -text
 src/org/labkey/test/etl/ETLHelper.java -text
 src/org/labkey/test/etl/ETLRemoteSourceTest.java -text
+src/org/labkey/test/etl/ETLSimpleTransformTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
 src/org/labkey/test/module/ModuleTest.java -text

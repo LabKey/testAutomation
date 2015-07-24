@@ -37,8 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DataIntegrationHelper
 {
@@ -46,7 +46,7 @@ public class DataIntegrationHelper
     private String _username = PasswordUtil.getUsername();
     private String _password = PasswordUtil.getPassword();
     private String _folderPath;
-    private String _diSchema = "dataintegration";
+    public final static String DI_SCHEMA = "dataintegration";
 
     public DataIntegrationHelper(String folderPath)
     {
@@ -117,10 +117,7 @@ public class DataIntegrationHelper
 
     public String getTransformStatusByTransformId(String transformId) throws CommandException, IOException
     {
-        // TODO: Proper handling of null transformId
-        String query = "SELECT Status FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
-        return response.getRows().get(0).get("Status").toString();
+        return getTransformRunFieldByTransformId(transformId, "Status");
     }
 
     public String getExperimentRunId(String jobId) throws Exception
@@ -128,11 +125,19 @@ public class DataIntegrationHelper
         return getTransformRunFieldByJobId(jobId, "ExpRunId");
     }
 
+    public String getTransformRunFieldByTransformId(String transformId, String fieldName) throws CommandException, IOException
+    {
+        // TODO: Proper handling of null transformId
+        String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
+        return response.getRows().get(0).get(fieldName).toString();
+    }
+
     public String getTransformRunFieldByJobId(String jobId, String fieldName) throws CommandException, IOException
     {
         // TODO: Proper handling of null jobId
         String query = "SELECT " + fieldName + " FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get(fieldName).toString();
     }
 
@@ -140,7 +145,7 @@ public class DataIntegrationHelper
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT TransformState FROM dataintegration.TransformConfiguration WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
         return response.getRows().get(0).get("TransformState").toString();
     }
 
@@ -159,7 +164,7 @@ public class DataIntegrationHelper
         UpdateTransformConfigurationCommand command = new UpdateTransformConfigurationCommand(transformId);
         command.setVerboseLogging(verbose);
         command.setEnabled(enabled);
-        response = command.execute(cn, _diSchema);
+        response = command.execute(cn, DI_SCHEMA);
         return response;
     }
 
@@ -170,7 +175,7 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get("EntityID").toString();
     }
 
-    private void sleep(long ms)
+    public void sleep(long ms)
     {
         try
         {
@@ -185,7 +190,7 @@ public class DataIntegrationHelper
     public String getEtlLogFile(String jobId) throws CommandException, IOException
     {
         String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
-        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        SelectRowsResponse response = executeQuery("/" + _folderPath, DI_SCHEMA, query);
         String filePath = response.getRows().get(0).get("FilePath").toString();
         if (filePath == null)
             return null;

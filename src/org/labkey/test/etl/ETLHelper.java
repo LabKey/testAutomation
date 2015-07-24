@@ -15,8 +15,9 @@
  */
 package org.labkey.test.etl;
 
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -24,6 +25,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -31,6 +33,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ public class ETLHelper
     public static final String ETL_TARGET_2 = "etl_target2";
     public static final String ETL_DELETE = "etl_delete";
     public static final String TRANSFER = "transfer";
+    public static final String COMPLETE = "COMPLETE";
     private BaseWebDriverTest _test;
 
     private int _jobsComplete;
@@ -122,6 +126,8 @@ public class ETLHelper
     {
         _expectedErrors = 0;
         _jobsComplete = 0;
+        _transformHistories.clear();
+        _transformSummaries.clear();
     }
 
     //sets 'enabled' checkbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
@@ -238,7 +244,7 @@ public class ETLHelper
 
     protected void verifyTransformHistory(String transformId, String transformDesc)
     {
-        verifyTransformHistory(transformId, transformDesc, "COMPLETE");
+        verifyTransformHistory(transformId, transformDesc, COMPLETE);
     }
 
     protected void verifyTransformHistory(String transformId, String transformDesc, String status)
@@ -425,7 +431,7 @@ public class ETLHelper
                     return true;
                 else if (_test.isElementPresent(Locator.tag("tr")
                         .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                        .withPredicate(Locator.xpath("td").withText("COMPLETE"))))
+                        .withPredicate(Locator.xpath("td").withText(COMPLETE))))
                     return true;
                 else
                     _test.refresh();
@@ -459,13 +465,28 @@ public class ETLHelper
         return wait ? _diHelper.runTransformAndWait(transformId, 30000) : _diHelper.runTransform(transformId);
     }
 
-    private String ensureFullIdString(String transformId)
+    String ensureFullIdString(String transformId)
     {
         if (!StringUtils.startsWith(transformId, "{"))
         {
             transformId = "{simpletest}/" + transformId;
         }
         return transformId;
+    }
+
+    public void waitForStatus(String transformId, @NotNull String status, int msTimeout) throws IOException, CommandException
+    {
+        String currentStatus;
+        long startTime = System.currentTimeMillis();
+        do
+        {
+            currentStatus = _diHelper.getTransformStatusByTransformId(ensureFullIdString(transformId));
+            if(status.equalsIgnoreCase(currentStatus))
+                return;
+            else
+                _diHelper.sleep(500);
+        }while(System.currentTimeMillis() - startTime < msTimeout);
+        throw new TestTimeoutException("Timeout for ETL status. Current status = " + currentStatus + ". Exceeded " + msTimeout + "ms");
     }
 
     protected RunTransformResponse runETL_API(String transformId) throws Exception
