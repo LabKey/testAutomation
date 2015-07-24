@@ -363,6 +363,7 @@ public class SecurityTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
         prepForPageLoad();
         clickButtonContainingText("Reset Password", 0);
+        sleep(500);
         acceptAlert();
         waitForPageToLoad();
         clickButton("Done");

@@ -6208,6 +6208,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
         beginAt(queryURL);
         createNewQuery(schemaName);
+        waitForElement(Locator.name("ff_newQueryName"));
         setFormElement(Locator.name("ff_newQueryName"), name);
         clickButton("Create and Edit Source", 0);
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
