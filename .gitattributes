@@ -421,6 +421,7 @@ src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
+src/org/labkey/test/pages/study/CreateStudyPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text

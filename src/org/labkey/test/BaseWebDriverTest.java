@@ -131,6 +131,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -1139,10 +1140,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if (!isElementPresent(Locator.css("#adminMenuPopupText")))
             stopImpersonating();
-        if (!isElementPresent(Locator.id("projectBar")))
+        if (!isElementPresent(Locators.projectBar))
         {
             goToHome();
-            waitForElement(Locator.id("projectBar"), WAIT_FOR_PAGE);
+            waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
         }
     }
 
@@ -2850,7 +2851,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void fireEvent(WebElement el, SeleniumEvent event)
     {
-        executeScript(""+
+        executeScript("" +
                 "var element = arguments[0];" +
                 "var eventType = arguments[1];" +
                 "var myEvent = document.createEvent('UIEvent');" +
@@ -2864,10 +2865,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void hoverProjectBar()
     {
-        Locator.IdLocator projectBar = Locator.id("projectBar");
-        waitForElement(projectBar);
+        waitForElement(Locators.projectBar);
         waitForHoverNavigationReady();
-        click(projectBar);
+        click(Locators.projectBar);
         waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
@@ -3486,16 +3486,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * Wait for Checker.check() to return true
+     * Wait for Supplier to return true
      * @param wait milliseconds
-     * @return false if Checker.check() doesn't return true within 'wait' ms
+     * @return false if Supplier.get() doesn't return true within 'wait' ms
      */
-    public boolean waitFor(Checker checker, int wait)
+    public boolean waitFor(Supplier<Boolean> checker, int wait)
     {
         long startTime = System.currentTimeMillis();
         do
         {
-            if( checker.check() )
+            if( checker.get() )
                 return true;
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
@@ -3503,7 +3503,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return false;
     }
 
-    public void waitFor(Checker checker, String failMessage, int wait)
+    public void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
     {
         if (!waitFor(checker, wait))
         {
@@ -3514,7 +3514,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForAlert(String alertText, int wait)
     {
-        waitFor(new Checker(){public boolean check(){return isAlertPresent();}}, "No alert appeared.", wait);
+        waitFor(this::isAlertPresent, "No alert appeared.", wait);
         assertAlert(alertText);
     }
 
@@ -3718,9 +3718,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public static abstract class Checker
+    /**
+     * @deprecated Use {@link Supplier<Boolean>}
+     */
+    @Deprecated
+    public static abstract class Checker implements Supplier<Boolean>
     {
         public abstract boolean check();
+
+        @Override
+        final public Boolean get()
+        {
+            return check();
+        }
     }
 
     public WebElement waitForElement(final Locator locator)
@@ -4013,7 +4023,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public String getFormElement(Locator loc)
     {
-        return loc.findElement(getDriver()).getAttribute("value");
+        return getFormElement(loc.findElement(getDriver()));
+    }
+
+    public String getFormElement(WebElement el)
+    {
+        return (String) executeScript("return arguments[0].value;", el);
     }
 
     public void assertFormElementEquals(Locator loc, String value)
@@ -5835,14 +5850,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void goToProjectHome()
     {
-        if(!isElementPresent(Locator.linkWithText(getProjectName())))
-            goToHome();
-        clickProject(getProjectName());
+        goToProjectHome(getProjectName());
     }
 
     public void goToProjectHome(String projectName)
     {
-        if(!isElementPresent(Locator.linkWithText(projectName)))
+        if(!isElementPresent(Locators.projectBar))
             goToHome();
         clickProject(projectName);
     }
@@ -5858,10 +5871,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void goToProjectSettings(String project)
     {
-        if(!isElementPresent(Locator.id("projectBar")))
-            goToHome();
-        clickProject(project);
-
+        goToProjectHome(project);
         goToProjectSettings();
     }
 
@@ -6199,7 +6209,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             selectQuery(schemaName, baseQueryName);
         else
             selectSchema(schemaName);
-        click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Create New Query']"));
+        clickAndWait(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Create New Query']"));
     }
 
 

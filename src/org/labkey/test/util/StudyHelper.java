@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.study.CreateStudyPage;
 
 import java.io.File;
 import java.util.List;
@@ -30,6 +31,12 @@ public class StudyHelper extends AbstractHelper
     public StudyHelper(BaseWebDriverTest test)
     {
         super(test);
+    }
+
+    public CreateStudyPage startCreateStudy()
+    {
+        _test.clickAndWait(Locator.lkButton("Create Study"));
+        return new CreateStudyPage(_test);
     }
 
     @LogMethod
@@ -378,5 +385,25 @@ public class StudyHelper extends AbstractHelper
         _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
         _test.uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
         _test.clickButton("Done");
+    }
+
+    public enum TimepointType
+    {
+        DATE,
+        VISIT
+    }
+
+    public enum RepositoryType
+    {
+        SIMPLE,
+        ADVANCED
+    }
+
+    public enum SecurityMode
+    {
+        BASIC_READ,
+        BASIC_WRITE,
+        ADVANCED_READ,
+        ADVANCED_WRITE
     }
 }
