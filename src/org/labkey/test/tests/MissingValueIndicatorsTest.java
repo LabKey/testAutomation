@@ -70,9 +70,9 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             sleep(500);
         }
 
-        click(getButtonLocator("Add"));
-        click(getButtonLocator("Add"));
-        click(getButtonLocator("Add"));
+        clickButton("Add", 0);
+        clickButton("Add", 0);
+        clickButton("Add", 0);
         sleep(500);
 
         // This is disgusting. For some reason a simple XPath doesn't seem to work: we have to get the id right,

@@ -16,10 +16,10 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,25 +89,31 @@ public abstract class GenericChartsTest extends ReportTest
     @LogMethod
     protected void savePlot(String name, String description)
     {
-        boolean saveAs = getButtonLocator("Save As") != null;
+        boolean saveAs;
+        WebElement saveButton;
+        try
+        {
+            saveButton = findButton("Save As");
+            saveAs = true;
+        }
+        catch (NoSuchElementException wrongButton)
+        {
+            saveButton = findButton("Save");
+            saveAs = false;
+        }
 
-        clickButton(saveAs ? "Save As" : "Save", 0);
+        saveButton.click();
         _extHelper.waitForExtDialog(saveAs ? "Save As" : "Save");
-        setFormElement("reportName", name);
-        setFormElement("reportDescription", description);
+        setFormElement(Locator.name("reportName"), name);
+        setFormElement(Locator.name("reportDescription"), description);
         clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save", "Save");
         _extHelper.waitForExtDialogToDisappear("Saved");
         waitForText(name);
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return !(Boolean)executeScript("var p = Ext4.getCmp('generic-report-panel-1'); " +
+        waitFor(() ->
+                !(Boolean) executeScript("var p = Ext4.getCmp('generic-report-panel-1'); " +
                         "if (p) return p.isDirty(); " +
-                        "else return false;");
-            }
-        }, "Page still dirty", WAIT_FOR_JAVASCRIPT);
+                        "else return false;"),
+                "Page still dirty", WAIT_FOR_JAVASCRIPT);
 
         _plots.add(name);
         _plotDescriptions.add(description);

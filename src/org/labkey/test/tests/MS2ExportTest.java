@@ -97,8 +97,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
     {
         checkRadioButton(Locator.radioButtonByNameAndValue("exportFormat", "Excel"));
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");
-        Locator.XPathLocator buttonLocator = getButtonLocator("Export");
-        return clickAndWaitForDownload(buttonLocator,1)[0];
+        return clickAndWaitForDownload(findButton("Export"));
     }
 
     private File compExcelExport()

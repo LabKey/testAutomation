@@ -94,10 +94,10 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
-        assertFormElementEquals("SpecimenID", "SpecimenID");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "VisitID");
-        assertFormElementEquals("Date", "DrawDt");
+        assertFormElementEquals(Locator.name("SpecimenID"), "SpecimenID");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "VisitID");
+        assertFormElementEquals(Locator.name("Date"), "DrawDt");
         // Unable to check fail state: Selenium can't handle GWT alert.
         // clickButton("Begin import", 0);
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
@@ -126,10 +126,10 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
-        assertFormElementEquals("SpecimenID", "SpecimenID");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "VisitID");
-        assertFormElementEquals("Date", "DrawDt");
+        assertFormElementEquals(Locator.name("SpecimenID"), "SpecimenID");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "VisitID");
+        assertFormElementEquals(Locator.name("Date"), "DrawDt");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         clickButton("Next", defaultWaitForPage);
@@ -155,10 +155,10 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Advanced");
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
         clickButton("OK", 0);
-        assertFormElementEquals("SpecimenID", "SpecimenID");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "VisitID");
-        assertFormElementEquals("Date", "DrawDt");
+        assertFormElementEquals(Locator.name("SpecimenID"), "SpecimenID");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "VisitID");
+        assertFormElementEquals(Locator.name("Date"), "DrawDt");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String);
         clickButton("Show Assay Designer");
 
@@ -181,34 +181,34 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         _fileBrowserHelper.importFile(ALIASED_ASSAY_1, "Create New General Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        assertFormElementEquals("SpecimenID", "specId");
-        assertFormElementEquals("ParticipantID", "ParticipantID");
-        assertFormElementEquals("VisitID", "visitNo");
-        assertFormElementEquals("Date", "draw_date");
+        assertFormElementEquals(Locator.name("SpecimenID"), "specId");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ParticipantID");
+        assertFormElementEquals(Locator.name("VisitID"), "visitNo");
+        assertFormElementEquals(Locator.name("Date"), "draw_date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
         _fileBrowserHelper.importFile(ALIASED_ASSAY_2, "Create New General Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        assertFormElementEquals("SpecimenID", "vialId1");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "visit_no");
-        assertFormElementEquals("Date", "drawDate");
+        assertFormElementEquals(Locator.name("SpecimenID"), "vialId1");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "visit_no");
+        assertFormElementEquals(Locator.name("Date"), "drawDate");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
         _fileBrowserHelper.importFile(ALIASED_ASSAY_3, "Create New General Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        assertFormElementEquals("SpecimenID", "vialId");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "visitId");
-        assertFormElementEquals("Date", "date");
+        assertFormElementEquals(Locator.name("SpecimenID"), "vialId");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "visitId");
+        assertFormElementEquals(Locator.name("Date"), "date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
         _fileBrowserHelper.importFile(ALIASED_ASSAY_4, "Create New General Assay Design");
         waitForText(WAIT_FOR_JAVASCRIPT, "SpecimenID");
-        assertFormElementEquals("SpecimenID", "guspec");
-        assertFormElementEquals("ParticipantID", "ptid");
-        assertFormElementEquals("VisitID", "visitId");
-        assertFormElementEquals("Date", "date");
+        assertFormElementEquals(Locator.name("SpecimenID"), "guspec");
+        assertFormElementEquals(Locator.name("ParticipantID"), "ptid");
+        assertFormElementEquals(Locator.name("VisitID"), "visitId");
+        assertFormElementEquals(Locator.name("Date"), "date");
         clickButton("Cancel");
 
         log("Import FASTA GPAT assay");

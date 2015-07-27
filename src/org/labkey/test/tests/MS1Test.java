@@ -280,8 +280,8 @@ public class MS1Test extends BaseWebDriverTest
         setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
         clickAndWait(Locator.linkWithText("similar"));
-        assertFormElementEquals("mzSource", "733.4119");
-        assertFormElementEquals("timeSource", "1928.3200");
+        assertFormElementEquals(Locator.name("mzSource"), "733.4119");
+        assertFormElementEquals(Locator.name("timeSource"), "1928.3200");
         assertTextPresent("1904");
 
         //scan 1904 should also be there
@@ -294,7 +294,7 @@ public class MS1Test extends BaseWebDriverTest
         assertTextPresent("1888", "1921", "1976");
 
         selectOptionByValue(Locator.name("timeUnits"), "scans");
-        assertFormElementEquals("timeSource", "1948");
+        assertFormElementEquals(Locator.name("timeSource"), "1948");
         setFormElement("timeOffset", "2");
         clickButton("Search");
         assertTextNotPresent("659.3492"); //m/z value that should no longer be there

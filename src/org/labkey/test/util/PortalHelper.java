@@ -22,10 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -401,15 +398,15 @@ public class PortalHelper extends AbstractHelper
     {
         openWebpartPermissionWindow(webpart);
 
-        _test.assertFormElementEquals("permission", expectedPermission);
+        _test.assertFormElementEquals(Locator.name("permission"), expectedPermission);
 
         if(expectedFolder == null)
         {
-            _test.assertFormElementEquals("permissionContainer", "");
+            _test.assertFormElementEquals(Locator.name("permissionContainer"), "");
         }
         else
         {
-            _test.assertFormElementEquals("permissionContainer", expectedFolder);
+            _test.assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
         }
 
         _test.click(Locator.tagWithText("span", "Cancel"));

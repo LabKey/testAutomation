@@ -172,7 +172,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButtonContainingText("Import Data");
         waitForText("Copy/paste text");
         setFormElement(Locator.xpath("//textarea"), header + tsv);
-        click(Locator.xpath(getButtonLocator("Submit").getLocatorString()));
+        clickButton("Submit", 0);
         waitForText(msg);
     }
 

@@ -97,6 +97,7 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -140,7 +141,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isDevModeEnabled;
@@ -3600,12 +3600,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public File clickAndWaitForDownload(Locator elementToClick)
     {
-        return clickAndWaitForDownload(elementToClick, 1)[0];
+        return clickAndWaitForDownload(elementToClick.findElement(getDriver()));
     }
 
     public File[] clickAndWaitForDownload(final Locator elementToClick, final int expectedFileCount)
     {
-        return doAndWaitForDownload(() -> click(elementToClick), expectedFileCount);
+        return clickAndWaitForDownload(elementToClick.findElement(getDriver()), expectedFileCount);
+    }
+
+    public File clickAndWaitForDownload(final WebElement elementToClick)
+    {
+        return clickAndWaitForDownload(elementToClick, 1)[0];
+    }
+
+    public File[] clickAndWaitForDownload(final WebElement elementToClick, final int expectedFileCount)
+    {
+        return doAndWaitForDownload(elementToClick::click, expectedFileCount);
     }
 
     public File doAndWaitForDownload(Runnable func)
@@ -3770,23 +3780,33 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return true;
     }
 
-    public void waitForAnyElement(final Locator... locators)
+    public WebElement waitForAnyElement(final Locator... locators)
     {
-        if (locators.length > 0)
+        if (locators.length == 0)
+            throw new IllegalArgumentException("Specify at least one Locator");
+
+        try
         {
-            waitFor(new Checker()
+            return shortWait().until(new ExpectedCondition<WebElement>()
             {
                 @Override
-                public boolean check()
+                public WebElement apply(@Nullable WebDriver webDriver)
                 {
                     for (Locator loc : locators)
                     {
-                        if (isElementPresent(loc))
-                            return true;
+                        try
+                        {
+                            return loc.findElement(webDriver);
+                        }
+                        catch (NoSuchElementException ignore) {}
                     }
-                    return false;
+                    return null;
                 }
-            }, "No Element Appeared", WAIT_FOR_JAVASCRIPT);
+            });
+        }
+        catch (TimeoutException notFound)
+        {
+            throw new NoSuchElementException("None of the specified elements appeared");
         }
     }
 
@@ -3810,18 +3830,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void waitForElementWithRefresh(Locator loc, int wait)
+    public WebElement waitForElementWithRefresh(Locator loc, int wait)
     {
         long startTime = System.currentTimeMillis();
 
         do
         {
-            if(waitForElement(loc, 1000, false))
-                return;
-            refresh();
+            try
+            {
+                return waitForElement(loc, 1000);
+            }
+            catch (NoSuchElementException retry)
+            {
+                refresh();
+            }
         }while(System.currentTimeMillis() - startTime < wait);
 
-        waitForElement(loc, 1000);
+        return waitForElement(loc, 1000);
     }
 
     public void waitForElementText(final Locator locator, final String text)
@@ -3932,7 +3957,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Deprecated public void submit()
     {
         WebElement form = getDriver().findElement(By.xpath("//td[@id='bodypanel']//form[1]"));
-        submit(form);
+        doAndWaitForPageToLoad(form::submit);
     }
 
     /**
@@ -3941,14 +3966,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Deprecated public void submit(Locator formLocator)
     {
         WebElement form = formLocator.findElement(getDriver());
-        submit(form);
-    }
-
-    /**
-     * @deprecated Use {@link #clickButton(String)}
-     */
-    @Deprecated public void submit(final WebElement form)
-    {
         doAndWaitForPageToLoad(form::submit);
     }
 
@@ -3992,11 +4009,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return (elemText != null && elemText.contains(text));
     }
 
-    public void assertFormElementEquals(String elementName, String value)
-    {
-        assertFormElementEquals(Locator.name(elementName), value);
-    }
-
     public void waitForFormElementToEqual(final Locator locator, final String value)
     {
         String failMessage = "Field with locator " + locator + " did not equal " + value + ".";
@@ -4038,7 +4050,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
+        assertNotEquals("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
     }
 
     public void assertOptionEquals(Locator loc, String value)
@@ -4107,14 +4119,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTextPresentInThisOrder(links);
     }
 
-    public void scrollIntoView(Locator loc)
+    public WebElement scrollIntoView(Locator loc)
     {
-        scrollIntoView(loc.findElement(getDriver()));
+        return scrollIntoView(loc.findElement(getDriver()));
     }
 
-    public void scrollIntoView(WebElement el)
+    public WebElement scrollIntoView(WebElement el)
     {
         executeScript("arguments[0].scrollIntoView(true);", el);
+        return el;
     }
 
     public void click(Locator l)
@@ -4281,7 +4294,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         Actions builder = new Actions(getDriver());
-        builder.clickAndHold(fromEl).moveToElement(toEl, toEl.getSize().getWidth()/2, y).release().build().perform();
+        builder.clickAndHold(fromEl).moveToElement(toEl, toEl.getSize().getWidth() / 2, y).release().build().perform();
     }
 
     public void dragAndDrop(Locator el, int xOffset, int yOffset)
@@ -4604,7 +4617,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public boolean isButtonPresent(String text)
     {
-        return (getButtonLocator(text) != null);
+        try
+        {
+            findButton(text);
+            return true;
+        }
+        catch (NoSuchElementException notPresent)
+        {
+            return false;
+        }
     }
 
     public void clickButtonByIndex(String text, int index)
@@ -4614,99 +4635,88 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void clickButtonByIndex(String text, int index, int wait)
     {
-        Locator.XPathLocator buttonLocator = getButtonLocator(text, index);
-        if (buttonLocator != null)
-            clickAndWait(buttonLocator, wait);
-        else
-            throw new NoSuchElementException("No button found with text \"" + text + "\" at index " + index);
+        clickAndWait(findButton(text, index), wait);
     }
 
-    public Locator.XPathLocator getButtonLocator(String text, int index)
+    public WebElement findButton(String text, int index)
     {
-        // check for normal labkey nav button:
-        Locator.XPathLocator locator = Locator.button(text).index(index);
-        if (isElementPresent(locator))
-            return locator;
+        Locator.XPathLocator[] locators = {
+                // check for normal labkey button:
+                Locator.lkButton(text).index(index),
+                // check for Ext 4 button:
+                Ext4Helper.Locators.ext4Button(text).index(index),
+                // check for Ext button:
+                Locator.extButton(text).index(index),
+                // check for normal html button:
+                Locator.button(text).index(index)
+        };
 
-        // check for normal labkey submit button:
-        locator = Locator.lkButton(text).index(index);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext button:
-        locator = Locator.extButton(text).index(index);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext 4 button:
-        locator = Ext4Helper.Locators.ext4Button(text).index(index);
-        if (isElementPresent(locator))
-            return locator;
-
-        return null;
-    }
-
-    public Locator.XPathLocator getButtonLocator(String text)
-    {
-        // check for normal button:
-        Locator.XPathLocator locator = Locator.button(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for normal labkey nav button:
-        locator = Locator.lkButton(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext button:
-        locator = Locator.extButton(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext 4 button:
-        locator = Ext4Helper.Locators.ext4Button(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for GWT button:
-        locator = Locator.gwtButton(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        if (text.equals(text.toUpperCase()))
-            return null;
-        else
+        try
         {
-            log("WARNING: Update test. Possible wrong casing for button: " + text);
-            return getButtonLocator(text.toUpperCase());
+            return waitForAnyElement(locators);
+        }
+        catch (NoSuchElementException notFound)
+        {
+            throw new NoSuchElementException("No button found with text \"" + text + "\" at index " + index, notFound);
         }
     }
 
-    protected Locator.XPathLocator getButtonLocatorContainingText(String text)
+    public WebElement findButton(String text)
     {
-        // check for normal button:
-        Locator.XPathLocator locator = Locator.buttonContainingText(text);
-        if (isElementPresent(locator))
-            return locator;
+        Locator.XPathLocator[] locators = {
+                // normal labkey nav button:
+                Locator.lkButton(text),
+                // Ext 4 button:
+                Ext4Helper.Locators.ext4Button(text),
+                // Ext 3 button:
+                Locator.extButton(text),
+                // normal HTML button:
+                Locator.button(text),
+                // GWT button:
+                Locator.gwtButton(text)
+        };
 
-        // check for normal labkey submit/nav button:
-        locator = Locator.lkButtonContainingText(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext button:
-        locator = Locator.extButtonContainingText(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        // check for Ext 4 button:
-        locator = Ext4Helper.Locators.ext4ButtonContainingText(text);
-        if (isElementPresent(locator))
-            return locator;
-
-        return null;
+        try
+        {
+            return waitForAnyElement(locators);
+        }
+        catch (NoSuchElementException tryCaps)
+        {
+            if (!text.equals(text.toUpperCase()))
+            {
+                log("WARNING: Update test. Possible wrong casing for button: " + text);
+                try
+                {
+                    return findButton(text.toUpperCase());
+                }
+                catch (NoSuchElementException capsFailed) {}
+            }
+            throw new NoSuchElementException("No button found with test " + text, tryCaps);
+        }
     }
 
+    protected WebElement findButtonContainingText(String text)
+    {
+        Locator.XPathLocator[] locators = {
+                // normal labkey button:
+                Locator.lkButtonContainingText(text),
+                // Ext 4 button:
+                Ext4Helper.Locators.ext4ButtonContainingText(text),
+                // Ext 3 button:
+                Locator.extButtonContainingText(text),
+                // normal HTML button:
+                Locator.buttonContainingText(text)
+        };
+
+        try
+        {
+            return waitForAnyElement(locators);
+        }
+        catch (NoSuchElementException notFound)
+        {
+            throw new NoSuchElementException("No button found containing test " + text, notFound);
+        }
+    }
 
     /**
      * Wait for a button to appear, click it, then waits for the page to load.
@@ -4731,22 +4741,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void clickButton(final String text, int waitMillis)
     {
-        // Wait for button to appear
-        String failMessage = "Button with text '" + text + "' did not appear";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return null != getButtonLocator(text);
-            }
-        }, failMessage, WAIT_FOR_JAVASCRIPT);
-
-        // Click and wait for page to load
-        Locator.XPathLocator buttonLocator = getButtonLocator(text);
-        if (buttonLocator != null)
-            clickAndWait(buttonLocator, waitMillis);
-        else
-            throw new NoSuchElementException("No button found with text \"" + text + "\"");
+        clickAndWait(findButton(text), waitMillis);
     }
 
     public void clickButtonContainingText(String text)
@@ -4756,11 +4751,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void clickButtonContainingText(String text, int waitMills)
     {
-        Locator.XPathLocator buttonLocator = getButtonLocatorContainingText(text);
-        if (buttonLocator != null)
-            clickAndWait(buttonLocator, waitMills);
-        else
-            throw new NoSuchElementException("No button found with text \"" + text + "\"");
+        clickAndWait(findButtonContainingText(text), waitMills);
     }
 
     public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)

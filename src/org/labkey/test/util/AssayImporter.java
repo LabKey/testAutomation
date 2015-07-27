@@ -18,8 +18,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
-import static org.junit.Assert.fail;
-
 public class AssayImporter
 {
     private BaseWebDriverTest test;
@@ -33,14 +31,11 @@ public class AssayImporter
 
     public void doImport()
     {
-        Locator.XPathLocator buttonLocator = test.getButtonLocator("Import Data");
         Locator linkLocator = Locator.linkContainingText("Import Data");
-        if (buttonLocator != null && test.isElementPresent(buttonLocator))
-            test.clickAndWait(buttonLocator);
-        else if (test.isElementPresent(linkLocator))
+        if (test.isElementPresent(linkLocator))
             test.clickAndWait(linkLocator);
         else
-            fail("No Import Data button available");
+            test.clickButton("Import Data");
 
         if (!options.isUseDefaultResolver())
         {

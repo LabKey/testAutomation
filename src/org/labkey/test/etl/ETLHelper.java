@@ -496,19 +496,7 @@ public class ETLHelper
 
     protected void clickRetryButton()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                if (null == _test.getButtonLocator("Retry"))
-                {
-                    _test.refresh();
-                    return false;
-                }
-                return true;
-            }
-        }, "Retry button did not appear.", BaseWebDriverTest.WAIT_FOR_PAGE);
-        _test.clickButton("Retry");
+        _test.clickAndWait(_test.waitForElementWithRefresh(Locator.lkButton("Retry"), BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
     protected void deleteSourceRow(String... ids)

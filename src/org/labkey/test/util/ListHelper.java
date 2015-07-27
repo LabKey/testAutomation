@@ -629,15 +629,18 @@ public class ListHelper extends AbstractHelper
         String prefix = _test.getPropertyXPathContains(areaTitle);
         _test.waitAndClick(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
 
-        // If domain hasn't been saved yet, the 'OK' prompt will not appear.
-        Locator.XPathLocator buttonLocator = _test.getButtonLocator("OK");
-        // TODO: Be smarter about this.  Might miss the OK that should be there.
-        if (buttonLocator != null)
+        try
         {
             // Confirm the deletion
             _test.clickButton("OK", 0);
-            _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
+        catch (NoSuchElementException ignore)
+        {
+            // TODO: Be smarter about this.  Might miss the OK that should be there.
+            // If domain hasn't been saved yet, the 'OK' prompt will not appear.
+            return;
+        }
+        _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void addFieldsNoImport(String fieldList)

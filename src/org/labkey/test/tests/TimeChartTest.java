@@ -250,7 +250,7 @@ public abstract class TimeChartTest extends ReportTest
 
     protected void saveReport(boolean expectReload)
     {
-        clickAndWait(getButtonLocator("Save", 1), expectReload ? WAIT_FOR_PAGE : 0);
+        clickAndWait(findButton("Save", 1), expectReload ? WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
             _extHelper.waitForExtDialog("Success");
@@ -287,7 +287,7 @@ public abstract class TimeChartTest extends ReportTest
 
     protected void applyChanges()
     {
-        waitAndClick(getButtonLocator("OK"));
+        clickButton("OK", 0);
         _ext4Helper.waitForMaskToDisappear();
     }
 

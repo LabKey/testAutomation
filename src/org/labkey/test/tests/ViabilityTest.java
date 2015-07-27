@@ -82,13 +82,13 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", true);
 
         log("** Check form field values");
-        assertFormElementEquals("_pool_1604505335_0_ParticipantID", "160450533");
-        assertFormElementEquals("_pool_1604505335_0_VisitID", "5.0");
-        assertFormElementEquals("_pool_1604505335_0_TotalCells", "3.700E7");
-        assertFormElementEquals("_pool_1604505335_0_ViableCells", "3.127E7");
-        assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_ParticipantID"), "160450533");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_VisitID"), "5.0");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_TotalCells"), "3.700E7");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_ViableCells"), "3.127E7");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_Viability"), "84.5%");
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
-        assertFormElementEquals("_pool_1604505335_0_IntValue", "");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_IntValue"), "");
 
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
@@ -242,11 +242,11 @@ public class ViabilityTest extends AbstractViabilityTest
         uploadViabilityRun("/sampledata/viability/small.VIA.csv", runName, false);
 
         log("** Check form field values");
-        assertFormElementEquals("_pool_1604505335_0_ParticipantID", "160450533");
-        assertFormElementEquals("_pool_1604505335_0_VisitID", "5.0");
-        assertFormElementEquals("_pool_1604505335_0_TotalCells", "3.700E7");
-        assertFormElementEquals("_pool_1604505335_0_ViableCells", "3.127E7");
-        assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_ParticipantID"), "160450533");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_VisitID"), "5.0");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_TotalCells"), "3.700E7");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_ViableCells"), "3.127E7");
+        assertFormElementEquals(Locator.name("_pool_1604505335_0_Viability"), "84.5%");
 
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");

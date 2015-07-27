@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -388,7 +387,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE);
         clickButton("Save");
         assertTextNotPresent("Invalid template");
-        assertFormElementEquals("emailSubject", subject); // regression check for issue #11389
+        assertFormElementEquals(Locator.name("emailSubject"), subject);
     }
 
     @Test
@@ -460,8 +459,8 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("entryPluralName"), "Tickets");
         clickButton("Update");
 
-        assertFormElementEquals("entrySingularName", "Ticket");
-        assertFormElementEquals("entryPluralName", "Tickets");
+        assertFormElementEquals(Locator.name("entrySingularName"), "Ticket");
+        assertFormElementEquals(Locator.name("entryPluralName"), "Tickets");
 
         assertTextPresent("Tickets Admin Page");
         clickAndWait(Locator.linkWithText("Back to Tickets"));

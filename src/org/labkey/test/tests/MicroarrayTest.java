@@ -151,7 +151,7 @@ public class MicroarrayTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("batchStringField"), "BulkProperties");
 
-        assertFormElementEquals("batchStringField", "BulkProperties");
+        assertFormElementEquals(Locator.name("batchStringField"), "BulkProperties");
         checkRadioButton(Locator.radioButtonByNameAndValue("__enableBulkProperties", "on"));
         // Try with an invalid sample name first
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +

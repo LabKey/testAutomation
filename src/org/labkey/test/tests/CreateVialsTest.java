@@ -165,7 +165,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         click(Locator.xpath("//input[@name='defaultLocationField']/../img"));
         waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
-        assertFormElementEquals("defaultLocationField", "Alice Lab");
+        assertFormElementEquals(Locator.name("defaultLocationField"), "Alice Lab");
 
         setFormElement(Locator.name("maxCellPerVialField"), "10e6");
         setFormElement(Locator.name("defaultUsedCellsField"), "1e5");

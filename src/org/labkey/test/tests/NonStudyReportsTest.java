@@ -168,9 +168,8 @@ public class NonStudyReportsTest extends ReportTest
         portalHelper.clickWebpartMenuItem("Data Views", true, "Manage Views");
         waitForText("Manage Views");
         clickReportDetailsLink(ATTACHMENT_REPORT_NAME);
-        waitForText("Report Details");
-        Locator.XPathLocator l = getButtonLocator("Edit Report");
-        assertTrue("Expected 'Edit Report' button to be present", l != null);
+        waitForElement(Locator.lkButton("View Report"));
+        assertElementPresent(Locator.lkButton("Edit Report"));
         clickButton("Edit Report");
         clickButton("Save");
         waitForText("Report Details");
@@ -178,9 +177,8 @@ public class NonStudyReportsTest extends ReportTest
         // cannot edit server
         clickTab("Overview");
         clickReportDetailsLink(ATTACHMENT_REPORT2_NAME);
-        waitForText("Report Details");
-        l = getButtonLocator("Edit Report");
-        assertTrue("Expected 'Edit Report' button to not be present", l == null);
+        waitForElement(Locator.lkButton("View Report"));
+        assertElementNotPresent(Locator.lkButton("Edit Report"));
         stopImpersonating();
 
         goToHome();

@@ -654,7 +654,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForCharts(2);
 
         // Count data points in charts by checking the title attribute of the points ('*' here due to xpath namespace limitations in svgs)
-        int elCount = getElementCount(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP1_NAME + ",\n Days"));
+//        int elCount = getElementCount(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP1_NAME + ",\n Days"));
 //        assertTrue(elCount == 10 || elCount == 20); // 10 in chart and 10 in thumbnail (chrome seems to count the thumbnail, but firefox does not)
 //        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
@@ -702,7 +702,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         enterMeasuresPanel();
         waitForText("This chart data is filtered");
         assertTextPresent("(ParticipantId =");
-        click(getButtonLocator("Cancel"));
+        clickButton("Cancel", 0);
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(10));
 

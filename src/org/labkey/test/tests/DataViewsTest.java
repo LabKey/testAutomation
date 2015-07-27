@@ -25,6 +25,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.Assert.*;
 
@@ -305,9 +306,9 @@ public class DataViewsTest extends ParticipantListTest
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Modified");
         _ext4Helper.checkCheckbox("Data Cut Date");
-        Locator manageButton = getButtonLocator("Manage Categories");
+        WebElement manageButton = findButton("Manage Categories");
         clickButton("Save", 0);
-        waitForElementToDisappear(manageButton, WAIT_FOR_JAVASCRIPT);
+        shortWait().until(ExpectedConditions.stalenessOf(manageButton));
         waitForText("Data Cut Date");
         waitForText("Modified");
         enableEditMode();

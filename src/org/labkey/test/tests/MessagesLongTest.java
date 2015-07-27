@@ -271,7 +271,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MSG2_TITLE));
         clickButton("Respond");
         selectOptionByText(Locator.name("status"), "Closed");
-        assertFormElementEquals("assignedTo", "");
+        assertFormElementEquals(Locator.name("assignedTo"), "");
         clickButton("Submit");
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");

@@ -42,7 +42,6 @@ public class TimeChartWizard
 
     public void chooseInitialMeasure(String queryName, String measure)
     {
-        _test.waitForElement(_test.getButtonLocator("Choose a Measure"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("Choose a Measure", 0);
         _test._extHelper.waitForExtDialog("Add Measure...");
         _test._extHelper.waitForLoadingMaskToDisappear(5 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -134,7 +133,7 @@ public class TimeChartWizard
         _test.setFormElement(Locator.name("reportName"), name);
         _test.setFormElement(Locator.name("reportDescription"), description);
 
-        _test.clickAndWait(_test.getButtonLocator("Save", 1), expectReload ? BaseWebDriverTest.WAIT_FOR_PAGE : 0);
+        _test.clickAndWait(_test.findButton("Save", 1), expectReload ? BaseWebDriverTest.WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
             _test._extHelper.waitForExtDialog("Success");
@@ -160,14 +159,14 @@ public class TimeChartWizard
 
     private void applyChanges()
     {
-        _test.waitAndClick(_test.getButtonLocator("OK"));
+        _test.clickButton("OK", 0);
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
     private void openGroupingPanel()
     {
         _test.clickButton("Grouping", 0);
-        _test.waitForElement(_test.getButtonLocator("Cancel"));
+        _test.findButton("Cancel");
     }
 
 

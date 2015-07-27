@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 public class CustomizeViewsHelper
 {
     private final BaseWebDriverTest _test;
@@ -125,8 +123,8 @@ public class CustomizeViewsHelper
      */
     public void saveCustomView(String name, boolean shared, boolean inherit)
     {
-        _test.scrollIntoView(_test.getButtonLocator("Save"));
-        _test.clickButton("Save", 0);
+        _test.scrollIntoView(_test.findButton("Save")).
+                click();
 
         _test._extHelper.waitForExtDialog("Save Custom View");
         

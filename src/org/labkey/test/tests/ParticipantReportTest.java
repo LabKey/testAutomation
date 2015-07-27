@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -323,7 +324,7 @@ public class ParticipantReportTest extends ReportTest
         _ext4Helper.selectGridItem("label", "17a. Preg. test result", -1, "measuresGridPanel", true);
         _ext4Helper.selectGridItem("label", "1.Adverse Experience (AE)", -1, "measuresGridPanel", true);
 
-        clickButton("Select", 0);
+        click(Ext4Helper.Locators.ext4Button("Select"));
 
         //Deselect All
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");

@@ -31,7 +31,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category(BVT.class)
 public class GroupTest extends BaseWebDriverTest
@@ -291,7 +293,7 @@ public class GroupTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("manage group"));
         waitForElement(Locator.name("names"));
         //Selenium can't handle file exports, so there's nothing to be done here.
-        assertElementPresent(getButtonLocatorContainingText("Export All to Excel"));
+        assertElementPresent(Locator.lkButton("Export All to Excel"));
 
     }
 
