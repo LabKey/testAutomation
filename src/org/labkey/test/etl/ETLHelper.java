@@ -364,24 +364,35 @@ public class ETLHelper
 
     public void runETL(String transformId)
     {
-        _runETL(transformId, true, false);
+        _runETL(transformId, true, false, false);
         _jobsComplete++;
+    }
+
+    public void runETL_JobError(String transformId)
+    {
+        _runETL(transformId, true, false, true);
     }
 
     protected void runETL_CheckerError(String transformId)
     {
-        _runETL(transformId, true, true);
+        _runETL(transformId, true, true, false);
     }
 
     public void runETL_NoWork(String transformId)
     {
-        _runETL(transformId, false, false);
+        _runETL(transformId, false, false, false);
     }
 
-    protected void _runETL(String transformId, boolean hasWork, boolean hasCheckerError)
+    protected void _runETL(String transformId, boolean hasWork, boolean hasCheckerError, boolean expectExecutionError)
     {
         runETLNoNav(transformId, hasWork, hasCheckerError);
 
+        if (!expectExecutionError)
+        {
+            _test.assertElementNotPresent(Locator.tag("tr")
+                    .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                    .withPredicate(Locator.xpath("td").withText("ERROR")));
+        }
         _test.log("returning to project home");
         _test.goToProjectHome();
     }
