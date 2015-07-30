@@ -270,6 +270,12 @@ public abstract class Locator
             {
                 return findElements(context).size() == 0;
             }
+
+            @Override
+            public String toString()
+            {
+                return "element to disappear";
+            }
         });
     }
 
