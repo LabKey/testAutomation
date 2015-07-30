@@ -39,7 +39,7 @@ public class TestCredentials
         }
         catch (IOException fail)
         {
-            throw new RuntimeException("Unable to load test credentials", fail);
+            throw new RuntimeException("Unable to load test credentials. Make sure " + credentialsFile.getName() + " exists; use test.credentials.template as a basis.", fail);
         }
     }
 

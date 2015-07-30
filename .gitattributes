@@ -719,6 +719,6 @@ src/org/labkey/test/util/ext4cmp/Ext4ComboRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FileFieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4GridRef.java -text
-/test.credentials.json -text
+/test.credentials.json.template -text
 /test.properties -text
 /upgrade_stress_test.cmd -text

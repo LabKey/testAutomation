@@ -1,3 +1,5 @@
 /build
+chromeextensions/*.zip
 /remainingTests.txt
 /selenium.log
+/test.credentials.json
