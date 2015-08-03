@@ -66,6 +66,18 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-beanutils-1.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-beanutils-1.7.0-src.zip!/commons-beanutils-1.7.0-src/optional/bean-collections/src/java" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/commons-beanutils-1.7.0-src.zip!/commons-beanutils-1.7.0-src/src/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
           <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.11.jar!/" />
         </CLASSES>
         <JAVADOC />
