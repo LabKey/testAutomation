@@ -21,14 +21,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
 
-/**
- * Created by susanh on 3/19/15.
- */
 @Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {

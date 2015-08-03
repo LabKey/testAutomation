@@ -15,13 +15,9 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
-import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -124,7 +120,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
             setFormElement(Locator.name("name"), TERMS_OF_USE_NAME);
             setFormElement(Locator.name("title"), WIKI_TERMS_TITLE);
             setFormElement(Locator.name("body"), body);
-            _wikiHelper.saveWikiPage();;
+            _wikiHelper.saveWikiPage();
             acceptTermsOfUse(null, true);
         }
     }

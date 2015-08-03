@@ -556,7 +556,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
                     "Image corrupt or truncated:",
-                    "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3, issue: 21717
+                    "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3 issue: https://github.com/mbostock/d3/issues/1805
                     "Using //@ to indicate", // jQuery
                     "CodeMirror is not defined", // There will be more severe errors than this if CodeMirror is actually broken
                     "NS_ERROR_FAILURE" // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
@@ -866,20 +866,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             bypassSecondaryAuthentication();
 
             // If there are site-wide terms, you will have to do this again and accept the terms that are now displayed.
-            if (isElementPresent(Locator.id("approvedTermsOfUse")))
+            if (isElementPresent(Locator.name("password")))
             {
-                if (isElementPresent(Locator.name("password")))
-                {
-                    setFormElement(Locator.name("email"), PasswordUtil.getUsername());
-                    setFormElement(Locator.name("password"), PasswordUtil.getPassword());
-                    acceptTermsOfUse(null, false);
-                    clickButton("Sign In");
-                }
-                else // just need to accept the terms that are now displayed
-                {
-                    acceptTermsOfUse(null, true);
-                }
+                acceptTermsOfUse(null, false);
+                clickButton("Sign In");
             }
+            else
+                acceptTermsOfUse(null, true);
 
             if (!isElementPresent(Locator.id("userMenuPopupLink")))
             {
@@ -1985,13 +1978,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
-            if (error instanceof UnreachableBrowserException || getDriver() == null ||
-                    error.getStackTrace()[0].getLineNumber() == -2 || // Line -2 indicates a native method. Probably failed due to timeout
-                    error.getCause() != null && error.getCause().getStackTrace()[0].getLineNumber() == -2) // API timeouts might wrap the native method exception
+            if (error instanceof UnreachableBrowserException || getDriver() == null)
             {
                 return;
             }
-            if (error instanceof TestTimeoutException)
+            if (error instanceof TestTimeoutException || error instanceof TimeoutException)
             {
                 _testTimeout = true;
             }
@@ -2029,7 +2020,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             try
             {
-                getArtifactCollector().dumpPageSnapshot(testName, null);
                 if (isTestRunningOnTeamCity())
                 {
                     getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
@@ -2038,6 +2028,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 if (_testTimeout)
                     getArtifactCollector().dumpThreads(this);
+                getArtifactCollector().dumpPageSnapshot(testName, null);
             }
             catch (RuntimeException | Error e)
             {
@@ -2137,15 +2128,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    protected void acceptTermsOfUse(@Nullable String text, boolean doAgree)
+    protected void acceptTermsOfUse(String termsText, boolean clickAgree)
     {
-        checkCheckbox(Locator.id("approvedTermsOfUse"));
-        if (null != text)
+        if (isElementPresent(Locator.id("approvedTermsOfUse")))
         {
-            assertTextPresent(text);
+            checkCheckbox(Locator.id("approvedTermsOfUse"));
+            if (null != termsText)
+                assertTextPresent(termsText);
+            if (clickAgree)
+                clickButton("Agree");
         }
-        if (doAgree)
-            clickButton("Agree");
     }
 
     @LogMethod
@@ -5970,8 +5962,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Start Import");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
-
-
 
     @LogMethod
     public void signOut(@Nullable String termsText)
