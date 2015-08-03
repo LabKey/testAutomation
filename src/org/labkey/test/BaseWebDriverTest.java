@@ -2139,22 +2139,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void acceptTermsOfUse(@Nullable String text, boolean doAgree)
     {
-        try
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
+        if (null != text)
         {
-            checkCheckbox(Locator.id("approvedTermsOfUse"));
-            if (null != text)
-            {
-                assertTextPresent(text);
-            }
-            if (doAgree)
-                clickButton("Agree");
-
+            assertTextPresent(text);
         }
-        catch (NoSuchElementException e)
-        {
-            if (null != text) // terms were expected but the element was not found
-                fail("Expected terms of use with text '" + text + "' but found no such element");
-        }
+        if (doAgree)
+            clickButton("Agree");
     }
 
     @LogMethod
