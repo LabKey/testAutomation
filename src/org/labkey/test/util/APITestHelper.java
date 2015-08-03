@@ -21,6 +21,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
@@ -160,7 +161,7 @@ public class APITestHelper
                 break;
             case post:
                 method = new HttpPost(requestUrl);
-                ((HttpPost)method).setEntity(new StringEntity(formData, "application/json", "UTF-8"));
+                ((HttpPost)method).setEntity(new StringEntity(formData, ContentType.create("application/json", "UTF-8")));
                 break;
         }
 
@@ -196,12 +197,12 @@ public class APITestHelper
         switch (type)
         {
             case get:
-                test.setFormElement("txtUrlGet", url);
+                test.setFormElement(Locator.id("txtUrlGet"), url);
                 test.click(Locator.xpath("//input[@id='btnGet']"));
                 break;
             case post:
-                test.setFormElement("txtUrlPost", url);
-                test.setFormElement("txtPost", StringUtils.trimToEmpty(formData));
+                test.setFormElement(Locator.id("txtUrlPost"), url);
+                test.setFormElement(Locator.id("txtPost"), StringUtils.trimToEmpty(formData));
                 test.click(Locator.xpath("//input[@id='btnPost']"));
                 break;
         }
@@ -223,9 +224,9 @@ public class APITestHelper
         }
 
         // clear all the forms elements
-        test.setFormElement("txtUrlGet", "");
-        test.setFormElement("txtUrlPost", "");
-        test.setFormElement("txtPost", "");
+        test.setFormElement(Locator.id("txtUrlGet"), "");
+        test.setFormElement(Locator.id("txtUrlPost"), "");
+        test.setFormElement(Locator.id("txtPost"), "");
     }
 
     enum ActionType {
