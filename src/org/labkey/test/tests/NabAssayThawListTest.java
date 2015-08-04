@@ -187,7 +187,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         log("Verify Delete and Re-import doesn't autofill SpecimenId");
         navToRunDetails();
-        click(Locator.linkWithText("Delete and Re-import"));
+        clickAndWait(Locator.linkWithText("Delete and Re-import"));
         Assert.assertEquals("Wrong participant visit resolver selected",
                 "Lookup", Locator.checkedRadioInGroup("participantVisitResolver").findElement(getDriver()).getAttribute("value"));
         Assert.assertEquals("Wrong participant visit resolver selected",
