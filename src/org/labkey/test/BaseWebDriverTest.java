@@ -848,11 +848,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
     public void simpleSignIn()
     {
-        if ( isGuestModeTest() )
+        if (isGuestModeTest())
+        {
+            goToHome();
             return;
+        }
 
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view");
+
+        if (PasswordUtil.getUsername().equals(getCurrentUser()))
+        {
+            goToHome();
+            return;
+        }
 
         // Sign in if browser isn't already signed in.  Otherwise, we'll be on the home page.
         if (isTitleEqual("Sign In"))
@@ -2739,6 +2748,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public String getCurrentContainerPath()
     {
         return (String)executeScript("return LABKEY.container.path;");
+    }
+
+    public String getCurrentUser()
+    {
+        return (String)executeScript("return LABKEY.user.email;");
     }
 
     public void assertAlert(String msg)
