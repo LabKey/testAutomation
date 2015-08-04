@@ -16,9 +16,9 @@
 
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -144,14 +144,24 @@ public class BasicTest extends BaseWebDriverTest
         assertTextNotPresent("WARNING:");
     }
 
+    @Test @Ignore
+    public void testRedirects()
+    {
+        goToHome();
+        final String expectedTitle = getDriver().getTitle();
+
+        beginAt("/login/initialUser.view");
+        Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
+    }
+
     @Test
     public void testFooter()
     {
-        assertTextPresent("Powered by LabKey Software");
+        assertElementPresent(Locator.linkWithText("Powered by LabKey Software"));
     }
 
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("core");
+        return Arrays.asList("core", "login", "admin");
     }
 }
