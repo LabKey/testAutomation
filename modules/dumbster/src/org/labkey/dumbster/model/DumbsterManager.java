@@ -21,10 +21,15 @@ import org.apache.log4j.Logger;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
+import org.labkey.api.util.StringUtilsLabKey;
 
+import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContextEvent;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -163,5 +168,13 @@ public class DumbsterManager implements ShutdownListener
             messages[i] = messageList.get(messages.length - i - 1);
 
         return messages;
+    }
+
+    public static MimeMessage convertToMimeMessage(SmtpMessage message) throws MessagingException
+    {
+        Session s = Session.getDefaultInstance(new Properties());
+        InputStream is = new ByteArrayInputStream(message.toString().getBytes(StringUtilsLabKey.DEFAULT_CHARSET));
+
+        return new MimeMessage(s, is);
     }
 }

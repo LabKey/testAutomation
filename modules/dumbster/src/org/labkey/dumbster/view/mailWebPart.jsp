@@ -16,15 +16,18 @@
  */
 %>
 <%@ page import="com.dumbster.smtp.SmtpMessage" %>
+<%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
+<%@ page import="org.labkey.api.view.template.ClientDependency" %>
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="org.labkey.api.view.template.ClientDependency" %>
-<%@ page import="org.apache.commons.lang3.ArrayUtils" %>
+<%@ page import="org.labkey.api.util.MailHelper" %>
+<%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
+<%@ page import="java.util.Set" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -122,7 +125,7 @@ function toggleRecorder(checkbox)
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Date/Time</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
-        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>View</div></td>
+        <td colspan="2" class="labkey-column-header labkey-col-header-filter" align="center"><div>View</div></td>
     </tr>
     <%
     if (messages.length > 0)
@@ -175,6 +178,8 @@ function toggleRecorder(checkbox)
                     inMessageBody = true;
             }
 
+            Set<String> contentTypes = MailHelper.getBodyPartContentTypes(DumbsterManager.convertToMimeMessage(m));
+
 %>
             <td><%=h(m.getHeaderValue("To"))%></td>
             <td><%=h(m.getHeaderValue("From"))%></td>
@@ -184,8 +189,10 @@ function toggleRecorder(checkbox)
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td>
             <td>
-                <a href="<%=h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "html"))%>" target="_messageHtml">HTML</a>
-                <a href="<%=h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "text"))%>" target="_messageText">Text</a>
+                <%=text(contentTypes.contains("text/html") ? "<a href=\"" + h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "html")) + "\" target=\"_messageHtml\">HTML</a>" : "&nbsp;")%>
+            </td>
+            <td>
+                <%=text(contentTypes.contains("text/plain") ? "<a href=\"" + h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "text")) + "\" target=\"_messageText\">Text</a>" : "&nbsp;")%>
             </td>
         </tr>
 <%

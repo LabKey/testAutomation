@@ -17,7 +17,6 @@
 package org.labkey.dumbster;
 
 import com.dumbster.smtp.SmtpMessage;
-import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.ApiSimpleResponse;
@@ -30,6 +29,7 @@ import org.labkey.api.security.RequiresSiteAdmin;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
+import org.labkey.api.util.MailHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.NavTree;
@@ -40,7 +40,6 @@ import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -160,82 +159,38 @@ public class DumbsterController extends SpringActionController
         public void export(MessageForm form, HttpServletResponse response, BindException errors) throws Exception
         {
             SmtpMessage message = DumbsterManager.get().getMessages()[form.getMessage()];
-
-            Map<String, String> map = new HashMap<>();
-            String[] lines = message.getBody().split("\n");
-
-            String key = null;
-            StringBuilder content = new StringBuilder();
-
-            // Check if we have a simple (non-multipart html message
-            String messageContentType = message.getHeaderValue("Content-Type");
-            if (messageContentType != null && messageContentType.startsWith("text/html"))
-            {
-                map.put("text/html", StringUtils.join(lines, "\n"));
-            }
-            else
-            {
-                // It's multipart, so parse the boundaries
-                for (String line : lines)
-                {
-                    if (line.startsWith("------=_"))
-                    {
-                        if (null != key)
-                            map.put(key, content.toString());
-
-                        content = new StringBuilder();
-                    }
-                    else if (line.startsWith("Content-Type: "))
-                    {
-                        key = line.substring(14, line.indexOf(';'));
-                    }
-                    else if (!line.startsWith("Content-Transfer-Encoding:"))
-                    {
-                        content.append(line);
-                        content.append('\n');
-                    }
-                }
-            }
+            Map<String, String> map = MailHelper.getBodyParts(DumbsterManager.convertToMimeMessage(message));
 
             String output;
             String desiredContentType = "text/plain";
 
             if ("html".equals(form.getType()))
             {
-                String contents = map.get("text/html");
-                String html = contents;
+                String html = map.get("text/html");
 
-                if (null != contents)
+                if (null != html)
                 {
-                    int htmlStart = contents.indexOf("<html>");
-
-                    if (htmlStart > -1)
-                    {
-                        int htmlEnd = contents.indexOf("</html>");
-
-                        if (htmlEnd > -1)
-                        {
-                            html = contents.substring(htmlStart, htmlEnd);
-                        }
-                    }
                     desiredContentType = "text/html";
+                    output = html;
                 }
-
-                output = null != html ? html : "No HTML found";
+                else
+                {
+                    output = "No HTML found";
+                }
             }
             else
             {
                 String contents = map.get("text/plain");
-
                 output = null != contents ? contents : "No text found";
             }
 
             getPageConfig().setTemplate(PageConfig.Template.None);
 
-            // Just blast the HTML contents... no debug comments, view divs, etc.
+            // Just blast the contents... no debug comments, view divs, etc.
             response.setContentType(desiredContentType);
             response.getWriter().print(output);
             response.flushBuffer();
         }
     }
+
 }
