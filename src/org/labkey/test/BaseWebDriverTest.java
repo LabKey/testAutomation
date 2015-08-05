@@ -81,6 +81,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -200,8 +201,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
     private List<JavaScriptError> _jsErrors;
-    private static WebDriverWait _shortWait;
-    private static WebDriverWait _longWait;
     private static JSErrorChecker _jsErrorChecker = null;
     private final ArtifactCollector _artifactCollector;
 
@@ -225,9 +224,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC";
-
-    public static String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC";
-
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC";
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
 
@@ -330,9 +327,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
-        _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
-        _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
-
         getDriver().manage().window().setSize(new Dimension(1280, 1024));
     }
 
@@ -873,8 +867,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             acceptTermsOfUse(null, false);
             clickButton("Sign In", 0);
             bypassSecondaryAuthentication();
-            waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage);
-            if (!isElementPresent(Locator.id("userMenuPopupLink")))
+
+            if (!waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage, false))
             {
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
@@ -938,12 +932,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void signInShouldFail(String email, String password, String... expectedMessages)
     {
         attemptSignIn(email, password);
-        String failMessage = "The e-mail address and password you entered did not match any accounts on file. Note: Passwords are case sensitive; make sure your Caps Lock is off.";
-        waitForElementText(Locator.css(".labkey-error"), failMessage);
+        String errorText = waitForElement(Locator.id("errors")).getText();
         assertTitleEquals("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
 
-        assertTextPresent(expectedMessages);
+        List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
+        assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
 
 
@@ -2045,9 +2039,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         finally
         {
-            try(TestScrubber scrubber = new TestScrubber())
+            if (!isTestCleanupSkipped())
             {
-                scrubber.cleanSiteSettings();
+                try (TestScrubber scrubber = new TestScrubber())
+                {
+                    scrubber.cleanSiteSettings();
+                }
             }
 
             doTearDown();
@@ -2199,12 +2196,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public WebDriverWait shortWait()
     {
-        return _shortWait;
+        return new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
     }
 
     public WebDriverWait longWait()
     {
-        return _longWait;
+        return new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
     }
 
     public boolean isGuestModeTest()
@@ -3085,15 +3082,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         final List<String> missingTexts = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = new TextSearcher.TextHandler(){
-            @Override
-            public boolean handle(String htmlSource, String text)
-            {
-                if (!htmlSource.contains(text))
-                    missingTexts.add(text);
-
-                return true;
-            }
+        TextSearcher.TextHandler handler = (htmlSource, text) -> {
+            if (!htmlSource.contains(text))
+                missingTexts.add(text);
+            return true;
         };
 
         searcher.searchForTexts(handler, texts);
@@ -3809,24 +3801,34 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void waitForAllElements(final Locator... locators)
+    public List<WebElement> waitForElements(final Locator... locators)
     {
         if (locators.length > 0)
         {
-            waitFor(new Checker()
+            return shortWait().until(new Function<SearchContext, List<WebElement>>()
             {
                 @Override
-                public boolean check()
+                public List<WebElement> apply(@Nullable SearchContext context)
                 {
+                    List<WebElement> allElements = new ArrayList<>();
                     for (Locator loc : locators)
                     {
-                        if (!isElementPresent(loc))
-                            return false;
+                        List<WebElement> elements = loc.findElements(context);
+                        if (elements.isEmpty())
+                            return null;
+                        allElements.addAll(elements);
                     }
-                    return true;
+                    return allElements;
                 }
-            }, "No Element Appeared", WAIT_FOR_JAVASCRIPT);
+
+                @Override
+                public String toString()
+                {
+                    return "elements to appear";
+                }
+            });
         }
+        return null;
     }
 
     public WebElement waitForElementWithRefresh(Locator loc, int wait)

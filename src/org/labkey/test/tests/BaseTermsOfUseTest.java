@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class BaseTermsOfUseTest extends BaseWebDriverTest
@@ -39,7 +39,6 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     protected static final String WIKI_TERMS_TITLE = "Terms of Use";
     protected static final String PROJECT_TERMS_SNIPPET = "fight club";
     protected static final String TERMS_OF_USE_NAME = "_termsOfUse";
-    protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
 
     protected void createPublicProject(String projectName)
     {
@@ -140,7 +139,7 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Collections.singletonList("core");
     }
 
     protected void goToProjectBegin(String projectName)

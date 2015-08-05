@@ -15,14 +15,16 @@
  */
 package org.labkey.test.util;
 
-import com.google.common.base.Function;
 import org.labkey.test.BaseWebDriverTest;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class TextSearcher
 {
     private Function<String, String> sourceTransformer;
     private Function<String, String> searchTransformer;
-    private Function<Void, String> sourceGetter;
+    private Supplier<String> sourceGetter;
 
     private TextSearcher()
     {
@@ -30,7 +32,7 @@ public class TextSearcher
         this.searchTransformer = TextTransformers.ENCODER;
     }
 
-    public TextSearcher(final Function<Void, String> sourceGetter)
+    public TextSearcher(final Supplier<String> sourceGetter)
     {
         this();
         this.sourceGetter = sourceGetter;
@@ -38,29 +40,25 @@ public class TextSearcher
 
     public TextSearcher(final BaseWebDriverTest test)
     {
-        this(new Function<Void, String>()
-        {
-            @Override
-            public String apply(Void o)
-            {
-                return test.getHtmlSource();
-            }
-        });
+        this(test::getHtmlSource);
     }
 
-    public final void setSourceTransformer(Function<String, String> sourceTransformer)
+    public final TextSearcher setSourceTransformer(Function<String, String> sourceTransformer)
     {
         this.sourceTransformer = sourceTransformer;
+        return this;
     }
 
-    public final void setSearchTransformer(Function<String, String> searchTransformer)
+    public final TextSearcher setSearchTransformer(Function<String, String> searchTransformer)
     {
         this.searchTransformer = searchTransformer;
+        return this;
     }
 
-    public void setSourceGetter(Function<Void, String> sourceGetter)
+    public final TextSearcher setSourceGetter(Supplier<String> sourceGetter)
     {
         this.sourceGetter = sourceGetter;
+        return this;
     }
 
     public final void searchForTexts(TextHandler textHandler, String[] texts)
@@ -68,7 +66,7 @@ public class TextSearcher
         if (null == texts || 0 == texts.length)
             return;
 
-        String transformedSource = sourceTransformer.apply(sourceGetter.apply(null));
+        String transformedSource = sourceTransformer.apply(sourceGetter.get());
 
         for (String text : texts)
         {
@@ -81,27 +79,12 @@ public class TextSearcher
     public interface TextHandler
     {
         // Return true to continue searching
-        abstract boolean handle(String htmlSource, String text);
+        boolean handle(String htmlSource, String text);
     }
 
     public static abstract class TextTransformers
     {
-        public static final Function<String, String> ENCODER = new Function<String, String>()
-        {
-            @Override
-            public String apply(String text)
-            {
-                return BaseWebDriverTest.encodeText(text);
-            }
-        };
-
-        private static final Function<String, String> IDENTITY = new Function<String, String>()
-        {
-            @Override
-            public String apply(String text)
-            {
-                return text;
-            }
-        };
+        public static final Function<String, String> ENCODER = BaseWebDriverTest::encodeText;
+        public static final Function<String, String> IDENTITY = text -> text;
     }
 }

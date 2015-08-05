@@ -23,8 +23,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
 
-import java.io.IOException;
-
 @Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
@@ -234,15 +232,8 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public void testFailedLoginNoAccept()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
-        try
-        {
-            PasswordUtil.ensureCredentials();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Unable to ensure credentials", e);
-        }
-        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "check the box to approve ");
+        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "To use this site, you must check the box to approve the terms of use.");
+        assertTextPresent(SITE_WIDE_TERMS_TEXT); // should show
     }
 
     // Attempt to log in with bad password.  Should show the terms of use again.
@@ -250,15 +241,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public void testFailedLoginBadPassword()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
-        try
-        {
-            PasswordUtil.ensureCredentials();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Unable to ensure credentials", e);
-        }
-        signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "agree ");
+        signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "To use this site, you must check the box to approve the terms of use.");
         assertTextPresent(SITE_WIDE_TERMS_TEXT); // should show
     }
 
