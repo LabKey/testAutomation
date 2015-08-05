@@ -848,14 +848,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
     public void simpleSignIn()
     {
-        if (isGuestModeTest())
+        if ( isGuestModeTest() )
         {
             goToHome();
             return;
         }
 
         if (!isTitleEqual("Sign In"))
-            beginAt("/login/login.view");
+            beginAt("/login/login.view?");
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
         {
@@ -871,18 +871,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
-            clickButton("Sign In");
+            clickButton("Sign In", 0);
             bypassSecondaryAuthentication();
-
-            // If there are site-wide terms, you will have to do this again and accept the terms that are now displayed.
-            if (isElementPresent(Locator.name("password")))
-            {
-                acceptTermsOfUse(null, false);
-                clickButton("Sign In");
-            }
-            else
-                acceptTermsOfUse(null, true);
-
+            waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage);
             if (!isElementPresent(Locator.id("userMenuPopupLink")))
             {
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
@@ -921,7 +912,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if ( !isElementPresent(Locator.linkWithText("Sign In")) )
             throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.");
 
-        attemptSignIn(email, password);
+         attemptSignIn(email, password);
+         waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage);
 
         if ( failOnError )
         {
@@ -940,17 +932,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
-        clickButton("Sign In");
+        clickButton("Sign In", 0);
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
     {
         attemptSignIn(email, password);
+        String failMessage = "The e-mail address and password you entered did not match any accounts on file. Note: Passwords are case sensitive; make sure your Caps Lock is off.";
+        waitForElementText(Locator.css(".labkey-error"), failMessage);
         assertTitleEquals("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
 
         assertTextPresent(expectedMessages);
     }
+
 
     protected void setInitialPassword(String user, String password)
     {
@@ -2141,13 +2136,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if (isElementPresent(Locator.id("approvedTermsOfUse")))
         {
-            checkCheckbox(Locator.id("approvedTermsOfUse"));
-            if (null != termsText)
-                assertTextPresent(termsText);
-            if (clickAgree)
-                clickButton("Agree");
+            Locator terms = Locator.id("approvedTermsOfUse");
+            if ( terms.findElement(getDriver()).isDisplayed())
+            {
+                checkCheckbox(terms);
+                if (null != termsText)
+                {
+                    assertTextPresent(termsText);
+                }
+                if (clickAgree)
+                    clickButton("Agree");
+            }
         }
     }
+
 
     @LogMethod
     public void ensureSignedInAsAdmin()
@@ -5976,6 +5978,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Start Import");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
+
+
 
     @LogMethod
     public void signOut(@Nullable String termsText)
