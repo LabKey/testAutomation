@@ -810,7 +810,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         goBack(defaultWaitForPage);
     }
 
-
     @LogMethod
     public void signIn()
     {
@@ -901,26 +900,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
-    public void signIn(String email, String password, boolean failOnError)
+    public void signIn(String email, String password)
     {
-        if ( !isElementPresent(Locator.linkWithText("Sign In")) )
-            throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.");
-
-         attemptSignIn(email, password);
-         waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage);
-
-        if ( failOnError )
-        {
-            if ( isTextPresent("Type in your email address and password") )
-                throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
-
-            assertSignOutAndMyAccountPresent();
-        }
+        attemptSignIn(email, password);
+        waitForElementToDisappear(Locator.lkButton("Sign In"));
+        Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
     }
 
     public void attemptSignIn(String email, String password)
     {
-        clickAndWait(Locator.linkWithText("Sign In"));
+        try
+        {
+            clickAndWait(Locator.linkWithText("Sign In"));
+        }
+        catch (NoSuchElementException error)
+        {
+            throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.", error);
+        }
 
         assertTitleEquals("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
@@ -932,14 +928,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void signInShouldFail(String email, String password, String... expectedMessages)
     {
         attemptSignIn(email, password);
-        String errorText = waitForElement(Locator.id("errors")).getText();
+        String errorText = waitForElement(Locator.id("errors").withText()).getText();
         assertTitleEquals("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
 
         List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
         assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
     }
-
 
     protected void setInitialPassword(String user, String password)
     {
@@ -986,6 +981,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void resetPassword(String resetUrl, String username, String newPassword)
     {
+        if (PasswordUtil.getUsername().equals(username))
+            throw new IllegalArgumentException("Don't change the primary site admin user's password");
+
         if(resetUrl!=null)
             beginAt(resetUrl);
 
@@ -1002,12 +1000,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             clickButton("Done");
 
             signOut();
-            signIn(username, newPassword, true);
+            signIn(username, newPassword);
         }
     }
 
     @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
     {
+        if (PasswordUtil.getUsername().equals(getCurrentUser()))
+            throw new IllegalArgumentException("Don't change the primary site admin user's password");
+
         goToMyAccount();
         clickButton("Change Password");
 
@@ -1017,7 +1018,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         clickButton("Set Password");
     }
-
 
     /**
      * change user's e-mail from userEmail to newUserEmail from admin console

@@ -118,7 +118,7 @@ public class UserTest extends SecurityTest
         signOut();
 
         //verify can log in with new address
-        signIn(newUserEmail, TEST_PASSWORD, true);
+        signIn(newUserEmail, TEST_PASSWORD);
 
         signOut();
 

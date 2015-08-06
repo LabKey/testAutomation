@@ -108,8 +108,8 @@ public class AuditLogTest extends BaseWebDriverTest
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
         signOut();
-        signIn(AUDIT_TEST_USER, "asdf", false); // Bad login.  Existing User
-        signIn(AUDIT_TEST_USER + "fail", "asdf", false); // Bad login.  Non-existent User
+        signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
+        signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         simpleSignIn();
         deleteUsers(true, AUDIT_TEST_USER);
 

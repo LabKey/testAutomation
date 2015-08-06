@@ -76,12 +76,12 @@ public class SecondaryAuthenticationTest extends BaseWebDriverTest
         String relativeURLBeforeSignIn = getCurrentRelativeURL();
 
         //Sign In - Primary Authentication
-        attemptSignIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        signIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
             /* Secondary Authentication */
 
             //'Sign In' link shouldn't be present
-            assertElementNotPresent(Locator.linkContainingText("Sign In"));
+            waitForElementToDisappear(Locator.linkContainingText("Sign In"));
 
             //User should be still recognized as guest until secondary authentication is successful.
             assertTextPresent("Is " + PasswordUtil.getUsername() +" really you?");

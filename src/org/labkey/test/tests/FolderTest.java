@@ -176,32 +176,31 @@ public class FolderTest extends BaseWebDriverTest
         goToProjectHome(project);
         clickFolder(folder);
         waitAndClick(Locator.linkWithText("12 datasets"));
-        pushLocation();
+        saveLocation();
         waitAndClick(Locator.linkWithText("LuminexAssay"));
         waitForText("Contains up to one row of LuminexAssay data for each Participant/Date/RowId combination.");
         assertElementPresent(Locator.linkWithText("249318596"));
-        popLocation();
-        pushLocation();
+
+        recallLocation();
         waitAndClick(Locator.linkWithText("Participation and Genetic Consent"));
         waitForText("Contains up to one row of Participation and Genetic Consent data for each Participant combination.");
         assertElementPresent(Locator.linkWithText("249325717"));
-        popLocation();
-        pushLocation();
+
+        recallLocation();
         waitAndClick(Locator.linkWithText("Demographics"));
         waitForText("Contains up to one row of Demographics data for each Participant combination.", "Group 1: Accute HIV-1", "Group 2: HIV-1 Negative");
-        popLocation();
-        pushLocation();
+
+        recallLocation();
         click(Locator.linkWithText("Status Assessment"));
         waitForText("Contains up to one row of Status Assessment data for each Participant/Date combination.");
         assertElementPresent(Locator.linkWithText("249320107"));
         assertElementPresent(Locator.linkWithText("249320127"));
         assertElementPresent(Locator.linkWithText("249320489"));
-        popLocation();
-        pushLocation();
+
+        recallLocation();
         waitAndClick(Locator.linkWithText("HIV Test Results"));
         waitForText("Contains up to one row of HIV Test Results data for each Participant/Date combination.", "Positive", "Negative");
-        popLocation();
-        pushLocation();
+
         goToManageLists();
         waitAndClick(Locator.tagWithText("span", "Views"));
         mouseOver(Locator.tagWithText("span", "Folder Filter"));

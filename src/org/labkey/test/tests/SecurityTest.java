@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.reader.Readers;
@@ -29,13 +28,14 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -59,7 +59,7 @@ public class SecurityTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("core");
+        return Collections.singletonList("core");
     }
 
     @Override
@@ -81,17 +81,9 @@ public class SecurityTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        deleteUsersIfPresent(ADMIN_USER_TEMPLATE,NORMAL_USER_TEMPLATE,PROJECT_ADMIN_USER,NORMAL_USER,SITE_ADMIN_USER);
-        if (!afterTest)
-            deleteUsers(false, TO_BE_DELETED_USER); // Only needed for pre-clean. Should be deleted during test
-    }
-
-    @After
-    public void cleanUp()
-    {
-        setDbLoginConfig(PasswordRule.Weak, PasswordExpiration.Never);
+        deleteUsersIfPresent(ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
     }
 
     @Test
@@ -140,7 +132,6 @@ public class SecurityTest extends BaseWebDriverTest
         "/experiment-types/begin.view?", "/pipeline-status/showList.view?", "/pipeline/setup.view?",
         "/ms2/showProteinAdmin.view?", "/admin/actions.view?", "/admin/caches.view?",
         "/admin/dbChecker.view?",
-            //"/admin/credits.view?",
         "/query/dataSourceAdmin.view?",
         "/admin/dumpHeap.view?", "/admin/environmentVariables.view?", "/admin/memTracker.view?",
         "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
@@ -220,7 +211,7 @@ public class SecurityTest extends BaseWebDriverTest
         
         String resetUrl = userForgotPasswordWorkflowTest(username, password);
         
-        userPasswordResetTest(username, resetUrl);
+        userPasswordResetTest(resetUrl);
 
         ensureSignedInAsAdmin();
     }
@@ -242,12 +233,12 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    protected static enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
+    protected enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
 
     /**
      * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode
      */
-    @LogMethod protected void userPasswordResetTest(String username, String resetUrl)
+    @LogMethod protected void userPasswordResetTest(String resetUrl)
     {
         ensureSignedOut();
 
@@ -318,7 +309,7 @@ public class SecurityTest extends BaseWebDriverTest
         signOut();
 
         //attempt sign in with old password- should succeed
-        signIn(username,password, true);
+        signIn(username, password);
         signOut();
 
         return resetUrl;
@@ -334,13 +325,8 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.id("EmailInput"), username);
         clickButtonContainingText("Submit", 0);
 
-//        clickButtonContainingText("Home");
         signIn();
-        String resetUrl = getPasswordResetUrl(username);
-
-        //sign out
-
-        return resetUrl;
+        return getPasswordResetUrl(username);
     }
 
     String[] wrongPasswordEntered =
@@ -361,11 +347,11 @@ public class SecurityTest extends BaseWebDriverTest
         String newPassword = password +"1";
         goToSiteUsers();
         clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
-        prepForPageLoad();
-        clickButtonContainingText("Reset Password", 0);
-        sleep(500);
-        acceptAlert();
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButtonContainingText("Reset Password", 0);
+            acceptAlert();
+        });
         clickButton("Done");
 
         String url = getPasswordResetUrl(username);
@@ -382,10 +368,6 @@ public class SecurityTest extends BaseWebDriverTest
         //attempt to log in with old password (should fail)
         signInShouldFail(username, password, wrongPasswordEntered);
         
-//        resetPasswordDisallowedValues();
-//
-//        resetPasswordValid(password);
-
         return newPassword;
     }
 
@@ -393,7 +375,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         // test for issue 13921
         goToSiteAdmins();
-        setFormElement("names", NORMAL_USER);
+        setFormElement(Locator.name("names"), NORMAL_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         assertTextPresent(NORMAL_USER);
@@ -413,7 +395,8 @@ public class SecurityTest extends BaseWebDriverTest
         _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
         _permissionsHelper.exitPermissionsUI();
 
-        addWebPart("Messages");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Messages");
         assertButtonPresent("New");
         pushLocation();
         signOut();
@@ -456,7 +439,7 @@ public class SecurityTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         _permissionsHelper.createPermissionsGroup("Administrators");
         _permissionsHelper.clickManageGroup("Administrators");
-        setFormElement("names", ADMIN_USER_TEMPLATE);
+        setFormElement(Locator.name("names"), ADMIN_USER_TEMPLATE);
         clickButton("Update Group Membership");
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setPermissions("Administrators", "Project Administrator");
@@ -465,7 +448,7 @@ public class SecurityTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
         _permissionsHelper.setPermissions("Testers", "Editor");
         _permissionsHelper.clickManageGroup("Testers");
-        setFormElement("names", NORMAL_USER_TEMPLATE);
+        setFormElement(Locator.name("names"), NORMAL_USER_TEMPLATE);
         clickButton("Update Group Membership");
 
         // create users and verify permissions
@@ -639,9 +622,7 @@ public class SecurityTest extends BaseWebDriverTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("audit log"));
 
-        prepForPageLoad();
-        selectOptionByText(Locator.name("view"), "User events");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
 
         DataRegionTable table = new DataRegionTable("query", this, false);
 
