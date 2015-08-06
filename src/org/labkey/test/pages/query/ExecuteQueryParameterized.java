@@ -64,7 +64,7 @@ public class ExecuteQueryParameterized extends LabKeyPage
 
         WebElement findInputField(String fieldKey)
         {
-            return Locator.tag("input").attributeEndsWith("name", ".props." + fieldKey).findElement(context);
+            return Locator.tag("input").attributeEndsWith("name", ".param." + fieldKey).findElement(context);
         }
         WebElement submitButton = new LazyWebElement(Locator.button("Submit"), context);
     }

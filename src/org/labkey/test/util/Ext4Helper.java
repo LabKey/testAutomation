@@ -701,9 +701,14 @@ public class Ext4Helper extends AbstractHelper
             return l;
         }
 
+        public static Locator.XPathLocator window()
+        {
+            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden();
+        }
+
         public static Locator.XPathLocator window(String title)
         {
-            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
+            return window().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
         }
 
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
