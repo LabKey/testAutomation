@@ -87,7 +87,7 @@ public class StudyTest extends StudyBaseTest
 
 
     //lists created in participant picker tests must be cleaned up afterwards
-    LinkedList<String> persistingLists  = new LinkedList<>();
+    LinkedList<String> persistingLists = new LinkedList<>();
     private String authorUser = "author1_study@study.test";
     private String specimenUrl = null;
 
@@ -156,6 +156,7 @@ public class StudyTest extends StudyBaseTest
             verifyParticipantComments();
             verifyParticipantReports();
             verifyPermissionsRestrictions();
+            verifyDeleteUnusedVisits();
         }
     }
 
@@ -238,6 +239,22 @@ public class StudyTest extends StudyBaseTest
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
     }
 
+    @LogMethod
+    private void verifyDeleteUnusedVisits()
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+
+        assertEquals("Unexpected visit count before delete unused", 66, getTableRowCount("visits"));
+        clickAndWait(Locator.linkWithText("Delete Unused Visits"));
+        assertTextAtPlaceInTable("Are you sure you want to delete the unused visits listed below?", "visitsToDelete", 1, 1);
+        assertEquals("Unexpected unused visit count on confirmation page", 26, getTableRowCount("visitsToDelete"));
+        clickAndWait(Locator.linkWithText("OK"));
+        assertEquals("Unexpected visit count after delete unused", 42, getTableRowCount("visits"));
+    }
+
     protected static final String SUBJECT_NOUN = "Mouse";
     protected static final String SUBJECT_NOUN_PLURAL = "Mice";
     protected static final String PROJECT_NAME = "StudyVerifyProject";
@@ -252,8 +269,7 @@ public class StudyTest extends StudyBaseTest
     @LogMethod
     protected void manageSubjectClassificationTest()
     {
-
-        if(!isQuickTest())
+        if (!isQuickTest())
         {
             //verify/create the right data
             goToManageParticipantClassificationPage(PROJECT_NAME, STUDY_NAME, SUBJECT_NOUN);
@@ -837,7 +853,7 @@ public class StudyTest extends StudyBaseTest
 
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
-        selectCmd.setColumns(Arrays.asList("*"));
+        selectCmd.setColumns(Collections.singletonList("*"));
         selectCmd.setSorts(Collections.singletonList(new Sort("Date", Sort.Direction.ASCENDING)));
         Connection cn = new Connection(getBaseURL(), getUsername(), PasswordUtil.getPassword());
         SelectRowsResponse selectResp = null;
