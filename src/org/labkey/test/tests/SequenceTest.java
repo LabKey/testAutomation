@@ -540,7 +540,7 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRef.getForLabel(this, "Minimum Read Length").setValue(minReadLength);
 
         waitForText("Adapters");
-        clickButton("Common Adapters", 0);
+        waitAndClick(Ext4Helper.Locators.ext4Button("Common Adapters").index(1));
         waitForElement(Ext4Helper.Locators.window("Choose Adapters"));
         waitForText("Choose Adapter Group");
         Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
@@ -617,7 +617,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorect param in form JSON", analysisDescription, params.get("protocolDescription"));
         assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
 
-        assertEquals("Incorect param in form JSON", "AdapterTrimming;CropReads;DownsampleReads;MaxInfoTrim;SlidingWindowTrim;ReadLengthFilter", params.get("fastqProcessing"));
+        assertEquals("Incorect param in form JSON", "IlluminaAdapterTrimming;AdapterTrimming;CropReads;DownsampleReads;MaxInfoTrim;SlidingWindowTrim;ReadLengthFilter", params.get("fastqProcessing"));
         assertEquals("Incorect param in form JSON", overlapLength.toString(), params.get("fastqProcessing.AdapterTrimming.overlapLength").toString());
         assertEquals("Incorect param in form JSON", errorRate.toString(), params.get("fastqProcessing.AdapterTrimming.errorRate").toString());
         assertEquals("Incorect param in form JSON", minReadLength, params.get("fastqProcessing.AdapterTrimming.minLength").toString());
