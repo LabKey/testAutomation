@@ -313,7 +313,7 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testPipelineFileAnalysisTask() throws Exception
     {
-        doPipelineFileAnalysis("targetFile");
+        doPipelineFileAnalysis("targetFile", null);
     }
 
     /**
@@ -322,12 +322,16 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testQueueAnotherEtl() throws Exception
     {
-        doPipelineFileAnalysis("targetFileQueueTail");
+        doPipelineFileAnalysis("targetFileQueueTail", "etlOut");
     }
 
-    private void doPipelineFileAnalysis(String etl) throws Exception
+    private void doPipelineFileAnalysis(String etl, @Nullable String outputSubDir) throws Exception
     {
         File dir = setupPipelineFileAnalysis();
+        if (null != outputSubDir)
+        {
+            dir = new File(dir, outputSubDir);
+        }
         String jobId = _etlHelper.runETL_API(etl).getJobId();
         validatePipelineFileAnalysis(dir, jobId);
     }
@@ -335,7 +339,7 @@ public class ETLTest extends ETLBaseTest
     private void validatePipelineFileAnalysis(File dir, String jobId) throws IOException, CommandException
     {
         String baseName = "report-" + _diHelper.getTransformRunFieldByJobId(jobId, "transformRunId");
-        File etlFile = new File(dir, "etlOut/" + baseName + ".testIn.tsv");
+        File etlFile = new File(dir, baseName + ".testIn.tsv");
         String fileContents = TestFileUtils.getFileContents(etlFile);
         String[] rows = fileContents.split("[\\n\\r]+");
         String expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
@@ -345,7 +349,7 @@ public class ETLTest extends ETLBaseTest
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
         assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
         //file created by external pipeline
-        File etlFile2 = new File(dir, "etlOut/" + baseName + ".testOut.tsv");
+        File etlFile2 = new File(dir, baseName + ".testOut.tsv");
         fileContents = TestFileUtils.getFileContents(etlFile2);
         rows = fileContents.split("[\\n\\r]+");
         assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
