@@ -809,7 +809,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard page 5 : Specimens
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        Assert.assertTrue(isCheckboxChecked(Locator.checkboxByName("includeSpecimens").findElement(getDriver())));
+        Assert.assertTrue(Locator.checkboxByName("includeSpecimens").findElement(getDriver()).isSelected());
         clickButton("Next", 0);
 
         // Wizard Page 6 : Study Objects

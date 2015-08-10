@@ -5347,23 +5347,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void checkCheckbox(WebElement el)
     {
-        if (!el.isSelected())
-        {
-            el.click();
-        }
+        setCheckbox(el, true);
     }
 
     public void uncheckCheckbox(WebElement el)
     {
-        if (el.isSelected())
-        {
-            el.click();
-        }
+        setCheckbox(el, false);
     }
 
-    public boolean isCheckboxChecked(WebElement el)
+    public void setCheckbox(WebElement el, boolean check)
     {
-        return el.isSelected();
+        if (check && !el.isSelected())
+            el.click();
+        else if (!check && el.isSelected())
+            el.click();
     }
 
     public void assertRadioButtonSelected(Locator radioButtonLocator)
