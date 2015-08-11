@@ -85,9 +85,9 @@ public class DataRegionTable
         return findDataRegionWithin(test, test.getDriver(), index);
     }
 
-    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, WebElement parent)
+    public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, SearchContext context)
     {
-        return findDataRegionWithin(test, parent, 0);
+        return findDataRegionWithin(test, context, 0);
     }
 
     public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, SearchContext context, int index)
