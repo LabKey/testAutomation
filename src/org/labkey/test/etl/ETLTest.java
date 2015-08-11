@@ -47,6 +47,8 @@ import static org.junit.Assert.assertTrue;
 public class ETLTest extends ETLBaseTest
 {
 
+    public static final String ETL_OUT = "etlOut";
+
     @Nullable
     @Override
     protected String getProjectName()
@@ -322,7 +324,7 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testQueueAnotherEtl() throws Exception
     {
-        doPipelineFileAnalysis("targetFileQueueTail", "etlOut");
+        doPipelineFileAnalysis("targetFileQueueTail", ETL_OUT);
     }
 
     private void doPipelineFileAnalysis(String etl, @Nullable String outputSubDir) throws Exception
@@ -428,7 +430,7 @@ public class ETLTest extends ETLBaseTest
     public void testRetryCancelledPipelineTask() throws IOException, CommandException
     {
         final String TARGET_FILE_WITH_SLEEP = _etlHelper.ensureFullIdString("targetFileWithSleep");
-        File dir = setupPipelineFileAnalysis();
+        File dir = new File(setupPipelineFileAnalysis(), ETL_OUT);
         _etlHelper.runETLNoNavNoWait(TARGET_FILE_WITH_SLEEP, true, false);
         refresh();
         clickButton("Cancel");
