@@ -28,18 +28,14 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     static final String TRANSFORM_APPEND_DESC = "Append Test";
     static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
     static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
-    static final String APPEND_WITH_ROWVERSION = "appendWithRowversion";
-    static final String APPEND = "append";
-    static final String APPEND_SELECT_ALL = "appendSelectAll";
+    static final String APPEND_WITH_ROWVERSION = "{simpletest}/appendWithRowversion";
+    static final String APPEND = "{simpletest}/append";
+    static final String APPEND_SELECT_ALL = "{simpletest}/appendSelectAll";
     static final String TRANSFORM_BAD_THROW_ERROR_SP = "{simpletest}/SProcBadThrowError";
     protected static final String TRANSFORM_APPEND = "{simpletest}/append";
     protected static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
     public ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
     protected DataIntegrationHelper _diHelper = _etlHelper.getDiHelper();
-
-    @Nullable
-    @Override
-    protected abstract String getProjectName();
 
     @Override
     protected BrowserType bestBrowser()

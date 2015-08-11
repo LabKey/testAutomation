@@ -32,6 +32,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
+import org.labkey.test.pages.dataintegration.ETLScheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLTest extends ETLBaseTest
 {
-
     public static final String ETL_OUT = "etlOut";
 
     @Nullable
@@ -76,7 +76,8 @@ public class ETLTest extends ETLBaseTest
     @After
     public void postTest()
     {
-        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
+        if (!_testFailed)
+            checkExpectedErrors(_etlHelper.getExpectedErrorCount());
     }
 
     @Test
@@ -373,12 +374,10 @@ public class ETLTest extends ETLBaseTest
     }
 
     /**
-     *
      * Test that jobs are serialized correctly so they can be requeued. Using "retry" as standin for requeue on server
      * restart, as it is the same mechanism. For each case, deliberated create an error condition (key violation, etc),
      * and then retry the job. If the same error occurs, the job requeued successfully. (Check the initial error now appears twice
      * in log.)
-     *
      */
     @Test
     public void testRequeueJobs() throws Exception
@@ -403,6 +402,8 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.deleteAllRows(ETLHelper.ETL_TARGET);
         _etlHelper.clickRetryButton();
         assertEquals("Wrong transform status for retried ETL.", ETLHelper.COMPLETE, _diHelper.getTransformStatusByTransformId(_etlHelper.ensureFullIdString(APPEND_SELECT_ALL)));
+        ETLScheduler scheduler = ETLScheduler.beginAt(this);
+        assertEquals("Error status didn't clear on successful retry for " + APPEND_SELECT_ALL, "COMPLETE", scheduler.transform(APPEND_SELECT_ALL).getLastStatus());
 
         // ModifiedSinceFilter
         tryAndRetry(APPEND, FILTER_ERROR_MESSAGE, true);
@@ -436,8 +437,15 @@ public class ETLTest extends ETLBaseTest
         clickButton("Cancel");
         // 23829 Validate run status is really CANCELLED
         _etlHelper.waitForStatus(TARGET_FILE_WITH_SLEEP, "CANCELLED", 10000);
+        clickTab("DataIntegration");
+        ETLScheduler scheduler = new ETLScheduler(this);
+        assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "CANCELLED", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
+        scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
         _etlHelper.clickRetryButton();
         _etlHelper.waitForEtl();
+        scheduler = ETLScheduler.beginAt(this);
+        assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "COMPLETE", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
+        scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
         String jobId = _diHelper.getTransformRunFieldByTransformId(TARGET_FILE_WITH_SLEEP, "jobId");
         validatePipelineFileAnalysis(dir, jobId);
     }
@@ -490,6 +498,20 @@ public class ETLTest extends ETLBaseTest
 
     }
 
+    @Test
+    public void testTruncateAndReset() throws Exception
+    {
+        _etlHelper.insertSourceRow("111", "Truncate me 1", null);
+        _etlHelper.insertSourceRow("222", "Truncate me 2", null);
+        _etlHelper.runETL_API(APPEND_SELECT_ALL);
+        ETLScheduler scheduler = ETLScheduler.beginAt(this);
+        scheduler.transform(APPEND_SELECT_ALL)
+                .truncateAndReset()
+                .confirmYes();
+
+        _etlHelper.assertNotInTarget1("111", "222", "Truncate me");
+    }
+
     private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
     {
         _etlHelper.runETLNoNav(transformId, true, false);
@@ -501,6 +523,4 @@ public class ETLTest extends ETLBaseTest
         refresh();
         assertTextPresent(expectedError, 2);
     }
-
-
 }

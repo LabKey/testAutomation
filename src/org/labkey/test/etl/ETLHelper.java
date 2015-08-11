@@ -580,13 +580,13 @@ public class ETLHelper
     protected void assertInDatasetTarget1(String... targets)
     {
         gotoDataset("ETL Target");
-        assertData(true, targets);
+        _test.assertTextPresent(targets);
     }
 
     protected void assertNotInDatasetTarget1(String... targets)
     {
         gotoDataset("ETL Target");
-        assertData(false, targets);
+        _test.assertTextNotPresent(targets);
     }
 
     protected void gotoQueryWebPart(String webpartName, String queryName)
@@ -596,18 +596,13 @@ public class ETLHelper
         _test.waitForText(webpartName);
     }
 
-    protected void assertData(boolean assertTextPresent, String... targets)
+    protected void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
     {
+        gotoQueryWebPart(webpartName, queryName);
         if (assertTextPresent)
             _test.assertTextPresent(targets);
         else
             _test.assertTextNotPresent(targets);
-    }
-
-    protected void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
-    {
-        gotoQueryWebPart(webpartName, queryName);
-        assertData(assertTextPresent, targets);
     }
 
     protected void assertNotInTarget1(String... targets)
@@ -633,7 +628,6 @@ public class ETLHelper
 
     protected void checkRun(boolean expectError)
     {
-        _test.clickTab("Portal");
         _test.goToModule("Pipeline");
         _test.waitForPipelineJobsToComplete(_jobsComplete, "ETL Job", expectError);
     }
