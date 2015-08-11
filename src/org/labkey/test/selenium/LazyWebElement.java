@@ -16,14 +16,8 @@
 package org.labkey.test.selenium;
 
 import org.labkey.test.Locator;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.WrapsElement;
-
-import java.util.List;
 
 /**
  * WebElement wrapper that waits for an attempt to interact with the WebElement before actually finding it

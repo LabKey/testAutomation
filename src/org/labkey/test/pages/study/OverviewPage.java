@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -189,16 +190,17 @@ public class OverviewPage extends LabKeyPage
     
     private class Elements extends ComponentElements
     {
-        public final WebElement participantCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"), context);
-        public final WebElement rowCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"), context);
-        public final WebElement studyOverview = new LazyWebElement(Locator.tagWithId("table", "studyOverview"), context);
+        @Override
+        protected SearchContext getContext()
+        {
+            return getDriver();
+        }
+
+        public final WebElement participantCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"), this);
+        public final WebElement rowCountCheckbox = new LazyWebElement(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"), this);
+        public final WebElement studyOverview = new LazyWebElement(Locator.tagWithId("table", "studyOverview"), this);
 
         private final Locator studyOverviewRow = new CachingLocator(Locator.CssLocator.union(Locator.css(".labkey-row"), Locator.css(".labkey-alternate-row")));
-
-        private Elements()
-        {
-            super(_test.getDriver());
-        }
 
         public List<WebElement> getStudyOverviewRows()
         {

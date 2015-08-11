@@ -117,48 +117,49 @@ public class CreateStudyPage extends LabKeyPage
     private Elements elements()
     {
         if (null == _elements)
-            _elements = new Elements(_test.getDriver());
+            _elements = new Elements();
 
         return _elements;
     }
 
     private class Elements extends ComponentElements
     {
-        protected Elements(SearchContext context)
+        @Override
+        protected SearchContext getContext()
         {
-            super(context);
+            return getDriver();
         }
 
-        final WebElement studyLabelInput = new LazyWebElement(Locator.name("label"), context);
-        final WebElement subjectNounSingularInput = new LazyWebElement(Locator.name("subjectNounSingular"), context);
-        final WebElement subjectNounPluralInput = new LazyWebElement(Locator.name("subjectNounPlural"), context);
-        final WebElement subjectColumnNameInput = new LazyWebElement(Locator.name("subjectColumnName"), context);
+        final WebElement studyLabelInput = new LazyWebElement(Locator.name("label"), this);
+        final WebElement subjectNounSingularInput = new LazyWebElement(Locator.name("subjectNounSingular"), this);
+        final WebElement subjectNounPluralInput = new LazyWebElement(Locator.name("subjectNounPlural"), this);
+        final WebElement subjectColumnNameInput = new LazyWebElement(Locator.name("subjectColumnName"), this);
 
         final WebElement timepointTypeRadio(TimepointType type)
         {
-            return new LazyWebElement(Locator.radioButtonByNameAndValue("timepointType", type.toString()), context);
+            return new LazyWebElement(Locator.radioButtonByNameAndValue("timepointType", type.toString()), this);
         }
-        final WebElement startDateInput = new LazyWebElement(Locator.name("startDate"), context);
-        final WebElement defaultTimepointDurationInput = new LazyWebElement(Locator.name("defaultTimepointDuration"), context);
+        final WebElement startDateInput = new LazyWebElement(Locator.name("startDate"), this);
+        final WebElement defaultTimepointDurationInput = new LazyWebElement(Locator.name("defaultTimepointDuration"), this);
 
         final WebElement repositoryTypeRadio(RepositoryType type)
         {
-            return new LazyWebElement(Locator.radioButtonByNameAndValue("simpleRepository", RepositoryType.SIMPLE == type ? "true" : "false"), context);
+            return new LazyWebElement(Locator.radioButtonByNameAndValue("simpleRepository", RepositoryType.SIMPLE == type ? "true" : "false"), this);
         }
 
-        final WebElement securityModeSelect = new LazyWebElement(Locator.name("securityString"), context);
+        final WebElement securityModeSelect = new LazyWebElement(Locator.name("securityString"), this);
 
         final WebElement shareDatasetsRadio(boolean share)
         {
-            return new LazyWebElement(Locator.radioButtonByNameAndValue("shareDatasets", String.valueOf(share)), context);
+            return new LazyWebElement(Locator.radioButtonByNameAndValue("shareDatasets", String.valueOf(share)), this);
         }
         final WebElement shareTimepointsRadio(boolean share)
         {
-            return new LazyWebElement(Locator.radioButtonByNameAndValue("shareVisits", String.valueOf(share)), context);
+            return new LazyWebElement(Locator.radioButtonByNameAndValue("shareVisits", String.valueOf(share)), this);
         }
 
-        final WebElement createStudyButton = new LazyWebElement(Locator.lkButton("Create Study"), context);
-        final WebElement backButton = new LazyWebElement(Locator.lkButton("Back"), context);
+        final WebElement createStudyButton = new LazyWebElement(Locator.lkButton("Create Study"), this);
+        final WebElement backButton = new LazyWebElement(Locator.lkButton("Back"), this);
     }
 
 }

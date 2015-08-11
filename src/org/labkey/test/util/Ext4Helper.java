@@ -645,9 +645,9 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    public void clickExt4MenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
-        _test.waitAndClick(menu);
+        menu.click();
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locators.menuItem(subMenuLabels[i]).notHidden();
@@ -664,6 +664,12 @@ public class Ext4Helper extends AbstractHelper
             _test.waitAndClickAndWait(itemLocator);
         else
             _test.waitAndClick(itemLocator);
+    }
+
+    @LogMethod(quiet = true)
+    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    {
+        clickExt4MenuButton(wait, menu.waitForElement(_test.shortWait()), onlyOpen, subMenuLabels);
     }
 
     public List<WebElement> getExt4MenuButtonSubMenu(Locator menu)

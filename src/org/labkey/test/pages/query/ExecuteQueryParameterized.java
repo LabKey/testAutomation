@@ -21,6 +21,7 @@ import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.DataRegionTable;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
@@ -57,15 +58,16 @@ public class ExecuteQueryParameterized extends LabKeyPage
 
     private class Elements extends ComponentElements
     {
-        protected Elements()
+        @Override
+        protected SearchContext getContext()
         {
-            super(_test.getDriver());
+            return getDriver();
         }
 
         WebElement findInputField(String fieldKey)
         {
-            return Locator.tag("input").attributeEndsWith("name", ".param." + fieldKey).findElement(context);
+            return Locator.tag("input").attributeEndsWith("name", ".param." + fieldKey).findElement(this);
         }
-        WebElement submitButton = new LazyWebElement(Locator.button("Submit"), context);
+        WebElement submitButton = new LazyWebElement(Locator.button("Submit"), this);
     }
 }

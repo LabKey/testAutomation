@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.DomainEditor;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -95,12 +96,13 @@ public class DatasetDomainEditor extends DomainEditor
 
     private class Elements extends ComponentElements
     {
-        private WebElement demographicCheckbox = new LazyWebElement(Locator.name("demographicData"), context);
-        private WebElement sharedBy = new LazyWebElement(Locator.name("demographicsSharedBy"), context);
-
-        Elements()
+        @Override
+        protected SearchContext getContext()
         {
-            super(_test.getDriver());
+            return _test.getDriver();
         }
+
+        private WebElement demographicCheckbox = new LazyWebElement(Locator.name("demographicData"), this);
+        private WebElement sharedBy = new LazyWebElement(Locator.name("demographicsSharedBy"), this);
     }
 }

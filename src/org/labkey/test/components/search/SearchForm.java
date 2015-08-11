@@ -62,24 +62,25 @@ public class SearchForm extends Component
 
     private class Elements extends ComponentElements
     {
-        Elements()
+        @Override
+        protected SearchContext getContext()
         {
-            super(getComponentElement());
+            return getComponentElement();
         }
 
         private WebElement searchBox()
         {
-            return findElement(Locator.id("query"));
+            return Locator.id("query").findElement(getContext());
         }
 
         private WebElement searchButton()
         {
-            return findElement(Locator.lkButton("Search"));
+            return Locator.lkButton("Search").findElement(getContext());
         }
 
         private WebElement helpLink()
         {
-            return findElement(Locator.css("a[target=labkeyHelp]"));
+            return Locator.css("a[target=labkeyHelp]").findElement(getContext());
         }
     }
 }

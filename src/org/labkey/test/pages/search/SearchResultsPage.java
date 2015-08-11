@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.search.SearchForm;
 import org.labkey.test.pages.LabKeyPage;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.util.regex.Matcher;
@@ -56,19 +57,20 @@ public class SearchResultsPage extends LabKeyPage
 
     private class Elements extends ComponentElements
     {
-        Elements()
+        @Override
+        protected SearchContext getContext()
         {
-            super(_test.getDriver());
+            return getDriver();
         }
 
         WebElement resultsCount()
         {
-            return findElement(Locator.css("table.labkey-search-results-counts td").index(0));
+            return Locator.css("table.labkey-search-results-counts td").index(0).findElement(this);
         }
 
         WebElement pageCount()
         {
-            return findElement(Locator.css("table.labkey-search-results-counts td").index(1));
+            return Locator.css("table.labkey-search-results-counts td").index(1).findElement(this);
         }
     }
 }
