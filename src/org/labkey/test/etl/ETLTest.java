@@ -501,15 +501,15 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testTruncateAndReset() throws Exception
     {
-        _etlHelper.insertSourceRow("111", "Truncate me 1", null);
-        _etlHelper.insertSourceRow("222", "Truncate me 2", null);
+        _etlHelper.insertSourceRow("trunc111", "Truncate me 1", null);
+        _etlHelper.insertSourceRow("trunc222", "Truncate me 2", null);
         _etlHelper.runETL_API(APPEND_SELECT_ALL);
         ETLScheduler scheduler = ETLScheduler.beginAt(this);
         scheduler.transform(APPEND_SELECT_ALL)
                 .truncateAndReset()
                 .confirmYes();
 
-        _etlHelper.assertNotInTarget1("111", "222", "Truncate me");
+        _etlHelper.assertNotInTarget1("trunc111", "trunc222", "Truncate me");
     }
 
     private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
