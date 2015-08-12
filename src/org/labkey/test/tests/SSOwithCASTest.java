@@ -45,12 +45,12 @@ import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 @Category({DailyA.class})
 public class SSOwithCASTest extends BaseWebDriverTest
 {
-    private static final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
-    private static final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
+    private final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
+    private final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
     private static final String credentialKey = "CAS";
-    private static final String CAS_HOST = TestCredentials.getServer(credentialKey).getHost();
-    private static final Login EXISTING_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(0);
-    private static final Login NEW_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(1);
+    private final String CAS_HOST = TestCredentials.getServer(credentialKey).getHost();
+    private final Login EXISTING_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(0);
+    private final Login NEW_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(1);
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
