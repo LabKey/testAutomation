@@ -909,13 +909,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void attemptSignIn(String email, String password)
     {
-        try
+        if (!getDriver().getTitle().equals("Sign In"))
         {
-            clickAndWait(Locator.linkWithText("Sign In"));
-        }
-        catch (NoSuchElementException error)
-        {
-            throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.", error);
+            try
+            {
+                clickAndWait(Locator.linkWithText("Sign In"));
+            }
+            catch (NoSuchElementException error)
+            {
+                throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.", error);
+            }
         }
 
         assertTitleEquals("Sign In");
@@ -2984,7 +2987,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Connection cn = createDefaultConnection(true);
         Command command = new Command("login", "enable");
-        command.setParameters(new HashMap<String, Object>(Maps.of("provider", "Test Secondary Authentication")));
+        command.setParameters(new HashMap<>(Maps.of("provider", "Test Secondary Authentication")));
         try
         {
             command.execute(cn, null);
@@ -3000,7 +3003,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Connection cn = createDefaultConnection(true);
         Command command = new Command("login", "disable");
-        command.setParameters(new HashMap<String, Object>(Maps.of("provider", "Test Secondary Authentication")));
+        command.setParameters(new HashMap<>(Maps.of("provider", "Test Secondary Authentication")));
         try
         {
             command.execute(cn, null);
