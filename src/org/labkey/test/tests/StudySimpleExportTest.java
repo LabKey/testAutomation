@@ -516,13 +516,13 @@ public class StudySimpleExportTest extends StudyBaseTest
         goToManageStudy();
         waitAndClickAndWait(Locator.linkWithText("Manage Cohorts"));
         waitForText(cohort1label);
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit").index(0));
         waitForText("Update Cohort: " + cohort1label);
         assertFormElementEquals(Locator.name("quf_subjectCount"), cohort1count);
         assertFormElementEquals(Locator.name("quf_description"), cohort1description);
         clickButton("Cancel");
         waitForText(cohort2label);
-        clickAndWait(Locator.linkWithText("edit", 1));
+        clickAndWait(Locator.linkWithText("edit").index(1));
         waitForText("Update Cohort: " + cohort2label);
         assertFormElementEquals(Locator.name("quf_subjectCount"), cohort2count);
         assertFormElementEquals(Locator.name("quf_description"), cohort2description);
@@ -960,7 +960,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Manage New Request Form"));
         log("Export Request forms");
         setFormElement(Locator.tagWithAttribute("input", "value", "Assay Plan"), "Assay Plan-1");
-        click(Locator.imageWithSrc("downarrow.gif", true, 1));
+        click(Locator.tag("img").withAttributeContaining("img", "downarrow.gif").index(1));
         clickButton("Add New Input", 0);
 
         Locator input1 = Locator.xpath("(//input[@type='text' and @name='title'])[4]");

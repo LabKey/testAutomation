@@ -1198,8 +1198,8 @@ public class MS2Test extends AbstractMS2ImportTest
         click(Locator.linkWithText("Show Peptide Prophet Details"));
         Object[] windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String) windows[1]);
-        waitForElement(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
-        assertEquals("Incorrect number of graphs", 13, getElementCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
+        waitForElement(Locator.tagWithAttribute("img", "alt", "Charge 3+ Cumulative Observed vs. Model"));
+        assertEquals("Incorrect number of graphs", 13, getElementCount(Locator.tag("img").withAttributeContaining("src", "labkey/ms2/MS2VerifyProject/ms2folder")));
         assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
         getDriver().close();
         getDriver().switchTo().window((String) windows[0]);

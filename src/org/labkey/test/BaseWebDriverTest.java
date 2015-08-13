@@ -67,6 +67,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.search.SearchSideWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
@@ -125,6 +126,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.Callable;
@@ -282,6 +284,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public WebDriver getDriver()
     {
+        if (Thread.interrupted())
+            throw new RuntimeException("Test thread terminated", new InterruptedException());
         return _driver;
     }
 
@@ -1974,7 +1978,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         error.printStackTrace(System.out);
 
-        if (error instanceof InterruptedException)
+        if (error instanceof InterruptedException || error.getCause() != null && error.getCause() instanceof InterruptedException)
             return;
 
         try
@@ -3471,15 +3475,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link BaseWebDriverTest#doAndWaitForPageSignal(Runnable, String)}
-     */
-    @Deprecated
-    public void applyAndWaitForPageSignal(Function<Void, Void> func, String signalName)
-    {
-        doAndWaitForPageSignal(() -> func.apply(null), signalName);
-    }
-
-    /**
      * Wait for Supplier to return true
      * @param wait milliseconds
      * @return false if Supplier.get() doesn't return true within 'wait' ms
@@ -3495,6 +3490,20 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         } while ((System.currentTimeMillis() - startTime) < wait);
 
         return false;
+    }
+
+    public void waitForEquals(String message, Supplier expected, Supplier actual, int wait)
+    {
+        waitFor(() -> Objects.equals(expected.get(), actual.get()), wait);
+
+        assertEquals(message, expected.get(), actual.get());
+    }
+
+    public void waitForNotEquals(String message, Supplier expected, Supplier actual, int wait)
+    {
+        waitFor(() -> !Objects.equals(expected.get(), actual.get()), wait);
+
+        assertNotEquals(message, expected.get(), actual.get());
     }
 
     public void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
@@ -4013,28 +4022,26 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return (elemText != null && elemText.contains(text));
     }
 
+    public void waitForFormElementToEqual(final WebElement el, final String value)
+    {
+        String failMessage = "Field with name " + el.getAttribute("name") + " did not have expected value";
+        waitForEquals(failMessage, () -> value, () -> getFormElement(el), WAIT_FOR_JAVASCRIPT);
+    }
+
     public void waitForFormElementToEqual(final Locator locator, final String value)
     {
-        String failMessage = "Field with locator " + locator + " did not equal " + value + ".";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return value.equals(getFormElement(locator));
-            }
-        }, failMessage, WAIT_FOR_JAVASCRIPT);
+        waitForFormElementToEqual(new EphemeralWebElement(locator, getDriver()), value);
+    }
+
+    public void waitForFormElementToNotEqual(final WebElement el, final String value)
+    {
+        String failMessage = "Field with name " + el.getAttribute("name") + " did change value";
+        waitForNotEquals(failMessage, () -> value, () -> getFormElement(el), WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForFormElementToNotEqual(final Locator locator, final String value)
     {
-        String failMessage = "Field with locator " + locator + " did not equal " + value + ".";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return !value.equals(getFormElement(locator));
-            }
-        }, failMessage, WAIT_FOR_JAVASCRIPT);
+        waitForFormElementToNotEqual(new EphemeralWebElement(locator, getDriver()), value);
     }
 
     public String getFormElement(Locator loc)

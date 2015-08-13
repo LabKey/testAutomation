@@ -221,8 +221,8 @@ public class TourTest extends BaseWebDriverTest
 
         public void assertNoTourBubble()
         {
-            if(isElementPresent(Locator.divByClassContaining("hopscotch-bubble animated hide"))) return;
-            assertElementNotPresent(Locator.divByClassContaining("hopscotch"));
+            if(isElementPresent(Locator.tag("div").withAttributeContaining("class", "hopscotch-bubble animated hide"))) return;
+            assertElementNotPresent(Locator.tag("div").withAttributeContaining("class", "hopscotch"));
         }
 
         private void assertTourBubble(String number, String title, String content)

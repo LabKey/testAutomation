@@ -572,7 +572,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickAndWait(Locator.linkWithText("run details", 3));
+        clickAndWait(Locator.linkWithText("run details").index(3));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
         DataRegionTable table = new DataRegionTable("AntigenStats", this, true, true);

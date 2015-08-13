@@ -17,11 +17,8 @@
 package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
-import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.Study;
-import org.labkey.test.categories.Disabled;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.StudyHelper;
 
@@ -208,7 +205,7 @@ public abstract class StudyManualTest extends StudyTest
         {
             if (labels.contains(currentLabel))
             {
-                clickAndWait(Locator.linkWithText("edit", row - 2));   // Zero-based, plus the header row doesn't have an edit link
+                clickAndWait(Locator.linkWithText("edit").index(row - 2));   // Zero-based, plus the header row doesn't have an edit link
                 uncheckCheckbox(Locator.name("showByDefault"));
                 clickButton("Save");
                 labels.remove(currentLabel);

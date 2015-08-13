@@ -602,7 +602,7 @@ public class FolderExportTest extends BaseWebDriverTest
         assertTextPresent(listName);
         clickAndWait(Locator.linkWithText(listName));
         assertTextPresent("persimmon");
-        assertElementPresent(Locator.imageWithSrc("/labkey/_images/mv_indicator.gif", false));
+        assertElementPresent(Locator.tag("img").withAttribute("src", "/labkey/_images/mv_indicator.gif"));
         assertTextNotPresent("grapefruit");//this has been filtered out.  if "grapefruit" is present, the filter wasn't preserved
         goBack();
 
@@ -642,14 +642,14 @@ public class FolderExportTest extends BaseWebDriverTest
         log("verify child containers were imported");
         hoverFolderBar();
         expandFolderTree("Subfolder1"); // Will expand to all subfolders with this name
-        clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
+        clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
         hoverFolderBar();
         expandFolderTree("_hidden");
         clickAndWait(Locator.linkWithText("_hidden").index(subfolderIndex));
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         hoverFolderBar();
-        clickAndWait(Locator.linkWithText("Subfolder2", subfolderIndex));
+        clickAndWait(Locator.linkWithText("Subfolder2").index(subfolderIndex));
         if (fromTemplate)
             assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
         else
@@ -657,7 +657,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
         log("verify container tabs were imported");
         hoverFolderBar();
-        clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
+        clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
         assertElementPresent(Locator.linkWithText("Assay Container"));
         assertElementPresent(Locator.linkWithText("Tab 2"));
         assertElementPresent(Locator.linkWithText("Study Container"));

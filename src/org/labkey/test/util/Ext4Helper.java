@@ -63,19 +63,6 @@ public class Ext4Helper extends AbstractHelper
         selectComboBoxItem(comboBox, TextMatchTechnique.EXACT, selections);
     }
 
-    /**
-     * @deprecated Use {@link #selectComboBoxItem(org.labkey.test.Locator.XPathLocator, org.labkey.test.util.Ext4Helper.TextMatchTechnique, String...)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator comboBox, boolean containsText, @LoggedParam String... selections)
-    {
-        if (containsText)
-            selectComboBoxItem(comboBox, TextMatchTechnique.CONTAINS, selections);
-        else
-            selectComboBoxItem(comboBox, TextMatchTechnique.EXACT, selections);
-    }
-
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, TextMatchTechnique matchTechnique, @LoggedParam String... selections)
     {
@@ -213,50 +200,17 @@ public class Ext4Helper extends AbstractHelper
         return getComboBoxOptions(Locators.formItemWithLabel(label));
     }
 
-//TODO: Use this once deprecated method has been removed
-//    @LogMethod(quiet=true)
-//    public List<String> getComboBoxOptions(Locator.XPathLocator comboBoxLocator)
-//    {
-//        openComboList(comboBoxLocator);
-//        List<String> options = _test.getTexts(Locators.comboListItem().findElements(_test.getDriver()));
-//        closeComboList(comboBoxLocator);
-//        return options;
-//    }
-
-    /**
-     * @deprecated TODO Remove after June sprint. Retaining to not break feature branches
-     * Only works because of unintended result of comboBowEl.findElements
-     */
-    @Deprecated
     @LogMethod(quiet=true)
-    public List<String> getComboBoxOptions(Locator loc)
+    public List<String> getComboBoxOptions(Locator.XPathLocator comboBoxLocator)
     {
-        ArrayList<String> ret = new ArrayList<>();
-        WebElement comboBoxEl = loc.findElement(_test.getDriver());
-        List<WebElement> inputEls = comboBoxEl.findElements(Locator.divByClassContaining("list-item").toBy());
-        for(WebElement inputEl : inputEls)
-        {
-            ret.add(inputEl.getText());
-        }
-        return ret;
+        openComboList(comboBoxLocator);
+        return _test.getTexts(Locators.comboListItem().findElements(_test.getDriver()));
     }
 
     @LogMethod(quiet = true)
-    public void selectRadioButton(@LoggedParam String label, boolean labelContains, @LoggedParam String selection)
+    public void selectRadioButton(@LoggedParam String groupLabel, @LoggedParam String selection)
     {
-        Locator l = Locator.xpath("//table/tbody/tr[td/label/span[contains(text(), '" + label + "')]]//label[text()='" + selection + "']");
-        _test.click(l);
-    }
-
-    @LogMethod(quiet = true)
-    public void selectRadioButton(@LoggedParam String label, @LoggedParam String selection)
-    {
-        Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
-        if (!_test.isElementPresent(l))
-        {
-            // try Ext 4.1.0 version
-            l = Locator.xpath("//div[./table//label[text()='" + label + "']]//label[text()='" + selection + "']");
-        }
+        Locator l = Locator.xpath("//div[.//label[text()='" + groupLabel + "']]//label[text()='" + selection + "']");
         _test.click(l);
     }
 
@@ -296,9 +250,8 @@ public class Ext4Helper extends AbstractHelper
     public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
     {
         _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
-        Locator loc = Locators.windowButton(windowTitle, buttonText);
-        _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.clickAndWait(loc, wait);
+        Locator loc = Locators.windowButton(windowTitle, buttonText).index(index);
+        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, loc, wait);
     }
 
     public void clearGridSelection(String markerCls)

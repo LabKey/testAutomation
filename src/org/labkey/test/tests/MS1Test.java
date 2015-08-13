@@ -428,16 +428,16 @@ public class MS1Test extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("details"));
 
         assertCharts();
-        assertChartRendered(Locator.imageWithSrc("type=bubble", true));
+        assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
         assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickButton("Next Feature >>");
         assertElementPresent(Locator.lkButtonDisabled("Next Feature >>"));
-        assertChartRendered(Locator.imageWithSrc("type=bubble", true));
+        assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
         clickButton("<< Previous Feature");
         assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
-        assertChartRendered(Locator.imageWithSrc("type=bubble", true));
+        assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
 
         log("showFeatureDetails.view OK");
 
@@ -447,9 +447,9 @@ public class MS1Test extends BaseWebDriverTest
 
     protected void assertCharts()
     {
-        assertElementPresent(Locator.imageWithSrc("type=elution", true));
-        assertElementPresent(Locator.imageWithSrc("type=spectrum", true));
-        assertElementPresent(Locator.imageWithSrc("type=bubble", true));
+        assertElementPresent(Locator.tag("img").withAttributeContaining("src", "type=elution"));
+        assertElementPresent(Locator.tag("img").withAttributeContaining("src", "type=spectrum"));
+        assertElementPresent(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
     }
 
     protected void assertChartRendered(Locator.XPathLocator loc)

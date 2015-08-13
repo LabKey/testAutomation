@@ -337,7 +337,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void setFileAttachment(int index, File attachment)
     {
-        clickAndWait(Locator.linkWithText("edit", index));
+        clickAndWait(Locator.linkWithText("edit").index(index));
         setFormElement(Locator.name("quf_FileAttachment"),  attachment);
         clickButton("Submit");
 

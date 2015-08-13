@@ -268,7 +268,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Save Changes and Send Notifications");
         assertTextNotPresent("New Request");
         assertTextPresent("Pending Approval");
-        clickAndWait(Locator.linkWithText("Details", 0));
+        clickAndWait(Locator.linkWithText("Details"));
         assertTextPresent("Duke University", "Providing lab approval");
         checkCheckbox(Locator.checkboxByName("complete"));
         setFormElement(Locator.name("comment"), "Approval granted.");
@@ -277,7 +277,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
 
-        clickAndWait(Locator.linkWithText("Details", 1));
+        clickAndWait(Locator.linkWithText("Details").index(1));
         clickButton("Delete Requirement");
         assertTextNotPresent("Receiving lab approval");
 
@@ -368,8 +368,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Mouse:"), true, "999320528");
-        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Visit:"), true, "Enroll/Vacc #1 (201)");
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Mouse:"), Ext4Helper.TextMatchTechnique.CONTAINS, "999320528");
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Visit:"), Ext4Helper.TextMatchTechnique.CONTAINS, "Enroll/Vacc #1 (201)");
 
         clickButton("Search");
         assertTextPresent("999320528");

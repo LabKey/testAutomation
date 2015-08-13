@@ -28,8 +28,6 @@ import org.labkey.test.categories.Sequest;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
-
 @Category({MS2.class, Sequest.class})
 public class SequestTest extends AbstractMS2SearchEngineTest
 {
@@ -126,7 +124,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export All", 0);
-        clickAndWait(Locator.linkWithText("TSV", 0));
+        clickAndWait(Locator.linkWithText("TSV"));
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
         assertTextPresent(PROTEIN);

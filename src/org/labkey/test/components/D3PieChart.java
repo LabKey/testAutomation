@@ -74,7 +74,7 @@ public class D3PieChart
 
     public String getCaption()
     {
-        return Locator.divByClassContaining("caption").findElement(_test.getDriver()).getText();
+        return Locator.tag("div").withAttributeContaining("class", "caption").findElement(_test.getDriver()).getText();
     }
 
     public String getOuterLabelByInnerLabel(String innerLabel)

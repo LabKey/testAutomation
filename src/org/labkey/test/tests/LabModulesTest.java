@@ -1229,17 +1229,17 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             //NOTE: these URLs should point to the workbook where the record was created, not the current folder
 
             //details link
-            String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details", rowNum), "href"), "UTF-8");
+            String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details").index(rowNum), "href"), "UTF-8");
             assertTrue("Expected [details] link to go to the container: " + workbook + ", href was: " + href,
                     href.contains(workbook));
 
             //update link
-            href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit").index(rowNum), "href"), "UTF-8");
             assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
                     href.contains("/ldk/" + workbook + "/manageRecord.view?"));
 
             //sample type
-            href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
+            href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA").index(rowNum), "href"), "UTF-8");
             assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
                     href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
 

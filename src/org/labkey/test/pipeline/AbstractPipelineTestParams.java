@@ -307,7 +307,8 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             while (_test.isElementPresent(Locator.linkWithText("COMPLETE").index(split)))
             {
                 _test.pushLocation();
-                _test.clickAndWait(Locator.linkWithText("COMPLETE", split++));
+                Integer index = split++;
+                _test.clickAndWait(Locator.linkWithText("COMPLETE").index(index));
                 validateExperiment();
                 _test.popLocation();
             }

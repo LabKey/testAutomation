@@ -643,7 +643,7 @@ public class StudyTest extends StudyBaseTest
 
             // Update the first row
             String newText = "more new text";
-            clickAndWait(Locator.linkWithText("edit", 0));
+            clickAndWait(Locator.linkWithText("edit").index(0));
             setFormElement(Locator.input("quf_TextField"), newText);
             clickButton("Submit");
             List<String> updatedTextField = Arrays.asList(newText, textField.get(0));
@@ -669,11 +669,11 @@ public class StudyTest extends StudyBaseTest
         _customizeViewsHelper.addCustomizeViewColumn("Bad Name", "Bad Name");
         _customizeViewsHelper.applyCustomView();
         _extHelper.clickMenuButton("QC State", "All data");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit").index(0));
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value");
         clickButton("Submit");
         assertTextPresent("Updatable Value");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit").index(0));
         assertFormElementEquals(Locator.input("quf_Bad Name"), "Updatable Value");
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value11");
         clickButton("Submit");
@@ -932,7 +932,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
         // test optional/required/not associated
-        clickAndWait(Locator.linkWithText("edit", 1));
+        clickAndWait(Locator.linkWithText("edit").index(1));
         selectOption("datasetStatus", 0, "NOT_ASSOCIATED");
         selectOption("datasetStatus", 1, "NOT_ASSOCIATED");
         selectOption("datasetStatus", 2, "NOT_ASSOCIATED");
@@ -943,7 +943,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("datasetStatus", 7, "REQUIRED");
         selectOption("datasetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 1));
+        clickAndWait(Locator.linkWithText("edit").index(1));
         selectOption("datasetStatus", 0, "NOT_ASSOCIATED");
         selectOption("datasetStatus", 1, "OPTIONAL");
         selectOption("datasetStatus", 2, "REQUIRED");
@@ -954,7 +954,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("datasetStatus", 7, "OPTIONAL");
         selectOption("datasetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 1));
+        clickAndWait(Locator.linkWithText("edit").index(1));
         assertSelectOption("datasetStatus", 0, "NOT_ASSOCIATED");
         assertSelectOption("datasetStatus", 1, "OPTIONAL");
         assertSelectOption("datasetStatus", 2, "REQUIRED");
@@ -1147,10 +1147,10 @@ public class StudyTest extends StudyBaseTest
         clickButton("View Data");
 
         // Edit 1 item changing sequence from 101; then edit again and change back and set VisitDay to something
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit").index(0));
         setFormElement(Locator.input("quf_SequenceNum"), "100");
         clickButton("Submit");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit").index(0));
         setFormElement(Locator.input("quf_SequenceNum"), "101");
         setFormElement(Locator.input("quf_VisitDay"), "102");
         clickButton("Submit");

@@ -32,8 +32,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
@@ -334,7 +332,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("Header"));
         assertTextPresent(HEADER_CONTENT);
-        clickAndWait(Locator.linkWithText("Edit", 0));
+        clickAndWait(Locator.linkWithText("Edit").index(0));
         deleteWikiPage();
         assertTextNotPresent(HEADER_CONTENT);
 

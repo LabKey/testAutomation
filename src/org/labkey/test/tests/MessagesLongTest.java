@@ -242,7 +242,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("Messages"));
-        clickAndWait(Locator.linkWithText("view message or respond", 1));
+        clickAndWait(Locator.linkWithText("view message or respond").index(1));
         clickButton("Respond");
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("Messages"));
@@ -285,14 +285,14 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
-        checkCheckbox(Locator.radioButtonByName("secure").index(0));
+        checkCheckbox(Locator.radioButtonByName("secure"));
         clickButton("Save");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickButton("Delete Message");
         clickButton("Delete");
 
         log("Check delete response works and is recognized");
-        clickAndWait(Locator.linkWithText("view message or respond", 1));
+        clickAndWait(Locator.linkWithText("view message or respond").index(1));
         clickAndWait(Locator.linkWithText("delete"));
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
@@ -313,17 +313,17 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check emailed messages");
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 6);
-        click(Locator.linkWithText(MSG1_TITLE, 0));
+        click(Locator.linkWithText(MSG1_TITLE));
         assertTextPresent(
                 "1 <b>x</b>",
                 "<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
-        click(Locator.linkWithText(MSG1_TITLE, 1));
+        click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
         assertElementNotPresent(Locator.linkWithText(MSG2_TITLE));
 
         log("Check attachment linked in emailed message");
-        click(Locator.linkWithText("RE: " + MSG1_TITLE, 0));
+        click(Locator.linkWithText("RE: " + MSG1_TITLE));
         assertTextPresent("common.properties");
         assertElementPresent(Locator.linkWithText("common.properties"));
 
@@ -496,7 +496,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         assertElementPresent(Locator.linkWithText(_messageTitle));
         assertElementPresent(Locator.linkWithText("RE: "+_messageTitle));
-        click(Locator.linkWithText("RE: "+_messageTitle, 1));
+        click(Locator.linkWithText("RE: " + _messageTitle).index(1));
     }
 
     private void createNewMessage(String title, String body)

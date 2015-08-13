@@ -254,7 +254,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         for (int i = 0; i < studies.length; i++)
         {
             pushLocation();
-            clickAndWait(Locator.linkWithText("Publish Study", i));
+            clickAndWait(Locator.linkWithText("Publish Study").index(i));
             assertTitleContains(studies[i]);
             popLocation();
         }

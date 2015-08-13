@@ -37,9 +37,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 
 @Category({DailyA.class})
@@ -111,13 +109,13 @@ public class SSOwithCASTest extends BaseWebDriverTest
         signOut();
 
         //check for image on the header
-        String imageHeader = getAttribute(Locator.imageWithAltText("Sign in using CAS", false), "src");
-        assertNotEquals("CAS image not found in the header", imageHeader, null);
+        String imageHeader = getAttribute(Locator.tagWithAttribute("img", "alt", "Sign in using CAS"), "src");
+        assertFalse("CAS image not found in the header", imageHeader.contains(HEADER_LOGO_FILE.getName()));
 
         //check for image on the SignIn page
         clickAndWait(Locators.signInButtonOrLink);//Go to Labkey Sign-in page
-        String imageLogin = getAttribute(Locator.imageWithAltText("Sign in using CAS", false), "src");
-        assertNotEquals("CAS image not found in the header", imageHeader, null);
+        String imageLogin = getAttribute(Locator.tagWithAttribute("img", "alt", "Sign in using CAS"), "src");
+        assertFalse("CAS image not found in the header", imageLogin.contains(LOGIN_LOGO_FILE.getName()));
 
         signIn();
 

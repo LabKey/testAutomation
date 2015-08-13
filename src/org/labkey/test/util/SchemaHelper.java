@@ -88,7 +88,7 @@ public class SchemaHelper extends AbstractHelper
             }
             _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
-            _test._ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Published Tables:?"), true, tables.split(","));
+            _test._ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Published Tables:?"), Ext4Helper.TextMatchTechnique.CONTAINS, tables.split(","));
         }
 
         if (metadata != null)

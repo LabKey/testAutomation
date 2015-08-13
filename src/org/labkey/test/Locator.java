@@ -17,26 +17,20 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.*;
 
 public abstract class Locator
 {
@@ -279,50 +273,6 @@ public abstract class Locator
         });
     }
 
-    /**
-     * @deprecated Use {@link #waitForElementToDisappear(SearchContext, int)}
-     */
-    @Deprecated
-    public void waitForElementToDisappear(final SearchContext context, WebDriverWait wait)
-    {
-        try
-        {
-            wait.until(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver d)
-                {
-                    return findElements(context).size() == 0;
-                }
-            });
-        }
-        catch (TimeoutException ex)
-        {
-            throw new RuntimeException("Timeout waiting for element to disappear: " + getLoggableDescription(), ex);
-        }
-    }
-
-    public void waitForElementToHaveValue(final SearchContext context, final int msTimeout, final String value)
-    {
-        FluentWait<SearchContext> wait = new FluentWait<>(context).withTimeout(msTimeout, TimeUnit.MILLISECONDS);
-
-        try
-        {
-            wait.ignoring(NotFoundException.class).until(new Function<SearchContext, Boolean>()
-            {
-                @Override
-                public Boolean apply(SearchContext context)
-                {
-                    return findElement(context).getText().contains(value);
-                }
-            });
-        }
-        catch (TimeoutException ex)
-        {
-            Assert.assertEquals("Element did not contain expected text", value, findElement(context).getText());
-        }
-    }
-
     public static IdLocator id(String id)
     {
         return new IdLocator(id);
@@ -338,11 +288,6 @@ public abstract class Locator
         return new CssLocator(selector);
     }
 
-    /**
-     * Find using xpath
-     * @param xpathExpr
-     * @return
-     */
     public static XPathLocator xpath(String xpathExpr)
     {
         return new XPathLocator(xpathExpr);
@@ -356,11 +301,6 @@ public abstract class Locator
     public static XPathLocator tagWithName(String tag, String name)
     {
         return tagWithAttribute(tag, "name", name);
-    }
-
-    public static XPathLocator formWithName(String formName)
-    {
-        return tagWithName("form", formName);
     }
 
     public static XPathLocator tagWithId(String tag, String id)
@@ -395,7 +335,7 @@ public abstract class Locator
 
     public static XPathLocator linkWithImage(String image)
     {
-        return xpath("//a/img[contains(@src, " + xq(image) + ")]");
+        return xpath("//a/img").withAttributeContaining("src", image);
     }
 
     public static XPathLocator gwtButton(String text)
@@ -430,22 +370,12 @@ public abstract class Locator
 
     public static XPathLocator extButton(String text)
     {
-        return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
+        return  tagWithClass("button", "x-btn-text").notHidden().withText(text);
     }
 
     public static XPathLocator extButtonEnabled(String text)
     {
         return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
-    }
-
-    public static XPathLocator extMenuItemEnabled(String text)
-    {
-        return xpath("//li").withClass("x-menu-list-item").withoutClass("x-item-disabled").append("//span").withClass("x-menu-item-text").withText(text);
-    }
-
-    public static XPathLocator extMenuItemDisabled(String text)
-    {
-        return xpath("//li").withClass("x-menu-list-item").withClass("x-item-disabled").append("//span").withClass("x-menu-item-text").withText(text);
     }
 
     public static XPathLocator extButtonContainingText(String text)
@@ -473,19 +403,9 @@ public abstract class Locator
         return new LinkLocator(text);
     }
 
-    public static XPathLocator linkWithText(String text, Integer index)
-    {
-        return tagWithText("a", text).index(index);
-    }
-
     public static XPathLocator linkContainingText(String text)
     {
         return xpath("//a").containing(text);
-    }
-
-    public static XPathLocator linkContainingText(String text, Integer index)
-    {
-        return linkContainingText(text).index(index);
     }
 
     public static XPathLocator menuItem(String text)
@@ -553,11 +473,6 @@ public abstract class Locator
         return xpath("//input[@type='checkbox' and @name=" + xq(name) + "]");
     }
 
-    public static XPathLocator checkboxByIdContaining(String id)
-    {
-        return xpath("//input[@type='checkbox' and @id[contains(@id,'" + id + ";]");
-    }
-
     public static XPathLocator radioButtonById(String id)
     {
         return xpath("//input[@type='radio' and @id=" + xq(id) + "]");
@@ -586,31 +501,6 @@ public abstract class Locator
     public static XPathLocator imageMapLinkByTitle(String imageMapName, String title)
     {
         return xpath("//map[@name=" + xq(imageMapName) + "]/area[@title=" + xq(title) + "]");
-    }
-
-    public static XPathLocator imageWithSrc(String src, boolean substringMatch)
-    {
-        if (substringMatch)
-            return xpath("//img[contains(@src, " + xq(src) + ")]");
-        else
-            return xpath("//img[@src=" + xq(src) + "]");
-    }
-
-    //Locator for image with src=src (if substringMatch=false
-    public static XPathLocator imageWithSrc(String src, boolean substringMatch, Integer index)
-    {
-        if (substringMatch)
-            return xpath("(//img[contains(@src, " + xq(src) + ")])[" + index + "]");
-        else
-            return xpath("(//img[@src=" + xq(src) + "])[" + index + "]");
-    }
-
-    public static XPathLocator imageWithAltText(String altText, boolean substringMatch)
-    {
-        if (substringMatch)
-            return xpath("//img[contains(@alt, " + xq(altText) + ")]");
-        else
-            return xpath("//img[@alt=" + xq(altText) + "]");
     }
 
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
@@ -656,25 +546,20 @@ public abstract class Locator
         return permissionButton(groupName, role).append(Locator.tag("span").withClass("closeicon"));
     }
 
-    public static XPathLocator fileTreeByName(String name)
-    {
-        return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(name) + "]");
-    }
-
     public static XPathLocator schemaTreeNode(String schemaName)
     {
-        return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
+        return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
     }
 
     public static XPathLocator queryTreeNode(String queryName)
     {
         // NOTE: this may mis-fire (hit the wrong node... watch for this)
-        return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div/span").withText(queryName);
+        return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(queryName);
     }
 
     public static XPathLocator permissionsTreeNode(String folderName)
     {
-        return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
+        return tagWithClass("a", "x-tree-node-anchor").child("span[text()='" + folderName + "' or text()='" + folderName + "*']");
     }
 
     public static XPathLocator currentProject()
@@ -682,36 +567,28 @@ public abstract class Locator
         return id("folderBar");
     }
 
-    public static XPathLocator divByName(String name)
-    {
-        return xpath("//div[@name='" + name + "']");
-    }
-
-    public static XPathLocator divByNameContaining(String partialName)
-    {
-        return xpath("//div[contains(@name, '" + partialName + "')]");
-    }
-
-    public static XPathLocator divById(String id)
-    {
-        return xpath("//div[@id='" + id + "']");
-    }
-
+    /**
+     * TODO: Remove in September 2015. Leaving method so as to not break feature branches
+     */
+    @Deprecated
     public static XPathLocator divByIdContaining(String partialId)
     {
-        return xpath("//div[contains(@id, '" + partialId + "')]");
+        return tag("div").withAttributeContaining("id", partialId);
     }
 
+    /**
+     * TODO: Remove in September 2015. Leaving method so as to not break feature branches
+     */
+    @Deprecated
     public static XPathLocator divByClassContaining(String partialClass)
     {
-        return xpath("//div[contains(@class, '" + partialClass + "')]");
+        return tag("div").withAttributeContaining("class", partialClass);
     }
 
     public static XPathLocator divByInnerText(String text)
     {
         return xpath("//div[.='" + text + "']");
     }
-
 
     public static IdLocator folderTab(String text)
     {
@@ -745,9 +622,7 @@ public abstract class Locator
     }
 
     /**
-     * Pagination text for dataregion with one page of data with
-     * @param rowCount
-     * @return
+     * Pagination text for dataregion with one page of data
      */
     public static XPathLocator paginationText(int rowCount)
     {
@@ -756,12 +631,12 @@ public abstract class Locator
 
     public static XPathLocator paginationText()
     {
-        return Locator.xpath("//div[contains(@class, 'labkey-pagination')]");
+        return Locator.tagWithClass("div", "labkey-pagination");
     }
 
     public static XPathLocator pageHeader(String headerText)
     {
-        return Locator.xpath("id('labkey-nav-trail-current-page')").withText(headerText);
+        return Locator.id("labkey-nav-trail-current-page").withText(headerText);
     }
 
     /**
@@ -810,11 +685,6 @@ public abstract class Locator
             super(loc);
         }
 
-        private XPathLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
         public XPathLocator containing(String contains)
         {
             return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
@@ -852,7 +722,10 @@ public abstract class Locator
 
         public XPathLocator index(Integer index)
         {
-            return new XPathLocator("("+_loc+")["+(index+1)+"]");
+            if (0 == index)
+                return this;
+            else
+                return new XPathLocator("("+_loc+")["+(index+1)+"]");
         }
 
         public By toBy()
@@ -1138,7 +1011,7 @@ public abstract class Locator
         @Override
         public String toString()
         {
-            return "css=" + _loc + (_contains != null ? ":contains('" + _contains + "')" : "");
+            return "css=" + _loc;
         }
 
         public By toBy()

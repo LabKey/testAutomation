@@ -154,7 +154,7 @@ public class GroupTest extends BaseWebDriverTest
 
 
         //exapnd plus  to check specific groups
-        click(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex));
+        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex));
 //        assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
 //                drt.getDataAsText(rowIndex, accessColumn).split(" "))); //TODO: Fix
 
@@ -173,7 +173,7 @@ public class GroupTest extends BaseWebDriverTest
 //        }
 
         //confirm details link leads to right user, page
-        clickAndWait(Locator.linkContainingText("details", rowIndex));
+        clickAndWait(Locator.linkContainingText("details").index(rowIndex));
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
         assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();

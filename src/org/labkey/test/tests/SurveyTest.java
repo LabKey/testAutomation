@@ -29,7 +29,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -143,7 +143,7 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dblfield"), "999.1");
         setFormElement(Locator.name("dtfield"), "2013-01-04");
         addSurveyFileAttachment("attfield", pipelineLoc + "/TestAttachment.txt");
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), true, "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
         log("Wait for the survey autosave (save attempts every minute)");
         waitForText(65000, "Responses automatically saved at");
 
@@ -282,11 +282,11 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dtfield"), "01/04/2013");
         // check survey skip logic that attachment field appears with selectin of lkField = Test1
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), true, "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
         assertElementNotPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), true, "Test2");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test2");
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), true, "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), Ext4Helper.TextMatchTechnique.CONTAINS, "Test1");
         addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
         clickButton("Next", 0);
         // check submit button text about invalid fields
@@ -388,6 +388,6 @@ public class SurveyTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("survey");
+        return Collections.singletonList("survey");
     }
 }
