@@ -431,20 +431,20 @@ public class FileBrowserHelper
 
     public static enum BrowserAction
     {
-        FOLDER_TREE("FolderTree", "Toggle Folder Tree", "folderTreeToggle"),
-        UP("Up", "Parent Folder", "parentFolder"),
-        RELOAD("Reload", "Refresh", "refresh"),
-        NEW_FOLDER("FolderNew", "Create Folder", "createDirectory"),
-        DOWNLOAD("Download", "Download", "download"),
-        DELETE("Delete", "Delete", "deletePath"),
-        RENAME("Rename", "Rename", "renamePath"),
-        MOVE("Move", "Move", "movePath"),
-        EDIT_PROPERTIES("EditFileProps", "Edit Properties", "editFileProps"),
-        UPLOAD("Upload", "Upload Files", "upload"),
-        IMPORT_DATA("DBCommit", "Import Data", "importData"),
-        EMAIL_SETTINGS("EmailSettings", "Email Preferences", "emailPreferences"),
-        AUDIT_HISTORY("AuditLog", "Audit History", "auditLog", true),
-        ADMIN("Configure", "Admin", "customize");
+        FOLDER_TREE("sitemap", "Toggle Folder Tree", "folderTreeToggle"),
+        UP("level-up", "Parent Folder", "parentFolder"),
+        RELOAD("refresh", "Refresh", "refresh"),
+        NEW_FOLDER("folder-o", "Create Folder", "createDirectory"),
+        DOWNLOAD("download", "Download", "download"),
+        DELETE("trash-o", "Delete", "deletePath"),
+        RENAME("pencil", "Rename", "renamePath"),
+        MOVE("sign-out", "Move", "movePath"),
+        EDIT_PROPERTIES("cog", "Edit Properties", "editFileProps"),
+        UPLOAD("file-o", "Upload Files", "upload"),
+        IMPORT_DATA("database", "Import Data", "importData"),
+        EMAIL_SETTINGS("envelope-o", "Email Preferences", "emailPreferences"),
+        AUDIT_HISTORY("users", "Audit History", "auditLog", true),
+        ADMIN("cog", "Admin", "customize");
 
         private String _iconName;
         private String _buttonText;
@@ -505,7 +505,7 @@ public class FileBrowserHelper
 
         public Locator getButtonIconLocator()
         {
-            return Locator.css(".icon" + _iconName);
+            return Locator.css(".fa-" + _iconName);
         }
 
         public Locator getButtonTextLocator()
