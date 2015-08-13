@@ -1,5 +1,5 @@
 package org.labkey.test.categories;
 
-public abstract class Git extends Daily
+public abstract class Git extends Test
 {
 }
