@@ -545,7 +545,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Choose Adapter Group");
         Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
         waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
-        Ext4GridRef grid = _ext4Helper.queryOne("#adapterGrid", Ext4GridRef.class);
+        Ext4GridRef grid = _ext4Helper.componentQuery("sequenceanalysis-adapterpanel grid", Ext4GridRef.class).get(1);
         grid.waitForRowCount(2);
         Assert.assertEquals("Incorrect cell value", rocheAdapters[0][0], grid.getFieldValue(1, "adapterName"));
         Assert.assertEquals("Incorrect cell value", rocheAdapters[1][0], grid.getFieldValue(2, "adapterName"));
@@ -553,16 +553,16 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Incorrect cell value", rocheAdapters[1][1], grid.getFieldValue(2, "adapterSequence"));
 
         grid.eval("getSelectionModel().select(0)");
-        clickButton("Move Down", 0);
+        grid.clickTbarButton("Move Down");
         sleep(500);
         assertTextBefore(rocheAdapters[1][0], rocheAdapters[0][0]);
 
         grid.eval("getSelectionModel().select(1)");
-        clickButton("Move Up", 0);
+        grid.clickTbarButton("Move Up");
         sleep(500);
         assertTextBefore(rocheAdapters[0][0], rocheAdapters[1][0]);
 
-        clickButton("Remove", 0);
+        grid.clickTbarButton("Remove");
         sleep(500);
         assertTextNotPresent(rocheAdapters[0][0]);
 
