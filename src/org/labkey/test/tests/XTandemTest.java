@@ -131,7 +131,7 @@ public class XTandemTest extends AbstractXTandemTest
     {
         clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
         checkRadioButton(Locator.radioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID));
-        setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.25");
+        setFormElement(Locator.name(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME), "0.25");
         clickButton("Compare");
         assertTextPresent(PEPTIDE4);
         assertTextNotPresent(PEPTIDE);
@@ -143,21 +143,21 @@ public class XTandemTest extends AbstractXTandemTest
         assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
-        setFormElement("identifier", SEARCH);
+        setFormElement(Locator.name("identifier"), SEARCH);
         click(Locator.name("exactMatch"));
         clickButton("Search");
         assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
-        setFormElement("minimumProbability", "2.0");
+        setFormElement(Locator.name("minimumProbability"), "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertElementNotPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
 
-        setFormElement("identifier", "GarbageProteinName");
-        setFormElement("minimumProbability", "");
+        setFormElement(Locator.name("identifier"), "GarbageProteinName");
+        setFormElement(Locator.name("minimumProbability"), "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));

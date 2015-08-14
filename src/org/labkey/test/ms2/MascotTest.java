@@ -110,8 +110,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         {
             // Case 2: correct server, wrong user id
             log("Testing non-existent Mascot user via " + mascotServerURL);
-            setFormElement("mascotUserAccount", "nonexistent");
-            setFormElement("mascotUserPassword", mascotUserPassword);
+            setFormElement(Locator.name("mascotUserAccount"), "nonexistent");
+            setFormElement(Locator.name("mascotUserPassword"), mascotUserPassword);
             pushLocation();
             clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
@@ -127,8 +127,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         {
             // Case 3: correct server, wrong user password
             log("Testing wrong password fo Mascot user " + mascotUserAccount + " via " + mascotServerURL);
-            setFormElement("mascotUserAccount", mascotUserAccount);
-            setFormElement("mascotUserPassword", "wrongpassword");
+            setFormElement(Locator.name("mascotUserAccount"), mascotUserAccount);
+            setFormElement(Locator.name("mascotUserPassword"), "wrongpassword");
             pushLocation();
             clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
@@ -175,9 +175,9 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         {
             // Case 5: auto-detect server, wrong user id
             log("Testing non-existent Mascot user and server auto-detection via " + altMascotServer);
-            setFormElement("mascotServer", altMascotServer);
-            setFormElement("mascotUserAccount", "nonexistent");
-            setFormElement("mascotUserPassword", mascotUserPassword);
+            setFormElement(Locator.name("mascotServer"), altMascotServer);
+            setFormElement(Locator.name("mascotUserAccount"), "nonexistent");
+            setFormElement(Locator.name("mascotUserPassword"), mascotUserPassword);
             pushLocation();
             clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");

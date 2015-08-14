@@ -129,7 +129,7 @@ public class PipelineFolder
         {
             String pathLabKey = TestFileUtils.getLabKeyRoot();
             _test.setFormElement(Locator.name("keyFile"), new File(pathLabKey + USER_KEY));
-            _test.setFormElement("keyPassword", USER_KEY_PASSWORD);
+            _test.setFormElement(Locator.name("keyPassword"), USER_KEY_PASSWORD);
             _test.setFormElement(Locator.name("certFile"), new File(pathLabKey + USER_CERT));
         }
         _test.submit();

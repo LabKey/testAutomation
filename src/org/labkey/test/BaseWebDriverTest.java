@@ -4836,23 +4836,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return address;
     }
 
-    /**
-     * @deprecated Use explicit Locator: {@link #setFormElement(Locator, String)}
-     */
-    @Deprecated public void setFormElement(String name, String text)
-    {
-        if(getDriver().findElements(By.id(name)).size() > 0)
-        {
-            log("DEPRECATED: Form element has id: \"" + name + "\". Use Locator.id");
-            setFormElement(Locator.id(name), text);
-        }
-        else
-        {
-            log("DEPRECATED: Form element is named: \"" + name + "\". Use Locator.name");
-            setFormElement(Locator.name(name), text);
-        }
-    }
-
     public void setFormElement(Locator l, String text)
     {
         WebElement el = l.findElement(getDriver());

@@ -54,12 +54,12 @@ public class QuantitationTest extends AbstractXTandemTest
 
         waitForElement(Locator.xpath("//select[@name='sequenceDB']/option[.='" + DATABASE + "']" ), WAIT_FOR_JAVASCRIPT);
         log("Set analysis parameters.");
-        setFormElement("protocolName", LIBRA_PROTOCOL_NAME);
-        setFormElement("protocolDescription", "Search with Libra quantitation");
+        setFormElement(Locator.name("protocolName"), LIBRA_PROTOCOL_NAME);
+        setFormElement(Locator.name("protocolDescription"), "Search with Libra quantitation");
         selectOptionByText(Locator.name("sequenceDB"), DATABASE);
-        setFormElement("configureXml", "");
+        setFormElement(Locator.name("configureXml"), "");
         waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
-        setFormElement("configureXml", LIBRA_INPUT_XML);
+        setFormElement(Locator.name("configureXml"), LIBRA_INPUT_XML);
         clickButton("Search");
         log("View the analysis log.");
         // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load

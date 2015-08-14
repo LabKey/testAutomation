@@ -163,7 +163,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         setFormElement(Locator.name("name"), WIKI_PAGE1_NAME);
         setFormElement(Locator.name("title"), WIKI_PAGE1_TITLE);
-        setFormElement("body", WIKI_PAGE1_CONTENT);
+        setFormElement(Locator.name("body"), WIKI_PAGE1_CONTENT);
         _wikiHelper.saveWikiPage();
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
@@ -176,7 +176,7 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.convertWikiFormat("RADEOX");
 
         setFormElement(Locator.name("title"), WIKI_PAGE2_TITLE);
-        setFormElement("body", WIKI_PAGE2_CONTENT);
+        setFormElement(Locator.name("body"), WIKI_PAGE2_CONTENT);
         _wikiHelper.saveWikiPage();
 
         clickAndWait(Locator.linkWithText("Welcome"));
@@ -283,7 +283,7 @@ public class WikiLongTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickAndWait(Locator.linkWithText("Start new discussion"));
         setFormElement(Locator.name("title"), DISC1_TITLE);
-        setFormElement("body", DISC1_BODY);
+        setFormElement(Locator.id("body"), DISC1_BODY);
         submit();
         waitForExtReady();
         click(Locator.linkWithText("see discussions (1)"));
@@ -294,7 +294,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check response on discussion board works");
         clickButton("Respond");
         setFormElement(Locator.name("title"), RESP1_TITLE);
-        setFormElement("body", RESP1_BODY);
+        setFormElement(Locator.id("body"), RESP1_BODY);
         submit();
         assertTextPresent(RESP1_TITLE,
                 RESP1_BODY);
@@ -436,7 +436,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.clickManageGroup(USERS_GROUP);
-        setFormElement("names", USER1);
+        setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 

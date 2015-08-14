@@ -175,17 +175,17 @@ public class StudyExportTest extends StudyManualTest
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
-        setFormElement("newLabel", "New Request");
+        setFormElement(Locator.name("newLabel"), "New Request");
         clickButton("Save");
-        setFormElement("newLabel", "Pending Approval");
+        setFormElement(Locator.name("newLabel"), "Pending Approval");
         clickButton("Save");
-        setFormElement("newLabel", "Complete");
+        setFormElement(Locator.name("newLabel"), "Complete");
         clickButton("Done");
         clickAndWait(Locator.linkWithText("Manage Actors and Groups"));
-        setFormElement("newLabel", "Institutional Review Board");
+        setFormElement(Locator.name("newLabel"), "Institutional Review Board");
         selectOptionByText(Locator.name("newPerSite"), "Multiple Per Study (Location Affiliated)");
         clickButton("Save");
-        setFormElement("newLabel", "Scientific Leadership Group");
+        setFormElement(Locator.name("newLabel"), "Scientific Leadership Group");
         selectOptionByText(Locator.name("newPerSite"), "One Per Study");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("Update Members"));
@@ -194,7 +194,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Default Requirements"));
         selectOptionByText(Locator.name("providerActor"), "Institutional Review Board");
-        setFormElement("providerDescription", "To be deleted");
+        setFormElement(Locator.id("providerDescription"), "To be deleted");
         clickButtonByIndex("Add Requirement", 1);
         assertTextPresent("To be deleted");
         clickAndWait(Locator.linkWithText("Delete"));
@@ -264,7 +264,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("Pending Approval");
         clickAndWait(Locator.linkWithText("Update Request"));
         selectOptionByText(Locator.name("status"), "Pending Approval");
-        setFormElement("comments", "Request is now pending.");
+        setFormElement(Locator.name("comments"), "Request is now pending.");
         clickButton("Save Changes and Send Notifications");
         assertTextNotPresent("New Request");
         assertTextPresent("Pending Approval");
@@ -311,7 +311,7 @@ public class StudyExportTest extends StudyManualTest
         checkAllOnPage("Dataset");
         _extHelper.clickMenuButton("QC State", "Update state of selected rows");
         selectOptionByText(Locator.name("newState"), "clean");
-        setFormElement("comments", "This data is clean.");
+        setFormElement(Locator.name("comments"), "This data is clean.");
         clickButton("Update Status");
         _extHelper.clickMenuButton("QC State", "clean");
 
@@ -323,7 +323,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Enable Comments/QC");
         checkAllOnPage("SpecimenDetail");
         _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
-        setFormElement("comments", "These vials are very important.");
+        setFormElement(Locator.name("comments"), "These vials are very important.");
         clickButton("Save Changes");
         assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
@@ -507,7 +507,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
         waitForElement(Locator.name("dsCategory"), WAIT_FOR_PAGE);
-        setFormElement("dsCategory", category);
+        setFormElement(Locator.name("dsCategory"), category);
         clickButton("Save");
     }
 
@@ -581,7 +581,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
-        setFormElement("typeName", "fileImportDataset");
+        setFormElement(Locator.name("typeName"), "fileImportDataset");
         click(Locator.checkboxByName("fileImport"));
         clickButton("Next");
 

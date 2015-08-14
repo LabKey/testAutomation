@@ -74,7 +74,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         checkHelpLinks(null, true, true);
 
         goToProjectSettings(getProjectAltertedName());
-        setFormElement("reportAProblemPath", "");
+        setFormElement(Locator.name("reportAProblemPath"), "");
         clickButton("Save");
 
         checkHelpLinks(getProjectAltertedName(), false, true);

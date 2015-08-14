@@ -73,7 +73,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
 
         String altSequestServer = "bogus.domain";
         log("Testing wrong Sequest server via " + altSequestServer);
-        setFormElement("sequestServer", altSequestServer);
+        setFormElement(Locator.name("sequestServer"), altSequestServer);
         pushLocation();
         clickAndWait(Locator.linkWithText("Test Sequest settings"));
         assertTextPresent("Test failed.", "Failed to interact with SequestQueue application");
@@ -153,7 +153,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
-        setFormElement("identifier", SEARCH);
+        setFormElement(Locator.name("identifier"), SEARCH);
         click(Locator.name("exactMatch"));
         clickButton("Search");
         assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
@@ -161,14 +161,14 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         assertTextPresent(SEARCH_FIND);
 
-        setFormElement("minimumProbability", "2.0");
+        setFormElement(Locator.name("minimumProbability"), "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextPresent(SEARCH_FIND);
         assertElementNotPresent(Locator.linkWithText(SAMPLE_BASE_NAME + " (test2)"));
 
-        setFormElement("identifier", "GarbageProteinName");
-        setFormElement("minimumProbability", "");
+        setFormElement(Locator.name("identifier"), "GarbageProteinName");
+        setFormElement(Locator.name("minimumProbability"), "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextNotPresent(SEARCH_FIND);

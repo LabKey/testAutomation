@@ -76,7 +76,7 @@ public class ReportSecurityTest extends ReportTest
 
         // add user to the first test group
         _permissionsHelper.clickManageGroup(TEST_GROUP);
-        setFormElement("names", TEST_USER);
+        setFormElement(Locator.name("names"), TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
@@ -117,7 +117,7 @@ public class ReportSecurityTest extends ReportTest
         clickButton("Save", 0);
         sleep(2000);
 
-        setFormElement("reportName", "participant chart");
+        setFormElement(Locator.name("reportName"), "participant chart");
         clickButton("OK", 0);
 
         waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
@@ -134,8 +134,8 @@ public class ReportSecurityTest extends ReportTest
         clickButton("Save", 0);
         sleep(2000);
 
-        setFormElement("reportName", "non participant chart");
-        setFormElement("description", "a private chart");
+        setFormElement(Locator.name("reportName"), "non participant chart");
+        setFormElement(Locator.name("description"), "a private chart");
         checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
 

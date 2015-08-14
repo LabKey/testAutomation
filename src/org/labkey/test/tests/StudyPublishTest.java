@@ -909,7 +909,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickButton("Developer", 0);
         waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
         clickButton("Enable", 0);
-        setFormElement("point-click-fn-textarea", TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
+        setFormElement(Locator.name("point-click-fn-textarea"), TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         _ext4Helper.waitForMaskToDisappear();
 

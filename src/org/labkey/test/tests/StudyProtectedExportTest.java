@@ -53,7 +53,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickTab("Manage");
         clickAndWait(Locator.linkContainingText("Manage Alternate"));
         _extHelper.setExtFormElementByLabel("Prefix", idPreface);
-        setFormElement("numberOfDigits", "" + idLength);
+        setFormElement(Locator.name("numberOfDigits"), "" + idLength);
         clickButton("Change Alternate IDs", 0);
         waitForText("Are you sure you want to change all Alternate IDs?");
         clickButton("OK", 0);

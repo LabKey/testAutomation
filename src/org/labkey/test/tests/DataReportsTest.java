@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -243,7 +242,7 @@ public class DataReportsTest extends ReportTest
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
-        setFormElement("label", "TestReport");
+        setFormElement(Locator.name("label"), "TestReport");
         clickButton("Save");
 
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -402,7 +401,7 @@ public class DataReportsTest extends ReportTest
 
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.clickManageGroup("Users");
-        setFormElement("names", R_USER);
+        setFormElement(Locator.name("names"), R_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         _permissionsHelper.enterPermissionsUI();

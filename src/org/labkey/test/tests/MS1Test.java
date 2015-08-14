@@ -287,7 +287,7 @@ public class MS1Test extends BaseWebDriverTest
         //scan 1904 should also be there
         assertTextPresent("1904");
 
-        setFormElement("mzOffset", "100");
+        setFormElement(Locator.name("mzOffset"), "100");
         selectOptionByValue(Locator.name("mzUnits"), "mz");
         clickButton("Search");
 
@@ -295,7 +295,7 @@ public class MS1Test extends BaseWebDriverTest
 
         selectOptionByValue(Locator.name("timeUnits"), "scans");
         assertFormElementEquals(Locator.name("timeSource"), "1948");
-        setFormElement("timeOffset", "2");
+        setFormElement(Locator.name("timeOffset"), "2");
         clickButton("Search");
         assertTextNotPresent("659.3492"); //m/z value that should no longer be there
 

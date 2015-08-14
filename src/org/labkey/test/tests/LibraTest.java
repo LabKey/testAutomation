@@ -105,7 +105,7 @@ public class LibraTest extends MS2TestBase
 
         // Try setting a target protein
         clickAndWait(Locator.linkWithText("Spectra Count Options"));
-        setFormElement("targetProtein", "gi|34392343");
+        setFormElement(Locator.name("targetProtein"), "gi|34392343");
         clickButton("Compare");
         assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 1);
         assertTextPresent("R.TDTGEPM'GR.G");
@@ -137,7 +137,7 @@ public class LibraTest extends MS2TestBase
         _customizeViewsHelper.saveCustomView("HyperFilter");
         click(Locator.radioButtonById("SpectraCountPeptideCharge"));
         selectOptionByText(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
-        setFormElement("targetProtein", "");
+        setFormElement(Locator.name("targetProtein"), "");
         clickButton("Compare");
         assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 12);
         assertTextPresent("-.MM'EILRGSPALSAFR.I", "R.TDTGEPM'GR.G");

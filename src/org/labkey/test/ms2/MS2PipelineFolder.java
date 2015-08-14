@@ -61,7 +61,7 @@ public class MS2PipelineFolder extends PipelineFolder
             _test.log("Set FASTA root");
             _test.clickAndWait(Locator.linkWithText("Set FASTA root"));
 
-            _test.setFormElement("localPathRoot", _fastaPath);
+            _test.setFormElement(Locator.name("localPathRoot"), _fastaPath);
             _test.submit();
         }
     }
