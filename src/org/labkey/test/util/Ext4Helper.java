@@ -210,7 +210,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectRadioButton(@LoggedParam String groupLabel, @LoggedParam String selection)
     {
-        Locator l = Locator.xpath("//div[.//label[text()='" + groupLabel + "']]//label[text()='" + selection + "']");
+        Locator l = Locator.xpath("//div[.//label/span[contains(text(), '" + groupLabel + "')]]//label[text()='" + selection + "']");
         _test.click(l);
     }
 
