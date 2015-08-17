@@ -256,12 +256,12 @@ public class ContainerContextTest extends BaseWebDriverTest
         beginAt("/pipeline-status/" + getProjectName() + "/showList.view?StatusFiles.sort=Description&StatusFiles.containerFilterName=CurrentAndSubfolders");
 
         log("** Checking URLs go to correct container...");
-        String href = getAttribute(Locator.linkWithText("COMPLETE").index(0), "href");
+        String href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(0), "href");
         assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view") ||
                 href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/pipeline-status-details.view"));
 
-        href = getAttribute(Locator.linkWithText("COMPLETE").index(1), "href");
+        href = getAttribute(Locator.tagWithText("a", "COMPLETE").index(1), "href");
         assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view") ||
                 href.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/pipeline-status-details.view"));
