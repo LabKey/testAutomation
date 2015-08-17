@@ -367,7 +367,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
                         contentCount += 1;
                 }
             }
-            assertEquals(errorMessage, contentCount, expectedCount);
+            assertEquals(errorMessage, expectedCount, contentCount);
         }
         catch (ParseException e)
         {
