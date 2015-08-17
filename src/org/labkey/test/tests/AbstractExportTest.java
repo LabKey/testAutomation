@@ -167,6 +167,23 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         assertExcelExportContents(exportedFile, allRows, expectedExportColumn);
     }
 
+    @Test
+    public final void testCreatePythonScriptNoFilter()
+    {
+        String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
+        int expectedLineCountWithNoFilters = 14;
+        assertPythonScriptContents(pythonScript, expectedLineCountWithNoFilters);
+    }
+
+    @Test
+    public final void testCreatePythonScriptWithFilter()
+    {
+        dataRegion.setFilter("ParticipantId", "Equals", "P2");
+        String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
+        int expectedLineCountWithNoFilters = 17;
+        assertPythonScriptContents(pythonScript, expectedLineCountWithNoFilters);
+    }
+
     protected final List<String> checkFirstNRows(int n)
     {
         List<String> rowIds = new ArrayList<>();
@@ -256,6 +273,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
                     new HashSet<>(expectedColumnContents.subList(1, expectedColumnContents.size())),
                     new HashSet<>(actualColumnContents.subList(1, actualColumnContents.size())));
         }
+    }
+
+    protected final void assertPythonScriptContents(String pythonScript, int expectedLineCount)
+    {
+        String[] linesInScript = pythonScript.split("\n");
+        assertEquals("Wrong number of lines in script", expectedLineCount, linesInScript.length);
     }
 
     protected boolean expectSortedExport()

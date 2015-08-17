@@ -80,7 +80,9 @@ public class DataRegionExportHelper
         _test._extHelper.clickSideTab("Script");
         _test.checkRadioButton(type.getRadioLocator());
         _test.click(Locator.lkButton("Create Script"));
-
+        // it takes time to create the script before the new window is available
+        // todo: figure a way to wait for new browser tab because this access of windows[1] happens too soon and throws npe without the sleep
+        _test.sleep(1000);
         Object[] windows = _test.getDriver().getWindowHandles().toArray();
         _test.getDriver().switchTo().window((String)windows[1]);
 
@@ -164,11 +166,13 @@ public class DataRegionExportHelper
 
     public static enum ScriptExportType
     {
-        R(0),
-        PERL(1),
-        JAVASCRIPT(2),
-        SAS(3),
-        URL(4);
+        JAVA(0),
+        JAVASCRIPT(1),
+        PERL(2),
+        PYTHON(3),
+        R(4),
+        SAS(5),
+        URL(6);
 
         private Locator fileTypeRadio;
 
