@@ -51,6 +51,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected abstract String getTestColumnTitle();
     protected abstract int getTestColumnIndex();
     protected abstract String getExportedTsvTestColumnHeader(); // tsv column headers might be field name, rather than label
+    protected abstract String getDataRegionColumnName();
     protected abstract String getExportedFilePrefixRegex();
     protected abstract String getDataRegionId();
     protected abstract void goToDataRegionPage();
@@ -171,17 +172,18 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     public final void testCreatePythonScriptNoFilter()
     {
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountWithNoFilters = 14;
-        assertPythonScriptContents(pythonScript, expectedLineCountWithNoFilters);
+        int expectedLineCountNoFilters = 14;
+        assertPythonScriptContents(pythonScript, expectedLineCountNoFilters, null);
     }
 
     @Test
     public final void testCreatePythonScriptWithFilter()
     {
-        dataRegion.setFilter("ParticipantId", "Equals", "P2");
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountWithNoFilters = 17;
-        assertPythonScriptContents(pythonScript, expectedLineCountWithNoFilters);
+        int expectedLineCountWithFilters = 17;
+        assertPythonScriptContents(pythonScript, expectedLineCountWithFilters, testColumn);
     }
 
     protected final List<String> checkFirstNRows(int n)
@@ -210,7 +212,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             {
                 return exportedFile.length() > 0;
             }
-        }, "Exported file is empty",  WAIT_FOR_JAVASCRIPT);
+        }, "Exported file is empty", WAIT_FOR_JAVASCRIPT);
     }
 
     protected final void assertTextExportContents(File exportedFile, int expectedDataRowCount)
@@ -275,10 +277,14 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         }
     }
 
-    protected final void assertPythonScriptContents(String pythonScript, int expectedLineCount)
+    protected final void assertPythonScriptContents(String pythonScript, int expectedLineCount, String testColumn)
     {
         String[] linesInScript = pythonScript.split("\n");
-        assertEquals("Wrong number of lines in script", expectedLineCount, linesInScript.length);
+        assertTrue("Wrong number of lines in script", expectedLineCount <= linesInScript.length);
+        if (null != testColumn)
+        {
+            assertTrue("Script is missing spefified filter", pythonScript.contains(testColumn));
+        }
     }
 
     protected boolean expectSortedExport()

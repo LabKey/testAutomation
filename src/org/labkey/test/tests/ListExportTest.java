@@ -63,6 +63,12 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getDataRegionColumnName()
+    {
+        return "Name";
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return LIST_NAME;

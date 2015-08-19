@@ -57,6 +57,12 @@ public class DatasetExportTest extends AssayResultsExportTest
     }
 
     @Override
+    protected String getDataRegionColumnName()
+    {
+        return "ParticipantId";
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return ASSAY_NAME;

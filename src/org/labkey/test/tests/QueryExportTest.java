@@ -64,6 +64,12 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getDataRegionColumnName()
+    {
+        return "Name";
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return QUERY_NAME;
