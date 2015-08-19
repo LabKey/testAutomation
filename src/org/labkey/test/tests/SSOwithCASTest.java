@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -46,9 +47,17 @@ public class SSOwithCASTest extends BaseWebDriverTest
     private final File HEADER_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_small.png");
     private final File LOGIN_LOGO_FILE = TestFileUtils.getSampleData("SSO/CAS/cas_big.png");
     private static final String credentialKey = "CAS";
-    private final String CAS_HOST = TestCredentials.getServer(credentialKey).getHost();
-    private final Login EXISTING_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(0);
-    private final Login NEW_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(1);
+    private final String CAS_HOST;
+    private final Login EXISTING_USER_LOGIN;
+    private final Login NEW_USER_LOGIN;
+
+    public SSOwithCASTest() throws IOException
+    {
+        super();
+        CAS_HOST = TestCredentials.getServer(credentialKey).getHost();
+        EXISTING_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(0);
+        NEW_USER_LOGIN = TestCredentials.getServer(credentialKey).getLogins().get(1);
+    }
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -79,7 +88,7 @@ public class SSOwithCASTest extends BaseWebDriverTest
         casLogout();
     }
 
-    @Test
+    @Test @Ignore("Test accounts have been removed")
     public void testNewUserSSO()
     {
         signOut();
@@ -130,13 +139,13 @@ public class SSOwithCASTest extends BaseWebDriverTest
         verifyLogoDeletion();
     }
 
-    @Test
+    @Test @Ignore("Test accounts have been removed")
     public void testSSOWithCASFromLoginPage()
     {
         testCAS(true);
     }
 
-    @Test
+    @Test @Ignore("Test accounts have been removed")
     public void testSSOwithCASFromHeaderLink()
     {
         testCAS(false);

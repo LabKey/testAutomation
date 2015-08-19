@@ -26,29 +26,44 @@ import java.util.Map;
 
 public class TestCredentials
 {
-    private static final Map<String, Server> credentials;
-    private static final File credentialsFile;
-    static
+    private static File credentialsFile;
+    private static Map<String, Server> credentials;
+
+    public static void setCredentialsFile(File credentialsFile)
     {
-        credentialsFile = FileUtil.getAbsoluteCaseSensitiveFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json")));
-        ObjectMapper mapper = new ObjectMapper();
-        try
-        {
-            Credentials parsedOutput = mapper.readValue(credentialsFile, Credentials.class);
-            credentials = parsedOutput.getCredentials();
-        }
-        catch (IOException fail)
-        {
-            throw new RuntimeException("Unable to load test credentials. Make sure " + credentialsFile.getName() + " exists; use test.credentials.template as a basis.", fail);
-        }
+        TestCredentials.credentialsFile = credentialsFile;
+        credentials = null;
+
+        if (!credentialsFile.exists())
+            throw new IllegalArgumentException(String.format("Unable to load test credentials [%s]. Use 'server/test/test.credentials.json.template' as a basis and/or specify credentials file with test.credentials.file property.", credentialsFile.getAbsolutePath()));
     }
 
-    public static Server getServer(String serverKey)
+    private static File getCredentialsFile() throws IOException
     {
-        Server server = credentials.get(serverKey);
+        if (null == credentialsFile)
+        {
+            setCredentialsFile(FileUtil.getAbsoluteCaseSensitiveFile(new File(System.getProperty("test.credentials.file", TestFileUtils.getLabKeyRoot() + "/server/test/test.credentials.json"))));
+        }
+        return credentialsFile;
+    }
+
+    private static Map<String, Server> getCredentials() throws IOException
+    {
+        if (null == credentials)
+        {
+            ObjectMapper mapper = new ObjectMapper();
+            Credentials parsedOutput = mapper.readValue(getCredentialsFile(), Credentials.class);
+            credentials = parsedOutput.getCredentials();
+        }
+        return credentials;
+    }
+
+    public static Server getServer(String serverKey) throws IOException
+    {
+        Server server = getCredentials().get(serverKey);
         if (null == server)
         {
-            throw new RuntimeException(String.format("No server named '%s' found in credentials file. [%s]", serverKey, credentialsFile.getAbsolutePath()));
+            throw new IllegalArgumentException(String.format("No server named '%s' found in credentials file. [%s]", serverKey, getCredentialsFile().getAbsolutePath()));
         }
         return server;
     }
