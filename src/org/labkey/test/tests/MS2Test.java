@@ -371,7 +371,7 @@ public class MS2Test extends AbstractMS2ImportTest
         DataRegionTable quantitationTable = new DataRegionTable(REGION_NAME_QUANTITATION, this);
         quantitationTable.setFilter("PercentCoverage", "Is Not Blank", null);
         assertTextNotPresent("gi|13442951|MAIL");
-        assertTextPresent("(GroupProbability > 0.7) AND (PercentCoverage IS NOT NULL)");
+        assertTextPresent("(GroupProbability > 0.7) AND (PercentCoverage is not blank)");
 
         validateLegacySingleRunExport();
 
