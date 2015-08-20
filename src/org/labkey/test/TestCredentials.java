@@ -35,7 +35,11 @@ public class TestCredentials
         credentials = null;
 
         if (!credentialsFile.exists())
-            throw new IllegalArgumentException(String.format("Unable to load test credentials [%s]. Use 'server/test/test.credentials.json.template' as a basis and/or specify credentials file with test.credentials.file property.", credentialsFile.getAbsolutePath()));
+        {
+            String error = String.format("Unable to load test credentials [%s]. Use 'server/test/test.credentials.json.template' as a basis and/or specify credentials file with test.credentials.file property.", credentialsFile.getAbsolutePath());
+            credentialsFile = null;
+            throw new IllegalArgumentException(error);
+        }
     }
 
     private static File getCredentialsFile() throws IOException
