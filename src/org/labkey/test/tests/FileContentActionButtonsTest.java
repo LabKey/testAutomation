@@ -186,9 +186,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     private void assertDefaultBrowserButtons()
     {
         Collection<FileBrowserHelper.BrowserAction> buttonsWithText = new HashSet<>(Arrays.asList(
-                FileBrowserHelper.BrowserAction.UPLOAD,
-                FileBrowserHelper.BrowserAction.IMPORT_DATA,
-                FileBrowserHelper.BrowserAction.AUDIT_HISTORY,
                 FileBrowserHelper.BrowserAction.ADMIN));
 
         // All icons are present by default

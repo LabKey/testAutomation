@@ -432,17 +432,17 @@ public class FileBrowserHelper
     public static enum BrowserAction
     {
         FOLDER_TREE("sitemap", "Toggle Folder Tree", "folderTreeToggle"),
-        UP("level-up", "Parent Folder", "parentFolder"),
+        UP("arrow-up", "Parent Folder", "parentFolder"),
         RELOAD("refresh", "Refresh", "refresh"),
         NEW_FOLDER("folder-o", "Create Folder", "createDirectory"),
         DOWNLOAD("download", "Download", "download"),
         DELETE("trash-o", "Delete", "deletePath"),
         RENAME("pencil", "Rename", "renamePath"),
         MOVE("sign-out", "Move", "movePath"),
-        EDIT_PROPERTIES("cog", "Edit Properties", "editFileProps"),
+        EDIT_PROPERTIES("pencil", "Edit Properties", "editFileProps"),
         UPLOAD("file-o", "Upload Files", "upload"),
         IMPORT_DATA("database", "Import Data", "importData"),
-        EMAIL_SETTINGS("envelope-o", "Email Preferences", "emailPreferences"),
+        EMAIL_SETTINGS("envelope", "Email Preferences", "emailPreferences"),
         AUDIT_HISTORY("users", "Audit History", "auditLog", true),
         ADMIN("cog", "Admin", "customize");
 
