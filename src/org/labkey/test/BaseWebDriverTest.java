@@ -3249,9 +3249,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 desc+="=";
             desc += " " + value;
         }
-        else if(type.contains("Blank"))
+        else if(type.contains("Is Blank"))
         {
-            desc = "NULL";
+            desc = column + " is blank";
+        }
+        else if(type.contains("Is Not Blank"))
+        {
+            desc = column + " is not blank";
         }
 
         assertTextPresent(desc);
