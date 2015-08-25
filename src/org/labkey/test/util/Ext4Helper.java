@@ -737,7 +737,7 @@ public class Ext4Helper extends AbstractHelper
 
         public static Locator.XPathLocator ext4Button(String text)
         {
-            return Locator.xpath("//a").notHidden().withClass(_cssPrefix + "btn").withDescendant(Locator.tagWithClass("span", _cssPrefix + "btn-inner").withText(text));
+            return Locator.xpath("//a").notHidden().withClass(_cssPrefix + "btn").withText(text);
         }
 
         public static Locator.XPathLocator ext4ButtonEnabled(String text)
