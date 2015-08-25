@@ -259,9 +259,7 @@ public class RReportHelper extends AbstractHelper
             _test.log("");   // Blank line helps make the following message more readable
             _test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
-        fail("R is not configured on this system. Failed R tests.");
-
-        return null; // Unreachable
+        throw new IllegalStateException("R is not configured on this system. Failed R tests.");
     }
 
     private File getRScriptExecutable()
