@@ -6195,7 +6195,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             selectQuery(schemaName, baseQueryName);
         else
             selectSchema(schemaName);
-        clickAndWait(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Create New Query']"));
+        clickAndWait(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[contains(text(), 'Create New Query')]"));
     }
 
 
@@ -6228,7 +6228,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void validateQueries(boolean validateSubfolders)
     {
-        click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[text()='Validate Queries']"));
+        click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[contains(text(), 'Validate Queries')]"));
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(Locator.tagWithClass("div", "qbrowser-validate"), WAIT_FOR_JAVASCRIPT);
         if (validateSubfolders)
