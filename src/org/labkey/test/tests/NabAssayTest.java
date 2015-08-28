@@ -487,6 +487,8 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         moveAssayFolderTest();
 
+        testWellAndDilutionData();
+
         directBrowserQueryTest();
     } //doTestSteps()
 
@@ -849,5 +851,47 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("ptid + visit + specimenid"));
         clickAndWait(Locator.linkWithText("run details"));
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
+    }
+
+    private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "0", "11",
+            "107916.0", " ", " ", "Specimen 5", "Specimen 5, Replicate 1", "2", "1", " ", "A11");
+    private static final List<String> expectedRow12 = Arrays.asList("ptid + visit", " ", "CELL_CONTROL_SAMPLE", "1", "0",
+            "993.0", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1", " ", "B0");
+
+    private static final List<String> expectedDilRow10 = Arrays.asList("ptid + visit", "4860.0", "6", "6.30088397355677E-4", "0.0225827354894656",
+            "107300.0", "110753.0", "109026.5", "2441.6397154371484", "Specimen 2", "Specimen 2, Replicate 3", "Specimen 2", "20.0", "43740.0", "1");
+    private static final List<String> expectedDilRow40 = Arrays.asList("ptid + visit", " ", " ", " ", " ",
+            "903.0", "1083.0", "974.875", "58.40606010631823", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1");
+
+    protected void testWellAndDilutionData()
+    {
+        clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        goToSchemaBrowser();
+        selectQuery("assay.NAb.TestAssayNab", "WellData");
+        waitAndClickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable table = new DataRegionTable("query", this, false, true);
+        List<String> row11 = table.getRowDataAsText(11);
+        assertTrue("", row11.size() == expectedRow11.size());
+        for (int i = 0; i < row11.size(); i++)
+            assertEquals("WellData row did not match. Expected: " + expectedRow11.get(i) + ", Found: " + row11.get(i), row11.get(i), expectedRow11.get(i));
+        List<String> row12 = table.getRowDataAsText(12);
+        assertTrue("", row11.size() == expectedRow12.size());
+        for (int i = 0; i < row11.size(); i++)
+            assertEquals("WellData row did not match. Expected: " + expectedRow12.get(i) + ", Found: " + row12.get(i), row12.get(i), expectedRow12.get(i));
+
+        goToSchemaBrowser();
+        selectQuery("assay.NAb.TestAssayNab", "DilutionData");
+        waitAndClickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable dilutionTable = new DataRegionTable("query", this, false, true);
+        List<String> row10 = dilutionTable.getRowDataAsText(10);
+        assertTrue("", row10.size() == expectedDilRow10.size());
+        for (int i = 0; i < row10.size(); i++)
+            assertEquals("WellData row did not match. Expected: " + expectedDilRow10.get(i) + ", Found: " + row10.get(i), row10.get(i), expectedDilRow10.get(i));
+        List<String> row40 = dilutionTable.getRowDataAsText(40);
+        assertTrue("", row40.size() == expectedDilRow40.size());
+        for (int i = 0; i < row40.size(); i++)
+            assertEquals("WellData row did not match. Expected: " + expectedDilRow40.get(i) + ", Found: " + row40.get(i), row40.get(i), expectedDilRow40.get(i));
+
     }
 }
