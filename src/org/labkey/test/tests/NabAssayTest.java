@@ -53,8 +53,9 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
+    private static final String NAB_FILENAME2 = "m0902053;3999.xls";
     protected final File TEST_ASSAY_NAB_FILE1 = TestFileUtils.getSampleData("Nab/m0902051;3997.xls");
-    protected final File TEST_ASSAY_NAB_FILE2 = TestFileUtils.getSampleData("Nab/m0902053;3999.xls");
+    protected final File TEST_ASSAY_NAB_FILE2 = TestFileUtils.getSampleData("Nab/" + NAB_FILENAME2);
     protected final File TEST_ASSAY_NAB_FILE3 = TestFileUtils.getSampleData("Nab/m0902055;4001.xlsx");
     protected final File TEST_ASSAY_NAB_FILE4 = TestFileUtils.getSampleData("Nab/m0902057;4003.xls");
     protected final File TEST_ASSAY_NAB_FILE5 = TestFileUtils.getSampleData("Nab/m0902059;4005.xls");
@@ -865,33 +866,47 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     protected void testWellAndDilutionData()
     {
+        log("Test WellData and DilutionData tables");
         clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", "WellData");
         waitAndClickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable table = new DataRegionTable("query", this, false, true);
         List<String> row11 = table.getRowDataAsText(11);
-        assertTrue("", row11.size() == expectedRow11.size());
+        assertEquals("Row size did not match", expectedRow11.size(), row11.size());
         for (int i = 0; i < row11.size(); i++)
-            assertEquals("WellData row did not match. Expected: " + expectedRow11.get(i) + ", Found: " + row11.get(i), row11.get(i), expectedRow11.get(i));
+            assertEquals("WellData row did not match.", expectedRow11.get(i), row11.get(i));
         List<String> row12 = table.getRowDataAsText(12);
-        assertTrue("", row11.size() == expectedRow12.size());
+        assertEquals("Row size did not match", expectedRow12.size(), row11.size());
         for (int i = 0; i < row11.size(); i++)
-            assertEquals("WellData row did not match. Expected: " + expectedRow12.get(i) + ", Found: " + row12.get(i), row12.get(i), expectedRow12.get(i));
+            assertEquals("WellData row did not match.", expectedRow12.get(i), row12.get(i));
 
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", "DilutionData");
         waitAndClickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable dilutionTable = new DataRegionTable("query", this, false, true);
         List<String> row10 = dilutionTable.getRowDataAsText(10);
-        assertTrue("", row10.size() == expectedDilRow10.size());
+        assertEquals("Row size did not match", expectedDilRow10.size(), row10.size());
         for (int i = 0; i < row10.size(); i++)
-            assertEquals("WellData row did not match. Expected: " + expectedDilRow10.get(i) + ", Found: " + row10.get(i), row10.get(i), expectedDilRow10.get(i));
+            assertEquals("WellData row did not match.", expectedDilRow10.get(i), row10.get(i));
         List<String> row40 = dilutionTable.getRowDataAsText(40);
-        assertTrue("", row40.size() == expectedDilRow40.size());
+        assertEquals("Row size did not match", expectedDilRow40.size(), row40.size());
         for (int i = 0; i < row40.size(); i++)
-            assertEquals("WellData row did not match. Expected: " + expectedDilRow40.get(i) + ", Found: " + row40.get(i), row40.get(i), expectedDilRow40.get(i));
+            assertEquals("WellData row did not match.", expectedDilRow40.get(i), row40.get(i));
 
+        log("Delete assay data file and test that run details still works");
+        File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);
+        boolean deleteSuccess = assayFile.delete();
+        assertTrue("Failed to delete file: " + NAB_FILENAME2, deleteSuccess);
+        clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickAndWait(Locator.linkWithText("ptid + date"));
+        clickAndWait(Locator.linkWithText("run details"));
+        DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
+
+        clickAndWait(Locator.linkWithText("Download Datafile"));
+        assertTextPresent("Data file for run ptid + date was not found.");
+        clickButton("Folder");
     }
 }
