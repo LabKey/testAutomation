@@ -770,6 +770,11 @@ public class Ext4Helper extends AbstractHelper
             return Locator.css("." + markerCls).append(Locator.css("." + _cssPrefix + "grid-data-row")).withText(columnVal);
         }
 
+        public static Locator.XPathLocator getGridRow()
+        {
+            return Locator.tag("tr").withClass(_cssPrefix + "grid-row");
+        }
+
         /**
          * @param cellText Exact text from any cell in the desired row
          * @param index 0-based index of rows with matching cellText
@@ -777,12 +782,12 @@ public class Ext4Helper extends AbstractHelper
          */
         public static Locator.XPathLocator getGridRow(String cellText, int index)
         {
-            return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
+            return getGridRow().withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
         }
 
         private static Locator.XPathLocator getGridRowContains(String cellText, int index)
         {
-            return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
+            return getGridRow().withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
         }
 
         public static Locator.XPathLocator invalidField()
