@@ -375,7 +375,7 @@ public class ETLTest extends ETLBaseTest
 
     /**
      * Test that jobs are serialized correctly so they can be requeued. Using "retry" as standin for requeue on server
-     * restart, as it is the same mechanism. For each case, deliberated create an error condition (key violation, etc),
+     * restart, as it is the same mechanism. For each case, deliberately create an error condition (key violation, etc),
      * and then retry the job. If the same error occurs, the job requeued successfully. (Check the initial error now appears twice
      * in log.)
      */
