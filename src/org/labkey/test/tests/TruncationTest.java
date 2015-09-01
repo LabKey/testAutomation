@@ -15,51 +15,90 @@
  */
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
-@Category({Study.class, Specimen.class})
-public class TruncationTest extends StudyBaseTest
+@Category({DailyA.class, Study.class, Specimen.class})
+public class TruncationTest extends BaseWebDriverTest
 {
     private final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/searchTest.lists.zip");
-    private final String STUDY_NAME = "Study 001";
+    private final String LIST_NAME = "List1";
 
     @Override
-    protected void doCreateSteps()
+    protected BrowserType bestBrowser()
     {
-        importStudy();
-        waitForPipelineJobsToComplete(1, "study import", false);
-        goToProjectHome();
+        return BrowserType.CHROME;
+    }
+
+    @Nullable
+    @Override
+    protected String getProjectName()
+    {
+        return "StudyDatasetsTest Project";
+    }
+
+    protected String getFolderName()
+    {
+        return "My Study";
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("study");
+    }
+
+    @BeforeClass
+    public static void doSetup()
+    {
+        TruncationTest init = (TruncationTest)getCurrentTest();
+        init.initTest();
+    }
+
+    private void initTest()
+    {
+        _containerHelper.createProject(getProjectName(), "Study");
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        importFolderFromZip(TestFileUtils.getSampleData("studies/AltIdStudy.folder.zip"));
+        clickTab("Overview");
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
         _listHelper.importListArchive(getFolderName(), LIST_ARCHIVE);
-        truncateList();
-        truncateDataset();
-        ensureTruncateVisibility();
     }
 
-    protected void truncateList()
+    @Test
+    public void testTruncateList()
     {
+        goToProjectHome();
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         click(Locator.linkContainingText("Delete All Rows"));
         click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("2 rows deleted");
-        click(Ext4Helper.Locators.ext4Button("OK"));
-        click(Locator.linkContainingText("view data"));
+        clickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("No data to show.");
     }
 
-    protected void truncateDataset()
+    @Test
+    public void testTruncateDataset()
     {
-        click(Locator.linkContainingText(STUDY_NAME));
-        waitAndClick(Locator.linkContainingText("Manage Datasets"));
-        waitForText("Create New Dataset");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        waitAndClickAndWait(Locator.linkContainingText("Manage Datasets"));
         waitAndClick(Locator.linkContainingText("DEM-1"));
         waitAndClick(Locator.linkContainingText("Delete All Rows"));
         click(Ext4Helper.Locators.ext4Button("Yes"));
@@ -69,18 +108,13 @@ public class TruncationTest extends StudyBaseTest
         waitForText("No data to show.");
     }
 
-    protected void ensureTruncateVisibility()
+    @Test
+    public void testTruncateVisibility()
     {
         impersonateRole("Editor");
-        click(Locator.linkContainingText(STUDY_NAME));
-        waitAndClick(Locator.xpath("//span[text()='Lists']"));
+        goToProjectHome();
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         assertTextNotPresent("Delete All Rows");
-        stopImpersonatingRole();
-    }
-
-    @Override
-    protected void doVerifySteps()
-    {
-        //Do nothing
     }
 }

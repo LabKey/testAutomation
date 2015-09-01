@@ -851,6 +851,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return;
         }
 
+        if (!isSignedInAsAdmin())
+        {
+            beginAt("/login/logout.view?");
+            if (!isSignedInAsAdmin()) // In case a non-admin user was impersonating
+                beginAt("/login/logout.view?");
+        }
+
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view?");
 
@@ -2759,6 +2766,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public String getCurrentUser()
     {
         return (String)executeScript("return LABKEY.user.email;");
+    }
+
+    public boolean isSignedInAsAdmin()
+    {
+        return (Boolean)executeScript("return LABKEY.user.isSystemAdmin;");
     }
 
     public void assertAlert(String msg)
@@ -5517,7 +5529,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             clickAndWait(Locator.lkButton("Home"));
         }
     }
-
 
     public void stopImpersonating()
     {
