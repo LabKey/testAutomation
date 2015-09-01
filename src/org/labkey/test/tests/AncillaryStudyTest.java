@@ -229,7 +229,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (insert)");
         clickFolder(STUDY_NAME);
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         _extHelper.clickMenuButton("Views", "Edit Snapshot");
@@ -251,7 +251,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (modify)");
         clickFolder(STUDY_NAME);
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         _extHelper.clickMenuButton("Views", "Edit Snapshot");
@@ -274,7 +274,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (delete)");
         clickFolder(STUDY_NAME);
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         _extHelper.clickMenuButton("Views", "Edit Snapshot");

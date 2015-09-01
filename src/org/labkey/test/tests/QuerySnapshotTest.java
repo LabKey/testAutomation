@@ -308,7 +308,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     @LogMethod
     private void changeDatasetLabel(@LoggedParam String datasetName, @LoggedParam String newLabel)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         waitAndClick(Locator.linkContainingText(datasetName));
         waitForText("Edit Definition");
         clickButton("Edit Definition");
@@ -320,7 +320,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     @LogMethod
     private void changeDatasetName(@LoggedParam String datasetName, @LoggedParam String newName)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         waitAndClick(Locator.linkContainingText(datasetName));
         waitForText("Edit Definition");
         clickButton("Edit Definition");

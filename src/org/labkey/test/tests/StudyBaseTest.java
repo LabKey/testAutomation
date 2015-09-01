@@ -360,12 +360,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickButton("Study Security", defaultWaitForPage);
     }
 
-    public void goToManageDatasets()
-    {
-        goToManageStudy();
-        waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
-    }
-
     //this assumes a QWP for VisitTag schema has been created and is visible
     protected void insertVisitTag(String QWPname, VisitTag tag)
     {

@@ -16,21 +16,31 @@
 
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.StudyHelper;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
-public class StudyDatasetsTest extends StudyBaseTest
+public class StudyDatasetsTest extends BaseWebDriverTest
 {
     private static final String CATEGORY1 = "Category1";
     private static final String GROUP1A = "Group1A";
@@ -64,13 +74,36 @@ public class StudyDatasetsTest extends StudyBaseTest
         return BrowserType.CHROME;
     }
 
+    @Nullable
     @Override
-    @LogMethod
-    protected void doCreateSteps()
+    protected String getProjectName()
     {
-        importStudy();
-        // wait for study (but not specimens) to finish loading
-        waitForPipelineJobsToComplete(1, "study import", false);
+        return "StudyDatasetsTest Project";
+    }
+
+    protected String getFolderName()
+    {
+        return "My Study";
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("study");
+    }
+
+    @BeforeClass
+    public static void doSetup()
+    {
+        StudyDatasetsTest init = (StudyDatasetsTest)getCurrentTest();
+        init.doCreateSteps();
+    }
+
+    private void doCreateSteps()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", null, true);
+        importFolderFromZip(TestFileUtils.getSampleData("studies/AltIdStudy.folder.zip"));
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP1A, "Mouse", CATEGORY1, true, null, PTIDS[0], PTIDS[1]);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP1B, "Mouse", CATEGORY1, false, null, PTIDS[2], PTIDS[3]);
@@ -78,9 +111,15 @@ public class StudyDatasetsTest extends StudyBaseTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2B, "Mouse", CATEGORY2, false, null, PTIDS[2], PTIDS[4]);
     }
 
-    @Override
-    @LogMethod
-    protected void doVerifySteps()
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        clickFolder(getFolderName());
+    }
+
+    @Test
+    public void testDatasets()
     {
         createDataset("A");
         renameDataset("A", "Original A", "A", "Original A", "XTest", "YTest", "ZTest");
@@ -104,9 +143,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         checkDataElementsPresent("B", DATASET_B_DATA.split("\t|\n"));
     }
 
-    protected void createDataset(String name)
+    @LogMethod
+    protected void createDataset(@LoggedParam String name)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
 
         waitForText("Create New Dataset");
         click(Locator.xpath("//a[text()='Create New Dataset']"));
@@ -128,9 +168,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Save");
     }
 
+    @LogMethod
     protected void renameDataset(String orgName, String newName, String orgLabel, String newLabel, String... fieldNames)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
 
         waitForElement(Locator.xpath("//a[text()='" + orgName + "']"));
         click(Locator.xpath("//a[text()='" + orgName + "']"));
@@ -161,9 +202,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     protected void importDatasetData(String datasetName, String header, String tsv, String msg)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         waitForElement(Locator.xpath("//a[text()='" + datasetName + "']"));
         click(Locator.xpath("//a[text()='" + datasetName + "']"));
         waitForText("Dataset Properties");
@@ -176,9 +218,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         waitForText(msg);
     }
 
+    @LogMethod
     protected void deleteFields(String name)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
 
         waitForElement(Locator.xpath("//a[text()='" + name + "']"));
         click(Locator.xpath("//a[text()='" + name + "']"));
@@ -197,9 +240,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Save");
     }
 
+    @LogMethod
     protected void checkFieldsPresent(String name, String... items)
     {
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
 
         waitForElement(Locator.xpath("//a[text()='" + name + "']"));
         click(Locator.xpath("//a[text()='" + name + "']"));
@@ -212,11 +256,12 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     protected void checkDataElementsPresent(String name, String... items)
     {
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         waitForElement(Locator.xpath("//a[text()='" + name + "']"));
         click(Locator.xpath("//a[text()='" + name + "']"));
         waitForText("Dataset Properties");
@@ -246,6 +291,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         verifyFilterPanelOnDemographics(dataregion);
     }
 
+    @LogMethod
     private void verifyFilterPanelOnDemographics(DataRegionTable dataset)
     {
         dataset.openSideFilterPanel();
@@ -304,6 +350,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     // in 13.2 Sprint 1 we changed reports and views so that they are associated with query name instead of label (i.e. dataset name instead of label)
     // there is also a migration step that happens when importing study archives with version < 13.11 to fixup these report/view references
     // this method verifies that migration on import for a handful of reports and views
+    @LogMethod
     private void verifyReportAndViewDatasetReferences()
     {
         clickProject(getProjectName());
@@ -339,6 +386,7 @@ public class StudyDatasetsTest extends StudyBaseTest
      * In 13.3 we merged dataViews and manageViews. The implicit categories prevelant in manageViews was discarded in favor of the
      * explicit category management created for dataViews. Don't use this obsolete method for the near future.
      */
+    @LogMethod
     private void verifyExpectedReportsAndViewsExist()
     {
         if (EXPECTED_REPORTS.size() == 0)
@@ -371,6 +419,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     private void createPrivateCustomView()
     {
         log("Create private custom view");
@@ -385,6 +434,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         EXPECTED_CUSTOM_VIEWS.put(CUSTOM_VIEW_PRIVATE, "CPS-1: Screening Chemistry Panel");
     }
 
+    @LogMethod
     private void verifyCustomViewWithDatasetJoins(String datasetLabel, String viewName, boolean checkSort, boolean checkAggregates, String... colFieldKeys)
     {
         log("Verify dataset label to name fixup for custom view import");
@@ -412,6 +462,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         _customizeViewsHelper.applyCustomView();
     }
 
+    @LogMethod
     private void verifyTimeChart(String datasetName, String datasetLabel)
     {
         log("Verfiy dataset label to name fixup for Time Chart");
@@ -431,6 +482,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Cancel", 0);
     }
 
+    @LogMethod
     private void verifyScatterPlot(String datasetLabel)
     {
         log("Verify dataset label to name fixup for Scatter Plot");
@@ -448,6 +500,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Cancel", 0);
     }
 
+    @LogMethod
     private void verifyParticipantReport(String... measureKeys)
     {
         log("Verify dataset label to name fixup for Participant Report");

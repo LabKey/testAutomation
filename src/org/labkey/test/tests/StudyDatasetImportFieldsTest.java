@@ -71,7 +71,7 @@ public class StudyDatasetImportFieldsTest extends StudyBaseTest
         waitForText(FOLDER_NAME + " Study");
         clickButton("Create Study", 0);
         waitForText("Manage Datasets");
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         click(Locator.linkWithText("Create New Dataset"));
         waitForElement(Locator.name("typeName"));
         setFormElement(Locator.name("typeName"), "Test Dataset");

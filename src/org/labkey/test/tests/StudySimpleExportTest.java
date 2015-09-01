@@ -120,7 +120,7 @@ public class StudySimpleExportTest extends StudyBaseTest
     {
         log("Do Setup: create simple dataset with one ptid and one visit");
         clickFolder(getFolderName());
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         waitForText("Create New Dataset");
         clickAndWait(Locator.linkWithText("Create New Dataset"));
         waitForElement(Locator.name("typeName"));

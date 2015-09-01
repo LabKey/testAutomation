@@ -219,13 +219,13 @@ public class StudyScheduleTest extends StudyBaseTest
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, "CPS-1: Screening Chemistry Panel");
         waitForElement(Locator.lkButton("Edit Definition"));
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         assertElementPresent(Locator.linkWithText(GHOST_DATASET_4));
         assertElementNotPresent(Locator.linkWithText("CPS-1: Screening Chemistry Panel"));
         linkDatasetFromDetails(GHOST_DATASET_5, DatasetType.defineManually, null);
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
         linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
-        goToManageDatasets();
+        _studyHelper.goToManageDatasets();
     }
 
     @LogMethod

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.study.CreateStudyPage;
 
@@ -385,6 +386,22 @@ public class StudyHelper extends AbstractHelper
         _test.checkCheckbox(Locator.checkboxByName("newFinalState"));
         _test.uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
         _test.clickButton("Done");
+    }
+
+    public void goToManageDatasets()
+    {
+        _test.goToManageStudy();
+        _test.waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
+    }
+
+    public static String getStudySampleDataPath()
+    {
+        return "/sampledata/study/";
+    }
+
+    public static String getPipelinePath()
+    {
+        return TestFileUtils.getLabKeyRoot() + getStudySampleDataPath();
     }
 
     public enum TimepointType
