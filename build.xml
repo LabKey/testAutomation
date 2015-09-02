@@ -69,9 +69,6 @@
         <os family="unix"/>
     </condition>
 
-    <property name="clover.jar" location="${project.root}/external/clover/clover-ant-3.1.8/lib/clover.jar"/>
-
-
     <target name="usage">
         <echo message="Valid Test Targets:" />
         <echo message="drt                run developer regression tests (short suite)" />
@@ -206,7 +203,6 @@
 
     <path id="test.build.classpath">
         <path refid="test.lib.classpath" />
-        <pathelement path="${clover.jar}"/>
         <pathelement path="${test.lib.home}/aspectjrt.jar"/>
         <!-- Put two paths for tools.jar on the classpath, in case java.home is pointed at the JRE in the ./jre
              subdirectory of the JDK -->
@@ -217,7 +213,6 @@
     <path id="test.run.classpath">
         <path refid="test.build.classpath"/>
         <pathelement location="${test.build.home}/classes" />
-        <pathelement path="${clover.jar}"/>
     </path>
 
     <target name="compile" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
@@ -308,7 +303,6 @@
           </classpath>
         </taskdef>
 
-        <antcall target="test_with_clover" />
         <antcall target="clean" />
         <antcall target="prepare" />
 
@@ -377,10 +371,6 @@
         <zip destfile="${srcdir}.zip">
             <zipfileset dir="${srcdir}" includes="*"/>
         </zip>
-    </target>
-
-    <target name="test_with_clover" if="test.with.clover">
-        <ant target="with_clover" antfile="${project.root}/server/build.xml" inheritall="false"/>
     </target>
 
     <target name="build-java-client" description="calls the jar task in the remoteapi/java/build.xml">
@@ -1122,10 +1112,6 @@
             includeantruntime="false" >
         </javac>
 
-        <condition property="clover.class.path" value="${tomcat.home}/lib" else="">
-            <isset property="test.with.clover"/>
-        </condition>
-
         <mkdir dir="${project.root}/sampledata/qc"/>
         <jar destfile="${project.root}/sampledata/qc/validator.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
@@ -1138,7 +1124,6 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.labkey.AssayValidator"/>
-                <attribute name="Class-Path" value="${clover.class.path}"/>
             </manifest>
         </jar>
         <jar destfile="${project.root}/sampledata/qc/transform.jar">
@@ -1152,7 +1137,6 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.labkey.AssayTransform"/>
-                <attribute name="Class-Path" value="${clover.class.path}"/>
             </manifest>
         </jar>
     </target>
@@ -1174,13 +1158,6 @@
             <!-- set the subject list on the ant command line with -Dstudysampler.subjectfile=/path/to/file.txt-->
             <arg value="${studysampler.subjectfile}"/>
         </java>
-    </target>
-
-    <target name="clover_zip">
-        <!-- Create a stable file name so that TeamCity can serve it up directly through its own UI -->
-        <zip destfile="${test.log.output.dir}/TeamCity-Clover-Code-Coverage.zip" update="true" >
-                <zipfileset dir="${clover.output.dir}" />
-         </zip>
     </target>
 
     <target name="skipfish_init">
