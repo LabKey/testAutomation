@@ -851,7 +851,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return;
         }
 
-        if (!isSignedInAsAdmin())
+        if (!onLabKeyPage() || !isSignedInAsAdmin())
         {
             beginAt("/login/logout.view?");
             if (!isSignedInAsAdmin()) // In case a non-admin user was impersonating
@@ -2766,6 +2766,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public String getCurrentUser()
     {
         return (String)executeScript("return LABKEY.user.email;");
+    }
+
+    public boolean onLabKeyPage()
+    {
+        return (Boolean)executeScript("return window.LABKEY != undefined;");
     }
 
     public boolean isSignedInAsAdmin()
