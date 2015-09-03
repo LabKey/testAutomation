@@ -890,11 +890,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         List<String> row10 = dilutionTable.getRowDataAsText(10);
         assertEquals("Row size did not match", expectedDilRow10.size(), row10.size());
         for (int i = 0; i < row10.size(); i++)
-            assertEquals("WellData row did not match.", expectedDilRow10.get(i), row10.get(i));
+            assertEquals("DilutionData row did not match.", expectedDilRow10.get(i), row10.get(i));
         List<String> row40 = dilutionTable.getRowDataAsText(40);
         assertEquals("Row size did not match", expectedDilRow40.size(), row40.size());
         for (int i = 0; i < row40.size(); i++)
-            assertEquals("WellData row did not match.", expectedDilRow40.get(i), row40.get(i));
+            assertEquals("DilutionData row did not match.", expectedDilRow40.get(i), row40.get(i));
 
         log("Delete assay data file and test that run details still works");
         File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);
