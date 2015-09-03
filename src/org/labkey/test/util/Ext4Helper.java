@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
@@ -210,13 +211,17 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectRadioButton(@LoggedParam String groupLabel, @LoggedParam String selection)
     {
-        Locator l = Locator.xpath("//div[div/label[text()='" + groupLabel + "']]//label[text()='" + selection + "']");
-        if (!_test.isElementPresent(l))
+        WebElement radioButton;
+        try
+        {
+            radioButton = Locator.xpath("//div[div/label[text()='" + groupLabel + "']]//label[text()='" + selection + "']").findElement(_test.getDriver());
+        }
+        catch (NoSuchElementException retry)
         {
             // try Ext 4.1.0 version
-            l = Locator.xpath("//div[./table//label[text()='" + groupLabel + "']]//label[text()='" + selection + "']");
+            radioButton = Locator.xpath("//div[./table//label[text()='" + groupLabel + "']]//label[text()='" + selection + "']").findElement(_test.getDriver());
         }
-        _test.click(l);
+        radioButton.click();
     }
 
     @LogMethod(quiet = true)
@@ -229,6 +234,13 @@ public class Ext4Helper extends AbstractHelper
     public void selectRadioButton(String selection)
     {
         Locator l = Locators.radiobutton(_test, selection);
+        _test.click(l);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectRadioButtonWithLabelContaining(@LoggedParam String label, @LoggedParam String selection)
+    {
+        Locator l = Locator.xpath("//table/tbody/tr[td/label/span[contains(text(), '" + label + "')]]//label[text()='" + selection + "']");
         _test.click(l);
     }
 
