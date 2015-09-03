@@ -855,8 +855,8 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Runs"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", EscapeUtil.fieldKeyEncodePart(RUN_GROUP1_NAME2) }, RUN_GROUP1_NAME2);
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", RUN_GROUP2_NAME } , "Run Groups " + RUN_GROUP2_NAME);
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", "Default Experiment" }, "Run Groups Default Experiment");
+        _customizeViewsHelper.addCustomizeViewColumn(new String[]{"RunGroupToggle", RUN_GROUP2_NAME}, "Run Groups " + RUN_GROUP2_NAME);
+        _customizeViewsHelper.addCustomizeViewColumn(new String[]{"RunGroupToggle", "Default Experiment"}, "Run Groups Default Experiment");
         _customizeViewsHelper.applyCustomView();
 
         assertTextPresent(
@@ -888,9 +888,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test that the compare run groups works");
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("ProteinProphet"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "ProteinProphet");
         clickButton("Compare");
 
         click(Locator.linkWithText("Comparison Overview"));
@@ -1004,9 +1002,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test Compare Peptides using Query");
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Peptide"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "Peptide");
         click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         setFormElement(Locator.input("targetProtein"), "");
         clickButton("Compare");

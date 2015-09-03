@@ -56,9 +56,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Runs"));
         DataRegionTable RunsTable = new DataRegionTable("MS2SearchRuns", this);
         RunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), 2000);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Peptide"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "Peptide");
         clickButton("Compare");
         Assert.assertEquals("Wrong number of rows in exported Excel file", 111, getCompExcelExportRowCount());
     }

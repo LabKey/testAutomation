@@ -642,66 +642,76 @@ public class DataRegionTable
 
     public void checkAll()
     {
-        WebElement toggleAll = Locators.dataRegion(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
-        _test.uncheckCheckbox(toggleAll);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
-        _test.checkCheckbox(toggleAll);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
+        String id = Locator.xq("dataregion_" + _tableName);
+        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
+        if (!toggle.isSelected())
+            _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange");
     }
 
     public void uncheckAll()
     {
-        WebElement toggleAll = Locators.dataRegion(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
-        _test.checkCheckbox(toggleAll);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
-        _test.uncheckCheckbox(toggleAll);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
-    }
-
-    private void waitForAllChecked()
-    {
-        _test.waitForElementToDisappear(Locator.css("#" + getHtmlName() + " input:not(:checked)[name='.select']"));
-    }
-
-    private void waitForAllUnchecked()
-    {
-        _test.waitForElementToDisappear(Locator.css("#" + getHtmlName() + " input:checked[name='.select']"));
+        String id = Locator.xq("dataregion_" + _tableName);
+        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
+        if (null != _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange"))
+            _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange");
     }
 
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
     public void checkCheckbox(String value)
     {
-        _test.checkDataRegionCheckbox(_tableName, value);
+        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+                Locator.tagWithName("input", ".select").withAttribute("value", value)).
+                findElement(_test.getDriver());
+        if (!checkbox.isSelected())
+            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
     }
 
     public void checkCheckbox(int index)
     {
-        _test.checkDataRegionCheckbox(_tableName, index);
+        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+                Locator.tagWithName("input", ".select")).index(index).
+                findElement(_test.getDriver());
+        if (!checkbox.isSelected())
+            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
     }
 
     public void uncheckCheckbox(int index)
     {
-        _test.uncheckDataRegionCheckbox(_tableName, index);
+        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+                Locator.tagWithName("input", ".select")).index(index).
+                findElement(_test.getDriver());
+        if (checkbox.isSelected())
+            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
     }
 
     public void pageFirst()
     {
-        _test.dataRegionPageFirst(_tableName);
+        _test.log("Clicking page first on data region '" + _tableName + "'");
+        clickDataRegionPageLink("First Page");
     }
 
     public void pageLast()
     {
-        _test.dataRegionPageLast(_tableName);
+        _test.log("Clicking page last on data region '" + _tableName + "'");
+        clickDataRegionPageLink("Last Page");
     }
 
     public void pageNext()
     {
-        _test.dataRegionPageNext(_tableName);
+        _test.log("Clicking page next on data region '" + _tableName + "'");
+        clickDataRegionPageLink("Next Page");
     }
 
     public void pagePrev()
     {
-        _test.dataRegionPagePrev(_tableName);
+        _test.log("Clicking page previous on data region '" + _tableName + "'");
+        clickDataRegionPageLink("Previous Page");
+    }
+
+    public void clickDataRegionPageLink(String title)
+    {
+        String id = Locator.xq("dataregion_header_" + _tableName);
+        _test.clickAndWait(Locator.xpath("//table[@id=" + id + "]//div/a[@title='" + title + "']"));
     }
 
     public void showAll()

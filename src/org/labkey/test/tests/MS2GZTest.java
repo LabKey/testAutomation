@@ -44,9 +44,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "ProteinProphet (Legacy)");
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
         clickButton("Compare");
         assertTextPresent("(GroupProbability > 0.7)", "GroupNumber", "0.78");
@@ -62,9 +60,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "ProteinProphet (Legacy)");
         checkCheckbox(Locator.checkboxByName("light2HeavyRatioMean"));
         uncheckCheckbox(Locator.checkboxByName("groupProbability"));
         clickButton("Compare");
@@ -75,9 +71,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Search Engine Protein"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "Search Engine Protein");
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
         checkCheckbox(Locator.checkboxByName("total"));
         clickButton("Compare");
@@ -95,9 +89,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "Peptide (Legacy)");
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
         clickButton("Compare");
         assertTextPresent("(DeltaMass > 0.0)", "K.VYLADPVVFTVKHIK.Q", "Pattern");

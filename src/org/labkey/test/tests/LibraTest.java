@@ -95,9 +95,7 @@ public class LibraTest extends MS2TestBase
     {
         clickProject(getProjectName());
         checkAllOnPage("MS2SearchRuns");
-        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Spectra Count"));
+        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Compare"), false, "Spectra Count");
         click(Locator.radioButtonById("SpectraCountPeptide"));
         clickButton("Compare");
         assertTextPresent("-.MM'EILRGSPALSAFR.I");

@@ -355,7 +355,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         final String messageColumn = "Message Settings";
 
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
-        checkDataRegionCheckbox(usersDataRegion, messageUserId);
+        new DataRegionTable(usersDataRegion, this).checkCheckbox(messageUserId);
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
         click(Locator.lkButton(USERS_UPDATE_BUTTON));
         waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
