@@ -851,13 +851,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return;
         }
 
-        if (!onLabKeyPage() || !isSignedInAsAdmin())
-        {
-            beginAt("/login/logout.view?");
-            if (!isSignedInAsAdmin()) // In case a non-admin user was impersonating
-                beginAt("/login/logout.view?");
-        }
-
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view?");
 
@@ -1826,6 +1819,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Before
     public final void beforeTest() throws Exception
     {
+        ensureNotImpersonating();
         simpleSignIn();
     }
 
@@ -5450,6 +5444,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertSignOutAndMyAccountPresent();
         goToHome();
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
+    }
+
+    private void ensureNotImpersonating()
+    {
+        if (!onLabKeyPage())
+            goToHome();
+
+        if (!isSignedInAsAdmin())
+            beginAt("/login/logout.view?");
     }
 
     private final HashMap<String, String> usersAndDisplayNames = new HashMap<>();
