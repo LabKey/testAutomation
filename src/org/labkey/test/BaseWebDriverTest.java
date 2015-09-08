@@ -1555,6 +1555,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void switchToWindow(int index)
     {
+        waitFor(() -> getDriver().getWindowHandles().size() > index, WAIT_FOR_JAVASCRIPT);
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
         getDriver().switchTo().window(windows.get(index));
     }
