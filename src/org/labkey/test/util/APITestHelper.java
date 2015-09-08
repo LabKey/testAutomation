@@ -84,7 +84,7 @@ public class APITestHelper
                     {
                         tests++;
                         test.log("Starting new test case: \"" + StringUtils.trimToEmpty(testCase.getName()) + "\" in file " + testFile.getPath());
-                        sendRequestDirect(testFile.getName(), testCase.getUrl(), testCase.getType(), testCase.getFormData(), testCase.getReponse(), testCase.isFailOnMatch(), username, password, false);
+                        sendRequestDirect(testFile.getName(), testCase.getUrl(), testCase.getType(), testCase.getFormData(), testCase.getResponse(), testCase.isFailOnMatch(), username, password, false);
                         test.log("test case completed");
                     }
                 }
@@ -138,7 +138,7 @@ public class APITestHelper
 
         String response = element.getResponse();
         if (response != null)
-            testCase.setReponse(StringUtils.trim(response));
+            testCase.setResponse(StringUtils.trim(response));
 
         String formData = element.getFormData();
         if (formData != null)
@@ -239,7 +239,7 @@ public class APITestHelper
         private String _name;
         private ActionType _type;
         private String _url;
-        private String _reponse;
+        private String _response;
         private String _formData;
         private boolean _failOnMatch;
 
@@ -273,14 +273,14 @@ public class APITestHelper
             _url = url;
         }
 
-        public String getReponse()
+        public String getResponse()
         {
-            return _reponse;
+            return _response;
         }
 
-        public void setReponse(String reponse)
+        public void setResponse(String response)
         {
-            _reponse = reponse;
+            _response = response;
         }
 
         public boolean isFailOnMatch()

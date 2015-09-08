@@ -177,7 +177,7 @@ public class SurveyTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 
-        //verify that the reponses were saved with their changes
+        //verify that the responses were saved with their changes
         clickFolder(folderName);
         clickAndWait(Locator.linkWithText("listA"));
         assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
@@ -309,7 +309,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Submit completed form");
         waitForText("Surveys: " + subfolderSurveyDesign);
         assertTextPresent(secondSurvey);
-        // verify survey reponses in the current folder
+        // verify survey responses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
         assertTextPresent("[{\"field1\":\"field1\",\"field2\":\"field2\"}]");
     }

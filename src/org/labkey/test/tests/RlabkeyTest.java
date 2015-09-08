@@ -134,7 +134,7 @@ public class RlabkeyTest extends BaseWebDriverTest
                     if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
                         testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.setCurlOptions(ssl.verifypeer=FALSE)");
                     sb.append(testScript);
-                    String verify = test.getReponse().trim();
+                    String verify = test.getResponse().trim();
 
                     log("exceute test: " + test.getName());
                     if (!_rReportHelper.executeScript(sb.toString(), verify))
