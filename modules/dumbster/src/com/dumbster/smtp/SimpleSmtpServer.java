@@ -192,7 +192,7 @@ public class SimpleSmtpServer implements Runnable {
       SmtpResponse response = request.execute();
       // Move to next internal state
       smtpState = response.getNextState();
-      // Send reponse to client
+      // Send response to client
       sendResponse(out, response);
 
       // Store input in message
