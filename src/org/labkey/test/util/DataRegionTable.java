@@ -645,15 +645,15 @@ public class DataRegionTable
         String id = Locator.xq("dataregion_" + _tableName);
         WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
         if (!toggle.isSelected())
-            _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange");
+            _test.doAndWaitForPageSignal(toggle::click, "selectChange");
     }
 
     public void uncheckAll()
     {
         String id = Locator.xq("dataregion_" + _tableName);
         WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
-        if (null != _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange"))
-            _test.doAndWaitForPageSignal(toggle::click, _tableName + ".selectChange");
+        if (null != _test.doAndWaitForPageSignal(toggle::click, "selectChange"))
+            _test.doAndWaitForPageSignal(toggle::click, "selectChange");
     }
 
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
@@ -663,7 +663,7 @@ public class DataRegionTable
                 Locator.tagWithName("input", ".select").withAttribute("value", value)).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
     }
 
     public void checkCheckbox(int index)
@@ -672,7 +672,7 @@ public class DataRegionTable
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
     }
 
     public void uncheckCheckbox(int index)
@@ -681,7 +681,7 @@ public class DataRegionTable
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, _tableName + ".selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
     }
 
     public void pageFirst()
