@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.components.Component;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -35,9 +36,10 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DataRegionTable
+public class DataRegionTable extends Component
 {
     protected final String _tableName;
+    protected final WebElement _tableElement;
     protected BaseWebDriverTest _test;
     protected final boolean _selectors;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
@@ -60,9 +62,15 @@ public class DataRegionTable
         _tableName = tableName;
         _selectors = selectors;
         _test = test;
-        _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
+        _tableElement = _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _floatingHeaders = floatingHeaders;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _tableElement;
     }
 
     private int getHeaderRowCount()
