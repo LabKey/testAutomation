@@ -1021,8 +1021,8 @@ public class StudySimpleExportTest extends StudyBaseTest
 
         waitAndClickAndWait(Locator.linkWithText("Manage New Request Form"));
         log("Verify Request forms");
-        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[1][@value='Shipping Information']"));
-        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[2][@value='Assay Plan-1']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[1][@value='Assay Plan-1']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[2][@value='Shipping Information']"));
         assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[3][@value='Comments']"));
         assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[4][@value='Request #4']"));
         assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[5][@value='Request #5']"));
