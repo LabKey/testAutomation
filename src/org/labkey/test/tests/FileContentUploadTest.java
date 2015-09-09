@@ -205,7 +205,6 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _listHelper.uploadData(COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(getProjectName());
         // Setup custom file properties
-        _fileBrowserHelper.waitForFileGridReady();
         _fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
 

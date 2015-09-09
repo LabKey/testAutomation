@@ -37,7 +37,6 @@ public class FeaturesTestParams extends AbstractInspectTestParams
         String[] names = getSampleNames();
         if (names.length != 0)
         {
-            _test._fileBrowserHelper.waitForImportDataEnabled();
             for (String name : names)
             {
                 _test._fileBrowserHelper.checkFileBrowserFileCheckbox(name + ".mzXML");

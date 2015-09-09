@@ -64,7 +64,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     public void preTest()
     {
         goToProjectHome();
-        _fileBrowserHelper.waitForFileGridReady();
     }
 
     @Test
@@ -72,7 +71,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     {
         impersonateRoles("Editor");
 
-        _fileBrowserHelper.waitForFileGridReady();
         assertActionsAvailable(
                 FileBrowserHelper.BrowserAction.FOLDER_TREE,
                 FileBrowserHelper.BrowserAction.UP,
@@ -96,7 +94,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     {
         impersonateRoles("Submitter", "Reader");
 
-        _fileBrowserHelper.waitForFileGridReady();
         assertActionsAvailable(
                 FileBrowserHelper.BrowserAction.FOLDER_TREE,
                 FileBrowserHelper.BrowserAction.UP,
@@ -117,7 +114,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     {
         impersonateRoles("Author");
 
-        _fileBrowserHelper.waitForFileGridReady();
         assertActionsAvailable(
                 FileBrowserHelper.BrowserAction.FOLDER_TREE,
                 FileBrowserHelper.BrowserAction.UP,
@@ -138,7 +134,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     {
         impersonateRoles("Reader");
 
-        _fileBrowserHelper.waitForFileGridReady();
         assertActionsAvailable(
                 FileBrowserHelper.BrowserAction.FOLDER_TREE,
                 FileBrowserHelper.BrowserAction.UP,

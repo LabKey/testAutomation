@@ -69,7 +69,6 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     public void preTest()
     {
         goToProjectHome();
-        _fileBrowserHelper.waitForFileGridReady();
     }
 
     @Test

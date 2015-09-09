@@ -99,7 +99,6 @@ public class SequestImportTest extends BaseWebDriverTest
 
         goToModule("Pipeline");
         clickButton("Process and Import Data");
-        _fileBrowserHelper.waitForFileGridReady();
         for (String file : runFiles)
         {
             waitForElement(FileBrowserHelper.Locators.gridRowWithNodeId(file).append(runLink));

@@ -94,7 +94,6 @@ public class FlowSpecimenTest extends BaseFlowTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
-        _fileBrowserHelper.waitForImportDataEnabled();
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Import Selected Runs");

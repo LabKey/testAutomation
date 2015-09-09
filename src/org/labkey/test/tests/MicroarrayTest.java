@@ -111,7 +111,6 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Microarray Dashboard"));
         clickButton("Process and Import Data");
 
-        _fileBrowserHelper.waitForImportDataEnabled();
         _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE1);
         _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE2);
         _fileBrowserHelper.selectImportDataAction("Use " + ASSAY_NAME);

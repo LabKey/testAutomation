@@ -1790,6 +1790,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @BeforeClass
     public static void preamble()
     {
+        if (getDownloadDir().exists())
+        {
+            try{
+                FileUtils.deleteDirectory(getDownloadDir());
+            }
+            catch (IOException ignore) { }
+        }
+
         currentTest.getContainerHelper().clearCreatedProjects();
         currentTest.doPreamble();
     }
