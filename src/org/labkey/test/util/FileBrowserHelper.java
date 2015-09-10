@@ -120,6 +120,7 @@ public class FileBrowserHelper
         final Locator.XPathLocator emptyGrid = fBrowser.append(Locator.tagWithClass("div", "x4-grid-empty"));
         final Locator.XPathLocator gridRow = fBrowser.append(Locators.gridRow());
 
+        _test._ext4Helper.waitForMaskToDisappear();
         return Locator.waitForAnyElement(_test.shortWait(), gridRow, emptyGrid);
     }
 
@@ -493,11 +494,7 @@ public class FileBrowserHelper
     public void waitForFileGridReady()
     {
         _test.waitForElement(Locators.pageSignal(IMPORT_SIGNAL_NAME));
-    }
-
-    public void waitForImportDataEnabled()
-    {
-        _test.waitForElement(Locators.pageSignal(IMPORT_SIGNAL_NAME), 6 * WAIT_FOR_JAVASCRIPT);
+        waitForGrid();
     }
 
     public void openFolderTree()
