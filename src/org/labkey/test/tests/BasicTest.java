@@ -154,12 +154,6 @@ public class BasicTest extends BaseWebDriverTest
         Assert.assertEquals("Initial user action did not redirect properly when logged in", expectedTitle, getDriver().getTitle());
     }
 
-    @Test
-    public void testFooter()
-    {
-        assertElementPresent(Locator.linkWithText("Powered by LabKey Software"));
-    }
-
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("core", "login", "admin");

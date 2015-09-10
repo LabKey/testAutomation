@@ -65,6 +65,8 @@ modules/chartingapi/resources/views/exportGenericChartTest.html -text
 modules/chartingapi/resources/views/exportTimeChartTest.html -text
 modules/chartingapi/resources/views/interactivityTest.html -text
 modules/chartingapi/resources/views/setAesTest.html -text
+modules/footerTest/module.properties -text
+modules/footerTest/resources/views/_footer.html -text
 modules/linkedschematest/module.properties -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestPeople.query.xml -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestQuery.query.xml -text
