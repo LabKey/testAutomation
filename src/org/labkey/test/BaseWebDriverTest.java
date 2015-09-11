@@ -869,10 +869,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
             acceptTermsOfUse(null, false);
             clickButton("Sign In", 0);
-            bypassSecondaryAuthentication();
 
-            if (!waitForElement(Locator.id("userMenuPopupLink"), defaultWaitForPage, false))
+            if (!waitFor(() -> {
+                if (isElementPresent(Locator.id("userMenuPopupLink")))
+                    return true;
+                bypassSecondaryAuthentication();
+                return false;
+            }, defaultWaitForPage))
             {
+                bypassSecondaryAuthentication();
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
                 if (errors.contains("The e-mail address and password you entered did not match any accounts on file."))
@@ -1411,7 +1416,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
             }
 
-            // Tests hit this page a lot. Make it loads as fast as possible
+            // Tests hit this page a lot. Make it load as fast as possible
             PortalHelper portalHelper = new PortalHelper(this);
             for (BodyWebPart webPart : portalHelper.getBodyWebParts())
                 webPart.delete();
@@ -2174,7 +2179,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     private void cleanup(boolean afterTest) throws TestTimeoutException
     {
-        if(!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest)this).needsSetup())
+        if (!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
             doCleanup(afterTest);
     }
 
@@ -3978,14 +3983,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForText(final String text, final int count, int wait)
     {
-        final String failMessage = "'"+text+"' was not present "+count+" times.";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return countText(text) == count;
-            }
-        }, failMessage, wait);
+        final String failMessage = "'" + text + "' was not present " + count + " times.";
+        waitFor(() -> countText(text) == count, failMessage, wait);
     }
 
     /**
