@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -30,14 +31,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
-import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.BVT;
-import org.labkey.test.categories.DRT;
-import org.labkey.test.categories.External;
-import org.labkey.test.categories.UnitTests;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -45,14 +41,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
-@Category({DRT.class, BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
 
     public JUnitTest() throws Exception
     {
+    }
+
+    public static String getWhen(Map<String,Object> test)
+    {
+        Object when = test.get("when");
+        if (!(when instanceof String) || StringUtils.isBlank((String)when))
+            return "DRT";
+        return ((String)when).toUpperCase();
     }
 
     // used when writing JUnitTest class name to the remainingTests.txt log file
@@ -87,14 +91,8 @@ public class JUnitTest extends TestSuite
         helper.unfail();
     }
 
-    public static TestSuite suite() throws Exception
+    public static TestSuite _suite(Predicate<Map<String,Object>> accept, int attempt, boolean performedUpgrade) throws Exception
     {
-        return suite(0, false);
-    }
-
-    public static TestSuite suite(int attempt, boolean performedUpgrade) throws Exception
-    {
-
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
         try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
@@ -119,7 +117,7 @@ public class JUnitTest extends TestSuite
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
                         log("Remote JUnitTest: Server modules starting up (attempt " + attempt + ") ...");
                         Thread.sleep(1000);
-                        return suite(attempt+1, false);
+                        return _suite(accept, attempt + 1, false);
                     }
                     else if (responseBody.contains("<title>Upgrade Status</title>") ||
                         responseBody.contains("<title>Install Modules</title>") ||
@@ -133,7 +131,7 @@ public class JUnitTest extends TestSuite
 
                         // perform upgrade then try to fetch the list again
                         upgradeHelper();
-                        return suite(attempt+1, true);
+                        return _suite(accept, attempt + 1, true);
                     }
                 }
 
@@ -151,7 +149,8 @@ public class JUnitTest extends TestSuite
                         String className = (String)testClass.get("className");
                         // Timeout is represented in seconds
                         int timeout = ((Number)testClass.get("timeout")).intValue();
-                        testsuite.addTest(new RemoteTest(className, timeout));
+                        if (accept.test(testClass))
+                            testsuite.addTest(new RemoteTest(className, timeout));
                     }
                     remotesuite.addTest(testsuite);
                 }
