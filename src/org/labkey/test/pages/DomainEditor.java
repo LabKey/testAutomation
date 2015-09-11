@@ -42,7 +42,7 @@ public abstract class DomainEditor
 
     public void selectField(int index)
     {
-        selectField(Locator.tagWithClass("tr", "editor-field-row").withDescendant(Locator.xpath("td/img").withAttribute("id", "partstatus_" + index)));
+        selectField(Locator.tagWithClass("tr", "editor-field-row").withDescendant(Locator.xpath("td/div").withAttribute("id", "partstatus_" + index)));
     }
 
     private void selectField(final Locator.XPathLocator rowLocator)

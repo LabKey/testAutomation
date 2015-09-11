@@ -640,7 +640,7 @@ public class ListHelper extends AbstractHelper
             // If domain hasn't been saved yet, the 'OK' prompt will not appear.
             return;
         }
-        _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.css("#partstatus_" + index + " span.gwt-FontImage.fa-trash-o"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void addFieldsNoImport(String fieldList)
