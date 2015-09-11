@@ -152,20 +152,20 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
 
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.removeToolbarButton("refresh");
-        click(Locator.xpath("//tr[@data-recordid='parentFolder']/td[2]")); // Unhide text for 'Parent Folder' button
-        click(Locator.xpath("//tr[@data-recordid='parentFolder']/td[3]")); // Hide icon for 'Parent Folder' button
+        click(Locator.xpath("//tr[@data-recordid='download']/td[2]")); // Unhide text for 'Download' button
+        click(Locator.xpath("//tr[@data-recordid='download']/td[3]")); // Hide icon for 'Download' button
         click(Ext4Helper.Locators.ext4Button("submit"));
         waitForElementToDisappear(FileBrowserHelper.BrowserAction.RELOAD.getButtonIconLocator());
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.UP.getButtonIconLocator());
-        waitForElement(FileBrowserHelper.BrowserAction.UP.getButtonTextLocator());
+        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonIconLocator());
+        waitForElement(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonTextLocator());
 
         // Verify custom action buttons
         _fileBrowserHelper.goToConfigureButtonsTab();
-        _fileBrowserHelper.removeToolbarButton("parentFolder");
+        _fileBrowserHelper.removeToolbarButton("download");
         _fileBrowserHelper.addToolbarButton("refresh");
         click(Ext4Helper.Locators.ext4Button("submit"));
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.UP.getButtonTextLocator());
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.UP.getButtonIconLocator());
+        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonTextLocator());
+        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonIconLocator());
         waitForElement(FileBrowserHelper.BrowserAction.RELOAD.getButtonIconLocator());
         waitForElement(FileBrowserHelper.BrowserAction.RELOAD.getButtonTextLocator());
 
