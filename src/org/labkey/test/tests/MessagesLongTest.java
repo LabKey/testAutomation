@@ -54,6 +54,8 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String MSG1_BODY_FIRST = "this is a test message";
     private static final String MSG2_TITLE = "test message 2";
     private static final String MSG3_TITLE = "test message 3";
+    private static final String MSG4_TITLE = "test message 4";
+    private static final String MSG4_BODY = "test message 4 - special characters: " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String RESP2_BODY = "third test, thanks";
     private static final String USER1 = "messageslong_user1@messages.test";
     private static final String USER2 = "messageslong_user2@messages.test";
@@ -162,6 +164,15 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(EXPIRES1, "<b>first message testing</b>");
         clickButton("Delete Message");
         clickButton("Delete");
+
+        log("Check that message with unicode character works");
+        clickButton("New");
+        setFormElement(Locator.name("title"), MSG4_TITLE);
+        setFormElement(Locator.id("body"), MSG4_BODY);
+        selectOptionByText(Locator.name("rendererType"), "Plain Text");
+        clickButton("Submit");
+        assertTextPresent(MSG4_TITLE);
+        assertTextPresent(MSG4_BODY);
 
         log("Check that HTML message works");
         clickButton("New");
