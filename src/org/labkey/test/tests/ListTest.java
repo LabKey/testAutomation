@@ -338,8 +338,8 @@ public class ListTest extends BaseWebDriverTest
 
         click(Locator.id("partdown_2"));
         click(Locator.id("name5")); // Select Hidden field.
-        checkCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
-        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
+        checkCheckbox(Locator.css("#propertyShownInGrid >input"));
+        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
         clickDone();
 
         log("Check that hidden column is hidden.");
@@ -360,9 +360,9 @@ public class ListTest extends BaseWebDriverTest
         dataregionToEditDesign();
 
         click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
-        checkCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
-        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
+        uncheckCheckbox(Locator.css("#propertyShownInGrid > input"));
+        checkCheckbox(Locator.css("#propertyShownInInsert > input"));
+        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -379,9 +379,9 @@ public class ListTest extends BaseWebDriverTest
         dataregionToEditDesign();
 
         click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
-        checkCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
-        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
+        uncheckCheckbox(Locator.css("#propertyShownInInsert > input"));
+        checkCheckbox(Locator.css("#propertyShownInUpdate > input"));
+        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
@@ -398,9 +398,9 @@ public class ListTest extends BaseWebDriverTest
         dataregionToEditDesign();
 
         click(Locator.id("name5")); // Select Hidden field.
-        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
-        checkCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
-        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
+        uncheckCheckbox(Locator.css("#propertyShownInUpdate > input"));
+        checkCheckbox(Locator.css("#propertyShownInDetail > input"));
+        waitForElement(Locator.css("#partstatus_5 > span.fa-wrench"));
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
