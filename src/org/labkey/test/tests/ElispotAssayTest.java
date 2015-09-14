@@ -536,8 +536,9 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         _assayHelper.clickEditAssayDesign();
-        waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
-        click(Locator.css("#partdelete_removeTransformScript0 img"));
+        Locator.CssLocator locator = Locator.css("div#partdelete_removeTransformScript0 span");
+        waitForElement(locator);
+        click(locator);
         clickButton("Save & Close");
         waitForElement(Locator.id("dataregion_Runs"));
     }
