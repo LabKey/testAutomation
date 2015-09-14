@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
@@ -72,7 +73,7 @@ public class StudyExportTest extends StudyManualTest
         modifyDatasetColumn(MODIFIED_DATASET);
         setDemographicsBit();
 
-        _listHelper.importListArchive(getFolderName(), new File(TestFileUtils.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip"));
+        _listHelper.importListArchive(getFolderName(), new File(TestFileUtils.getLabKeyRoot(), "remoteapi/r/test/listArchive.zip"));
 
         // export new study to zip file using "xml" formats
         exportStudy(true);
@@ -95,6 +96,11 @@ public class StudyExportTest extends StudyManualTest
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(3, "study and specimen archive import", false);
+    }
+
+    protected int getVisitCount()
+    {
+        return 67;
     }
 
     protected void doCohortCreateSteps()
@@ -241,10 +247,11 @@ public class StudyExportTest extends StudyManualTest
         assertButtonPresent("Cancel");
         assertButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
-        prepForPageLoad();
-        clickButton("Submit", 0);
-        acceptAlert(); // TODO: add check for expected alert text
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> {
+                    clickButton("Submit", 0);
+                    acceptAlert(); // TODO: add check for expected alert text
+                },
+                WAIT_FOR_PAGE);
         waitAndClickAndWait(Locator.linkWithText("Specimen Requests"));
         assertButtonNotPresent("Submit");
         assertButtonPresent("Details");
@@ -308,7 +315,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("47 datasets"));
         clickAndWait(Locator.linkWithText(DEMOGRAPHICS_DATASET));
         _extHelper.clickMenuButton("QC State", "All data");
-        checkAllOnPage("Dataset");
+        new DataRegionTable("Dataset", this).checkAll();
         _extHelper.clickMenuButton("QC State", "Update state of selected rows");
         selectOptionByText(Locator.name("newState"), "clean");
         setFormElement(Locator.name("comments"), "This data is clean.");
@@ -321,19 +328,23 @@ public class StudyExportTest extends StudyManualTest
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         clickButton("Enable Comments/QC");
-        checkAllOnPage("SpecimenDetail");
+        new DataRegionTable("SpecimenDetail", this).checkAll();
         _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement(Locator.name("comments"), "These vials are very important.");
         clickButton("Save Changes");
         assertTextPresent("These vials are very important.", 25);
-        setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
-        checkAllOnPage("SpecimenDetail");
-        prepForPageLoad();
-        _extHelper.clickMenuButton(false, "Comments and QC", "Clear Vial Comments for Selected");
-        acceptAlert(); // TODO: add check for expected alert text
-        waitForPageToLoad();
+        DataRegionTable specimenDetail = new DataRegionTable("SpecimenDetail", this);
+        specimenDetail.setFilter("MouseId", "Equals", "999320824");
+        specimenDetail.checkAll();
+
+        doAndWaitForPageToLoad(() -> {
+                    _extHelper.clickMenuButton(false, "Comments and QC", "Clear Vial Comments for Selected");
+                    acceptAlert(); // TODO: add check for expected alert text
+                },
+                WAIT_FOR_PAGE);
+
         assertTextNotPresent("These vials are very important.");
-        clearFilter("SpecimenDetail", "MouseId");
+        new DataRegionTable("SpecimenDetail", this).clearFilter("MouseId");
         assertTextPresent("These vials are very important.", 23);
         _extHelper.clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
@@ -389,10 +400,11 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
-        prepForPageLoad();
-        clickButton("Delete missing specimens", 0);
-        acceptAlert(); // TODO: add check for expected alert text
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> {
+                    clickButton("Delete missing specimens", 0);
+                    acceptAlert(); // TODO: add check for expected alert text
+                },
+                WAIT_FOR_PAGE);
         assertTextPresent("Duke University",
                 "An Assay Plan",
                 "Providing lab approval",
@@ -408,9 +420,8 @@ public class StudyExportTest extends StudyManualTest
 
         enterStudySecurity();
 
-        prepForPageLoad();
-        selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE"),
+                WAIT_FOR_PAGE);
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("47 datasets"));
@@ -441,10 +452,11 @@ public class StudyExportTest extends StudyManualTest
 
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.xpath("//input[contains(@value, '999320529')]"));
-        prepForPageLoad();
-        clickButton("Delete", 0);
-        acceptAlert(); // TODO: add check for expected alert text
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> {
+                    clickButton("Delete", 0);
+                    acceptAlert(); // TODO: add check for expected alert text
+                },
+                WAIT_FOR_PAGE);
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:

@@ -2788,14 +2788,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertAlert(String msg)
     {
-        Alert alert = getDriver().switchTo().alert();
+        Alert alert = waitForAlert();
         assertEquals(msg, alert.getText());
         alert.accept();
     }
 
     public void assertAlertContains(String partialMessage)
     {
-        Alert alert = getDriver().switchTo().alert();
+        Alert alert = waitForAlert();
         assertTrue(alert.getText().contains(partialMessage));
         alert.accept();
     }
@@ -2839,7 +2839,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public String acceptAlert()
     {
-        Alert alert = getDriver().switchTo().alert();
+        Alert alert = waitForAlert();
         String text = alert.getText();
         alert.accept();
         return text;
@@ -2847,10 +2847,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public String cancelAlert()
     {
-        Alert alert = getDriver().switchTo().alert();
+        Alert alert = waitForAlert();
         String text = alert.getText();
         alert.dismiss();
         return text;
+    }
+
+    private Alert waitForAlert()
+    {
+        waitFor(this::isAlertPresent, WAIT_FOR_JAVASCRIPT);
+        return getDriver().switchTo().alert();
+    }
+
+    public void waitForAlert(String alertText, int wait)
+    {
+        waitFor(this::isAlertPresent, "No alert appeared.", wait);
+        assertAlert(alertText);
     }
 
     public void assertExtMsgBox(String title, String text)
@@ -3542,12 +3554,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             _testTimeout = true;
             fail(failMessage + " ["+wait+"ms]");
         }
-    }
-
-    public void waitForAlert(String alertText, int wait)
-    {
-        waitFor(this::isAlertPresent, "No alert appeared.", wait);
-        assertAlert(alertText);
     }
 
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)

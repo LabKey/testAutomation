@@ -247,12 +247,22 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
-        assertEquals("Unexpected visit count before delete unused", 66, getTableRowCount("visits"));
+        assertEquals("Unexpected visit count before delete unused", getVisitCount(), getTableRowCount("visits"));
         clickAndWait(Locator.linkWithText("Delete Unused Visits"));
         assertTextAtPlaceInTable("Are you sure you want to delete the unused visits listed below?", "visitsToDelete", 1, 1);
-        assertEquals("Unexpected unused visit count on confirmation page", 26, getTableRowCount("visitsToDelete"));
+        assertEquals("Unexpected unused visit count on confirmation page", getUnusedVisitCount(), getTableRowCount("visitsToDelete") - 2);
         clickAndWait(Locator.linkWithText("OK"));
-        assertEquals("Unexpected visit count after delete unused", 42, getTableRowCount("visits"));
+        assertEquals("Unexpected visit count after delete unused", getVisitCount() - getUnusedVisitCount(), getTableRowCount("visits"));
+    }
+
+    protected int getVisitCount()
+    {
+        return 66;
+    }
+
+    protected int getUnusedVisitCount()
+    {
+        return 24;
     }
 
     protected static final String SUBJECT_NOUN = "Mouse";
