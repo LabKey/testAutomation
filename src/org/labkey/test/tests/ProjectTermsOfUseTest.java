@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.Maps;
 
 @Category({DailyB.class})
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
@@ -81,7 +83,11 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         clickProject(PUBLIC_TERMS_PROJECT_NAME);
         assertTextNotPresent(PROJECT_TERMS_SNIPPET);
 
-        signIn();
+        // simulate a session expiration and make sure you can still log in to a project with terms.
+        signOut();
+        beginAt(WebTestHelper.buildURL("login", "login", Maps.of("returnUrl", "/labkey/project/" + PUBLIC_TERMS_PROJECT_NAME + "/begin.view?")));
+        simpleSignIn();
+
         log("Attempt to bypass terms with saved URLs");
         popLocation();
         assertTextPresent(PROJECT_TERMS_SNIPPET); // PROJECT_NAME
