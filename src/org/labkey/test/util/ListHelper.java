@@ -125,7 +125,7 @@ public class ListHelper extends AbstractHelper
     public void updateRow(int id, Map<String, String> data)
     {
         DataRegionTable dr = new DataRegionTable("query", _test);
-        _test.click(dr.updateLink(id - 1));
+        _test.clickAndWait(dr.updateLink(id - 1));
         setRowData(data);
     }
 
