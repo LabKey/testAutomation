@@ -17,8 +17,7 @@ package org.labkey.test.tests;
 
 import junit.framework.TestSuite;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.categories.External;
-import org.labkey.test.categories.UnitTests;
+import org.labkey.test.categories.DRT;
 
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import java.util.Map;
  * Created by matthew on 9/11/15.
  */
 
-@Category({org.labkey.test.categories.DRT.class, UnitTests.class, External.class})
+@Category({DRT.class})
 public class JUnitDRTTest
 {
     static boolean accept(Map<String, Object> test)

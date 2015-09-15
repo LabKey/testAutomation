@@ -31,9 +31,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.External;
+import org.labkey.test.categories.UnitTests;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -43,12 +47,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+@Category({BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
 
     public JUnitTest() throws Exception
     {
+    }
+
+    public static TestSuite suite() throws Exception
+    {
+        return JUnitTest._suite((p) -> true, 0, false);
     }
 
     public static String getWhen(Map<String,Object> test)
