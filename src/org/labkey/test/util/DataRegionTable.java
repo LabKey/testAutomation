@@ -147,7 +147,7 @@ public class DataRegionTable extends Component
 
     private boolean bottomBarPresent()
     {
-        return _test.isElementPresent(Locator.xpath("//table[starts-with(@id, 'dataregion_footer_')]"));
+        return _test.isElementPresent(Locator.css("table#dataregion_footer_" + _tableName));
     }
 
     public boolean hasAggregateRow()
@@ -165,8 +165,7 @@ public class DataRegionTable extends Component
 
     public int getDataRowCount()
     {
-        int rows = 0;
-        rows = _test.getTableRowCount(getHtmlName()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
+        int rows = _test.getTableRowCount(getHtmlName()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
         if (hasAggregateRow())
             rows -= 1;
 
