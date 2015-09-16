@@ -141,7 +141,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test delete wiki");
         goToProjectHome();
-        _extHelper.clickExtMenuButton(true, Locator.tagWithAttribute("img", "title", "More"), "Edit");
+        _extHelper.clickExtMenuButton(true, Locator.tagWithAttribute("span", "title", "More"), "Edit");
         clickButton("Delete Page");
         clickButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
@@ -163,7 +163,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
-        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
+        click(Locator.tagWithAttribute("span", "title", "Edit Inline"));
         waitForElement(inlineEditor);
 
         String addedContent = "Inline edited content";
@@ -175,7 +175,7 @@ public class WikiTest extends BaseWebDriverTest
         assertButtonNotPresent("Save");
 
         log("** test second edit on inline wiki webpart editor");
-        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
+        click(Locator.tagWithAttribute("span", "title", "Edit Inline"));
         waitForElement(inlineEditor);
         addedContent = "Second inline edited content: " + WIKI_CHECK_CONTENT;
         setInlineEditorContent(getAttribute(inlineEditor.child("textarea"), "id"), addedContent);
@@ -184,7 +184,7 @@ public class WikiTest extends BaseWebDriverTest
         assertTextPresent(addedContent);
 
         log("** test cancel on inline wiki webpart editor");
-        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
+        click(Locator.tagWithAttribute("span", "title", "Edit Inline"));
         String unsavedContent = "SHOULD NOT BE SAVED";
         waitForElement(inlineEditor);
         setInlineEditorContent(getAttribute(inlineEditor.child("textarea"), "id"), unsavedContent);

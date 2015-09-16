@@ -225,7 +225,7 @@ public class PortalHelper extends AbstractHelper
 
     public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
+        _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//span[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
     @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
@@ -245,7 +245,7 @@ public class PortalHelper extends AbstractHelper
         }
         else
         {
-            Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
+            Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[span[@title='Remove From Page']]");
             _test.click(removeButton);
         }
         _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -339,7 +339,7 @@ public class PortalHelper extends AbstractHelper
         String panelClass = portalPanel.findElement(_test.getDriver()).getAttribute("class");
         if (panelClass.contains("labkey-body-panel"))
         {
-            Locator.xpath("//img[@title='Move "+direction+"']").findElement(webPart).click();
+            Locator.xpath("//span[@title='Move "+direction+"']").findElement(webPart).click();
         }
         else if (panelClass.contains("labkey-side-panel"))
         {
@@ -463,7 +463,7 @@ public class PortalHelper extends AbstractHelper
 
         public static Locator.XPathLocator webPartTitleMenu(String title)
         {
-            return Locator.xpath("//img[@id='more-" + title.toLowerCase() + "']");
+            return Locator.xpath("//span[@id='more-" + title.toLowerCase() + "']");
         }
 
         public static Locator.CssLocator bodyWebpartTitle = Locator.css("#bodypanel .labkey-wp-title-text");

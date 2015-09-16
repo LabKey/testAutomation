@@ -171,7 +171,7 @@ public class PortalTest extends BaseWebDriverTest
                 click(Locator.id("search-input")); // dismiss menu
             }
             else
-                assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]//a/img[@title='Remove From Page']"));
+                assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]//a/span[@title='Remove From Page']"));
         }
 
         List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(getDriver());
