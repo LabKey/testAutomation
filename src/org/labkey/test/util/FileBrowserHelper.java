@@ -258,7 +258,6 @@ public class FileBrowserHelper
 
     public void selectImportDataAction(@LoggedParam String actionName)
     {
-        waitForFileGridReady();
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
         Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
@@ -373,7 +372,10 @@ public class FileBrowserHelper
         waitForFileGridReady();
         WebElement button = action.findButton(_test);
         if (button.isDisplayed())
-            _test.clickAndWait(action.findButton(_test), action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
+        {
+            _test.waitFor(() -> !button.getAttribute("class").contains("disabled"), WAIT_FOR_JAVASCRIPT);
+            _test.clickAndWait(button, action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
+        }
         else
             clickFileBrowserButtonOverflow(action);
     }
