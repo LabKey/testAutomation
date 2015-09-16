@@ -3504,12 +3504,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public String doAndWaitForPageSignal(Runnable func, String signalName)
     {
+        return doAndWaitForPageSignal(func, signalName, shortWait());
+    }
+
+    /**
+     * Wait for signaling element created by LABKEY.Utils.signalWebDriverTest
+     * If signal element is already present, this will wait for it to become stale and be recreated
+     * @param func Function that will trigger the desired signal to appear on the page
+     * @param signalName Should match the signal name defined in LABKEY.Utils.signalWebDriverTest
+     * @return The 'value' of the signal, if any
+     */
+    public String doAndWaitForPageSignal(Runnable func, String signalName, WebDriverWait wait)
+    {
         List<WebElement> previousSignal = Locators.pageSignal(signalName).findElements(getDriver());
 
         func.run();
 
         if (!previousSignal.isEmpty())
-            shortWait().until(ExpectedConditions.stalenessOf(previousSignal.get(0)));
+            wait.until(ExpectedConditions.stalenessOf(previousSignal.get(0)));
 
         WebElement newSignal = waitForElement(Locators.pageSignal(signalName));
         return newSignal.getAttribute("value");
