@@ -80,27 +80,15 @@ public class Ext4CmpRef
 
     public void waitForEnabled()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (Boolean)getFnEval("return !this.isDisabled();");
-            }
-        }, "Component was not enabled", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> (Boolean)getFnEval("return !this.isDisabled();"),
+                "Component was not enabled", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
     public static void waitForComponent(final BaseWebDriverTest test, @LoggedParam final String query)
     {
-        test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;");
-            }
-        }, "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        test.waitFor(() -> (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;"),
+                "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public <Type extends Ext4CmpRef> Type down(String componentSelector, Class<Type> clazz)

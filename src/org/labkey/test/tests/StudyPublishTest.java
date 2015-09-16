@@ -416,13 +416,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 pushLocation();
                 clickAndWait(Locator.linkWithText(report));
 
-                waitFor(new Checker()
-                    {
-                        public boolean check()
-                        {
-                            return isTextPresent(report) || isTextPresent("Table or query not found") || getResponseCode() == 404;
-                        }
-                    }, "View did not load: " + report, WAIT_FOR_JAVASCRIPT);
+                waitFor(() -> isTextPresent(report) || isTextPresent("Table or query not found") || getResponseCode() == 404,
+                        "View did not load: " + report, WAIT_FOR_JAVASCRIPT);
 
                 if (isTextPresent(report))
                 {

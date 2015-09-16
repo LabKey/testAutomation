@@ -326,25 +326,22 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            { // Workaround: erratic combo-box behavior
-                try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());}
-                catch (NoSuchElementException recheck) {return false;}
+        waitFor(() ->
+                { // Workaround: erratic combo-box behavior
+                    try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());}
+                    catch (NoSuchElementException recheck) {return false;}
 
-                if (!getFormElement(Locator.css("#targetProject input")).equals(getProjectName()))
-                {
-                    click(Locator.xpath("//table[@id='targetProject']"));
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }, "Failed to select project", WAIT_FOR_JAVASCRIPT);
+                    if (!getFormElement(Locator.css("#targetProject input")).equals(getProjectName()))
+                    {
+                        click(Locator.xpath("//table[@id='targetProject']"));
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                },
+                "Failed to select project", WAIT_FOR_JAVASCRIPT);
 
         clickButton("Next", defaultWaitForPage);
 

@@ -176,28 +176,14 @@ public class Ext4GridRef extends Ext4CmpRef
 
     public void waitForGridEditor()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return getActiveGridEditor() != null;
-
-            }
-        }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() ->  getActiveGridEditor() != null,
+                "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForGridEditorToDisappear()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return getActiveGridEditor() == null;
-
-            }
-        }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> getActiveGridEditor() == null,
+                "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public int getRowCount()
@@ -212,26 +198,14 @@ public class Ext4GridRef extends Ext4CmpRef
 
     public void waitForRowCount(final int count)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return getRowCount() == count;
-            }
-        }, "Expected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> getRowCount() == count,
+                "Expected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForSelected(final int count)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return getSelectedCount() == count;
-            }
-        }, "Expected selected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> getSelectedCount() == count,
+                "Expected selected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public WebElement getActiveGridEditor()

@@ -424,15 +424,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             default:
                 throw new IllegalArgumentException("Unknown method for selecting FCS files: " + selectFCSFilesOption);
         }
-        waitFor(new Checker() {
-            @Override
-            public boolean check()
-            {
-                boolean checked = isChecked(Locator.id(selectFCSFilesOption.name()));
-                log("selectedFCSFilesOption is checked: " + checked);
-                return checked;
-            }
-        }, "selectFCSFilesOption", 2000);
+        waitFor(() -> isChecked(Locator.id(selectFCSFilesOption.name())), "selectFCSFilesOption", 2000);
         clickButton("Next");
     }
 

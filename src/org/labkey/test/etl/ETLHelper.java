@@ -431,25 +431,20 @@ public class ETLHelper
 
     protected void waitForEtl()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                if (_test.isElementPresent(Locator.tag("tr")
-                        .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                        .withPredicate(Locator.xpath("td").withText("ERROR"))))
-                    return true;
-                else if (_test.isElementPresent(Locator.tag("tr")
-                        .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
-                        .withPredicate(Locator.xpath("td").withText(COMPLETE))))
-                    return true;
-                else
-                    _test.refresh();
-
-                return false;
-            }
-        }, "ETL did not finish", BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitFor(() -> {
+                    if (_test.isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
+                        return true;
+                    else if (_test.isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                            .withPredicate(Locator.xpath("td").withText(COMPLETE))))
+                        return true;
+                    else
+                        _test.refresh();
+                    return false;
+                },
+                "ETL did not finish", BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     private Locator.XPathLocator findTransformConfigCell(String transformId, boolean isLink)

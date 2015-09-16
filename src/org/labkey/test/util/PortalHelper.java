@@ -351,14 +351,8 @@ public class PortalHelper extends AbstractHelper
         }
 
         final int expectedIndex = initialIndex + (direction == Direction.DOWN ? 1 : -1);
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (_test.getElementIndex(webPart) / 2) == expectedIndex;
-            }
-        }, "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> (_test.getElementIndex(webPart) / 2) == expectedIndex,
+                "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void openWebpartPermissionWindow(String webpart)

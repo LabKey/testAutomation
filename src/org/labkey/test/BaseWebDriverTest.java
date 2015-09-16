@@ -1606,13 +1606,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
         // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isTextPresent("System maintenance complete");
-            }
-        }, "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
+        waitFor(() -> isTextPresent("System maintenance complete"),
+                "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
     }
 
     private void populateLastPageInfo()
@@ -2947,26 +2942,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void waitForFolderNavigationReady()
     {
         waitForHoverNavigationReady();
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
-            }
-        }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;"),
+                "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForHoverNavigationReady()
     {
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (boolean) executeScript("if (window.HoverNavigation) return true; else return false;");
-            }
-        }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
+                "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -3433,16 +3416,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger the expected page load.");
         _testTimeout = true;
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                // Wait for marker to disappear
-                return (boolean) executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
-                        "catch(e) {return false;}");
-            }
-        }, "Page failed to load", millis);
+        waitFor(() -> (boolean) executeScript(
+                        "try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
+                        "catch(e) {return false;}"),
+                "Page failed to load", millis);
         _testTimeout = false;
         _preppedForPageLoad = false;
     }
@@ -3705,25 +3682,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         };
 
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                final File[] files = downloadDir.listFiles(newFileFilter);
-                return files != null && files.length >= expectedFileCount;
-            }
-        }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
+        waitFor(() ->{
+                    final File[] files = downloadDir.listFiles(newFileFilter);
+                    return files != null && files.length >= expectedFileCount;
+                },
+                "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                final File[] files = downloadDir.listFiles(tempFilesFilter);
-                return files != null && files.length == 0;
-            }
-        }, "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> {
+                    final File[] files = downloadDir.listFiles(tempFilesFilter);
+                    return files != null && files.length == 0;
+                },
+                "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
 
         File[] newFiles = downloadDir.listFiles(newFileFilter);
         assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
@@ -3916,15 +3885,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForElementText(final Locator locator, final String text, int wait)
     {
-        waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                String elemText = getText(locator);
-                return elemText.equals(text);
-            }
-        }, "Expected '" + text + "' in element '" + locator + "'", wait);
+        waitFor(() -> getText(locator).equals(text),
+                "Expected '" + text + "' in element '" + locator + "'", wait);
     }
 
     public void waitForElementToDisappear(final Locator locator)
@@ -3959,13 +3921,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void waitForTextToDisappear(final String text, int wait)
     {
         String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return !isTextPresent(text);
-            }
-        }, failMessage, wait);
+        waitFor(() -> !isTextPresent(text), failMessage, wait);
     }
 
     public void waitForTextWithRefresh(int wait, String... text)
@@ -3989,13 +3945,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForText(int wait, final String... text)
     {
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return isTextPresent(text);
-            }
-        }, wait);
+        waitFor(() -> isTextPresent(text), wait);
         assertTextPresent(text);
     }
 
@@ -6340,26 +6290,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
 
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                log("Waiting for " + description);
-                List<String> statusValues = getPipelineStatusValues();
-                log("[" + StringUtils.join(statusValues,",") + "]");
-                if (!expectError)
-                {
-                    assertElementNotPresent(Locator.linkWithText("ERROR"));
-                }
-                if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
-                {
-                    refresh();
-                    return false;
-                }
-                return true;
-            }
-        }, "Pipeline jobs did not complete.", wait);
+        waitFor(() -> {
+                    log("Waiting for " + description);
+                    List<String> statusValues = getPipelineStatusValues();
+                    log("[" + StringUtils.join(statusValues,",") + "]");
+                    if (!expectError)
+                    {
+                        assertElementNotPresent(Locator.linkWithText("ERROR"));
+                    }
+                    if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
+                    {
+                        refresh();
+                        return false;
+                    }
+                    return true;
+                },
+                "Pipeline jobs did not complete.", wait);
 
         assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
     }
@@ -6475,19 +6421,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         if (!isDumpSvgs())
         {
-            waitFor(new BaseWebDriverTest.Checker()
-            {
-                @Override
-                public boolean check()
+            waitFor(() -> {
+                if (isElementPresent(svgLoc))
                 {
-                    if (isElementPresent(svgLoc))
-                    {
-                        String svgText = prepareSvgText(getText(svgLoc));
-                        return expectedText.equals(svgText);
-                    }
-                    else
-                        return false;
+                    String svgText = prepareSvgText(getText(svgLoc));
+                    return expectedText.equals(svgText);
                 }
+                else
+                    return false;
             }, WAIT_FOR_JAVASCRIPT);
 
             String svgText = prepareSvgText(getText(svgLoc));
@@ -6528,14 +6469,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForElements(final Locator loc, final int count)
     {
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return count == loc.findElements(getDriver()).size();
-            }
-        }, WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> count == loc.findElements(getDriver()).size(), WAIT_FOR_JAVASCRIPT);
 
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
     }

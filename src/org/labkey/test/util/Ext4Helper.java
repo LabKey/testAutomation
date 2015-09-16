@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class Ext4Helper extends AbstractHelper
 {
@@ -247,14 +248,8 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void waitForComponentNotDirty(@LoggedParam final String componentId)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return !(Boolean) _test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
-            }
-        }, "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> !(Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();"),
+                "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
@@ -579,14 +574,9 @@ public class Ext4Helper extends AbstractHelper
         }
     }
 
-    public BaseWebDriverTest.Checker getExt4SelectorChecker(final String selector)
+    public Supplier<Boolean> getExt4SelectorChecker(final String selector)
     {
-        return new BaseWebDriverTest.Checker(){
-            public boolean check()
-            {
-                return queryOne(selector, Ext4CmpRef.class) != null;
-            }
-        };
+        return () -> queryOne(selector, Ext4CmpRef.class) != null;
     }
 
     public void clickTabContainingText(String tabText)

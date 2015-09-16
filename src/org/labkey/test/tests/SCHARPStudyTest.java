@@ -27,6 +27,7 @@ import org.labkey.test.util.PostgresOnlyTest;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
@@ -39,7 +40,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
     private String _pipelinePathMain = new File(_labkeyRoot, "/sampledata/study").getPath();
     private File _studyZipFile = TestFileUtils.getSampleData("studies/studyshell.zip");
 
-    protected static class StatusChecker extends Checker
+    protected static class StatusChecker implements Supplier<Boolean>
     {
         private BaseWebDriverTest _test;
         private String _waitForMessage;
@@ -51,7 +52,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
             _waitForMessage = waitForMessage;
         }
 
-        public boolean check()
+        public Boolean get()
         {
             String curMessage = _test.getText(_loc);
             if (null == curMessage)

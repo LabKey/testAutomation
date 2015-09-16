@@ -588,15 +588,9 @@ public class DataRegionTable extends Component
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         _test.waitForElement(filterDialog);
 
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return _test.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden())||
-                       _test.isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden()));
-            }
-        }, "Filter Dialog", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> _test.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
+                        _test.isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
+                "Filter Dialog", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 

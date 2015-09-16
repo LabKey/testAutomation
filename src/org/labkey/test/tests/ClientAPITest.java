@@ -416,14 +416,8 @@ public class ClientAPITest extends BaseWebDriverTest
     private String getActiveEditorId()
     {
         int limit = 3;
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (Boolean)executeScript("return window.gridView.activeEditor != null;");
-            }
-        }, "Could not get the id of the active editor in the grid!", limit * 50);
+        waitFor(() -> (Boolean)executeScript("return window.gridView.activeEditor != null;"),
+                "Could not get the id of the active editor in the grid!", limit * 50);
 
         return (String)executeScript("return window.gridView.activeEditor.field.id;");
     }

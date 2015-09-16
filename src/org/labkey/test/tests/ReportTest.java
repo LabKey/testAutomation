@@ -43,13 +43,8 @@ public abstract class ReportTest extends StudyBaseTest
         _ext4Helper.clickWindowButton("Delete Views", "OK", 0, 0);
 
         // make sure the report is deleted
-        waitFor(new Checker()
-                {
-                    public boolean check()
-                    {
-                        return !isElementPresent(report);
-                    }
-                }, "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> !isElementPresent(report),
+                "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod

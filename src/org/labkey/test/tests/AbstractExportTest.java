@@ -205,14 +205,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         final String fileExportRegex = getExportedFilePrefixRegex() + "_[0-9_-]*\\." + expectedExtension;
         assertTrue("Exported file has wrong name:\n expected: " + fileExportRegex + "\n actual: " + exportedFile.getName(), exportedFile.getName().matches(fileExportRegex));
 
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return exportedFile.length() > 0;
-            }
-        }, "Exported file is empty", WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> exportedFile.length() > 0, "Exported file is empty", WAIT_FOR_JAVASCRIPT);
     }
 
     protected final void assertTextExportContents(File exportedFile, int expectedDataRowCount)

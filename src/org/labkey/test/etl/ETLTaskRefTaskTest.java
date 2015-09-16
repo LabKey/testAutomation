@@ -121,26 +121,22 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
         assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_SLEEP, "RUNNING", true));
 
         // lastly, wait for the queued job to finish running
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                try
-                {
-                    if ("COMPLETE".equals(_diHelper.getTransformStatus(queuedJobId))) return true;
-                    else
+        waitFor(() -> {
+                    try
                     {
-                        log("Waiting for queued job to complete...");
-                        return false;
+                        if ("COMPLETE".equals(_diHelper.getTransformStatus(queuedJobId))) return true;
+                        else
+                        {
+                            log("Waiting for queued job to complete...");
+                            return false;
+                        }
                     }
-                }
-                catch (CommandException | IOException e)
-                {
-                    throw new RuntimeException("Exception thrown checking job status", e);
-                }
-            }
-        }, "Queued ETL did not COMPLETE. JobId: " + queuedJobId, 21000);
+                    catch (CommandException | IOException e)
+                    {
+                        throw new RuntimeException("Exception thrown checking job status", e);
+                    }
+                },
+                "Queued ETL did not COMPLETE. JobId: " + queuedJobId, 21000);
 
     }
 

@@ -139,16 +139,10 @@ public class TimeChartWizard
             _test._extHelper.waitForExtDialog("Success");
             _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return _test.isTextPresent("Please select at least one") || // group/participant
+        _test.waitFor(() -> _test.isTextPresent("Please select at least one") || // group/participant
                         _test.isTextPresent("No data found") ||
-                        _test.isElementPresent(Locator.css("svg"));
-            }
-        }, "Time chart failed to appear after saving", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                        _test.isElementPresent(Locator.css("svg")),
+                "Time chart failed to appear after saving", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private void openSaveMenu()

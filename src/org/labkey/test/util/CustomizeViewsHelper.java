@@ -592,13 +592,8 @@ public class CustomizeViewsHelper
 
         moveCustomizeViewItem(itemIndex, moveUp, type);
 
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return itemIndex != _test.getElementIndex(Locator.xpath(itemXPath));
-            }
-        }, "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> itemIndex != _test.getElementIndex(Locator.xpath(itemXPath)),
+                "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)

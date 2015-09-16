@@ -56,14 +56,8 @@ public class Ext4ComboRef extends Ext4FieldRef
 
     public void waitForStoreLoad()
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (Boolean)getFnEval("return this.store && this.store.getCount() > 0;");
-            }
-        }, "No records loaded in store", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> (Boolean)getFnEval("return this.store && this.store.getCount() > 0;"),
+                "No records loaded in store", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setComboByDisplayValue(String displayValue)

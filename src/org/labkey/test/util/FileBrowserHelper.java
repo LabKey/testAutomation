@@ -303,22 +303,12 @@ public class FileBrowserHelper
 
         openUploadPanel();
 
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).equals("");
-            }
-        }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).equals(""),
+                "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
 
         _test.setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName());
-            }
-        }, "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName()),
+                "Upload field was not set to '" + file.getName() + "'.", WAIT_FOR_JAVASCRIPT);
 
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);

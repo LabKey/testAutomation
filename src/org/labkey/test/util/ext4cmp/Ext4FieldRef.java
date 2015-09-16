@@ -63,14 +63,8 @@ public class Ext4FieldRef extends Ext4CmpRef
     @LogMethod(quiet = true)
     public static void waitForField(final BaseWebDriverTest test, @LoggedParam final String label)
     {
-        test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return isFieldPresent(test, label);
-            }
-        }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        test.waitFor(() -> isFieldPresent(test, label),
+                "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setValue(Object val)

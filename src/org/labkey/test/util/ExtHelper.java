@@ -204,13 +204,8 @@ public class ExtHelper extends AbstractHelper
 
     public void waitForExtDialog(final String title, int timeout)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return _test.isElementPresent(Locators.extDialog(title));
-            }
-        }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
+        _test.waitFor(() -> _test.isElementPresent(Locators.extDialog(title)),
+                "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
     }
 
     public void waitForExtDialogToDisappear(String title)
@@ -220,13 +215,8 @@ public class ExtHelper extends AbstractHelper
 
     public void waitForExtDialogToDisappear(final String title, int timeout)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return !_test.isElementPresent(Locators.extDialog(title));
-            }
-        }, "Ext Dialog with title '" + title + "' was still present after " + timeout + "ms", timeout);
+        _test.waitFor(() -> !_test.isElementPresent(Locators.extDialog(title)),
+                "Ext Dialog with title '" + title + "' was still present after " + timeout + "ms", timeout);
     }
 
     public String getExtMsgBoxText(String title)

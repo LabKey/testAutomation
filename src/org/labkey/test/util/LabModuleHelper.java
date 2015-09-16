@@ -193,38 +193,20 @@ public class LabModuleHelper
 
     public void waitForField(final String label, int wait)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return Ext4FieldRef.isFieldPresent(_test, label);
-            }
-        }, "Field did not appear: " + label, wait);
+        _test.waitFor(() -> Ext4FieldRef.isFieldPresent(_test, label),
+                "Field did not appear: " + label, wait);
     }
 
     public void waitForCmp(final String query)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return _test._ext4Helper.queryOne(query, Ext4CmpRef.class) != null;
-            }
-        }, "Ext4 component did not appear for query: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> _test._ext4Helper.queryOne(query, Ext4CmpRef.class) != null,
+                "Ext4 component did not appear for query: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForDisabled(final Ext4CmpRef cmp, final boolean state)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return (Boolean)cmp.getEval("isDisabled() == arguments[0]", state);
-            }
-        }, "Component did not change to disabled = " + state, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitFor(() -> (Boolean)cmp.getEval("isDisabled() == arguments[0]", state),
+                "Component did not change to disabled = " + state, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void addRecordsToAssayTemplate(String[][] data)
@@ -458,14 +440,7 @@ public class LabModuleHelper
 
     public void waitForFile(final File file)
     {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return file.exists();
-            }
-        }, "Unable to find file: " + file.getPath(), WAIT_FOR_PAGE);
+        _test.waitFor(file::exists, "Unable to find file: " + file.getPath(), WAIT_FOR_PAGE);
     }
 
     public static String getBaseName(String fileName)

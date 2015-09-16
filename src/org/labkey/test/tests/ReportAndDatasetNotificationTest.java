@@ -318,16 +318,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
             _extHelper.waitForExtDialog("Success");
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return isTextPresent("Please select at least one") || // group/participant
+        waitFor(() -> isTextPresent("Please select at least one") || // group/participant
                         isTextPresent("No data found") ||
-                        isElementPresent(Locator.css("svg"));
-            }
-        }, "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
+                        isElementPresent(Locator.css("svg")),
+                "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
     }
 
     private void enableEditMode()
