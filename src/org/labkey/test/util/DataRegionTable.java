@@ -147,7 +147,7 @@ public class DataRegionTable extends Component
 
     private boolean bottomBarPresent()
     {
-        return _test.isElementPresent(Locator.css("table#dataregion_footer_" + _tableName));
+        return _test.isElementPresent(Locator.tagWithId("table", "dataregion_footer_" + _tableName));
     }
 
     public boolean hasAggregateRow()
