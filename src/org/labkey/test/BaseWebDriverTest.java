@@ -3500,7 +3500,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if (!previousSignal.isEmpty())
             wait.until(ExpectedConditions.stalenessOf(previousSignal.get(0)));
 
-        WebElement newSignal = waitForElement(Locators.pageSignal(signalName));
+        WebElement newSignal = Locators.pageSignal(signalName).waitForElement(wait);
         return newSignal.getAttribute("value");
     }
 
