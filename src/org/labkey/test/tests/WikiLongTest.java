@@ -464,8 +464,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        click(Locator.linkWithImage(WebTestHelper.getContextPath() + "/_images/partdelete.png"));
-        waitForElementToDisappear(Locator.linkWithImage(WebTestHelper.getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.css("span.fa-times[title='Remove From Page']"));
+        waitForElementToDisappear(Locator.css("span.fa-times[title='Remove From Page']"), WAIT_FOR_JAVASCRIPT);
         assertElementNotPresent(Locator.linkWithText("Welcome"));
 
         log("test wiki TOC customize link");
