@@ -191,17 +191,15 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
-        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
-        _extHelper.waitForExtDialogToDisappear("Save");
-        _ext4Helper.waitForMaskToDisappear();
-        waitForElementToDisappear(Ext4Helper.Locators.window("Saved"));
+        doAndWaitForPageSignal(() -> _ext4Helper.clickWindowButton("Save", "Save", 0, 0), "genericChartDirty");
 
         clickTab("Clinical and Assay Data");
         waitForText("Tests");
         collapseCategory("Tests");
         openReport(PARTICIPANTREPORT_NAME);
         enableEditMode();
-        Locator.XPathLocator deleteButton = Locator.xpath("//img[@data-qtip = 'Delete']");click(deleteButton); // Delete a column.
+        Locator.XPathLocator deleteButton = Locator.xpath("//img[@data-qtip = 'Delete']");
+        click(deleteButton); // Delete a column.
         clickButton("Save", 0);
         waitForElementToDisappear(deleteButton.notHidden());
         _ext4Helper.waitForMaskToDisappear();
