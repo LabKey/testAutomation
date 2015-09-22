@@ -103,7 +103,7 @@ public class WebDavTest extends BaseWebDriverTest
 
         try
         {
-            sardine.list(testURL + "nonexistant/");
+            sardine.list(testURL + "nonexistent/");
             fail("Expected 404");
         }
         catch (IOException x)
