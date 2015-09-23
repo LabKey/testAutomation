@@ -112,6 +112,8 @@ public class SecurityTest extends BaseWebDriverTest
             cantReachAdminToolFromUserAccount(false);
             passwordStrengthTest();
             dumbsterTest();
+            loginSelfRegistrationEnabledTest();
+            loginSelfRegistrationDisabledTest();
         }
         passwordResetTest();
     }
@@ -699,5 +701,65 @@ public class SecurityTest extends BaseWebDriverTest
 
         stopImpersonating();
         resetDbLoginConfig();
+    }
+
+    @LogMethod public void loginSelfRegistrationEnabledTest()
+    {
+        // prep: ensure that user does not currently exist in labkey and  self register is enabled
+        String selfRegUserEmail = "selfreg@test.labkey.local";
+        deleteUsersIfPresent(selfRegUserEmail);
+        try
+        {
+            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=RegistrationEnabled&enabled=true");
+            assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
+        }
+        catch (IOException e){
+            throw (new RuntimeException("failed to enable user self register", e));
+        }
+        signOut();
+
+        // test: attempt login, check if register button appears, click register
+        if (!getDriver().getTitle().equals("Sign In"))
+        {
+            clickAndWait(Locator.linkWithText("Sign In"));
+        }
+        assertTitleEquals("Sign In");
+        assertElementPresent(Locator.tagWithName("form", "login"));
+        clickAndWait(Locator.linkWithText("Register for a new account"));
+
+        assertTitleEquals("Register");
+        assertElementPresent(Locator.tagWithName("form", "register"));
+        setFormElement(Locator.id("email"), selfRegUserEmail);
+        setFormElement(Locator.id("emailConfirmation"), selfRegUserEmail);
+        clickButton("Register", 0);
+        waitForText("We have sent a registration email to " + selfRegUserEmail);
+
+        // cleanup: sign admin back in
+        signIn();
+    }
+
+    @LogMethod public void loginSelfRegistrationDisabledTest()
+    {
+        // prep: ensure self register is disabled
+        try
+        {
+            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=RegistrationEnabled&enabled=false");
+            assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
+        }
+        catch (IOException e){
+            throw (new RuntimeException("failed to disable user self register", e));
+        }
+        signOut();
+
+        // test: attempt login and confirm self register link is not on login screen
+        if (!getDriver().getTitle().equals("Sign In"))
+        {
+            clickAndWait(Locator.linkWithText("Sign In"));
+        }
+        assertTitleEquals("Sign In");
+        assertElementNotPresent(Locator.linkWithText("Register for a new account"));
+
+        // cleanup: sign admin back in
+        signIn();
     }
 }
