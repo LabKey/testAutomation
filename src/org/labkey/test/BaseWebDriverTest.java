@@ -1993,6 +1993,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
+            try
+            {
+                if (isTestRunningOnTeamCity())
+                {
+                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
+                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
+                    getArtifactCollector().dumpPipelineFiles();
+                }
+                if (_testTimeout)
+                    getArtifactCollector().dumpThreads(this);
+            }
+            catch (RuntimeException | Error e)
+            {
+                log("Unable to dump pipeline files");
+                e.printStackTrace(System.out);
+            }
+
             if (error instanceof UnreachableBrowserException || getDriver() == null)
             {
                 return;
@@ -2035,19 +2052,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             try
             {
-                if (isTestRunningOnTeamCity())
-                {
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "sampledata"));
-                    getArtifactCollector().addArtifactLocation(new File(TestFileUtils.getLabKeyRoot(), "build/deploy/files"));
-                    getArtifactCollector().dumpPipelineFiles();
-                }
-                if (_testTimeout)
-                    getArtifactCollector().dumpThreads(this);
                 getArtifactCollector().dumpPageSnapshot(testName, null);
             }
             catch (RuntimeException | Error e)
             {
-                log("Unable to dump failure information");
+                log("Unable to dump screenshots");
                 e.printStackTrace(System.out);
             }
 
