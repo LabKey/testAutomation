@@ -221,14 +221,7 @@ public class ArtifactCollector
 
     public void addArtifactLocation(File path)
     {
-        addArtifactLocation(path, new FileFilter()
-        {
-            @Override
-            public boolean accept(File pathname)
-            {
-                return true;
-            }
-        });
+        addArtifactLocation(path, pathname -> true);
     }
 
     public void dumpPipelineFiles()
@@ -261,15 +254,9 @@ public class ArtifactCollector
 
     private ArrayList<File> listFilesRecursive(File path, final FileFilter filter)
     {
-        FileFilter directoryOrArtifactFilter = new FileFilter()
-        {
-            @Override
-            public boolean accept(File pathname)
-            {
-                return pathname.isDirectory() && !pathname.isHidden() ||
-                       pathname.lastModified() > _testStart && filter.accept(pathname);
-            }
-        };
+        FileFilter directoryOrArtifactFilter = pathname ->
+                pathname.isDirectory() && !pathname.isHidden() ||
+               pathname.lastModified() > _testStart && filter.accept(pathname);
 
         File[] files = path.listFiles(directoryOrArtifactFilter);
         ArrayList<File> allFiles = new ArrayList<>();
