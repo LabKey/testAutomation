@@ -132,16 +132,16 @@ public class ETLScheduler extends LabKeyPage
             return this;
         }
 
-        public boolean isVerboseLoggingEnabled()
-        {
-            return elements().verboseLoggingCheckbox.isSelected();
-        }
-
-        public TransformRow setVerboseLoggingEnabled(boolean enable)
-        {
-            _test.setCheckbox(elements().verboseLoggingCheckbox, enable);
-            return this;
-        }
+//        public boolean isVerboseLoggingEnabled()
+//        {
+//            return elements().verboseLoggingCheckbox.isSelected();
+//        }
+//
+//        public TransformRow setVerboseLoggingEnabled(boolean enable)
+//        {
+//            _test.setCheckbox(elements().verboseLoggingCheckbox, enable);
+//            return this;
+//        }
 
         public String getSchedule()
         {
@@ -238,10 +238,10 @@ public class ETLScheduler extends LabKeyPage
             private final int SOURCE_MODULE = 2;
             private final int SCHEDULE = 3;
             private final int ENABLED = 4;
-            private final int VERBOSE_LOGGING = 5;
-            private final int LAST_STATUS = 6;
-            private final int LAST_RUN = 7;
-            private final int LAST_CHECKED = 8;
+//            private final int VERBOSE_LOGGING = 5;
+            private final int LAST_STATUS = 5;
+            private final int LAST_RUN = 6;
+            private final int LAST_CHECKED = 7;
 
             @Override
             protected SearchContext getContext()
@@ -253,7 +253,7 @@ public class ETLScheduler extends LabKeyPage
             WebElement sourceModule = new LazyWebElement(Locator.css("td:nth-of-type(" + SOURCE_MODULE + ")"), this);
             WebElement schedule = new LazyWebElement(Locator.css("td:nth-of-type(" + SCHEDULE + ")"), this);
             WebElement enabledCheckbox = new LazyWebElement(Locator.css("td:nth-of-type(" + ENABLED + ") input[type=checkbox]"), this);
-            WebElement verboseLoggingCheckbox = new LazyWebElement(Locator.css("td:nth-of-type(" + VERBOSE_LOGGING + ") input[type=checkbox]"), this);
+//            WebElement verboseLoggingCheckbox = new LazyWebElement(Locator.css("td:nth-of-type(" + VERBOSE_LOGGING + ") input[type=checkbox]"), this);
             WebElement lastStatus = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_STATUS + ")"), this);
             WebElement lastRun = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_RUN + ")"), this);
             WebElement lastChecked = new LazyWebElement(Locator.css("td:nth-of-type(" + LAST_CHECKED + ")"), this);
