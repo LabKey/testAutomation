@@ -17,7 +17,6 @@ package org.labkey.test.credentials;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.util.List;
 import java.util.Map;

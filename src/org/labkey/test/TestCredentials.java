@@ -17,6 +17,7 @@ package org.labkey.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.labkey.api.util.FileUtil;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.credentials.Credentials;
 import org.labkey.test.credentials.Server;
 
@@ -57,7 +58,7 @@ public class TestCredentials
         {
             ObjectMapper mapper = new ObjectMapper();
             Credentials parsedOutput = mapper.readValue(getCredentialsFile(), Credentials.class);
-            credentials = parsedOutput.getCredentials();
+            credentials = new CaseInsensitiveHashMap<>(parsedOutput.getCredentials());
         }
         return credentials;
     }
