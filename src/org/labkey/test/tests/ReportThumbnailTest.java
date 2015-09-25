@@ -368,7 +368,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         // NOTE: the checkRevisionNumber here makes an assumption about this being a new thumbnail with no previous thumbnails.
         goToDataViews();
-        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
@@ -424,7 +424,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void setIconSRC(String chart)
     {
         waitForElement(Locator.linkWithText(chart));
-        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
@@ -453,7 +453,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
-        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
@@ -483,7 +483,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void assignCustomIcon(String chart, File icon, int currentRevNum, int nextRevNum)
     {
         goToDataViews();
-        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");

@@ -292,7 +292,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickFolder(STUDY_NAME);
         assertTextPresent(STUDY_DESCRIPTION);
         assertElementPresent(Locator.xpath("//a[contains(@href, 'name=" + PROTOCOL_DOC.getName() + "')]"));
-        clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
+        clickAndWait(Locator.xpath("//a[./span[@title='Edit']]"));
 
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Label"), "Extra " + STUDY_NAME);
