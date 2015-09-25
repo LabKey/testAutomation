@@ -241,7 +241,7 @@ public class DataViewsTest extends ParticipantListTest
 
     private void enableEditMode()
     {
-        waitAndClick(Locator.css("a>img[title=Edit]"));
+        waitAndClick(Locator.css("a>span[title=Edit]"));
         waitForElement(Locator.css("span[class~=edit-views-link]"), WAIT_FOR_JAVASCRIPT);
     }
 
