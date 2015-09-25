@@ -937,7 +937,7 @@ public class AssayTest extends AbstractAssayTest
 
         //edit study properties
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study"));
-        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        click(Locator.tagWithAttribute("span", "title", "Edit"));
         waitForElement(Locator.name("Investigator"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Investigator"), INVESTIGATOR);
         setFormElement(Locator.name("Grant"), GRANT);
