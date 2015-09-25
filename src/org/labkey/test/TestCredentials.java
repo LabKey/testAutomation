@@ -37,7 +37,7 @@ public class TestCredentials
         if (!credentialsFile.exists())
         {
             String error = String.format("Unable to load test credentials [%s]. Use 'server/test/test.credentials.json.template' as a basis and/or specify credentials file with test.credentials.file property.", credentialsFile.getAbsolutePath());
-            credentialsFile = null;
+            TestCredentials.credentialsFile = null;
             throw new IllegalArgumentException(error);
         }
     }
@@ -60,6 +60,17 @@ public class TestCredentials
             credentials = parsedOutput.getCredentials();
         }
         return credentials;
+    }
+
+    public static boolean hasCredentials(String serverKey)
+    {
+        try
+        {
+            return getCredentials().containsKey(serverKey);
+        }
+        catch (IOException ignore) {}
+
+        return false;
     }
 
     public static Server getServer(String serverKey) throws IOException

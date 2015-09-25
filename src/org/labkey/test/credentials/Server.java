@@ -17,8 +17,10 @@ package org.labkey.test.credentials;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bean for an individual server's credentials
@@ -30,6 +32,7 @@ public class Server
     private String host;
     private List<Login> logins;
     private List<ApiKey> apiKeys;
+    private Map<String, Object> extraValues;
 
     public String getKey()
     {
@@ -69,5 +72,15 @@ public class Server
     public void setApiKeys(List<ApiKey> apiKeys)
     {
         this.apiKeys = apiKeys;
+    }
+
+    public Map<String, Object> getExtraValues()
+    {
+        return extraValues;
+    }
+
+    public void setExtraValues(Map<String, Object> extraValues)
+    {
+        this.extraValues = extraValues;
     }
 }

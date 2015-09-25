@@ -425,7 +425,6 @@ src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
 src/org/labkey/test/tests/AbstractExportTest.java -text
 src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
-src/org/labkey/test/tests/AbstractMS2ImportTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
@@ -497,7 +496,6 @@ src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/KnitrReportTest.java -text
 src/org/labkey/test/tests/LabModulesTest.java -text
-src/org/labkey/test/tests/LibraTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
@@ -505,9 +503,6 @@ src/org/labkey/test/tests/ListPublishTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LookupToSampleIDTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
-src/org/labkey/test/tests/MS2ExportTest.java -text
-src/org/labkey/test/tests/MS2GZTest.java -text
-src/org/labkey/test/tests/MS2Test.java -text
 src/org/labkey/test/tests/MenuBarTest.java -text
 src/org/labkey/test/tests/MessagesLongTest.java -text
 src/org/labkey/test/tests/MicroarrayTest.java -text
@@ -521,7 +516,6 @@ src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
 src/org/labkey/test/tests/PipelineCancelTest.java -text
-src/org/labkey/test/tests/PipelineTest.java -text
 src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
@@ -606,8 +600,6 @@ src/org/labkey/test/tests/WebpartPermissionsTest.java -text
 src/org/labkey/test/tests/WikiLongTest.java -text
 src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
-src/org/labkey/test/tests/XTandemShortTest.java -text
-src/org/labkey/test/tests/XTandemTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
 src/org/labkey/test/unsupported/PepDBModuleTest.java -text
