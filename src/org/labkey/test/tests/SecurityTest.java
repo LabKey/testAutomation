@@ -710,7 +710,7 @@ public class SecurityTest extends BaseWebDriverTest
         deleteUsersIfPresent(selfRegUserEmail);
         try
         {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=RegistrationEnabled&enabled=true");
+            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true");
             assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
         }
         catch (IOException e){
@@ -743,7 +743,7 @@ public class SecurityTest extends BaseWebDriverTest
         // prep: ensure self register is disabled
         try
         {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=RegistrationEnabled&enabled=false");
+            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false");
             assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
         }
         catch (IOException e){
