@@ -99,7 +99,7 @@ public class Ext4Helper extends AbstractHelper
         _test.waitForElement(Locators.comboListItem());
     }
 
-    private void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
+    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
     {
         Locator.XPathLocator listItem = Locators.comboListItem();
 
