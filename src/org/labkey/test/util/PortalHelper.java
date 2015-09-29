@@ -239,15 +239,7 @@ public class PortalHelper extends AbstractHelper
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
         int startCount = _test.getElementCount(Locators.webPartTitle(webPartTitle));
-        if (_test.isElementPresent(Locators.sideWebpartTitle.withText(webPartTitle)))
-        {
-            clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
-        }
-        else
-        {
-            Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[span[@title='Remove From Page']]");
-            _test.click(removeButton);
-        }
+        clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
         _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
     }
@@ -337,11 +329,7 @@ public class PortalHelper extends AbstractHelper
 
         Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
         String panelClass = portalPanel.findElement(_test.getDriver()).getAttribute("class");
-        if (panelClass.contains("labkey-body-panel"))
-        {
-            Locator.xpath("//span[@title='Move "+direction+"']").findElement(webPart).click();
-        }
-        else if (panelClass.contains("labkey-side-panel"))
+        if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel") )
         {
             clickWebpartMenuItem(webPartTitle, false, "Move " + direction.toString());
         }

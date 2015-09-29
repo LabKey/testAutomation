@@ -148,31 +148,21 @@ public class PortalTest extends BaseWebDriverTest
         for (String webpartTitle : requiredWebparts)
         {
             log("Check required webpart: " + webpartTitle);
-            if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
-            {
-                click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
-                assertElementNotPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
-                click(Locator.id("search-input")); // dismiss menu
-            }
-            else
-                assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]").withPredicate("not(.//a/img[@title='Remove From Page'])"));
+            click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
+            waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
+            assertElementNotPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
+            click(Locator.id("search-input")); // dismiss menu
         }
 
         log(preferredWebparts.size() > 0 ? "Assert that preferred webparts can't be deleted" : "No preferred webparts");
         for (String webpartTitle : preferredWebparts)
         {
             log("Check preferred webpart: " + webpartTitle);
-            if (isElementPresent(PortalHelper.Locators.sideWebpartTitle.withText(webpartTitle)))
-            {
-                click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-                waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
-                assertElementPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
-                click(Locator.id("search-input")); // dismiss menu
-            }
-            else
-                assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]//a/span[@title='Remove From Page']"));
-        }
+            click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
+            waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
+            assertElementPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
+            click(Locator.id("search-input")); // dismiss menu
+         }
 
         List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(getDriver());
         webparts.addAll(PortalHelper.Locators.sideWebpartTitle.findElements(getDriver()));
