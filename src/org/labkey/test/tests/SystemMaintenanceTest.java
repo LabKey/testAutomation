@@ -50,16 +50,11 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
     {
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
-        // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
+
+        // Manually start system maintenance... we'll check for completion below
         startSystemMaintenance();
 
-        goToAdmin();
-        clickAndWait(Locator.linkWithText("Site Settings"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("usageReportingLevel", "MEDIUM"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "HIGH"));
-        clickButton("Save");
-
-        // Now that the test is done, ensure that system maintenance is complete...
+        // Ensure that system maintenance is complete...
         waitForSystemMaintenanceCompletion();
 
         // Verify scheduled system maintenance is disabled.

@@ -1576,6 +1576,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     private static long smStart = 0;
+    private static String smUrl = null;
 
     public void startSystemMaintenance()
     {
@@ -1585,7 +1586,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void startSystemMaintenance(String taskName)
     {
         Map<String, String> urlParams = new HashMap<>();
-        urlParams.put("temp", "true");
+        urlParams.put("test", "true");
         if (!taskName.isEmpty())
             urlParams.put("taskName", taskName);
         String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
@@ -1594,7 +1595,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
         request.setRequestMethod("POST");
         request.copySession(getDriver());
-        assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, request.getResponse().getResponseCode());
+        SimpleHttpResponse response = request.getResponse();
+        assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, response.getResponseCode());
+        smUrl = response.getResponseBody();
     }
 
     public void waitForSystemMaintenanceCompletion()
@@ -1602,12 +1605,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
         long elapsed = System.currentTimeMillis() - smStart;
 
-        beginAt(WebTestHelper.buildURL("admin", "systemmaintenance"));
-
+        // Navigate to pipeline details page, then refresh page and check for system maintenance complete, up to 10 minutes from the start of the test
+        beginAt(smUrl);
         int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
-        // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
-        waitFor(() -> isTextPresent("System maintenance complete"),
-                "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
+        waitForTextWithRefresh(timeLeft > 0 ? timeLeft : 0, "System maintenance complete");
     }
 
     private void populateLastPageInfo()
