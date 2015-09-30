@@ -253,10 +253,11 @@ public class PortalHelper extends AbstractHelper
     {
         addWebPart("Query");
 
+        _test.waitForElement(Locator.css(".schema-loaded-marker"));
+
         if (title != null)
             _test.setFormElement(Locator.name("title"), title);
 
-        _test.waitForElement(Locator.css(".schema-loaded-marker"));
         _test._ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
 
         if (queryName != null)
@@ -329,7 +330,7 @@ public class PortalHelper extends AbstractHelper
 
         Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
         String panelClass = portalPanel.findElement(_test.getDriver()).getAttribute("class");
-        if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel") )
+        if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel"))
         {
             clickWebpartMenuItem(webPartTitle, false, "Move " + direction.toString());
         }
