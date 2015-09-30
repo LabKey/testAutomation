@@ -464,7 +464,8 @@ public class WikiLongTest extends BaseWebDriverTest
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        click(Locator.css("span.fa-times[title='Remove From Page']"));
+        click(Locator.css("span.labkey-wp-icon-button-active span.fa-caret-down"));
+        click(Locator.xpath("//div[contains(@class, 'x4-panel')]//div[contains(@class, 'x4-component')]//span[contains(@class, 'x4-menu-item-text')][text() = 'Remove From Page']"));
         waitForElementToDisappear(Locator.css("span.fa-times[title='Remove From Page']"), WAIT_FOR_JAVASCRIPT);
         assertElementNotPresent(Locator.linkWithText("Welcome"));
 
