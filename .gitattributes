@@ -297,8 +297,9 @@ src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/CachingLocator.java -text
 src/org/labkey/test/Cleanable.java -text
+src/org/labkey/test/ExtraSiteWrapper.java -text
 src/org/labkey/test/LabKeyJDBCTest.java -text
-src/org/labkey/test/LabKeyWebDriverWrapper.java -text
+src/org/labkey/test/LabKeySiteWrapper.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Locators.java -text
 src/org/labkey/test/ModulePropertyValue.java -text
@@ -312,6 +313,7 @@ src/org/labkey/test/TestProperties.java -text
 src/org/labkey/test/TestScrubber.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text
+src/org/labkey/test/WebDriverWrapper.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text

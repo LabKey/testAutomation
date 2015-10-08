@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -38,7 +39,7 @@ public class TextSearcher
         this.sourceGetter = sourceGetter;
     }
 
-    public TextSearcher(final BaseWebDriverTest test)
+    public TextSearcher(final WebDriverWrapper test)
     {
         this(test::getHtmlSource);
     }

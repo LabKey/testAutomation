@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -29,11 +30,13 @@ import static org.labkey.test.Locator.NOT_HIDDEN;
 
 import static org.junit.Assert.*;
 
-public class ExtHelper extends AbstractHelper
+public class ExtHelper
 {
-    public ExtHelper(BaseWebDriverTest test)
+    WebDriverWrapper _test;
+
+    public ExtHelper(WebDriverWrapper test)
     {
-        super(test);
+        _test = test;
     }
 
     public void clickMenuButton(String menusLabel, String... subMenuLabels)

@@ -18,8 +18,15 @@ package org.labkey.test;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineToolsHelper;
 
-public class TestScrubber extends LabKeyWebDriverWrapper
+import java.io.File;
+
+public class TestScrubber extends ExtraSiteWrapper
 {
+    public TestScrubber(BrowserType browserType, File downloadDir)
+    {
+        super(browserType, downloadDir);
+    }
+
     @LogMethod
     public void cleanSiteSettings()
     {

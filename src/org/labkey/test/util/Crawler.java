@@ -20,7 +20,7 @@ import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeyWebDriverWrapper;
+import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.UnhandledAlertException;
@@ -38,7 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class Crawler
 {
@@ -734,11 +735,11 @@ public class Crawler
                 TestLogger.log("Crawl failure: collecting origin page info.");
                 String originUrl = origin.toString();
                 int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                try (LabKeyWebDriverWrapper originBrowser = new LabKeyWebDriverWrapper())
+                try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(BaseWebDriverTest.getCurrentTest().getBrowserType(), BaseWebDriverTest.getDownloadDir()))
                 {
                     originBrowser.simpleSignIn();
                     originBrowser.beginAt(originUrl.substring(relativeURLStart));
-                    originBrowser.getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
+                    BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
                 }
                 catch (Exception ignore) {}
             }

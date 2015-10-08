@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 
@@ -29,14 +30,14 @@ import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 
 public class PipelineToolsHelper
 {
-    private BaseWebDriverTest _test;
+    private LabKeySiteWrapper _test;
     private static String _originalToolsDir = null;
     private static String _currentToolsDir = null;
     private static String _pathSeparator = File.pathSeparator;
     private static final String _defaultToolsDirectory = (new File(getLabKeyRoot() + "/build/deploy/bin")).getAbsoluteFile().toString();
     private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
 
-    public PipelineToolsHelper(BaseWebDriverTest test)
+    public PipelineToolsHelper(LabKeySiteWrapper test)
     {
         _test = test;
     }

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -30,14 +31,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class Ext4Helper extends AbstractHelper
+public class Ext4Helper
 {
     private static final String DEFAULT_CSS_PREFIX = "x4-";
     private static String _cssPrefix = DEFAULT_CSS_PREFIX;
 
-    public Ext4Helper(BaseWebDriverTest test)
+    WebDriverWrapper _test;
+
+    public Ext4Helper(WebDriverWrapper test)
     {
-        super(test);
+        _test = test;
         resetCssPrefix();
     }
 
@@ -541,7 +544,7 @@ public class Ext4Helper extends AbstractHelper
             if (Locator.id(id).findElements(_test.getDriver()).size() > 0)
                 ids.add(id); // ignore uninitialized ext components
         }
-        return _test._ext4Helper.componentsFromIds(ids, clazz);
+        return componentsFromIds(ids, clazz);
     }
 
     public <Type extends Ext4CmpRef> Type queryOne(String componentSelector, Class<Type> clazz)
@@ -651,7 +654,7 @@ public class Ext4Helper extends AbstractHelper
             return Locator.tagWithClass("*", _cssPrefix + "boundlist-item").notHidden();
         }
 
-        public static Locator.XPathLocator checkbox(BaseWebDriverTest test, String label)
+        public static Locator.XPathLocator checkbox(WebDriverWrapper test, String label)
         {
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'" + _cssPrefix + "form-checkbox')][../label[text()='" + label + "']]");
             if (!test.isElementPresent(l))
@@ -659,7 +662,7 @@ public class Ext4Helper extends AbstractHelper
             return l;
         }
 
-        public static Locator.XPathLocator radiobutton(BaseWebDriverTest test, String label)
+        public static Locator.XPathLocator radiobutton(WebDriverWrapper test, String label)
         {
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'" + _cssPrefix + "form-radio')][../label[contains(text(), '" + label + "')]]");
             if (!test.isElementPresent(l))

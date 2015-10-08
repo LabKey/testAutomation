@@ -17,26 +17,35 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
- * Placeholder
- * This class should contain most basic page interaction functionality
+ * This class should, eventually, contain most basic page interaction functionality
  * {@link org.labkey.test.BaseWebDriverTest} currently does this
  */
-public class LabKeyPage
+public class LabKeyPage extends WebDriverWrapper
 {
+    @Deprecated
     protected BaseWebDriverTest _test;
+    private WebDriver _driver;
 
-    public LabKeyPage(BaseWebDriverTest test)
+    public LabKeyPage(WebDriverWrapper test)
     {
-        _test = test;
+        _test = (BaseWebDriverTest)test;
+        _driver = _test.getDriver();
         waitForPage();
     }
 
-    public WebDriver getDriver()
+    @Override
+    public WebDriver getWrappedDriver()
     {
-        return _test.getDriver();
+        return _driver;
     }
 
     protected void waitForPage() {}

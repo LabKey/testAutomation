@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class RelativeUrl
         _parameters.put(param, value);
     }
 
-    public void navigate(BaseWebDriverTest test)
+    public void navigate(WebDriverWrapper test)
     {
         test.beginAt(toString());
     }
