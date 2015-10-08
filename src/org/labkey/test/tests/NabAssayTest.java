@@ -452,6 +452,16 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("assay"));
         assertNabData(true);
 
+        // Delete a single run (regression test for issue 24487)
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickAndWait(Locator.linkWithText("View Runs"));
+
+        DataRegionTable dataRegionTable = new DataRegionTable("Runs", this);
+        dataRegionTable.checkCheckbox(0);
+        clickButton("Delete", "Confirm Delete");
+        clickButton("Confirm Delete");
+
         doSchemaBrowserTest();
 
         doResolverTypeTest();
