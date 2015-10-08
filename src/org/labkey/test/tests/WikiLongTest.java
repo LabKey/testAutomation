@@ -201,6 +201,7 @@ public class WikiLongTest extends BaseWebDriverTest
         _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT);
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
+
         File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
         _wikiHelper.saveWikiPage();
@@ -466,8 +467,8 @@ public class WikiLongTest extends BaseWebDriverTest
         clickTab("Portal");
         click(Locator.css("span.labkey-wp-icon-button-active span.fa-caret-down"));
         click(Locator.xpath("//div[contains(@class, 'x4-panel')]//div[contains(@class, 'x4-component')]//span[contains(@class, 'x4-menu-item-text')][text() = 'Remove From Page']"));
-        waitForElementToDisappear(Locator.css("span.fa-times[title='Remove From Page']"), WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.linkWithText("Welcome"));
+        if(isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-wiki')]//h3[contains(@class, 'heading-1')][text()='Page AAA']")))
+            waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'labkey-wiki')]//h3[contains(@class, 'heading-1')][text()='Page AAA']"), WAIT_FOR_JAVASCRIPT);
 
         log("test wiki TOC customize link");
         _portalHelper.addWebPart("Wiki Table of Contents");
