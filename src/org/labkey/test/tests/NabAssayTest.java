@@ -854,15 +854,15 @@ public class NabAssayTest extends AbstractQCAssayTest
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
     }
 
-    private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "0", "11",
-            "107916.0", " ", " ", "Specimen 5", "Specimen 5, Replicate 1", "2", "1", " ", "A11");
-    private static final List<String> expectedRow12 = Arrays.asList("ptid + visit", " ", "CELL_CONTROL_SAMPLE", "1", "0",
-            "993.0", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1", " ", "B0");
+    private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "1", "12",
+            "107916.0", " ", " ", "Specimen 5", "Specimen 5, Replicate 1", "2", "1", " ", "A12");
+    private static final List<String> expectedRow12 = Arrays.asList("ptid + visit", " ", "CELL_CONTROL_SAMPLE", "2", "1",
+            "993.0", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1", " ", "B1");
 
-    private static final List<String> expectedDilRow10 = Arrays.asList("ptid + visit", "4860.0", "6", "6.30088397355677E-4", "0.0225827354894656",
-            "107300.0", "110753.0", "109026.5", "2441.6397154371484", "Specimen 2", "Specimen 2, Replicate 3", "Specimen 2", "20.0", "43740.0", "1");
+    private static final List<String> expectedDilRow10 = Arrays.asList("ptid + visit", "4860.0", "6", "0.06%", "0.022583",
+            "107300.0", "110753.0", "109026.5", "2441.6397", "Specimen 2", "Specimen 2, Replicate 3", "Specimen 2", "20.0", "43740.0", "1");
     private static final List<String> expectedDilRow40 = Arrays.asList("ptid + visit", " ", " ", " ", " ",
-            "903.0", "1083.0", "974.875", "58.40606010631823", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1");
+            "903.0", "1083.0", "974.875", "58.4061", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1");
 
     protected void testWellAndDilutionData()
     {
