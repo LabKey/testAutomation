@@ -266,33 +266,12 @@ public class ScriptValidationTest extends SimpleModuleTest
         }
         catch (CommandException e)
         {
-            assertEquals("TestErrorInComplete error field two", e.getMessage());
+            assertEquals("TestErrorInComplete error global four!", e.getMessage());
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
-                "\"exception\":\"TestErrorInComplete error field two\"," +
+                "\"exception\":\"TestErrorInComplete error global four!\"," +
                 "\"success\":false" +
                 "\"errors\":[{" +
-                    "\"errors\":[{" +
-                        "\"id\":\"Hex\"," +
-                        "\"field\":\"Hex\"," +
-                        "\"message\":\"TestErrorInComplete error field two\"," +
-                        "\"msg\":\"TestErrorInComplete error field two\"" +
-                    "},{" +
-                        "\"id\":\"Hex\"," +
-                        "\"field\":\"Hex\"," +
-                        "\"message\":\"TestErrorInComplete error field three\"," +
-                        "\"msg\":\"TestErrorInComplete error field three\"" +
-                    "}]," +
-                    "\"schemaName\":\"vehicle\"," +
-                    "\"queryName\":\"Colors\"," +
-                    "\"exception\":\"TestErrorInComplete error field two\"," +
-                    "\"rowNumber\":3," +
-                    "\"row\":{" +
-                        "\"Name\":\"TestErrorInComplete!\"," +
-                        "\"Hex\":null" +
-                        "\"_rowNumber\":3" +
-                    "}" +
-                "},{" +
                     "\"errors\":[{" +
                         "\"id\":\"Name\"," +
                         "\"field\":\"Name\"," +

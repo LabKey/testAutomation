@@ -67,7 +67,7 @@ function beforeInsert(row, errors) {
         return false;
 
     if (row.Name == "TestErrorInComplete")
-        errors.Hex = "TestErrorInComplete error field one";
+        errorsInComplete = true;
 
     // Values can be transformed during insert and update
     row.Name = row.Name + "!";
@@ -133,16 +133,6 @@ function afterDelete(row, errors) {
 // called once after insert/update/delete
 function complete(event, errors) {
     if (event == "insert") {
-
-        for (var i in errors) {
-            var error = errors[i];
-            // DEV NOTE: This is a little wierd: the value of error.Hex is the
-            // stringified form of the error.Hex field error list and so is
-            // bracketed by [ and ] which might be unexpected in the script.
-            // Assigning to 'Hex' adds new error messages.  Old ones can't be removed.
-            if (error.Hex == "[TestErrorInComplete error field one]")
-                error.Hex = [ "TestErrorInComplete error field two", "TestErrorInComplete error field three" ];
-        }
 
         for (var i in rows) {
             var row = rows[i];
