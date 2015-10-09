@@ -780,6 +780,11 @@ public class Ext4Helper
             return Locator.tag("tr").withClass(_cssPrefix + "grid-row");
         }
 
+        public static Locator.XPathLocator getGridDataRow()
+        {
+            return Locator.tag("tr").withClass(_cssPrefix + "grid-data-row");
+        }
+
         /**
          * @param cellText Exact text from any cell in the desired row
          * @param index 0-based index of rows with matching cellText
