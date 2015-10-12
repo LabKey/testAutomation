@@ -215,7 +215,7 @@
         <pathelement location="${test.build.home}/classes" />
     </path>
 
-    <target name="compile" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
+    <target name="build" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
         <loadfile property="moduleDirectories" srcfile="${modulesFile.fullpath}">
             <filterchain>
                 <striplinecomments>
@@ -377,14 +377,14 @@
         <ant antfile="${javaclient.build.xml}" target="jar" inheritall="false"/>
     </target>
 
-    <target name="setPassword" depends="compile">
+    <target name="setPassword" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
         </java>
     </target>
 
-    <target name="setTeamcityAgentPassword" depends="compile">
+    <target name="setTeamcityAgentPassword" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
@@ -393,14 +393,14 @@
         </java>
     </target>
 
-    <target name="ensurePassword" depends="compile">
+    <target name="ensurePassword" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="ensure"/>
         </java>
     </target>
 
-    <target name="deletePassword" depends="compile">
+    <target name="deletePassword" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil" failonerror="true">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="delete"/>
@@ -491,7 +491,7 @@
         </condition>
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
+    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,build,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
         <fail unless="tomcat.home" />
 
         <!--Can't pass empty values to jvmarg on Linux; use a dummy value instead-->
@@ -1017,7 +1017,7 @@
       </waitfor>
     </target>
 
-    <target name="runsuite" depends="compile,package-chrome-extensions,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started, install-rpackages">
+    <target name="runsuite" depends="build,package-chrome-extensions,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started, install-rpackages">
         <junit fork="true" forkmode="once" maxmemory="512m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltOnError}"
@@ -1074,7 +1074,7 @@
     </target>
 
     <!-- for testing the TestHelper ui -->
-    <target name="testhelper-test" depends="compile,set-user-props">
+    <target name="testhelper-test" depends="build,set-user-props">
         <java classname="org.labkey.test.testpicker.TestHelper" fork="true">
             <classpath refid="test.run.classpath"/>
         </java>
@@ -1149,7 +1149,7 @@
         <ant antfile="${project.root}/tools/Rpackages/build.xml" target="install-rpackages"/>
     </target>
 
-    <target name="studysampler" depends="compile">
+    <target name="studysampler" depends="build">
         <copy file="${test.src.home}/org/labkey/test/studysampler/words.txt" todir="${test.build.home}/classes/"/>
         <java classname="org.labkey.test.studysampler.Runner">
             <classpath refid="test.run.classpath"/>
@@ -1279,7 +1279,7 @@
         <antcall target="skipfish_fail"/>
     </target>
 
-    <target name="skipfish_getCredentials" depends="compile">
+    <target name="skipfish_getCredentials" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil" outputproperty="skipfish.credentials" failonerror="true">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="getSkipfishCredentials"/>
