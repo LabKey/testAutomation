@@ -142,6 +142,6 @@ UNDONE: need to fix the merge case
         // verify the Last Status values and links to job logs
         goToModule("DataIntegration");
         click(_etlHelper.findLastStatusCell(TRANSFORM_BYRUNID, ETLHelper.COMPLETE, true));
-        assertTextPresent("transformrun = 42");
+        waitForText("transformrun = 42");
     }
 }

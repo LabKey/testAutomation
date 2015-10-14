@@ -820,7 +820,7 @@ public class ETLHelper
                     "Created By",
                     "Modified",
                     "Modified By",
-                    "Exprunid",
+//                    "Exprunid",
                     "Job Id",
                     "Transform Run Log"}, null);
 
