@@ -175,7 +175,7 @@ public class ETLTest extends ETLBaseTest
         assertTextPresent("Column not found: etl_source.monkeys");
         errors.clear();
 
-        errors.add("contains value not castable to a date");
+        errors.add("contains value not castable");
         _etlHelper.runETLandCheckErrors(TRANSFORM_BADCAST, false, true, errors);
         errors.clear();
 
@@ -191,7 +191,7 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.disableScheduledRun("Error Bad Source Schema");
         clickTab("Portal");
         Assert.assertTrue(countText("java.lang.IllegalArgumentException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
-        //no way of knowing error count due to scheduled job running unkown number of times
+        //no way of knowing error count due to scheduled job running unknown number of times
         pushLocation();
         resetErrors();
         popLocation();
