@@ -281,18 +281,19 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         int ignored = ignoreSampleminded ? 2 : 0;
         int invalid = hasInvalid ? 1 : 0;
-        int specimen = bySpecimenId ? 0 : 2;
+        int query = bySpecimenId ? 0 : 3;
+        int expected = bySpecimenId ? 0 : 2;
 
         waitForElement(tableLoc);
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
         assertEquals(5 - invalid, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
-        assertEquals(1 + specimen, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(query, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
         assertEquals(2 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
         assertEquals(2 - ignored, getElementCount(Locator.xpath("//td[contains(@class, 'received')]")));
         assertEquals(invalid, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        assertEquals(12 - specimen, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(12 - expected, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
