@@ -201,6 +201,7 @@ modules/simpletest/resources/queries/vehicle/Toyotas.sql -text
 modules/simpletest/resources/queries/vehicle/TransactionTest.sql -text
 modules/simpletest/resources/queries/vehicle/Vehicles/.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
+modules/simpletest/resources/queries/vehicle/Vehicles/EditableFileBasedView.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/Filter[!!-~]On[!!-~]Letter[!!-~]P.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/SortOnModelYear.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
