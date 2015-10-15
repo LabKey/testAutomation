@@ -119,22 +119,22 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     protected void doVerifySteps() throws Exception
     {
-//        doTestRestrictedModule();
-//        doTestCustomFolder();
-//        doTestSchemas();
-//        doTestTableAudit();
-//        doTestViews();
-//        doTestWebParts();
-//        doTestModuleProperties();
-//        doTestQueries();
-//        doTestQueryViews();
-//        doTestReports();
-//        doTestInsertUpdateViews();
-//        doTestParameterizedQueries();
-//        doTestContainerColumns();
-//        doTestFilterSort();
-//        doTestImportTemplates();
-//        doTestDatasetsAndFileBasedQueries();
+        doTestRestrictedModule();
+        doTestCustomFolder();
+        doTestSchemas();
+        doTestTableAudit();
+        doTestViews();
+        doTestWebParts();
+        doTestModuleProperties();
+        doTestQueries();
+        doTestQueryViews();
+        doTestReports();
+        doTestInsertUpdateViews();
+        doTestParameterizedQueries();
+        doTestContainerColumns();
+        doTestFilterSort();
+        doTestImportTemplates();
+        doTestDatasetsAndFileBasedQueries();
         doTestViewEditing();
     }
 
@@ -458,18 +458,18 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("view history"));
         clickAndWait(Locator.linkContainingText("view history"));
 
-        table = new DataRegionTable("query", this, false, true);
+        table = new DataRegionTable("query", this, true, true);
         assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
         pushLocation();
-        clickAndWait(table.link(1, 0));
+        clickAndWait(table.detailsLink(1));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         //assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
 
         popLocation();
-        clickAndWait(table.link(5, 0));
+        clickAndWait(table.detailsLink(5));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         assertElementPresent(Locator.xpath("//i[text() = 'A row was inserted.']"));
 
@@ -481,15 +481,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("view data"));
 
         table = new DataRegionTable("query", this, true, true);
-        clickAndWait(table.link(0, 1));
+        clickAndWait(table.detailsLink(0));
 
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
-        table = new DataRegionTable("query", this, false, true);
+        table = new DataRegionTable("query", this, true, true);
         assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
-        clickAndWait(table.link(0, 0));
+        clickAndWait(table.detailsLink(0));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         assertElementPresent(Locator.xpath("//td[contains(text(), 'Prius C') and contains(text(), 'Prius')]"));
 
@@ -668,7 +668,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("CreatedBy");
         _customizeViewsHelper.applyCustomView();
-        assertTextPresent("is unsaved", "Created By");
+        // Wait for the save button to appear
+        waitForElement(Locator.xpath("//table//div[contains(@class, 'labkey-dataregion-msg')]/span[contains(@class, 'unsavedview-save')]"));
         _customizeViewsHelper.saveUnsavedViewGridClosed(null);
         waitForText("Crazy People Copy");
 
