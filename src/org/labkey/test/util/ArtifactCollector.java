@@ -100,14 +100,14 @@ public class ArtifactCollector
         }
     }
 
-    public void dumpThreads(BaseWebDriverTest baseWebDriverTest)
+    public void dumpThreads()
     {
         if (!isLocalServer())
             return;
 
         File threadDumpRequest = new File(TestFileUtils.getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
         threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
-        baseWebDriverTest.log("Threads dumped to standard labkey log file");
+        TestLogger.log("Threads dumped to standard labkey log file");
     }
 
     public void dumpPageSnapshot(String testName, @Nullable String subdir)

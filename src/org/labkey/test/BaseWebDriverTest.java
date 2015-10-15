@@ -1187,7 +1187,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     getArtifactCollector().dumpPipelineFiles();
                 }
                 if (_testTimeout)
-                    getArtifactCollector().dumpThreads(this);
+                    getArtifactCollector().dumpThreads();
             }
             catch (RuntimeException | Error e)
             {
@@ -1408,6 +1408,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 leakCRC = crc.getValue();
                 getArtifactCollector().dumpHeap();
+                getArtifactCollector().dumpThreads();
                 fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
             }
 
