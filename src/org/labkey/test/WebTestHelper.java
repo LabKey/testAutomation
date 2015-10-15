@@ -43,9 +43,9 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
-import org.seleniumhq.jetty7.util.URIUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -241,7 +241,7 @@ public class WebTestHelper
         if (containerPath != null)
         {
             url.append("/");
-            url.append(URIUtil.encodePath(containerPath));
+            url.append(EscapeUtil.encode(containerPath));
         }
 
         url.append("/");

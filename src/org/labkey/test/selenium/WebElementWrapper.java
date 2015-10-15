@@ -17,7 +17,9 @@ package org.labkey.test.selenium;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
@@ -113,5 +115,11 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement
     public String getCssValue(String propertyName)
     {
         return getWrappedElement().getCssValue(propertyName);
+    }
+
+    @Override
+    public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException
+    {
+        return getWrappedElement().getScreenshotAs(target);
     }
 }
