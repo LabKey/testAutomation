@@ -83,7 +83,7 @@ public class PivotQueryTest extends BaseWebDriverTest
 
         log("** Verifing pivot table contents");
         // First "Participant" data cell
-        Locator Participant_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[1]");
+        Locator Participant_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[2]");
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell

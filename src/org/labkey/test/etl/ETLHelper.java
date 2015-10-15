@@ -679,8 +679,8 @@ public class ETLHelper
         //
         void verifyResults()
         {
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assertEquals(_columns.length, drt.getColumnCount());
+            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
+            assertEquals(_columns.length, drt.getColumnCount()-1);
             assertEquals(_data.size(), drt.getDataRowCount());
 
             for (int row = 0; row < _data.size(); row++)
@@ -837,8 +837,8 @@ public class ETLHelper
         @Override
         protected void verifyResults()
         {
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assertTrue("column length mismatch for data region " + getDataRegionName(), _columns.length == drt.getColumnCount());
+            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
+            assertTrue("column length mismatch for data region " + getDataRegionName(), _columns.length == drt.getColumnCount()-1);
             assertEquals(1, drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));
