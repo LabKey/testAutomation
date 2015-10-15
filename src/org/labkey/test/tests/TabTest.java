@@ -19,11 +19,14 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -104,8 +107,19 @@ public class TabTest extends SimpleModuleTest
         // TODO: Test import/export of renamed tabs if applicable
         // See Issue 16929: Folder tab order & names aren't retained through folder export/import
 
-        portalHelper.deleteTab("RENAMED TAB 1");
+        //Delete tab while on different  Tab
+        String tab2Delete = "RENAMED TAB 1";
+        clickAndWait(Locator.linkWithText(tab2Delete));
         portalHelper.deleteTab("Test Tab 2");
+        shortWait();
+        List<BodyWebPart> bodyparts = portalHelper.getBodyWebParts();
+        assertTrue("Webparts failed to load after tab delete while on page", bodyparts != null && bodyparts.size() > 0);
+        assertNotNull(getText(PortalHelper.Locators.activeTab.containing(tab2Delete)));
+
+        //Delete tab while on the Tab
+        portalHelper.deleteTab(tab2Delete);
+        bodyparts = portalHelper.getBodyWebParts();
+        assertTrue("Webparts failed to load after tab delete", bodyparts != null && bodyparts.size() > 0);
     }
 
     @LogMethod

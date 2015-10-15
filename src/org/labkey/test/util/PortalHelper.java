@@ -200,6 +200,12 @@ public class PortalHelper extends AbstractHelper
         return bodyWebParts;
     }
 
+    public BodyWebPart getBodyWebPart(String partName)
+    {
+        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(_test.getDriver());
+        return new BodyWebPart(_test, el);
+    }
+
     public List<SideWebPart> getSideWebParts()
     {
         List<WebElement> webPartElements = Locator.css(".labkey-side-panel > table[name=webpart]").findElements(_test.getDriver());
@@ -456,5 +462,7 @@ public class PortalHelper extends AbstractHelper
         {
             return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
         }
+
+        public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");
     }
 }
