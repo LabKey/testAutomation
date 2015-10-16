@@ -340,6 +340,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonate(String fakeUser)
     {
+        scrollIntoView(Locators.USER_MENU);
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
         _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");

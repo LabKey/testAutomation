@@ -1796,6 +1796,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         Locator.XPathLocator folderBar = Locator.id("folderBar").withText();
         waitForElement(folderBar);
         waitForFolderNavigationReady();
+        scrollIntoView(folderBar);
         click(folderBar);
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }

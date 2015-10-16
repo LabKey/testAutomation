@@ -79,12 +79,14 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         //_ext4Helper.selectRadioButton ("Visibility","Hidden");
         _ext4Helper.uncheckCheckbox("Shared");
         _ext4Helper.clickWindowButton("Report 1","Save",0,0);
+        sleep(500);
         clickFolder("My Study");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 2");
         _ext4Helper.selectComboBoxItem("Author","author");
         _ext4Helper.checkCheckbox("Shared");
         _ext4Helper.clickWindowButton("Report 2","Save",0,0);
+        sleep(500);
         clickFolder("My Study");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 3");
@@ -96,14 +98,17 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     protected void doVerifySteps()
 
     {
+        sleep(500);
         impersonate ("editor@test.com");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 4");
         _ext4Helper.clickWindowButton("Report 4","Save",0,0);
+        sleep(500);
         stopImpersonating();
 
         clickProject("StudyVerifyProject");
         clickFolder("My Study");
+        sleep(500);
         impersonate("author@test.com");
         PortalHelper portalHelper1 = new PortalHelper(this);
         portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
