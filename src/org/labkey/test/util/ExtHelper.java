@@ -404,11 +404,8 @@ public class ExtHelper
     {
         Locator.XPathLocator comboArrow = parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]");
         _test.click(comboArrow);
-        Locator.XPathLocator comboList = Locator.xpath("//div").withClass("x-combo-list");
-        _test.waitFor(() -> _test.isElementVisible(comboList), 1000);
         Locator.XPathLocator comboListItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
         _test.waitAndClick(comboListItem);
-       // _test.waitForFormElementToEqual(parentLocator.append(Locator.tagWithClass("input", "x-form-text")), selection);
         if (_test.isElementPresent(comboListItem))
         {
             _test.click(comboArrow);
