@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static org.labkey.test.TestProperties.isHeapDumpCollectionEnabled;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 
@@ -134,6 +135,8 @@ public class ArtifactCollector
         if (!isLocalServer())
             return;
         if ( _test.isGuestModeTest() )
+            return;
+        if (!isHeapDumpCollectionEnabled())
             return;
 
         _test.pushLocation();
