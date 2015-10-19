@@ -273,10 +273,10 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected final void assertPythonScriptContents(String pythonScript, int expectedLineCount, String testColumn)
     {
         String[] linesInScript = pythonScript.split("\n");
-        assertTrue("Wrong number of lines in script", expectedLineCount <= linesInScript.length);
+        assertTrue("Wrong number of lines in script [" + linesInScript.length + "]. Expected >" + expectedLineCount, expectedLineCount <= linesInScript.length);
         if (null != testColumn)
         {
-            assertTrue("Script is missing spefified filter", pythonScript.contains(testColumn));
+            assertTrue("Script is missing filter for column '" + testColumn + "'", pythonScript.contains(testColumn));
         }
     }
 
