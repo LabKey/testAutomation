@@ -100,6 +100,11 @@ public abstract class TestProperties
         return "never".equals(System.getProperty("systemMaintenance"));
     }
 
+    public static boolean isHeapDumpCollectionEnabled()
+    {
+        return "true".equals(System.getProperty("enable.heap.dump"));
+    }
+
     public static String ensureChromedriverExeProperty()
     {
         final String key = "webdriver.chrome.driver";
