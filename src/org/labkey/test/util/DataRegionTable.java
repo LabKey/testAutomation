@@ -464,6 +464,20 @@ public class DataRegionTable extends Component
         return "No data to show.".equals(_getDataAsText(getHeaderRowCount(), 0));
     }
 
+    public WebElement findCell(int row, String column)
+    {
+        if (getColumn(column) < 0)
+            throw new NoSuchElementException("No such column '" + column + "'");
+        return findCell(row, getColumn(column));
+    }
+
+    public WebElement findCell(int row, int column)
+    {
+        row += getHeaderRowCount();
+        column += _selectors ? 1 : 0;
+        return Locator.css("tr:nth-of-type(" + (row + 1) + ") > td:nth-of-type(" + (column + 1) + ")").findElement(_tableElement);
+    }
+
     public String getDataAsText(int row, int column)
     {
         return _getDataAsText(row + getHeaderRowCount(), column + (_selectors ? 1 : 0));
