@@ -19,6 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -168,7 +171,8 @@ public class WikiHelper
         _test.waitForElement(Locator.id("wiki-input-window-change-format-to"));
         _test.selectOptionByValue(Locator.id("wiki-input-window-change-format-to"), format);
         _test.clickButton("Convert", 0);
-        _test.waitForElement(Locator.id("status").containing("Converted."));
+        WebElement status = _test.waitForElement(Locator.id("status").containing("Converted."));
+        _test.waitFor(() -> !status.isDisplayed(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     /**
