@@ -613,20 +613,19 @@ public class Ext4Helper
         menu.click();
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            Locator parentLocator = Locators.menuItem(subMenuLabels[i]).notHidden();
-            _test.waitForElement(parentLocator, 1000);
-            _test.clickAt(parentLocator, 5, 5, 0);
+            WebElement subMenuItem = _test.waitForElement(Locators.menuItem(subMenuLabels[i]).notHidden(), 1000);
+            _test.scrollIntoView(subMenuItem);
+            _test.clickAt(subMenuItem, 5, 5, 0);
         }
-        Locator itemLocator = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden();
+        WebElement item = _test.waitForElement(Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
         if (onlyOpen)
-        {
-            _test.waitForElement(itemLocator, 1000);
             return;
-        }
+
+        _test.scrollIntoView(item);
         if (wait)
-            _test.waitAndClickAndWait(itemLocator);
+            _test.clickAndWait(item);
         else
-            _test.waitAndClick(itemLocator);
+            item.click();
     }
 
     @LogMethod(quiet = true)
