@@ -77,7 +77,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
     private static final String WIKI_PAGE2_CONTENT =
             "1 Page AAA\n" +
-            "[Welcome|" + WIKI_PAGE1_NAME + "]";
+            "[Welcome to the WikiLongTest|" + WIKI_PAGE1_NAME + "]";
 
     private static final String WIKI_PAGE3_CONTENT =
             "<b>Some HTML content</b>\n" +
@@ -179,7 +179,7 @@ public class WikiLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("body"), WIKI_PAGE2_CONTENT);
         _wikiHelper.saveWikiPage();
 
-        clickAndWait(Locator.linkWithText("Welcome"));
+        clickAndWait(Locator.linkWithText("Welcome to the WikiLongTest"));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
 
         searchFor(PROJECT_NAME, "\"Page AAA\"", 1, WIKI_PAGE2_TITLE);
@@ -247,7 +247,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("next"));
         assertTextPresent("Some HTML content");
         clickAndWait(Locator.linkWithText("previous"));
-        assertTextPresent("Welcome");
+        assertTextPresent("Welcome to the WikiLongTest");
 
         log("Check sibling order edit works");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
@@ -373,7 +373,7 @@ public class WikiLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         sleep(500);
         clickButton("Submit");
-        clickAndWait(Locator.linkWithText("Welcome"));
+        clickAndWait(Locator.linkWithText("Welcome to the WikiLongTest"));
         log("make sure it all got copied");
         click(Locator.navTreeExpander(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
@@ -428,7 +428,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
-        assertTextNotPresent("Welcome");
+        assertTextNotPresent("Welcome to the WikiLongTest");
         log("Also check copying permission");
         clickTab("Wiki");
         portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
