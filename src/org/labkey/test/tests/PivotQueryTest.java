@@ -87,15 +87,15 @@ public class PivotQueryTest extends BaseWebDriverTest
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell
-        Locator ParticipantCount_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[2]");
+        Locator ParticipantCount_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[3]");
         assertElementContains(ParticipantCount_cell, "5");
 
         // First "ConcInRange_MIN" data cell
-        Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[3]");
+        Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[4]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // First "ConcInRange_CONCAT" data cell
-        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[6]");
+        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[7]");
         String contents = getText(ConcInRange_CONCAT_cell);
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
