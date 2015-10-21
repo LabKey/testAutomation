@@ -82,10 +82,15 @@ public class PipelineStatusTable extends DataRegionTable
 
     public int getJobRow(String name)
     {
+        return getJobRow(name, false);
+    }
+
+    public int getJobRow(String name, boolean descriptionStartsWith)
+    {
         int i = 0;
         for (String description : getMapDescriptionStatus().keySet())
         {
-            if (name.equals(description))
+            if (name.equals(description) || (descriptionStartsWith && description.startsWith(name)))
                 return i;
             i++;
         }

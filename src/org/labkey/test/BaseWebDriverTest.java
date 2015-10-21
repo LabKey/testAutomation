@@ -3071,10 +3071,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns)
     {
+        deletePipelineJob(jobDescription, deleteRuns, false);
+    }
+
+    @LogMethod
+    protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns, @LoggedParam boolean descriptionStartsWith)
+    {
         goToModule("Pipeline");
 
         PipelineStatusTable table = new PipelineStatusTable(this, true, false);
-        int tableJobRow = table.getJobRow(jobDescription);
+        int tableJobRow = table.getJobRow(jobDescription, descriptionStartsWith);
         assertNotEquals("Failed to find job rowid", -1, tableJobRow);
         table.checkCheckbox(tableJobRow);
 
