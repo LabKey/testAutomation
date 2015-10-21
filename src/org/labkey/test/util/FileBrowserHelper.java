@@ -109,7 +109,14 @@ public class FileBrowserHelper
         final Locator folderTreeNodeSelected = folderTreeNode.withClass("x4-grid-row-selected");
         if (!_test.isElementPresent(folderTreeNodeSelected))
         {
-            _test.doAndWaitForPageSignal(() -> _test.click(folderTreeNode), IMPORT_SIGNAL_NAME);
+            try
+            {
+                _test.doAndWaitForPageSignal(() -> _test.click(folderTreeNode), IMPORT_SIGNAL_NAME);
+            }
+            catch (StaleElementReferenceException staleSignal)
+            {
+                _test.waitForElement(Locators.pageSignal(IMPORT_SIGNAL_NAME));
+            }
             waitForGrid();
         }
     }
