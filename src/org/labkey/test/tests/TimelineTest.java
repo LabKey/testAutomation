@@ -26,9 +26,13 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyA.class, Wiki.class})
 public class TimelineTest extends BaseWebDriverTest
@@ -152,7 +156,10 @@ public class TimelineTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
         waitForElement(Locator.tagContainingText("div", "Jane Janeson"), 10000);
         click(Locator.tagContainingText("div", "Jane Janeson"));
-        assertTextPresent("Hi Jane I am the description");
+        WebElement popupBody = waitForElement(Locator.css(".timeline-event-bubble-body"));
+        assertEquals("Wrong text in timeline popup", "Hi Jane I am the description", popupBody.getText());
+        click(Locator.xpath("//div[contains(@style, 'close-button.png')]"));
+        shortWait().until(ExpectedConditions.stalenessOf(popupBody));
     }
 
     private void removeTestPage()
