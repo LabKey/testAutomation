@@ -55,6 +55,7 @@ data/api/webdavTest.html -text
 data/api/webdavTest.js -text
 data/api/workbookAPITest.html -text
 modules/ETLtest/module.properties -text
+modules/ETLtest/resources/ETLs/ListAToListB.xml -text
 modules/ETLtest/resources/ETLs/merge.xml -text
 modules/chartingapi/module.properties -text
 modules/chartingapi/resources/views/begin.html -text
@@ -382,6 +383,7 @@ src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/etl/ETLBaseTest.java -text
 src/org/labkey/test/etl/ETLClientApiCommandTest.java -text
 src/org/labkey/test/etl/ETLHelper.java -text
+src/org/labkey/test/etl/ETLListTest.java -text
 src/org/labkey/test/etl/ETLRemoteSourceTest.java -text
 src/org/labkey/test/etl/ETLSimpleTransformTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text

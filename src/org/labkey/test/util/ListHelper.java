@@ -331,9 +331,14 @@ public class ListHelper extends AbstractHelper
 
     public void importListArchive(String folderName, File inputFile)
     {
+        _test.clickFolder(folderName);
+        importListArchive(inputFile);
+    }
+
+    public void importListArchive(File inputFile)
+    {
         assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
-        _test.clickFolder(folderName);
         if (!_test.isElementPresent(Locator.linkWithText("Lists")))
         {
             PortalHelper portalHelper = new PortalHelper(_test);

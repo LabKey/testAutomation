@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>List A to List B</name>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <source schemaName="lists" queryName="ListA" />
+            <destination schemaName="lists" queryName="ListB" targetOption="merge"/>
+        </transform>
+    </transforms>
+</etl>
