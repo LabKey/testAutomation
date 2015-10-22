@@ -173,7 +173,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         // set the assay plan
         String assayPlanTxt = "My assay plan " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
         setFormElement(Locator.name("assayPlan"), assayPlanTxt);
-        clickButton("Save");
+        clickButton("Save", 1000);
 
         checkRhoQueryRowCount("AssaySpecimenVisit", 35);
         checkRhoQueryRowCount("AssaySpecimenMap", 35);
