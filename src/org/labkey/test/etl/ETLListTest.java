@@ -1,14 +1,14 @@
 package org.labkey.test.etl;
 
-import org.junit.BeforeClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 
@@ -19,7 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Category({InDevelopment.class})
+@Category({DailyB.class})
 public class ETLListTest extends BaseWebDriverTest
 {
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
