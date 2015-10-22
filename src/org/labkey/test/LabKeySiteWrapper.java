@@ -16,9 +16,12 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -30,6 +33,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
@@ -239,18 +243,57 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     @LogMethod(quiet = true)
-    public void disableMiniProfiler()
+    public boolean disableMiniProfiler()
+    {
+        boolean restoreMiniProfiler = isMiniProfilerEnabled();
+        setMiniProfilerEnabled(false);
+        return restoreMiniProfiler;
+    }
+
+    @LogMethod(quiet = true)
+    public boolean isMiniProfilerEnabled()
     {
         Connection cn = createDefaultConnection(true);
-        Command command = new Command("mini-profiler", "setEnabled");
-        command.setParameters(new HashMap<String, Object>(Maps.of("enabled", "false")));
+        Command command = new Command("mini-profiler", "enabled");
         try
         {
-            command.execute(cn, null);
+            CommandResponse r = command.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            if (response.containsKey("success") && (Boolean)response.get("success"))
+            {
+                Map<String, Object> data = (Map<String, Object>)response.get("data");
+                return (Boolean)data.get("enabled");
+            }
         }
         catch (IOException | CommandException e)
         {
-            throw new RuntimeException("Failed to disable mini-profiler", e);
+            throw new RuntimeException("Failed to get mini-profiler enabled state", e);
+        }
+
+        return false;
+    }
+
+    @LogMethod
+    public void setMiniProfilerEnabled(boolean enabled)
+    {
+        Connection cn = createDefaultConnection(true);
+        PostCommand setEnabled = new PostCommand("mini-profiler", "enabled");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("enabled", enabled);
+        setEnabled.setJsonObject(jsonObject);
+        try
+        {
+            CommandResponse r = setEnabled.execute(cn, null);
+            Map<String, Object> response = r.getParsedData();
+            if (response.containsKey("success") && (Boolean)response.get("success"))
+            {
+                Map<String, Object> data = (Map<String, Object>)response.get("data");
+                log("MiniProfiler state updated, enabled=" + data.get("enabled"));
+            }
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException("Failed to " + (enabled ? "enable" : "disable") + " mini-profiler", e);
         }
     }
 

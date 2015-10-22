@@ -897,6 +897,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String BEFORE_CLASS = "BeforeClass";
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
+    private static boolean reenableMiniProfiler = false;
     private static Class testClass;
     private static int testCount;
     private static int currentTestNumber;
@@ -991,7 +992,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         signIn();
         enableEmailRecorder();
-        disableMiniProfiler();
+        reenableMiniProfiler = disableMiniProfiler();
         resetErrors();
 
         if (isSystemMaintenanceDisabled())
@@ -1022,6 +1023,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (beforeClassSucceeded)
         {
+            if (reenableMiniProfiler)
+                getCurrentTest().setMiniProfilerEnabled(true);
+
             getCurrentTest().doPostamble();
         }
     }
