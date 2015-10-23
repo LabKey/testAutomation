@@ -1386,15 +1386,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             if (attempt > 0)
             {
-                log("Found " + leakCount + " in-use objects; rerunning GC. ("
-                        + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
-
-                // If another thread (e.g., SearchService) is doing work then give it 10 seconds before trying again
-                if (isElementPresent(Locators.labkeyError.containing("Active thread(s) may have objects in use:")))
-                {
-                    log("Pausing 10 seconds to wait for active thread");
-                    sleep(10000);
-                }
+                log("Found " + leakCount + " in-use objects; rerunning GC. (" + (GC_ATTEMPT_LIMIT - attempt) + " attempt(s) remaining.)");
+                log("Pausing 10 seconds to wait for any active threads");
+                sleep(10000);
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
