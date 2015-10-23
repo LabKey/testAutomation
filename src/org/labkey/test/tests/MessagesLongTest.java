@@ -179,7 +179,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.id("body"), HTML_BODY);
         selectOptionByText(Locator.name("rendererType"), "HTML");
-        clickButton("Submit", 1000);
+        clickButton("Submit", defaultWaitForPage * 2);
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
         assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
