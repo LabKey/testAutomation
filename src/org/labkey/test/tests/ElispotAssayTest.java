@@ -340,7 +340,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.applyCustomView();
 
         DataRegionTable dataTable = new DataRegionTable("Data", this);
-        List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
+        List<String> cellWell = dataTable.getColumnDataAsText("Cells per Well");
         List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
         List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
 
@@ -394,12 +394,14 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         String[] expectedMedians = new String[]{"13333.3", "13333.3", "126666.7", "40000.0"};
 
         int row = 0;
+        int columnIdx = 9; //DataRegionTable doesn't map the subheaders so you can't use the column names
         for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, 8));
+            assertEquals(mean, table.getDataAsText(row++, columnIdx));
 
         row = 0;
+        columnIdx++; //Increment column to look at median column
         for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, 9));
+            assertEquals(median, table.getDataAsText(row++, columnIdx));
         PlateSummary plateSummary = new PlateSummary(this, 1);
         assertEquals(Arrays.asList(new String[]{"0.0","5.0","2.0","2.0","1.0","0.0","689.0","641.0","726.0","746.0","621.0","727.0"}), plateSummary.getRowValues(1));
 
@@ -580,14 +582,16 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 //        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);      // TODO: we're not showing by default now
 
         int row = 0;
+        int columnIdx = 9; //DataRegionTable doesn't map the subheaders so you can't use the column names
         String[] expectedMeans = new String[]{"0.0", "2271111.1", "1111.1", "4444.4"};
         for (String mean : expectedMeans)
-            assertEquals(mean, table.getDataAsText(row++, 8));
+            assertEquals(mean, table.getDataAsText(row++, columnIdx));
 
         row = 0;
+        columnIdx++;
         String[] expectedMedians = new String[]{"0.0", "2376666.7", "3333.3", "6666.7"};
         for (String median : expectedMedians)
-            assertEquals(median, table.getDataAsText(row++, 9));
+            assertEquals(median, table.getDataAsText(row++, columnIdx));
         PlateSummary plateSummary = new PlateSummary(this, 1);
         assertEquals(Arrays.asList(new String[]{"809.0","859.0","821.0","924.0","799.0","833.0","805.0","781.0","782.0","673.0","303.0","TNTC"}), plateSummary.getRowValues(3));
         //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
