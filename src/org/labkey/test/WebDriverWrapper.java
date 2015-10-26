@@ -637,6 +637,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void goToSchemaBrowser()
     {
         goToModule("Query");
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.lk-sb-instructions")));
+        waitForElement(Locators.pageSignal("queryTreeRendered"));
     }
 
     public void goToFolderManagement()
@@ -1436,18 +1438,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 "Page failed to load", millis);
         _testTimeout = false;
         _preppedForPageLoad = false;
-    }
-
-    public void waitForExtReady()
-    {
-        ((JavascriptExecutor) getDriver()).executeAsyncScript(
-                "var callback = arguments[arguments.length - 1];" +
-                        "if(window['Ext4'])" +
-                        "   Ext4.onReady(callback);" +
-                        "else if(window['Ext'])" +
-                        "   Ext.onReady(callback);" +
-                        "else" +
-                        "   callback();");
     }
 
     /**

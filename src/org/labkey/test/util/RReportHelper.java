@@ -194,7 +194,9 @@ public class RReportHelper extends AbstractHelper
             {
                 scripts.editEngine(defaultScriptName);
                 rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
-                return getRVersion(rExecutable);
+                String rVersion = getRVersion(rExecutable);
+                _test.clickButton("Cancel", 0);
+                return rVersion;
             }
             else // Reset R scripting engine on TeamCity
                 scripts.deleteEngine(defaultScriptName);

@@ -21,6 +21,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class ConfigureReportsAndScriptsHelper
     public void addEngine(@LoggedParam EngineType type, EngineConfig config)
     {
         _test._extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), "New " + type + " Engine");
-        _test.waitForElement(Locators.editEngineWindow);
+        WebElement window = _test.waitForElement(Locators.editEngineWindow);
 
         Map<Locator, String> configMap = config.getConfigMap();
 
@@ -67,7 +69,7 @@ public class ConfigureReportsAndScriptsHelper
         String language = _test.getFormElement(Locator.id("editEngine_languageName"));
 
         _test.clickButton("Submit", 0);
-        _test.waitForElementToDisappear(Locators.editEngineWindow);
+        _test.shortWait().until(ExpectedConditions.stalenessOf(window));
         _test.waitForElement(Locators.enginesGridRowForLanguage(language));
     }
 

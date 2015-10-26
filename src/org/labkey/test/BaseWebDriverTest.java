@@ -1772,10 +1772,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void hoverProjectBar()
     {
-        waitForElement(Locators.projectBar);
         waitForHoverNavigationReady();
+        mouseOver(Locators.projectBar);
         click(Locators.projectBar);
-        waitForElement(Locator.css("#projectBar_menu .project-nav"));
+        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")));
     }
 
     public void clickProject(String project)
@@ -2756,12 +2756,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             schemaWithParents += separator + schemaPart;
             separator = ".";
 
-            log("Selecting schema " + schemaWithParents + " in the schema browser...");
             Locator.XPathLocator loc = Locator.schemaTreeNode(schemaPart);
 
             //first load of schemas might a few seconds
-            waitForElement(loc, 30000);
             shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
+            Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
+
+            if (isElementPresent(selectedSchema))
+                continue; // already selected
+            log("Selecting schema " + schemaWithParents + " in the schema browser...");
             click(Locator.css("body")); // Dismiss tooltip
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
@@ -2769,8 +2772,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 scrollIntoView(loc);
             }
             catch (StaleElementReferenceException ignore) {}
-            click(loc);
-            waitForElement(Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart), 60000);
+            doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
+            waitForElement(selectedSchema, 60000);
         }
     }
 
