@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,22 +120,26 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         enableModules(Collections.singletonList(moduleName));
     }
 
-    public void enableModules(List<String> moduleNames)
+    @Deprecated
+    public void enableModules(List<String> moduleNames, boolean checkFirst)
     {
-        enableModules(moduleNames, false);
+        enableModules(moduleNames);
     }
 
-    // NOTE: consider using this pathway all the time (e.g. drop the the checkFirst flag).
-    public void enableModules(List<String> moduleNames, boolean checkFirst)
+    public void enableModules(List<String> moduleNames)
     {
         _test.goToFolderManagement();
         _test.clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
-            Locator loc = Locator.checkboxByTitle(moduleName);
-            if(checkFirst)
-                assertTrue(moduleName + " module was not detected. Check that the module is installed and you are on the supported backend.", _test.isElementPresent(loc));
-            _test.checkCheckbox(loc);
+            try
+            {
+                _test.checkCheckbox(Locator.checkboxByTitle(moduleName));
+            }
+            catch (NoSuchElementException missingModule)
+            {
+                fail(moduleName + " module was not found. Check that the module is installed and you are on a supported database.");
+            }
         }
         _test.clickButton("Update Folder");
     }
