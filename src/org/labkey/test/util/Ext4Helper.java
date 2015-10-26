@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -607,9 +608,22 @@ public class Ext4Helper
         _test.waitForElement(Locators.mask(), wait);
     }
 
+    public void waitForOnReady()
+    {
+        ((JavascriptExecutor) _test.getDriver()).executeAsyncScript(
+                "var callback = arguments[arguments.length - 1];" +
+                "if(window['Ext4'])" +
+                "   Ext4.onReady(callback);" +
+                "else if(window['Ext'])" +
+                "   Ext.onReady(callback);" +
+                "else" +
+                "   callback();");
+    }
+
     @LogMethod(quiet = true)
     public void clickExt4MenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
+        waitForOnReady();
         menu.click();
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
