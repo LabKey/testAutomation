@@ -169,12 +169,14 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         // make modifications
         openReport(TIMECHART_NAME);
-        clickButton("Edit", "Save As");
+        waitForElement(Locator.css("svg"));
+        clickButton("Edit");
+        waitForElement(Locator.css("svg"));
         clickButton("Grouping", "Grouping Options");
         _ext4Helper.selectRadioButton("Participants");
-        clickButton("OK", 0);
+        doAndWaitForElementToRefresh(() -> clickButton("OK", 0), Locator.css("svg"), shortWait());
         clickButtonByIndex("Save", 0, 0);
-        waitForText("Viewable By");
+        waitForElement(Ext4Helper.Locators.window("Save"));
         saveReport(false);
 
         openReport(R_NAME);
@@ -184,10 +186,12 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Save");
 
         openReport(PLOT_NAME);
-        clickButton("Edit", "Save As");
+        waitForElement(Locator.css("svg"));
+        clickButton("Edit");
+        waitForElement(Locator.css("svg"));
         clickButton("Options", "Plot Options");
         _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
-        clickButton("OK", 0);
+        doAndWaitForElementToRefresh(() -> clickButton("OK", 0), Locator.css("svg"), shortWait());
         _ext4Helper.waitForMaskToDisappear();
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
