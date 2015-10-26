@@ -396,7 +396,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     @LogMethod
     protected void importAnalysis_selectFCSFiles(String containerPath, final SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
-        waitForExtReady();
+        _ext4Helper.waitForOnReady();
         if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
             _fileBrowserHelper.waitForFileGridReady();
 

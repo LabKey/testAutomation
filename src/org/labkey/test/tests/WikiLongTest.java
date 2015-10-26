@@ -279,14 +279,14 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check that discussion board works");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        waitForExtReady();
+        _ext4Helper.waitForOnReady();
         click(Locator.linkWithText("discussion"));
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickAndWait(Locator.linkWithText("Start new discussion"));
         setFormElement(Locator.name("title"), DISC1_TITLE);
         setFormElement(Locator.id("body"), DISC1_BODY);
         submit();
-        waitForExtReady();
+        _ext4Helper.waitForOnReady();
         click(Locator.linkWithText("see discussions (1)"));
         clickAndWait(Locator.linkWithText(DISC1_TITLE));
         assertTextPresent(DISC1_TITLE,
