@@ -213,6 +213,7 @@ modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS
 modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.report.xml -text
 modules/simpletest/resources/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/resources/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
+modules/simpletest/resources/reports/schemas/lists/People/peopleKnitr.report.xml -text
 modules/simpletest/resources/reports/schemas/schemaFolderReport.r -text
 modules/simpletest/resources/schemas/LinkedVehicle.template.xml -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-1.00.sql -text
@@ -551,6 +552,7 @@ src/org/labkey/test/tests/SecurityShortTest.java -text
 src/org/labkey/test/tests/SecurityTest.java -text
 src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
+src/org/labkey/test/tests/SharedReportTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SiteWideTermsOfUseTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text

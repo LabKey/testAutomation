@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor descriptorType="rReportDescriptor" reportName="peopleKnitr" reportKey="lists/People" xmlns="http://labkey.org/query/xml" xmlns:rep="http://labkey.org/data/xml/reportProps">
+  <Properties>
+    <Prop name="descriptorType">rReportDescriptor</Prop>
+    <Prop name="reportName">Knitr People</Prop>
+    <Prop name="version">15.1</Prop>
+    <Prop name="reportType">ReportService.rReport</Prop>
+    <Prop name="queryName">People</Prop>
+    <Prop name="schemaName">lists</Prop>
+    <Prop name="dataRegionName">query</Prop>
+    <Prop name="cached">true</Prop>
+    <Prop name="script"><![CDATA[##
+#  Copyright (c) 2015 LabKey Corporation
+#
+#  Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+##
+```{r knitr}
+library(knitr)
+opts_chunk$set(cache.path = file.path(labkey.file.root, "cache/testcache", labkey.user.email, ""))
+```
+
+```{r libs, cache = FALSE}
+library("pheatmap")
+```
+
+```{r param-caching, cache=TRUE, cache.extra=digest::digest(labkey.data), echo=FALSE}
+```
+
+
+```{r data, cache = TRUE, dependson="param-caching"}
+#mat <- matrix(rnorm(1e8, sd = 4), ncol = 1e4)
+mat <- matrix(rnorm(100*100, sd = 4), ncol = 100)
+head(labkey.data)
+```
+
+
+```{r heatmap, cache = TRUE, dependson="data"}
+#pheatmap(mat[100,100], main = labkey.data$age[1], cluster_rows=FALSE, cluster_cols=FALSE, breaks=seq(-6,6,1))
+plot(labkey.data[3])
+```]]></Prop>
+    <Prop name="sourceTabVisible">false</Prop>
+    <Prop name="runInBackground">false</Prop>
+    <Prop name="knitrFormat">Markdown</Prop>
+    <Prop name="modified">2015-10-26</Prop>
+  </Properties>
+  <tags>
+    <rep:property>
+      <rep:propDef name="thumbnailType" label="ThumbnailType" type="http://www.w3.org/2001/XMLSchema#string"/>
+      <rep:propValue value="AUTO"/>
+    </rep:property>
+    <rep:property>
+      <rep:propDef name="thumbnailRevision" label="ThumbnailRevision" type="http://www.w3.org/2001/XMLSchema#int"/>
+      <rep:propValue value="3.0"/>
+    </rep:property>
+  </tags>
+</ReportDescriptor>
