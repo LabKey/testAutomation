@@ -213,6 +213,7 @@ modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS
 modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.report.xml -text
 modules/simpletest/resources/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/resources/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
+modules/simpletest/resources/reports/schemas/lists/People/peopleKnitr.r -text
 modules/simpletest/resources/reports/schemas/lists/People/peopleKnitr.report.xml -text
 modules/simpletest/resources/reports/schemas/schemaFolderReport.r -text
 modules/simpletest/resources/schemas/LinkedVehicle.template.xml -text
