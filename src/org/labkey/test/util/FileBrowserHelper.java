@@ -15,10 +15,13 @@
  */
 package org.labkey.test.util;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -293,7 +296,7 @@ public class FileBrowserHelper
         {
             _test.log("Opening upload panel...");
             _test.click(BrowserAction.UPLOAD.button());
-            _test.waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            WebElement uploadPanelEl = _test.waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);            _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(uploadPanelEl));
             _test.fireEvent(BrowserAction.UPLOAD.button(), BaseWebDriverTest.SeleniumEvent.mouseout); // Dismiss qtip
         }
     }
@@ -320,16 +323,28 @@ public class FileBrowserHelper
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);
 
-        _test.doAndWaitForPageSignal(() -> {
-            _test.clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.doAndWaitForElementToRefresh(() -> {
+            _test.shortWait().until(new Function<WebDriver, WebElement>()
+            {
+                @Override
+                public WebElement apply(@Nullable WebDriver driver)
+                {
+                    _test.clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+                    // Button will have 'hover' styling if click didn't work
+                    return _test.waitForElement(Ext4Helper.Locators.ext4Button("Upload").withoutClass("x4-over"), 500);
+                }
+            });
 
             if (replace)
             {
-                _test.waitForElement(Ext4Helper.Locators.window("File Conflict:"));
+                _test.waitForElement(Ext4Helper.Locators.window("File Conflict:"), 500);
                 _test.assertTextPresent("Would you like to replace it?");
                 _test.clickButton("Yes", 0);
             }
-        }, IMPORT_SIGNAL_NAME);
+        }, Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(file.getName()), _test.shortWait());
+
+        if (description != null)
+            _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(description));
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
@@ -348,10 +363,6 @@ public class FileBrowserHelper
             for (FileBrowserExtendedProperty prop : fileProperties)
                 _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(prop.getValue()));
         }
-
-        _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(file.getName()));
-        if (description != null)
-            _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(description));
 
         // verify that the description field is empty
         _test.assertFormElementEquals(Locator.name("description"), "");
