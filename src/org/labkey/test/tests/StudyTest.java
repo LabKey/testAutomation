@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -907,6 +908,7 @@ public class StudyTest extends StudyBaseTest
         DataRegionTable drt = new DataRegionTable("Dataset", this);
         DataRegionExportHelper exportHelper = new DataRegionExportHelper(drt);
         exportHelper.exportText();
+        scrollIntoView(Locators.ADMIN_MENU);
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
