@@ -51,6 +51,7 @@ public class DataRegionExportHelper
         _test._extHelper.clickSideTab("Excel");
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         _test.checkRadioButton(type.getRadioLocator());
+        _test.scrollIntoView(Locator.lkButton("Export to Excel"));
         return _test.clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
     }
 
