@@ -2762,7 +2762,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
             Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
 
-            if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart) || isElementPresent(selectedSchema))
+            if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart))
+                waitForElement(selectedSchema);
+            if (isElementPresent(selectedSchema))
                 continue; // already selected
             log("Selecting schema " + schemaWithParents + " in the schema browser...");
             click(Locator.css("body")); // Dismiss tooltip
