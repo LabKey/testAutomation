@@ -774,7 +774,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToProjectHome();
         clickFolder(getFolderName());
         waitForElement(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"));
-        clickAt(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"), 1, 1, 0);
+        click(Locator.xpath("//a[.='" + parentName + "']/..//..//a[.='Republish']"));
         _extHelper.waitForExtDialog("Republish Study");
 
 
