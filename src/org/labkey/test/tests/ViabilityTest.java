@@ -25,6 +25,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.TextSearcher;
 
 import java.io.File;
 import java.util.List;
@@ -216,12 +217,14 @@ public class ViabilityTest extends AbstractViabilityTest
     {
         log("** Checking ResultSpecimens lookups");
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=assay&query.queryName=" + getAssayName() + " ResultSpecimens");
-        assertTextPresent("foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
+        DataRegionTable table = new DataRegionTable("query", this);
+        assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens", null,
-                new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"});
-        assertTextNotPresent("foobar");
-        assertTextPresent("161400006.11-5", "105.78%", "20,000,000.0", "CEL");
+                new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits", "SpecimenID/AssayMatch"});
+        table = new DataRegionTable("query", this);
+        assertTextNotPresent(new TextSearcher(table.getComponentElement()::getText), "foobar");
+        assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "161400006.11-5", "105.78%", "20,000,000.0", "CEL");
     }
 
     protected void runTransformTest()
