@@ -376,6 +376,7 @@ public class PortalHelper extends AbstractHelper
             _test.click(Locator.tagWithText("div", folder));
         }
         _test.click(Locator.tagWithText("span", "Save"));
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     /**
