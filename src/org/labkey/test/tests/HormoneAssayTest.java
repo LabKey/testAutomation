@@ -431,10 +431,10 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("PC U2 00153152_Progesterone_19.57", new String[]{"PC U2 00153152", "", "Progesterone", "19.57", "ng/ml", "Pos Control", "", "", ""});
         expected.put("Subject4_Progesterone_0", new String[]{"Subject4", "2012-01-05", "Progesterone", "0", "ng/ml", "Unknown", "DU", "2", ""});
         expected.put("Subject4_Estradiol_189.59", new String[]{"Subject4", "2012-01-05", "Estradiol", "189.59", "pg/ml", "Unknown", "DU", "2", ""});
-        expected.put("Subject5_Progesterone_-0.05", new String[]{"Subject5", "2012-01-06", "Progesterone", "-0.05", "ng/ml", "Unknown", "MD1", "4", "Test, Blank greater than result"});
-        expected.put("Subject5_Estradiol_4.92", new String[]{"Subject5", "2012-01-06", "Estradiol", "4.92", "pg/ml", "Unknown", "MD1", "4", "Test"});
+        expected.put("Subject5_Progesterone_-0.05", new String[]{"Subject5", "2012-01-06", "Progesterone", "-0.05", "ng/ml", "Unknown", "MD1", "4", "<Test, Blank greater than result"});
+        expected.put("Subject5_Estradiol_4.92", new String[]{"Subject5", "2012-01-06", "Estradiol", "4.92", "pg/ml", "Unknown", "MD1", "4", "<Test"});
         expected.put("Subject6_Progesterone_-8.37", new String[]{"Subject6", "2012-01-07", "Progesterone", "-8.37", "ng/ml", "Unknown", "MA", "10", "Blank greater than result"});
-        expected.put("Subject6_Estradiol_-3.46", new String[]{"Subject6", "2012-01-07", "Estradiol", "-3.46", "pg/ml", "Unknown", "MA", "10", "Test, Blank greater than result"});
+        expected.put("Subject6_Estradiol_-3.46", new String[]{"Subject6", "2012-01-07", "Estradiol", "-3.46", "pg/ml", "Unknown", "MA", "10", "<Test, Blank greater than result"});
         expected.put("Subject7_Progesterone_5.37", new String[]{"Subject7", "2012-01-08", "Progesterone", "5.37", "ng/ml", "Unknown", "DU", "5", ""});
         expected.put("Subject7_Estradiol_39.34", new String[]{"Subject7", "2012-01-08", "Estradiol", "39.34", "pg/ml", "Unknown", "DU", "5", ""});
         expected.put("Subject8_Progesterone_-0.01", new String[]{"Subject8", "2012-01-09", "Progesterone", "-0.01", "ng/ml", "Unknown", "MD1", "2", "Blank greater than result"});
