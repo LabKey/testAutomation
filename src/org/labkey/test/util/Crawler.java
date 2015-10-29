@@ -710,7 +710,7 @@ public class Crawler
 
             // Find all the links at the site
             if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)
-                _test.hoverFolderBar();
+                _test.openFolderMenu();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));

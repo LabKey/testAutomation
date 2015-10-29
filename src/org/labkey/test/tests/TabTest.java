@@ -309,7 +309,7 @@ public class TabTest extends SimpleModuleTest
         // Verify that subfolders got moved into tabs
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertElementPresent(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
-        hoverFolderBar();
+        openFolderMenu();
         assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL)));
         assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL)));
         clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));

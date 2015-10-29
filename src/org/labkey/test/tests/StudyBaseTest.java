@@ -129,7 +129,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void initializeFolder()
     {
-        hoverProjectBar();
+        openProjectMenu();
         int response = -1;
         try{
             response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + WebTestHelper.stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));

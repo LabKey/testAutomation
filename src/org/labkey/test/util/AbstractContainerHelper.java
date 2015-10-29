@@ -269,7 +269,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         {
             _test.clickFolder(parent);
         }
-        _test.hoverFolderBar();
+        _test.openFolderMenu();
         if (_test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
             throw new IllegalArgumentException("Folder: " + child + " already exists in project: " + project);
         _test.log("Creating subfolder " + child + " under " + parent);
@@ -295,7 +295,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _test.clickButton("Delete");
         // verify that we're not on an error page with a check for a project link:
         _test.assertElementPresent(Locator.currentProject().withText(project));
-        _test.hoverFolderBar();
+        _test.openFolderMenu();
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
     }
 
@@ -319,7 +319,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
         _test.assertElementPresent(Locator.currentProject().withText(project));
-        _test.hoverFolderBar();
+        _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
     }
@@ -347,7 +347,7 @@ public abstract class AbstractContainerHelper extends AbstractHelper
 
         // verify that we're not on an error page with a check for folder link:
         _test.assertElementPresent(Locator.currentProject().withText(projectName));
-        _test.hoverFolderBar();
+        _test.openFolderMenu();
         _test.waitForElement(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
         String newProject = _test.getText(Locator.currentProject());
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));

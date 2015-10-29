@@ -87,7 +87,7 @@ public class GroupTest extends BaseWebDriverTest
         //double check that user can't see the project yet- otherwise our later check will be invalid
 
         impersonate(TEST_USERS_FOR_GROUP[0]);
-        hoverProjectBar();
+        openProjectMenu();
         assertElementNotPresent(Locator.linkWithText(getProjectName()));
         stopImpersonating();
         //create users
@@ -363,7 +363,7 @@ public class GroupTest extends BaseWebDriverTest
     protected void assertUserCanSeeProject(String user, String project)
     {
         impersonate(user);
-        hoverProjectBar();
+        openProjectMenu();
         assertElementPresent(Locator.linkWithText(project));
         stopImpersonating();
     }

@@ -20,6 +20,7 @@ public abstract class Locators
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.IdLocator projectBar = Locator.id("projectBar");
+    public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.CssLocator labkeyError = Locator.css(".labkey-error");
     public static final Locator signInButtonOrLink = Locator.tag("a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
 

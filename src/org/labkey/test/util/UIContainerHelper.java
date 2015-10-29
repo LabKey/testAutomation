@@ -81,7 +81,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     @Override
     public void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
-        _test.hoverProjectBar();
+        _test.openProjectMenu();
 
         if (!_test.isElementPresent(Locator.linkWithText(project)))
         {
@@ -129,7 +129,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
-        _test.hoverProjectBar();
+        _test.openProjectMenu();
         _test.assertElementNotPresent(Locator.linkWithText(project));
     }
 }

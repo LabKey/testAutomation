@@ -73,6 +73,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
@@ -1770,12 +1771,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
     }
 
-    public void hoverProjectBar()
+    public void openProjectMenu()
     {
         waitForHoverNavigationReady();
-        mouseOver(Locators.projectBar);
-        click(Locators.projectBar);
-        shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")));
+        shortWait().until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(@Nullable WebDriver driver)
+            {
+                click(Locators.projectBar);
+                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")).apply(driver);
+            }
+        });
     }
 
     public void clickProject(String project)
@@ -1785,7 +1792,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void clickProject(String project, boolean assertDestination)
     {
-        hoverProjectBar();
+        openProjectMenu();
         WebElement projectLink = Locator.linkWithText(project).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
         if (assertDestination)
@@ -1795,19 +1802,24 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void hoverFolderBar()
+    public void openFolderMenu()
     {
-        Locator.XPathLocator folderBar = Locator.id("folderBar").withText();
-        waitForElement(folderBar);
+        waitForElement(Locators.folderMenu.withText());
         waitForFolderNavigationReady();
-        scrollIntoView(folderBar);
-        click(folderBar);
-        waitForElement(Locator.css("#folderBar_menu .folder-nav"));
+        shortWait().until(new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(@Nullable WebDriver driver)
+            {
+                click(Locators.folderMenu);
+                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#folderBar_menu .folder-nav")).apply(driver);
+            }
+        });
     }
 
     public void clickFolder(String folder)
     {
-        hoverFolderBar();
+        openFolderMenu();
         expandFolderTree(folder);
         waitAndClickAndWait(Locator.linkWithText(folder));
     }

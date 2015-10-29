@@ -285,7 +285,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        hoverProjectBar();
+        openProjectMenu();
         if (isElementPresent(Locator.linkWithText(name)))
             clickProject(name);
         else

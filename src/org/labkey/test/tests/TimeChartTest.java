@@ -79,7 +79,7 @@ public abstract class TimeChartTest extends ReportTest
 
     @LogMethod protected void configureStudy()
     {
-        hoverProjectBar();
+        openProjectMenu();
         if (!isElementPresent(Locator.linkWithText(getProjectName())))
             _containerHelper.createProject(getProjectName(), null);
 
@@ -89,7 +89,7 @@ public abstract class TimeChartTest extends ReportTest
 
     @LogMethod protected void configureVisitStudy()
     {
-        hoverProjectBar();
+        openProjectMenu();
         if (!isElementPresent(Locator.linkWithText(getProjectName())))
             _containerHelper.createProject(getProjectName(), null);
 
