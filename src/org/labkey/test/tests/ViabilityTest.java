@@ -221,7 +221,8 @@ public class ViabilityTest extends AbstractViabilityTest
         assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "foobar", "vial1", "xyzzy", "160450533-5", "161400006.11-5");
 
         setSelectedFields("/" + getProjectName() + "/" + getFolderName(), "assay", getAssayName() + " ResultSpecimens", null,
-                new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits", "SpecimenID/AssayMatch"});
+                new String[] { "ResultID", "ResultID/Recovery", "Specimen", "SpecimenIndex", "SpecimenID/Volume", "SpecimenID/Specimen/VolumeUnits"/*, "SpecimenID/AssayMatch"*/});
+        // TODO: Issue 24688: Viability/Guava assay - bad SQL for specimen lookup AssayMatch column
         table = new DataRegionTable("query", this);
         assertTextNotPresent(new TextSearcher(table.getComponentElement()::getText), "foobar");
         assertTextPresent(new TextSearcher(table.getComponentElement()::getText), "161400006.11-5", "105.78%", "20,000,000.0", "CEL");
