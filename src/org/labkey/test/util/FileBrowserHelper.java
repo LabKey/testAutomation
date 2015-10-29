@@ -140,7 +140,10 @@ public class FileBrowserHelper
         scrollToGridRow(fileName);
 
         if(!_test._ext4Helper.isChecked(Locators.gridRowCheckbox(fileName)))
+        {
+            _test.scrollIntoView(Locators.gridRowCheckbox(fileName));
             _test.doAndWaitForPageSignal(() -> _test._ext4Helper.checkCheckbox(Locators.gridRowCheckbox(fileName)), IMPORT_SIGNAL_NAME);
+        }
     }
 
     @LogMethod
