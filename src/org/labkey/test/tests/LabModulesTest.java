@@ -1017,6 +1017,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             assertElementPresent(Ext4Helper.Locators.menuItem(pair.getValue()));
         }
 
+        _helper.goToLabHome();
         waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
