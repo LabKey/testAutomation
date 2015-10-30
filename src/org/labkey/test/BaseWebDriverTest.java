@@ -2807,7 +2807,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             scrollIntoView(loc);
         }
         catch (StaleElementReferenceException ignore) {}
-        clickAt(loc, 1, 1, 0);
+        clickAt(loc, 5, 5, 0);
 
         waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
     }
