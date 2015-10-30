@@ -278,6 +278,8 @@ public class CustomizeViewsHelper
         Locator.XPathLocator columnItem = expandPivots(fieldKeyParts);
         Locator checkbox = columnItem.append("/input[@type='checkbox']");
         _test.waitForElement(checkbox);
+        //note: if the column is not in view, it does not seem to get checked
+        _test.scrollIntoView(checkbox);
         _test.checkCheckbox(checkbox);
     }
 
