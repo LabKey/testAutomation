@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.NoSuchElementException;
@@ -38,6 +39,7 @@ import static org.junit.Assert.fail;
 
 public class DataRegionTable extends Component
 {
+    public static final String SELECTION_SIGNAL = "selectChange";
     protected final String _tableName;
     protected final WebElement _tableElement;
     protected BaseWebDriverTest _test;
@@ -65,6 +67,7 @@ public class DataRegionTable extends Component
         _tableElement = _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _floatingHeaders = floatingHeaders;
+        if (selectors) _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
     }
 
     @Override
@@ -648,15 +651,15 @@ public class DataRegionTable extends Component
         String id = Locator.xq("dataregion_" + _tableName);
         WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
         if (!toggle.isSelected())
-            _test.doAndWaitForPageSignal(toggle::click, "selectChange");
+            _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
     }
 
     public void uncheckAll()
     {
         String id = Locator.xq("dataregion_" + _tableName);
         WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
-        if (null != _test.doAndWaitForPageSignal(toggle::click, "selectChange"))
-            _test.doAndWaitForPageSignal(toggle::click, "selectChange");
+        if (null != _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL))
+            _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
     }
 
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
@@ -666,7 +669,7 @@ public class DataRegionTable extends Component
                 Locator.tagWithName("input", ".select").withAttribute("value", value)).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
     }
 
     public void checkCheckbox(int index)
@@ -675,7 +678,7 @@ public class DataRegionTable extends Component
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
     }
 
     public void uncheckCheckbox(int index)
@@ -684,7 +687,7 @@ public class DataRegionTable extends Component
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (checkbox.isSelected())
-            _test.doAndWaitForPageSignal(checkbox::click, "selectChange");
+            _test.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
     }
 
     public void pageFirst()
@@ -814,7 +817,7 @@ public class DataRegionTable extends Component
         return subMenuItems;
     }
 
-    public static class Locators
+    public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator dataRegion(String tableName)
         {
