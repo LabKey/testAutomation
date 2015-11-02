@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* vehicle-15.20-15.21.sql */
+
 EXEC core.fn_dropifexists 'etlTest', 'vehicle', 'PROCEDURE', NULL;
 GO
 CREATE PROCEDURE vehicle.etlTest
