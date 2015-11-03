@@ -24,7 +24,8 @@ public class ETLListTest extends BaseWebDriverTest
 {
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
     private static final String ETL_LIST_MERGE = "{ETLtest}/ListAToListB";
-    private static final File ETL_LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ETL_ListAListB.lists.zip");
+    // TODO: revert to ETL_ListAListB.lists.zip when 24725 is resolved. Delete xETL_ListAListB.lists.zip
+    private static final File ETL_LIST_ARCHIVE = TestFileUtils.getSampleData("lists/xETL_ListAListB.lists.zip");
     private static final String SRC_LIST = "ListA";
     private static final String DEST_LIST = "ListB";
 
@@ -69,7 +70,8 @@ public class ETLListTest extends BaseWebDriverTest
 
         goBack();
         clickAndWait(Locator.linkWithText(SRC_LIST));
-        _listHelper.insertNewRow(Maps.of("Key", "K4", "Field1", "new"));
+        // TODO: switch back to "Key" when 24725 is resolved
+        _listHelper.insertNewRow(Maps.of("xKey", "K4", "Field1", "new"));
         _etlHelper.runETL(ETL_LIST_MERGE);
         expectedKeys.add("K4");
 
