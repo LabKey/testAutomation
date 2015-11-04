@@ -320,7 +320,7 @@ public class MS1Test extends BaseWebDriverTest
         assertTextPresent(run1Title, run2Title);
 
         //Features View
-        log("Tesitng showFeatures.view....");
+        log("Testing showFeatures.view....");
         clickAndWait(Locator.linkWithText(run2Title));
 
         //test filtering
