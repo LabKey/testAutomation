@@ -111,7 +111,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     {
         AssayDomainEditor assayDesigner = _assayHelper.createAssayAndEdit(type, name);
 
-        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("/LookupToSampleIDTest Project/TestingGPATAssay", "Samples", lookupTableValue);
+        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("/LookupToSampleIDTest Project/TestingGPATAssay", "samples", lookupTableValue);
         lookupInfo.setTableType(lookupTableType);
 
         _listHelper.addLookupField(name + " Data Fields", 4, SAMPLE_ID_FIELD_NAME, SAMPLE_ID_FIELD_LABEL, lookupInfo);

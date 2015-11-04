@@ -100,7 +100,7 @@ public class ExpTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Graph Summary View"));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE));
-        assertTextPresent("CAexample_mini.mzXML", "Not available on disk");
+        assertTextPresent("CAexample_mini.mzXML", "File Not Found");
 
         // Write a simple custom query that wraps the data table
         clickTab("Query");
