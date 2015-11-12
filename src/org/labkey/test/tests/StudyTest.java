@@ -517,6 +517,7 @@ public class StudyTest extends StudyBaseTest
     {
         startCreateParticipantGroup();
         clickButtonContainingText("Cancel", 0);
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     /**preconditions: at participant picker main page
