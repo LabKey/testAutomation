@@ -172,7 +172,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     public final void testCreatePythonScriptNoFilter()
     {
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountNoFilters = 12;
+        int expectedLineCountNoFilters = 10;
         assertPythonScriptContents(pythonScript, expectedLineCountNoFilters, null);
     }
 
@@ -182,7 +182,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountWithFilters = 15;
+        int expectedLineCountWithFilters = 13;
         assertPythonScriptContents(pythonScript, expectedLineCountWithFilters, testColumn);
     }
 
