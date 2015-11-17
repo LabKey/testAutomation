@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -421,7 +420,7 @@ public class FileBrowserHelper
                 action = BrowserAction.getActionFromButtonClass(cssClasses[i]);
             }
             if (action == null)
-                throw new IllegalStateException("No button found for unrecognize action: " + button.getAttribute("data-qtip"));
+                throw new IllegalStateException("No button found for unrecognized action: " + button.getAttribute("data-qtip"));
             actions.add(action);
         }
 

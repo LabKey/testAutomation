@@ -46,7 +46,7 @@ public class FlowAnalysisResolverTest extends BaseFlowTest
 
         //import set 2
 
-        //import analsysis
+        //import analysis
         String analysisZipPath = "/resolve-test/statistics.tsv";
 
         goToFlowDashboard();
