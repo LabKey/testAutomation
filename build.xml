@@ -377,8 +377,10 @@
         <ant antfile="${javaclient.build.xml}" target="jar" inheritall="false"/>
     </target>
 
-    <target name="setPassword" depends="build">
+    <target name="setPassword" depends="build,set-user-props">
         <java classname="org.labkey.test.util.PasswordUtil">
+            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
+            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
         </java>
@@ -386,6 +388,7 @@
 
     <target name="setTeamcityAgentPassword" depends="build">
         <java classname="org.labkey.test.util.PasswordUtil">
+            <sysproperty key="labkey.port" value="${labkey.port}"/>
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
             <arg id="username" value="cruisecontrol@labkey.com"/>

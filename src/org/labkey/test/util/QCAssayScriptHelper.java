@@ -16,15 +16,12 @@ package org.labkey.test.util;
  * limitations under the License.
  */
 
-import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 import static org.junit.Assert.fail;
 
@@ -85,44 +82,5 @@ public class QCAssayScriptHelper
         {
             scripts.deleteEngine(engineName);
         }
-    }
-
-    @LogMethod
-    public void createNetrcFile()
-    {
-        // ensure the .netrc file exists
-        try
-        {
-            File netrcFile = new File(System.getProperty("user.home") + "/" + "_netrc");
-
-            if (!netrcFile.exists())
-                netrcFile = new File(System.getProperty("user.home") + "/" + ".netrc");
-
-            if (!netrcFile.exists())
-            {
-                try (PrintWriter pw = PrintWriters.getPrintWriter(netrcFile))
-                {
-                    pw.append("machine localhost:8080");
-                    pw.append('\n');
-                    pw.append("login ");
-                    pw.append(PasswordUtil.getUsername());
-                    pw.append('\n');
-                    pw.append("password ");
-                    pw.append(PasswordUtil.getPassword());
-                    pw.append('\n');
-                }
-            }
-        }
-        catch (IOException ioe)
-        {
-            _test.log("failed trying to create a .netrc file " + ioe.getMessage());
-        }
-    }
-
-    @LogMethod
-    public void prepareProgrammaticQC()
-    {
-        ensureEngineConfig();
-        createNetrcFile();
     }
 }

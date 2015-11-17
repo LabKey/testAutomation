@@ -16,12 +16,18 @@
 
 package org.labkey.test.util;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import org.labkey.api.writer.PrintWriters;
+import org.labkey.remoteapi.sas.NetrcFileParser;
+import org.labkey.test.WebTestHelper;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class PasswordUtil
 {
-    private static final String PASSWORD_FILE_NAME = ".cpasDRTPassword";
     private static Credentials _cachedCredentials = null;
 
     private static class Credentials
@@ -48,8 +54,6 @@ public class PasswordUtil
         PasswordUtil util = new PasswordUtil();
         if (args.length == 0)
             util.outputUsage();
-        else if ("delete".equals(args[0]))
-            deleteStoredPassword();
         else if ("set".equals(args[0]))
         {
             if (args.length == 3)
@@ -70,8 +74,6 @@ public class PasswordUtil
     private void outputUsage()
     {
         System.out.println("Usage:");
-        System.out.println("PasswordUtil delete");
-        System.out.println("  Deletes a stored password on this machine.");
         System.out.println("PasswordUtil set");
         System.out.println("  Prompts for and stores a password on this machine.");
         System.out.println("PasswordUtil ensure");
@@ -80,31 +82,17 @@ public class PasswordUtil
         System.out.println("  Echos the stored credentials.");
     }
 
-    private static File verifyDir(String dirName)
+    private static File getNetrcFile()
     {
-        if (dirName != null)
-        {
-            File dir = new File(dirName);
-            if (dir.exists())
-                return dir;
-        }
-        return null;
+        return new File(System.getProperty("user.home"), System.getProperty("os.name").toLowerCase().contains("win") ? "_netrc" : ".netrc");
     }
 
-    private static File findPasswordFile()
+    private static String getHost()
     {
-        File dir = verifyDir(System.getProperty("user.home"));
-        if (dir == null)
-        {
-            System.out.println("User home couldn't be found.  Using working directory instead.");
-            dir = verifyDir(System.getProperty("user.dir"));
-        }
-        if (dir == null)
-            throw new IllegalStateException("System property for user.home or user.dir must be set to enable password storage.");
-
-        return new File(dir, PASSWORD_FILE_NAME);
+        String host = WebTestHelper.getTargetServer() + ":" + WebTestHelper.getWebPort();
+        return host.replaceFirst("https?://", "");
     }
-
+    
     public static void setCredentials() throws IOException
     {
         int c;
@@ -132,25 +120,36 @@ public class PasswordUtil
     public static void setCredentials(String username, String password) throws IOException
     {
         _cachedCredentials = null;
-        File file = deleteStoredPassword();
-        StringBuilder credentials = new StringBuilder();
-        credentials.append(username).append("\n").append(password);
 
-        byte[] bytes = credentials.toString().getBytes(StandardCharsets.UTF_8);
-        byte[] inverted = invertBytes(bytes, bytes.length);
-
-        try (FileOutputStream ostream = new FileOutputStream(file))
+        try
         {
-            ostream.write(inverted);
-        }
-    }
+            File netrcFile = getNetrcFile();
 
-    public static File deleteStoredPassword()
-    {
-        File file = findPasswordFile();
-        if (file != null && file.exists())
-            file.delete();
-        return file;
+            if(new NetrcFileParser().getEntry(netrcFile, getHost()) != null)
+            {
+                System.err.println("netrc file already has an entry for " + getHost() + ". Please delete entry and retry or update it manually");
+                return;
+            }
+
+            boolean alreadyExists = netrcFile.exists();
+
+            try (PrintWriter pw = PrintWriters.getPrintWriter(new FileOutputStream(netrcFile, alreadyExists)))
+            {
+                if (alreadyExists)
+                    pw.append("\n");
+                pw.append("machine ");
+                pw.append(getHost());
+                pw.append("\nlogin ");
+                pw.append(username);
+                pw.append("\npassword ");
+                pw.append(password);
+                pw.append('\n');
+            }
+        }
+        catch (IOException ioe)
+        {
+            System.err.println("failed trying to create a .netrc file " + ioe.getMessage());
+        }
     }
 
     public static void echoCredentials()
@@ -184,19 +183,14 @@ public class PasswordUtil
     {
         if (_cachedCredentials == null)
         {
-            File file = findPasswordFile();
-
-            try (InputStream istream = new FileInputStream(file))
+            try
             {
-                byte[] bytes = new byte[1024];
-                int len = istream.read(bytes);
-                String data = new String(invertBytes(bytes, len));
-                String[] credentialString = data.split("\n");
-                _cachedCredentials = new Credentials(credentialString[0], credentialString[1]);
+                NetrcFileParser.NetrcEntry entry = ensureCredentials();
+                _cachedCredentials = new Credentials(entry.getLogin(), entry.getPassword());
             }
             catch (IOException e)
             {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to load credentials", e);
             }
         }
         return _cachedCredentials;
@@ -212,22 +206,25 @@ public class PasswordUtil
         return getCredentials().getPassword();
     }
 
-    private static byte[] invertBytes(byte[] data, int length)
+    public static NetrcFileParser.NetrcEntry ensureCredentials() throws IOException
     {
-        byte[] inverted = new byte[length];
-        for (int i = 0; i < length; i++)
-            inverted[i] = (byte) (255 ^ data[i]);
-        return inverted;
-    }
-
-    public static void ensureCredentials() throws IOException
-    {
-        File file = findPasswordFile();
-        if (file == null || !file.exists())
+        File file = getNetrcFile();
+        try
         {
-            System.err.println("Credentials have not been saved for the current user.");
-            System.err.println("Do an 'ant setPassword' from the server/test directory.");
-            System.exit(1);
+            if (file.exists())
+            {
+                NetrcFileParser parser = new NetrcFileParser();
+                NetrcFileParser.NetrcEntry entry = parser.getEntry(getNetrcFile(), getHost());
+                if (entry != null)
+                    return entry;
+                throw new IOException("Credentials for " + getHost() + " not found in " + getNetrcFile());
+            }
+            throw new FileNotFoundException("Credentials have not been saved for this server.");
+        }
+        catch (IOException e)
+        {
+            System.out.flush(); // Make sure log is readable
+            throw new IOException("Do an 'ant setPassword' from the server/test directory.", e);
         }
     }
 }

@@ -17,20 +17,10 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
-import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.QCAssayScriptHelper;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import static org.junit.Assert.*;
 
 /**
  * @deprecated TODO: Move shared functionality to a Helper class
@@ -43,7 +33,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
     public void prepareProgrammaticQC()
     {
         QCAssayScriptHelper javaEngine = new QCAssayScriptHelper(this);
-        javaEngine.prepareProgrammaticQC();
+        javaEngine.ensureEngineConfig();
     }
 
     public void deleteEngine()
