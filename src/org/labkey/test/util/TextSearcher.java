@@ -87,5 +87,19 @@ public class TextSearcher
     {
         public static final Function<String, String> ENCODER = BaseWebDriverTest::encodeText;
         public static final Function<String, String> IDENTITY = text -> text;
+
+        //Inserts spaces between camel-cased words
+        public static final Function<String, String> FIELD_LABEL = (text) ->
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append(text.charAt(0));
+            for (int i = 1; i < text.length(); i++)
+            {
+                if (Character.isUpperCase(text.charAt(i)) && ' ' != text.charAt(i - 1))
+                    sb.append(" ");
+                sb.append(text.charAt(i));
+            }
+            return ENCODER.apply(sb.toString());
+        };
     }
 }
