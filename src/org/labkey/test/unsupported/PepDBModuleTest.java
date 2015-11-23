@@ -106,7 +106,6 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
         beginAt("/pepdb/" + getProjectName() + "/Labs/Test/" + FOLDER_NAME + "/begin.view?");
 
         /*  Insert the Peptide Group" */
-
         getDriver().findElement(By.linkText("Insert a New Group")).click();
         getDriver().findElement(By.name("peptide_group_name")).clear();
         getDriver().findElement(By.name("peptide_group_name")).sendKeys("gagptegprac");
@@ -114,8 +113,7 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
         new Select(getDriver().findElement(By.name("clade_id"))).selectByVisibleText("Other");
         new Select(getDriver().findElement(By.name("group_type_id"))).selectByVisibleText("Other");
         getDriver().findElement(By.cssSelector("a.labkey-button > span")).click();
-
-        beginAt("/pepdb/" + getProjectName() + "/Labs/Test/" + FOLDER_NAME + "/begin.view?");
+        clickFolder(FOLDER_NAME);
 
         // Import some test Peptides from a file.
         clickAndWait(Locator.linkWithText("Import Peptides"));
@@ -126,7 +124,7 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
         /*  Import Peptide Pool 'Pool Descriptions' file.
         *     ./test_import_files/pool_description_file/pool_description.txt
         */
-        beginAt("/pepdb/" + getProjectName() + "/Labs/Test/" + FOLDER_NAME + "/begin.view?");
+        clickFolder(FOLDER_NAME);
         getDriver().findElement(By.linkText("Import Peptide Pools")).click();
         new Select(getDriver().findElement(By.name("actionType"))).selectByVisibleText("Pool Descriptions");
 
@@ -136,6 +134,7 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
         /* Import Peptide Pool 'Peptides in Pool' file.
           ./test_import_files/pool_detail_file/pool_details.txt
         */
+        clickFolder(FOLDER_NAME);
         getDriver().findElement(By.linkText("Import Peptide Pools")).click();
         new Select(getDriver().findElement(By.name("actionType"))).selectByVisibleText("Peptides in Pool");
 
@@ -143,6 +142,7 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
         getDriver().findElement(By.cssSelector("a.labkey-button > span")).click();
 
         /* Search for the Peptides belonging to our just-imported pool */
+        clickFolder(FOLDER_NAME);
         getDriver().findElement(By.linkText("Search for Peptides by Criteria")).click();
         new Select(getDriver().findElement(By.name("queryKey"))).selectByVisibleText("Peptides in a Peptide Pool");
         selectOptionByTextContaining(getDriver().findElement(By.name("queryValue")), "Prac_Pool");
@@ -195,8 +195,10 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
          *   columns imported earlier during the importing of the peptides.
          *
         */
-
+        clickFolder(FOLDER_NAME);
         getDriver().findElement(By.linkText("Search for Peptides by Criteria")).click();
+        new Select(getDriver().findElement(By.id("queryKey"))).selectByVisibleText("Peptides in a Peptide Pool");
+
         selectOptionByTextContaining(getDriver().findElement(By.name("queryValue")), "Prac_Pool");
         getDriver().findElement(By.name("action_type")).click();
         getDriver().findElement(By.linkText(pepString(4))).click();

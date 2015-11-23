@@ -40,7 +40,8 @@ public abstract class Locator
     protected String _text;
 
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden'))";
+    public static final String HIDDEN = "ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden')";
+    public static final String NOT_HIDDEN = "not(" + HIDDEN + ")";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
     protected Locator(String loc)
@@ -773,6 +774,11 @@ public abstract class Locator
         public XPathLocator append(XPathLocator child)
         {
             return new XPathLocator(getPath() + child.getPath());
+        }
+
+        public XPathLocator hidden()
+        {
+            return this.withPredicate(HIDDEN);
         }
 
         public XPathLocator notHidden()

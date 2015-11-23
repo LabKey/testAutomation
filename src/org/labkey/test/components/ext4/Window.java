@@ -1,5 +1,6 @@
 package org.labkey.test.components.ext4;
 
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
@@ -17,11 +18,21 @@ public class Window extends Component
     WebDriverWrapper _driver;
     Elements _elements;
 
+    public Window(String windowTitle, WebDriverWrapper driver)
+    {
+        this(Ext4Helper.Locators.window(windowTitle).waitForElement(driver.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT), driver);
+    }
+
     public Window(WebElement window, WebDriverWrapper driver)
     {
         _window = window;
         _driver = driver;
         _elements = new Elements();
+    }
+
+    protected WebDriverWrapper getDriver()
+    {
+        return _driver;
     }
 
     @Override
@@ -53,6 +64,16 @@ public class Window extends Component
     public void close()
     {
         elements().closeButton.click();
+        waitForClose();
+    }
+
+    public void waitForClose()
+    {
+        waitForClose(1000);
+    }
+
+    public void waitForClose(int msWait)
+    {
         _driver.waitFor(() -> {
             try
             {
@@ -62,7 +83,7 @@ public class Window extends Component
             {
                 return true;
             }
-        }, "Window did not close", 1000);
+        }, "Window did not close", msWait);
     }
 
     protected Elements elements()
@@ -70,7 +91,7 @@ public class Window extends Component
         return _elements;
     }
 
-    private class Elements extends ComponentElements
+    protected class Elements extends ComponentElements
     {
         @Override
         protected SearchContext getContext()

@@ -37,8 +37,9 @@ public class LabKeyPage extends WebDriverWrapper
 
     public LabKeyPage(WebDriverWrapper test)
     {
-        _test = (BaseWebDriverTest)test;
-        _driver = _test.getDriver();
+        if (test instanceof BaseWebDriverTest)
+            _test = (BaseWebDriverTest)test;
+        _driver = test.getDriver();
         waitForPage();
     }
 

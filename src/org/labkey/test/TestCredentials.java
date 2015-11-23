@@ -43,7 +43,7 @@ public class TestCredentials
         }
     }
 
-    private static File getCredentialsFile() throws IOException
+    public static File getCredentialsFile() throws IOException
     {
         if (null == credentialsFile)
         {
