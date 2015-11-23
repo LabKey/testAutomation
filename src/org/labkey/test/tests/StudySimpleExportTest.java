@@ -51,6 +51,7 @@ import static org.junit.Assert.*;
 public class StudySimpleExportTest extends StudyBaseTest
 {
     private static final String TEST_DATASET_NAME = "TestDataset";
+    public static final String NOTIFICATION_EMAIL = "specimen-test@simpleexport.test";
     private final String FOLDER_SCOPE = "folder";
     private final String PROJECT_SCOPE = "project";
 
@@ -980,11 +981,11 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
         log("Export Notifications");
         click(Locator.radioButtonByNameAndValue("replyToCurrentUser", "false"));
-        setFormElement(Locator.tagWithName("input", "replyTo"), "specimen-test@labkey.com");
+        setFormElement(Locator.tagWithName("input", "replyTo"), NOTIFICATION_EMAIL);
 
         click(Locator.checkboxByName("ccCheckbox"));
         waitForElement(Locator.xpath("//textarea[@id='cc']").notHidden());
-        setFormElement(Locator.xpath("//textarea[@id='cc']"), "specimen-test@labkey.com");
+        setFormElement(Locator.xpath("//textarea[@id='cc']"), NOTIFICATION_EMAIL);
         click(Locator.radioButtonByNameAndValue("defaultEmailNotify", "None"));
         click(Locator.radioButtonByNameAndValue("specimensAttachment", "ExcelAttachment"));
         clickButton("Save");
@@ -1031,10 +1032,10 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
         log("Verify Notifications");
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("replyToCurrentUser", "false"));
-        assertFormElementEquals(Locator.tagWithName("input", "replyTo"), "specimen-test@labkey.com");
+        assertFormElementEquals(Locator.tagWithName("input", "replyTo"), NOTIFICATION_EMAIL);
 
         assertChecked(Locator.checkboxByName("ccCheckbox"));
-        assertFormElementEquals(Locator.xpath("//textarea[@id='cc']"), "specimen-test@labkey.com");
+        assertFormElementEquals(Locator.xpath("//textarea[@id='cc']"), NOTIFICATION_EMAIL);
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("defaultEmailNotify", "None"));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("specimensAttachment", "ExcelAttachment"));
         clickButton("Cancel");
