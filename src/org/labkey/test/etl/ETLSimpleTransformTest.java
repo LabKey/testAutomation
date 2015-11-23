@@ -62,7 +62,8 @@ public class ETLSimpleTransformTest extends ETLBaseTest
     @After
     public void postTest()
     {
-        checkExpectedErrors(_etlHelper.getExpectedErrorCount());
+        if (!_testFailed)
+            checkExpectedErrors(_etlHelper.getExpectedErrorCount());
     }
 
 

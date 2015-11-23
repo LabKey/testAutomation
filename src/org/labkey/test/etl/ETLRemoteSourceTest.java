@@ -90,7 +90,8 @@ public class ETLRemoteSourceTest extends ETLBaseTest
     public void postTest()
     {
         deleteRemoteConnection();
-        resetErrors();
+        if (!_testFailed)
+            resetErrors();
     }
 
     private void createRemoteConnection()
@@ -109,7 +110,7 @@ public class ETLRemoteSourceTest extends ETLBaseTest
     // test a "remote" ETL that transfers data into datasets (instead of just base tables)
     //
     @Test
-    public void verifyRemoteTransform()
+    public void testRemoteTransform()
     {
         // bump our pipeline job count since we used the pipeline to import the study
         _etlHelper.incrementJobsCompleteCount();
@@ -141,7 +142,7 @@ public class ETLRemoteSourceTest extends ETLBaseTest
     }
 
     @Test
-    public void RemoteTransformErrorTest()
+    public void testTransformError()
     {
         List<String> errors = new ArrayList<>();
         //run remote etl without remote connection configured
