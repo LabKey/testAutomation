@@ -180,16 +180,11 @@ public class ListHelper extends AbstractHelper
 
         clickSave();
 
-        _test.log("Check that they were added");
-        if (cols.length > 0)
+        for (ListColumn col : cols)
         {
-            _test.waitForElement(Locator.lkButton("Export Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            for (ListColumn col : cols)
-            {
-                _test.assertTextPresent(col.getName());
-                if (!StringUtils.isEmpty(col.getLabel()) && !col.getName().equals(col.getLabel()))
-                    _test.assertTextPresent(col.getLabel());
-            }
+            _test.assertTextPresent(col.getName());
+            if (!StringUtils.isEmpty(col.getLabel()) && !col.getName().equals(col.getLabel()))
+                _test.assertTextPresent(col.getLabel());
         }
     }
 
@@ -377,6 +372,10 @@ public class ListHelper extends AbstractHelper
         _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
         _test.waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+
+        // TODO: Remove workaround. Project menu is opening after save on TeamCity for some reason
+        _test.mouseOver(Locator.css("body"));
+        _test.waitForElementToDisappear(Locator.id("projectBar_menu").notHidden());
     }
 
     public void clickDeleteList()
