@@ -1085,14 +1085,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertNoLabKeyErrors()
     {
-        assertElementNotPresent(Locator.xpath("//div[@class='labkey-error']"));
-        assertElementNotPresent(Locator.xpath("//font[@class='labkey-error']"));
+        assertFalse("Unexpected errors found", isElementPresent(Locators.labkeyError));
     }
 
     public void assertLabKeyErrorPresent()
     {
-        assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
-                isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
+        assertTrue("No errors found", isElementPresent(Locators.labkeyError));
     }
 
     public static String encodeText(String unencodedText)
