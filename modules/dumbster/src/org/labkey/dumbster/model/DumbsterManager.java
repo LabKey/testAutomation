@@ -18,6 +18,7 @@ package org.labkey.dumbster.model;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import org.apache.log4j.Logger;
+import org.labkey.api.settings.AppProps;
 import org.labkey.api.util.ContextListener;
 import org.labkey.api.util.MailHelper;
 import org.labkey.api.util.ShutdownListener;
@@ -115,7 +116,7 @@ public class DumbsterManager implements ShutdownListener
         // viewing until the next call to start() overwrites.
         if (_server != null)
         {
-            _log.info("Reverting MailHelper to labkey.xml configuration");
+            _log.info("Reverting MailHelper to " + AppProps.getInstance().getWebappConfigurationFilename() + " configuration");
             MailHelper.setSession(null);
 
             _server.stop();
