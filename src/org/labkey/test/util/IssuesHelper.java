@@ -94,4 +94,9 @@ public class IssuesHelper extends AbstractHelper
         else
             _test.assertElementPresent(Locator.css(".labkey-error").withText("Enter a value in the text box before clicking any of the \"Add <Keyword>\" buttons"));
     }
+
+    public void backToIssues()
+    {
+        _test.clickAndWait(Locator.lkButton("Back to Issues"));
+    }
 }

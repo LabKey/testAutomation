@@ -16,77 +16,109 @@
 
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
-public class UserTest extends SecurityTest
+public class UserTest extends BaseWebDriverTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
-    private static final String TEST_PASSWORD = "testPassword";
+    private static final String TEST_PASSWORD = "0asdfgh!";
 
     /**copied from LoginController.EMAIL_PASSWORDMISMATCH_ERROR, but needs to be broken into multiple separate sentences,
      *  the search function can't handle the line breaks
      */
-    public static final String[] EMAIL_PASSWORD_MISMATCH_ERROR =
+    private static final String[] EMAIL_PASSWORD_MISMATCH_ERROR =
             {"The e-mail address and password you entered did not match any accounts on file.",
              "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
 
+    private static final String NORMAL_USER = "normal_user@user.test";
+    private static final String BLANK_USER = "blank_user@user.test";
+    private static final String DEACTIVATED_USER = "disabled_user@user.test";
+    private static final String PASSWORD_RESET_USER = "pwreset_user@user.test";
 
     //users for change e-mail tests.  Both included at top level so they can be included in the clean up.
     // only one should exist at any one time, but by deleting both we ensure that nothing persists even if
     // the test fails
-    protected static final String NORMAL_USER2 = "user2_securitytest@security.test";
-    protected static final String NORMAL_USER2_ALTERNATE = "not-user2@security.test";
+    private static final String CHANGE_EMAIL_USER = "pre-pw_change@user.test";
+    private static final String CHANGE_EMAIL_USER_ALTERNATE = "post-pw_change@user.test";
+
+    @Nullable
+    @Override
+    protected String getProjectName()
+    {
+        return "UserTest Project";
+    }
 
     @Override
-    protected boolean isQuickTest()
+    public List<String> getAssociatedModules()
     {
-        return true;
+        return Arrays.asList("core");
     }
 
-    @Test @Override
-    public void testSteps()
+    @BeforeClass
+    public static void setupProject()
     {
-        super.testSteps();
-
-        siteUsersTest();
-        requiredFieldsTest();
-        simplePasswordResetTest();
-        changeUserEmailTest();
-        deactivatedUserTest();
-        longUserPropertiesTest();
-        specialCharactersUserPropertiesTest();
-        scriptInjectionUserPropertiesTest();
-        addCustomPropertiesTest();
+        UserTest init = (UserTest)getCurrentTest();
+        init.doSetup();
     }
 
+    private void doSetup()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+        createUserWithPermissions(NORMAL_USER, getProjectName(), "Editor");
+    }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        super.doCleanup(afterTest);
-        Locator.XPathLocator button = Locator.tagContainingText("span", "Change User Properties");
-        waitForElement(button);
-        click(button);
-        checkRequiredField("FirstName", false);
-        clickButton("Save");
+        _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        deleteUsers(false, NORMAL_USER2, NORMAL_USER2_ALTERNATE); // Deleted/renamed during test. Only needed during pre-clean
+        deleteUsersIfPresent(CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER);
+        waitAndClickAndWait(Locator.tagContainingText("span", "Change User Properties"));
+        for (String field : REQUIRED_FIELDS)
+        {
+            checkRequiredField(field, false);
+        }
+        List<Integer> customFieldIds = new ArrayList<>();
+        for (WebElement deleteButton : Locator.tag("div").attributeStartsWith("id", "partdelete").findElements(getDriver()))
+        {
+            int index = Integer.parseInt(deleteButton.getAttribute("id").replace("partdelete_", ""));
+            customFieldIds.add(index);
+        }
+        for (Integer index : customFieldIds)
+        {
+            _listHelper.deleteField("Field Properties", index);
+        }
+        clickButton("Save");
     }
 
-    @LogMethod
-    private void siteUsersTest()
+    @Before
+    public void preTest()
+    {
+        enableEmailRecorder();
+    }
+
+    @Test
+    public void testSiteUsersPermission()
     {
         goToSiteUsers();
         assertTextPresent("Last Login", "Last Name", "Active");
@@ -103,68 +135,70 @@ public class UserTest extends SecurityTest
         stopImpersonating();
     }
 
-    // Issue 3876: Add more security tests
-    @LogMethod
-    private void changeUserEmailTest()
+    @Test
+    public void testChangeUserEmail()
     {
-        boolean fromAdmin = false;
-        //get appropriate user
-        String userEmail = getEmailChangeableUser();
-        String newUserEmail = NORMAL_USER2_ALTERNATE;
+        createUserAndNotify(CHANGE_EMAIL_USER, NORMAL_USER);
+        setInitialPassword(CHANGE_EMAIL_USER, TEST_PASSWORD);
 
         //change their email address
-        changeUserEmail(userEmail, newUserEmail);
+        changeUserEmail(CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE);
 
         signOut();
 
         //verify can log in with new address
-        signIn(newUserEmail, TEST_PASSWORD);
+        signIn(CHANGE_EMAIL_USER_ALTERNATE, TEST_PASSWORD);
 
         signOut();
 
         //verify can't log in with old address
-        signInShouldFail(userEmail, TEST_PASSWORD, EMAIL_PASSWORD_MISMATCH_ERROR);
+        signInShouldFail(CHANGE_EMAIL_USER, TEST_PASSWORD, EMAIL_PASSWORD_MISMATCH_ERROR);
 
         simpleSignIn();
 
-        deleteUsers(true, newUserEmail);
+        deleteUsers(true, CHANGE_EMAIL_USER_ALTERNATE);
     }
 
-    @LogMethod
-    private void deactivatedUserTest()
+    @Test
+    public void testDeactivatedUser()
     {
+        createUserWithPermissions(DEACTIVATED_USER, getProjectName(), "Editor");
         goToSiteUsers();
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
-        int row = usersTable.getRow("Email", NORMAL_USER);
-        String userId = usersTable.getDataAsText(row, "User Id");
-        String adminUserId = usersTable.getDataAsText(usersTable.getRow("Email", PROJECT_ADMIN_USER), "User Id");
+        int row = usersTable.getRow("Email", DEACTIVATED_USER);
+        String disabledUserId = usersTable.getDataAsText(row, "User Id");
+        String normalUserId = usersTable.getDataAsText(usersTable.getRow("Email", NORMAL_USER), "User Id");
         usersTable.checkCheckbox(row);
         clickButton("Deactivate");
         clickButton("Deactivate");
-        assertTextNotPresent(NORMAL_USER);
+        assertTextNotPresent(DEACTIVATED_USER);
 
         log("Deactivated users shouldn't show up in issues 'Assign To' list");
         goToProjectHome();
         goToModule("Issues");
+        IssuesHelper issuesHelper = new IssuesHelper(this);
+        issuesHelper.goToAdmin();
+        issuesHelper.setIssueAssignmentList("Site:Users");
+        issuesHelper.backToIssues();
         clickAndWait(Locator.linkWithText("New Issue"));
-        assertElementNotPresent(createAssignedToOptionLocator(userId));
-        assertTextNotPresent(displayNameFromEmail(NORMAL_USER));
-        assertElementPresent(createAssignedToOptionLocator(adminUserId));
-        assertTextPresent(displayNameFromEmail(PROJECT_ADMIN_USER));
+        assertElementNotPresent(createAssignedToOptionLocator(disabledUserId));
+        assertTextNotPresent(displayNameFromEmail(DEACTIVATED_USER));
+        assertElementPresent(createAssignedToOptionLocator(normalUserId));
+        assertTextPresent(displayNameFromEmail(NORMAL_USER));
 
         log("Reactivate user");
         goToSiteUsers();
-        assertTextNotPresent(NORMAL_USER);
+        assertTextNotPresent(DEACTIVATED_USER);
         clickAndWait(Locator.linkWithText("include inactive users"));
         usersTable = new DataRegionTable("Users", this, true, true);
-        row = usersTable.getRow("Email", NORMAL_USER);
-        assertEquals(NORMAL_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
+        row = usersTable.getRow("Email", DEACTIVATED_USER);
+        assertEquals(DEACTIVATED_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
         usersTable.checkCheckbox(row);
         clickButton("Re-Activate");
         clickButton("Re-activate");
         usersTable = new DataRegionTable("Users", this, true, true);
-        row = usersTable.getRow("Email", NORMAL_USER);
-        assertEquals(NORMAL_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
+        row = usersTable.getRow("Email", DEACTIVATED_USER);
+        assertEquals(DEACTIVATED_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
     }
 
     private Locator createAssignedToOptionLocator(String username)
@@ -172,27 +206,16 @@ public class UserTest extends SecurityTest
         return Locator.xpath("//select[@id='assignedTo']/option[@value='" + username +  "']");
     }
 
-    /**if user NORMAL_USER2 does not exist, create them,
-     * give them password TEST_PASSWORD, and sign them in.
-     * @return email address of user
-     */
-    private String getEmailChangeableUser()
-    {
-        createUserAndNotify(NORMAL_USER2, NORMAL_USER);
-        clickProject("Home");
-        setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
-
-        return NORMAL_USER2;
-    }
-
-
     /**
      * Selects required user information fields and tests to see they are
      * enforced in the user info form.
      */
-    @LogMethod
-    private void requiredFieldsTest()
+    @Test
+    public void testRequiredFields()
     {
+        createUserAndNotify(BLANK_USER, null);
+        setInitialPassword(BLANK_USER, TEST_PASSWORD);
+
         goToSiteUsers();
         clickButton("Change User Properties");
 
@@ -213,37 +236,36 @@ public class UserTest extends SecurityTest
         checkRequiredField("FirstName", true);
         clickButton("Save");
 
-        navigateToUserDetails(NORMAL_USER);
-        clickButton("Edit");
-        setFormElement(Locator.name("quf_FirstName"), "");
+        signOut();
+        attemptSignIn(BLANK_USER, TEST_PASSWORD);
+        waitForElement(Locator.name("quf_FirstName"));
+
         clickButton("Submit");
-
         assertTextPresent("This field is required");
-        clickButton("Cancel");
-
-        clickButton("Show Users");
+        setFormElement(Locator.name("quf_FirstName"), "*");
+        clickButton("Submit");
     }
 
-    @LogMethod
-    private void simplePasswordResetTest()
+    @Test
+    public void testSimplePasswordReset()
     {
+        createUser(PASSWORD_RESET_USER, null);
         enableEmailRecorder();
 
         goToSiteUsers();
-        clickAndWait(Locator.linkWithText(displayNameFromEmail(NORMAL_USER)));
-        prepForPageLoad();
-        clickButtonContainingText("Reset Password", 0);
-        assertAlertContains("You are about to clear the user's current password");
-        waitForPageToLoad();
+        clickAndWait(Locator.linkWithText(displayNameFromEmail(PASSWORD_RESET_USER)));
+        doAndWaitForPageToLoad(() -> {
+            clickButtonContainingText("Reset Password", 0);
+            assertAlertContains("You are about to clear the user's current password");
+        });
         clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.
-//        clickProject(PROJECT_NAME);
         goToProjectHome();
         goToModule("Dumbster");
         click(Locator.linkContainingText("Reset Password Notification")); // Expand message.
 
         clickAndWait(Locator.linkContainingText("setPassword")); // Set Password URL
-        assertTextPresent(NORMAL_USER);
+        assertTextPresent(PASSWORD_RESET_USER);
         setFormElement(Locator.id("password"), TEST_PASSWORD);
         setFormElement(Locator.id("password2"), TEST_PASSWORD);
 
@@ -251,23 +273,17 @@ public class UserTest extends SecurityTest
 
         clickUserMenuItem("Sign Out");
         clickAndWait(Locator.linkWithText("Sign In"));
-        setFormElement(Locator.id("email"), NORMAL_USER);
+        setFormElement(Locator.id("email"), PASSWORD_RESET_USER);
         setFormElement(Locator.id("password"), TEST_PASSWORD);
         clickButton("Sign In");
         assertSignOutAndMyAccountPresent();
-        assertTextPresent(NORMAL_USER);
+        assertTextPresent(PASSWORD_RESET_USER);
         assertTextNotPresent("Sign In");
-
-        signOut();
-        simpleSignIn();
     }
 
     private void checkRequiredField(String name, boolean select)
     {
-        Locator fieldLocator = Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]");
-        waitForElement(fieldLocator);
-
-        click(fieldLocator);
+        waitAndClick(Locator.xpath("//div[@class='gwt-Label' and contains(text(),'" + name + "')]"));
 
         String prefix = getPropertyXPath("Field Properties");
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
@@ -300,11 +316,11 @@ public class UserTest extends SecurityTest
         clickAndWait(details);
     }
 
-    @LogMethod
-    public void longUserPropertiesTest()
+    @Test
+    public void testLongUserProperties()
     {
         goToSiteUsers();
-        navigateToUserDetails(PROJECT_ADMIN_USER);
+        navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
 
         StringBuilder illegalLongProperty = new StringBuilder();
@@ -339,14 +355,14 @@ public class UserTest extends SecurityTest
 
         Locator userInfoPanel = Locator.id("SiteUsers");
         String userInfo = getText(userInfoPanel);
-        assertFalse("Illegal text [XXX] present after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
+        assertFalse("Too-long property persists after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
     }
 
-    @LogMethod
-    public void specialCharactersUserPropertiesTest()
+    @Test
+    public void testSpecialCharactersUserProperties()
     {
         goToSiteUsers();
-        navigateToUserDetails(PROJECT_ADMIN_USER);
+        navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
 
         setFormElement(Locator.name("quf_FirstName"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
@@ -357,11 +373,11 @@ public class UserTest extends SecurityTest
         assertElementPresent(Locator.css("#SiteUsers td.labkey-form-label + td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES), 2);
     }
 
-    @LogMethod
-    public void scriptInjectionUserPropertiesTest()
+    @Test
+    public void testScriptInjectionUserProperties()
     {
         goToSiteUsers();
-        navigateToUserDetails(PROJECT_ADMIN_USER);
+        navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
 
         setFormElement(Locator.name("quf_FirstName"), INJECT_CHARS_1);
@@ -375,11 +391,9 @@ public class UserTest extends SecurityTest
     private static final String PROP_NAME1 = "Institution";
     private static final String PROP_NAME2 = "InstitutionId";
 
-    @LogMethod
-    private void addCustomPropertiesTest()
+    @Test
+    public void testCustomProperties()
     {
-        int defaultUserFieldCount = 7;
-
         goToSiteUsers();
         clickButton("Change User Properties");
 
@@ -387,30 +401,16 @@ public class UserTest extends SecurityTest
         _listHelper.addField("Field Properties", PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
 
-        try {
-            clickButton("Save");
+        clickButton("Save");
 
-            assertTextPresent(PROP_NAME1, PROP_NAME2);
+        assertTextPresent(PROP_NAME1, PROP_NAME2);
 
-            navigateToUserDetails(NORMAL_USER);
-            assertTextPresent(PROP_NAME1, PROP_NAME2);
+        navigateToUserDetails(NORMAL_USER);
+        assertTextPresent(PROP_NAME1, PROP_NAME2);
 
-            clickButton("Edit");
-            assertTextPresent(PROP_NAME1, PROP_NAME2);
-            clickButton("Cancel");
-        }
-        finally
-        {
-            goToSiteUsers();
-            clickButton("Change User Properties");
-
-            waitForText("Add Field");
-
-            _listHelper.deleteField("Field Properties", defaultUserFieldCount);
-            _listHelper.deleteField("Field Properties", defaultUserFieldCount + 1);
-
-            clickButton("Save");
-        }
+        clickButton("Edit");
+        assertTextPresent(PROP_NAME1, PROP_NAME2);
+        clickButton("Cancel");
     }
 
     @Override
