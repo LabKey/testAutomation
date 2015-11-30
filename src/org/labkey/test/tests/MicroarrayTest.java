@@ -219,10 +219,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.closeCustomizeViewPanel();
-
-
     }
-
 
     private void validateRuns()
     {
@@ -230,9 +227,8 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MAGEML_FILE1));
         assertTextPresent("115468001");
         clickAndWait(Locator.linkWithText("First"));
-        assertTextPresent(MAGEML_FILE1);
+        assertTextPresent(MAGEML_FILE1, SAMPLE_SET);
         assertTextNotPresent(MAGEML_FILE2);
-        assertTextPresent(SAMPLE_SET);
 
         log("Test run outputs/ data files");
         clickTab("Microarray Dashboard");
