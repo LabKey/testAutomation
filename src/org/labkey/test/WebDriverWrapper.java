@@ -1085,12 +1085,26 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertNoLabKeyErrors()
     {
-        assertFalse("Unexpected errors found", isElementPresent(Locators.labkeyError));
+        List<WebElement> errors = Locators.labkeyError.findElements(getDriver());
+
+        for (WebElement error : errors)
+        {
+            String errorText = error.getText();
+            if (!errorText.isEmpty())
+                fail("Unexpected error found: " + errorText);
+        }
     }
 
     public void assertLabKeyErrorPresent()
     {
-        assertTrue("No errors found", isElementPresent(Locators.labkeyError));
+        List<WebElement> errors = Locators.labkeyError.findElements(getDriver());
+
+        for (WebElement error : errors)
+        {
+            if (!error.getText().isEmpty())
+                return;
+        }
+        fail("No errors found");
     }
 
     public static String encodeText(String unencodedText)
