@@ -20,9 +20,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.List;
@@ -633,18 +635,20 @@ public class ListHelper extends AbstractHelper
         String prefix = _test.getPropertyXPathContains(areaTitle);
         _test.waitAndClick(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
 
-        try
+        _test.waitFor(() ->
         {
-            // Confirm the deletion
-            _test.clickButton("OK", 0);
-        }
-        catch (NoSuchElementException ignore)
-        {
-            // TODO: Be smarter about this.  Might miss the OK that should be there.
-            // If domain hasn't been saved yet, the 'OK' prompt will not appear.
-            return;
-        }
-        _test.waitForElement(Locator.css("#partstatus_" + index + " span.gwt-FontImage.fa-trash-o"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            if (_test.isElementPresent(Locator.css("#partstatus_" + index + " span.gwt-FontImage.fa-trash-o")))
+                return true;
+
+            try
+            {
+                WebElement okButton = Locator.lkButton("OK").findElement(_test.getDriver());
+                okButton.click();
+                _test.shortWait().until(ExpectedConditions.stalenessOf(okButton));
+            }
+            catch (NoSuchElementException ignore) {}
+            return false;
+        }, "Failed to delete field #" + index, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void addFieldsNoImport(String fieldList)
