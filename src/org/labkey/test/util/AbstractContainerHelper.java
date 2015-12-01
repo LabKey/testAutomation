@@ -120,12 +120,6 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         enableModules(Collections.singletonList(moduleName));
     }
 
-    @Deprecated
-    public void enableModules(List<String> moduleNames, boolean checkFirst)
-    {
-        enableModules(moduleNames);
-    }
-
     public void enableModules(List<String> moduleNames)
     {
         _test.goToFolderManagement();
