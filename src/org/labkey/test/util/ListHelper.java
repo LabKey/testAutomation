@@ -633,11 +633,12 @@ public class ListHelper extends AbstractHelper
     public void deleteField(String areaTitle, int index)
     {
         String prefix = _test.getPropertyXPathContains(areaTitle);
-        _test.waitAndClick(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
+        WebElement deleteButton = _test.waitForElement(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
+        deleteButton.click();
 
         _test.waitFor(() ->
         {
-            if (_test.isElementPresent(Locator.css("#partstatus_" + index + " span.gwt-FontImage.fa-trash-o")))
+            if (ExpectedConditions.stalenessOf(deleteButton).apply(_test.getDriver()))
                 return true;
 
             try
