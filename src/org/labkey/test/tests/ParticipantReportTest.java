@@ -184,12 +184,12 @@ public class ParticipantReportTest extends ReportTest
         assertTextPresent("1a. ALT (SGPT)", 18); // 8 mice + 8 grid field tooltips + 1 Report Field list + 1 in hidden add field dialog
 
         assertTextPresent("Showing partial results while in edit mode.");
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
 
         // verify form validation
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Error");
@@ -247,14 +247,14 @@ public class ParticipantReportTest extends ReportTest
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
         // Delete a column and save report
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
         clickSaveParticipantReport();
 
         // Delete a column save a copy of the report (Save As)
         // Not testing column reorder. Ext4 and selenium don't play well together for drag & drop
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Severity Grade' column.
         clickButton("Save As", 0);
@@ -266,7 +266,7 @@ public class ParticipantReportTest extends ReportTest
         waitForTextToDisappear("Severity Grade");
 
         // Verify saving with existing report name.
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save As", 0);
         _extHelper.waitForExtDialog("Save As");
@@ -293,7 +293,7 @@ public class ParticipantReportTest extends ReportTest
         assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
 
@@ -309,7 +309,7 @@ public class ParticipantReportTest extends ReportTest
         assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
 
@@ -331,7 +331,7 @@ public class ParticipantReportTest extends ReportTest
         waitAndClick(filterExpander);
         waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
@@ -373,7 +373,7 @@ public class ParticipantReportTest extends ReportTest
             assertTextNotPresent(ptid);
         }
 
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT3_NAME);
         clickSaveParticipantReport();
@@ -394,7 +394,7 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Select", 0);
         waitForElement(Locator.linkWithText(PTIDS_ONE[0]));
 
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 116 Results"));
 
@@ -419,7 +419,7 @@ public class ParticipantReportTest extends ReportTest
         assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT4_NAME);
         clickSaveParticipantReport();
@@ -526,7 +526,7 @@ public class ParticipantReportTest extends ReportTest
         _ext4Helper.selectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
 
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        click(Locator.xpath("//a[./span[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[" + Locator.NOT_HIDDEN + "]"), WAIT_FOR_JAVASCRIPT);
         clickSaveParticipantReport();
 
