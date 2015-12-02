@@ -228,8 +228,16 @@ public abstract class AbstractContainerHelper extends AbstractHelper
             _test.waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
-        _test.clickButton("Finish", _test.defaultWaitForPage);
-        _test.waitForElement(Locator.id("folderBar").withText(project));
+        if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
+        {
+            _test.clickButton("Finish", _test.defaultWaitForPage);
+            _test.waitForElement(Locator.id("folderBar").withText(project));
+        }
+        else
+        {
+            // There may be additional steps based on folder type
+            _test.clickButton("Next", _test.defaultWaitForPage);
+        }
 
         //unless we need addtional tabs, we end here.
         if (null == tabsToAdd || tabsToAdd.length == 0)
