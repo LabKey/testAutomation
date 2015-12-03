@@ -1088,6 +1088,7 @@
                 </uptodate>
                 <available file="${project.root}/sampledata/qc/transform.jar"/>
                 <available file="${project.root}/sampledata/qc/validator.jar"/>
+                <available file="${project.root}/sampledata/qc/validatorWarning.jar"/>
             </and>
         </condition>
         <antcall target="build-qc-validator-if-dirty" />
@@ -1097,6 +1098,7 @@
         <delete dir="${project.root}/sampledata/qc/classes"/>
         <delete file="${project.root}/sampledata/qc/validator.jar"/>
         <delete file="${project.root}/sampledata/qc/transform.jar"/>
+        <delete file="${project.root}/sampledata/qc/transformWarning.jar"/>
 
         <mkdir dir="${project.root}/sampledata/qc/classes"/>
         <javac srcdir="${project.root}/sampledata/qc/src"
@@ -1134,6 +1136,19 @@
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.labkey.AssayTransform"/>
+            </manifest>
+        </jar>
+        <jar destfile="${project.root}/sampledata/qc/transformWarning.jar">
+            <fileset dir="${project.root}/build/client-api/java/classes"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.6.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/httpcore-4.3.2.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/httpclient-4.3.5.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging-1.1.3.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
+            <fileset dir="${project.root}/sampledata/qc/classes"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="org.labkey.AssayTransformWarning"/>
             </manifest>
         </jar>
     </target>
