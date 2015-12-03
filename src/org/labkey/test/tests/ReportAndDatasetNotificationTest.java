@@ -328,7 +328,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
     private void enableEditMode()
     {
-        waitAndClick(Locator.css("a>img[title=Edit]"));
+        waitAndClick(Locator.css("tr.labkey-wp-header a>span.fa-pencil"));
         waitForText("Choose Measures");
     }
 
