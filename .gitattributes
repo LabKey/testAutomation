@@ -1,4 +1,6 @@
 * text=auto !eol
+/assayTransformWarning.R -text
 src/org/labkey/AbstractAssayValidator.java -text
 src/org/labkey/AssayTransform.java -text
+src/org/labkey/AssayTransformWarning.java -text
 src/org/labkey/AssayValidator.java -text

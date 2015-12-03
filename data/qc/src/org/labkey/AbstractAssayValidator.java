@@ -16,9 +16,9 @@ public abstract class AbstractAssayValidator
     private String _email;
     private String _password;
     private File _errorFile;
-    private Map<String, String> _runProperties = new HashMap<String, String>();
-    private Map<String, String> _transformFile = new HashMap<String, String>();
-    private List<String> _errors = new ArrayList<String>();
+    private Map<String, String> _runProperties = new HashMap<>();
+    private Map<String, String> _transformFile = new HashMap<>();
+    private List<String> _errors = new ArrayList<>();
     private String _host;
 
     public enum Props {
@@ -58,6 +58,18 @@ public abstract class AbstractAssayValidator
         return _runProperties;
     }
 
+    public String getRunProperty(String prop) {
+        return getRunProperties().get(prop);
+    }
+
+    public String getRunProperty(Props prop) {
+        return getRunProperty(prop.name());
+    }
+
+    public File getWorkingDir() {
+        return new File(getRunProperty(Props.workingDir));
+    }
+
     public List<String> getErrors() {
         return _errors;
     }
@@ -87,16 +99,16 @@ public abstract class AbstractAssayValidator
         Connection con = new Connection(getHost(), getEmail(), getPassword());
         InsertRowsCommand cmd = new InsertRowsCommand("lists", "QC Log");
 
-        Map<String, Object> row = new HashMap<String,Object>();
+        Map<String, Object> row = new HashMap<>();
         row.put("Date", new Date());
-        row.put("Container", getRunProperties().get(Props.containerPath.name()));
-        row.put("AssayId", getRunProperties().get(Props.assayId.name()));
-        row.put("AssayName", getRunProperties().get(Props.assayName.name()));
-        row.put("User", getRunProperties().get(Props.userName.name()));
+        row.put("Container", getRunProperty(Props.containerPath));
+        row.put("AssayId", getRunProperty(Props.assayId));
+        row.put("AssayName", getRunProperty(Props.assayName));
+        row.put("User", getRunProperty(Props.userName));
         row.put("Comments", comment);
 
         cmd.addRow(row);
-        cmd.execute(con, getRunProperties().get(Props.containerPath.name()));
+        cmd.execute(con, getRunProperty(Props.containerPath));
     }
 
     protected void writeError(String message, String prop) throws IOException
@@ -123,9 +135,8 @@ public abstract class AbstractAssayValidator
 
     protected void parseRunProperties(File runProperties)
     {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(runProperties));
+        try (BufferedReader br = new BufferedReader(new FileReader(runProperties)))
+        {
             String l;
             while ((l = br.readLine()) != null)
             {
@@ -141,25 +152,77 @@ public abstract class AbstractAssayValidator
             if (_runProperties.containsKey(Props.errorsFile.name()))
                 setErrorFile(new File(_runProperties.get(Props.errorsFile.name())));
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-            throw new RuntimeException(e.getMessage());
-        }
-        finally
-        {
-            if (br != null)
-                try {br.close();} catch(IOException ioe) {}
+            throw new RuntimeException(e);
         }
     }
 
+    private int _runErrorLevel = 0;
+
+    protected void setMaxSeverity(int level)
+    {
+        // 0:NONE, 1:WARN, 2:ERROR
+        int value = 0;
+
+        // Don't display warnings if severityLevel set to ERROR
+        if(level == 2)
+        {
+            value = 2;
+        }
+        else if(!getRunProperty("severityLevel").equals("ERROR") && level > _runErrorLevel)
+        {
+            value = level;
+        }
+
+        _runErrorLevel = value;
+    }
+
+    protected void writeWarnings() throws IOException
+    {
+        if(_runErrorLevel > 0)
+        {
+            try (PrintWriter fileConn = new PrintWriter(new BufferedWriter(new FileWriter(new File(getRunProperty(Props.transformedRunPropertiesFile))))))
+            {
+                if (_runErrorLevel == 1)
+                {
+                    fileConn.append("maximumSeverity\tWARN");
+                }
+                else
+                {
+                    fileConn.append("maximumSeverity\tERROR");
+                }
+            }
+
+            // This file gets read and displayed directly as warnings or errors, depending on maximumSeverity level.
+            try (PrintWriter errors = new PrintWriter(new BufferedWriter(new FileWriter(new File(getWorkingDir(), "errors.html")))))
+            {
+                errors.println("Inline warning from Java transform.<br><a href=\"http://www.labkey.test\">Warning link</a>");
+            }
+
+            // These two files are just to verify files are available to be downloaded and reviewed
+            try (PrintWriter errors = new PrintWriter(new BufferedWriter(new FileWriter(new File(getWorkingDir(), "test1.txt")))))
+            {
+                errors.println("This is test file 1 (Java).");
+            }
+            try (PrintWriter errors = new PrintWriter(new BufferedWriter(new FileWriter(new File(getWorkingDir(), "test2.txt")))))
+            {
+                errors.println("This is test file 2 (Java).");
+            }
+
+            // System output should appear in import
+            System.out.println("System.out warning");
+            System.err.println("System.err warning");
+        }
+    }
     /**
      * Parse the tab-delimitted input data file
      */
     protected List<Map<String, String>> parseRunData(File data)
     {
         BufferedReader br = null;
-        Map<Integer, String> columnMap = new LinkedHashMap<Integer, String>();
-        List<Map<String, String>> dataMap = new ArrayList<Map<String, String>>();
+        Map<Integer, String> columnMap = new LinkedHashMap<>();
+        List<Map<String, String>> dataMap = new ArrayList<>();
 
         try {
             br = new BufferedReader(new FileReader(data));
@@ -191,7 +254,7 @@ public abstract class AbstractAssayValidator
 
     protected Map<String, String> parseDataRow(String row, Map<Integer, String> columnMap)
     {
-        Map<String, String> props = new LinkedHashMap<String, String>();
+        Map<String, String> props = new LinkedHashMap<>();
         int i=0;
         for (String col : row.split("\t"))
         {
