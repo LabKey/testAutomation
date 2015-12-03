@@ -168,7 +168,7 @@ public class ArtifactCollector
         }
         catch (IOException ioe)
         {
-            _test.log("Failed to copy screenshot file: " + ioe.getMessage());
+            TestLogger.log("Failed to copy screenshot file: " + ioe.getMessage());
         }
 
         return null;
@@ -191,7 +191,7 @@ public class ArtifactCollector
             }
             catch (AWTException | IOException e)
             {
-                _test.log("Failed to take full screenshot: " + e.getMessage());
+                TestLogger.log("Failed to take full screenshot: " + e.getMessage());
             }
         }
 
@@ -250,7 +250,14 @@ public class ArtifactCollector
                 File dest = new File(dumpDir, file.getParent().substring(artifactDir.toString().length()));
                 if (!dest.exists())
                     dest.mkdirs();
-                file.renameTo(new File(dest, file.getName()));
+                try
+                {
+                    FileUtils.copyFile(file, new File(dest, file.getName()));
+                }
+                catch (IOException log)
+                {
+                    TestLogger.log("Failed to collect test artifact: " + file.toString().substring(artifactDir.toString().length()));
+                }
             }
         }
     }
