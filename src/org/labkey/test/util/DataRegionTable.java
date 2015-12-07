@@ -287,12 +287,12 @@ public class DataRegionTable extends Component
         return cell.child("a[1]");
     }
 
-    public Locator.XPathLocator link(int row, String columnName)
+    public WebElement link(int row, String columnName)
     {
         int col = getColumn(columnName);
         if (col == -1)
             fail("Couldn't find column '" + columnName + "'");
-        return link(row, col);
+        return findElement(link(row, col));
     }
 
     public int getColumn(String name)
