@@ -3012,7 +3012,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void waitForElements(final Locator loc, final int count)
     {
-        waitFor(() -> count == loc.findElements(getDriver()).size(), WAIT_FOR_JAVASCRIPT);
+        waitForElements(loc, count, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void waitForElements(final Locator loc, final int count, int wait)
+    {
+        waitFor(() -> count == loc.findElements(getDriver()).size(), wait);
 
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
     }
