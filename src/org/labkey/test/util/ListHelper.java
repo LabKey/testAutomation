@@ -257,6 +257,12 @@ public class ListHelper extends AbstractHelper
             _test._extHelper.clickExtTab("Advanced");
             clickMvEnabled("");
         }
+
+        if (col.getScale() != null)
+        {
+            _test._extHelper.clickExtTab("Advanced");
+            setColumnScale(col.getScale());
+        }
     }
 
     public void beginCreateListFromTab(String tabName, String listName)
@@ -561,6 +567,41 @@ public class ListHelper extends AbstractHelper
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='mvEnabled']");
         _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.checkCheckbox(l);
+    }
+
+    /**
+     * Set the value on the List Designer Scale widget
+     * @param value
+     */
+    public void setColumnScale(Integer value)
+    {
+        if (value == null)
+            return;
+
+        selectPropertyTab("Advanced");
+        Locator l = DesignerLocators.scaleTextbox;
+        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+
+        if (value == Integer.MAX_VALUE)
+        {
+            _test.checkCheckbox(DesignerLocators.maxCheckbox);
+        }
+        else
+        {
+            _test.uncheckCheckbox(DesignerLocators.maxCheckbox);
+            _test.getElement(l).clear();
+            _test.setFormElement(l, value.toString());
+        }
+    }
+
+    /**
+     * Gets the value from the Scale Textbox on the List Designer
+     */
+    public Integer getColumnScale()
+    {
+        selectPropertyTab("Advanced");
+        String value = _test.getFormElement(DesignerLocators.scaleTextbox);
+        return Integer.valueOf(value.replace(",",""));
     }
 
     @LogMethod(quiet = true)
@@ -884,8 +925,9 @@ public class ListHelper extends AbstractHelper
         private LookupInfo _lookup;
         private FieldValidator _validator;
         private String _url;
+        private Integer _scale;
 
-        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url)
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url, Integer scale)
         {
             _name = name;
             _label = label;
@@ -895,6 +937,12 @@ public class ListHelper extends AbstractHelper
             _lookup = lookup;
             _validator = validator;
             _url = url;
+            _scale = scale;
+        }
+
+        public ListColumn(String name, String label, ListColumnType type, String description, String format, LookupInfo lookup, FieldValidator validator, String url)
+        {
+            this(name, label, type, description, format, lookup, validator, url, null);
         }
 
         public ListColumn(String name, String label, ListColumnType type, String description, LookupInfo lookup)
@@ -981,5 +1029,26 @@ public class ListHelper extends AbstractHelper
         {
             return _url;
         }
+
+        public void setScale(Integer value)
+        {
+            _scale = value;
+        }
+
+        public Integer getScale()
+        {
+            return _scale;
+        }
     }
+
+    /**
+     * Set of locators for navigating the List Designer page
+     */
+    public static class DesignerLocators extends org.labkey.test.Locators
+    {
+        public static Locator.XPathLocator maxCheckbox = Locator.xpath("//input[@name='isMaxText']");
+        public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
+
+    }
+
 }

@@ -452,6 +452,7 @@ src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/CohortTest.java -text
+src/org/labkey/test/tests/ColumnResizeTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeEmailTemplateTest.java -text
