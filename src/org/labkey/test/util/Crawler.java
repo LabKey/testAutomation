@@ -54,6 +54,7 @@ public class Crawler
     {
         // Keys must be all lowercase
         _sourceReplacements.put("http://help.labkey.org/wiki/home/cpas/documentation/", "");   // Allow forbidden word "cpas" in help links
+        _sourceReplacements.put("http://www.labkey.org/wiki/home/cpas/documentation/", "");   // Allow forbidden word "cpas" in help links
     }
 
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
