@@ -66,6 +66,7 @@ public class MessagesLongTest extends BaseWebDriverTest
             "<b>${labkey.webPart(partName='Lists')}</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
+    private static final String TEMPLATE_TEXT = "***Please do not reply to this email notification. Replies to this email are routed to an unmonitored mailbox. Instead, please use the link below.***";
 
     String user = "message_user@gmail.com";
     String group = "Message group";
@@ -117,11 +118,20 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, user);
         deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
+        modifyTemplate(false);
+        goToHome();
+
     }
 
     @Test
     public void testSteps()
     {
+
+        log("Modify the default email template for message board notification.");
+        // This is done to test Issue 23934: Allow customization of email template for message board notifications
+        modifyTemplate(true);
+        goToHome();
+
         log("Open new project, add group, alter permissions");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         _permissionsHelper.createPermissionsGroup("Administrators");
@@ -336,8 +346,15 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check attachment linked in emailed message");
         click(Locator.linkWithText("RE: " + MSG1_TITLE));
         assertTextPresent("common.properties");
+        assertTextNotPresent(TEMPLATE_TEXT);
         assertElementPresent(Locator.linkWithText("common.properties"));
 
+        log("Validate that the Message Board Daily Digest is sent.");
+        getDriver().navigate().to(getBaseURL() + "/announcements/home/sendDailyDigest.view?");
+        goToModule("Dumbster");
+        assertTextPresent("New posts to /" + PROJECT_NAME, 2);
+        click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
+        assertTextPresent("The following new posts were made yesterday");
 
     }
 
@@ -635,4 +652,26 @@ public class MessagesLongTest extends BaseWebDriverTest
         }
 
     }
+
+    private void modifyTemplate(boolean modify)
+    {
+        String emailTemplate;
+        goToAdminConsole();
+        click(Locator.linkWithText("email customization"));
+        selectOptionByText(Locator.css("select[id='templateClass']"), "Message board notification");
+        if(modify)
+        {
+            emailTemplate = getFormElement(Locator.css("textarea[id='emailMessage']")).replace(TEMPLATE_TEXT, "");
+            setFormElement(Locator.css("textarea[id='emailMessage']"), emailTemplate);
+            clickButton("Save");
+        }
+        else
+        {
+            if (isButtonPresent("Reset to Default Template"))
+            {
+                clickButton("Reset to Default Template");
+            }
+        }
+    }
+
 }
