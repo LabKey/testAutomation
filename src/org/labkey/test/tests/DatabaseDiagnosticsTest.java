@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PipelineHelper;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class, DailyB.class})
@@ -64,7 +65,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return null;
+        return Arrays.asList("admin");
     }
 
     @Override public BrowserType bestBrowser()

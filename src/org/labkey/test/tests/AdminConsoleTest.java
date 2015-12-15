@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyA;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -36,11 +37,6 @@ public class AdminConsoleTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
-    {
-        testRibbonBar();
-    }
-
     public void testRibbonBar()
     {
         goToAdminConsole();
@@ -106,7 +102,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
     public List<String> getAssociatedModules()
     {
-        return null;
+        return Arrays.asList("admin");
     }
 
     @Override
