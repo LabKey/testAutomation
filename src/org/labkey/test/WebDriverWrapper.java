@@ -1612,7 +1612,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
             public boolean accept(File file)
             {
                 return file.getName().contains(".part") ||
-                        file.getName().contains(".tmp") ||
                         file.getName().contains(".crdownload");
             }
         };
