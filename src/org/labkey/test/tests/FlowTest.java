@@ -55,36 +55,33 @@ public class FlowTest extends BaseFlowTest
     @BeforeClass
     public static void initR()
     {
-        // fail fast if R is not configured
+        FlowTest init = (FlowTest)getCurrentTest();
+        init.doInit();
+    }
+
+    private void doInit()
+    {
         // R is needed for the positivity report
         RReportHelper _rReportHelper = new RReportHelper(getCurrentTest());
         _rReportHelper.ensureRConfig();
-    }
 
-    public boolean isShortTest()
-    {
-        return false;
+        setupQuery();
+        importFiles();
     }
 
     @Test
     public void _doTestSteps()
     {
-        setupQuery();
-        importFiles();
         analysisFilterTest();
-
-        if(!isShortTest())
-        {
-            testChartMeasurePicker();
-            configureSampleSetAndMetadata();
-            sampleSetAndMetadataTest();
-            customGraphQuery();
-            positivityReportTest();
-            copyAnalysisScriptTest();
-            removeAnalysisFilter();
-            verifyDiscoverableFCSFiles();
-            verifyExperimentRunGraphLinks();
-        }
+        testChartMeasurePicker();
+        configureSampleSetAndMetadata();
+        sampleSetAndMetadataTest();
+        customGraphQuery();
+        positivityReportTest();
+        copyAnalysisScriptTest();
+        removeAnalysisFilter();
+        verifyDiscoverableFCSFiles();
+        verifyExperimentRunGraphLinks();
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
