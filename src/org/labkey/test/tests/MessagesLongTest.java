@@ -168,7 +168,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("expires"), EXPIRES1);
         setFormElement(Locator.id("body"), "1 <b>first message testing</b>");
         selectOptionByText(Locator.name("rendererType"), "Wiki Page");
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         assertTextPresent(MSG1_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(EXPIRES1, "<b>first message testing</b>");
@@ -189,7 +189,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.id("body"), HTML_BODY);
         selectOptionByText(Locator.name("rendererType"), "HTML");
-        clickButton("Submit", defaultWaitForPage * 2);
+        clickButton("Submit", longWaitForPage);
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
         assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
@@ -197,7 +197,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view message or respond"));
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.id("body"), MSG1_BODY);
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
@@ -205,7 +205,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), RESP1_TITLE);
         setFormElement(Locator.name("expires"), EXPIRES2);
         setFormElement(Locator.id("body"), RESP1_BODY);
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
 
         log("Make sure response was entered correctly");
         assertTextPresent(
@@ -219,7 +219,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkContainingText("Attach a file"));
         File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[00]"), file);
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
         assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
@@ -258,14 +258,14 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check if sorting works");
         portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.name("title"), MSG2_TITLE);
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond").index(1));
         clickButton("Respond");
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("Admin"));
         checkCheckbox(Locator.radioButtonByName("sortOrderIndex").index(1));
@@ -293,7 +293,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Respond");
         selectOptionByText(Locator.name("status"), "Closed");
         assertFormElementEquals(Locator.name("assignedTo"), "");
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");
         impersonate(USER1);
