@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
 
 public class DataRegionTable extends Component
 {
-    public static final String SELECTION_SIGNAL = "selectChange";
+    public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _tableName;
     protected final WebElement _tableElement;
     protected BaseWebDriverTest _test;
