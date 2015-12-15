@@ -170,7 +170,7 @@ public abstract class AbstractAssayValidator
         {
             value = 2;
         }
-        else if(!getRunProperty("severityLevel").equals("ERROR") && level > _runErrorLevel)
+        else if(!"ERROR".equals(getRunProperty("severityLevel")) && level > _runErrorLevel)
         {
             value = level;
         }
@@ -205,7 +205,7 @@ public abstract class AbstractAssayValidator
             {
                 errors.println("This is test file 1 (Java).");
             }
-            try (PrintWriter errors = new PrintWriter(new BufferedWriter(new FileWriter(new File(getWorkingDir(), "test2.txt")))))
+            try (PrintWriter errors = new PrintWriter(new BufferedWriter(new FileWriter(new File(getWorkingDir(), "test2.tsv")))))
             {
                 errors.println("This is test file 2 (Java).");
             }
