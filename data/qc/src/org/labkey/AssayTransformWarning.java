@@ -54,9 +54,8 @@ public class AssayTransformWarning extends AbstractAssayValidator
         {
             if (getRunProperties().containsKey(Props.runDataFile.name()))
             {
-                String runData = getRunProperty(Props.runDataFile);
-                File inputFile = new File(runData);
-                File transformFile = new File(getTransformFile().get(runData));
+                File inputFile = new File(getRunProperty(Props.runDataUploadedFile));
+                File transformFile = new File(getTransformFile().get(getRunProperty(Props.runDataFile)));
 
                 try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
                 {
