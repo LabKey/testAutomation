@@ -19,15 +19,15 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, Study.class})
+@Category({BVT.class, Study.class})
 public class QuerySnapshotTest extends StudyBaseTest
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";

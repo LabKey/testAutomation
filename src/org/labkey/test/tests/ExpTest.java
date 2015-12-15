@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Category({BVT.class, FileBrowser.class})
+@Category({DailyB.class, FileBrowser.class})
 public class ExpTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExpVerifyProject";
@@ -64,7 +64,7 @@ public class ExpTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Test

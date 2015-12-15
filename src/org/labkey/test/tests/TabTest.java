@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
@@ -28,9 +28,11 @@ import org.labkey.test.util.PortalHelper;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-@Category({BVT.class})
+@Category({DailyA.class})
 public class TabTest extends SimpleModuleTest
 {
     @Override public BrowserType bestBrowser()

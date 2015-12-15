@@ -21,7 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -31,7 +31,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-@Category({BVT.class, Wiki.class})
+@Category({DailyA.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_NAME = "ButtonVerifyProject";
