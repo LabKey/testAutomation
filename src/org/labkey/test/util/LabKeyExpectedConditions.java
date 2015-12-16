@@ -195,4 +195,37 @@ public abstract class LabKeyExpectedConditions
             }
         };
     }
+
+    public static ExpectedCondition<WebElement> newDataRegionPanelIsExpanded(DataRegionTable dataRegion)
+    {
+        final WebElement dataRegionEl = dataRegion.locator().findElement(dataRegion._test.getDriver());
+        return new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver d)
+            {
+                //List<WebElement> els = dataRegionEl.findElements(By.cssSelector("div.customize-view-designer:not([style*='display:none']):not([style*='display: none'])"));
+                List<WebElement> els = dataRegionEl.findElements(By.cssSelector("div.customize-view-designer"));
+                for (WebElement el : els)
+                {
+                    try
+                    {
+                        if (el.isDisplayed())
+                            return el;
+                    }
+                    catch (StaleElementReferenceException retry)
+                    {
+                        return null;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "data region panel to open";
+            }
+        };
+    }
 }
