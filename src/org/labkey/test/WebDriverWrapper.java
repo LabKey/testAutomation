@@ -21,8 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.api.util.FileUtil;
+import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -62,6 +62,9 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -78,9 +81,11 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -95,6 +100,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -243,6 +249,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     {
                         try
                         {
+                            // This doesn't collect timestamps
                             JavaScriptError.addExtension(profile);}
                         catch(IOException e)
                         {throw new RuntimeException("Failed to load JS error checker", e);}
@@ -252,6 +259,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
                     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+                    if (isScriptCheckEnabled())
+                    {
+                        // This doesn't collect JS source information (file & line number)
+                        LoggingPreferences loggingPreferences = new LoggingPreferences();
+                        loggingPreferences.enable(LogType.BROWSER, Level.SEVERE);
+                        capabilities.setCapability("loggingPrefs", loggingPreferences);
+                    }
 
                     String browserPath = System.getProperty("selenium.browser.path", "");
                     if (browserPath.length() > 0)
@@ -314,21 +328,87 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return _jsErrorChecker;
     }
 
-    protected interface JSErrorChecker
+    protected abstract class JSErrorChecker
     {
-        void pause();
-        void resume();
+        public abstract void pause();
+        public abstract void resume();
         @NotNull
-        List<String> ignored();
+        public abstract List<LogEntryWithSourceInfo> getErrors();
         @NotNull
-        List<JavaScriptError> getErrors();
+        protected abstract List<String> ignored();
+
+        public boolean isErrorIgnored(LogEntryWithSourceInfo error)
+        {
+            for (String ignoredText : ignored())
+            {
+                if(error.getMessage().contains(ignoredText) || error.getSourceName().contains(ignoredText))
+                    return false;
+            }
+
+            return true;
+        }
     }
 
-    private class FirefoxJSErrorChecker implements JSErrorChecker
+    protected class LogEntryWithSourceInfo extends LogEntry
+    {
+        private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
+        private String sourceName;
+        private int lineNumber;
+
+        LogEntryWithSourceInfo(LogEntry entry, @NotNull String sourceName, int lineNumber)
+        {
+            super(entry.getLevel(), entry.getTimestamp(), entry.getMessage());
+            this.sourceName = sourceName;
+            this.lineNumber = lineNumber;
+        }
+
+        public String getSourceName()
+        {
+            return sourceName;
+        }
+
+        public int getLineNumber()
+        {
+            return lineNumber;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("[%s] %s", DATE_FORMAT.format(new Date(getTimestamp())), toStringNoTimestamp());
+        }
+
+        private String toStringNoTimestamp()
+        {
+            return String.format("%s {%s%s}",getMessage(), sourceName, sourceName.contains(".view?") ? "" : String.format(":%d", lineNumber));
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return toStringNoTimestamp().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
+
+            LogEntryWithSourceInfo that = (LogEntryWithSourceInfo) o;
+
+            return toStringNoTimestamp().equals(that.toStringNoTimestamp());
+        }
+    }
+
+    private class FirefoxJSErrorChecker extends JSErrorChecker
     {
         private boolean jsCheckerPaused = false;
         private int _jsErrorPauseCount = 0; // To keep track of nested pauses
-        private List<JavaScriptError> _jsErrors = new ArrayList<>();
+        private List<Pair<Long, Long>> _pauseWindows = new ArrayList<>();
+        private long _pauseStart = Long.MAX_VALUE;
 
         @Override
         public void pause()
@@ -337,7 +417,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (!jsCheckerPaused)
             {
                 jsCheckerPaused = true;
-                _jsErrors.addAll(JavaScriptError.readErrors(getDriver()));
+                _pauseStart = System.currentTimeMillis();
             }
         }
 
@@ -347,7 +427,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (--_jsErrorPauseCount < 1 && jsCheckerPaused)
             {
                 jsCheckerPaused = false;
-                JavaScriptError.readErrors(getDriver()); // clear errors
+                _pauseWindows.add(new Pair<>(_pauseStart, System.currentTimeMillis()));
+                _pauseStart = Long.MAX_VALUE;
             }
         }
 
@@ -377,14 +458,40 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         @NotNull
         @Override
-        public List<JavaScriptError> getErrors()
+        public List<LogEntryWithSourceInfo> getErrors()
         {
-            _jsErrors.addAll(JavaScriptError.readErrors(getDriver()));
+            List<LogEntryWithSourceInfo> _jsErrors = new ArrayList<>();
+
+            List<LogEntry> logEntries = getDriver().manage().logs().get(LogType.BROWSER).filter(Level.SEVERE);
+            List<JavaScriptError> javaScriptErrors = JavaScriptError.readErrors(getDriver());
+
+            for (int i = 0; i < logEntries.size(); i++)
+            {
+                LogEntry logEntry = logEntries.get(i);
+
+                if (!isErrorWhilePaused(logEntry))
+                {
+                    JavaScriptError javaScriptError = javaScriptErrors.get(i);
+                    _jsErrors.add(new LogEntryWithSourceInfo(logEntry, javaScriptError.getSourceName(), javaScriptError.getLineNumber()));
+                }
+            }
             return _jsErrors;
+        }
+
+        private boolean isErrorWhilePaused(LogEntry entry)
+        {
+            for (Pair<Long, Long> pauseWindow : _pauseWindows)
+            {
+                if (entry.getTimestamp() < pauseWindow.getKey())
+                    return false;
+                else if (entry.getTimestamp() < pauseWindow.getValue())
+                    return true;
+            }
+            return !(entry.getTimestamp() < _pauseStart);
         }
     }
 
-    private class ChromeJSErrorChecker implements JSErrorChecker
+    private class ChromeJSErrorChecker extends JSErrorChecker
     {
         @Override
         public void pause()
@@ -407,7 +514,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         @Override @NotNull
-        public List<JavaScriptError> getErrors()
+        public List<LogEntryWithSourceInfo> getErrors()
         {
             return Collections.emptyList();
         }
@@ -451,17 +558,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             throw new RuntimeException(e);
         }
-    }
-
-    protected boolean validateJsError(JavaScriptError error)
-    {
-        for (String ignoredText : _jsErrorChecker.ignored())
-        {
-            if(error.toString().contains(ignoredText))
-                return false;
-        }
-
-        return true;
     }
 
     public void log(String str)
@@ -2876,7 +2972,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         else if (matches.isEmpty())
             select.selectByVisibleText(value);
         else
-            Assert.fail("Too many matches for '" + value + "': ['" + StringUtils.join(matches, "', '") + "']");
+            fail("Too many matches for '" + value + "': ['" + StringUtils.join(matches, "', '") + "']");
 
     }
 

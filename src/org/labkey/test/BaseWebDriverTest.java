@@ -18,7 +18,6 @@ package org.labkey.test;
 
 import com.google.common.base.Predicate;
 import com.thoughtworks.selenium.SeleniumException;
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +38,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,7 +69,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
@@ -1019,6 +1018,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         simpleSignIn();
     }
 
+    @After
+    public final void afterTest()
+    {
+        checkJsErrors();
+    }
+
     @AfterClass
     public static void postamble() throws Exception
     {
@@ -1053,12 +1058,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             setUp(); // Instantiate new WebDriver if needed
             _testFailed = false;
-        }
-
-        @Override
-        protected void succeeded(Description description)
-        {
-            checkJsErrors();
         }
 
         @Override
@@ -1606,44 +1605,39 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (isScriptCheckEnabled() && getDriver() != null && getJsErrorChecker() != null)
         {
-            int duplicateCount = 0;
-            List<JavaScriptError> jsErrors;
-            try
-            {
-                jsErrors = getJsErrorChecker().getErrors();
-            }
-            catch (WebDriverException ex)
-            {
-                return; // Error checker has not been initialized
-            }
-            Set<JavaScriptError> validErrors = new HashSet<>();
-            Set<JavaScriptError> ignoredErrors = new HashSet<>();
-            for (JavaScriptError error : jsErrors)
+            List<LogEntryWithSourceInfo> jsErrors = getJsErrorChecker().getErrors();
+
+            List<LogEntryWithSourceInfo> validErrors = new ArrayList<>();
+            Set<LogEntryWithSourceInfo> ignoredErrors = new HashSet<>();
+
+            for (LogEntryWithSourceInfo error : jsErrors)
             {
                 if (!validErrors.contains(error) && !ignoredErrors.contains(error)) // Don't log duplicate errors
                 {
                     if (validErrors.size() + ignoredErrors.size() == 0)
                         log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>"); // first error
 
-                    if (validateJsError(error))
-                    {
+                    if (!getJsErrorChecker().isErrorIgnored(error))
                         validErrors.add(error);
-                        log(error.toString());
-                    }
-                    else // log ignored errors, but don't fail
-                    {
+                    else
                         ignoredErrors.add(error);
-                        log("[Ignored] " + error.toString());
-                    }
                 }
-                else
-                    duplicateCount++;
             }
-            if (duplicateCount > 0)
-                log(duplicateCount + " duplicate errors.");
-
-            if (validErrors.size() + ignoredErrors.size() > 0)
+            if (ignoredErrors.size() + validErrors.size() > 0)
+            {
                 log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
+                for (LogEntryWithSourceInfo error : validErrors)
+                    log(error.toString());
+
+                if (!ignoredErrors.isEmpty())
+                {
+                    log("<<<<<<<<<<<<<<<IGNORED ERRORS>>>>>>>>>>>>>>>>>>");
+                    for (LogEntryWithSourceInfo error : ignoredErrors)
+                        log("[Ignored] " + error.toString());
+                }
+
+                log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
+            }
 
             if (validErrors.size() > 0)
             {
@@ -1651,7 +1645,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (validErrors.size() > 1)
                     errorCtStr = " (1 of " + validErrors.size() + ") ";
                 if (!_testFailed) // Don't clobber existing failures. Just log them.
-                    fail("JavaScript error" + errorCtStr + ": " + validErrors.toArray()[0]);
+                    fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
             }
         }
     }
