@@ -276,7 +276,7 @@ public class UserTest extends BaseWebDriverTest
         setFormElement(Locator.id("email"), PASSWORD_RESET_USER);
         setFormElement(Locator.id("password"), TEST_PASSWORD);
         clickButton("Sign In");
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
         assertTextPresent(PASSWORD_RESET_USER);
         assertTextNotPresent("Sign In");
     }

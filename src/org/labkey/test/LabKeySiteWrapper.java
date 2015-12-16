@@ -17,7 +17,6 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
-import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -39,6 +38,7 @@ import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 import static org.labkey.test.WebTestHelper.getHttpPostResponse;
 
@@ -104,7 +104,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
         }
 
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
 
         if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Startup Modules"))||
                 isElementPresent(Locator.css(".labkey-nav-page-header").withText("Upgrade Modules")))
@@ -114,27 +114,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-
-    // first is authenticated user, second is impersonated user or "-"
-    Pair<String,String> getUser()
-    {
-        String authenticated = null;
-        String impersonated = null;
-        WebElement a = Locator.xpath("//META[@name='authenticatedUser']").findElement(getDriver());
-        if (null != a)
-            authenticated = a.getAttribute("content");
-        WebElement e = Locator.xpath("//META[@name='impersonatedUser']").findElement(getDriver());
-        if (null != e)
-            impersonated = e.getAttribute("content");
-        return new Pair<>(authenticated,impersonated);
-    }
-
-
+    @Deprecated // TODO: Remove after all 16.1.2 feature branches have been merged
     public void assertSignOutAndMyAccountPresent()
     {
-        click(Locator.id("userMenuPopupLink"));
-        assertElementPresent(Ext4Helper.Locators.menuItem("My Account"));
-        assertElementPresent(Ext4Helper.Locators.menuItem("Sign Out"));
+        assertSignedInNotImpersonating();
+    }
+
+    public void assertSignedInNotImpersonating()
+    {
+        assertTrue("Not signed in", isSignedIn());
+        assertFalse("Impersonating", isImpersonating());
+        assertElementPresent(Locators.USER_MENU);
     }
 
     public void deleteSiteWideTermsOfUsePage()
@@ -387,14 +377,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void stopImpersonatingRole()
     {
         clickUserMenuItem("Stop Impersonating");
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
         goToHome();
     }
 
     public void stopImpersonatingGroup()
     {
         clickUserMenuItem("Stop Impersonating");
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
         goToHome();
     }
 
@@ -422,7 +412,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String fakeUser = _impersonationStack.pop();
         assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
         goToHome();
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }

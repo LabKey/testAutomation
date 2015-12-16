@@ -666,7 +666,7 @@ public class SecurityTest extends BaseWebDriverTest
         setFormElement(Locator.id("password"), PASSWORDS[0]);
         setFormElement(Locator.id("password2"), PASSWORDS[0]);
         clickButton("Set Password");
-        assertSignOutAndMyAccountPresent();
+        assertSignedInNotImpersonating();
         //success
         impersonate(NORMAL_USER);
 

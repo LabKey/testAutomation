@@ -1025,9 +1025,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (Boolean)executeScript("return window.LABKEY != undefined;");
     }
 
+    public boolean isSignedIn()
+    {
+        return (Boolean)executeScript("return LABKEY.user.isSignedIn;");
+    }
+
     public boolean isSignedInAsAdmin()
     {
         return (Boolean)executeScript("return LABKEY.user.isSystemAdmin;");
+    }
+
+    public boolean isImpersonating()
+    {
+        return (Boolean)executeScript("return LABKEY.impersonatingUser != undefined;");
     }
 
     public void assertAlert(String msg)
