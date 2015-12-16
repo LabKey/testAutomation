@@ -17,6 +17,7 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
+import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
@@ -112,6 +113,22 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickButton("Next");
         }
     }
+
+
+    // first is authenticated user, second is impersonated user or "-"
+    Pair<String,String> getUser()
+    {
+        String authenticated = null;
+        String impersonated = null;
+        WebElement a = Locator.xpath("//META[@name='authenticatedUser']").findElement(getDriver());
+        if (null != a)
+            authenticated = a.getAttribute("content");
+        WebElement e = Locator.xpath("//META[@name='impersonatedUser']").findElement(getDriver());
+        if (null != e)
+            impersonated = e.getAttribute("content");
+        return new Pair<>(authenticated,impersonated);
+    }
+
 
     public void assertSignOutAndMyAccountPresent()
     {
