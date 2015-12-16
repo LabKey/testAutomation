@@ -1983,12 +1983,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement scrollIntoView(Locator loc)
     {
-        return scrollIntoView(loc.findElement(getDriver()));
+        return scrollIntoView(loc.findElement(getDriver()), true);
+    }
+
+    public WebElement scrollIntoView(Locator loc, Boolean alignToTop)
+    {
+        return scrollIntoView(loc.findElement(getDriver()), alignToTop);
     }
 
     public WebElement scrollIntoView(WebElement el)
     {
-        executeScript("arguments[0].scrollIntoView(true);", el);
+        return scrollIntoView(el, true);
+    }
+
+    public WebElement scrollIntoView(WebElement el, Boolean alignToTop)
+    {
+        if(alignToTop)
+        {
+            executeScript("arguments[0].scrollIntoView(true);", el);
+        }
+        else
+        {
+            executeScript("arguments[0].scrollIntoView(false);", el);
+        }
         return el;
     }
 

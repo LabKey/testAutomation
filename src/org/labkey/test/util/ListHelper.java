@@ -489,6 +489,7 @@ public class ListHelper extends AbstractHelper
         _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
         try
         {
+            _test.scrollIntoView(Locator.tag("div").withClass("x-combo-list-item").withText(value), false);
             _test.waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
             _test.log(".. selected");
         }
@@ -529,6 +530,7 @@ public class ListHelper extends AbstractHelper
         _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
         try
         {
+            _test.scrollIntoView(Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), false);
             _test.waitAndClick(500*attempt, Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), 0);
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
