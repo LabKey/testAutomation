@@ -240,6 +240,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/x-gzip," +
                                     "application/x-zip-compressed," +
                                     "application/xml," +
+                                    "text/plain," +
                                     "text/xml," +
                                     "text/x-script.perl," +
                                     "text/tab-separated-values," +
