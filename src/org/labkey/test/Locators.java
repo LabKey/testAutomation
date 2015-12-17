@@ -27,8 +27,8 @@ public abstract class Locators
     public static final Locator.CssLocator labkeyHeader = Locator.css(".labkey-main .header-block");
     public static final Locator.CssLocator labkeyBody = Locator.css(".labkey-main .body-block");
 
-    public static Locator.XPathLocator pageSignal(String signalName)
+    public static Locator pageSignal(String signalName)
     {
-        return Locator.id("testSignals").child(Locator.tagWithName("div", signalName));
+        return Locator.css("#testSignals > META[name=" + signalName + "]");
     }
 }

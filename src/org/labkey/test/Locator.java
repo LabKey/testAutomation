@@ -530,7 +530,7 @@ public abstract class Locator
         return Locator.tagWithClass("div", "x-tbar-page-next").withPredicate(Locator.xpath("../preceding-sibling::td/span").containing(label));
     }
 
-    public static XPathLocator permissionRendered()
+    public static Locator permissionRendered()
     {
         return Locators.pageSignal("policyRendered");
     }
