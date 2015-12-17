@@ -1612,16 +1612,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             for (LogEntryWithSourceInfo error : jsErrors)
             {
-                if (!validErrors.contains(error) && !ignoredErrors.contains(error)) // Don't log duplicate errors
-                {
-                    if (validErrors.size() + ignoredErrors.size() == 0)
-                        log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>"); // first error
-
-                    if (!getJsErrorChecker().isErrorIgnored(error))
-                        validErrors.add(error);
-                    else
-                        ignoredErrors.add(error);
-                }
+                if (!getJsErrorChecker().isErrorIgnored(error))
+                    validErrors.add(error);
+                else
+                    ignoredErrors.add(error);
             }
             if (ignoredErrors.size() + validErrors.size() > 0)
             {
