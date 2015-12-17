@@ -342,10 +342,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             for (String ignoredText : ignored())
             {
                 if(error.getMessage().contains(ignoredText) || error.getSourceName().contains(ignoredText))
-                    return false;
+                    return true;
             }
 
-            return true;
+            return false;
         }
     }
 
