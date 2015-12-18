@@ -446,6 +446,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "ext-all-sandbox-debug.js",
                     "ext-all-sandbox.js",
                     "ext-all-sandbox-dev.js",
+                    "d3-3.3.9.js", // Ignore internal D3 errors
                     "XULElement.selectedIndex", // Ignore known Firefox Issue
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
