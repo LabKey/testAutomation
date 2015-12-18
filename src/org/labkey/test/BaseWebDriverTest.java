@@ -71,6 +71,7 @@ import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1605,12 +1606,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (isScriptCheckEnabled() && getDriver() != null && getJsErrorChecker() != null)
         {
-            List<LogEntryWithSourceInfo> jsErrors = getJsErrorChecker().getErrors();
+            List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
 
-            List<LogEntryWithSourceInfo> validErrors = new ArrayList<>();
-            Set<LogEntryWithSourceInfo> ignoredErrors = new HashSet<>();
+            List<LogEntry> validErrors = new ArrayList<>();
+            Set<LogEntry> ignoredErrors = new HashSet<>();
 
-            for (LogEntryWithSourceInfo error : jsErrors)
+            for (LogEntry error : jsErrors)
             {
                 if (!getJsErrorChecker().isErrorIgnored(error))
                     validErrors.add(error);
@@ -1620,13 +1621,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (ignoredErrors.size() + validErrors.size() > 0)
             {
                 log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
-                for (LogEntryWithSourceInfo error : validErrors)
+                for (LogEntry error : validErrors)
                     log(error.toString());
 
                 if (!ignoredErrors.isEmpty())
                 {
                     log("<<<<<<<<<<<<<<<IGNORED ERRORS>>>>>>>>>>>>>>>>>>");
-                    for (LogEntryWithSourceInfo error : ignoredErrors)
+                    for (LogEntry error : ignoredErrors)
                         log("[Ignored] " + error.toString());
                 }
 

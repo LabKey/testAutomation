@@ -334,15 +334,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         public abstract void pause();
         public abstract void resume();
         @NotNull
-        public abstract List<LogEntryWithSourceInfo> getErrors();
+        public abstract List<LogEntry> getErrors();
         @NotNull
         protected abstract List<String> ignored();
 
-        public boolean isErrorIgnored(LogEntryWithSourceInfo error)
+        public boolean isErrorIgnored(LogEntry error)
         {
             for (String ignoredText : ignored())
             {
-                if(error.getMessage().contains(ignoredText) || error.getSourceName().contains(ignoredText))
+                if(error.toString().contains(ignoredText))
                     return true;
             }
 
@@ -460,9 +460,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         @NotNull
         @Override
-        public List<LogEntryWithSourceInfo> getErrors()
+        public List<LogEntry> getErrors()
         {
-            List<LogEntryWithSourceInfo> _jsErrors = new ArrayList<>();
+            List<LogEntry> _jsErrors = new ArrayList<>();
 
             List<LogEntry> logEntries = getDriver().manage().logs().get(LogType.BROWSER).filter(Level.SEVERE);
             List<JavaScriptError> javaScriptErrors = JavaScriptError.readErrors(getDriver());
@@ -473,8 +473,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                 if (!isErrorWhilePaused(logEntry))
                 {
-                    JavaScriptError javaScriptError = javaScriptErrors.get(i);
-                    _jsErrors.add(new LogEntryWithSourceInfo(logEntry, javaScriptError.getSourceName(), javaScriptError.getLineNumber()));
+                    if (javaScriptErrors.size() > i && javaScriptErrors.get(i).getErrorMessage().equals(logEntry.getMessage()))
+                        _jsErrors.add(new LogEntryWithSourceInfo(logEntry,
+                                javaScriptErrors.get(i).getSourceName(), javaScriptErrors.get(i).getLineNumber()));
+                    else
+                        _jsErrors.add(logEntry);
                 }
             }
             return _jsErrors;
@@ -516,7 +519,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
 
         @Override @NotNull
-        public List<LogEntryWithSourceInfo> getErrors()
+        public List<LogEntry> getErrors()
         {
             return Collections.emptyList();
         }
