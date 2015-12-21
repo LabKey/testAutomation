@@ -33,6 +33,7 @@ import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
@@ -278,10 +279,11 @@ public class KnitrReportTest extends BaseWebDriverTest
             try
             {
                 boolean foundError = false;
-                List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver());
-                for (JavaScriptError j : jsErrors)
+
+                List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
+                for (LogEntry j : jsErrors)
                 {
-                    String msg = j.getErrorMessage();
+                    String msg = j.getMessage();
                     if (null != msg)
                     {
                         log("found JS error: " + msg);
