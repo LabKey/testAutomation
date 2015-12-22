@@ -61,7 +61,7 @@ public abstract class DomainEditor
     public void save()
     {
         _test.clickButton("Save", 0);
-        _test.waitForText(20000, "Save successful.");
+        _test.waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
     }
 
     public void saveAndClose()
