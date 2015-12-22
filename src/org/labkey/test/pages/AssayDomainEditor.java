@@ -15,10 +15,14 @@
  */
 package org.labkey.test.pages;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -111,12 +115,110 @@ public class AssayDomainEditor extends DomainEditor
             _test.uncheckCheckbox(Locator.checkboxByName("editableRunProperties"));
     }
 
+    public void setEditableResults(boolean set)
+    {
+        if (set)
+            _test.checkCheckbox(Locator.checkboxByName("editableResultProperties"));
+        else
+            _test.uncheckCheckbox(Locator.checkboxByName("editableResultProperties"));
+    }
+
     public void setBackgroundImport(boolean set)
     {
         if (set)
             _test.checkCheckbox(Locator.checkboxByName("backgroundUpload"));
         else
             _test.uncheckCheckbox(Locator.checkboxByName("backgroundUpload"));
+    }
+
+    public void addBatchField(String name, @Nullable String label, @Nullable String type)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        addField(xpathSection, name, label, type);
+    }
+
+    public void removeBatchField(String name)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        removeField(xpathSection, name);
+    }
+
+    public void addRunField(String name, @Nullable String label, @Nullable String type)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        addField(xpathSection, name, label, type);
+    }
+
+    public void removeRunField(String name)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        removeField(xpathSection, name);
+    }
+
+    public void addDataField(String name, @Nullable String label, @Nullable String type)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        addField(xpathSection, name, label, type);
+    }
+
+    public void removeDataField(String name)
+    {
+        final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
+        removeField(xpathSection, name);
+    }
+
+    private void addField(String xpathSection, String name, @Nullable String label, @Nullable String type)
+    {
+        List<WebElement> inputBoxes;
+
+        Locator.xpath(xpathSection + "span[contains(@id, 'button_Add Field')]").findElement(_test.getDriver()).click();
+
+        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name')]").findElements(_test.getDriver());
+        _test.setFormElement(inputBoxes.get(inputBoxes.size() - 1), name);
+
+        if(label != null)
+        {
+            inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'label')]").findElements(_test.getDriver());
+            _test.setFormElement(inputBoxes.get(inputBoxes.size() - 1), label);
+        }
+
+        if(type != null)
+        {
+            inputBoxes = Locator.xpath(xpathSection + "input[starts-with(@name, 'ff_type')]/./following-sibling::div").findElements(_test.getDriver());
+            inputBoxes.get(inputBoxes.size() - 1).click();
+            _test.click(Locator.xpath("//div[contains(@class, 'x-window')]//div[contains(@class, 'x-window-bwrap')]//table//tr//label[contains(text(), '" + type + "')]"));
+            _test.click(Locator.xpath("//button[contains(@class, 'x-btn-text')][contains(text(), 'Apply')]"));
+        }
+    }
+
+    public void removeField(String xpathSection, String name)
+    {
+        final String xpathDelete1 = "input[contains(@id, '-input') and starts-with(@id, 'name')][";
+        final String xpathDelete2 = "]/./ancestor::tr[contains(@class, 'editor-field-row')]/./descendant::div[contains(@id, 'partdelete')]";
+        List<WebElement> inputBoxes;
+        WebElement theBox = null;
+        int index = 1;
+
+        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(_test.getDriver());
+        for(WebElement we : inputBoxes)
+        {
+            if(we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
+            {
+                theBox = we;
+                break;
+            }
+            else
+            {
+                index++;
+            }
+        }
+
+        if(theBox != null)
+        {
+            Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(_test.getDriver()).click();
+            _test.clickButton("OK", 0);
+        }
+
     }
 
     @Override

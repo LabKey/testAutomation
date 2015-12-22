@@ -500,6 +500,7 @@ src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
 src/org/labkey/test/tests/HiddenEmailTest.java -text
 src/org/labkey/test/tests/HormoneAssayTest.java -text
+src/org/labkey/test/tests/InlineImagesAssayTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JBrowseTest.java -text
 src/org/labkey/test/tests/JUnitDRTTest.java -text
