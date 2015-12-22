@@ -446,8 +446,8 @@ public class ListHelper extends AbstractHelper
         setColumnType(prefix, lookup, null, index);
     }
 
-    @LogMethod
-    private void setColumnType(@Nullable String prefix, @Nullable LookupInfo lookup, @Nullable ListColumnType colType, int i)
+    @LogMethod(quiet = true)
+    private void setColumnType(@Nullable String prefix, @Nullable LookupInfo lookup, @LoggedParam @Nullable ListColumnType colType, @LoggedParam int i)
     {
         // click the combobox trigger image
         _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
