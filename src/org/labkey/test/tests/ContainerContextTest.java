@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -38,6 +39,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
@@ -49,13 +51,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Data.class})
 public class ContainerContextTest extends BaseWebDriverTest
 {
     private static final String SUB_FOLDER_A = "A";
     private static final String SUB_FOLDER_B = "B";
+
+    protected static final String TEST_ASSAY_A = "Test Assay A";
+    protected static final String TEST_ASSAY_DESC_A = "Description for assay A";
+
+    protected static final String TEST_ASSAY_B = "Test Assay B";
+    protected static final String TEST_ASSAY_DESC_B = "Description for assay B";
 
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
@@ -64,6 +73,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     private static final String MANUFACTURER = "Toyota";
     private static final String MODEL = "Prius C";
     private RReportHelper _RReportHelper = new RReportHelper(this);
+    private PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
     protected String getProjectName()
@@ -94,16 +104,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @Test
-    public void testSteps() throws Exception
+    @BeforeClass
+    public static void setup() throws Exception
     {
-        doSetup();
-
-        doTestListLookupURL();
-        doTestIssue15610();
-        doTestIssue15751();
-        doTestIssue20375();
-        doTestSimpleModuleTables();
+        ContainerContextTest init = (ContainerContextTest)getCurrentTest();
+        init.doSetup();
     }
 
     protected void doSetup() throws Exception
@@ -112,14 +117,14 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
-        addWebPart("Workbooks");
+        _portalHelper.addWebPart("Workbooks");
 
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies"});
         _containerHelper.createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies"});
     }
 
-    @LogMethod
-    protected void doTestListLookupURL()
+    @Test
+    public void testListLookupURL()
     {
         log("** Creating lookup target list in sub-folder");
         goToProjectHome();
@@ -195,8 +200,8 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     // Issue 15610: viscstudieslist - URLs generated from lookups are broken
-    @LogMethod
-    protected void doTestIssue15610()
+    @Test
+    public void testIssue15610()
     {
         log("** Creating study in " + SUB_FOLDER_A);
         goToProjectHome();
@@ -245,8 +250,8 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     // Issue 15751: Pipeline job list generates URLs without correct container
-    @LogMethod
-    protected void doTestIssue15751()
+    @Test
+    public void testIssue15751()
     {
         log("** Create pipeline jobs");
         insertJobIntoSubFolder(SUB_FOLDER_A);
@@ -268,7 +273,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void insertJobIntoSubFolder(String folder)
+    public void insertJobIntoSubFolder(String folder)
     {
         goToProjectHome();
 
@@ -299,10 +304,11 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     // Issue 20375: DetailsURL link has no container in certain cases
-    @LogMethod
-    protected void doTestIssue20375()
+    @Test
+    public void testIssue20375()
     {
         log("** Create wiki pages in subfolders");
+        goToProjectHome();
         WikiHelper wikiHelper = new WikiHelper(this);
 
         clickFolder(SUB_FOLDER_A);
@@ -341,8 +347,8 @@ public class ContainerContextTest extends BaseWebDriverTest
                 detailsURL.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/wiki-page.view?name=subfolder-b"));
     }
 
-    @LogMethod
-    protected void doTestSimpleModuleTables() throws Exception
+    @Test
+    public void testSimpleModuleTables() throws Exception
     {
         log("** Creating required vehicle schema records...");
         int vehicleId = createRequiredRecords();
@@ -465,6 +471,75 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         createQuery(getProjectName(), "EmissionTests Without Container", "vehicle", customQueryWithoutContainer, customMetadata, false);
         verifySimpleModuleTables("EmissionTests Without Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
+    }
+
+    @Test
+    public void testAssayList()
+    {
+        goToProjectHome();
+        clickFolder(SUB_FOLDER_A);
+        log("Defining a test assay at subfolder A");
+        _portalHelper.addWebPart("Assay List");
+        //clickButton("Manage Assays");
+        clickButton("New Assay Design");
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
+        clickButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_A);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC_A);
+        clickButton("Save", 0);
+        waitForText("Save successful");
+
+        goToProjectHome();
+        clickFolder(SUB_FOLDER_B);
+        log("Defining a test assay at subfolder B");
+        _portalHelper.addWebPart("Assay List");
+        //clickButton("Manage Assays");
+        clickButton("New Assay Design");
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
+        clickButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_B);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC_B);
+        clickButton("Save", 0);
+        waitForText("Save successful");
+
+        goToProjectHome();
+        _portalHelper.addWebPart("Assay List");
+
+        //Details URL should point to assays begin view in current container, not container where it was defined
+        String detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
+        String detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
+        log("  detailsURL_A = " + detailsURL_A);
+        assertTrue("Expected details URL to point to project home " + detailsURL_A,
+                detailsURL_A.contains("/labkey/assay/" + getProjectName() + "/assayBegin.view?"));
+        log("  detailsURL_B = " + detailsURL_B);
+        assertTrue("Expected details URL to point to project home " + detailsURL_B,
+                detailsURL_B.contains("/labkey/assay/" + getProjectName() + "/assayBegin.view?"));
+        clickFolder(SUB_FOLDER_A);
+        detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
+        detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
+        log("  detailsURL_A = " + detailsURL_A);
+        assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
+                detailsURL_A.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_A + "/assayBegin.view?"));
+        log("  detailsURL_B = " + detailsURL_B);
+        assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
+                detailsURL_B.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_A + "/assayBegin.view?"));
+        clickFolder(SUB_FOLDER_B);
+        detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
+        detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
+        log("  detailsURL_A = " + detailsURL_A);
+        assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
+                detailsURL_A.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_B + "/assayBegin.view?"));
+        log("  detailsURL_B = " + detailsURL_B);
+        assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
+                detailsURL_B.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_B + "/assayBegin.view?"));
     }
 
     protected void overrideMetadata(String container, String schemaName, String queryName, String xml)
