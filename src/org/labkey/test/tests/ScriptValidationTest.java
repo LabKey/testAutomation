@@ -235,6 +235,7 @@ public class ScriptValidationTest extends SimpleModuleTest
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"beforeInsert validation failed\"," +
+                "\"errorCount\":1," +
                 "\"errors\":[{" +
                     "\"errors\":[{" +
                         "\"message\":\"beforeInsert validation failed\"," +
@@ -246,10 +247,12 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestReturnFalse\"," +
-                        "\"Hex\":null" +
+                        "\"Hex\":\"\"" +
                         "\"_rowNumber\":1" +
                     "}" +
-                "}]" +
+                "}]," +
+                "\"success\":false," +
+                "\"extraContext\":{}," +
             "}");
             json.assertEquals("FAILED", expected, properties);
         }
