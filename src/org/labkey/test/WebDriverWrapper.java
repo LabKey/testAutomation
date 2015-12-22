@@ -446,6 +446,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "ext-all-sandbox-debug.js",
                     "ext-all-sandbox.js",
                     "ext-all-sandbox-dev.js",
+                    "schemaMap.schemas", // EHR error
                     "com.google.gwt", // Ignore GWT errors
                     "d3-3.3.9.js", // Ignore internal D3 errors
                     "XULElement.selectedIndex", // Ignore known Firefox Issue
