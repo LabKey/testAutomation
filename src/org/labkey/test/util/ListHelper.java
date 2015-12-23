@@ -104,19 +104,28 @@ public class ListHelper extends AbstractHelper
 
     public void insertNewRow(Map<String, String> data)
     {
-
-        _test.clickButton("Insert New");
-        setRowData(data);
+        insertNewRow(data, true);
     }
 
-    private void setRowData(Map<String, String> data)
+    public void insertNewRow(Map<String, String> data, boolean validateText)
+    {
+        _test.clickButton("Insert New");
+        setRowData(data, validateText);
+    }
+
+    private void setRowData(Map<String, String> data, boolean validateText)
     {
         for(String key : data.keySet())
         {
             _test.setFormElement(Locator.name("quf_" + key), data.get(key));
         }
         _test.clickButton("Submit");
-        _test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
+
+        if(validateText)
+        {
+            _test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
+        }
+
     }
 
     /**
@@ -126,11 +135,15 @@ public class ListHelper extends AbstractHelper
      */
     public void updateRow(int id, Map<String, String> data)
     {
-        DataRegionTable dr = new DataRegionTable("query", _test);
-        _test.clickAndWait(dr.updateLink(id - 1));
-        setRowData(data);
+        updateRow(id, data, true);
     }
 
+    public void updateRow(int id, Map<String, String> data, boolean validateText)
+    {
+        DataRegionTable dr = new DataRegionTable("query", _test);
+        _test.clickAndWait(dr.updateLink(id - 1));
+        setRowData(data, validateText);
+    }
 
     /**
      * Starting at the grid view of a list, delete it
