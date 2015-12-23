@@ -469,7 +469,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             List<LogEntry> errorsFromWebDriver = getDriver().manage().logs().get(LogType.BROWSER).filter(Level.SEVERE);
             List<JavaScriptError> errorsFromPlugin = JavaScriptError.readErrors(getDriver());
 
-            for (int i = 0, j = 0; i < errorsFromWebDriver.size(); i++)
+            for (int i = 0, j = 0; i < errorsFromWebDriver.size() && j < errorsFromPlugin.size(); i++)
             {
                 LogEntry logEntry = errorsFromWebDriver.get(i);
 
