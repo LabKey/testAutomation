@@ -1953,8 +1953,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (changed)
         {
             clickButton("Save Changes", 0);
-            waitForText("Properties saved");
+            waitForElement(Ext4Helper.Locators.window("Success"));
             clickButton("OK", 0);
+            _ext4Helper.waitForMaskToDisappear();
         }
         else
         {
