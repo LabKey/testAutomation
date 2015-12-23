@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,8 +31,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.QCAssayScriptHelper;
-import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 import org.labkey.test.util.ExcelHelper;
 
@@ -96,9 +95,6 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
     private void doInit()
     {
-        new RReportHelper(this).ensureRConfig();
-        new QCAssayScriptHelper(this).ensureEngineConfig();
-
         _containerHelper.createProject(getProjectName(), "Assay");
     }
 
@@ -118,8 +114,9 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         File exportedFile;
         Workbook workbook;
         Sheet sheet;
-
         List<String> exportedColumn;
+
+        String filePath;
 
         log("Create an Assay.");
 
@@ -129,29 +126,33 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner.setEditableRuns(true);
         assayDesigner.setEditableResults(true);
 
-        log("Create a \"File\" column for the assay batch.");
+        log("Create a 'File' column for the assay batch.");
         assayDesigner.addBatchField("BatchFileField", "Batch File Field", "File");
 
-        log("Create a \"File\" column for the assay run.");
+        log("Create a 'File' column for the assay run.");
         assayDesigner.addRunField("RunFileField", "Run File Field", "File");
 
-        log("Create a \"File\" column for the assay data.");
+        log("Create a 'File' column for the assay data.");
         assayDesigner.addDataField("DataFileField", "Data File Field", "File");
 
         log("Save the changes.");
         assayDesigner.save();
         assayDesigner.saveAndClose();
+        sleep(1000);
 
         log("Populate the assay with data.");
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
 
-        log("Set the \"File\" column on the batch grid.");
-        // This could be done by creating a File object and sending it to setFormElement.
-        Locator l = Locator.css("#ExperimentRun > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=\"file\"]");
-        WebElement el = l.findElement(getDriver());
-        el.sendKeys(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + XLS_FILE);
-        clickButton("Next");
+        log("Set the 'File' column on the batch grid.");
+
+        filePath = TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + XLS_FILE;
+        assertFileExist(filePath);
+        log("Going to attach file: " + filePath);
+
+        setFormElement(Locator.css("#ExperimentRun > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=\"file\"]"), filePath);
+        clickButton("Next", 5000);
+        waitForText("Run Data *");  // Make sure the page has loaded completely.
 
         log("Paste tab separated values for the assay data.");
         setFormElement(Locator.name("name"), runName);
@@ -159,26 +160,30 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         clickButton("Save and Finish");
 
+        // Note the translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'... converts the attribute value to lower case.
+        // This is just to make the test more robust when checking values that contain file names.
         log("Verify link to attached file and icon is present as expected.");
-        assertElementPresent("Did not find link to file " + XLS_FILE + " in grid.", Locator.xpath("//a[contains(text(), '" + XLS_FILE + "')]"), 1);
-        assertElementPresent("Did not find expected file icon in grid.", Locator.xpath("//a[contains(text(), 'foo.xls')]//img[contains(@src, 'xls.gif')]"), 1);
+        assertElementPresent("Did not find link to file " + XLS_FILE + " in grid.", Locator.xpath("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + XLS_FILE + "')]"), 1);
+        assertElementPresent("Did not find expected file icon in grid.", Locator.xpath("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'foo.xls')]//img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'xls.gif')]"), 1);
 
-        log("Set the \"File\" column on the runs.");
+        log("Set the 'File' column on the runs.");
+
+        filePath = TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + PNG01_FILE;
+        assertFileExist(filePath);
+        log("Going to attach file: " + filePath);
 
         click(Locator.linkWithText("view runs"));
         click(Locator.linkWithText("edit"));
 
-        // This could be done by creating a File object and sending it to setFormElement.
-        l = Locator.css("#Runs > table > tbody > tr:nth-child(4) > td:nth-child(2) > input[type=\"file\"]");
-        el = l.findElement(getDriver());
-        el.sendKeys(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + PNG01_FILE);
-        clickButton("Submit");
+        setFormElement(Locator.css("#Runs > table > tbody > tr:nth-child(4) > td:nth-child(2) > input[type=\"file\"]"), filePath);
+        clickButton("Submit", 5000);
+        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been renedered.
 
         log("Verify inline image is present as expected.");
-        assertElementPresent("Did not find expected inline image for "+ PNG01_FILE + " in grid.", Locator.xpath("//img[contains(@title, 'assaydata/" + PNG01_FILE + "')]"), 1);
+        assertElementPresent("Did not find expected inline image for "+ PNG01_FILE + " in grid.", Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"), 1);
 
         log("Hover over the thumbnail and make sure the pop-up is as expected.");
-        mouseOver(Locator.xpath("//img[contains(@title, 'assaydata/" + PNG01_FILE + "')]"));
+        mouseOver(Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"));
         sleep(5000);
         assertElementVisible(Locator.css("#helpDiv"));
         assertElementPresent("Download image is not as expected.", Locator.xpath("//div[@id='helpDiv']//img[contains(@src, '" + getProjectName() + "/downloadFileLink')]"), 1);
@@ -189,24 +194,27 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         click(Locator.linkWithText("view results"));
 
         log("Verify that the correct number of file fields are populated as expected.");
-        assertElementPresent("Did not find the expected number of links for the file " + XLS_FILE, Locator.xpath("//a[contains(text(), '" + XLS_FILE + "')]"), 3);
-        assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE + " from the runs.", Locator.xpath("//img[contains(@title, 'assaydata/" + PNG01_FILE + "')]"), 3);
+        assertElementPresent("Did not find the expected number of links for the file " + XLS_FILE, Locator.xpath("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + XLS_FILE + "')]"), 3);
+        assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE + " from the runs.", Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"), 3);
 
         log("Verify that the reference to the png that was in the data used for populating is listed as unavailable.");
         assertTextPresent(LRG_PNG_FILE + " (unavailable)");
 
-        log("Add the image to one of the result's \"File\" column.");
+        log("Add the image to one of the result's 'File' column.");
+
+        filePath = TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + LRG_PNG_FILE;
+        assertFileExist(filePath);
+        log("Going to attach file: " + filePath);
+
         List<WebElement> editLinks = Locator.linkWithText("edit").findElements(getDriver());
         editLinks.get(2).click();
 
-        // This could be done by creating a File object and sending it to setFormElement.
-        l = Locator.css("#Data > table > tbody > tr:nth-child(5) > td:nth-child(2) > input[type=\"file\"]");
-        el = l.findElement(getDriver());
-        el.sendKeys(TestFileUtils.getLabKeyRoot() + SAMPLE_DATA_LOC + LRG_PNG_FILE);
-        clickButton("Submit");
+        setFormElement(Locator.css("#Data > table > tbody > tr:nth-child(5) > td:nth-child(2) > input[type=\"file\"]"), filePath);
+        clickButton("Submit", 5000);
+        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been renedered.
 
         log("Validate that two links to this image file are now present.");
-        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE + "')]"), 2);
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE + " from the runs.", Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + LRG_PNG_FILE + "')]"), 2);
 
         log("Export the grid to excel.");
         list = new DataRegionTable("Data", this);
@@ -222,19 +230,19 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
             log("Validate that the value for the file columns is as expected.");
             exportedColumn = ExcelHelper.getColumnData(sheet, 4);
-            assertTrue("Value of \"File\" column for the first row in the data grid not exported as expected.", exportedColumn.get(1).equals(LRG_PNG_FILE));
-            assertTrue("Value of \"File\" column for the second row in the data grid not exported as expected.", exportedColumn.get(2).trim().equals(""));
-            assertTrue("Value of \"File\" column for the last row in the data grid not exported as expected.", exportedColumn.get(3).equals(LRG_PNG_FILE));
+            assertTrue("Value of 'File' column for the first row in the data grid not exported as expected.", exportedColumn.get(1).trim().toLowerCase().contains(LRG_PNG_FILE));
+            assertTrue("Value of 'File' column for the second row in the data grid not exported as expected.", exportedColumn.get(2).trim().equals(""));
+            assertTrue("Value of 'File' column for the last row in the data grid not exported as expected.", exportedColumn.get(3).trim().toLowerCase().contains(LRG_PNG_FILE));
 
             exportedColumn = ExcelHelper.getColumnData(sheet, 5);
-            assertTrue("Value of \"File\" column for the first row in the run grid not exported as expected.", exportedColumn.get(1).equals("assaydata/" + PNG01_FILE));
-            assertTrue("Value of \"File\" column for the second row in the run grid not exported as expected.", exportedColumn.get(2).equals("assaydata/" + PNG01_FILE));
-            assertTrue("Value of \"File\" column for the last row in the run grid not exported as expected.", exportedColumn.get(3).equals("assaydata/" + PNG01_FILE));
+            assertTrue("Value of 'File' column for the first row in the run grid not exported as expected.", exportedColumn.get(1).trim().toLowerCase().contains(PNG01_FILE));
+            assertTrue("Value of 'File' column for the second row in the run grid not exported as expected.", exportedColumn.get(2).trim().toLowerCase().contains(PNG01_FILE));
+            assertTrue("Value of 'File' column for the last row in the run grid not exported as expected.", exportedColumn.get(3).trim().toLowerCase().contains(PNG01_FILE));
 
             exportedColumn = ExcelHelper.getColumnData(sheet, 7);
-            assertTrue("Value of \"File\" column for the first row in the batch grid not exported as expected.", exportedColumn.get(1).equals("assaydata/" + XLS_FILE));
-            assertTrue("Value of \"File\" column for the second row in the batch grid not exported as expected.", exportedColumn.get(2).equals("assaydata/" + XLS_FILE));
-            assertTrue("Value of \"File\" column for the last row in the batch grid not exported as expected.", exportedColumn.get(3).equals("assaydata/" + XLS_FILE));
+            assertTrue("Value of 'File' column for the first row in the batch grid not exported as expected.", exportedColumn.get(1).trim().toLowerCase().contains(XLS_FILE));
+            assertTrue("Value of 'File' column for the second row in the batch grid not exported as expected.", exportedColumn.get(2).trim().toLowerCase().contains(XLS_FILE));
+            assertTrue("Value of 'File' column for the last row in the batch grid not exported as expected.", exportedColumn.get(3).trim().toLowerCase().contains(XLS_FILE));
 
         }
         catch (IOException | InvalidFormatException e)
@@ -242,21 +250,21 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
             throw new RuntimeException(e);
         }
 
-        log("Remove the \"File\" column from the batch and see that things still work.");
+        log("Remove the 'File' column from the batch and see that things still work.");
 
         assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.removeBatchField("BatchFileField");
         assayDesigner.saveAndClose();
-
+        waitForElement(Locator.linkWithText("view results")); // Make sure page has loaded completely.
         click(Locator.linkWithText("view results"));
 
         log("Verify that the file fields from the batch are no longer present.");
-        assertElementPresent("Found a link to file " + XLS_FILE + " in grid, it should not be there.", Locator.xpath("//a[contains(text(), '" + XLS_FILE + "')]"), 0);
-        assertElementPresent("Found a file icon in grid, it should not be there.", Locator.xpath("//a[contains(text(), 'foo.xls')]//img[contains(@src, 'xls.gif')]"), 0);
+        assertElementPresent("Found a link to file " + XLS_FILE + " in grid, it should not be there.", Locator.xpath("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + XLS_FILE + "')]"), 0);
+        assertElementPresent("Found a file icon in grid, it should not be there.", Locator.xpath("//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'foo.xls')]//img[contains(translate(@src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'xls.gif')]"), 0);
 
-        log("Verify that the other \"File\" fields are not affected.");
-        assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE + " from the runs.", Locator.xpath("//img[contains(@title, 'assaydata/" + PNG01_FILE + "')]"), 3);
-        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE + "')]"), 2);
+        log("Verify that the other 'File' fields are not affected.");
+        assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE + " from the runs.", Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"), 3);
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE + " from the runs.", Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + LRG_PNG_FILE + "')]"), 2);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");
@@ -273,19 +281,19 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
             log("Validate that the value for the file columns is as expected.");
             exportedColumn = ExcelHelper.getColumnData(sheet, 4);
-            assertTrue("Value of \"File\" column for the first row in the data grid not exported as expected.", exportedColumn.get(1).equals(LRG_PNG_FILE));
-            assertTrue("Value of \"File\" column for the second row in the data grid not exported as expected.", exportedColumn.get(2).trim().equals(""));
-            assertTrue("Value of \"File\" column for the last row in the data grid not exported as expected.", exportedColumn.get(3).equals(LRG_PNG_FILE));
+            assertTrue("Value of 'File' column for the first row in the data grid not exported as expected.", exportedColumn.get(1).trim().toLowerCase().contains(LRG_PNG_FILE));
+            assertTrue("Value of 'File' column for the second row in the data grid not exported as expected.", exportedColumn.get(2).trim().equals(""));
+            assertTrue("Value of 'File' column for the last row in the data grid not exported as expected.", exportedColumn.get(3).trim().toLowerCase().contains(LRG_PNG_FILE));
 
             exportedColumn = ExcelHelper.getColumnData(sheet, 5);
-            assertTrue("Value of \"File\" column for the first row in the run grid not exported as expected.", exportedColumn.get(1).equals("assaydata/" + PNG01_FILE));
-            assertTrue("Value of \"File\" column for the second row in the run grid not exported as expected.", exportedColumn.get(2).equals("assaydata/" + PNG01_FILE));
-            assertTrue("Value of \"File\" column for the last row in the run grid not exported as expected.", exportedColumn.get(3).equals("assaydata/" + PNG01_FILE));
+            assertTrue("Value of 'File' column for the first row in the run grid not exported as expected.", exportedColumn.get(1).trim().toLowerCase().contains(PNG01_FILE));
+            assertTrue("Value of 'File' column for the second row in the run grid not exported as expected.", exportedColumn.get(2).trim().toLowerCase().contains(PNG01_FILE));
+            assertTrue("Value of 'File' column for the last row in the run grid not exported as expected.", exportedColumn.get(3).trim().toLowerCase().contains(PNG01_FILE));
 
             exportedColumn = ExcelHelper.getColumnData(sheet, 7);
-            assertTrue("Value of the removed \"File\" column for the first row in the batch grid not exported as expected.", exportedColumn.get(1).equals(""));
-            assertTrue("Value of the removed \"File\" column for the second row in the batch grid not exported as expected.", exportedColumn.get(2).equals(""));
-            assertTrue("Value of the removed \"File\" column for the last row in the batch grid not exported as expected.", exportedColumn.get(3).equals(""));
+            assertTrue("Value of the removed 'File' column for the first row in the batch grid not exported as expected.", exportedColumn.get(1).trim().equals(""));
+            assertTrue("Value of the removed 'File' column for the second row in the batch grid not exported as expected.", exportedColumn.get(2).trim().equals(""));
+            assertTrue("Value of the removed 'File' column for the last row in the batch grid not exported as expected.", exportedColumn.get(3).trim().equals(""));
 
         }
         catch (IOException | InvalidFormatException e)
@@ -295,4 +303,10 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
     }
 
+    private void assertFileExist(String filePath)
+    {
+        File imgFile;
+        imgFile = new File(filePath);
+        Assert.assertTrue("File " + filePath + " can not be found.", imgFile.exists());
+    }
 }
