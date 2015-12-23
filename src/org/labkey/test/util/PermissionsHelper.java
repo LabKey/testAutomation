@@ -282,7 +282,15 @@ public class PermissionsHelper
         if (!_test.isElementPresent(Locator.permissionRendered()))
         {
             _test.clickAdminMenuItem("Folder", "Permissions");
-            _test.waitForElement(Locator.permissionRendered());
+            try
+            {
+                _test.waitForElement(Locator.permissionRendered());
+            }
+            catch (NoSuchElementException retry)
+            {
+                _test.refresh();
+                _test.waitForElement(Locator.permissionRendered());
+            }
         }
     }
 
