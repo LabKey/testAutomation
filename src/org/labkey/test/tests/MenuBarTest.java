@@ -103,7 +103,7 @@ public class MenuBarTest extends BaseWebDriverTest
         hoverMenu("Assays");
         waitForElement(Locator.lkButton("Manage Assays"), 3000);
 
-        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampledataPath() + "/menubar/Test Assay.xar", 1);
+        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("menubar/Test Assay.xar"), 1);
         clickProject(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");

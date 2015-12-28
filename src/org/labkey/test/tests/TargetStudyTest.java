@@ -144,7 +144,7 @@ public class TargetStudyTest extends AbstractAssayTest
         if (!isElementPresent(Locator.linkWithText("Assay List")))
             portalHelper.addWebPart("Assay List");
 
-        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampledataPath() + "/TargetStudy/Assay.xar", 1);
+        _assayHelper.uploadXarFileAsAssayDesign(TestFileUtils.getSampleData("TargetStudy/Assay.xar"), 1);
     }
 
     protected void uploadRuns()

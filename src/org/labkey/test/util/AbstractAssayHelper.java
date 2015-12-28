@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.google.common.base.Function;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
@@ -26,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractAssayHelper extends AbstractHelper
 {
@@ -36,11 +35,6 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     }
 
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
-
-    public void uploadXarFileAsAssayDesign(String path, int pipelineCount)
-    {
-        uploadXarFileAsAssayDesign(new File(path), pipelineCount);
-    }
 
     /**
      * Upload a xar file as an assay configuration
