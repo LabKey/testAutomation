@@ -102,7 +102,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         createAssayFolder();
         waitForElement(Locator.linkWithText("Specimen Report Study Folder Study specimens"));
-        assertTextPresent("34 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "48 " + assay1 + " queries");
+        assertTextPresent("38 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "48 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
@@ -290,7 +290,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("SR1", "SR2");
         assertEquals(5 - invalid, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
         assertEquals(query, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
-        assertEquals(2 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
+        assertEquals(4 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
         assertEquals(2 - ignored, getElementCount(Locator.xpath("//td[contains(@class, 'received')]")));
         assertEquals(invalid, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
         assertEquals(12 - expected, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
@@ -318,8 +318,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable drt = new DataRegionTable("query", this);
-        assertEquals(4, drt.getDataRowCount());
-        assertTextPresent("specimen collected", 2);
+        assertEquals(6, drt.getDataRowCount());
+        assertTextPresent("specimen collected", 4);
         assertTextPresent("specimen received by lab", 2);
     }
 
