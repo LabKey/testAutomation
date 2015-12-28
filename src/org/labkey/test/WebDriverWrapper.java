@@ -1707,6 +1707,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndWaitForDownload(func, 1)[0];
     }
 
+    private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[a-zA-Z0-9]{4,}\\.tmp");
+
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
         final File downloadDir = BaseWebDriverTest.getDownloadDir();
@@ -1726,7 +1728,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             public boolean accept(File file)
             {
                 return file.getName().contains(".part") ||
-                        file.getName().contains(".crdownload");
+                        file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
             }
         };
         final FileFilter newFileFilter = new FileFilter()
