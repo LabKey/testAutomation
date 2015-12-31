@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.reader.Readers;
 import org.labkey.api.util.FileUtil;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -665,7 +666,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTrue("Unable to find file: " + output.getPath(), output.exists());
         log("File size: " + FileUtils.sizeOf(output));
 
-        try (InputStream fileStream = new FileInputStream(output); BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(fileStream), StandardCharsets.UTF_8)))
+        try (InputStream fileStream = new FileInputStream(output); BufferedReader br = Readers.getReader(new GZIPInputStream(fileStream)))
         {
             int count = 0;
             int totalChars = 0;

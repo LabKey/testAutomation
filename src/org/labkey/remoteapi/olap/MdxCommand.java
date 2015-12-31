@@ -17,14 +17,12 @@ package org.labkey.remoteapi.olap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -125,7 +123,7 @@ public class MdxCommand extends PostCommand<MdxResponse>
         try (Response response = _execute(connection, folderPath))
         {
             JSONObject json;
-            json = (JSONObject) JSONValue.parse(new BufferedReader(new InputStreamReader(new GZIPInputStream(response.getInputStream()), StandardCharsets.UTF_8)));
+            json = (JSONObject) JSONValue.parse(Readers.getReader(new GZIPInputStream(response.getInputStream())));
             return createResponse(null, response.getStatusCode(), response.getContentType(), json);
         }
     }
