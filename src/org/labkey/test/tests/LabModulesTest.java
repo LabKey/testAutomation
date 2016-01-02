@@ -62,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -535,6 +536,27 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Incorrect number of rows created", PROJECT_ENROLLMENT.length, saveResp.getRowsAffected().intValue());
+
+        //test expectations
+        SelectRowsCommand sr = new SelectRowsCommand("laboratory", "project_usage");
+        List<String> columns = Arrays.asList("subjectId", "project", "groupname", "startdate", "enddate");
+        sr.setColumns(columns);
+        sr.setSorts(Arrays.asList(new Sort("rowid")));
+
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+
+        int i = 0;
+        for (Map<String, Object> row : resp.getRows())
+        {
+            String[] expected = PROJECT_ENROLLMENT[i];
+            i++;
+
+            if ("".equals(expected[2]))
+            {
+                //even though we insert empty string, the client API should trim this to null
+                assertNull("groupname column is not null", row.get("groupname"));
+            }
+        }
     }
 
     private void insertSamples() throws Exception
