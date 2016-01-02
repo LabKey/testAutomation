@@ -1205,6 +1205,8 @@ public class SequenceTest extends BaseWebDriverTest
         DataRegionTable dr = new DataRegionTable("query", test);
         dr.setFilter("name", "Equals", genomeName);
 
+        //page has loaded
+        dr = new DataRegionTable("query", test);
         test.clickAndWait(dr.link(0, "Genome Name"));
         test.waitForElement(Locator.tagContainingText("span", "Aliases for External Browsers or Databases"));
 
