@@ -694,7 +694,7 @@ public class SequenceTest extends BaseWebDriverTest
         //avoid entering a workbook
         beginAt(getBaseURL() + "/pipeline/" + getProjectName() + "/browse.view");
         waitForText("fileset");
-        _fileBrowserHelper.expandFileBrowserRootNode();
+        _fileBrowserHelper.waitForFileGridReady();
         for (String f : files)
         {
             _fileBrowserHelper.checkFileBrowserFileCheckbox(f);
