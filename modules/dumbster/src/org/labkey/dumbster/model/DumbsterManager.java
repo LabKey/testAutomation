@@ -27,7 +27,6 @@ import org.labkey.api.util.StringUtilsLabKey;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContextEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,11 +130,11 @@ public class DumbsterManager implements ShutdownListener
         return "Dumbster manager";
     }
 
-    public void shutdownPre(ServletContextEvent servletContextEvent)
+    public void shutdownPre()
     {
     }
 
-    public void shutdownStarted(ServletContextEvent servletContextEvent)
+    public void shutdownStarted()
     {
         // Stop listening on the mail port before shutdown.
         stop();
