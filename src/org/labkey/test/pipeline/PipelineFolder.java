@@ -17,45 +17,24 @@ package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
-
-import java.io.File;
 
 public class PipelineFolder
 {
-    // These files are not checked in, since that would be a security issue.
-    // Ask Brendan, Josh or Brian, if you need them.
-    protected static final String USER_CERT = "/sampledata/pipeline/globus/usercert.pem";
-    protected static final String USER_KEY = "/sampledata/pipeline/globus/userkey.pem";
-    protected static final String USER_KEY_PASSWORD = "";
-
-    public enum Type { mini, enterprise }
-
     protected PipelineWebTestBase _test;
     protected String _folderName;
     protected String _folderType = "None";
     protected String[] _tabs = new String[0];
     protected String[] _webParts = new String[0];
     protected String _pipelinePath;
-    protected Type _pipelineType;
     protected MailSettings _mailSettings;
 
     public PipelineFolder(PipelineWebTestBase test,
                           String folderName,
                           String pipelinePath)
     {
-        this(test, folderName, pipelinePath, Type.mini);
-    }
-
-    public PipelineFolder(PipelineWebTestBase test,
-                          String folderName,
-                          String pipelinePath,
-                          Type pipelineType)
-    {
         _test = test;
         _folderName = folderName;
         _pipelinePath = pipelinePath;
-        _pipelineType = pipelineType;
     }
 
     public String getFolderName()
@@ -66,11 +45,6 @@ public class PipelineFolder
     public String getPipelinePath()
     {
         return _pipelinePath;
-    }
-
-    public Type getPipelineType()
-    {
-        return _pipelineType;
     }
 
     public String getFolderType()
@@ -125,13 +99,6 @@ public class PipelineFolder
         _test.log("Set pipeline root.");
         _test.setPipelineRoot(_pipelinePath);
 
-        if (getPipelineType() == Type.enterprise)
-        {
-            String pathLabKey = TestFileUtils.getLabKeyRoot();
-            _test.setFormElement(Locator.name("keyFile"), new File(pathLabKey + USER_KEY));
-            _test.setFormElement(Locator.name("keyPassword"), USER_KEY_PASSWORD);
-            _test.setFormElement(Locator.name("certFile"), new File(pathLabKey + USER_CERT));
-        }
         _test.submit();
 
         if (_mailSettings != null)
