@@ -247,7 +247,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestReturnFalse\"," +
-                        "\"Hex\":\"\"" +
+                        "\"Hex\":null" +
                         "\"_rowNumber\":1" +
                     "}" +
                 "}]," +
