@@ -36,6 +36,8 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
 
+    protected abstract void goToUploadXarPage();
+
     /**
      * Upload a xar file as an assay configuration
      *
@@ -47,12 +49,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     @LogMethod
     public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
     {
-        assertTrue("XAR file does not exist: " + file.toString(), file.exists());
-        //create a new luminex assay
-        _test.clickButton("Manage Assays");
-        _test.clickButton("New Assay Design");
-
-        _test.clickAndWait(Locator.linkWithText("upload"));
+        goToUploadXarPage();
         _test.setFormElement(Locator.name("uploadFile"), file);
         _test.clickAndWait(Locator.lkButton("Upload"));
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);

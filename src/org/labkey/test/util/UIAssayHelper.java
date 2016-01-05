@@ -56,4 +56,12 @@ public class UIAssayHelper extends AbstractAssayHelper
     {
         importAssay(assayName, file, projectPath); //UI doesn't need to worry about the batch properties, it's done automatically
     }
+
+    @Override
+    public void goToUploadXarPage()
+    {
+        _test.goToManageAssays();
+        _test.clickButton("New Assay Design");
+        _test.clickAndWait(Locator.linkWithText("upload"));
+    }
 }

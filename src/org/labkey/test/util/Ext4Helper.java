@@ -593,7 +593,6 @@ public class Ext4Helper
         waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    @LogMethod()
     public void waitForMaskToDisappear(int wait)
     {
         _test.waitForElementToDisappear(Locators.mask(), wait);

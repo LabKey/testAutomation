@@ -995,10 +995,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void navigateToQuery(String schemaName, String queryName)
     {
+        navigateToQuery(schemaName, queryName, null);
+    }
+
+    public void navigateToQuery(String schemaName, String queryName, Integer msTimeout)
+    {
         RelativeUrl queryURL = new RelativeUrl("query", "executequery");
         queryURL.setContainerPath(getCurrentContainerPath());
         queryURL.addParameter("schemaName", schemaName);
         queryURL.addParameter("query.queryName", queryName);
+        queryURL.setTimeout(msTimeout);
 
         queryURL.navigate(this);
     }

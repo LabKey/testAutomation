@@ -246,7 +246,8 @@ public class WebTestHelper
 
         url.append("/");
         url.append(action);
-        url.append(".view");
+        if (!action.contains("."))
+            url.append(".view");
 
         boolean firstParam = true;
         for (Map.Entry param : params.entrySet())

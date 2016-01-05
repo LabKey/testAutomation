@@ -30,6 +30,7 @@ public class RelativeUrl
     private String _containerPath;
     private String _action;
     private Map<String, String> _parameters;
+    private Integer _msTimeout;
 
     public RelativeUrl(String controller, String action)
     {
@@ -107,7 +108,10 @@ public class RelativeUrl
 
     public void navigate(WebDriverWrapper test)
     {
-        test.beginAt(toString());
+        if (null == _msTimeout)
+            test.beginAt(toString());
+        else
+            test.beginAt(toString(), _msTimeout);
     }
 
     public void setController(String controller)
@@ -126,5 +130,10 @@ public class RelativeUrl
             action = action.substring(0, action.indexOf("Action"));
 
         _action = action;
+    }
+
+    public void setTimeout(Integer msTimeout)
+    {
+        _msTimeout = msTimeout;
     }
 }

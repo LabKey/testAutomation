@@ -24,6 +24,7 @@ import org.labkey.remoteapi.assay.ImportRunCommand;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +61,12 @@ public class APIAssayHelper extends AbstractAssayHelper
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath, batchProperties);
+    }
+
+    @Override
+    protected void goToUploadXarPage()
+    {
+        _test.beginAt(WebTestHelper.buildURL("experiment", _test.getCurrentContainerPath(), "showAddXarFile"));
     }
 
     private int getIdFromAssayName(String assayName, String projectPath)
