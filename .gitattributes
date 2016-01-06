@@ -478,6 +478,7 @@ src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileBasedPipelineTest.java -text
+src/org/labkey/test/tests/FileBrowserIconsTest.java -text
 src/org/labkey/test/tests/FileContentActionButtonsTest.java -text
 src/org/labkey/test/tests/FileContentDownloadTest.java -text
 src/org/labkey/test/tests/FileContentUploadTest.java -text
