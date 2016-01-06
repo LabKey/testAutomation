@@ -27,6 +27,7 @@ public class DataRegionExportHelper
     private BaseWebDriverTest _test;
     private DataRegionTable _drt;
     private int _expectedFileCount;
+    private final boolean newRegion = false;
 
     public DataRegionExportHelper(DataRegionTable drt)
     {
@@ -48,7 +49,7 @@ public class DataRegionExportHelper
     public File exportExcel(ExcelFileType type, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
-        _test._extHelper.clickSideTab("Excel");
+        clickTab("Excel");
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         _test.checkRadioButton(type.getRadioLocator());
         _test.scrollIntoView(Locator.lkButton("Export to Excel"));
@@ -68,7 +69,7 @@ public class DataRegionExportHelper
     public File exportText(TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
-        _test._extHelper.clickSideTab("Text");
+        clickTab("Text");
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         _test.selectOptionByValue(Locator.name("delim"), delim.toString());
         _test.selectOptionByValue(Locator.name("quote"), quote.toString());
@@ -78,7 +79,7 @@ public class DataRegionExportHelper
     public String exportScript(ScriptExportType type)
     {
         expandExportPanel();
-        _test._extHelper.clickSideTab("Script");
+        clickTab("Script");
         _test.checkRadioButton(type.getRadioLocator());
         _test.click(Locator.lkButton("Create Script"));
         // it takes time to create the script before the new window is available
@@ -102,6 +103,8 @@ public class DataRegionExportHelper
         {
             _test.clickButton("Export", 0);
             _test.shortWait().until(expandedPanel);
+            if (newRegion)
+                _test.sleep(1000); // wait for animation to complete
         }
     }
 
@@ -113,6 +116,14 @@ public class DataRegionExportHelper
             _test.checkCheckbox(exportSelectedCheckbox);
         else
             _test.uncheckCheckbox(exportSelectedCheckbox);
+    }
+
+    private void clickTab(String text)
+    {
+        if (newRegion)
+            _test.click(Locator.xpath("//div[contains(@class, 'tabs-left')]").append(Locator.xpath("//a[@data-toggle='tab' and text()='" + text + "']")));
+        else
+            _test._extHelper.clickSideTab(text);
     }
 
     public static enum ExcelFileType

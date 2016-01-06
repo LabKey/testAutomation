@@ -1002,6 +1002,7 @@ public class StudyTest extends StudyBaseTest
         log("verify ");
         clickButtonContainingText("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
         assertTrue("Could not find column \"MouseVisit/DEM-1\"", _customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
@@ -1152,7 +1153,6 @@ public class StudyTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText(DEMOGRAPHICS_TITLE));
         clickButton("Edit Definition");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]"));
         _listHelper.addField("Dataset Fields", "VisitDay", "VisitDay", ListHelper.ListColumnType.Integer);
         Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
         selectOptionByValue(element3, "DEMdt");

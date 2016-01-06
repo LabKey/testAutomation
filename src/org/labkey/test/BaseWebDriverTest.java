@@ -57,6 +57,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.search.SearchSideWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -152,9 +153,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private final ArtifactCollector _artifactCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
-    public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
+    public final CustomizeView _customizeViewsHelper;
     public StudyHelper _studyHelper = new StudyHelper(this);
-    public ListHelper _listHelper = new ListHelper(this);
+    public final ListHelper _listHelper;
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
@@ -188,6 +189,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeViewsHelper(this);
+//        _customizeViewsHelper = new CustomizeView(this);
         _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");

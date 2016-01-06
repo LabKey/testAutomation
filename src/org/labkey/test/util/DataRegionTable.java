@@ -42,7 +42,7 @@ public class DataRegionTable extends Component
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _tableName;
     protected final WebElement _tableElement;
-    protected BaseWebDriverTest _test;
+    public BaseWebDriverTest _test;
     protected final boolean _selectors;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();

@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.CustomizeView;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -29,35 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CustomizeViewsHelper
+public class CustomizeViewsHelper extends CustomizeView
 {
-    private final BaseWebDriverTest _test;
-    private final DataRegionTable _dataRegion;
-    private final Locator.IdLocator _dataRegionLoc;
-    private final RReportHelper _reportHelper;
-
     public CustomizeViewsHelper(BaseWebDriverTest test)
     {
-        _test = test;
-        _dataRegion = null;
-        _dataRegionLoc = Locator.id("");
-        _reportHelper = new RReportHelper(test);
+        super(test);
     }
 
     public CustomizeViewsHelper(DataRegionTable dataRegion)
     {
-        _test = dataRegion._test;
-        _dataRegion = dataRegion;
-        _dataRegionLoc = dataRegion.locator();
-        _reportHelper = new RReportHelper(_test);
-    }
-
-    public DataRegionTable getDataRegion()
-    {
-        if (_dataRegion != null)
-            return _dataRegion;
-        else
-            return DataRegionTable.findDataRegion(_test);
+        super(dataRegion);
     }
 
     public void openCustomizeViewPanel()

@@ -22,10 +22,10 @@ import java.util.Map;
  */
 public class CustomizeView extends Component
 {
-    private final BaseWebDriverTest _test;
-    private final DataRegionTable _dataRegion;
-    private final Locator.IdLocator _dataRegionLoc;
-    private final RReportHelper _reportHelper;
+    protected final BaseWebDriverTest _test;
+    protected final DataRegionTable _dataRegion;
+    protected final Locator.IdLocator _dataRegionLoc;
+    protected final RReportHelper _reportHelper;
 
     public CustomizeView(BaseWebDriverTest test)
     {
@@ -35,20 +35,19 @@ public class CustomizeView extends Component
         _reportHelper = new RReportHelper(test);
     }
 
-//    public CustomizeView(DataRegionTable dataRegion)
-//    {
-//        _test = dataRegion._test;
-//        _dataRegion = dataRegion;
-//        _dataRegionLoc = dataRegion.locator();
-//        _reportHelper = new RReportHelper(_test);
-//    }
+    public CustomizeView(DataRegionTable dataRegion)
+    {
+        _test = dataRegion._test;
+        _dataRegion = dataRegion;
+        _dataRegionLoc = dataRegion.locator();
+        _reportHelper = new RReportHelper(_test);
+    }
 
     public DataRegionTable getDataRegion()
     {
         if (_dataRegion != null)
             return _dataRegion;
-        else
-            return DataRegionTable.findDataRegion(_test);
+        return DataRegionTable.findDataRegion(_test);
     }
 
     public void openCustomizeViewPanel()
@@ -64,7 +63,7 @@ public class CustomizeView extends Component
 
     public void closeCustomizeViewPanel()
     {
-        _test.click(_dataRegionLoc.toCssLocator().append(Locator.css(".x-panel-header > .x-tool-close")));
+        _test.click(_dataRegionLoc.toCssLocator().append(Locator.css(".x4-panel-header > .x4-tool-after-title")));
         _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegionLoc.toCssLocator().append(Locator.css(".labkey-data-region-header-container .labkey-ribbon")).toBy()));
     }
 
@@ -248,21 +247,24 @@ public class CustomizeView extends Component
     private Locator.XPathLocator expandPivots(String[] fieldKeyParts)
     {
         String nodePath = "";
-        String fieldKey = StringUtils.join(fieldKeyParts, "/");
+        String fieldKey = StringUtils.join(fieldKeyParts, "/").toUpperCase();
 
         for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
-            nodePath += fieldKeyParts[i];
-            _test.waitForElement(_dataRegionLoc.append("//div[contains(@class, 'treecolumn')]").withDescendant(Locator.xpath("//span[text()='" + fieldKey + "']")), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if (_test.isElementPresent(_dataRegionLoc.append("//div[contains(@class, 'treecolumn')]").withDescendant(Locator.xpath("//span[text()='" + fieldKey + "']")).append(Locator.xpath("/img[1][contains(@class, 'plus')]"))))
+            nodePath += fieldKeyParts[i].toUpperCase();
+            Locator.XPathLocator columnRow = _dataRegionLoc.append("//tr[contains(@class, 'x4-grid-data-row') and @data-recordid='" + nodePath + "']");
+            _test.waitForElement(columnRow);
+
+            Locator.XPathLocator columnRowToggle = columnRow.append(Locator.xpath("//img[1][contains(@class, 'x4-tree-elbow-plus')]"));
+            if (_test.isElementPresent(columnRowToggle))
             {
-                _test.click(_dataRegionLoc.append("//div[contains(@class, 'treecolumn')]").withDescendant(Locator.xpath("//span[text()='" + fieldKey + "']")).append(Locator.xpath("/img[1][contains(@class, 'plus')]")));
+                _test.click(columnRowToggle);
             }
-            _test.waitForElement(_dataRegionLoc.append("//div[contains(@class, 'treecolumn')]").withDescendant(Locator.xpath("//span[text()='" + fieldKey + "']")).append(Locator.xpath("[img[1][contains(@class, 'minus')]]/following-sibling::ul")).notHidden(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
+            _test.waitForElement(_dataRegionLoc.append("//tr[contains(@class, 'x4-grid-tree-node-expanded') and @data-recordid='" + nodePath + "']"));
             nodePath += "/";
         }
 
-        return _dataRegionLoc.append("//div[contains(@class, 'treecolumn')]").withDescendant(Locator.xpath("//span[text()='" + fieldKey + "']"));
+        return _dataRegionLoc.append("//tr[contains(@class, 'x4-grid-data-row') and @data-recordid='" + fieldKey + "']");
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
@@ -392,6 +394,7 @@ public class CustomizeView extends Component
     public void showHiddenItems()
     {
         _test.click(Locator.tagWithText("Label", "Show Hidden Fields"));
+        _test.sleep(250); // wait for columns to display
     }
 
     private void removeCustomizeViewItem(int item_index, ViewItemType type)
