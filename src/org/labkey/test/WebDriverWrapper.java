@@ -2706,7 +2706,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void clickButton(final String text, int waitMillis)
     {
-        clickAndWait(findButton(text), waitMillis);
+        clickButton(text, waitMillis, 0);
+    }
+
+    /**
+     * Wait for a button to appear, click it, then wait for <code>waitMillis</code> for the page to load.
+     *     -- which is which button of this name (first, second, etc.)
+     */
+    public void clickButton(final String text, int waitMillis, int which)
+    {
+        clickAndWait(findButton(text, which), waitMillis);
     }
 
     public void clickButtonContainingText(String text)
