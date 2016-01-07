@@ -210,7 +210,7 @@ public class FilterTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Is Blank");
-        clickButton("Clear Filter");
+        clickButton("CLEAR FILTER");
         //the change above would result in filters being dropped.
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
@@ -223,7 +223,7 @@ public class FilterTest extends BaseWebDriverTest
         setFormElement(Locator.name("value_1"), "Light;Robust");
 
         _extHelper.clickExtTab("Choose Values"); //we should get no alerts
-        clickButton("Clear Filter");
+        clickButton("CLEAR FILTER");
         setUpFacetedFilter("query", "Color", "Light", "Robust");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Light", "Robust");
