@@ -35,13 +35,12 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-public class ListHelper extends AbstractHelper
+public class ListHelper
 {
     BaseWebDriverTest _test;
 
     public ListHelper(BaseWebDriverTest test)
     {
-        super(test);
         _test = test;
     }
 

@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-public class RReportHelper extends AbstractHelper
+public class RReportHelper
 {
     public enum ReportOption {
         shareReport("Make this view available to all users", null, true),
@@ -53,9 +53,11 @@ public class RReportHelper extends AbstractHelper
         }
     }
 
+    protected BaseWebDriverTest _test;
+
     public RReportHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     private static File rExecutable = null;

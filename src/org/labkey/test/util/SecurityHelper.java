@@ -17,11 +17,13 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 
-public class SecurityHelper extends AbstractHelper
+public class SecurityHelper
 {
+    protected BaseWebDriverTest _test;
+
     public SecurityHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public void setSiteGroupPermissions(String groupName, String permissionString)

@@ -27,11 +27,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class StudyHelper extends AbstractHelper
+public class StudyHelper
 {
+    protected BaseWebDriverTest _test;
+
     public StudyHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public CreateStudyPage startCreateStudy()

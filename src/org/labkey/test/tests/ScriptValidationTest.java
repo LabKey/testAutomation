@@ -22,7 +22,12 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.*;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
@@ -35,7 +40,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test JavaScript validation in file-based modules.
@@ -100,7 +107,7 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private void doTestValidation() throws Exception
     {
-        JSONHelper json = new JSONHelper(this);
+        JSONHelper json = new JSONHelper();
 
         /* The following catch CommandExceptions in order to be able to access specific properties. */
 

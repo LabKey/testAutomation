@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * Utilities to compare JSON blobs.
  */
-public class JSONHelper extends AbstractHelper
+public class JSONHelper
 {
     // json key elements to ignore during the comparison phase, these can be regular expressions
     static final Pattern[] GLOBALLY_IGNORED = {
@@ -52,20 +51,14 @@ public class JSONHelper extends AbstractHelper
 
     private ArrayList<Pattern> _ignoredElements;
 
-    public JSONHelper(BaseWebDriverTest test)
+    public JSONHelper()
     {
-        super(test);
-        _ignoredElements = new ArrayList<>();
-        _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
+        _ignoredElements = new ArrayList<>(Arrays.asList(GLOBALLY_IGNORED));
     }
 
-    public JSONHelper(BaseWebDriverTest test, Pattern[] ignored)
+    public JSONHelper(Pattern[] ignored)
     {
-        super(test);
-
-        // load up the elements to skip comparisons on
-        _ignoredElements = new ArrayList<>();
-        _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
+        this();
         if (ignored != null)
             _ignoredElements.addAll(Arrays.asList(ignored));
     }
@@ -82,12 +75,12 @@ public class JSONHelper extends AbstractHelper
 
         if (compareElement(expectedJSON, actualJSON))
         {
-            _test.log("matched json");
+            TestLogger.log("matched json");
         }
         else
         {
-            _test.log("Expected:\n" + expected + "\n");
-            _test.log("Actual:\n" + actual + "\n");
+            TestLogger.log("Expected:\n" + expected + "\n");
+            TestLogger.log("Actual:\n" + actual + "\n");
 
             String diff = Diff.diff(expected, actual);
             fail(msg + "\n" + diff + "\n");
@@ -98,12 +91,12 @@ public class JSONHelper extends AbstractHelper
     {
         if (compareElement(expected, actual))
         {
-            _test.log("matched json");
+            TestLogger.log("matched json");
         }
         else
         {
-            _test.log("Expected:\n" + expected.toJSONString() + "\n");
-            _test.log("Actual:\n" + actual.toJSONString() + "\n");
+            TestLogger.log("Expected:\n" + expected.toJSONString() + "\n");
+            TestLogger.log("Actual:\n" + actual.toJSONString() + "\n");
 
             String diff = Diff.diff(expected.toString(), actual.toString());
             fail(msg + "\n" + diff + "\n");
@@ -192,7 +185,7 @@ public class JSONHelper extends AbstractHelper
     private void log(String msg, boolean fatal)
     {
         if (fatal)
-            _test.log(msg);
+            TestLogger.log(msg);
     }
 
     private boolean skipElement(String element)

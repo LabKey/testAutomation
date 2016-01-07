@@ -626,7 +626,6 @@ src/org/labkey/test/util/APITestHelper.java -text
 src/org/labkey/test/util/APIUserHelper.java -text
 src/org/labkey/test/util/AbstractAssayHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
-src/org/labkey/test/util/AbstractHelper.java -text
 src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ApiPermissionsHelper.java -text

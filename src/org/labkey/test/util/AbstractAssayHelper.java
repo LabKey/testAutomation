@@ -27,11 +27,13 @@ import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class AbstractAssayHelper extends AbstractHelper
+public abstract class AbstractAssayHelper
 {
+    protected BaseWebDriverTest _test;
+
     public AbstractAssayHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;

@@ -27,16 +27,18 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
  */
-public class PortalHelper extends AbstractHelper
+public class PortalHelper
 {
+    protected BaseWebDriverTest _test;
+
     public PortalHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public void enableTabEditMode()

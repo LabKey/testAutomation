@@ -15,17 +15,18 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 
 import java.util.Map;
 
-public class ChartHelper  extends AbstractHelper
+public class ChartHelper
 {
+    protected WebDriverWrapper _test;
 
-    public ChartHelper(BaseWebDriverTest test)
+    public ChartHelper(WebDriverWrapper test)
     {
-        super(test);
+        _test = test;
     }
 
     /**
@@ -35,7 +36,6 @@ public class ChartHelper  extends AbstractHelper
     public void editDrtRow(int row, Map<String, String> nameAndValue)
     {
         _test.clickAndWait(Locator.linkWithText("edit").index(row));
-//        test.waitForElement(Locator.name(nameAndValue.keySet().));
         for(String name : nameAndValue.keySet())
             _test.setFormElement(Locator.xpath("//tr[td[contains(text(),'" + name + "')]]/td//input"), nameAndValue.get(name));
         _test.clickButton("Submit");

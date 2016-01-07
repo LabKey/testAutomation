@@ -22,15 +22,16 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-public class PerlHelper extends AbstractHelper
+public class PerlHelper
 {
+    protected BaseWebDriverTest _test;
+
     public PerlHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     @LogMethod

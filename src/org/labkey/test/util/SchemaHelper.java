@@ -15,15 +15,16 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 
-public class SchemaHelper extends AbstractHelper
+public class SchemaHelper
 {
+    protected WebDriverWrapper _test;
 
-    public SchemaHelper(BaseWebDriverTest test)
+    public SchemaHelper(WebDriverWrapper test)
     {
-        super(test);
+        _test = test;
     }
 
     @LogMethod

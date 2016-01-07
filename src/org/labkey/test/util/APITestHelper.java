@@ -60,7 +60,7 @@ public class APITestHelper
 
     public void setIgnoredElements(Pattern[] ignoredElements)
     {
-        jsonHelper = new JSONHelper(test, ignoredElements);
+        jsonHelper = new JSONHelper(ignoredElements);
     }
 
     public void runApiTests() throws Exception
@@ -73,7 +73,7 @@ public class APITestHelper
         if (testFiles != null && testFiles.length > 0)
         {
             if (jsonHelper == null)
-                jsonHelper = new JSONHelper(test, new Pattern[0]);
+                jsonHelper = new JSONHelper(new Pattern[0]);
 
             int tests = 0;
             for (File testFile : testFiles)

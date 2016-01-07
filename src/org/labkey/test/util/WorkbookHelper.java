@@ -21,13 +21,15 @@ import org.labkey.test.Locator;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class WorkbookHelper extends AbstractHelper
+public class WorkbookHelper
 {
+    protected BaseWebDriverTest _test;
+
     public WorkbookHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     /**

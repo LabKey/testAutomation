@@ -31,12 +31,14 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SearchHelper extends AbstractHelper
+public class SearchHelper
 {
+    protected BaseWebDriverTest _test;
+
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
     public SearchHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public void initialize()

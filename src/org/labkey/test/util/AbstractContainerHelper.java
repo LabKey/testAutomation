@@ -29,16 +29,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-public abstract class AbstractContainerHelper extends AbstractHelper
+public abstract class AbstractContainerHelper
 {
+    protected BaseWebDriverTest _test;
+
     private static List<String> _createdProjects = new ArrayList<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
 
     public AbstractContainerHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     public List<String> getCreatedProjects()

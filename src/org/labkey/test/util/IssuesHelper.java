@@ -17,20 +17,22 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.WebDriverWrapper;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class IssuesHelper extends AbstractHelper
+public class IssuesHelper
 {
-    public IssuesHelper(BaseWebDriverTest test)
+    protected WebDriverWrapper _test;
+
+    public IssuesHelper(WebDriverWrapper test)
     {
-        super(test);
+        _test = test;
     }
 
     @LogMethod
