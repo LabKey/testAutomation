@@ -145,6 +145,7 @@ modules/scriptpad/resources/web/input_data.tsv -text
 modules/scriptpad/scriptpad.iml -text
 modules/simpletest/module.properties -text
 modules/simpletest/resources/config/module.xml -text
+modules/simpletest/resources/domain-templates/test-dataclass/TestingFromTemplate.template.xml -text
 modules/simpletest/resources/etls/SProcBadModifiedSinceWithBadSource.xml -text
 modules/simpletest/resources/etls/SProcBadNonZeroReturnCode.xml -text
 modules/simpletest/resources/etls/SProcBadProcedureName.xml -text
