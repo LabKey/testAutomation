@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.NoSuchElementException;
