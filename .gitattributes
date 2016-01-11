@@ -150,7 +150,6 @@ modules/simpletest/resources/data/priority.tsv -text
 modules/simpletest/resources/data/samples.tsv -text
 modules/simpletest/resources/data/todolist.tsv -text
 modules/simpletest/resources/domain-templates/TestingFromTemplate.template.xml -text svneol=unset#application/xml
-modules/simpletest/resources/domain-templates/test-dataclass/TestingFromTemplate.template.xml -text
 modules/simpletest/resources/domain-templates/todolist.template.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SProcBadModifiedSinceWithBadSource.xml -text
 modules/simpletest/resources/etls/SProcBadNonZeroReturnCode.xml -text
