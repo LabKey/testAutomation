@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates
+    xmlns="http://labkey.org/data/xml/domainTemplate"
+    xmlns:dat="http://labkey.org/data/xml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <template xsi:type="ListTemplateType">
+        <table tableName="Category" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="category">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>50</dat:scale>
+                </dat:column>
+            </dat:columns>
+        </table>
+        <initialData>
+            <file>/data/category.tsv</file>
+        </initialData>
+        <options>
+            <keyCol>category</keyCol>
+        </options>
+    </template>
+
+    <template xsi:type="ListTemplateType">
+        <table tableName="Priority" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="pri">
+                    <dat:datatype>int</dat:datatype>
+                </dat:column>
+                <dat:column columnName="title">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>50</dat:scale>
+                </dat:column>
+            </dat:columns>
+        </table>
+        <initialData importIdentity="true">
+            <file>/data/priority.tsv</file>
+        </initialData>
+        <options>
+            <keyCol>pri</keyCol>
+        </options>
+    </template>
+
+    <template xsi:type="SampleSetTemplateType">
+        <table tableName="Samples" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="family">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>8</dat:scale>
+                </dat:column>
+                <dat:column columnName="index">
+                    <dat:datatype>int</dat:datatype>
+                </dat:column>
+                <dat:column columnName="parent">
+                    <dat:datatype>varchar</dat:datatype>
+                </dat:column>
+                <!-- TODO: Use new InputDatas and InputSamples for auto-derivation -->
+            </dat:columns>
+        </table>
+        <initialData importIdentity="true">
+            <file>/data/samples.tsv</file>
+        </initialData>
+        <options>
+            <keyCol>family</keyCol>
+            <keyCol>index</keyCol>
+            <parentCol>parent</parentCol>
+        </options>
+    </template>
+
+    <template xsi:type="DataClassTemplateType">
+        <table tableName="TodoList" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="title">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>50</dat:scale>
+                    <dat:nullable>false</dat:nullable>
+                </dat:column>
+                <dat:column columnName="text">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>5000</dat:scale>
+                </dat:column>
+                <dat:column columnName="file">
+                    <dat:rangeURI>http://www.labkey.org/exp/xml#attachment</dat:rangeURI>
+                </dat:column>
+                <dat:column columnName="pri">
+                    <dat:nullable>false</dat:nullable>
+                    <dat:fk>
+                        <dat:fkDbSchema>lists</dat:fkDbSchema>
+                        <dat:fkTable>Priority</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+                <!-- TODO: create a multi-value lookup -->
+                <dat:column columnName="categories">
+                    <dat:fk>
+                        <dat:fkDbSchema>lists</dat:fkDbSchema>
+                        <dat:fkTable>Category</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+                <dat:column columnName="sample">
+                    <dat:fk>
+                        <dat:fkDbSchema>exp.material</dat:fkDbSchema>
+                        <dat:fkTable>Samples</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+            </dat:columns>
+        </table>
+        <indices>
+          <!-- test unique index on 'title' column -->
+          <index type='unique'>
+            <column>title</column>
+          </index>
+        </indices>
+        <initialData importLookupByAlternateKey="true">
+            <file>/data/todolist.tsv</file>
+        </initialData>
+        <options>
+            <nameExpression>TODO-${genId}</nameExpression>
+            <!--<sampleSet>Samples</sampleSet>-->
+        </options>
+    </template>
+
+    <template xsi:type="ListTemplateType">
+        <table tableName="ItemCategoryJunction" tableDbType="NOT_IN_DB">
+            <dat:columns>
+                <dat:column columnName="rowId">
+                    <dat:datatype>int</dat:datatype>
+                </dat:column>
+                <dat:column columnName="item">
+                    <dat:datatype>int</dat:datatype>
+                    <dat:fk>
+                        <dat:fkDbSchema>exp.data</dat:fkDbSchema>
+                        <dat:fkTable>TodoItem</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+                <dat:column columnName="category">
+                    <dat:datatype>varchar</dat:datatype>
+                    <dat:scale>50</dat:scale>
+                    <dat:fk>
+                        <dat:fkDbSchema>lists</dat:fkDbSchema>
+                        <dat:fkTable>category</dat:fkTable>
+                    </dat:fk>
+                </dat:column>
+            </dat:columns>
+        </table>
+        <!--
+        <initialData importIdentity="true" importLookupByAlternateKey="true">
+            <file>/data/item-categories.tsv</file>
+        </initialData>
+        -->
+        <options>
+            <keyCol>rowId</keyCol>
+        </options>
+    </template>
+
+</templates>
