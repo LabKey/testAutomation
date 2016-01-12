@@ -625,6 +625,14 @@ public class Ext4Helper
     {
         waitForOnReady();
         menu.click();
+        try
+        {
+            _test.waitForElement(Locators.menuItem(), 1000);
+        }
+        catch (NoSuchElementException retry)
+        {
+            menu.click(); // Sometimes ext4 menus don't open on the first try
+        }
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             WebElement subMenuItem = _test.waitForElement(Locators.menuItem(subMenuLabels[i]).notHidden(), 1000);
@@ -728,9 +736,14 @@ public class Ext4Helper
             return formItem().withDescendant(Locator.tag("input").withAttribute("name", name));
         }
 
+        public static Locator.XPathLocator menuItem()
+        {
+            return Locator.tagWithClass("span", _cssPrefix + "menu-item-text");
+        }
+
         public static Locator.XPathLocator menuItem(String text)
         {
-            return Locator.tagWithClass("span", _cssPrefix + "menu-item-text").withText(text);
+            return menuItem().withText(text);
         }
 
         public static Locator.XPathLocator menuItemDisabled(String text)
