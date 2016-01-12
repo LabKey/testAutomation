@@ -75,7 +75,6 @@ public class WebTestHelper
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
-    public static long leakCRC = 0;
 
     private static void acceptLocalhostCert() throws Exception
     {

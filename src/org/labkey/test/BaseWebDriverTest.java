@@ -82,7 +82,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,7 +95,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.CRC32;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -118,7 +117,6 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.isLocalServer;
-import static org.labkey.test.WebTestHelper.leakCRC;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -160,7 +158,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
-    public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
+    public PermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -901,6 +899,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final String AFTER_CLASS = "AfterClass";
     private static boolean beforeClassSucceeded = false;
     private static boolean reenableMiniProfiler = false;
+    private static long testClassStartTime;
     private static Class testClass;
     private static int testCount;
     private static int currentTestNumber;
@@ -911,6 +910,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         public Statement apply(Statement base, Description description)
         {
+            testClassStartTime = System.currentTimeMillis();
             testClass = description.getTestClass();
             _driver = null;
             testCount = description.getChildren().size();
@@ -1384,6 +1384,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         log("Starting memory leak check...");
         int leakCount = MAX_LEAK_LIMIT + 1;
+        long msSinceTestStart = Long.MAX_VALUE;
 
         for (int attempt = 0; attempt < GC_ATTEMPT_LIMIT && leakCount > MAX_LEAK_LIMIT; attempt++)
         {
@@ -1399,6 +1400,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     sleep(10000);
                 }
             }
+            msSinceTestStart = System.currentTimeMillis() - testClassStartTime;
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
                 throw new IllegalStateException("Asserts must be enabled to track memory leaks; add -ea to your server VM params and restart or add -DmemCheck=false to your test VM params.");
@@ -1407,16 +1409,24 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         if (leakCount > MAX_LEAK_LIMIT)
         {
-            String leaks = Locator.name("leaks").findElement(getDriver()).getText();
-            CRC32 crc = new CRC32();
-            crc.update(leaks.getBytes(StandardCharsets.UTF_8));
-
-            if (leakCRC != crc.getValue())
+            String newLeak = null;
+            List<WebElement> errorRows = Locator.css("#leaks tr:not(:first-child)").findElements(getDriver());
+            for (WebElement errorRow : errorRows)
             {
-                leakCRC = crc.getValue();
+                String ageStr = errorRow.findElement(By.cssSelector(".age")).getText();
+                Duration leakAge = Duration.parse("PT" + ageStr);
+                if (msSinceTestStart > leakAge.toMillis())
+                {
+                    newLeak = errorRow.findElement(By.cssSelector(".allocationStack")).getText();
+                    break;
+                }
+            }
+
+            if (newLeak != null)
+            {
                 getArtifactCollector().dumpHeap();
                 getArtifactCollector().dumpThreads();
-                fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
+                fail(String.format("Found memory leak: %s [1 of %d, MAX:%d]\nSee test artifacts for more information.", newLeak, leakCount, MAX_LEAK_LIMIT));
             }
 
             log("Found " + leakCount + " in-use objects.  They appear to be from a previous test.");
