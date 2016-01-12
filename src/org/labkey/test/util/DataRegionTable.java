@@ -622,12 +622,21 @@ public class DataRegionTable extends Component
 
     public void clearFilter(String columnName)
     {
-        _test.clearFilter(_tableName, columnName);
+        clearFilter(columnName, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clearFilter(String columnName, int waitMillis)
     {
-        _test.clearFilter(_tableName, columnName, waitMillis);
+        _test.log("Clearing filter in " + _tableName + " for " + columnName);
+
+        Runnable clickClearFilter = () ->
+                _test._ext4Helper.clickExt4MenuButton(false, Locators.columnHeader(_tableName, columnName), false, "Clear Filter");
+
+        if (waitMillis == 0)
+            _test.doAndWaitForPageSignal(clickClearFilter, SELECTION_SIGNAL);
+        else
+            _test.doAndWaitForPageToLoad(clickClearFilter, waitMillis);
+
     }
 
     public void clearAllFilters(String columnName)
