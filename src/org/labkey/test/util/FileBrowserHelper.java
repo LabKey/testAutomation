@@ -15,12 +15,11 @@
  */
 package org.labkey.test.util;
 
-import com.google.common.base.Function;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -325,17 +324,8 @@ public class FileBrowserHelper
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);
 
-        _test.doAndWaitForElementToRefresh(() -> {
-            _test.shortWait().until(new Function<WebDriver, WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver driver)
-                {
-                    _test.clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-                    // Button will have 'hover' styling if click didn't work
-                    return _test.waitForElement(Ext4Helper.Locators.ext4Button("Upload").withoutClass("x4-over"), 500);
-                }
-            });
+        Runnable clickUpload = () -> {
+            _test.clickButton("Upload", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
             if (replace)
             {
@@ -343,7 +333,16 @@ public class FileBrowserHelper
                 _test.assertTextPresent("Would you like to replace it?");
                 _test.clickButton("Yes", 0);
             }
-        }, Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(file.getName()), _test.shortWait());
+        };
+        Locator uploadedFile = Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(file.getName());
+        try
+        {
+            _test.doAndWaitForElementToRefresh(clickUpload, uploadedFile, _test.shortWait());
+        }
+        catch (NoSuchElementException retry)
+        {
+            _test.doAndWaitForElementToRefresh(clickUpload, uploadedFile, _test.shortWait());
+        }
 
         if (description != null)
             _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(description));
