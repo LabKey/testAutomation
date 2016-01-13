@@ -158,7 +158,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
-    public PermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
+    public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
