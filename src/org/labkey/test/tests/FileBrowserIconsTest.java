@@ -126,7 +126,11 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         log("Validate number of list icons is correct.");
         pass = validateCount("span.fa-list-alt", 1) & pass;
 
+        log("Validate number of powerpoint icons is correct.");
+        pass = validateCount("span.fa-file-powerpoint-o", 2) & pass;
+
         assertTrue("Count(s) for icons were not as expected. Review log to find the counts that were wrong.", pass);
+
     }
 
     private boolean validateCount(String cssIcon, int expCount)
