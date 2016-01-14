@@ -270,6 +270,13 @@ public class Ext4Helper
         _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, loc, wait);
     }
 
+    public void clickWindowButtonAndWait(String windowTitle, String buttonText)
+    {
+        _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
+        Locator loc = Locators.windowButton(windowTitle, buttonText);
+        _test.waitAndClickAndWait(loc);
+    }
+
     public void clearGridSelection(String markerCls)
     {
         String script =
