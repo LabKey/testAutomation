@@ -917,7 +917,11 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickFolder(folder);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("location", location));
+
+        Locator radioLocation = Locator.radioButtonByNameAndValue("location", location);
+        waitForElement(radioLocation);
+        checkRadioButton(radioLocation);
+
         clickButton("Export");
     }
 
