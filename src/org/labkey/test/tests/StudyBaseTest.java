@@ -235,7 +235,8 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickTab("Manage");
         clickButton("Export Study");
 
-        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Specimen Settings", "Participant Comment Settings");
+        waitForText("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets",
+                "Dataset Data", "Specimens", "Specimen Settings", "Participant Comment Settings");
 
         if (uncheckObjects != null)
         {
