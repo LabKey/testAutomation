@@ -1890,12 +1890,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void selectSecurityGroupsExport()
     {
-        checkCheckbox(Locator.checkboxByNameAndValue("types", "Project-level groups and members"));
+        Locator checkbox = Locator.checkboxByNameAndValue("types", "Project-level groups and members");
+        waitForElement(checkbox);
+        checkCheckbox(checkbox);
     }
 
     protected void selectRoleAssignmentsExport()
     {
-        checkCheckbox(Locator.checkboxByNameAndValue("types", "Role assignments for users and groups"));
+        Locator checkbox = Locator.checkboxByNameAndValue("types", "Role assignments for users and groups");
+        waitForElement(checkbox);
+        checkCheckbox(checkbox);
     }
 
     @LogMethod
