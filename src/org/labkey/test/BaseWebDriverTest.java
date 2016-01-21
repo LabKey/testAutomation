@@ -2687,10 +2687,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _fileBrowserHelper.importFile(folderFile, "Import Folder");
+
         waitForText("Import Folder from Pipeline");
+        Locator validateQuriesCheckbox = Locator.name("validateQueries");
+        waitForElement(validateQuriesCheckbox);
         if (!validateQueries)
-            uncheckCheckbox(Locator.name("validateQueries"));
+            uncheckCheckbox(validateQuriesCheckbox);
         clickButton("Start Import");
+
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
 
