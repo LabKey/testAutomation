@@ -1910,6 +1910,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             clickFolder(folderName);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
+        waitForElement(Locator.name("location"));
+
         if (exportSecurityGroups)
             selectSecurityGroupsExport();
         if (exportRoleAssignments)
