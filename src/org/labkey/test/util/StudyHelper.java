@@ -23,9 +23,13 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.study.CreateStudyPage;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class StudyHelper
 {
@@ -244,8 +248,16 @@ public class StudyHelper
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
 
-        _test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
+        _test.waitForElement(Locator.checkboxByNameAndValue("types", "Study"));
+        List<String> studyObjects = Arrays.asList("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
+        List<String> missingObjects = new ArrayList<>();
+        for (String obj : studyObjects)
+        {
+            if (!_test.isElementPresent(Locator.checkboxByNameAndValue("types", obj)))
+                missingObjects.add(obj);
+        }
+        assertTrue("Missing study objects: " + String.join(", ", missingObjects), missingObjects.isEmpty());fail();
 
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         _test.clickButton("Export");
