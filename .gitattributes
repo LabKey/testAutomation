@@ -304,6 +304,13 @@ src/org/labkey/remoteapi/getdata/GetDataCommand.java -text
 src/org/labkey/remoteapi/getdata/GetDataResponse.java -text
 src/org/labkey/remoteapi/olap/MdxCommand.java -text
 src/org/labkey/remoteapi/olap/MdxResponse.java -text
+src/org/labkey/remoteapi/security/AddAssignmentCommand.java -text
+src/org/labkey/remoteapi/security/BaseUpdateAssignmentCommand.java -text
+src/org/labkey/remoteapi/security/BulkUpdateGroupCommand.java -text
+src/org/labkey/remoteapi/security/BulkUpdateGroupResponse.java -text
+src/org/labkey/remoteapi/security/ClearAssignedRolesCommand.java -text
+src/org/labkey/remoteapi/security/DeletePolicyCommand.java -text
+src/org/labkey/remoteapi/security/RemoveAssignmentCommand.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
