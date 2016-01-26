@@ -437,7 +437,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         public List<String> ignored()
         {
             return Arrays.asList(
-                    "[:0]", // Truncated JSON: "Ext.Error: You're trying to decode an invalid JSON String:"
+                    "[:0]", "{:0}", // Truncated JSON: "Ext.Error: You're trying to decode an invalid JSON String:"
                     "__webdriver_evaluate",
                     "setting a property that has only a getter",
                     "records[0].get is not a function",
@@ -1022,6 +1022,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String containerId = getContainerId();
         popLocation();
         return containerId;
+    }
+
+    public String getCurrentProject()
+    {
+        String[] splitPath = getCurrentContainerPath().split("/");
+        for (String pathElement : splitPath)
+        {
+            if (!pathElement.isEmpty())
+                return pathElement;
+        }
+        return "/"; //root
     }
 
     public String getCurrentContainerPath()
