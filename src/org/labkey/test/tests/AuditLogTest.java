@@ -140,7 +140,7 @@ public class AuditLogTest extends BaseWebDriverTest
         deleteProject(AUDIT_TEST_PROJECT, true);
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The user/group Testers was assigned to the security role Editor.", 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The group Testers was assigned to the security role Editor.", 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "User: " + AUDIT_TEST_USER + " was added as a member to Group: Testers", 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
 
@@ -240,7 +240,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=GroupAuditEvent");
         if (canSeeAuditLog)
-            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user/group " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
+            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
         else
             assertTextPresent("No data to show.");
     }
