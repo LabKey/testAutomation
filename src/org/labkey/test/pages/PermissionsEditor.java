@@ -38,7 +38,6 @@ public class PermissionsEditor
     public PermissionsEditor(BaseWebDriverTest test)
     {
         _test = test;
-        test.waitForElement(Locator.permissionRendered());
     }
 
     public void selectFolder(String folderName)
