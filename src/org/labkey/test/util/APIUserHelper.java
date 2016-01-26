@@ -19,6 +19,8 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.remoteapi.security.GetUsersCommand;
+import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.io.IOException;
@@ -33,27 +35,42 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public CreateUserResponse createUser(String userName, boolean verifySuccess)
+    public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
     {
+        CreateUserCommand command = new CreateUserCommand(userName);
+        command.setSendEmail(sendEmail);
+        Connection connection = _test.createDefaultConnection(false);
+        try
+        {
+            CreateUserResponse response = command.execute(connection, "");
 
-            CreateUserCommand command = new CreateUserCommand(userName);
-            Connection connection = _test.createDefaultConnection(false);
-            try
+            if (verifySuccess)
             {
-                CreateUserResponse response = command.execute(connection, "");
+                assertEquals(userName, response.getEmail());
+                assertTrue("Invalid userId", response.getUserId() != null);
+            }
+            return response;
+        }
+        catch (CommandException | IOException e)
+        {
+            if(verifySuccess)
+                throw new RuntimeException("Error while creating user", e);
+            return null;
+        }
+    }
 
-                if (verifySuccess)
-                {
-                    assertEquals(userName, response.getEmail());
-                    assertTrue("Invalid userId", response.getUserId() != null);
-                }
-                return response;
-            }
-            catch (CommandException | IOException e)
-            {
-                if(verifySuccess)
-                    throw new RuntimeException("Error while creating user", e);
-                return null;
-            }
+    public GetUsersResponse getUsers()
+    {
+        GetUsersCommand command = new GetUsersCommand();
+        Connection connection = _test.createDefaultConnection(false);
+
+        try
+        {
+            return command.execute(connection, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

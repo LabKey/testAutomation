@@ -22,18 +22,31 @@ import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.security.AddAssignmentCommand;
+import org.labkey.remoteapi.security.AddGroupMembersCommand;
+import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
+import org.labkey.remoteapi.security.CreateGroupCommand;
+import org.labkey.remoteapi.security.DeleteGroupCommand;
+import org.labkey.remoteapi.security.DeletePolicyCommand;
 import org.labkey.remoteapi.security.GetGroupPermsCommand;
 import org.labkey.remoteapi.security.GetGroupPermsResponse;
+import org.labkey.remoteapi.security.RemoveAssignmentCommand;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
+    private List<Map<String, Object>> groupCache;
+    private String groupCacheContainer;
+
     public ApiPermissionsHelper(BaseWebDriverTest test)
     {
         super(test);
@@ -64,8 +77,8 @@ public class ApiPermissionsHelper extends PermissionsHelper
         else
             roles.addAll(getGroupRoles(container, userOrGroupName));
 
-        Assert.assertTrue(String.format("%s did not have role: %s\nFound: %s", userOrGroupName, permissionSetting, StringUtils.join("\n", roles)),
-                roles.contains(expectedRole) || "No Permissions".equals(permissionSetting) && roles.size() > 0);
+        Assert.assertTrue(String.format("%s did not have role: %s\nFound: %s", userOrGroupName, expectedRole, StringUtils.join("\n", roles)),
+                roles.contains(expectedRole) || "No Permissions".equals(permissionSetting) && roles.size() == 0);
     }
 
     public List<String> getGroupRoles(String container, String groupName)
@@ -85,26 +98,18 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public boolean doesGroupExist(String groupName, String container)
     {
-        List<Map<String, Object>> groups = getGroups(container);
-
-        for (Map<String, Object> group : groups)
-        {
-            if (groupName.equals(group.get("name")))
-                return true;
-        }
-
-        return false;
+        return getProjectGroupId(groupName, container) != null;
     }
 
     @Override
-    public boolean isUserInGroup(String userOrGroup, String groupName, String container, PrincipalType principalType)
+    public boolean isUserInGroup(String memberToCheck, String groupName, String container, PrincipalType principalType)
     {
-        List<Map<String, Object>> groups = new ArrayList<>();
+        List<Map<String, Object>> inTheseGroups = new ArrayList<>();
         if (principalType == PrincipalType.USER)
         {
             try
             {
-                groups = getUserGroups(container, userOrGroup);
+                inTheseGroups = getUserGroups(container, memberToCheck);
             }
             catch (CommandException ignore)
             {
@@ -115,9 +120,9 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             for(Map<String, Object> group : getGroups(container))
             {
-                if (groupName.equals(group.get("name")))
+                if (memberToCheck.equals(group.get("name")))
                 {
-                    groups = (List)group.get("groups");
+                    inTheseGroups = (List)group.get("groups");
                     break;
                 }
             }
@@ -125,44 +130,124 @@ public class ApiPermissionsHelper extends PermissionsHelper
         else
             throw new IllegalArgumentException(principalType.toString() + " not supported");
 
-        for (Map<String, Object> group : groups)
+        for (Map<String, Object> group : inTheseGroups)
         {
             if (groupName.equals(group.get("name")))
                 return true;
         }
 
         return false;
-//        List<String> groupMembers = getGroupMembers(container, groupName);
-//
-//        return groupMembers.contains(user);
     }
 
     private List<Map<String, Object>> getGroups(String container)
     {
-        Connection connection = _test.createDefaultConnection(false);
-        GetGroupPermsCommand command = new GetGroupPermsCommand();
-        GetGroupPermsResponse response;
-        try
+        if (groupCache == null || !container.equals(groupCacheContainer))
         {
-            response = command.execute(connection, container);
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
+            Connection connection = _test.createDefaultConnection(false);
+            GetGroupPermsCommand command = new GetGroupPermsCommand();
+            GetGroupPermsResponse response;
+            try
+            {
+                response = command.execute(connection, container);
+            }
+            catch (IOException | CommandException e)
+            {
+                throw new RuntimeException(e);
+            }
+
+            groupCacheContainer = container;
+            groupCache = (List) ((Map) response.getParsedData().get("container")).get("groups");
         }
 
-        return (List)((Map)response.getParsedData().get("container")).get("groups");
+        return groupCache;
     }
 
+    private List<Map<String, Object>> getProjectGroups(String project)
+    {
+        List<Map<String, Object>> groups = new ArrayList<>(groupCache == null ? getGroups(project) : groupCache);
+
+        Iterator<Map<String, Object>> iter = groups.iterator();
+        while (iter.hasNext())
+        {
+            Map<String, Object> group = iter.next();
+            if ((Boolean)group.get("isProjectGroup"))
+            {
+                iter.remove();
+            }
+        }
+        return groups;
+    }
+
+    private List<Map<String, Object>> getSiteGroups()
+    {
+        List<Map<String, Object>> groups = new ArrayList<>(groupCache == null ? getGroups("/") : groupCache);
+
+        Iterator<Map<String, Object>> iter = groups.iterator();
+        while (iter.hasNext())
+        {
+            Map<String, Object> group = iter.next();
+            if (!(Boolean)group.get("isProjectGroup"))
+            {
+                iter.remove();
+            }
+        }
+        return groups;
+    }
+
+    private Integer getProjectGroupId(String groupName, String project)
+    {
+        for (Map<String, Object> group : getGroups(project))
+        {
+            if (groupName.equals(group.get("name")))
+            {
+                return Math.toIntExact((long)group.get("id"));
+            }
+        }
+        return null;
+    }
+
+    private Integer getSiteGroupId(String groupName)
+    {
+        for (Map<String, Object> group : getSiteGroups())
+        {
+            if (groupName.equals(group.get("name")))
+            {
+                return Math.toIntExact((long)group.get("id"));
+            }
+        }
+        return null;
+    }
+
+    public Integer getGroupId(String groupName)
+    {
+        Integer id = getSiteGroupId(groupName);
+        if (id == null)
+            id = getProjectGroupId(groupName, _test.getCurrentProject());
+        return id;
+    }
+
+    public Integer getUserId(String user)
+    {
+        try
+        {
+            return ((Number)getUserPerms("/", user).getProperty("user.userId")).intValue();
+        }
+        catch (CommandException e)
+        {
+            return null;
+        }
+    }
+
+    //TODO: Not yet implemented
     private List<String> getGroupMembers(String container, String groupName)
     {
-        Long groupId = null;
+        Integer groupId = null;
         List<Map<String, Object>> groups = getGroups(container);
         for (Map<String, Object> group : groups)
         {
             if (groupName.equals(group.get("name")))
             {
-                groupId = (Long)group.get("id");
+                groupId = Math.toIntExact((long)group.get("id"));
                 break;
             }
         }
@@ -186,14 +271,14 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private List<Map<String, Object>> getUserGroups(String container, String user) throws CommandException
     {
-        return (List)getUserPerms(container, user).get("groups");
+        return (List)getUserPerms(container, user).getProperty("container.groups");
     }
 
     private List<String> getUserRoles(String container, String user)
     {
         try
         {
-            return (List<String>)getUserPerms(container, user).get("roles");
+            return (List<String>)getUserPerms(container, user).getProperty("container.roles");
         }
         catch (CommandException e)
         {
@@ -201,7 +286,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
-    private Map<String, Object> getUserPerms(String container, String user) throws CommandException
+    private CommandResponse getUserPerms(String container, String user) throws CommandException
     {
         Connection connection = _test.createDefaultConnection(false);
         Command command = new Command("security", "getUserPerms");
@@ -217,6 +302,322 @@ public class ApiPermissionsHelper extends PermissionsHelper
             throw new RuntimeException(e);
         }
 
-        return (Map) response.getParsedData().get("container");
+        return response;
+    }
+
+    @Override
+    public void checkInheritedPermissions()
+    {
+        new UIPermissionsHelper(_test).checkInheritedPermissions();
+    }
+
+    @Override
+    public void uncheckInheritedPermissions()
+    {
+        unsetInheritPermissions(_test.getContainerId());
+    }
+
+    public void unsetInheritPermissions(String containerId)
+    {
+        DeletePolicyCommand  command = new DeletePolicyCommand(containerId);
+        Connection connection = _test.createDefaultConnection(true);
+
+        try
+        {
+            command.execute(connection, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isPermissionsInherited()
+    {
+        return isPermissionsInherited(_test.getCurrentContainerPath());
+    }
+
+    public boolean isPermissionsInherited(String container)
+    {
+        Connection connection = _test.createDefaultConnection(false);
+        GetGroupPermsCommand command = new GetGroupPermsCommand();
+        GetGroupPermsResponse response;
+        try
+        {
+            response = command.execute(connection, container);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return response.getProperty("container.isInheritingPerms");
+    }
+
+    @Override
+    protected void removeRoleAssignment(String userOrGroupName, String permissionString, MemberType memberType)
+    {
+        String container = _test.getCurrentContainerPath();
+        if (memberType == MemberType.user)
+            removeUserRoleAssignment(userOrGroupName, permissionString, container);
+        else
+        {
+            Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
+            removeRoleAssignment(principalId, permissionString, container);
+        }
+    }
+
+    public void removeUserRoleAssignment(String userEmail, String permissionString, String container)
+    {
+        RemoveAssignmentCommand command = new RemoveAssignmentCommand();
+        Connection connection = _test.createDefaultConnection(true);
+
+        command.setEmail(userEmail);
+        command.setRoleClassName(toRole(permissionString));
+
+        try
+        {
+            command.execute(connection, container);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeRoleAssignment(Integer principalId, String roleClassName, String container)
+    {
+        RemoveAssignmentCommand command = new RemoveAssignmentCommand();
+        Connection connection = _test.createDefaultConnection(true);
+
+        command.setPrincipalId(principalId);
+        command.setRoleClassName(roleClassName);
+
+        try
+        {
+            command.execute(connection, container);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
+    {
+        addMemberToRole(userOrGroupName, permissionString, memberType, _test.getCurrentContainerPath());
+    }
+
+    public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType, String container)
+    {
+        AddAssignmentCommand command = new AddAssignmentCommand();
+        Connection connection = _test.createDefaultConnection(true);
+
+        Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
+        command.setPrincipalId(principalId);
+        command.setRoleClassName(toRole(permissionString));
+
+        try
+        {
+            command.execute(connection, container);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected Integer getPrincipalId(String userOrGroupName, MemberType principalType, String project)
+    {
+        switch (principalType)
+        {
+            case user:
+                return getUserId(userOrGroupName);
+            case group:
+                return getProjectGroupId(userOrGroupName, project);
+            case siteGroup:
+                return getSiteGroupId(userOrGroupName);
+            default:
+                throw new IllegalStateException("Unknown principal type: " + principalType.toString());
+        }
+    }
+
+    @Override
+    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    {
+        addMemberToRole(userName, permissionString, MemberType.user, "/");
+    }
+
+    @Override
+    public void deleteGroup(String groupName, boolean failIfNotFound)
+    {
+        Integer groupId = getSiteGroupId(groupName);
+
+        if (groupId == null)
+        {
+            if (failIfNotFound)
+                throw new IllegalStateException("Group does not exist: " + groupName);
+            else
+                return;
+        }
+
+        DeleteGroupCommand command = new DeleteGroupCommand(groupId);
+        Connection connection = _test.createDefaultConnection(true);
+        try
+        {
+            command.execute(connection, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @LogMethod (quiet = true)
+    public Integer createProjectGroup(@LoggedParam String groupName, @LoggedParam String container)
+    {
+        CreateGroupCommand command = new CreateGroupCommand(groupName);
+
+        try
+        {
+            Connection connection = _test.createDefaultConnection(true);
+            return command.execute(connection, container).getGroupId().intValue();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @LogMethod (quiet = true)
+    private Integer _createPermissionsGroup(@LoggedParam String groupName, @LoggedParam String container, @LoggedParam String... members)
+    {
+        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupName);
+        command.setCreateGroup(true);
+        command.setMethod(BulkUpdateGroupCommand.Method.add);
+        addMembersToBulkUpdateCommand(command, members);
+
+        try
+        {
+            Connection connection = _test.createDefaultConnection(true);
+            return command.execute(connection, container).getId().intValue();
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Integer createGlobalPermissionsGroup(String groupName, String... users)
+    {
+        return _createPermissionsGroup(groupName, "/", users);
+    }
+
+    @Override
+    public Integer createPermissionsGroup(String groupName)
+    {
+        return  createProjectGroup(groupName, _test.getCurrentProject());
+    }
+
+    @Override
+    public Integer createPermissionsGroup(String groupName, String... users)
+    {
+        return _createPermissionsGroup(groupName, _test.getCurrentProject(), users);
+    }
+
+    private void addMembersToGroup(String project, Integer groupId, String... members)
+    {
+        AddGroupMembersCommand command = new AddGroupMembersCommand(groupId);
+        List<Integer> principalIds = Arrays.asList(members).stream().map(this::getUserId).collect(Collectors.toList());
+        principalIds.addAll(Arrays.asList(members).stream().map((s -> getProjectGroupId(s, project))).collect(Collectors.toList()));
+        principalIds.removeIf((integer -> null == integer));
+        command.addPrincipalId(principalIds);
+
+        try
+        {
+            Connection connection = _test.createDefaultConnection(true);
+            command.execute(connection, project);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            groupCache = null;
+        }
+    }
+
+    private void addMembersToBulkUpdateCommand(BulkUpdateGroupCommand command, String... members)
+    {
+        for (String member : members)
+        {
+            if (member.contains("@"))
+                command.addMemberUser(member);
+            else
+            {
+                Integer memberId = getGroupId(member);
+                if (memberId == null)
+                    throw new RuntimeException("Group not found: " + member);
+                command.addMemberGroup(memberId);
+            }
+        }
+    }
+
+    @Override
+    public void addUserToProjGroup(String userName, String projectName, String groupName)
+    {
+        Integer groupId = getProjectGroupId(groupName, projectName);
+        addMembersToGroup(projectName, groupId, userName);
+    }
+
+    @Override
+    public void addUserToSiteGroup(String userName, String groupName)
+    {
+        Integer groupId = getSiteGroupId(groupName);
+        addMembersToGroup("/", groupId, userName);
+    }
+
+    @Override
+    public void removeUserFromGroup(String groupName, String userName)
+    {
+        Integer groupId = getGroupId(groupName);
+        if (groupId == null)
+            throw new IllegalArgumentException("Attempting to remove members from non-existent site group: " + groupName);
+        removeMembersFromGroup(groupId, userName);
+    }
+
+    @Override
+    public void removeUserFromSiteGroup(String groupName, String userName)
+    {
+        Integer groupId = getSiteGroupId(groupName);
+        if (groupId == null)
+            throw new IllegalArgumentException("Attempting to remove members from non-existent group: " + groupName);
+        removeMembersFromGroup(groupId, userName);
+    }
+
+    private void removeMembersFromGroup(Integer groupId, String... members)
+    {
+        BulkUpdateGroupCommand command = new BulkUpdateGroupCommand(groupId);
+        command.setCreateGroup(false);
+        command.setMethod(BulkUpdateGroupCommand.Method.delete);
+        addMembersToBulkUpdateCommand(command, members);
+
+        try
+        {
+            Connection connection = _test.createDefaultConnection(true);
+            command.execute(connection, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            groupCache = null;
+        }
     }
 }

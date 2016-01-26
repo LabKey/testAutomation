@@ -158,7 +158,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
-    public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
+    public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -491,7 +491,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void ensureAdminMode()
     {
-        if (!isElementPresent(Locator.css("#adminMenuPopupText")))
+        if (!isSignedInAsAdmin())
             stopImpersonating();
         if (!isElementPresent(Locators.projectBar))
         {
@@ -1336,7 +1336,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String projectName = getProjectName();
 
         if (null != projectName)
-            deleteProject(projectName, afterTest);
+            _containerHelper.deleteProject(projectName, afterTest);
     }
 
     public void cleanup() throws Exception
@@ -2312,6 +2312,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         new DataRegionTable(dataRegionName, this).checkCheckbox(index);
     }
 
+    @Deprecated
     public void addUserToGroupFromGroupScreen(String userName)
     {
         waitForElement(Locator.name("names"));
@@ -2355,19 +2356,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      */
     public void createUserWithPermissions(String userName, String projectName, String permissions)
     {
-        createUser(userName, null);
+        _userHelper.createUser(userName, true);
         if(projectName==null)
             goToProjectHome();
         else
-            clickProject(projectName);
+            goToProjectHome(projectName);
         _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
+    @Deprecated
     public CreateUserResponse createUser(String userName, @Nullable String cloneUserName)
     {
         return createUser(userName, cloneUserName, true);
     }
 
+    @Deprecated
     public CreateUserResponse createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
     {
         if(cloneUserName == null)
@@ -2380,11 +2383,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    @Deprecated
     public void createUserAndNotify(String userName, String cloneUserName)
     {
         createUserAndNotify(userName, cloneUserName, true);
     }
 
+    @Deprecated
     public void createUserAndNotify(String userName, String cloneUserName, boolean verifySuccess)
     {
         ensureAdminMode();
@@ -2426,11 +2431,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         int checked = 0;
         List<String> displayNames = new ArrayList<>();
-        ensureAdminMode();
-        goToSiteUsers();
-
-        if(isElementPresent(Locator.linkWithText("INCLUDE INACTIVE USERS")))
-            clickAndWait(Locator.linkWithText("INCLUDE INACTIVE USERS"));
+        beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
 
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
 
@@ -2439,15 +2440,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             int row = usersTable.getRow("Email", userEmail);
 
             boolean isPresent = row != -1;
-
-            // If we didn't find the user and we have more than one page, then show all pages and try again
-            if (!isPresent && isElementPresent(Locator.linkContainingText("Next")) && isElementPresent(Locator.linkContainingText("Last")))
-            {
-                clickButton("Page Size", 0);
-                clickAndWait(Locator.linkWithText("Show All"));
-                row = usersTable.getRow("Email", userEmail);
-                isPresent = row != -1;
-            }
 
             if (failIfNotFound)
                 assertTrue(userEmail + " was not present", isPresent);

@@ -54,11 +54,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -259,6 +261,24 @@ public class WebTestHelper
         }
 
         return url.toString();
+    }
+
+    public static Map<String, String> parseUrlQuery(URL url)
+    {
+        String query = url.getQuery();
+        if (query.startsWith("?"))
+            query = query.substring(1);
+        String[] queryArgs = query.split("&");
+
+        Map<String, String> parsedQuery = new HashMap<>(queryArgs.length);
+
+        for (String arg : queryArgs)
+        {
+            String[] split = arg.split("=", 2);
+            parsedQuery.put(split[0], split.length > 1 ? split[1] : null);
+        }
+
+        return parsedQuery;
     }
 
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.

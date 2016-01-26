@@ -631,6 +631,7 @@ src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
+src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
 src/org/labkey/test/unsupported/PepDBModuleTest.java -text
 src/org/labkey/test/unsupported/PeptideModuleTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
@@ -711,6 +712,7 @@ src/org/labkey/test/util/TextSearcher.java -text
 src/org/labkey/test/util/TimeChartHelper.java -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
+src/org/labkey/test/util/UIPermissionsHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text
 src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/WindowsOnlyTest.java -text

@@ -18,6 +18,11 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -29,26 +34,60 @@ public class UIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public CreateUserResponse createUser(String userName, boolean verifySuccess)
+    public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
     {
-            _test.goToHome();
-            _test.ensureAdminMode();
-            _test.goToSiteUsers();
-            _test.clickButton("Add Users");
+        _test.goToSiteUsers();
+        _test.clickButton("Add Users");
 
-            _test.setFormElement(Locator.name("newUsers"), userName);
-        _test.uncheckCheckbox(Locator.checkboxByName("sendMail"));
+        _test.setFormElement(Locator.name("newUsers"), userName);
+        _test.setCheckbox(Locator.checkboxByName("sendMail").findElement(_test.getDriver()), sendEmail);
         //            if (cloneUserName != null)
 //            {
 //                checkCheckbox("cloneUserCheck");
 //                setFormElement("cloneUser", cloneUserName);
 //            }
-            _test.clickButton("Add Users");
+        _test.clickButton("Add Users");
 
-            if (verifySuccess)
-                assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
+        if (verifySuccess)
+            assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
 
-            // there is no Response object creating via the ui
-            return null;
+        WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(_test.getDriver());
+        String message = resultEl.getText();
+
+        String email;
+        Number userId;
+        List<WebElement> userInfo = Locator.css("meta").findElements(resultEl);
+        if (userInfo.size() > 0)
+        {
+            email = userInfo.get(0).getAttribute("email");
+            String userIdStr = userInfo.get(0).getAttribute("userId");
+            userId = userIdStr == null ? null : Integer.parseInt(userIdStr);
+        }
+        else
+        {
+            email = null;
+            userId = null;
+        }
+
+        CreateUserResponse fakeResponse = new CreateUserResponse(null, 200, null, null, null){
+            @Override
+            public Number getUserId()
+            {
+                return userId;
+            }
+
+            @Override
+            public String getEmail()
+            {
+                return email;
+            }
+
+            @Override
+            public String getMessage()
+            {
+                return message;
+            }
+        };
+        return fakeResponse;
     }
 }

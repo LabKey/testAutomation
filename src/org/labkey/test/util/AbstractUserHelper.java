@@ -27,10 +27,30 @@ public abstract class AbstractUserHelper
         _test = test;
     }
 
-    public CreateUserResponse createUser(String userName)
+    public CreateUserResponse createUser(String userName, String clonedUserName)
     {
-        return createUser(userName, true);
+        return createUser(userName);
     }
 
-    public abstract CreateUserResponse createUser(String userName, boolean verifySuccess);
+    public CreateUserResponse createUser(String userName)
+    {
+        return createUser(userName, false, true);
+    }
+
+    public CreateUserResponse createUser(String userName, boolean verifySuccess)
+    {
+        return createUser(userName, false, verifySuccess);
+    }
+
+    public CreateUserResponse createUserAndNotify(String userName)
+    {
+        return createUser(userName, true, true);
+    }
+
+    public CreateUserResponse createUserAndNotify(String userName, boolean verifySuccess)
+    {
+        return createUser(userName, true, verifySuccess);
+    }
+
+    public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
 }

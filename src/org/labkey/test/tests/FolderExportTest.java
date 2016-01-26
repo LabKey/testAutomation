@@ -59,6 +59,7 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
+    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = new File(TestFileUtils.getSampledataPath(), "FolderExport");
     private static final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
@@ -96,13 +97,6 @@ public class FolderExportTest extends BaseWebDriverTest
             "FolderImportTest 4",
             "FolderImportTest 5",
             "FolderImportTest 6"};
-
-
-    public FolderExportTest()
-    {
-        super();
-        _permissionsHelper = new ApiPermissionsHelper(this);
-    }
 
     @Override
     protected String getProjectName()
