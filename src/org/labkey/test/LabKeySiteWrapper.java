@@ -429,7 +429,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected final HashMap<String, String> usersAndDisplayNames = new HashMap<>();
 
     // assumes there are not collisions in the database causing unique numbers to be appended
-    protected String displayNameFromEmail(String email)
+    // TODO Can be static should be moved to the WebTestHelper test class.
+    public String displayNameFromEmail(String email)
     {
         if (usersAndDisplayNames.containsKey(email))
             return usersAndDisplayNames.get(email);
