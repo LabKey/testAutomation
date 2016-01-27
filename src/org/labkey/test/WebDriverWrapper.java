@@ -1084,7 +1084,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         int alertCount = 0;
         while (isAlertPresent()){
             Alert alert = getDriver().switchTo().alert();
-            log("Found unexpected alert: " + alert.getText());
+            log("Found unexpected alert: " + getAlertText(alert));
             alert.dismiss();
             alertCount++;
         }
@@ -1096,11 +1096,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
         int alertCount = 0;
         while (isAlertPresent()){
             Alert alert = getDriver().switchTo().alert();
-            log("Found unexpected alert: " + alert.getText());
+            log("Found unexpected alert: " + getAlertText(alert));
             alert.accept();
             alertCount++;
         }
         return alertCount;
+    }
+
+    private String getAlertText(Alert alert)
+    {
+        try
+        {
+            return alert.getText();
+        }
+        catch (RuntimeException e)
+        {
+            return "Failed to get alert text: " + e.getMessage();
+        }
     }
 
     public boolean isAlertPresent()
