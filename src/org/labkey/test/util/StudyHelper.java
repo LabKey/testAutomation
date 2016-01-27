@@ -257,7 +257,7 @@ public class StudyHelper
             if (!_test.isElementPresent(Locator.checkboxByNameAndValue("types", obj)))
                 missingObjects.add(obj);
         }
-        assertTrue("Missing study objects: " + String.join(", ", missingObjects), missingObjects.isEmpty());fail();
+        assertTrue("Missing study objects: " + String.join(", ", missingObjects), missingObjects.isEmpty());
 
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         _test.clickButton("Export");
