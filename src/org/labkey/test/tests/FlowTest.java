@@ -480,7 +480,7 @@ public class FlowTest extends BaseFlowTest
 
         //TODO:  how many to select?
         selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
-        click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected"));
+        doAndWaitForPageSignal(() -> click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected")), DataRegionTable.SELECTION_SIGNAL);
         clickButton("Next");
         waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");
