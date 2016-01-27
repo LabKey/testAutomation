@@ -266,7 +266,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Import Data");
 
         setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
-        _listHelper.submitImportTsv_error(null);
+        _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
 
         _listHelper.submitTsvData(TEST_DATA_TWO_COLUMN_DATASET);
         validateTwoColumnData("Dataset", "ParticipantId");
