@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * This class should, eventually, contain most basic page interaction functionality
- * {@link org.labkey.test.BaseWebDriverTest} currently does this
+ * {@link org.labkey.test.LabKeySiteWrapper} currently does this
  */
 public class LabKeyPage extends WebDriverWrapper
 {
@@ -35,11 +35,21 @@ public class LabKeyPage extends WebDriverWrapper
     protected BaseWebDriverTest _test;
     private WebDriver _driver;
 
+    /**
+     * @deprecated Use {@link LabKeyPage(WebDriver)}
+     */
+    @Deprecated
     public LabKeyPage(WebDriverWrapper test)
     {
         if (test instanceof BaseWebDriverTest)
             _test = (BaseWebDriverTest)test;
         _driver = test.getDriver();
+        waitForPage();
+    }
+
+    public LabKeyPage(WebDriver driver)
+    {
+        _driver = driver;
         waitForPage();
     }
 
