@@ -31,7 +31,7 @@ public class PipelineHelper
     {
         public static Locator.XPathLocator pipelineStatusLink(int index)
         {
-            return Locator.id("dataregion_StatusFiles").append("/tbody/tr/td[2]/a[starts-with(@href, '/labkey/pipeline-status/details.view?')]").index(index);
+            return Locator.id("dataregion_StatusFiles").append("/tbody/tr/td[2]/a[starts-with(@href, '/labkey/pipeline-status/details.view?') or starts-with(@href, '/labkey/pipeline-status-details.view?')]").index(index);
         }
     }
 }
