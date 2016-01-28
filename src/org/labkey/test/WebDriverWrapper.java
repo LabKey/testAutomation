@@ -196,6 +196,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
 
+                    options.addArguments("ignore-certificate-errors");
+
                     if (isScriptCheckEnabled())
                     {
                         File jsErrorCheckerExtension = new File(TestFileUtils.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker");
@@ -246,6 +248,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "text/tab-separated-values," +
                                     "text/csv");
                     profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
+                    profile.setAcceptUntrustedCertificates(true);
                     if (isScriptCheckEnabled())
                     {
                         try
