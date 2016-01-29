@@ -189,7 +189,8 @@ public class FolderExportTest extends BaseWebDriverTest
         // test project import with all users and some groups existing
         createUsers(testUsers);
         _containerHelper.createProject(importProjects[2], null);
-        createProjectGroups(true, importProjects[2]);
+        _permissionsHelper.createPermissionsGroup(submitterGroup, testUser4);
+        _permissionsHelper.createPermissionsGroup(parentGroup, testUser3);
         importFolder(importProjects[2], projectPermsZip);
         verifyProjectGroups(importProjects[2], notImportedGroups, importedGroups, true);
         verifyRoleAssignments(true, true, false);
@@ -349,39 +350,18 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void createProjectGroups(boolean createSubset, String projectName)
+    private void createProjectGroups()
     {
-        if (createSubset)
-        {
-            log("Creating subset of project groups");
-            if (!_permissionsHelper.doesGroupExist(submitterGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(submitterGroup, testUser4);
-            if (!_permissionsHelper.doesGroupExist(parentGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(parentGroup, testUser3);
-        }
-        else
-        {
-            log("Creating all project groups");
-            if (!_permissionsHelper.doesGroupExist(submitterGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(submitterGroup, testUser1);
-            if (!_permissionsHelper.doesGroupExist(superTesterGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(superTesterGroup, submitterGroup, testUser2);
-            if (!_permissionsHelper.doesGroupExist(parentGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(parentGroup, superTesterGroup, testUser3);
-            if (!_permissionsHelper.doesGroupExist(emptyGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(emptyGroup);
-            if (!_permissionsHelper.doesGroupExist(groupGroup, projectName))
-                _permissionsHelper.createPermissionsGroup(groupGroup, submitterGroup, emptyGroup);
-
-        }
-        clickButton("Save and Finish");
+        _permissionsHelper.createPermissionsGroup(submitterGroup, testUser1);
+        _permissionsHelper.createPermissionsGroup(superTesterGroup, submitterGroup, testUser2);
+        _permissionsHelper.createPermissionsGroup(parentGroup, superTesterGroup, testUser3);
+        _permissionsHelper.createPermissionsGroup(emptyGroup);
+        _permissionsHelper.createPermissionsGroup(groupGroup, submitterGroup, emptyGroup);
     }
 
     @LogMethod
     private void setPermissions()
     {
-        log("Creating test users and assigning permissions");
-
         _permissionsHelper.setUserPermissions(testUser1, "Folder Administrator");
         _permissionsHelper.setUserPermissions(testUser2, "Editor");
         _permissionsHelper.setUserPermissions(testUser3, "Project Administrator");
@@ -394,25 +374,23 @@ public class FolderExportTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(parentGroup, "Editor");
         _permissionsHelper.setPermissions(groupGroup, "Reader");
         _permissionsHelper.setPermissions(groupGroup, "Author");
-        clickButton("Save and Finish");
     }
 
     @LogMethod
     private void createUsersAndGroupsWithPermissions()
     {
         createUsers(testUsers);
-        createProjectGroups(false, getProjectName());
+        goToProjectHome();
+        createProjectGroups();
         setPermissions();
 
         _containerHelper.createSubfolder(getProjectName(), folderWithPermissions);
 //         stop inheriting permissions from the parent project and set specific permissions in the subfolder
 
         _permissionsHelper.setUserPermissions(testUser1, "Reader");
-        clickButton("Save and Finish");
         _containerHelper.createSubfolder(getProjectName() + "/" + folderWithPermissions, "Subfolder5", "Collaboration");
         _containerHelper.createSubfolder(getProjectName(), folderInheritingPermissions);
         _permissionsHelper.checkInheritedPermissions();
-        clickButton("Save and Finish");
     }
 
     @Test

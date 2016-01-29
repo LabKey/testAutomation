@@ -473,6 +473,10 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             throw new RuntimeException(e);
         }
+        finally
+        {
+            groupCache = null;
+        }
     }
 
     @LogMethod (quiet = true)
@@ -488,6 +492,10 @@ public class ApiPermissionsHelper extends PermissionsHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
+        }
+        finally
+        {
+            groupCache = null;
         }
     }
 
@@ -507,6 +515,10 @@ public class ApiPermissionsHelper extends PermissionsHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
+        }
+        finally
+        {
+            groupCache = null;
         }
     }
 
