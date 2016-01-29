@@ -1034,7 +1034,9 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_VERIFY) + "/echoForm.view"));
+            assertTrue(getCurrentRelativeURL().contains("/junit"));
+            assertTrue(getCurrentRelativeURL().contains("/" + EscapeUtil.encode(PROJECT_VERIFY) + "/"));
+            assertTrue(getCurrentRelativeURL().contains("echoForm.view"));
         }
         popLocation();
     }
