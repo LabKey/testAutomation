@@ -2067,17 +2067,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void assertFormElementEquals(Locator loc, String value)
     {
-        assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, getFormElement(loc));
+        assertEquals(value, getFormElement(loc));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        assertNotEquals("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
+        assertNotEquals(value, getFormElement(loc));
     }
 
     public void assertOptionEquals(Locator loc, String value)
     {
-        assertEquals("Option '" + loc + "' was not equal '" + value + "'", value, getSelectedOptionText(loc));
+        assertEquals(value, getSelectedOptionText(loc));
     }
 
     public String getSelectedOptionText(Locator loc)
@@ -2276,7 +2276,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void mouseOver(Locator l)
     {
         WebElement el = l.findElement(getDriver());
+        mouseOver(el);
+    }
 
+    public void mouseOver(WebElement el)
+    {
         Actions builder = new Actions(getDriver());
         builder.moveToElement(el).build().perform();
     }
@@ -2295,6 +2299,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         dragAndDrop(from, to, Position.top);
     }
+    public void dragAndDrop(WebElement from, WebElement to)
+    {
+        dragAndDrop(from, to, Position.top);
+    }
 
     public enum Position
     {top, bottom, middle}
@@ -2303,7 +2311,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         WebElement fromEl = from.findElement(getDriver());
         WebElement toEl = to.findElement(getDriver());
+        dragAndDrop(fromEl, toEl, pos);
+    }
 
+    public void dragAndDrop(WebElement fromEl, WebElement toEl, Position pos)
+    {
         int y;
         switch (pos)
         {
@@ -2327,7 +2339,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void dragAndDrop(Locator el, int xOffset, int yOffset)
     {
         WebElement fromEl = el.findElement(getDriver());
+        dragAndDrop(fromEl, xOffset, yOffset);
+    }
 
+    public void dragAndDrop(WebElement fromEl, int xOffset, int yOffset)
+    {
         Actions builder = new Actions(getDriver());
         builder.clickAndHold(fromEl).moveByOffset(xOffset + 1, yOffset + 1).release().build().perform();
     }
@@ -3111,7 +3127,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertAttributeEquals(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        assertEquals("Expected attribute '" + locator + "@" + attributeName + "' value to be '" + value + "', but was '" + actual + "' instead.", value, actual);
+        assertEquals(value, actual);
+    }
+
+    public void assertAttributeEquals(WebElement element, String attributeName, String value)
+    {
+        String actual = element.getAttribute(attributeName);
+        assertEquals(value, actual);
     }
 
     public void assertAttributeContains(Locator locator, String attributeName, String value)
@@ -3120,10 +3142,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
     }
 
+    public void assertAttributeContains(WebElement element, String attributeName, String value)
+    {
+        String actual = element.getAttribute(attributeName);
+        assertTrue("Expected attribute '" + element + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
+    }
+
     public void assertAttributeNotContains(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
+    }
+
+    public void assertAttributeNotContains(WebElement element, String attributeName, String value)
+    {
+        String actual = element.getAttribute(attributeName);
+        assertTrue("Expected attribute '" + element + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
     public String getAttribute(Locator locator, String attributeName)
@@ -3180,6 +3214,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         WebElement el = l.findElement(getDriver());
         el.sendKeys(Keys.DOWN);
+    }
+
+    public void pressUpArrow(Locator l)
+    {
+        WebElement el = l.findElement(getDriver());
+        el.sendKeys(Keys.UP);
     }
 
     public void setCodeEditorValue(String id, String value)
