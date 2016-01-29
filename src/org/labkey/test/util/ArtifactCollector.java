@@ -22,9 +22,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
@@ -47,13 +49,21 @@ import static org.labkey.test.WebTestHelper.isLocalServer;
 public class ArtifactCollector
 {
     private final BaseWebDriverTest _test;
+    private final WebDriverWrapper _driver;
+
     // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
     private static List<Pair<File, FileFilter>> pipelineDirs = new CopyOnWriteArrayList<>();
     private static long _testStart;
 
     public ArtifactCollector(BaseWebDriverTest test)
     {
+        this(test, test);
+    }
+
+    public ArtifactCollector(BaseWebDriverTest test, WebDriverWrapper driver)
+    {
         _test = test;
+        _driver = driver;
     }
 
     public static void init()
@@ -139,10 +149,10 @@ public class ArtifactCollector
         if (!isHeapDumpCollectionEnabled())
             return;
 
-        _test.pushLocation();
+        _driver.pushLocation();
 
         // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
-        _test.beginAt("/admin/dumpHeap.view");
+        _driver.beginAt("/admin/dumpHeap.view");
         File destDir = ensureDumpDir();
         String dumpMsg = Locator.css("#bodypanel > div").findElement(_test.getDriver()).getText();
         String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
@@ -152,9 +162,9 @@ public class ArtifactCollector
         if ( heapDump.renameTo(destFile) )
             publishArtifact(destFile);
         else
-            _test.log("Unable to move HeapDump file to test logs directory.");
+            TestLogger.log("Unable to move HeapDump file to test logs directory.");
 
-        _test.popLocation(); // go back to get screenshot if needed.
+        _driver.popLocation(); // go back to get screenshot if needed.
     }
 
     public File dumpScreen(File dir, String baseName)
@@ -162,7 +172,7 @@ public class ArtifactCollector
         File screenFile = new File(dir, baseName + ".png");
         try
         {
-            File tempScreen = ((TakesScreenshot) _test.getDriver()).getScreenshotAs(OutputType.FILE);
+            File tempScreen = ((TakesScreenshot) _driver).getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(tempScreen, screenFile);
             return screenFile;
         }
@@ -200,14 +210,20 @@ public class ArtifactCollector
 
     public File dumpHtml(File dir, String baseName)
     {
-        if (_test.getLastPageText() == null)
+        String pageHtml;
+        if (_test == _driver)
+            pageHtml = _test.getLastPageText();
+        else
+            pageHtml = _driver.getHtmlSource();
+
+        if (pageHtml == null)
             return null;
 
         File htmlFile = new File(dir, baseName + ".html");
 
         try (Writer writer = PrintWriters.getPrintWriter(htmlFile))
         {
-            writer.write(_test.getLastPageText());
+            writer.write(pageHtml);
             return htmlFile;
         }
         catch (IOException e)

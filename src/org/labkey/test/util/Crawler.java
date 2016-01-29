@@ -119,6 +119,7 @@ public class Crawler
             new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
+            new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
@@ -746,13 +747,12 @@ public class Crawler
             if (origin != null)
             {
                 TestLogger.log("Crawl failure: collecting origin page info.");
-                String originUrl = origin.toString();
-                int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
                 try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(BaseWebDriverTest.getCurrentTest().getBrowserType(), BaseWebDriverTest.getDownloadDir()))
                 {
                     originBrowser.simpleSignIn();
-                    originBrowser.beginAt(originUrl.substring(relativeURLStart));
-                    BaseWebDriverTest.getCurrentTest().getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
+                    originBrowser.beginAt(origin.toString());
+                    ArtifactCollector collector = new ArtifactCollector(BaseWebDriverTest.getCurrentTest(), originBrowser);
+                    collector.dumpPageSnapshot("crawler", "crawlOrigin");
                 }
                 catch (Exception ignore) {}
             }
