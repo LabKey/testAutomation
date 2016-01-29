@@ -366,7 +366,7 @@ public class Crawler
             if (_action.contains("-"))
             {
                 /* folders/ */
-                int dash = _action.indexOf("-");
+                int dash = _action.lastIndexOf("-");
                 _controller = _action.substring(0,dash);
                 _action = _action.substring(dash+1);
             }
