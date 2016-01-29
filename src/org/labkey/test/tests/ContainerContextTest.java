@@ -29,6 +29,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -518,33 +519,33 @@ public class ContainerContextTest extends BaseWebDriverTest
         String detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to project home " + detailsURL_A,
-                detailsURL_A.contains("/labkey/assay/" + getProjectName() + "/assayBegin.view?"));
+                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName(), "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to project home " + detailsURL_B,
-                detailsURL_B.contains("/labkey/assay/" + getProjectName() + "/assayBegin.view?"));
+                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName(), "assayBegin")));
         clickFolder(SUB_FOLDER_A);
         detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
         detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
-                detailsURL_A.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_A + "/assayBegin.view?"));
+                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
-                detailsURL_B.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_A + "/assayBegin.view?"));
+                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
         clickFolder(SUB_FOLDER_B);
         detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
         detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
-                detailsURL_A.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_B + "/assayBegin.view?"));
+                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
-                detailsURL_B.contains("/labkey/assay/" + getProjectName() +"/"+ SUB_FOLDER_B + "/assayBegin.view?"));
+                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
     }
 
     protected void overrideMetadata(String container, String schemaName, String queryName, String xml)
     {
-        beginAt("/query/" + container + "/schema.view?schemaName=" + schemaName + "&queryName=" + queryName);
+        beginAt(WebTestHelper.buildURL("query", container, "schema", Maps.of("schemaName", schemaName, "queryName", queryName)));
         waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         waitForText(10000, "Label");

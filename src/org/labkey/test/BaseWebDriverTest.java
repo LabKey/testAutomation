@@ -534,7 +534,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             try
             {
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-                getDriver().get(buildURL("login", "logout"));
+                getDriver().get(getBaseURL() + buildURL("login", "logout"));
 
                 if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {

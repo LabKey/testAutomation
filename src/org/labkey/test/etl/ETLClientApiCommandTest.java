@@ -29,9 +29,11 @@ import org.labkey.remoteapi.di.RunTransformCommand;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -129,7 +131,7 @@ public class ETLClientApiCommandTest extends ETLBaseTest
 
     private String getPipelineURLFragment(String jobId)
     {
-        return "/pipeline-status/" + getProjectName() + "/details.view?rowId=" + jobId;
+        return WebTestHelper.buildURL("pipeline-status", getProjectName(), "details", Maps.of("rowId", jobId));
     }
 
     private void verifyClientApi()

@@ -619,20 +619,32 @@ public class Crawler
     {
         // quick unit-test
         {
-        ControllerActionId a = new ControllerActionId("/controller/folder/action.view");
-        assertEquals("controller", a.getController());
-        assertEquals("folder", a.getFolder());
-        assertEquals("action", a.getAction());
+            ControllerActionId a = new ControllerActionId("/controller/project/folder/action.view");
+            assertEquals("controller", a.getController());
+            assertEquals("project/folder", a.getFolder());
+            assertEquals("action", a.getAction());
         }
         {
-        ControllerActionId b = new ControllerActionId("/folder/controller-action.view");
-        assertEquals("controller", b.getController());
-        assertEquals("folder", b.getFolder());
-        assertEquals("action", b.getAction());
+            ControllerActionId b = new ControllerActionId("/project/folder/controller-action.view");
+            assertEquals("controller", b.getController());
+            assertEquals("project/folder", b.getFolder());
+            assertEquals("action", b.getAction());
         }
         {
-        ControllerActionId c = new ControllerActionId("/_webdav/fred");
-        assertEquals("_webdav", c.getController());
+            ControllerActionId a = new ControllerActionId("/controller-sub/folder/action.view");
+            assertEquals("controller-sub", a.getController());
+            assertEquals("folder", a.getFolder());
+            assertEquals("action", a.getAction());
+        }
+        {
+            ControllerActionId b = new ControllerActionId("/folder/controller-sub-action.view");
+            assertEquals("controller-sub", b.getController());
+            assertEquals("folder", b.getFolder());
+            assertEquals("action", b.getAction());
+        }
+        {
+            ControllerActionId c = new ControllerActionId("/_webdav/fred");
+            assertEquals("_webdav", c.getController());
         }
 
         TestLogger.log("Starting crawl...");

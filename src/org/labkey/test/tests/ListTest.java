@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
@@ -1034,9 +1035,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            assertTrue(getCurrentRelativeURL().contains("/junit"));
-            assertTrue(getCurrentRelativeURL().contains("/" + EscapeUtil.encode(PROJECT_VERIFY) + "/"));
-            assertTrue(getCurrentRelativeURL().contains("echoForm.view"));
+            assertTrue(getCurrentRelativeURL().contains(WebTestHelper.buildURL("junit", PROJECT_VERIFY, "echoForm")));
         }
         popLocation();
     }

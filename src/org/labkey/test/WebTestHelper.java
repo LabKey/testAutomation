@@ -77,6 +77,12 @@ public class WebTestHelper
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
+    private static boolean USE_CONTAINER_RELATIVE_URL = true;
+
+    public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
+    {
+        USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
+    }
 
     private static void acceptLocalhostCert() throws Exception
     {
@@ -234,10 +240,13 @@ public class WebTestHelper
 
     public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
     {
-        StringBuilder url = new StringBuilder(getBaseURL());
+        StringBuilder url = new StringBuilder();
 
-        url.append("/");
-        url.append(controller);
+        if (!USE_CONTAINER_RELATIVE_URL)
+        {
+            url.append("/");
+            url.append(controller);
+        }
 
         if (containerPath != null)
         {
@@ -246,6 +255,11 @@ public class WebTestHelper
         }
 
         url.append("/");
+        if (USE_CONTAINER_RELATIVE_URL)
+        {
+            url.append(controller);
+            url.append("-");
+        }
         url.append(action);
         if (!action.contains("."))
             url.append(".view");

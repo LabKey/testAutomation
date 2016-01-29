@@ -27,12 +27,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDomainEditor;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.openqa.selenium.WebElement;
 import org.labkey.test.util.ExcelHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,7 +187,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         mouseOver(Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"));
         sleep(5000);
         assertElementVisible(Locator.css("#helpDiv"));
-        assertElementPresent("Download image is not as expected.", Locator.xpath("//div[@id='helpDiv']//img[contains(@src, '" + getProjectName() + "/downloadFileLink')]"), 1);
+        assertElementPresent("Download image is not as expected.", Locator.xpath("//div[@id='helpDiv']//img[contains(@src, '" + WebTestHelper.buildURL("core", getProjectName(), "downloadFileLink") + "')]"), 1);
 
         // Not going to try and download the file as part of the automaiton, although that could be added if wanted int he future.
 

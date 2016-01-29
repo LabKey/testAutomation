@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
@@ -131,7 +130,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
         waitForElement(Locator.tag("span").containing("You must choose"));
 
         log("Check url's to are correctly constructed");
-        final String url = WebTestHelper.getContextPath() + "/study/" + EscapeUtil.encode(PROJECT_NAME) + "/" + EscapeUtil.encode(FOLDER_NAME) + "/dataset.view?datasetId=5018&Dataset.ParticipantId~in=" + PTID_NO_ALIAS + "%3B" + PTID_NEW_2;
+        final String url = WebTestHelper.buildURL("study", PROJECT_NAME + "/" + FOLDER_NAME, "dataset") + "?datasetId=5018&Dataset.ParticipantId~in=" + PTID_NO_ALIAS + "%3B" + PTID_NEW_2;
         assertElementPresent(Locator.linkWithHref(url));
 
         log("Resolve conflicts and check for correct row retention");
