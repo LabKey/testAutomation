@@ -458,6 +458,9 @@ public class WebTestHelper
 
     public static int getHttpGetResponse(String url, String username, String password) throws IOException
     {
+        if (url.startsWith("/"))
+            url = getBaseURL() + url;
+
         HttpResponse response = null;
         int status;
 
@@ -483,6 +486,9 @@ public class WebTestHelper
 
     public static int getHttpPostResponse(String url, String username, String password) throws IOException
     {
+        if (url.startsWith("/"))
+            url = getBaseURL() + url;
+
         HttpResponse response = null;
         int status;
 
@@ -508,6 +514,9 @@ public class WebTestHelper
 
     public static String getHttpGetResponseBody(String url, String username, String password) throws HttpException, IOException
     {
+        if (url.startsWith("/"))
+            url = getBaseURL() + url;
+
         HttpResponse response = null;
         String responseBody;
 
@@ -533,6 +542,9 @@ public class WebTestHelper
 
     public static String getHttpPostResponseBody(String url, String username, String password) throws HttpException, IOException
     {
+        if (url.startsWith("/"))
+            url = getBaseURL() + url;
+
         HttpResponse response = null;
         String responseBody;
 
