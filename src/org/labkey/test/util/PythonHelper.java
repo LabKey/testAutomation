@@ -24,12 +24,9 @@ import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.junit.Assert.*;
 
 public class PythonHelper
 {
@@ -73,9 +70,9 @@ public class PythonHelper
                 scripts.deleteEngine(defaultScriptName);
         }
 
-        String pythonVersion = getPythonVersion(getRExecutable());
+        String pythonVersion = getPythonVersion(getPythonExecutable());
 
-        ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(getRExecutable());
+        ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(getPythonExecutable());
         config.setLanguage("Python");
         config.setExtensions("py");
         config.setVersion(pythonVersion);
@@ -84,7 +81,7 @@ public class PythonHelper
         return pythonVersion;
     }
 
-    private File getRExecutable()
+    private File getPythonExecutable()
     {
         if (pythonExecutable != null)
             return pythonExecutable;
@@ -154,8 +151,8 @@ public class PythonHelper
         }
         catch(IOException ex)
         {
-            if (versionOutput.length() > 0) _test.log("R --version > " + versionOutput);
-            throw new RuntimeException("Unable to determine R version: " + python.getAbsolutePath(), ex);
+            if (versionOutput.length() > 0) _test.log("python --version > " + versionOutput);
+            throw new RuntimeException("Unable to determine python version: " + python.getAbsolutePath(), ex);
         }
     }
 }
