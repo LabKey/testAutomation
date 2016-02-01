@@ -829,7 +829,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         urlParams.put("test", "true");
         if (!taskName.isEmpty())
             urlParams.put("taskName", taskName);
-        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
+        String maintenanceTriggerUrl = WebTestHelper.getBaseURL() + WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
 
         smStart = System.currentTimeMillis();
         SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
