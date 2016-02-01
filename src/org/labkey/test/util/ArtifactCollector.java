@@ -172,7 +172,7 @@ public class ArtifactCollector
         File screenFile = new File(dir, baseName + ".png");
         try
         {
-            File tempScreen = ((TakesScreenshot) _driver).getScreenshotAs(OutputType.FILE);
+            File tempScreen = ((TakesScreenshot) _driver.getDriver()).getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(tempScreen, screenFile);
             return screenFile;
         }
