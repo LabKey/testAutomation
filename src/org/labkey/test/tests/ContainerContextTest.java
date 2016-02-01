@@ -519,28 +519,28 @@ public class ContainerContextTest extends BaseWebDriverTest
         String detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to project home " + detailsURL_A,
-                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName(), "assayBegin")));
+                detailsURL_A.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName(), "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to project home " + detailsURL_B,
-                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName(), "assayBegin")));
+                detailsURL_B.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName(), "assayBegin")));
         clickFolder(SUB_FOLDER_A);
         detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
         detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
-                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
+                detailsURL_A.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
-                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
+                detailsURL_B.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName() + "/" + SUB_FOLDER_A, "assayBegin")));
         clickFolder(SUB_FOLDER_B);
         detailsURL_A = getAttribute(Locator.tagWithText("a", TEST_ASSAY_A), "href");
         detailsURL_B = getAttribute(Locator.tagWithText("a", TEST_ASSAY_B), "href");
         log("  detailsURL_A = " + detailsURL_A);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_A,
-                detailsURL_A.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
+                detailsURL_A.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
         log("  detailsURL_B = " + detailsURL_B);
         assertTrue("Expected details URL to point to subfolder " + detailsURL_B,
-                detailsURL_B.contains(WebTestHelper.buildURL("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
+                detailsURL_B.contains(WebTestHelper.buildRelativeUrl("assay", getProjectName() + "/" + SUB_FOLDER_B, "assayBegin")));
     }
 
     protected void overrideMetadata(String container, String schemaName, String queryName, String xml)

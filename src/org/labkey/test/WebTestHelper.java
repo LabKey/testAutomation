@@ -240,6 +240,26 @@ public class WebTestHelper
 
     public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
     {
+        return getBaseURL() + buildRelativeUrl(controller, containerPath, action, params);
+    }
+
+    public static String buildRelativeUrl(String controller, String action)
+    {
+        return buildRelativeUrl(controller, null, action, Collections.EMPTY_MAP);
+    }
+
+    public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, String> params)
+    {
+        return buildRelativeUrl(controller, null, action, params);
+    }
+
+    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action)
+    {
+        return buildRelativeUrl(controller, containerPath, action, Collections.EMPTY_MAP);
+    }
+
+    public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, String> params)
+    {
         StringBuilder url = new StringBuilder();
 
         if (!USE_CONTAINER_RELATIVE_URL)
@@ -264,14 +284,17 @@ public class WebTestHelper
         if (!action.contains("."))
             url.append(".view");
 
-        boolean firstParam = true;
-        for (Map.Entry param : params.entrySet())
+        if (params != null)
         {
-            url.append(firstParam ? "?" : "&");
-            url.append(param.getKey());
-            url.append("=");
-            url.append(param.getValue());
-            firstParam = false;
+            boolean firstParam = true;
+            for (Map.Entry param : params.entrySet())
+            {
+                url.append(firstParam ? "?" : "&");
+                url.append(param.getKey());
+                url.append("=");
+                url.append(param.getValue());
+                firstParam = false;
+            }
         }
 
         return url.toString();
