@@ -192,10 +192,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("download.prompt_for_download", "false");
                     prefs.put("download.default_directory", downloadDir.getAbsolutePath());
                     prefs.put("profile.content_settings.pattern_pairs.*.multiple-automatic-downloads", 1); // Turns off multiple download warning
+                    prefs.put("security.warn_submit_insecure", "false");
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
-
                     options.addArguments("ignore-certificate-errors");
 
                     if (isScriptCheckEnabled())
@@ -248,7 +248,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "text/tab-separated-values," +
                                     "text/csv");
                     profile.setPreference("pdfjs.disabled", true); // disable Firefox's built-in PDF viewer
-                    profile.setAcceptUntrustedCertificates(true);
+
+                    profile.setPreference("browser.ssl_override_behavior", 0);
+
                     if (isScriptCheckEnabled())
                     {
                         try
@@ -258,7 +260,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         catch(IOException e)
                         {throw new RuntimeException("Failed to load JS error checker", e);}
                     }
-
+                    profile.setAcceptUntrustedCertificates(true);
+                    profile.setAssumeUntrustedCertificateIssuer(false);
                     profile.setEnableNativeEvents(useNativeEvents());
 
                     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
@@ -1046,6 +1049,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public String getCurrentUser()
     {
         return (String)executeScript("return LABKEY.user.email;");
+    }
+
+    public String getCurrentUserName()
+    {
+        return (String)executeScript("return LABKEY.user.displayName");
     }
 
     public boolean onLabKeyPage()
