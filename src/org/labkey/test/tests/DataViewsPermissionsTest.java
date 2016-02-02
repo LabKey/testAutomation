@@ -24,8 +24,7 @@ import org.labkey.test.util.PortalHelper;
 @Category({DailyA.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
-
-    PortalHelper portalHelper = new PortalHelper(this);
+    private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected void doCreateSteps()
     {

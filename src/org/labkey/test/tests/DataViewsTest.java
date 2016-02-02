@@ -59,10 +59,8 @@ public class DataViewsTest extends ParticipantListTest
 
         // wait for study and specimens to finish loading
         waitForSpecimenImport();
-        setStudyRedesign();
         setupDatasetCategories();
         log("Create report for data view webpart test.");
-        goToModule("StudyRedesign");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
@@ -90,7 +88,7 @@ public class DataViewsTest extends ParticipantListTest
     public void basicTest()
     {
         log("Data Views Test");
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(someDatasets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
@@ -181,7 +179,7 @@ public class DataViewsTest extends ParticipantListTest
         assertTextPresent(NEW_DESCRIPTION);
 
         log("Verify report deletion");
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
         enableEditMode();
         openEditPanel(REPORT_TO_DELETE);
@@ -197,14 +195,14 @@ public class DataViewsTest extends ParticipantListTest
     public void datasetStatusTest()
     {
         log("Testing status settings for datasets");
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(someDatasets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Status");
         clickButton("Save", 0);
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
 
         for (String[] entry : datasets)
         {
@@ -223,7 +221,7 @@ public class DataViewsTest extends ParticipantListTest
             click(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
 
             waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
-            clickAndWait(Locator.linkContainingText("Data & Reports"));
+            clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         }
     }
 
@@ -295,7 +293,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         log("Verify refresh date");
         String refreshDate = "2012-03-01";
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(someDatasets[3]);
         // Refresh date not present when not set.
         mouseOver(Locator.linkWithText(EDITED_DATASET));
@@ -339,7 +337,7 @@ public class DataViewsTest extends ParticipantListTest
     @LogMethod
     public void subcategoryTest()
     {
-        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
@@ -412,7 +410,7 @@ public class DataViewsTest extends ParticipantListTest
 
     private void exportImportTest()
     {
-        log("Verify roundtripping of study redesign features");
+        log("Verify round-tripping of study features");
         exportStudy(false);
         deleteStudy();
 
@@ -424,7 +422,7 @@ public class DataViewsTest extends ParticipantListTest
 
         waitForPipelineJobsToComplete(3, "Study import", false);
 
-        clickAndWait(Locator.linkWithText("Data & Reports"));
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
 
         log("Verify export-import of refresh date settings");
         //why should a date appear somewhere on the page at this point???

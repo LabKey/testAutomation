@@ -346,11 +346,11 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     }
 
     //must be in folder whose designation you wish to change.
-    protected void setStudyRedesign()
+    protected void setStudyITNFolderType()
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Study Redesign (ITN)"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Study (ITN)"));
         clickButton("Update Folder");
     }
 

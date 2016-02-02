@@ -79,7 +79,6 @@ public class StudyScheduleTest extends StudyBaseTest
 
         // wait for study and specimens to finish loading
         waitForSpecimenImport();
-        setStudyRedesign();
     }
 
     @Override
