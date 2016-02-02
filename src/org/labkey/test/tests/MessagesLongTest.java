@@ -25,6 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -337,7 +338,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText(MSG1_TITLE));
         assertTextPresent(
                 "1 <b>x</b>",
-                "<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
+                "<a href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\" class=\"labkey-text-link\">manage lists</a>");
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
