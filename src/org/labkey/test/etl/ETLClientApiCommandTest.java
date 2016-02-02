@@ -131,7 +131,7 @@ public class ETLClientApiCommandTest extends ETLBaseTest
 
     private String getPipelineURLFragment(String jobId)
     {
-        return WebTestHelper.buildURL("pipeline-status", getProjectName(), "details", Maps.of("rowId", jobId));
+        return WebTestHelper.buildRelativeUrl("pipeline-status", getProjectName(), "details", Maps.of("rowId", jobId));
     }
 
     private void verifyClientApi()
