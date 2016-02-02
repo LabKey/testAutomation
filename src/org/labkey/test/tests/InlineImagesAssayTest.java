@@ -100,7 +100,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
     }
 
     @Test
-    public final void AssayTest()
+    public final void testAssayInlineImages()
     {
 
         String assayName = "InlineImageTest";
@@ -187,7 +187,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         mouseOver(Locator.xpath("//img[contains(translate(@title, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + PNG01_FILE + "')]"));
         sleep(5000);
         assertElementVisible(Locator.css("#helpDiv"));
-        assertElementPresent("Download image is not as expected.", Locator.xpath("//div[@id='helpDiv']//img[contains(@src, '" + WebTestHelper.buildURL("core", getProjectName(), "downloadFileLink") + "')]"), 1);
+        assertElementPresent("Download image is not as expected.", Locator.xpath("//div[@id='helpDiv']//img[contains(@src, '" + WebTestHelper.buildRelativeUrl("core", getProjectName(), "downloadFileLink") + "')]"), 1);
 
         // Not going to try and download the file as part of the automaiton, although that could be added if wanted int he future.
 
