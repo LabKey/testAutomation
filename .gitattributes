@@ -714,6 +714,7 @@ src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIPermissionsHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text
+src/org/labkey/test/util/VagrantUtil.java -text
 src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/WindowsOnlyTest.java -text
 src/org/labkey/test/util/WorkbookHelper.java -text
