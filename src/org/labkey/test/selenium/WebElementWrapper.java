@@ -19,6 +19,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
@@ -121,5 +122,11 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement
     public <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException
     {
         return getWrappedElement().getScreenshotAs(target);
+    }
+
+    @Override
+    public Rectangle getRect()
+    {
+        return getWrappedElement().getRect();
     }
 }

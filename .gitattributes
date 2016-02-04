@@ -3,11 +3,6 @@ bin/linux/amd64/VERSION -text
 bin/linux/amd64/chromedriver -text
 bin/linux/i386/VERSION -text
 bin/linux/i386/chromedriver -text
-bin/linux/phantomjs-1.9.0-linux-x86_64/phantomjs-1.9.0-linux-x86_64/ChangeLog -text
-bin/linux/phantomjs-1.9.0-linux-x86_64/phantomjs-1.9.0-linux-x86_64/LICENSE.BSD -text
-bin/linux/phantomjs-1.9.0-linux-x86_64/phantomjs-1.9.0-linux-x86_64/README.md -text
-bin/linux/phantomjs-1.9.0-linux-x86_64/phantomjs-1.9.0-linux-x86_64/bin/phantomjs -text
-bin/linux/phantomjs-1.9.0-linux-x86_64/phantomjs-1.9.0-linux-x86_64/third-party.txt -text
 bin/mac/VERSION -text
 bin/mac/chromedriver -text
 bin/windows/VERSION -text

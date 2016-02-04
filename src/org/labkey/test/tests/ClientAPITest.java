@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONArray;
@@ -144,8 +143,8 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         deleteUsersIfPresent(EMAIL_RECIPIENTS);
         deleteUsersIfPresent(AUTOCOMPLETE_USER);
-        deleteProject(PROJECT_NAME, afterTest);
-        deleteProject(OTHER_PROJECT, afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(OTHER_PROJECT, afterTest);
     }
 
     @BeforeClass
@@ -371,8 +370,6 @@ public class ClientAPITest extends BaseWebDriverTest
         waitUntilGridUpdateComplete();
 
         // on the next row, change 'Bill' to 'Billy'
-        doubleClick(Locator.xpath("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]"));
-        sleep(500);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
