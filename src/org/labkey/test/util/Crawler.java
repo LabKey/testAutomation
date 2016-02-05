@@ -158,6 +158,7 @@ public class Crawler
             new ControllerActionId("study", "deleteDatasetReport"),
             new ControllerActionId("study", "deleteDataset"),
             new ControllerActionId("study", "importStudyFromPipeline"),
+            new ControllerActionId("study", "manageStudyProperties"), // Intermittently triggers form dirty alert
             new ControllerActionId("study", "protocolDocumentDownload"),
             new ControllerActionId("study-reports", "deleteReports"),
             new ControllerActionId("study-reports", "deleteReport"),
