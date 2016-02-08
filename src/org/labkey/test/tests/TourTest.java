@@ -28,9 +28,6 @@ import org.labkey.test.util.LogMethod;
 
 import java.util.List;
 
-/**
- * Created by RyanS on 2/23/2015.
- */
 @Category({DailyA.class})
 public class TourTest extends BaseWebDriverTest
 {
@@ -72,7 +69,7 @@ public class TourTest extends BaseWebDriverTest
         waitForText("Tours");
         waitAndClick(Locator.xpath("//span[text()='Insert New']"));
         waitForText("Tour Builder");
-        TourEditor tourEditor = new TourEditor(this);
+        TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setTitle("Test Tour");
         tourEditor.setMode(TourEditor.TourMode.RUNONCE);
         tourEditor.setDescription(TOUR_DESC);
@@ -135,13 +132,13 @@ public class TourTest extends BaseWebDriverTest
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         clickAndWait(Locator.linkWithText("Edit"));
-        TourEditor tourEditor = new TourEditor(this);
+        TourEditor tourEditor = new TourEditor(getDriver());
         String tourJSON = tourEditor.export();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER2 + "/begin.view");
         waitForText("Tours");
         waitAndClick(Locator.xpath("//span[text()='Insert New']"));
         waitForText("Tour Builder");
-        tourEditor = new TourEditor(this);
+        tourEditor = new TourEditor(getDriver());
         tourEditor.importTour(tourJSON);
         tourEditor.setTitle(TOUR_NAME);
         tourEditor.save();
@@ -161,7 +158,7 @@ public class TourTest extends BaseWebDriverTest
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         clickAndWait(Locator.linkWithText("Edit"));
-        TourEditor tourEditor = new TourEditor(this);
+        TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setMode(TourEditor.TourMode.RUNALWAYS);
         tourEditor.save();
         goToProjectHome();
@@ -180,7 +177,7 @@ public class TourTest extends BaseWebDriverTest
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
         clickAndWait(Locator.linkWithText("Edit"));
-        TourEditor tourEditor = new TourEditor(this);
+        TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setMode(TourEditor.TourMode.OFF);
         tourEditor.save();
         goToProjectHome();

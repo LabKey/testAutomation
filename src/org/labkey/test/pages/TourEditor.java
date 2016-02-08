@@ -15,64 +15,60 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
+import org.openqa.selenium.WebDriver;
 
-/**
- * Created by RyanS on 2/24/2015.
- */
-public class TourEditor
+public class TourEditor extends LabKeyPage
 {
-    private BaseWebDriverTest _test;
-
-    public TourEditor(BaseWebDriverTest test)
+    public TourEditor(WebDriver driver)
     {
-        _test = test;
+        super(driver);
     }
 
     public void save()
     {
-        _test.click(Locators.saveButton);
+        click(Locators.saveButton);
     }
 
     public void saveAndClose()
     {
-        _test.click(Locators.saveAndCloseButton);
+        clickAndWait(Locators.saveAndCloseButton);
     }
 
     public void cancel()
     {
-        _test.click(Locators.cancelButton);
+        clickAndWait(Locators.cancelButton);
     }
 
     public void clear()
     {
-        _test.click(Locators.clearButton);
+        click(Locators.clearButton);
     }
 
     public void addStep()
     {
-        _test.click(Locators.addStepButton);
+        click(Locators.addStepButton);
     }
 
     public void importTour(String JSON)
     {
-        _test.click(Locators.importTourButton);
-        _test._extHelper.setCodeMirrorValue("export-script-textarea", JSON);
-        _test.click(Locator.tagContainingText("span", "Import").index(2));
+        click(Locators.importTourButton);
+        _extHelper.setCodeMirrorValue("export-script-textarea", JSON);
+        _ext4Helper.clickWindowButton("Import Tour", "Import", 0, 0);
+        waitForElementToDisappear(Ext4Helper.Locators.window("Import Tour"));
     }
 
     public String export()
     {
-        _test.click(Locators.exportButton);
-        _test.waitForElement(Ext4Helper.Locators.window("Export Tour"));
-        return _test._extHelper.getCodeMirrorValue("export-script-textarea");
+        click(Locators.exportButton);
+        waitForElement(Ext4Helper.Locators.window("Export Tour"));
+        return _extHelper.getCodeMirrorValue("export-script-textarea");
     }
 
     public void setTitle(String title)
     {
-        _test.setFormElement(Locators.titleTextArea, title);
+        setFormElement(Locators.titleTextArea, title);
     }
 
     public void setMode(TourMode mode)
@@ -80,33 +76,33 @@ public class TourEditor
         switch(mode)
         {
             case RUNALWAYS:
-            _test.selectOptionByText(Locators.setModeCombo, "Run Always");
+            selectOptionByText(Locators.setModeCombo, "Run Always");
             break;
 
             case RUNONCE:
-            _test.selectOptionByText(Locators.setModeCombo, "Run Once");
+            selectOptionByText(Locators.setModeCombo, "Run Once");
             break;
 
             case OFF:
-            _test.selectOptionByText(Locators.setModeCombo, "Off");
+            selectOptionByText(Locators.setModeCombo, "Off");
         }
     }
 
     public void setDescription(String description)
     {
-        _test.setFormElement(Locators.descriptionTextArea, description);
+        setFormElement(Locators.descriptionTextArea, description);
     }
 
     //index is 1 based
     public void setSelector(int index, String selector)
     {
-        _test.setFormElement(Locators.getSelectorTextArea(index), selector);
+        setFormElement(Locators.getSelectorTextArea(index), selector);
     }
 
     //index is 1 based
     public void setStep(int index, String step)
     {
-        _test.setFormElement(Locators.getStepTextArea(index), step);
+        setFormElement(Locators.getStepTextArea(index), step);
     }
 
     public enum TourMode
