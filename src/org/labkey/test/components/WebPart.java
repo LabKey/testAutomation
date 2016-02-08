@@ -17,18 +17,41 @@ package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public abstract class WebPart extends Component
 {
-    protected BaseWebDriverTest _test;
-    protected WebElement _componentElement;
-    protected String _title;
-    protected String _id;
+    protected final WebDriverWrapper _test;
 
+    protected final WebElement _componentElement;
+    protected String _title;
+    protected final String _id;
+
+    public WebPart(WebDriver driver, WebElement componentElement)
+    {
+        this(new WebDriverWrapperImpl(driver), componentElement);
+    }
+
+    public WebPart(WebDriverWrapper test, WebElement componentElement)
+    {
+        _componentElement = componentElement;
+        _test = test;
+        _id = _componentElement.getAttribute("id");
+    }
+
+    @Override
     public WebElement getComponentElement()
     {
         return _componentElement;
+    }
+
+    public WebDriver getDriver()
+    {
+        return _test.getDriver();
     }
 
     protected abstract void waitForReady();
@@ -72,8 +95,14 @@ public abstract class WebPart extends Component
         return new Elements();
     }
 
-    protected class Elements
+    protected class Elements extends ComponentElements
     {
+        @Override
+        protected SearchContext getContext()
+        {
+            return getComponentElement();
+        }
+
         public Locator.XPathLocator webPart = Locator.tagWithId("table", _id);
         public Locator.XPathLocator webPartTitle = webPart.append(Locator.xpath("/tbody/tr/th"));
     }

@@ -52,19 +52,19 @@ public class StudyOverviewWebPart extends BodyWebPart
     public OverviewPage clickStudyNavigator()
     {
         _test.clickAndWait(elements().linkStudyNavigator);
-        return new OverviewPage(_test);
+        return new OverviewPage(getDriver());
     }
 
     public LabKeyPage clickManageStudy()
     {
         _test.clickAndWait(elements().linkManageStudy);
-        return new LabKeyPage(_test);
+        return new LabKeyPage(getDriver());
     }
 
     public LabKeyPage clickManageFiles()
     {
         _test.clickAndWait(elements().linkManageFiles);
-        return new LabKeyPage(_test);
+        return new LabKeyPage(getDriver());
     }
 
     @Override

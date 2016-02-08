@@ -15,8 +15,9 @@
  */
 package org.labkey.test.components.search;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -25,16 +26,17 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.SearchHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class SearchForm extends Component
 {
-    private final BaseWebDriverTest _test;
+    private final WebDriverWrapper _driver;
     private final WebElement _componentElement;
 
-    public SearchForm(BaseWebDriverTest test, SearchContext parent)
+    public SearchForm(WebDriver driver, SearchContext parent)
     {
-        _test = test;
+        _driver = new WebDriverWrapperImpl(driver);
         _componentElement = parent.findElement(By.cssSelector(".labkey-search-form"));
     }
 
@@ -49,10 +51,10 @@ public class SearchForm extends Component
     {
         SearchHelper.waitForIndexer();
 
-        _test.setFormElement(elements().searchBox(), searchTerm);
-        _test.clickAndWait(elements().searchButton());
+        _driver.setFormElement(elements().searchBox(), searchTerm);
+        _driver.clickAndWait(elements().searchButton());
 
-        return new SearchResultsPage(_test);
+        return new SearchResultsPage(_driver.getDriver());
     }
 
     private Elements elements()

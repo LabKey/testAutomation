@@ -328,6 +328,7 @@ src/org/labkey/test/TestScrubber.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text
 src/org/labkey/test/WebDriverWrapper.java -text
+src/org/labkey/test/WebDriverWrapperImpl.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text
@@ -379,6 +380,7 @@ src/org/labkey/test/components/Component.java -text
 src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/CustomizeView.java -text
 src/org/labkey/test/components/D3PieChart.java -text
+src/org/labkey/test/components/ListsWebPart.java -text
 src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/SideWebPart.java -text

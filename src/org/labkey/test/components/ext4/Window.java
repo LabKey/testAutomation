@@ -18,14 +18,15 @@ package org.labkey.test.components.ext4;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class Window extends Component
 {
@@ -33,19 +34,19 @@ public class Window extends Component
     WebDriverWrapper _driver;
     Elements _elements;
 
-    public Window(String windowTitle, WebDriverWrapper driver)
+    public Window(String windowTitle, WebDriver driver)
     {
-        this(Ext4Helper.Locators.window(windowTitle).waitForElement(driver.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT), driver);
+        this(Ext4Helper.Locators.window(windowTitle).waitForElement(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT), driver);
     }
 
-    public Window(WebElement window, WebDriverWrapper driver)
+    public Window(WebElement window, WebDriver driver)
     {
         _window = window;
-        _driver = driver;
+        _driver = new WebDriverWrapperImpl(driver);
         _elements = new Elements();
     }
 
-    protected WebDriverWrapper getDriver()
+    protected WebDriverWrapper getWrapper()
     {
         return _driver;
     }
@@ -58,12 +59,12 @@ public class Window extends Component
 
     public void clickButton(String buttonText)
     {
-        _driver.clickAndWait(elements().findButton(buttonText));
+        getWrapper().clickAndWait(elements().findButton(buttonText));
     }
 
     public void clickButton(String buttonText, int msWait)
     {
-        _driver.clickAndWait(elements().findButton(buttonText), msWait);
+        getWrapper().clickAndWait(elements().findButton(buttonText), msWait);
     }
 
     public String getTitle()
@@ -89,7 +90,7 @@ public class Window extends Component
 
     public void waitForClose(int msWait)
     {
-        _driver.waitFor(() -> {
+        getWrapper().waitFor(() -> {
             try
             {
                 return !_window.isDisplayed();

@@ -15,18 +15,18 @@
  */
 package org.labkey.test.components.search;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.components.BodyWebPart;
+import org.openqa.selenium.WebDriver;
 
 public class SearchBodyWebPart extends BodyWebPart
 {
-    public SearchBodyWebPart(BaseWebDriverTest test)
+    public SearchBodyWebPart(WebDriver driver)
     {
-        super(test, "Search");
+        super(driver, "Search");
     }
 
     public SearchForm searchForm()
     {
-        return new SearchForm(_test, getComponentElement());
+        return new SearchForm(getDriver(), getComponentElement());
     }
 }

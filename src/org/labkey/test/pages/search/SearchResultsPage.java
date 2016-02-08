@@ -21,6 +21,7 @@ import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.search.SearchForm;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.regex.Matcher;
@@ -30,14 +31,14 @@ import static org.junit.Assert.assertTrue;
 
 public class SearchResultsPage extends LabKeyPage
 {
-    public SearchResultsPage(BaseWebDriverTest test)
+    public SearchResultsPage(WebDriver test)
     {
         super(test);
     }
 
     public SearchForm searchForm()
     {
-        return new SearchForm(_test, _test.getDriver());
+        return new SearchForm(getDriver(), getDriver());
     }
 
     public Integer getResultCount()

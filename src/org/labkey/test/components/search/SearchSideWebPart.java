@@ -22,11 +22,11 @@ public class SearchSideWebPart extends SideWebPart
 {
     public SearchSideWebPart(BaseWebDriverTest test)
     {
-        super(test, "Search");
+        super(test.getDriver(), "Search");
     }
 
     public SearchForm searchForm()
     {
-        return new SearchForm(_test, getComponentElement());
+        return new SearchForm(getDriver(), getComponentElement());
     }
 }

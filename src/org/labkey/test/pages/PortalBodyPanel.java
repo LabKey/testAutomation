@@ -15,14 +15,12 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.openqa.selenium.WebDriver;
 
-public class PortalBodyPanel
+public class PortalBodyPanel extends LabKeyPage
 {
-    protected BaseWebDriverTest _test;
-
-    protected PortalBodyPanel(BaseWebDriverTest test)
+    protected PortalBodyPanel(WebDriver test)
     {
-        _test = test;
+        super(test);
     }
 }

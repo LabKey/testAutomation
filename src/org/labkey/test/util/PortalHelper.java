@@ -19,9 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -32,34 +34,49 @@ import static org.junit.Assert.fail;
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
  */
-public class PortalHelper
+public class PortalHelper extends WebDriverWrapper
 {
-    protected BaseWebDriverTest _test;
+    protected WebDriver _driver;
 
+    public PortalHelper(WebDriver driver)
+    {
+        _driver = driver;
+    }
+
+    /**
+     * @deprecated Use {@link PortalHelper(WebDriver)}
+     */
+    @Deprecated
     public PortalHelper(BaseWebDriverTest test)
     {
-        _test = test;
+        this(test.getDriver());
+    }
+
+    @Override
+    public WebDriver getWrappedDriver()
+    {
+        return _driver;
     }
 
     public void enableTabEditMode()
     {
-        _test.click(Locator.linkWithTitle("Toggle Edit Mode"));
-        _test.waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-enabled']"));
+        click(Locator.linkWithTitle("Toggle Edit Mode"));
+        waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-enabled']"));
     }
 
     public void disableTabEditMode()
     {
-        _test.click(Locator.linkWithTitle("Toggle Edit Mode"));
-        _test.waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-disabled']"));
+        click(Locator.linkWithTitle("Toggle Edit Mode"));
+        waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-disabled']"));
     }
 
     @LogMethod(quiet = true)
     private void clickTabMenuItem(@LoggedParam String tabText, boolean wait, @LoggedParam String... items)
     {
-        _test.mouseOver(Locator.linkWithText(tabText));
+        mouseOver(Locator.linkWithText(tabText));
         Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
-        _test.waitForElement(tabMenuXPath);
-        _test._extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
+        waitForElement(tabMenuXPath);
+        _extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
     }
 
     @LogMethod(quiet = true)
@@ -72,8 +89,8 @@ public class PortalHelper
         Locator.XPathLocator tabList = Locator.xpath("//ul[contains(@class, 'tab-nav')]//li");
         Locator.XPathLocator tabLink = Locator.xpath("//a[@id=" + Locator.xq(tabId) + "]");
 
-        int tabCount = _test.getElementCount(tabList) - 1;
-        int startIndex = _test.getElementIndex(tabList.withDescendant(tabLink)); // zero-based
+        int tabCount = getElementCount(tabList) - 1;
+        int startIndex = getElementIndex(tabList.withDescendant(tabLink)); // zero-based
         int expectedEndIndex = startIndex;
 
         clickTabMenuItem(tabText, false, "Move", direction.toString());
@@ -90,7 +107,7 @@ public class PortalHelper
                 break;
         }
 
-        _test.waitForElement(tabList.index(expectedEndIndex).withDescendant(tabLink));
+        waitForElement(tabList.index(expectedEndIndex).withDescendant(tabLink));
     }
 
     @LogMethod(quiet = true)
@@ -98,7 +115,7 @@ public class PortalHelper
     {
         clickTabMenuItem(tabText, true, "Hide");
         disableTabEditMode();
-        _test.assertElementNotVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        assertElementNotVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
         enableTabEditMode();
     }
 
@@ -107,7 +124,7 @@ public class PortalHelper
     {
         clickTabMenuItem(tabText, true, "Show");
         disableTabEditMode();
-        _test.assertElementVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        assertElementVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
         enableTabEditMode();
     }
 
@@ -116,8 +133,8 @@ public class PortalHelper
     {
         Locator tabLocator = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']");
         clickTabMenuItem(tabText, true, "Delete");
-        _test.waitForElementToDisappear(tabLocator);
-        _test.assertElementNotPresent(tabLocator);
+        waitForElementToDisappear(tabLocator);
+        assertElementNotPresent(tabLocator);
     }
 
     @LogMethod(quiet = true)
@@ -129,20 +146,20 @@ public class PortalHelper
     @LogMethod(quiet = true)
     public void addTab(@LoggedParam String tabName, @Nullable @LoggedParam String expectedError)
     {
-        _test.click(Locator.linkWithText("+"));
-        _test.waitForText("Add Tab");
-        _test.setFormElement(Locator.input("tabName"), tabName);
+        click(Locator.linkWithText("+"));
+        waitForText("Add Tab");
+        setFormElement(Locator.input("tabName"), tabName);
 
         if (expectedError != null)
         {
-            _test.clickButton("Ok", 0);
-            _test.waitForText(expectedError);
-            _test.clickButton("OK", 0);
+            clickButton("Ok", 0);
+            waitForText(expectedError);
+            clickButton("OK", 0);
         }
         else
         {
-            _test.clickButton("Ok");
-            _test.waitForElement(Locator.folderTab(tabName));
+            clickButton("Ok");
+            waitForElement(Locator.folderTab(tabName));
         }
     }
 
@@ -156,20 +173,20 @@ public class PortalHelper
     public void renameTab(@LoggedParam String tabText, @LoggedParam String newName, @Nullable @LoggedParam String expectedError)
     {
         clickTabMenuItem(tabText, false, "Rename");
-        _test.waitForText("Rename Tab");
-        _test.setFormElement(Locator.input("tabName"),newName);
-        _test.clickButton("Ok", 0);
+        waitForText("Rename Tab");
+        setFormElement(Locator.input("tabName"),newName);
+        clickButton("Ok", 0);
         if (expectedError != null)
         {
-            _test.waitForText(expectedError);
-            _test.clickButton("OK", 0);
+            waitForText(expectedError);
+            clickButton("OK", 0);
             // Close the rename tab window.
-            _test.clickButton("Cancel", 0);
+            clickButton("Cancel", 0);
         }
         else
         {
-            _test.waitForElement(Locator.linkWithText(newName));
-            _test.assertElementNotPresent(Locator.linkWithText(tabText));
+            waitForElement(Locator.linkWithText(newName));
+            assertElementNotPresent(Locator.linkWithText(tabText));
         }
     }
 
@@ -191,12 +208,12 @@ public class PortalHelper
 
     public List<BodyWebPart> getBodyWebParts()
     {
-        List<WebElement> webPartElements = Locator.css("#bodypanel > table[name=webpart]").findElements(_test.getDriver());
+        List<WebElement> webPartElements = Locator.css("#bodypanel > table[name=webpart]").findElements(getDriver());
         List<BodyWebPart> bodyWebParts = new ArrayList<>();
         
         for (WebElement el : webPartElements)
         {
-            bodyWebParts.add(new BodyWebPart(_test, el));
+            bodyWebParts.add(new BodyWebPart(_driver, el));
         }
         
         return bodyWebParts;
@@ -204,18 +221,18 @@ public class PortalHelper
 
     public BodyWebPart getBodyWebPart(String partName)
     {
-        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(_test.getDriver());
-        return new BodyWebPart(_test, el);
+        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(_driver);
+        return new BodyWebPart(_driver, el);
     }
 
     public List<SideWebPart> getSideWebParts()
     {
-        List<WebElement> webPartElements = Locator.css(".labkey-side-panel > table[name=webpart]").findElements(_test.getDriver());
+        List<WebElement> webPartElements = Locator.css(".labkey-side-panel > table[name=webpart]").findElements(getDriver());
         List<SideWebPart> sideWebParts = new ArrayList<>();
 
         for (WebElement el : webPartElements)
         {
-            sideWebParts.add(new SideWebPart(_test, el));
+            sideWebParts.add(new SideWebPart(_driver, el));
         }
 
         return sideWebParts;
@@ -233,23 +250,23 @@ public class PortalHelper
 
     public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//span[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
+        _extHelper.clickExtMenuButton(wait, Locator.xpath("//span[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
     @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
     {
-        _test.waitForElement(Locator.xpath("//option").withText(webPartName));
+        waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
-        _test.selectOptionByText(form.append("//select"), webPartName);
-        _test.submit(form);
+        selectOptionByText(form.append("//select"), webPartName);
+        clickAndWait(form.append(Locator.linkWithText("Add")));
     }
 
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        int startCount = _test.getElementCount(Locators.webPartTitle(webPartTitle));
+        int startCount = getElementCount(Locators.webPartTitle(webPartTitle));
         clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
-        _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
+        waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
     }
 
     public void addQueryWebPart(@LoggedParam String schemaName)
@@ -261,25 +278,25 @@ public class PortalHelper
     {
         addWebPart("Query");
 
-        _test.waitForElement(Locator.css(".schema-loaded-marker"));
+        waitForElement(Locator.css(".schema-loaded-marker"));
 
         if (title != null)
-            _test.setFormElement(Locator.name("title"), title);
+            setFormElement(Locator.name("title"), title);
 
-        _test._ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
+        _ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
 
         if (queryName != null)
         {
-            _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
-            _test.waitForElement(Locator.css(".query-loaded-marker"));
-            _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
-            _test.waitForElement(Locator.css(".view-loaded-marker"));
+            click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
+            waitForElement(Locator.css(".query-loaded-marker"));
+            _ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
+            waitForElement(Locator.css(".view-loaded-marker"));
 
             if (viewName != null)
-                _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
+                _ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
         }
 
-        _test.clickButton("Submit");
+        clickButton("Submit");
 
         if (title == null)
         {
@@ -289,7 +306,7 @@ public class PortalHelper
                 title = queryName;
         }
 
-        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
+        waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
     }
 
     public void addReportWebPart(@LoggedParam String reportId)
@@ -302,28 +319,28 @@ public class PortalHelper
         addWebPart("Report");
 
         if (title != null)
-            _test.setFormElement(Locator.name("title"), title);
+            setFormElement(Locator.name("title"), title);
 
-        _test.selectOptionByText(Locator.id("reportId"), reportId);
+        selectOptionByText(Locator.id("reportId"), reportId);
 
         if (showTabs != null)
         {
             if(showTabs)
-                _test.checkCheckbox(Locator.id("showTabs"));
+                checkCheckbox(Locator.id("showTabs"));
             else
-                _test.uncheckCheckbox(Locator.id("showTabs"));
+                uncheckCheckbox(Locator.id("showTabs"));
         }
 
         if (visibleSections.length > 0)
-            _test.waitForElement(Locator.id("showSection"));
+            waitForElement(Locator.id("showSection"));
         for (String section : visibleSections)
         {
-            _test.selectOptionByValue(Locator.id("showSection"), section);
+            selectOptionByValue(Locator.id("showSection"), section);
         }
 
-        _test.clickButton("Submit");
+        clickButton("Submit");
 
-        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title != null ? title : "Reports"));
+        waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title != null ? title : "Reports"));
     }
 
     @LogMethod(quiet = true)public void moveWebPart(@LoggedParam String webPartTitle, @LoggedParam Direction direction)
@@ -332,12 +349,12 @@ public class PortalHelper
             throw new IllegalArgumentException("Can't move webpart horizontally.");
 
         Locator.XPathLocator webPartLoc = Locator.xpath("//table[@name='webpart']").withPredicate(Locator.tagWithClass("span", "labkey-wp-title-text").withText(webPartTitle));
-        final WebElement webPart = webPartLoc.findElement(_test.getDriver());
+        final WebElement webPart = webPartLoc.findElement(getDriver());
 
-        int initialIndex = (_test.getElementIndex(webPart) / 2); // Each webpart has an adjacent <br>
+        int initialIndex = (getElementIndex(webPart) / 2); // Each webpart has an adjacent <br>
 
         Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
-        String panelClass = portalPanel.findElement(_test.getDriver()).getAttribute("class");
+        String panelClass = portalPanel.findElement(getDriver()).getAttribute("class");
         if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel"))
         {
             clickWebpartMenuItem(webPartTitle, false, "Move " + direction.toString());
@@ -348,15 +365,15 @@ public class PortalHelper
         }
 
         final int expectedIndex = initialIndex + (direction == Direction.DOWN ? 1 : -1);
-        _test.waitFor(() -> (_test.getElementIndex(webPart) / 2) == expectedIndex,
+        waitFor(() -> (getElementIndex(webPart) / 2) == expectedIndex,
                 "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void openWebpartPermissionWindow(String webpart)
     {
         clickWebpartMenuItem(webpart, false, "Permissions");
-        _test._ext4Helper.waitForMask();
-        _test.waitForText("Check Permission");
+        _ext4Helper.waitForMask();
+        waitForText("Check Permission");
     }
 
     /**
@@ -368,17 +385,17 @@ public class PortalHelper
     {
         openWebpartPermissionWindow(webpart);
 
-        _test._ext4Helper.selectComboBoxItem("Required Permission:", permission);
+        _ext4Helper.selectComboBoxItem("Required Permission:", permission);
 
         if(folder==null)
-            _test._ext4Helper.selectRadioButton("Check Permission On:", "Current Folder");
+            _ext4Helper.selectRadioButton("Check Permission On:", "Current Folder");
         else
         {
-            _test._ext4Helper.selectRadioButton("Check Permission On:", "Choose Folder");
-            _test.click(Locator.tagWithText("div", folder));
+            _ext4Helper.selectRadioButton("Check Permission On:", "Choose Folder");
+            click(Locator.tagWithText("div", folder));
         }
-        _test.click(Locator.tagWithText("span", "Save"));
-        _test._ext4Helper.waitForMaskToDisappear();
+        click(Locator.tagWithText("span", "Save"));
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     /**
@@ -390,19 +407,19 @@ public class PortalHelper
     {
         openWebpartPermissionWindow(webpart);
 
-        _test.assertFormElementEquals(Locator.name("permission"), expectedPermission);
+        assertFormElementEquals(Locator.name("permission"), expectedPermission);
 
         if(expectedFolder == null)
         {
-            _test.assertFormElementEquals(Locator.name("permissionContainer"), "");
+            assertFormElementEquals(Locator.name("permissionContainer"), "");
         }
         else
         {
-            _test.assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
+            assertFormElementEquals(Locator.name("permissionContainer"), expectedFolder);
         }
 
-        _test.click(Locator.tagWithText("span", "Cancel"));
-        _test._ext4Helper.waitForMaskToDisappear();
+        click(Locator.tagWithText("span", "Cancel"));
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     public static enum Direction

@@ -18,12 +18,7 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
-import java.util.List;
 
 /**
  * This class should, eventually, contain most basic page interaction functionality
@@ -36,7 +31,7 @@ public class LabKeyPage extends WebDriverWrapper
     private WebDriver _driver;
 
     /**
-     * @deprecated Use {@link LabKeyPage(WebDriver)}
+     * @deprecated Remove usages of {@link #_test} from class and use {@link LabKeyPage(WebDriver)}
      */
     @Deprecated
     public LabKeyPage(WebDriverWrapper test)

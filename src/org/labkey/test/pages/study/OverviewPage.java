@@ -16,13 +16,13 @@
 package org.labkey.test.pages.study;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.CachingLocator;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -34,9 +34,9 @@ public class OverviewPage extends LabKeyPage
 {
     Elements _elements;
 
-    public OverviewPage(BaseWebDriverTest test)
+    public OverviewPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
     }
 
     public boolean isParticipantCountShown()
@@ -48,8 +48,8 @@ public class OverviewPage extends LabKeyPage
     {
         if (!isParticipantCountShown())
         {
-            _test.clickAndWait(elements().participantCountCheckbox);
-            return new OverviewPage(_test);
+            clickAndWait(elements().participantCountCheckbox);
+            return new OverviewPage(getDriver());
         }
         return this;
     }
@@ -58,8 +58,8 @@ public class OverviewPage extends LabKeyPage
     {
         if (isParticipantCountShown())
         {
-            _test.clickAndWait(elements().participantCountCheckbox);
-            return new OverviewPage(_test);
+            clickAndWait(elements().participantCountCheckbox);
+            return new OverviewPage(getDriver());
         }
         return this;
     }
@@ -73,8 +73,8 @@ public class OverviewPage extends LabKeyPage
     {
         if (!isRowCountShown())
         {
-            _test.clickAndWait(elements().rowCountCheckbox);
-            return new OverviewPage(_test);
+            clickAndWait(elements().rowCountCheckbox);
+            return new OverviewPage(getDriver());
         }
         return this;
     }
@@ -83,8 +83,8 @@ public class OverviewPage extends LabKeyPage
     {
         if (isRowCountShown())
         {
-            _test.clickAndWait(elements().rowCountCheckbox);
-            return new OverviewPage(_test);
+            clickAndWait(elements().rowCountCheckbox);
+            return new OverviewPage(getDriver());
         }
         return this;
     }
@@ -139,7 +139,7 @@ public class OverviewPage extends LabKeyPage
             dataset = dataset.substring(0, dataset.length() - 1); // Strip help link '?'
             if (leftVisitIndex == null) leftVisitIndex = 0;
             if (endVisitIndex == null) endVisitIndex = cells.size() - 2;
-            List<String> countTexts = _test.getTexts(cells.subList(leftVisitIndex + 1, endVisitIndex + 2));
+            List<String> countTexts = getTexts(cells.subList(leftVisitIndex + 1, endVisitIndex + 2));
             List<CountPair> participantRowCounts = new ArrayList<>();
 
             for (String countStr : countTexts)
@@ -178,7 +178,7 @@ public class OverviewPage extends LabKeyPage
         List<WebElement> visitCells = Locator.css("td").findElements(headerRow);
         visitCells = visitCells.subList(1, visitCells.size() - 1);
 
-        return _test.getTexts(visitCells);
+        return getTexts(visitCells);
     }
 
     public Elements elements()
