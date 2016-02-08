@@ -1324,6 +1324,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return texts;
     }
 
+    @Deprecated
     public WebElement getElement(Locator locator)
     {
         return locator.findElement(getDriver());
