@@ -18,6 +18,8 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 // TODO: Tons of missing functionality
 // TODO: Much ListHelper functionality belongs here
@@ -60,13 +62,28 @@ public abstract class DomainEditor
 
     public void save()
     {
-        _test.clickButton("Save", 0);
-        _test.waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
+        _test.doAndWaitForElementToRefresh(
+                () -> _test.clickButton("Save", 0),
+                Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."),
+                new WebDriverWait(_test.getDriver(), 20));
     }
 
     public void saveAndClose()
     {
-        _test.clickButton("Save & Close");
+        try
+        {
+            _test.clickButton("Save & Close");
+        }
+        catch (UnhandledAlertException alert)
+        {
+            if (alert.getAlertText().contains("data you have entered may not be saved."))
+            {
+                _test.cancelAlert();
+                _test.clickButton("Save & Close");
+            }
+            else
+                throw alert;
+        }
     }
 
     public static class Locators
