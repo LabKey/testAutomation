@@ -144,11 +144,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.clickImportData();
-        setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST_BAD);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
         assertLabKeyErrorPresent();
 
-        setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_LIST);
         _listHelper.submitImportTsv_success();
         validateSingleColumnData();
 
@@ -167,11 +167,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("Test separate MVIndicator column");
         clickButton("Import Data");
-        setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
         assertLabKeyErrorPresent();
 
-        setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST);
         _listHelper.submitImportTsv_success();
         validateTwoColumnData("query", "name");
     }
@@ -241,10 +241,10 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("View Data");
         clickButton("Import Data");
 
-        setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error(null);
 
-        setFormElement(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET);
         _listHelper.submitImportTsv_success();
         validateSingleColumnData();
 
@@ -265,7 +265,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Import dataset data with two mv columns");
         clickButton("Import Data");
 
-        setFormElement(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
+        setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
 
         _listHelper.submitTsvData(TEST_DATA_TWO_COLUMN_DATASET);
