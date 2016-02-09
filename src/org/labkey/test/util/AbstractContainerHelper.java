@@ -19,9 +19,13 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -326,6 +330,8 @@ public abstract class AbstractContainerHelper
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
+        _test.fireEvent(Locator.id("menubar"), WebDriverWrapper.SeleniumEvent.click);
+        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.id("folderBar_menu")));
     }
 
     @LogMethod
