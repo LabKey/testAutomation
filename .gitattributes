@@ -419,6 +419,7 @@ src/org/labkey/test/pages/LabKeyPage.java -text
 src/org/labkey/test/pages/OlapTestJson.java -text
 src/org/labkey/test/pages/PermissionsEditor.java -text
 src/org/labkey/test/pages/PortalBodyPanel.java -text
+src/org/labkey/test/pages/StartImportPage.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
@@ -450,6 +451,7 @@ src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
+src/org/labkey/test/tests/AdvancedImportOptions.java -text
 src/org/labkey/test/tests/AffymetrixAssayTest.java -text
 src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
