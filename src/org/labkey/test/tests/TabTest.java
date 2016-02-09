@@ -113,7 +113,6 @@ public class TabTest extends SimpleModuleTest
         String tab2Delete = "RENAMED TAB 1";
         clickAndWait(Locator.linkWithText(tab2Delete));
         portalHelper.deleteTab("Test Tab 2");
-        shortWait();
         List<BodyWebPart> bodyparts = portalHelper.getBodyWebParts();
         assertTrue("Webparts failed to load after tab delete while on page", bodyparts != null && bodyparts.size() > 0);
         assertNotNull(getText(PortalHelper.Locators.activeTab.containing(tab2Delete)));
