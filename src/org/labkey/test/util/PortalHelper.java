@@ -28,6 +28,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.fail;
 
@@ -36,26 +37,27 @@ import static org.junit.Assert.fail;
  */
 public class PortalHelper extends WebDriverWrapper
 {
-    protected WebDriver _driver;
+    protected Supplier<WebDriver> _driver;
 
-    public PortalHelper(WebDriver driver)
+    public PortalHelper(Supplier<WebDriver> driver)
     {
         _driver = driver;
     }
 
-    /**
-     * @deprecated Use {@link PortalHelper(WebDriver)}
-     */
-    @Deprecated
-    public PortalHelper(BaseWebDriverTest test)
+    public PortalHelper(WebDriver driver)
     {
-        this(test.getDriver());
+        this(() -> driver);
+    }
+
+    public PortalHelper(WebDriverWrapper test)
+    {
+        this(test::getDriver);
     }
 
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _driver;
+        return _driver.get();
     }
 
     public void enableTabEditMode()
@@ -213,7 +215,7 @@ public class PortalHelper extends WebDriverWrapper
         
         for (WebElement el : webPartElements)
         {
-            bodyWebParts.add(new BodyWebPart(_driver, el));
+            bodyWebParts.add(new BodyWebPart(getDriver(), el));
         }
         
         return bodyWebParts;
@@ -221,8 +223,8 @@ public class PortalHelper extends WebDriverWrapper
 
     public BodyWebPart getBodyWebPart(String partName)
     {
-        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(_driver);
-        return new BodyWebPart(_driver, el);
+        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(getDriver());
+        return new BodyWebPart(getDriver(), el);
     }
 
     public List<SideWebPart> getSideWebParts()
@@ -232,7 +234,7 @@ public class PortalHelper extends WebDriverWrapper
 
         for (WebElement el : webPartElements)
         {
-            sideWebParts.add(new SideWebPart(_driver, el));
+            sideWebParts.add(new SideWebPart(getDriver(), el));
         }
 
         return sideWebParts;
