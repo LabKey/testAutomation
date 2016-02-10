@@ -18,6 +18,9 @@ package org.labkey.test.selenium;
 import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * WebElement wrapper that waits for an attempt to interact with the WebElement before actually finding it
@@ -27,6 +30,7 @@ public class LazyWebElement extends WebElementWrapper
     protected WebElement _webElement;
     private Locator _locator;
     private SearchContext _searchContext;
+    private Long _waitMs;
 
     public LazyWebElement(Locator locator, SearchContext searchContext)
     {
@@ -34,11 +38,26 @@ public class LazyWebElement extends WebElementWrapper
         _searchContext = searchContext;
     }
 
+    public LazyWebElement withTimeout(long ms)
+    {
+        _waitMs = ms;
+        return this;
+    }
+
     @Override
     public WebElement getWrappedElement()
     {
         if (null == _webElement)
-            _webElement = getLocator().findElement(getSearchContext());
+        {
+            if (_waitMs != null)
+            {
+                FluentWait<SearchContext> wait = new FluentWait<>(getSearchContext());
+                wait.withTimeout(_waitMs, TimeUnit.MILLISECONDS);
+                _webElement = getLocator().waitForElement(wait);
+            }
+            else
+                _webElement = getLocator().findElement(getSearchContext());
+        }
 
         return _webElement;
     }

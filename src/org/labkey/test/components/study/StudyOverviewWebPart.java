@@ -20,6 +20,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.study.OverviewPage;
+import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebElement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +42,7 @@ public class StudyOverviewWebPart extends BodyWebPart
 
     public int getParticipantCount()
     {
-        String studyProperties = _test.getText(elements().studyProperties);
+        String studyProperties = elements().studyProperties.getText();
         Pattern participantCountPattern = Pattern.compile("Data is present for (\\d+)");
         Matcher matcher = participantCountPattern.matcher(studyProperties);
         if (matcher.find())
@@ -75,9 +77,9 @@ public class StudyOverviewWebPart extends BodyWebPart
 
     private class Elements extends BodyWebPart.Elements
     {
-        Locator.XPathLocator studyProperties = webPart.append(Locator.tagWithClass("td", "study-properties"));
-        Locator.XPathLocator linkStudyNavigator = webPart.append(Locator.tagWithText("a", "Study Navigator"));
-        Locator.XPathLocator linkManageStudy = webPart.append(Locator.tagWithText("a", "Manage Study"));
-        Locator.XPathLocator linkManageFiles = webPart.append(Locator.tagWithText("a", "Manage Files"));
+        WebElement studyProperties = new LazyWebElement(Locator.css("td.study-properties"), this);
+        WebElement linkStudyNavigator = new LazyWebElement(Locator.xpath("a").withText("Study Navigator"), this);
+        WebElement linkManageStudy = new LazyWebElement(Locator.xpath("a").withText("Manage Study"), this);
+        WebElement linkManageFiles = new LazyWebElement(Locator.xpath("a").withText("Manage Files"), this);
     }
 }

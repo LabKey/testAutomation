@@ -19,6 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -29,7 +30,6 @@ public abstract class WebPart extends Component
 
     protected final WebElement _componentElement;
     protected String _title;
-    protected final String _id;
 
     public WebPart(WebDriver driver, WebElement componentElement)
     {
@@ -40,7 +40,6 @@ public abstract class WebPart extends Component
     {
         _componentElement = componentElement;
         _test = test;
-        _id = _componentElement.getAttribute("id");
     }
 
     @Override
@@ -103,7 +102,6 @@ public abstract class WebPart extends Component
             return getComponentElement();
         }
 
-        public Locator.XPathLocator webPart = Locator.tagWithId("table", _id);
-        public Locator.XPathLocator webPartTitle = webPart.append(Locator.xpath("/tbody/tr/th"));
+        public WebElement webPartTitle = new LazyWebElement(Locator.xpath("tbody/tr/th"), this);
     }
 }

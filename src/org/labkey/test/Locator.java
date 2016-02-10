@@ -23,6 +23,7 @@ import org.openqa.selenium.NotFoundException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
@@ -856,6 +857,24 @@ public abstract class Locator
         public String getLoggableDescription()
         {
             return toString();
+        }
+
+        @Override
+        public WebElement findElement(SearchContext context)
+        {
+            if (_loc.startsWith("//"))
+                return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElement(context);
+            else
+                return super.findElement(context);
+        }
+
+        @Override
+        public List<WebElement> findElements(SearchContext context)
+        {
+            if (_loc.startsWith("//"))
+                return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElements(context);
+            else
+                return super.findElements(context);
         }
     }
 

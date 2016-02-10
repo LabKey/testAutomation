@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -351,50 +352,34 @@ public class Ext4Helper
 
     public void checkCheckbox(Locator.XPathLocator checkboxLocator)
     {
-        if (!isChecked(checkboxLocator))
-            _test.click(checkboxLocator);
+        new Checkbox(checkboxLocator.findElement(_test.getDriver())).check();
     }
 
     public void uncheckCheckbox(Locator.XPathLocator checkboxLocator)
     {
-        if (isChecked(checkboxLocator))
-            _test.click(checkboxLocator);
+        new Checkbox(checkboxLocator.findElement(_test.getDriver())).uncheck();
     }
 
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label)
     {
-        if (!isChecked(label))
-        {
-            Locator l = Locators.checkbox(_test, label);
-            _test.click(l);
-        }
+        new Checkbox(label, _test.getDriver()).check();
     }
 
     @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label)
     {
-        if (isChecked(label))
-        {
-            Locator l = Locators.checkbox(_test, label);
-            _test.click(l);
-        }
+        new Checkbox(label, _test.getDriver()).uncheck();
     }
 
     public boolean isChecked(String label)
     {
-        Locator.XPathLocator checkbox = Locators.checkbox(_test, label);
-        return isChecked(checkbox);
+        return new Checkbox(label, _test.getDriver()).isChecked();
     }
 
-    public boolean isChecked(Locator.XPathLocator checkboxLoc)
+    public boolean isChecked(Locator checkboxLoc)
     {
-        WebElement checkbox = checkboxLoc.findElement(_test.getDriver());
-        String backgroundImage = checkbox.getCssValue("background-image");
-        Assert.assertTrue("Not a checkbox or radio button: " + checkbox.toString(), backgroundImage.contains("checkbox") || backgroundImage.contains("radio"));
-        String atlasPosition = checkbox.getCssValue("background-position");
-        String atlasYOffset = atlasPosition.split(" ")[1];
-        return atlasYOffset.contains("-"); // Probably '-13px' or '-26px'. Unchecked states are all at offset zero
+        return new Checkbox(checkboxLoc.findElement(_test.getDriver())).isChecked();
     }
 
     /**

@@ -51,7 +51,7 @@ public class SideWebPart extends WebPart
     public String getTitle()
     {
         if (_title == null)
-            _title = elements().webPartTitle.findElement(getDriver()).getAttribute("title");
+            _title = elements().webPartTitle.getAttribute("title");
         return _title;
     }
 
@@ -74,25 +74,6 @@ public class SideWebPart extends WebPart
     {
         PortalHelper portalHelper = new PortalHelper(getDriver());
         portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.DOWN);
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BodyWebPart webPart = (BodyWebPart) o;
-
-        if (!_id.equals(webPart._id)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return _id.hashCode();
     }
 
     public static Locator locator()

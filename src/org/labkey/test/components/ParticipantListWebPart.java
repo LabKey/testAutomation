@@ -18,6 +18,8 @@ package org.labkey.test.components;
 import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -75,7 +77,7 @@ public class ParticipantListWebPart extends BodyWebPart
      */
     public Pair<Integer, Integer> getFilteredParticipantCount()
     {
-        String message = findElement(elements().statusMessage).getText();
+        String message = elements().statusMessage.getText();
 
         if (message.equals(String.format("No matching %s.", _participantNounPlural))||
                 message.startsWith(String.format("No %s IDs contain", _participantNounSingular)))
@@ -101,6 +103,6 @@ public class ParticipantListWebPart extends BodyWebPart
 
     protected class Elements extends WebPart.Elements
     {
-        public Locator.XPathLocator statusMessage = Locator.id("participantsDiv1.status");
+        public WebElement statusMessage = new LazyWebElement(Locator.tag("span").attributeEndsWith("id", ".status"), this);
     }
 }

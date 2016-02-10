@@ -17,22 +17,12 @@ package org.labkey.test.selenium;
 
 import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.FluentWait;
 
+@Deprecated
 public class LazyWaitingWebElement extends LazyWebElement
 {
     public LazyWaitingWebElement(Locator locator, SearchContext searchContext)
     {
         super(locator, searchContext);
-    }
-
-    @Override
-    public WebElement getWrappedElement()
-    {
-        if (null == _webElement)
-            _webElement = getLocator().waitForElement(new FluentWait<>(getSearchContext()));
-
-        return _webElement;
     }
 }
