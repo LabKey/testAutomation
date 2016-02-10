@@ -61,12 +61,15 @@ public abstract class DomainEditor
 
     public void save()
     {
+        _test.sleep(500); // Wait for GWT form to not be dirty
         _test.clickButton("Save", 0);
         _test.waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
+        _test.sleep(500); // Wait for GWT form to not be dirty
     }
 
     public void saveAndClose()
     {
+        _test.sleep(500); // Wait for GWT form to not be dirty
         try
         {
             _test.clickButton("Save & Close");
