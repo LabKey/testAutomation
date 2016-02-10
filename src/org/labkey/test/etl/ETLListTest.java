@@ -32,17 +32,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class ETLListTest extends BaseWebDriverTest
 {
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
     private static final String ETL_LIST_MERGE = "{ETLtest}/ListAToListB";
+    private static final String ETL_AUTO_INCR_LIST_TRUNCATE = "{ETLtest}/AutoIncrementListAToListB_truncate";
     // TODO: revert to ETL_ListAListB.lists.zip when 24725 is resolved. Delete xETL_ListAListB.lists.zip
     private static final File ETL_LIST_ARCHIVE = TestFileUtils.getSampleData("lists/xETL_ListAListB.lists.zip");
+    private static final File ETL_AUTO_INCR_LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ETL_AutoIncrListA_AutoIncrListB.lists.zip");
     private static final String SRC_LIST = "ListA";
     private static final String DEST_LIST = "ListB";
+    private static final String AUTO_INCR_SRC_LIST = "AutoIncrementListA";
+    private static final String AUTO_INCR_DEST_LIST = "AutoIncrementListB";
 
 
     @Override
@@ -70,6 +74,8 @@ public class ETLListTest extends BaseWebDriverTest
     {
         goToProjectHome();
         _listHelper.importListArchive(ETL_LIST_ARCHIVE);
+        goToProjectHome();
+        _listHelper.importListArchive(ETL_AUTO_INCR_LIST_ARCHIVE);
     }
 
     @Test
@@ -93,7 +99,30 @@ public class ETLListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DEST_LIST));
         dest = new DataRegionTable("query", this);
         actualKeys = dest.getColumnDataAsText("Key");
-        assertEquals("Initial list copy failed", expectedKeys, actualKeys);
+        assertEquals("List merge failed", expectedKeys, actualKeys);
+    }
+
+    @Test
+    public void testAutoIncrTruncateEtl()
+    {
+        List<String> expectedRows = new ArrayList<>(Arrays.asList("Row1", "Row2"));
+        _etlHelper.runETL(ETL_AUTO_INCR_LIST_TRUNCATE);
+
+        clickAndWait(Locator.linkWithText(AUTO_INCR_DEST_LIST));
+        DataRegionTable dest = new DataRegionTable("query", this);
+        List<String> actualRows = dest.getColumnDataAsText("Field1");
+        assertEquals("Initial list copy failed", expectedRows, actualRows);
+
+        goBack();
+        clickAndWait(Locator.linkWithText(AUTO_INCR_SRC_LIST));
+        _listHelper.insertNewRow(Maps.of("Field1", "new"));
+        _etlHelper.runETL(ETL_AUTO_INCR_LIST_TRUNCATE);
+        expectedRows.add("new");
+
+        clickAndWait(Locator.linkWithText(AUTO_INCR_DEST_LIST));
+        dest = new DataRegionTable("query", this);
+        actualRows = dest.getColumnDataAsText("Field1");
+        assertEquals("Second list copy failed", expectedRows, actualRows);
     }
 
     @Override

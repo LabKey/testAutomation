@@ -50,6 +50,7 @@ data/api/webdavTest.html -text
 data/api/webdavTest.js -text
 data/api/workbookAPITest.html -text
 modules/ETLtest/module.properties -text
+modules/ETLtest/resources/ETLs/AutoIncrementListAToListB_truncate.xml -text
 modules/ETLtest/resources/ETLs/ListAToListB.xml -text
 modules/ETLtest/resources/ETLs/merge.xml -text
 modules/chartingapi/module.properties -text

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>AutoIncrementList A to List B with truncate</name>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <source schemaName="lists" queryName="AutoIncrementListA" />
+            <destination schemaName="lists" queryName="AutoIncrementListB" targetOption="truncate"/>
+        </transform>
+    </transforms>
+</etl>
