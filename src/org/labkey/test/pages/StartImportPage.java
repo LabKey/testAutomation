@@ -108,17 +108,17 @@ public class StartImportPage extends LabKeyPage
     public void setAllAdvancedOptionCheckBoxes(boolean checked)
     {
         List<WebElement> chkBoxes = Locator.css("div.import-option-panel div.x4-column-layout-ct div.x4-panel-body input").findElements(getDriver());
-        for(WebElement chkBox : chkBoxes)
-        {
-            // TODO the 'study' checkbox is there but it is not visible. so ignoring it for now.
-            if(!chkBox.getAttribute("value").toLowerCase().equals("study"))
-            {
-                if (checked)
-                    checkCheckbox(chkBox);
-                else
-                    uncheckCheckbox(chkBox);
-            }
-        }
+        chkBoxes
+                .stream()
+                .forEach(chkBox -> {
+                    if (!chkBox.getAttribute("value").toLowerCase().equals("study"))
+                    {
+                        if (checked)
+                            checkCheckbox(chkBox);
+                        else
+                            uncheckCheckbox(chkBox);
+                    }
+                });
     }
 
     public Locator getCheckBoxLocatorCss(AdvancedOptionsCheckBoxes chkBox)
