@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
@@ -76,6 +77,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         goToProjectSettings(getProjectAltertedName());
         setFormElement(Locator.name("reportAProblemPath"), "");
         clickButton("Save");
+        assertElementNotPresent(Locators.labkeyError);
 
         checkHelpLinks(getProjectAltertedName(), false, true);
 //        assertElementNotPresent("Support link still present after removing link from settings", supportLink);
