@@ -3,5 +3,5 @@ server/modules/*
 server/customModules/*
 server/optionalModules/*
 externalModules/labModules/LDK
-externalModules/labModules/Laboratory
+externalModules/labModules/laboratory
 externalModules/onprcEHRModules/mergesync
