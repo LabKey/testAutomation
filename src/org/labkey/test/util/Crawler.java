@@ -755,7 +755,6 @@ public class Crawler
                     ArtifactCollector collector = new ArtifactCollector(BaseWebDriverTest.getCurrentTest(), originBrowser);
                     collector.dumpPageSnapshot("crawler", "crawlOrigin");
                 }
-                catch (Exception ignore) {}
             }
 
             throw rethrow;
