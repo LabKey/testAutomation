@@ -78,7 +78,6 @@ public abstract class DomainEditor
         {
             if (alert.getAlertText().contains("data you have entered may not be saved."))
             {
-                _test.cancelAlert();
                 _test.clickButton("Save & Close");
             }
             else
