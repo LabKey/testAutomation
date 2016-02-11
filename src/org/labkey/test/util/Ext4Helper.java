@@ -619,7 +619,7 @@ public class Ext4Helper
         menu.click();
         try
         {
-            _test.waitForElement(Locators.menuItem(), 1000);
+            _test.waitForElement(Locators.menuItem().notHidden(), 1000);
         }
         catch (NoSuchElementException retry)
         {
