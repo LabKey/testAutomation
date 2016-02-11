@@ -862,7 +862,7 @@ public abstract class Locator
         @Override
         public WebElement findElement(SearchContext context)
         {
-            if (_loc.startsWith("//"))
+            if (context instanceof WebElement && _loc.startsWith("//"))
                 return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElement(context);
             else
                 return super.findElement(context);
@@ -871,7 +871,7 @@ public abstract class Locator
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            if (_loc.startsWith("//"))
+            if (context instanceof WebElement && _loc.startsWith("//"))
                 return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElements(context);
             else
                 return super.findElements(context);
