@@ -23,11 +23,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -61,6 +63,12 @@ public class UserTest extends BaseWebDriverTest
     // the test fails
     private static final String CHANGE_EMAIL_USER = "pre-pw_change@user.test";
     private static final String CHANGE_EMAIL_USER_ALTERNATE = "post-pw_change@user.test";
+
+    public UserTest()
+    {
+        super();
+        _userHelper = new UIUserHelper(this);
+    }
 
     @Nullable
     @Override
@@ -411,6 +419,18 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextPresent(PROP_NAME1, PROP_NAME2);
         clickButton("Cancel");
+    }
+
+    @Test
+    public void testAddUserCSRF()
+    {
+        goToSiteUsers();
+        clickButton("Add Users");
+        setFormElement(Locator.name("newUsers"), "nocsrf@user.test");
+        setFormElementJS(Locator.name("X-LABKEY-CSRF"), "");
+
+        clickButton("Add Users");
+        assertElementPresent(Locators.labkeyError.containing("This request has an invalid security context."));
     }
 
     @Override
