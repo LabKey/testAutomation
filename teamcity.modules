@@ -6,3 +6,4 @@ externalModules/labModules/LDK
 externalModules/labModules/laboratory
 externalModules/labModules/SequenceAnalysis
 externalModules/onprcEHRModules/mergesync
+externalModules/snprcEHRModules/*
