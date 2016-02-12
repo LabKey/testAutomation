@@ -77,25 +77,28 @@ function sampleSetDomainTypeTest() {
                 LABKEY.Domain.save(function() {
                     r('Successfully updated the description.', true);
                 },
-                        function(){
+                        function(response){
                             r('Failed to update the \'' + NAME + '\' Sample Set.' +
-                                    '<br/><br/><span style="color: red;">' +
-                                    response.exception + '<br/>' +
-                                    response.stackTrace[0] + '</span>', true);
+                                    '<br/><span class="labkey-error" style="color: red;">' +
+                                    response.exception +
+                                    (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
+                                    '</span>', true);
                         },
                         _dd, 'Samples', NAME);
 
             }, function(response) {
-                r('Failed to update the \'' + NAME + '\' Sample Set.<br/><br/><span style="color: red;">' +
-                        response.exception + '<br/>' +
-                        response.stackTrace[0] + '</span>', true);
+                r('Failed to update the \'' + NAME + '\' Sample Set.<br/><br/><span class="labkey-error" style="color: red;">' +
+                        response.exception +
+                        (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
+                        '</span>', true);
             }, 'Samples', NAME);
         }
 
         function createErrorHandler(response) {
-            r('Failed to create the \'' + NAME + '\' Sample Set.<br/><br/><span style="color: red;">' +
-                    response.exception + '<br/>' +
-                    response.stackTrace[0] + '</span>', true);
+            r('Failed to create the \'' + NAME + '\' Sample Set.<br/><br/><span class="labkey-error" style="color: red;">' +
+                    response.exception +
+                    (response['stackTrace'] != undefined ? ('<br/>' + response.stackTrace[0]) : '') +
+                    '</span>', true);
         }
 
         LABKEY.Domain.create(createSuccessHandler, createErrorHandler,
