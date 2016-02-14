@@ -2994,6 +2994,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             el.click();
     }
 
+    public void setCheckbox(Locator checkBoxLocator, boolean check)
+    {
+        WebElement checkbox = checkBoxLocator.findElement(getDriver());
+        setCheckbox(checkbox, check);
+    }
+
     public void assertRadioButtonSelected(Locator radioButtonLocator)
     {
         assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
