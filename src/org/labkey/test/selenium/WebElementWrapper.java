@@ -22,11 +22,13 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsElement;
 
 import java.util.List;
 
-public abstract class WebElementWrapper implements WebElement, WrapsElement
+public abstract class WebElementWrapper implements WebElement, WrapsElement, Locatable
 {
     @Override
     public void click()
@@ -128,5 +130,11 @@ public abstract class WebElementWrapper implements WebElement, WrapsElement
     public Rectangle getRect()
     {
         return getWrappedElement().getRect();
+    }
+
+    @Override
+    public Coordinates getCoordinates()
+    {
+        return ((Locatable)getWrappedElement()).getCoordinates();
     }
 }
