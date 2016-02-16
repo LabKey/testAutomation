@@ -119,6 +119,7 @@ public class Crawler
             new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
+            new ControllerActionId("admin", "resetProperties"), // TODO: https://www.labkey.org/home/Developer/issues/issues-update.view?issueId=25589
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
@@ -724,7 +725,7 @@ public class Crawler
             currentPageUrl = _test.getURL();
 
             // Find all the links at the site
-            if (_test.isElementPresent(Locator.id("folderBar")) & depth > 0)
+            if (depth == 1 && _test.isElementPresent(Locator.id("folderBar")))
                 _test.openFolderMenu();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
@@ -740,6 +741,13 @@ public class Crawler
             int code = _test.getResponseCode();
             if (code >= 400)
                 fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
+            List<String> serverError = _test.getTexts(Locator.css("table.server-error").findElements(_test.getDriver()));
+            if (!serverError.isEmpty())
+            {
+                String[] errorLines = serverError.get(0).split("\n");
+                fail(relativeURL + " produced error: \"" + errorLines[0] + "\".  Originating page: " + origin.toString());
+            }
+
         }
         catch (RuntimeException | AssertionError rethrow)
         {
