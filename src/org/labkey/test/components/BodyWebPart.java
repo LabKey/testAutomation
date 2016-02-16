@@ -26,6 +26,7 @@ public class BodyWebPart extends WebPart
     public BodyWebPart(WebDriver driver, WebElement webPartElement)
     {
         super(driver, webPartElement);
+        waitForReady();
     }
 
     public BodyWebPart(WebDriver test, String title, int index)
