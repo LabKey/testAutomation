@@ -172,7 +172,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Save");
 
         log("QC States: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("QC States: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/quality_control_states.xml");
@@ -237,7 +237,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Save");
 
         log("Default Formats: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Default Formats: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/datasets/datasets_manifest.xml");
@@ -290,7 +290,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitForElement(Locator.tagWithText("div", "This is my custom participant view"));
 
         log("Custom Ptid View: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Custom Ptid View: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/views/settings.xml");
@@ -349,7 +349,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Visit Properties: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Visit Properties: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/visit_map.xml");
@@ -439,7 +439,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Study Properties: export study folder to the pipeline as indiviual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Study Properties: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/study.xml");
@@ -504,7 +504,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Cohort Properties: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Cohort Properties: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/cohorts.xml");
@@ -693,7 +693,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         populateTableData(tableData, getFolderName(), FOLDER_SCOPE);
 
         log("StudyDesign Tables: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("StudyDesign Tables: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
@@ -702,7 +702,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         verifyTableData(tableData, FOLDER_NAME, FOLDER_SCOPE);
 
         clickFolder(getFolderName());
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         // delete all of the project level data, and import into a new folder, both project and
         // folder data should appear
@@ -883,7 +883,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         populateTableData(tableData, getFolderName(), FOLDER_SCOPE);
 
         log("StudyDesign Extensible Tables: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("StudyDesign Extensible Tables: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
@@ -910,19 +910,6 @@ public class StudySimpleExportTest extends StudyBaseTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn(fieldName);
         _customizeViewsHelper.saveCustomView("", true);
-    }
-
-    private void exportStudyArchive(String folder, String location)
-    {
-        clickFolder(folder);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Export"));
-
-        Locator radioLocation = Locator.radioButtonByNameAndValue("location", location);
-        waitForElement(radioLocation);
-        checkRadioButton(radioLocation);
-
-        clickButton("Export");
     }
 
     private void createSubfolderAndImportStudyFromPipeline(String subfolderName)
@@ -1008,7 +995,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Save");
 
          log("StudyDesign Extensible Tables: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("StudyDesign Extensible Tables: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
@@ -1116,7 +1103,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Study Properties: export study folder to the pipeline as individual files");
-        exportStudyArchive(getFolderName(), "0");
+        exportFolderAsIndividualFiles(getFolderName(), false, false, false);
 
         log("Study Properties: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
