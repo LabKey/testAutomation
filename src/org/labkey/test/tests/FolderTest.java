@@ -77,7 +77,7 @@ public class FolderTest extends BaseWebDriverTest
     {
         clickProject(getProjectName());
         goToFolderManagement();
-        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(getProjectName()));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(getProjectName()));
 
         log("Ensure folders will be visible");
 

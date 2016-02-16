@@ -748,9 +748,9 @@ public class Ext4Helper
             return Locator.tag("div").withClass(_cssPrefix + "mask").notHidden();
         }
 
-        public static Locator.XPathLocator folderManagementTreeNode(String nodeText)
+        public static Locator.XPathLocator folderManagementTreeSelectedNode(String nodeText)
         {
-            return Locator.xpath("//tr").withClass(_cssPrefix + "grid-row").append("/td/div").withText(nodeText);
+            return Locator.xpath("//tr").withClass(_cssPrefix + "grid-row").withClass(_cssPrefix + "grid-row-selected").append("/td/div").withText(nodeText);
         }
 
         public static Locator.XPathLocator tab()

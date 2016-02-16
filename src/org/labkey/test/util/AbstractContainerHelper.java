@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -294,7 +293,7 @@ public abstract class AbstractContainerHelper
         _test.clickFolder(folderName);
         _test.ensureAdminMode();
         _test.goToFolderManagement();
-        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
+        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Delete");
         // confirm delete subfolders if present
         if(_test.isTextPresent("This folder has subfolders."))
@@ -315,7 +314,7 @@ public abstract class AbstractContainerHelper
         _test.clickFolder(folderName);
         _test.ensureAdminMode();
         _test.goToFolderManagement();
-        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName).notHidden());
+        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName).notHidden());
         _test.clickButton("Rename");
         _test.setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
@@ -342,7 +341,7 @@ public abstract class AbstractContainerHelper
         _test.clickFolder(folderName);
         _test.ensureAdminMode();
         _test.goToFolderManagement();
-        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
+        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Move");
         if (createAlias)
             _test.checkCheckbox(Locator.name("addAlias"));
