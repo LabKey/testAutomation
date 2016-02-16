@@ -260,7 +260,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
         }
 
-        _driver = createNewWebDriver(getDriver(), BROWSER_TYPE, getDownloadDir());
+        _driver = createNewWebDriver(_driver, BROWSER_TYPE, getDownloadDir());
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);

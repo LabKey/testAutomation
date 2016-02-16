@@ -137,10 +137,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         _ext4Helper = new Ext4Helper(this);
     }
 
+    @NotNull
     public final WebDriver getDriver()
     {
         if (Thread.interrupted())
             throw new RuntimeException("Test thread terminated", new InterruptedException());
+        if (getWrappedDriver() == null)
+            throw new NullPointerException("WebDriver has not been initialized yet");
         return getWrappedDriver();
     }
 
