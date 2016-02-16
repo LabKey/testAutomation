@@ -78,6 +78,8 @@ public abstract class DomainEditor
         {
             if (alert.getAlertText().contains("data you have entered may not be saved."))
             {
+                _test.dismissAllAlerts();
+                _test.sleep(500); // Wait for GWT form to not be dirty
                 _test.clickButton("Save & Close");
             }
             else
