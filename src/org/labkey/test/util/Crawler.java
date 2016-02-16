@@ -119,7 +119,6 @@ public class Crawler
             new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
-            new ControllerActionId("admin", "resetProperties"), // TODO: https://www.labkey.org/home/Developer/issues/issues-update.view?issueId=25589
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
