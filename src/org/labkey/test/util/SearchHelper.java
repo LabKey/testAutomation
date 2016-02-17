@@ -62,7 +62,8 @@ public class SearchHelper
         }
     }
 
-    public void verifySearchResults(String container, boolean crawlResults)
+    @LogMethod
+    public void verifySearchResults(@LoggedParam String container, boolean crawlResults)
     {
         _test.log("Verify search results.");
 
@@ -73,11 +74,13 @@ public class SearchHelper
 
         if (!notFound.isEmpty())
         {
+            _test.log(String.format("Bad search results for %s. Wait and retry.", notFound.toString()));
             _test.sleep(5000);
             notFound = verifySearchItems(notFound, container, crawlResults);
 
             if (!notFound.isEmpty())
             {
+                _test.log(String.format("Bad search results for %s. Wait and retry", notFound.toString()));
                 _test.sleep(10000);
                 notFound = verifySearchItems(notFound, container, crawlResults);
 
