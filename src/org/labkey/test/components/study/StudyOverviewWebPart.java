@@ -78,8 +78,8 @@ public class StudyOverviewWebPart extends BodyWebPart
     private class Elements extends BodyWebPart.Elements
     {
         WebElement studyProperties = new LazyWebElement(Locator.css("td.study-properties"), this);
-        WebElement linkStudyNavigator = new LazyWebElement(Locator.xpath("a").withText("Study Navigator"), this);
-        WebElement linkManageStudy = new LazyWebElement(Locator.xpath("a").withText("Manage Study"), this);
-        WebElement linkManageFiles = new LazyWebElement(Locator.xpath("a").withText("Manage Files"), this);
+        WebElement linkStudyNavigator = new LazyWebElement(Locator.tag("a").withText("Study Navigator"), this);
+        WebElement linkManageStudy = new LazyWebElement(Locator.tag("a").withText("Manage Study"), this);
+        WebElement linkManageFiles = new LazyWebElement(Locator.tag("a").withText("Manage Files"), this);
     }
 }
