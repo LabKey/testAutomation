@@ -667,6 +667,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //now walk assay tabs
         for (Pair<String, String> pair : getAssaysToCreate())
         {
+            log("checking assay: " + pair.getKey());
             waitAndClick(Ext4Helper.Locators.ext4Tab(pair.getKey()));
             waitForElement(Ext4Helper.Locators.ext4Tab(pair.getValue() + ": Raw Data"));
         }
