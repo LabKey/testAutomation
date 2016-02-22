@@ -914,8 +914,8 @@ public class SequenceTest extends BaseWebDriverTest
         Long id1 = (Long) executeScript("return LABKEY.Security.currentUser.id");
         Long id2 = (Long) fieldsJson.get("userId");
         assertEquals("Incorect param for userId", id1, id2);
-        String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
-        assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
+        //String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
+        assertEquals("Incorect param for containerPath.  Raw URL: [" + getURL() + "]", getCurrentContainerPath(), fieldsJson.get("containerPath"));
 
         Collections.sort(files);
         assertEquals("Unexpected value for param", StringUtils.join(files, ";"), fieldsJson.get("fileNames"));
