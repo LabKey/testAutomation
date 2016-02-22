@@ -367,14 +367,31 @@ public class Ext4Helper
     }
 
     @LogMethod(quiet = true)
+    public void checkCheckbox(@LoggedParam String label, @LoggedParam int index)
+    {
+        new Checkbox(label, index, _test.getDriver()).check();
+    }
+
+    @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label)
     {
         new Checkbox(label, _test.getDriver()).uncheck();
     }
 
+    @LogMethod(quiet = true)
+    public void uncheckCheckbox(@LoggedParam String label, @LoggedParam int index)
+    {
+        new Checkbox(label, index, _test.getDriver()).uncheck();
+    }
+
     public boolean isChecked(String label)
     {
         return new Checkbox(label, _test.getDriver()).isChecked();
+    }
+
+    public boolean isChecked(String label, int index)
+    {
+        return new Checkbox(label, index, _test.getDriver()).isChecked();
     }
 
     public boolean isChecked(Locator checkboxLoc)

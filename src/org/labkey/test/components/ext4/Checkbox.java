@@ -14,7 +14,12 @@ public class Checkbox extends Component
 
     public Checkbox(String label, SearchContext context)
     {
-        this(findCheckbox(label, context));
+        this(findCheckbox(label, context, 0));
+    }
+
+    public Checkbox(String label, int index, SearchContext context)
+    {
+        this(findCheckbox(label, context, index));
     }
 
     public Checkbox(WebElement checkbox)
@@ -63,15 +68,25 @@ public class Checkbox extends Component
         Assert.assertTrue("Not a checkbox or radio button: " + _el.toString(), backgroundImage.contains("checkbox") || backgroundImage.contains("radio"));
     }
 
-    private static WebElement findCheckbox(String label, SearchContext context)
+    private static WebElement findCheckbox(String label, SearchContext context, int index)
     {
+        Locator locator;
+
         try
         {
-            return Locator.xpath("//input[contains(@class,'" + Ext4Helper.getCssPrefix() + "form-checkbox')][../label[text()='" + label + "']]").findElement(context);
+            locator = Locator.xpath("//input[contains(@class,'" + Ext4Helper.getCssPrefix() + "form-checkbox')][../label[text()='" + label + "']]");
+            if (index > 0)
+                locator = locator.index(index);
+
+            return locator.findElement(context);
         }
         catch (NoSuchElementException other)
         {
-            return Locator.xpath("//input[contains(@class,'" + Ext4Helper.getCssPrefix() + "form-checkbox')][../../td/label[text()='" + label + "']]").findElement(context);
+            locator = Locator.xpath("//input[contains(@class,'" + Ext4Helper.getCssPrefix() + "form-checkbox')][../../td/label[text()='" + label + "']]");
+            if (index > 0)
+                locator = locator.index(index);
+
+            return locator.findElement(context);
         }
     }
 }
