@@ -106,25 +106,25 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         final String LIST_NAME = "MVList";
         final String TEST_DATA_SINGLE_COLUMN_LIST =
-                "Name" + "\t" + "Age" + "\t" + "Sex" + "\n" +
-                        "Ted" + "\t" + "N" + "\t" + "male" + "\n" +
-                        "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
-                        "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
+                "Name\tAge\tSex\n" +
+                "Ted\tN\tmale\n" +
+                "Alice\t17\tfemale\n" +
+                "Bob\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_LIST =
-                "Name" + "\t" + "Age" + "\t" + "AgeMVIndicator" + "\t" + "Sex" + "\t" + "SexMVIndicator" + "\n" +
-                        "Franny" + "\t" + "" + "\t" + "N" + "\t" + "male" + "\t" + "" + "\n" +
-                        "Zoe" + "\t" + "25" + "\t" + "Q" + "\t" + "female" + "\t" + "" + "\n" +
-                        "J.D." + "\t" + "50" + "\t" + "" + "\t" + "male" + "\t" + "Q" + "\n";
+                "Name\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "Franny\t\tN\tmale\t\n" +
+                "Zoe\t25\tQ\tfemale\t\n" +
+                "J.D.\t50\t\tmale\tQ";
         final String TEST_DATA_SINGLE_COLUMN_LIST_BAD =
-                "Name" + "\t" + "Age" + "\t" + "Sex" + "\n" +
-                        "Ted" + "\t" + ".N" + "\t" + "male" + "\n" +
-                        "Alice" + "\t" + "17" + "\t" + "female" + "\n" +
-                        "Bob" + "\t" + "Q" + "\t" + "N" + "\n";
+                "Name\tAge\tSex\n" +
+                "Ted\t.N\tmale\n" +
+                "Alice\t17\tfemale\n" +
+                "Bob\tQ\tN";
         final String TEST_DATA_TWO_COLUMN_LIST_BAD =
-                "Name" + "\t" + "Age" + "\t" + "AgeMVIndicator" + "\t" + "Sex" + "\t" + "SexMVIndicator" + "\n" +
-                        "Franny" + "\t" + "" + "\t" + "N" + "\t" + "male" + "\t" + "" + "\n" +
-                        "Zoe" + "\t" + "25" + "\t" + "Q" + "\t" + "female" + "\t" + "" + "\n" +
-                        "J.D." + "\t" + "50" + "\t" + "" + "\t" + "male" + "\t" + ".Q" + "\n";
+                "Name\tAge\tAgeMVIndicator\tSex\tSexMVIndicator\n" +
+                "Franny\t\tN\tmale\t\n" +
+                "Zoe\t25\tQ\tfemale\t\n" +
+                "J.D.\t50\t\tmale\t.Q";
 
 
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
