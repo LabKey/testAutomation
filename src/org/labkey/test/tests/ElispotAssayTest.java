@@ -27,7 +27,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PlateSummary;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -114,7 +114,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         log("Setting up Elispot assay");
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
         assayDesigner.setName(TEST_ASSAY_ELISPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_ELISPOT_DESC);
@@ -165,7 +165,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         log("Setting up Fluorospot assay");
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
         assayDesigner.setName(TEST_ASSAY_FLUOROSPOT);
         assayDesigner.setPlateTemplate(PLATE_TEMPLATE_NAME);
         assayDesigner.setDescription(TEST_ASSAY_FLUOROSPOT_DESC);
@@ -503,7 +503,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
 
 
-        AssayDomainEditor assayDesigner = _assayHelper.clickEditAssayDesign();
+        AssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
         waitForElement(Locator.id("dataregion_Runs"));

@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,25 +105,25 @@ public abstract class AbstractAssayHelper
         _test.waitForElement(Locator.id("AssayList"));
     }
 
-    public AssayDomainEditor createAssayAndEdit(String type, String name)
+    public AssayDesignerPage createAssayAndEdit(String type, String name)
     {
         _test.clickButton("New Assay Design");
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(_test);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test);
         assayDesigner.setName(name);
         assayDesigner.save();
 
         return assayDesigner;
     }
 
-    public AssayDomainEditor clickEditAssayDesign()
+    public AssayDesignerPage clickEditAssayDesign()
     {
         return clickEditAssayDesign(false);
     }
 
-    public AssayDomainEditor clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    public AssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
         _test.prepForPageLoad();
         _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
@@ -138,15 +138,15 @@ public abstract class AbstractAssayHelper
         _test.waitForPageToLoad(BaseWebDriverTest.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.id("AssayDesignerDescription"));
 
-        return new AssayDomainEditor(_test);
+        return new AssayDesignerPage(_test);
     }
 
-    public AssayDomainEditor copyAssayDesign()
+    public AssayDesignerPage copyAssayDesign()
     {
         return copyAssayDesign(null);
     }
 
-    public AssayDomainEditor copyAssayDesign(@Nullable String destinationFolder)
+    public AssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
         _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "copy assay design");
 
@@ -155,7 +155,7 @@ public abstract class AbstractAssayHelper
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
 
-        return new AssayDomainEditor(_test);
+        return new AssayDesignerPage(_test);
     }
 
     public void deleteAssayDesign()

@@ -342,13 +342,13 @@ public class StudyHelper
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
     }
 
-    public DatasetDomainEditor defineDataset(@LoggedParam String name, String containerPath)
+    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath)
     {
         return defineDataset(name, containerPath, null);
     }
 
     @LogMethod
-    public DatasetDomainEditor defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
+    public DatasetDesignerPage defineDataset(@LoggedParam String name, String containerPath, @Nullable String id)
     {
         _test.beginAt(WebTestHelper.buildURL("study", containerPath, "defineDatasetType"));
 
@@ -366,7 +366,7 @@ public class StudyHelper
 
         _test.clickButton("Next");
 
-        return new DatasetDomainEditor(_test);
+        return new DatasetDesignerPage(_test);
     }
 
     @LogMethod

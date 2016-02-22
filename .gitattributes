@@ -410,10 +410,10 @@ src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
-src/org/labkey/test/pages/AssayDomainEditor.java -text
+src/org/labkey/test/pages/AssayDesignerPage.java -text
+src/org/labkey/test/pages/BaseDesignerPage.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
 src/org/labkey/test/pages/DatasetInsertPage.java -text
-src/org/labkey/test/pages/DomainEditor.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
 src/org/labkey/test/pages/InsertPage.java -text
 src/org/labkey/test/pages/IssueDetailsPage.java -text
@@ -655,7 +655,7 @@ src/org/labkey/test/util/CustomizeViewsHelper.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
 src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
-src/org/labkey/test/util/DatasetDomainEditor.java -text
+src/org/labkey/test/util/DatasetDesignerPage.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text

@@ -19,26 +19,40 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriver;
 
 // TODO: Tons of missing functionality
 // TODO: Much ListHelper functionality belongs here
 // TODO: Create subclasses for particular domain editors (e.g. Metadata)
-public abstract class DomainEditor
+public abstract class BaseDesignerPage extends LabKeyPage
 {
-    protected BaseWebDriverTest _test;
-
+    protected static final String DESIGNER_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
     private static final String ROW_HIGHLIGHT = "238"; // rgb(238,238,238)
 
-    public DomainEditor(BaseWebDriverTest test)
+    public BaseDesignerPage(WebDriver driver)
     {
-        _test = test;
+        super(driver);
         waitForReady();
     }
 
     public void waitForReady()
     {
-        _test.waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    protected void doAndExpectDirty(Runnable func)
+    {
+        if (Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_SIGNAL)))
+            return;
+        waitForElement(Locators.pageSignal(DESIGNER_SIGNAL, "true"));
+    }
+
+    protected void doAndExpectClean(Runnable func)
+    {
+        if (!Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_SIGNAL)))
+            return;
+        waitForElement(Locators.pageSignal(DESIGNER_SIGNAL, "false"));
     }
 
     public void selectField(int index)
@@ -48,46 +62,45 @@ public abstract class DomainEditor
 
     private void selectField(final Locator.XPathLocator rowLocator)
     {
-        _test.click(rowLocator.append("/td")); // First td (status) should be safe to click
+        click(rowLocator.append("/td")); // First td (status) should be safe to click
 
-        _test.waitForElement(rowLocator.withClass("selected-field-row"));
+        waitForElement(rowLocator.withClass("selected-field-row"));
     }
 
     public void clickTab(String tab)
     {
-        _test.click(Locator.tagWithAttribute("ul", "role", "tablist").append("/li").withText(tab));
-        _test.waitForElement(Locator.tagWithClass("li", "x-tab-strip-active").withText(tab));
+        click(Locator.tagWithAttribute("ul", "role", "tablist").append("/li").withText(tab));
+        waitForElement(Locator.tagWithClass("li", "x-tab-strip-active").withText(tab));
     }
 
     public void save()
     {
-        _test.sleep(500); // Wait for GWT form to not be dirty
-        _test.clickButton("Save", 0);
-        _test.waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
-        _test.sleep(500); // Wait for GWT form to not be dirty
+        sleep(1000); // Wait for GWT form to have all changes
+        doAndExpectClean(() -> clickButton("Save", 0));
+        waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
     }
 
     public void saveAndClose()
     {
-        _test.sleep(500); // Wait for GWT form to not be dirty
+        Locators.pageSignal(DESIGNER_SIGNAL).waitForElement(getDriver(), 1000);
         try
         {
-            _test.clickButton("Save & Close");
+            clickButton("Save & Close");
         }
         catch (UnhandledAlertException alert)
         {
             if (alert.getAlertText().contains("data you have entered may not be saved."))
             {
-                _test.dismissAllAlerts();
-                _test.sleep(500); // Wait for GWT form to not be dirty
-                _test.clickButton("Save & Close");
+                dismissAllAlerts();
+                sleep(1000); // Wait for GWT form to not be dirty
+                clickButton("Save & Close");
             }
             else
                 throw alert;
         }
     }
 
-    public static class Locators
+    public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator fieldPanel(String panelTitle)
         {

@@ -18,7 +18,7 @@ package org.labkey.test.pages;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -26,48 +26,54 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-public class AssayDomainEditor extends DomainEditor
+public class AssayDesignerPage extends BaseDesignerPage
 {
-    public AssayDomainEditor(BaseWebDriverTest test)
+    public AssayDesignerPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
+    }
+
+    @Deprecated
+    public AssayDesignerPage(BaseWebDriverTest test)
+    {
+        this(test.getDriver());
     }
 
     @Override
     public void waitForReady()
     {
         super.waitForReady();
-        _test.waitForElement(Locator.id("AssayDesignerDescription"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("AssayDesignerDescription"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setName(String name)
     {
-        _test.setFormElement(Locator.id("AssayDesignerName"), name);
-        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change);
+        setFormElement(Locator.id("AssayDesignerName"), name);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change);
     }
 
     public void setDescription(String description)
     {
-        _test.setFormElement(Locator.id("AssayDesignerDescription"), description);
+        setFormElement(Locator.id("AssayDesignerDescription"), description);
     }
 
     public void setAutoCopyData(boolean set)
     {
         if (set)
-            _test.checkCheckbox(Locator.checkboxByName("autoCopy"));
+            checkCheckbox(Locator.checkboxByName("autoCopy"));
         else
-            _test.uncheckCheckbox(Locator.checkboxByName("autoCopy"));
+            uncheckCheckbox(Locator.checkboxByName("autoCopy"));
     }
 
     public void setAutoCopyTarget(String containerPath)
     {
-        _test.selectOptionByText(Locator.id("autoCopyTarget"), containerPath);
+        selectOptionByText(Locator.id("autoCopyTarget"), containerPath);
     }
 
     public void addTransformScript(File transformScript)
     {
-        int index = _test.getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
-        _test.click(Locator.lkButton("Add Script"));
+        int index = getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
+        click(Locator.lkButton("Add Script"));
 
         setTransformScript(transformScript, index);
     }
@@ -81,54 +87,54 @@ public class AssayDomainEditor extends DomainEditor
     {
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
 
-        _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
     }
 
     public void setPlateTemplate(String template)
     {
-        _test.selectOptionByText(Locator.id("plateTemplate"), template);
+        selectOptionByText(Locator.id("plateTemplate"), template);
     }
 
     public void setDetectionMethod(String method)
     {
-        _test.selectOptionByText(Locator.id("detectionMethod"), method);
+        selectOptionByText(Locator.id("detectionMethod"), method);
     }
 
     public void setMetaDataInputFormat(MetadataInputFormat format)
     {
-        _test.selectOptionByValue(Locator.id("metadataInputFormat"), format.name());
+        selectOptionByValue(Locator.id("metadataInputFormat"), format.name());
     }
 
     public void setSaveScriptData(boolean set)
     {
         if (set)
-            _test.checkCheckbox(Locator.checkboxByName("debugScript"));
+            checkCheckbox(Locator.checkboxByName("debugScript"));
         else
-            _test.uncheckCheckbox(Locator.checkboxByName("debugScript"));
+            uncheckCheckbox(Locator.checkboxByName("debugScript"));
     }
 
     public void setEditableRuns(boolean set)
     {
         if (set)
-            _test.checkCheckbox(Locator.checkboxByName("editableRunProperties"));
+            checkCheckbox(Locator.checkboxByName("editableRunProperties"));
         else
-            _test.uncheckCheckbox(Locator.checkboxByName("editableRunProperties"));
+            uncheckCheckbox(Locator.checkboxByName("editableRunProperties"));
     }
 
     public void setEditableResults(boolean set)
     {
         if (set)
-            _test.checkCheckbox(Locator.checkboxByName("editableResultProperties"));
+            checkCheckbox(Locator.checkboxByName("editableResultProperties"));
         else
-            _test.uncheckCheckbox(Locator.checkboxByName("editableResultProperties"));
+            uncheckCheckbox(Locator.checkboxByName("editableResultProperties"));
     }
 
     public void setBackgroundImport(boolean set)
     {
         if (set)
-            _test.checkCheckbox(Locator.checkboxByName("backgroundUpload"));
+            checkCheckbox(Locator.checkboxByName("backgroundUpload"));
         else
-            _test.uncheckCheckbox(Locator.checkboxByName("backgroundUpload"));
+            uncheckCheckbox(Locator.checkboxByName("backgroundUpload"));
     }
 
     public void addBatchField(String name, @Nullable String label, @Nullable String type)
@@ -171,23 +177,23 @@ public class AssayDomainEditor extends DomainEditor
     {
         List<WebElement> inputBoxes;
 
-        Locator.xpath(xpathSection + "span[contains(@id, 'button_Add Field')]").findElement(_test.getDriver()).click();
+        Locator.xpath(xpathSection + "span[contains(@id, 'button_Add Field')]").findElement(getDriver()).click();
 
-        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name')]").findElements(_test.getDriver());
-        _test.setFormElement(inputBoxes.get(inputBoxes.size() - 1), name);
+        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name')]").findElements(getDriver());
+        setFormElement(inputBoxes.get(inputBoxes.size() - 1), name);
 
         if(label != null)
         {
-            inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'label')]").findElements(_test.getDriver());
-            _test.setFormElement(inputBoxes.get(inputBoxes.size() - 1), label);
+            inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'label')]").findElements(getDriver());
+            setFormElement(inputBoxes.get(inputBoxes.size() - 1), label);
         }
 
         if(type != null)
         {
-            inputBoxes = Locator.xpath(xpathSection + "input[starts-with(@name, 'ff_type')]/./following-sibling::div").findElements(_test.getDriver());
+            inputBoxes = Locator.xpath(xpathSection + "input[starts-with(@name, 'ff_type')]/./following-sibling::div").findElements(getDriver());
             inputBoxes.get(inputBoxes.size() - 1).click();
-            _test.click(Locator.xpath("//div[contains(@class, 'x-window')]//div[contains(@class, 'x-window-bwrap')]//table//tr//label[contains(text(), '" + type + "')]"));
-            _test.click(Locator.xpath("//button[contains(@class, 'x-btn-text')][contains(text(), 'Apply')]"));
+            click(Locator.xpath("//div[contains(@class, 'x-window')]//div[contains(@class, 'x-window-bwrap')]//table//tr//label[contains(text(), '" + type + "')]"));
+            click(Locator.xpath("//button[contains(@class, 'x-btn-text')][contains(text(), 'Apply')]"));
         }
     }
 
@@ -199,7 +205,7 @@ public class AssayDomainEditor extends DomainEditor
         WebElement theBox = null;
         int index = 1;
 
-        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(_test.getDriver());
+        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(getDriver());
         for(WebElement we : inputBoxes)
         {
             if(we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
@@ -215,8 +221,8 @@ public class AssayDomainEditor extends DomainEditor
 
         if(theBox != null)
         {
-            Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(_test.getDriver()).click();
-            _test.clickButton("OK", 0);
+            Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(getDriver()).click();
+            clickButton("OK", 0);
         }
 
     }
@@ -225,7 +231,7 @@ public class AssayDomainEditor extends DomainEditor
     public void saveAndClose()
     {
         super.saveAndClose();
-        _test.waitForElement(Locator.css("table.labkey-data-region")); // 'Runs' or 'AssayList'
+        waitForElement(Locator.css("table.labkey-data-region")); // 'Runs' or 'AssayList'
     }
 
     public enum MetadataInputFormat

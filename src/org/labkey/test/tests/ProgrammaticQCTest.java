@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.ListHelper;
 
 import java.io.*;
@@ -103,7 +103,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
         _assayHelper.clickEditAssayDesign();
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
         assayDesigner.saveAndClose();
         goToProjectHome();
@@ -126,7 +126,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         if (addQCScript)
         {

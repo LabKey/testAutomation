@@ -29,7 +29,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -121,7 +121,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Create an Assay.");
 
-        AssayDomainEditor assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
+        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
 
         log("Mark the assay as editable.");
         assayDesigner.setEditableRuns(true);

@@ -27,7 +27,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.AssayImporter;
 import org.labkey.test.util.DataRegionTable;
@@ -219,9 +219,9 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText(MULTI_VIRUS_ASSAY_NAB));
 
-            AssayDomainEditor assayDesigner = _assayHelper.copyAssayDesign();
+            AssayDesignerPage assayDesigner = _assayHelper.copyAssayDesign();
             assayDesigner.setName(fileBasedMetadataAssay);
-            assayDesigner.setMetaDataInputFormat(AssayDomainEditor.MetadataInputFormat.FILE_BASED);
+            assayDesigner.setMetaDataInputFormat(AssayDesignerPage.MetadataInputFormat.FILE_BASED);
             assayDesigner.saveAndClose();
         }
 

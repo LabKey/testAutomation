@@ -18,28 +18,35 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
-import org.labkey.test.pages.DomainEditor;
+import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
-public class DatasetDomainEditor extends DomainEditor
+public class DatasetDesignerPage extends BaseDesignerPage
 {
     private Elements _elements;
 
-    public DatasetDomainEditor(BaseWebDriverTest test)
+    public DatasetDesignerPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
         _elements = new Elements();
+    }
+
+    @Deprecated
+    public DatasetDesignerPage(BaseWebDriverTest test)
+    {
+        this(test.getDriver());
     }
 
     public void waitForReady()
     {
         super.waitForReady();
-        _test.waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -51,38 +58,38 @@ public class DatasetDomainEditor extends DomainEditor
     @Override
     public void save()
     {
-        _test.clickButton("Save");
+        clickButton("Save");
     }
 
     public void checkDemographicData()
     {
-        _test.checkCheckbox(elements().demographicCheckbox);
+        checkCheckbox(elements().demographicCheckbox);
     }
 
     public void uncheckDemographicData()
     {
-        _test.uncheckCheckbox(elements().demographicCheckbox);
+        uncheckCheckbox(elements().demographicCheckbox);
     }
 
     public void shareDemographics(ShareDemographicsBy by)
     {
-        _test.selectOptionByValue(elements().sharedBy, by.toString());
+        selectOptionByValue(elements().sharedBy, by.toString());
     }
 
     public void inferFieldsFromFile(File file)
     {
-        _test.clickButton("Infer Fields from File", 0);
+        clickButton("Infer Fields from File", 0);
         WebElement dialog =
                 Locator.tagWithClass("div", "gwt-DialogBox")
                 .withDescendant(Locator.tagWithClass("div", "Caption").withText("Infer Fields from File"))
-                .waitForElement(_test.shortWait());
+                .waitForElement(shortWait());
         WebElement radio = Locator.radioButtonByNameAndValue("source", "file").findElement(dialog);
         radio.click();
         WebElement fileField = Locator.tagWithName("input", "uploadFormElement").findElement(dialog);
-        _test.setFormElement(fileField, file);
+        setFormElement(fileField, file);
         WebElement submitButton = Locator.lkButton("Submit").findElement(dialog);
         submitButton.click();
-        _test.shortWait().until(ExpectedConditions.stalenessOf(dialog));
+        shortWait().until(ExpectedConditions.stalenessOf(dialog));
     }
 
 
@@ -99,7 +106,7 @@ public class DatasetDomainEditor extends DomainEditor
         @Override
         protected SearchContext getContext()
         {
-            return _test.getDriver();
+            return getDriver();
         }
 
         private WebElement demographicCheckbox = new LazyWebElement(Locator.name("demographicData"), this);

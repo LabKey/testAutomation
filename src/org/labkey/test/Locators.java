@@ -31,4 +31,8 @@ public abstract class Locators
     {
         return Locator.css("#testSignals > META[name=" + signalName + "]");
     }
+    public static Locator pageSignal(String signalName, String value)
+    {
+        return Locator.css("#testSignals > META[name=" + signalName + "][value=" + value + "]");
+    }
 }

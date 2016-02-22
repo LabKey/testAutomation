@@ -25,7 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -109,7 +109,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
 
     private void createAssay(String type, String name, String lookupTableValue, String lookupTableType)
     {
-        AssayDomainEditor assayDesigner = _assayHelper.createAssayAndEdit(type, name);
+        AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit(type, name);
 
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("/LookupToSampleIDTest Project/TestingGPATAssay", "samples", lookupTableValue);
         lookupInfo.setTableType(lookupTableType);

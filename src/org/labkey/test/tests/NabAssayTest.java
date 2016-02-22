@@ -24,7 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.AssayDomainEditor;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
@@ -752,7 +752,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _assayHelper.clickEditAssayDesign();
 
-        AssayDomainEditor assayDesigner = new AssayDomainEditor(this);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
 
