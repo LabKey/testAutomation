@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ListHelper
 {
+    public static final String EDITOR_CHANGE_SIGNAL = "propertiesEditorChange";
     BaseWebDriverTest _test;
 
     public ListHelper(BaseWebDriverTest test)
@@ -492,8 +493,7 @@ public class ListHelper
             selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
         }
 
-        _test.clickButton("Apply", 0);
-
+        _test.doAndWaitForPageSignal(() -> _test.clickButton("Apply", 0), EDITOR_CHANGE_SIGNAL);
         _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
     }
 
