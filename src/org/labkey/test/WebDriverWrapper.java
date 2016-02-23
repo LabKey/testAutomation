@@ -317,6 +317,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
     }
 
+    public Object executeAsyncScript(String script, Object... arguments)
+    {
+        script = "var callback = arguments[arguments.length - 1];\n" + script; // See WebDriver documentation
+        return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
+    }
+
     public void pauseJsErrorChecker()
     {
         if (_jsErrorChecker != null && isScriptCheckEnabled())
