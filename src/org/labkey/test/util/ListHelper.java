@@ -493,7 +493,7 @@ public class ListHelper
             selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
         }
 
-        _test.doAndWaitForPageSignal(() -> _test.clickButton("Apply", 0), EDITOR_CHANGE_SIGNAL);
+        _test.clickButton("Apply", 0);
         _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
     }
 
