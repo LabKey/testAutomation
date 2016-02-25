@@ -164,10 +164,11 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void removeTestPage()
     {
-        if (TestProperties.isLinkCheckEnabled())
+        if (true)//TestProperties.isLinkCheckEnabled())
         {
             clickFolder(FOLDER_NAME);
             portalHelper.removeWebPart(WIKIPAGE_NAME);
+            portalHelper.removeWebPart("Timeline");
         }
     }
 
