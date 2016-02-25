@@ -33,6 +33,7 @@ import org.junit.runner.Description;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.Filterable;
 import org.junit.runner.manipulation.NoTestsRemainException;
+import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.reader.Readers;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.remoteapi.CommandException;
@@ -271,6 +272,25 @@ public class Runner extends TestSuite
                 String result = failed || errored ? "Failed " : "Completed ";
                 TestLogger.log("=============== " + result + currentTestName + getProgress() + " =================");
                 try{logToServer("=== " + result + currentTestName + getProgress() + " ===");} catch (CommandException | IOException ignore){}
+
+                Enumeration<TestFailure> errors = testResult.errors();
+
+                while (!_remainingTests.isEmpty() && errors.hasMoreElements())
+                {
+                    Throwable error = errors.nextElement().thrownException();
+                    if (error instanceof TestTimedOutException)
+                    {
+                        TestLogger.log("Test timed out: waiting a bit to let it wrap up");
+                        try
+                        {
+                            Thread.sleep(30000);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
             }
             else
             {
