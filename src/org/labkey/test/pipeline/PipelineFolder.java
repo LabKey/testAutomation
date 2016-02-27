@@ -17,6 +17,7 @@ package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
+import org.openqa.selenium.WebDriverException;
 
 public class PipelineFolder
 {
@@ -121,7 +122,7 @@ public class PipelineFolder
         {
             _test._containerHelper.deleteFolder(_test.getProjectName(), _folderName);
         }
-        catch (Throwable ignored)
+        catch (WebDriverException ignored)
         {}
     }
 

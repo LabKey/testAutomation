@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -152,7 +153,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         popLocation(longWaitForPage);
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest)
     {
         deleteAllRuns();
         deleteProject(getProjectName(), afterTest);
@@ -163,7 +164,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             setFormElement(Locator.id("workingDirectory"), "");
             clickButton("update");
         }
-        catch (Throwable ignored) {}
+        catch (WebDriverException ignored) {}
         deletePipelineWorkDirectory();
     }
 

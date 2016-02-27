@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.ListHelper;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.*;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     {
         deleteProject(getProjectName(), afterTest);
         try {deleteEngine();}
-        catch (Throwable t) {}
+        catch (WebDriverException t) {}
     }
 
     private void defineQCAssay()
