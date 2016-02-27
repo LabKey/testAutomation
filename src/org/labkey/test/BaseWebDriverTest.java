@@ -41,16 +41,18 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
-import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -908,7 +910,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static TestWatcher testClassWatcher() {return new TestWatcher()
     {
         @Override
-        public Statement apply(Statement base, Description description)
+        public void starting(Description description)
         {
             testClassStartTime = System.currentTimeMillis();
             testClass = description.getTestClass();
@@ -918,14 +920,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             beforeClassSucceeded = false;
             _anyTestCaseFailed = false;
 
-            return super.apply(base, description);
-        }
-
-        @Override
-        public void starting(Description description)
-        {
             TestLogger.resetLogger();
-            TestLogger.log("// BeforeClass \\\\");
+            TestLogger.log("// BeforeClass - " + description.getTestClass().getSimpleName() + " \\\\");
             TestLogger.increaseIndent();
 
             ArtifactCollector.init();
@@ -945,7 +941,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         protected void failed(Throwable e, Description description)
         {
-            String pseudoTestName = beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS;
+            String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
 
             if (currentTest != null)
             {
@@ -956,7 +952,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 catch (RuntimeException | Error secondary)
                 {
                     TestLogger.log("Error while collecting failure data");
-                    secondary.printStackTrace(System.out);
+                    System.err.println(e.getMessage());
                 }
             }
         }
@@ -967,7 +963,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
 
             TestLogger.resetLogger();
-            TestLogger.log("\\\\ AfterClass Complete //");
+            TestLogger.log("\\\\ AfterClass Complete - " + description.getTestClass().getSimpleName() + " //");
         }
     };}
 
@@ -1039,17 +1035,58 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    private static boolean testClassTimedOut = false;
+
     @ClassRule
     public static Timeout globalTimeout()
     {
-        return new Timeout(2400000); // 40 minutes
+        return new Timeout(25, TimeUnit.SECONDS){
+            @Override
+            protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
+            {
+                Statement failOnTimeoutStatement = super.createFailOnTimeoutStatement(statement);
+                return new Statement()
+                {
+                    @Override
+                    public void evaluate() throws Throwable
+                    {
+                        testClassTimedOut = false;
+                        try
+                        {
+                            failOnTimeoutStatement.evaluate();
+                        }
+                        catch (TestTimedOutException t)
+                        {
+                            testClassTimedOut = true;
+                            _anyTestCaseFailed = true;
+                            throw t;
+                        }
+                    }
+                };
+            }
+        };
     }
 
     @Rule
-    public Timeout testTimeout = new Timeout(1800000); // 30 minutes
+    public Timeout testTimeout = new Timeout(30, TimeUnit.MINUTES);
 
     private TestWatcher _watcher = new TestWatcher()
     {
+        @Override
+        public Statement apply(Statement base, Description description)
+        {
+            final Statement statement = super.apply(base, description);
+            return new Statement()
+            {
+                @Override
+                public void evaluate() throws Throwable
+                {
+                    Assume.assumeFalse("Class timed out, skipping remaining tests", testClassTimedOut);
+                    statement.evaluate();
+                }
+            };
+        }
+
         @Override
         protected void starting(Description description)
         {
@@ -1067,15 +1104,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         protected void failed(Throwable e, Description description)
         {
             Ext4Helper.resetCssPrefix();
-            try
-            {
-                handleFailure(e, description.getMethodName());
-            }
-            catch (RuntimeException | Error secondary)
-            {
-                log("Error while collecting failure data");
-                secondary.printStackTrace(System.out);
-            }
+            handleFailure(e, description.getMethodName());
         }
 
         @Override
@@ -1092,18 +1121,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         protected void skipped(AssumptionViolatedException e, Description description)
         {
-            if (currentTestNumber == 0)
-            {
-                TestLogger.resetLogger();
-                TestLogger.log("\\\\ BeforeClass Complete //");
-            }
-
-            currentTestNumber++;
-
-            String testCaseName = description.getMethodName();
-
+            TestLogger.log(e.getMessage());
             TestLogger.resetLogger();
-            TestLogger.log("<< Test Case Skipped - " + testCaseName + " >>");
+            TestLogger.log("\\\\ Test Case Skipped - " + description.getMethodName() + " //");
         }
 
         @Override
@@ -1112,7 +1132,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (currentTestNumber == 0)
             {
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ BeforeClass Complete //");
+                TestLogger.log("\\\\ BeforeClass - " + description.getTestClass().getSimpleName() + " Complete //");
             }
 
             currentTestNumber++;
@@ -1150,7 +1170,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (currentTestNumber == testCount)
             {
                 TestLogger.resetLogger();
-                TestLogger.log("// AfterClass \\\\");
+                TestLogger.log("// AfterClass - " + description.getTestClass().getSimpleName() + " \\\\");
                 TestLogger.increaseIndent();
             }
 
@@ -1178,10 +1198,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        error.printStackTrace(System.out);
-
-        if (error instanceof InterruptedException || error.getCause() != null && error.getCause() instanceof InterruptedException)
+        if (testClassTimedOut ||
+                error instanceof TestTimedOutException ||
+                error instanceof InterruptedException ||
+                error.getCause() != null && error.getCause() instanceof InterruptedException)
             return;
+
+        System.err.println("ERROR: " + error.getMessage());
 
         try
         {
@@ -1199,7 +1222,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException | Error e)
             {
                 log("Unable to dump pipeline files");
-                e.printStackTrace(System.out);
+                System.err.println(e.getMessage());
             }
 
             if (error instanceof UnreachableBrowserException || getDriver() == null)
@@ -1232,14 +1255,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     catch (IOException t)
                     {
                         log("Unable to re-invoke last page");
-                        t.printStackTrace(System.out);
+                        System.err.println(t.getMessage());
                     }
                 }
             }
             catch (RuntimeException | Error e)
             {
                 log("Unable to determine information about the last page");
-                e.printStackTrace(System.out);
+                System.err.println(e.getMessage());
             }
 
             try
@@ -1250,7 +1273,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (RuntimeException | Error e)
             {
                 log("Unable to dump screenshots");
-                e.printStackTrace(System.out);
+                System.err.println(e.getMessage());
             }
 
             dismissAllAlerts();
@@ -1757,7 +1780,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         catch (IOException e)
         {
-            e.printStackTrace(System.out);
+            e.printStackTrace(System.err);
             return null;
         }
     }
