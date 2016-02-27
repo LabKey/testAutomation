@@ -1040,7 +1040,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @ClassRule
     public static Timeout globalTimeout()
     {
-        return new Timeout(25, TimeUnit.SECONDS){
+        return new Timeout(40, TimeUnit.MINUTES){
             @Override
             protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
             {
