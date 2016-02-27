@@ -74,11 +74,11 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.11.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.12.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.11-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../external/lib/server/junit-4.12-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
