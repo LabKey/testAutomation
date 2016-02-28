@@ -15,10 +15,12 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -144,5 +146,41 @@ public class PipelineAnalysisHelper
                 assertTrue("Expected file doesn't exist: " + actualFile, actualFile.exists());
             }
         }
+    }
+
+    /**
+     * Run a given protocol. Create it if it doesn't exist
+     * @param protocolName The name of the protocol to run
+     * @param protocolDef Optional bioml xml definition to use for this protocol
+     * @param allowRetry  Allowing retrying the run if the Retry button is present. If false and the Retry button is present, a test failure occurs
+     */
+    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry)
+    {
+        // If the given protocol name already exists, select it. If not, define a new one
+        Locator protocolSelect = Locator.id("protocolSelect");
+        _test.assertElementPresent(protocolSelect); // this insures the possible NoSuchElementException below is due to the option not existing
+        try
+        {
+            _test.selectOptionByValue(protocolSelect, protocolName);
+        }
+        catch (NoSuchElementException nse)
+        {
+            // Create a new one
+            _test.selectOptionByText(protocolSelect, "<New Protocol>");
+            _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
+            if (null != protocolDef)
+                _test.setFormElement(Locator.id("xmlParametersInput"), protocolDef);
+        }
+
+        Locator retryButton = Locator.lkButton("Retry");
+        if (allowRetry && _test.isElementPresent(retryButton))
+            _test.clickButton("Retry");
+        else
+        {
+            _test.assertElementNotPresent(retryButton);
+            _test.clickButton("Analyze");
+        }
+
+        _test.waitForElementToDisappear(Locator.linkWithText("IMPORT RESULTS RUNNING"), BaseWebDriverTest.MAX_WAIT_SECONDS * 1000);
     }
 }

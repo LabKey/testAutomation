@@ -164,7 +164,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
-    protected static final int MAX_WAIT_SECONDS = 10 * 60;
+    public static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public static final double DELTA = 10E-10;
 
