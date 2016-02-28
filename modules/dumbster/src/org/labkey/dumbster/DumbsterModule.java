@@ -41,7 +41,7 @@ public class DumbsterModule extends DefaultModule
 
     public double getVersion()
     {
-        return 15.30;
+        return 16.10;
     }
 
     protected void init()
