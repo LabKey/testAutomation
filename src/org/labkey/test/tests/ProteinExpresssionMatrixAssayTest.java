@@ -45,7 +45,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     private static final String FOLDER_TYPE_MS2 = "MS2";
     private static final String FOLDER_NAME = "ProteinExpressionMatrixFolder";
 
-    private static final File FASTA_FILE = new File("/sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta");
+    private static final File FASTA_FILE = new File("/sampledata/xarfiles/ms2pipe/databases/Bovine_mini1.fasta");
     private static final File TSV_FILE = new File("/ms2/matrix/MatchesFasta.tsv");
     private static final File EXCEL_FILE = new File("/ms2/matrix/MatchesFasta.xlsx");
     private static final File TSV_FILE_BAD_DATA = new File("/ms2/matrix/DoesNotMatchFasta.tsv");
