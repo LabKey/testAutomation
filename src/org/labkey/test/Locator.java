@@ -963,7 +963,7 @@ public abstract class Locator
         public static CssLocator union(CssLocator... locators)
         {
             if (locators.length == 0)
-                return null;
+                throw new IllegalArgumentException("Specify one or more locators to union");
 
             for (Locator loc : locators)
             {

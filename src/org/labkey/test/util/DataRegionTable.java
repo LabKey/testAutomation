@@ -36,35 +36,66 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+/**
+ * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
+ */
 public class DataRegionTable extends Component
 {
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _tableName;
     protected final WebElement _tableElement;
     public BaseWebDriverTest _test;
-    protected final boolean _selectors;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
-    protected final boolean _floatingHeaders;
+    protected final boolean _selectors;
+    protected boolean _floatingHeaders = true;
 
-    public DataRegionTable(String tableName, BaseWebDriverTest test)
+    /**
+     * @param test Necessary while DRT methods live in BWDT
+     * @param el table element that contains data region
+     */
+    public DataRegionTable(BaseWebDriverTest test, WebElement el)
     {
-        this(tableName, test, true, true);
+        _test = test;
+        _tableElement = el;
+        _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
+        _tableName = el.getAttribute("id").replace("dataregion_", "");
+        _columnCount = _test.getTableColumnCount(getTableId());
+        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
+        _floatingHeaders = !Locator.css("*[id~='dataregion_header_row_spacer_']").findElements(_tableElement).isEmpty();
     }
 
+    /**
+     *
+     * @param formId
+     * @param test
+     */
+    public DataRegionTable(String formId, BaseWebDriverTest test)
+    {
+        this(test, test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getTableId(formId)) + "]")));
+    }
+
+    /**
+     * @deprecated Don't specify selectors. We can auto-detect
+     */
+    @Deprecated
     public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors)
     {
         this(tableName, test, selectors, true);
     }
 
+    /**
+     * @deprecated Don't specify selectors or floating headers. We can auto-detect
+     */
+    @Deprecated
     public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors, boolean floatingHeaders)
     {
         _tableName = tableName;
         _selectors = selectors;
         _test = test;
-        _tableElement = _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
-        _columnCount = _test.getTableColumnCount(getHtmlName());
+        _tableElement = _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]"));
+        _columnCount = _test.getTableColumnCount(getTableId());
         _floatingHeaders = floatingHeaders;
         if (selectors) _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
     }
@@ -105,7 +136,7 @@ public class DataRegionTable extends Component
         Locator.CssLocator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
         List<WebElement> dataRegions = dataRegionLoc.findElements(context);
         if (dataRegions.size() > index)
-            return new DataRegionTable(dataRegions.get(index).getAttribute("id").replace("dataregion_", ""), test);
+            return new DataRegionTable(test, dataRegions.get(index));
         else
             throw new NoSuchElementException(String.format("Not enough data regions. Index: %d, Count: %d", index, dataRegions.size()));
     }
@@ -132,14 +163,19 @@ public class DataRegionTable extends Component
         return _tableName;
     }
 
-    public String getHtmlName()
+    public String getTableId()
     {
-        return "dataregion_" + _tableName;
+        return getTableId(_tableName);
+    }
+
+    private static String getTableId(String formId)
+    {
+        return "dataregion_" + formId;
     }
 
     public Locator.IdLocator locator()
     {
-        return Locator.id(getHtmlName());
+        return Locator.id(getTableId());
     }
 
     public int getColumnCount()
@@ -154,7 +190,7 @@ public class DataRegionTable extends Component
 
     public boolean hasAggregateRow()
     {
-        return _test.isElementPresent(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]//tr[contains(@class, 'labkey-col-total')]"));
+        return _test.isElementPresent(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]//tr[contains(@class, 'labkey-col-total')]"));
     }
 
     public List<WebElement> getHeaderButtons()
@@ -167,7 +203,7 @@ public class DataRegionTable extends Component
 
     public int getDataRowCount()
     {
-        int rows = _test.getTableRowCount(getHtmlName()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
+        int rows = _test.getTableRowCount(getTableId()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
         if (hasAggregateRow())
             rows -= 1;
 
@@ -200,7 +236,7 @@ public class DataRegionTable extends Component
 
     public String getTotal(int columnIndex)
     {
-        return _test.getText(Locator.css("#" + getHtmlName() + " tr.labkey-col-total > td:nth-of-type(" + (columnIndex + (_selectors ? 2 : 1)) + ")"));
+        return _test.getText(Locator.css("#" + getTableId() + " tr.labkey-col-total > td:nth-of-type(" + (columnIndex + (_selectors ? 2 : 1)) + ")"));
     }
 
     /**
@@ -255,7 +291,7 @@ public class DataRegionTable extends Component
 
     public Locator.XPathLocator detailsXpath(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-details')]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-details')]");
     }
 
     public Locator.XPathLocator detailsLink(int row)
@@ -266,7 +302,7 @@ public class DataRegionTable extends Component
 
     public Locator.XPathLocator updateXpath(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-update')]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-update')]");
     }
 
     public Locator.XPathLocator updateLink(int row)
@@ -277,7 +313,7 @@ public class DataRegionTable extends Component
 
     public Locator.XPathLocator xpath(int row, int col)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
+        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
     }
 
     public Locator.XPathLocator link(int row, int col)
@@ -446,7 +482,7 @@ public class DataRegionTable extends Component
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) +"]//tr[" + (row+5) + "]//input[@name='.select']"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+5) + "]//input[@name='.select']"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
@@ -492,7 +528,7 @@ public class DataRegionTable extends Component
 
         try
         {
-            ret = _test.getTableCellText(getHtmlName(), row, column);
+            ret = _test.getTableCellText(getTableId(), row, column);
         }
         catch (NoSuchElementException ignore) {}
 
@@ -827,6 +863,11 @@ public class DataRegionTable extends Component
 
     public static class Locators extends org.labkey.test.Locators
     {
+        public static Locator.XPathLocator dataRegion()
+        {
+            return Locator.tagWithClass("table", "labkey-data-region").attributeStartsWith("id", "dataregion_");
+        }
+
         public static Locator.XPathLocator dataRegion(String tableName)
         {
             return Locator.tagWithId("table", "dataregion_" + tableName);
