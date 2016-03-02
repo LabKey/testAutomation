@@ -23,17 +23,33 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestSet;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Continue;
-import org.labkey.test.categories.SuiteComparator;
 import org.labkey.test.categories.Test;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import javax.swing.tree.*;
-import java.util.*;
-import java.util.List;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 public class TestHelper
 {
@@ -257,15 +273,15 @@ public class TestHelper
 
         SuiteBuilder suiteBuilder = SuiteBuilder.getInstance();
 
-        List<Class> suites = new ArrayList<>(suiteBuilder.getSuites());
-        Collections.sort(suites, new SuiteComparator());
+        List<String> suites = new ArrayList<>(suiteBuilder.getSuites());
+        Collections.sort(suites);
 
-        for (Class suite : suites)
+        for (String suite : suites)
         {
             TestSet testSet = suiteBuilder.getTestSet(suite);
-            if (testSet.isSuite())
+            if (!testSet.getTestNames().isEmpty())
             {
-                CheckNode suiteNode = new CheckNode(testSet.getSuite().getSimpleName());
+                CheckNode suiteNode = new CheckNode(testSet.getSuite());
                 List<String> testNames = testSet.getTestNames();
                 Collections.sort(testNames);
                 for (String test : testNames)
@@ -372,7 +388,7 @@ public class TestHelper
         continueButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-                setResult(SuiteBuilder.getInstance().getTestSet(Continue.class), new ArrayList<String>());
+                setResult(SuiteBuilder.getInstance().getTestSet(Continue.class.getSimpleName()), new ArrayList<String>());
                 _window.dispose();
             }
         });
@@ -807,7 +823,7 @@ public class TestHelper
 
             if (selectedTests.size() != 0 )
             {
-                setResult(SuiteBuilder.getInstance().getTestSet(Test.class), selectedTests);
+                setResult(SuiteBuilder.getInstance().getTestSet(Test.class.getSimpleName()), selectedTests);
             }
             _window.dispose();
         }

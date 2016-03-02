@@ -16,25 +16,23 @@
 package org.labkey.test;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Test;
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class SuiteBuilder
 {
     private static SuiteBuilder _instance = null;
-    private static Map<Class, Set<Class>> _suites;
+    private static Map<String, Set<Class>> _suites;
 
     private SuiteBuilder()
     {
-        _suites = new HashMap<>();
+        _suites = new CaseInsensitiveHashMap<>();
         loadSuites();
     }
 
@@ -54,67 +52,48 @@ public class SuiteBuilder
 
         Set<Class<?>> tests = reflections.getTypesAnnotatedWith(Category.class);
 
-        _suites.put(Continue.class, new HashSet<Class>()); // Not actually a suite, used to continue interrupted suite
+        _suites.put(Continue.class.getSimpleName(), new HashSet<Class>()); // Not actually a suite, used to continue interrupted suite
 
         for (Class test : tests)
         {
             for (Class category : ((Category)test.getAnnotation(Category.class)).value())
             {
-                addTestToSuite(test, category);
+                addTestToSuite(test, category.getSimpleName());
                 Class supercategory = category.getSuperclass();
 
                 while (Test.class.isAssignableFrom(supercategory))
                 {
-                    addTestToSuite(test, supercategory);
+                    addTestToSuite(test, supercategory.getSimpleName());
                     supercategory = supercategory.getSuperclass();
                 }
+            }
+
+            // parse test package, add module-derived suites. We expect these to follow the pattern
+            //    org.labkey.test.tests.<moduleName>.<testClassName>
+            String[] packageNameParts = test.getPackage().getName().split("\\.");
+            if (packageNameParts != null &&
+                    packageNameParts.length >= 5 &&
+                    packageNameParts[3].equalsIgnoreCase("tests") )
+            {
+                addTestToSuite(test, packageNameParts[4]);
             }
         }
     }
 
-    private void addTestToSuite(Class test, Class suite)
+    private void addTestToSuite(Class test, String suiteName)
     {
-        if (!Test.class.isAssignableFrom(suite))
-            throw new IllegalArgumentException(suite.getSimpleName() + " is not a valid test suite, check your tests' @Category annotations: valid suites are in org.labkey.test.categories package");
+        if (!_suites.containsKey(suiteName.toLowerCase()))
+            _suites.put(suiteName, new HashSet<Class>());
 
-        if (!_suites.containsKey(suite))
-            _suites.put(suite, new HashSet<Class>());
-
-        _suites.get(suite).add(test);
-    }
-
-    public TestSet getTestSet(Class suite)
-    {
-        if (!Test.class.isAssignableFrom(suite))
-            throw new IllegalArgumentException(suite.getSimpleName() + " is not a valid test suite");
-
-        Method getCrawlerTimeout;
-        int timeout;
-        try
-        {
-            getCrawlerTimeout = suite.getMethod("getCrawlerTimeout");
-            timeout = (int)getCrawlerTimeout.invoke(null);
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex)
-        {
-            throw new IllegalArgumentException(suite.getSimpleName() + " is not a valid test suite", ex);
-        }
-
-        return new TestSet(_suites.get(suite), suite, timeout);
+        _suites.get(suiteName).add(test);
     }
 
     public TestSet getTestSet(String suiteName)
     {
-        for (Class suite : _suites.keySet())
-        {
-            if (suite.getSimpleName().equalsIgnoreCase(suiteName))
-                return getTestSet(suite);
-        }
-
-        throw new IllegalArgumentException(suiteName + " is not a valid test suite");
+        return new TestSet(_suites.get(suiteName),suiteName);
     }
 
-    public Set<Class> getSuites()
+    public Set<String> getSuites()
     {
         return _suites.keySet();
     }

@@ -16,8 +16,6 @@
 
 package org.labkey.test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,15 +23,17 @@ import java.util.Set;
 
 public class TestSet
 {
-    private Class _suite;
+    private String _suite;
     private List<Class> _tests;
-    private int _crawlerTimeout;
+    private int _crawlerTimeout = 90000;
 
-    TestSet(Set<Class> tests, Class suite, int crawlerTimeout)
+    TestSet(Set<Class> tests, String suite)
     {
+        if (tests == null)
+            throw new IllegalArgumentException(suite + " is not a valid test suite");
+
         _tests = new ArrayList(tests);
         _suite = suite;
-        _crawlerTimeout = crawlerTimeout;
     }
 
     void setTests(List<Class> tests)
@@ -48,25 +48,12 @@ public class TestSet
 
     public String name()
     {
-        return _suite.getSimpleName();
-    }
-
-    public Class getSuite()
-    {
         return _suite;
     }
 
-    public boolean isSuite()
+    public String getSuite()
     {
-        try
-        {
-            Method isSuite = _suite.getMethod("isSuite");
-            return (Boolean)isSuite.invoke(null);
-        }
-        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex)
-        {
-            throw new IllegalArgumentException(_suite.getSimpleName() + " is not a valid test suite", ex);
-        }
+        return _suite;
     }
 
     public int getCrawlerTimeout()

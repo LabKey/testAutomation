@@ -78,7 +78,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
 public class Runner extends TestSuite
 {
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static final Class DEFAULT_SUITE = org.labkey.test.categories.DRT.class;
+    private static final String DEFAULT_SUITE = org.labkey.test.categories.DRT.class.getSimpleName();
     private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
@@ -754,8 +754,8 @@ public class Runner extends TestSuite
                 catch (Exception e)
                 {
                     System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
-                    for (Class suite : _suites.getSuites())
-                        System.out.println("   " + suite.getSimpleName());
+                    for (String suite : _suites.getSuites())
+                        System.out.println("   " + suite);
                     System.exit(0);
                 }
             }
@@ -784,7 +784,7 @@ public class Runner extends TestSuite
             TestSet set = getTestSet();
             List<String> testNames = getTestNames();
 
-            if (set.getSuite() == org.labkey.test.categories.Test.class && testNames.isEmpty())
+            if (set.getSuite().equalsIgnoreCase(org.labkey.test.categories.Test.class.getSimpleName()) && testNames.isEmpty())
             {
                 TestHelper.ResultPair pair = TestHelper.run();
                 if (pair != null)
@@ -830,7 +830,7 @@ public class Runner extends TestSuite
             throw new RuntimeException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
         }
 
-        if (Continue.class == set.getSuite())
+        if (Continue.class.getSimpleName().equalsIgnoreCase(set.getSuite()))
         {
             set.setTests(readClasses(getRemainingTestsFile()));
             if (shuffleTests)
@@ -838,7 +838,7 @@ public class Runner extends TestSuite
                 set.randomizeTests();
             }
         }
-        else if (org.labkey.test.categories.Test.class == set.getSuite() && testNames.isEmpty())
+        else if (org.labkey.test.categories.Test.class.getSimpleName().equalsIgnoreCase(set.getSuite()) && testNames.isEmpty())
         {
             set.setTests(new ArrayList<Class>());
         }
