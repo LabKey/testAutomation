@@ -66,14 +66,9 @@ public class DataRegionTable extends Component
         _floatingHeaders = !Locator.css("*[id~='dataregion_header_row_spacer_']").findElements(_tableElement).isEmpty();
     }
 
-    /**
-     *
-     * @param formId
-     * @param test
-     */
     public DataRegionTable(String formId, BaseWebDriverTest test)
     {
-        this(test, test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getTableId(formId)) + "]")));
+        this(formId, test, true, true);
     }
 
     /**
