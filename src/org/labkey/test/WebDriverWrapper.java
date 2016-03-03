@@ -1599,7 +1599,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * @deprecated Use {@link #doAndWaitForPageToLoad(Runnable, int)}
-     * To be made private
      */
     @Deprecated
     public void waitForPageToLoad(int millis)
@@ -1616,7 +1615,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * @deprecated Use {@link #doAndWaitForPageToLoad(Runnable)}
-     * To be made private
      */
     @Deprecated
     public void waitForPageToLoad()
@@ -1636,15 +1634,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0)
         {
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
-            prepForPageLoad();
-        }
-
-        func.run();
-
-        if (msWait > 0)
-        {
-            waitForPageToLoad(msWait);
+            doAndWaitForElementToRefresh(func, Locator.css("*"), new WebDriverWait(getDriver(), msWait < 1000 ? 1 : (msWait / 1000)));
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+        }
+        else
+        {
+            func.run();
         }
 
         return System.currentTimeMillis() - startTime;
