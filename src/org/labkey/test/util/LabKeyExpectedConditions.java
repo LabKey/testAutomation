@@ -177,6 +177,8 @@ public abstract class LabKeyExpectedConditions
                 {
                     try
                     {
+                        // TODO: DataRegion change. This shouldn't need the css value check, is displayed is enough.
+//                        if (el.isDisplayed())
                         if ("static".equalsIgnoreCase(el.getCssValue("position")) && el.isDisplayed())
                             return el;
                     }

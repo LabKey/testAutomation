@@ -25,6 +25,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -862,6 +863,8 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("FirstRun", "SecondRun");
 
         log("Setting the customized view to include subfolders");
+        // TODO: DatRegion change. Use this declaration.
+//        CustomizeView customizeViewsHelper = new CustomizeView(assayRuns);
         CustomizeViewsHelper customizeViewsHelper = new CustomizeViewsHelper(assayRuns);
         customizeViewsHelper.openCustomizeViewPanel();
 

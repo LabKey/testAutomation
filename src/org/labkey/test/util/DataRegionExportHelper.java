@@ -27,6 +27,8 @@ public class DataRegionExportHelper
     private BaseWebDriverTest _test;
     private DataRegionTable _drt;
     private int _expectedFileCount;
+    // TODO: DataRegion change.
+//    private final boolean newRegion = true;
     private final boolean newRegion = false;
 
     public DataRegionExportHelper(DataRegionTable drt)

@@ -38,6 +38,7 @@ import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -1234,6 +1235,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
 
+        // TODO: DataRegion change.
+//        CustomizeView cv = new CustomizeView(this);
         CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
         cv.openCustomizeViewPanel();
         cv.showHiddenItems();

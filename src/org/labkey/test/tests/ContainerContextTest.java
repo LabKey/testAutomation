@@ -33,6 +33,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
@@ -385,6 +386,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Removing container column and rehecking lookup URLs...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
         CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+        // TODO: DataRegion change. Use this declaration.
+//        CustomizeView cv = new CustomizeView(this);
         cv.openCustomizeViewPanel();
         cv.showHiddenItems();
         cv.removeCustomizeViewColumn("Container");

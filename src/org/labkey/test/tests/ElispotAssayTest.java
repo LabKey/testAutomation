@@ -29,6 +29,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
@@ -220,14 +221,20 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
         log("add the analyte field to the table and adding sorts");
+        // TODO DataRegion change. Add this to use new dataregion helper.
+//        CustomizeView cvHelper = new CustomizeView(table);
         CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(table);
         cvHelper.openCustomizeViewPanel();
         cvHelper.addCustomizeViewColumn("Analyte");
 
+        // TODO: DataRegion change. Case issue, is this a bug?
+//        cvHelper.removeCustomizeViewSort("ANTIGENLSID/AntigenName");
         cvHelper.removeCustomizeViewSort("AntigenLsid/AntigenName");
         cvHelper.removeCustomizeViewSort("Analyte");
         cvHelper.removeCustomizeViewSort("WellgroupLocation");
 
+        // TODO: DataRegion change. Case issue, is this a bug?
+//        cvHelper.addCustomizeViewSort("ANTIGENLSID/AntigenName", "AntigenName", sortDir);
         cvHelper.addCustomizeViewSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
         cvHelper.addCustomizeViewSort("Analyte", "Analyte", sortDir);
         cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);

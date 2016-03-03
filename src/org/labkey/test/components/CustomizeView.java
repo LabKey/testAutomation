@@ -21,10 +21,14 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -65,20 +69,39 @@ public class CustomizeView extends Component
         return DataRegionTable.findDataRegion(_test);
     }
 
+    @LogMethod
     public void openCustomizeViewPanel()
     {
         if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
             _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Views")), false, "Customize View");
-            _test.longWait().until(LabKeyExpectedConditions.newDataRegionPanelIsExpanded(getDataRegion()));
+            try
+            {
+                _test.longWait().until(LabKeyExpectedConditions.newDataRegionPanelIsExpanded(getDataRegion()));
+            }
+            catch(org.openqa.selenium.TimeoutException te)
+            {
+                // This is here as an attempt to work around an issue on TeamCity.
+                _test.log("Last gasp attempt to get the dataregion panel to show. Refresh the browser and wait for a second.");
+                _test.refresh();
+                _test.sleep(1000);
+                _test.log("Call executeAsyncScript and run the javascript that will show the custom view.");
+                ((JavascriptExecutor) _test.getDriver()).executeAsyncScript(
+                        "var callback = arguments[arguments.length - 1];" +
+                        "for(var k in LABKEY.DataRegions) { LABKEY.DataRegions[LABKEY.DataRegions[k].name].toggleShowCustomizeView(); };" +
+                        "callback();");
+                _test.log("Done. If it is not present now, it will fail in the next waitForElement.");
+                _test.log("Is panel present? " + _test.isElementPresent(Locator.css(".labkey-customview-centerpanel")));
+            }
         }
-        //_test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        //_test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(Locator.css(".customizeViewPanel"))));
+        _test.sleep(500);
+        _test.waitForElement(Locator.css(".labkey-customview-centerpanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(Locator.css(".labkey-customview-centerpanel"))));
     }
 
     public void closeCustomizeViewPanel()
     {
-        _test.click(_dataRegionLoc.toCssLocator().append(Locator.css(".x4-panel-header > .x4-tool-after-title")));
+        _test.click(_dataRegionLoc.toCssLocator().append(Locator.css(".x4-panel-header .x4-tool-after-title")));
         _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegionLoc.toCssLocator().append(Locator.css(".labkey-data-region-header-container .labkey-ribbon")).toBy()));
     }
 
@@ -147,7 +170,7 @@ public class CustomizeView extends Component
             if ("".equals(name))
             {
                 _test.log("Saving default custom view");
-                _test.click(Locator.radioButtonByNameAndValue("saveCustomView_namedView", "default"));
+                _test.click(Locator.xpath("//label[contains(@id, 'radiofield') and contains(@class, 'x4-form-cb-label') and contains(text(), 'Default')]"));
             }
             else
             {
@@ -270,8 +293,9 @@ public class CustomizeView extends Component
             Locator.XPathLocator columnRow = _dataRegionLoc.append("//tr[contains(@class, 'x4-grid-data-row') and @data-recordid='" + nodePath + "']");
             _test.waitForElement(columnRow);
 
-            Locator.XPathLocator columnRowToggle = columnRow.append(Locator.xpath("//img[1][contains(@class, 'x4-tree-elbow-plus')]"));
-            if (_test.isElementPresent(columnRowToggle))
+            Locator.XPathLocator columnRowToggle = columnRow.append(Locator.xpath("//img[contains(@class, 'x4-tree-elbow-plus')]"));
+            Locator.XPathLocator columnExpandedIndicator = columnRow.append(Locator.xpath("[not(contains(@class, 'x4-grid-tree-node-expanded'))]"));
+            if (_test.isElementPresent(columnExpandedIndicator))
             {
                 _test.click(columnRowToggle);
             }
@@ -291,11 +315,14 @@ public class CustomizeView extends Component
 
         // Expand all nodes necessary to reveal the desired node.
         Locator.XPathLocator columnItem = expandPivots(fieldKeyParts);
-        Locator checkbox = columnItem.append("/input[@type='button']");
+        Locator checkbox = columnItem.append("//input[@type='button']");
         _test.waitForElement(checkbox);
         //note: if the column is not in view, it does not seem to get checked
         _test.scrollIntoView(checkbox);
-        _test.checkCheckbox(checkbox);
+        if((_test.getAttribute(checkbox, "aria-checked") == null) || (!_test.getAttribute(checkbox, "aria-checked").toLowerCase().equals("true")))
+        {
+            _test.checkCheckbox(checkbox);
+        }
     }
 
     public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
@@ -759,8 +786,10 @@ public class CustomizeView extends Component
     public boolean isLookupColumn(String fieldKey)
     {
         Locator.XPathLocator columnItem = expandPivots(fieldKey.split("/"));
-        Locator plus = columnItem.child("img[1][contains(@class, 'plus')]");
-        Locator minus = columnItem.child("img[1][contains(@class, 'minus')]");
+//        Locator plus = columnItem.child("img[1][contains(@class, 'plus')]");
+        Locator plus = columnItem.append("//img[1][contains(@class, 'plus')]");
+//        Locator minus = columnItem.child("img[1][contains(@class, 'minus')]");
+        Locator minus = columnItem.append("//img[1][contains(@class, 'minus')]");
         return _test.isElementPresent(plus) || _test.isElementPresent(minus);
     }
 

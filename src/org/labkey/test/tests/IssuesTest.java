@@ -709,6 +709,8 @@ public class IssuesTest extends BaseWebDriverTest
 
         goToModule("Issues");
         // validate that the move button not active without destination (here we validate list view)
+        // TODO: DataRegion change. With the new data region the only value int he class is 'labkey-disabled-button' the space will cause it to fail.
+//        assertElementPresent(Locator.xpath("//a[contains(@class, 'labkey-disabled-button')]/span[text()='Move']"));
         assertElementPresent(Locator.xpath("//a[@class=' labkey-disabled-button']/span[text()='Move']"));
         clickButton("Admin");
 

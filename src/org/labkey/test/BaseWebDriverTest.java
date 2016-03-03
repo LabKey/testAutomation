@@ -62,6 +62,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.search.SearchSideWebPart;
+import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -189,6 +190,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeViewsHelper(this);
+        //TODO: DataRegion change. Use this declaration.
 //        _customizeViewsHelper = new CustomizeView(this);
         _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
 
@@ -2688,6 +2690,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
+    public void importFolderFromZipUseAdvance(File zipFile, boolean validateQueries, boolean useAdvancedOptions, int completedJobs, boolean expectErrors, int wait)
+    {
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, validateQueries, useAdvancedOptions);
+        importPage.clickStartImport();
+        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
+    }
+
     public void importFolderFromPipeline(String folderFile)
     {
         importFolderFromPipeline(folderFile, 1, true);
@@ -2713,6 +2722,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickButton("Start Import");
 
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
+    }
+
+    public void importFolderFromPipelineUseAdvance(File zipFile, boolean validateQueries, boolean useAdvancedOptions, int completedJobs, boolean expectErrors, int wait)
+    {
+        StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, validateQueries, useAdvancedOptions);
+        importPage.clickStartImport();
+        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
     @LogMethod
