@@ -294,6 +294,12 @@ modules/simpletest/resources/web/simpletest/alert.png -text
 modules/simpletest/resources/web/simpletest/testfile.js -text
 modules/simpletest/resources/web/simpletest/testfile2.js -text
 modules/simpletest/webapp/WEB-INF/simpletest/simpletestContext.xml -text
+modules/triggerTestModule/module.properties -text
+modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
+modules/triggerTestModule/resources/queries/lists/Employees.js -text
+modules/triggerTestModule/resources/queries/study/Demographics.js -text
+modules/triggerTestModule/resources/scripts/TriggerTestModule/EmployeeLib.js -text
+modules/triggerTestModule/triggerTestModule.iml -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/remoteapi/getdata/GetDataCommand.java -text
@@ -599,6 +605,7 @@ src/org/labkey/test/tests/TimeChartTest.java -text
 src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
 src/org/labkey/test/tests/TourTest.java -text
+src/org/labkey/test/tests/TriggerScriptTest.java -text
 src/org/labkey/test/tests/TruncationTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
