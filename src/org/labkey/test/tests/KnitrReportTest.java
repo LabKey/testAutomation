@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
@@ -115,12 +117,13 @@ public class KnitrReportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testKnitrMarkupFormat()
+    public void testKnitrMarkupFormat() throws Exception
     {
+        Locator.CssLocator plotLocator = Locator.css("img[alt='plot of chunk graphics']");
         Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
                                     Locator.css("h2").withText("R code chunks"),
                                     Locator.css("code.r").containing("set.seed(123)"),       // Echoed R code
-                                    Locator.xpath("//img").withAttribute("alt", "plot of chunk graphics"),
+                                    plotLocator,
                                     //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
                                     //Locator.css(".MathJax, .mathjax")
         };
@@ -131,6 +134,7 @@ public class KnitrReportTest extends BaseWebDriverTest
                                       "data_means"};      // Non-echoed R code
 
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
+        assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(plotLocator.findElement(getDriver()).getAttribute("src")));
     }
 
     @Test
@@ -321,7 +325,7 @@ public class KnitrReportTest extends BaseWebDriverTest
     }
 
 
-    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
+    private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
         final String reportName = reportSourcePath.getFileName() + " Report";
         String reportSource = createKnitrReport(reportSourcePath, knitrOption);
@@ -348,17 +352,17 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         assertEquals("Incorrect number of lines present in code editor.", expectedLineCount, lineCount);
 
-        saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
+        return saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
 
-    private void saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
+    private WebElement saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
     {
         _rReportHelper.saveReport(reportName);
         waitAndClickAndWait(Locator.linkContainingText(reportName));
-        assertReportContents(reportContains, reportNotContains);
+        return assertReportContents(reportContains, reportNotContains);
     }
 
-    private void assertReportContents(Locator[] reportContains, String[] reportNotContains)
+    private WebElement assertReportContents(Locator[] reportContains, String[] reportNotContains)
     {
         WebElement reportDiv = waitForElement(Locator.css("div.reportView > div.labkey-knitr"));
 
@@ -373,6 +377,8 @@ public class KnitrReportTest extends BaseWebDriverTest
         {
             assertFalse("Report contained undesired text : " + text, reportText.contains(text));
         }
+
+        return reportDiv;
     }
 
     private static String readReport(final Path reportFile)
