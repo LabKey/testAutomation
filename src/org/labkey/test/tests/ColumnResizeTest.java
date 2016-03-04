@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,14 +23,11 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.junit.Assert;
-import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by iansigmon on 12/8/15.
@@ -250,7 +246,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         _listHelper.selectPropertyTab("Advanced");
         assertElementVisible(ListHelper.DesignerLocators.maxCheckbox);
         assertChecked(ListHelper.DesignerLocators.maxCheckbox);
-        Assert.assertFalse("Scale textbox is enabled for row [" + rowIndex + "]", getElement(ListHelper.DesignerLocators.scaleTextbox).isEnabled());
+        Assert.assertFalse("Scale textbox is enabled for row [" + rowIndex + "]", ListHelper.DesignerLocators.scaleTextbox.findElement(getDriver()).isEnabled());
     }
 
     private void assertMaxNotChecked(int rowIndex)
@@ -259,6 +255,6 @@ public class ColumnResizeTest extends BaseWebDriverTest
         _listHelper.selectPropertyTab("Advanced");
         assertElementVisible(ListHelper.DesignerLocators.maxCheckbox);
         assertNotChecked(ListHelper.DesignerLocators.maxCheckbox);
-        Assert.assertTrue("Scale textbox is not enabled for row [" + rowIndex + "]", getElement(ListHelper.DesignerLocators.scaleTextbox).isEnabled());
+        Assert.assertTrue("Scale textbox is not enabled for row [" + rowIndex + "]", ListHelper.DesignerLocators.scaleTextbox.findElement(getDriver()).isEnabled());
     }
 }

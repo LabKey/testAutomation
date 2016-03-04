@@ -609,7 +609,7 @@ public class ListHelper
         else
         {
             _test.uncheckCheckbox(DesignerLocators.maxCheckbox);
-            _test.getElement(l).clear();
+            l.findElement(_test.getDriver()).clear();
             _test.setFormElement(l, value.toString());
         }
     }

@@ -407,7 +407,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _customizeViewsHelper.removeCustomizeViewColumn("Color");
         scrollIntoView(findButton("Save")).click();
         _extHelper.waitForExtDialog("Save Custom View");
-        assertFalse("should not be able to select default view", getElement(Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default")).isEnabled());
+        assertFalse("should not be able to select default view", Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default").findElement(getDriver()).isEnabled());
         clickButton("Cancel", 0);
 
         //DataRegionTable dr = new DataRegionTable("query", this);

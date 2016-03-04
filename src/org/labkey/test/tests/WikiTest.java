@@ -202,11 +202,10 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void setInlineEditorContent(String editorId, String content)
     {
-        Locator.XPathLocator frameId = Locator.id(editorId + "_ifr");
-        waitForElement(frameId);
+        WebElement frame = waitForElement(Locator.id(editorId + "_ifr"));
 
         // swtich to the tinymce iframe
-        getDriver().switchTo().frame(getElement(frameId));
+        getDriver().switchTo().frame(frame);
 
         // locate the tinymce body element
         Locator l = Locator.id("tinymce");

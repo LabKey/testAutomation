@@ -1333,6 +1333,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * @deprecated Use {@link Locator#findElement(SearchContext)}
+     * TODO: remove after 16.2.1
      */
     @Deprecated
     public WebElement getElement(Locator locator)
