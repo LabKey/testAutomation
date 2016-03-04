@@ -1331,6 +1331,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return texts;
     }
 
+    /**
+     * @deprecated Use {@link Locator#findElement(SearchContext)}
+     */
     @Deprecated
     public WebElement getElement(Locator locator)
     {
