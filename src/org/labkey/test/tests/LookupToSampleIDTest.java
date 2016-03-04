@@ -115,6 +115,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         lookupInfo.setTableType(lookupTableType);
 
         _listHelper.addLookupField(name + " Data Fields", 4, SAMPLE_ID_FIELD_NAME, SAMPLE_ID_FIELD_LABEL, lookupInfo);
+        sleep(1000); // GWT timing
         assayDesigner.saveAndClose();
     }
 
