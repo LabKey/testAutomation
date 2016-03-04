@@ -37,6 +37,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private static final String DATA_CLASSES_SCHEMA = "exp.data";
     private static final String DATA_CLASSES_NAME = "DataClassTest";
 
+    protected final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
     public List<String> getAssociatedModules()
@@ -134,10 +136,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         public Map<String, String> toStringMap()
         {
             return Maps.of("name", name, "ssn", ssn, "company", company);
-            //, "key", key == null? null : key.toString());
         }
 
-        public String toDelmitedString(String delimiter)
+        public String toDelimitedString(String delimiter)
         {
             return name + delimiter + ssn + delimiter + company + "\n";
         }
@@ -203,8 +204,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         //Setup Data Class
         goToProjectHome();
-        addWebPart("Datasets");
-        addWebPart("Data Classes");
+
+        _portalHelper.addWebPart("Datasets");
+        _portalHelper.addWebPart("Data Classes");
 
     }
 
@@ -286,8 +288,8 @@ public class TriggerScriptTest extends BaseWebDriverTest
         log("** " + testName + step + " Event");
         String tsvData = EmployeeRecord.getTsvHeaders();
         String delimiter = "\t";
-        tsvData += caughtAfter.toDelmitedString(delimiter);
-        tsvData += changedBefore.toDelmitedString(delimiter);
+        tsvData += caughtAfter.toDelimitedString(delimiter);
+        tsvData += changedBefore.toDelimitedString(delimiter);
 
         setFormElement(Locator.id("tsv3"), tsvData);
         _listHelper.submitImportTsv_error(AFTER_INSERT_ERROR);
@@ -295,9 +297,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check BeforeInsert event
         step = "BeforeInsert";
         log("** " + testName + step + " Event");
-        getElement(Locator.id("tsv3")).clear();
+        Locator.id("tsv3").findElement(getDriver()).clear();
         tsvData = EmployeeRecord.getTsvHeaders();
-        tsvData += changedBefore.toDelmitedString(delimiter);
+        tsvData += changedBefore.toDelimitedString(delimiter);
         setFormElement(Locator.id("tsv3"), tsvData);
         _listHelper.submitImportTsv_success();
 
@@ -405,6 +407,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
     @Ignore("Issue 25741: JS triggers for bulk import data (CSV or Excel) of datasets don't fire\n")
     @Test
+    //TODO: enable this test when Issue 25741 is resolved
     public void testDatasetImportTriggers() throws Exception
     {
         String flagField = "Comments"; //Field to watch in trigger script
@@ -498,7 +501,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         Map<String,Object> row1 = new HashMap();
         String text1 = "123";
-        boolean boolean1 = false;
         row1.put(keyColumnName, text1);
         if(requiresDate)
             row1.put("Date", new Date());
@@ -507,7 +509,6 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         Map<String,Object> row2 = new HashMap();
         String text2 = "321";
-        boolean boolean2 = false;
         row2.put(keyColumnName, text2);
         if(requiresDate)
             row2.put("Date", new Date());
