@@ -29,6 +29,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -207,10 +208,11 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Views", QUERY_REPORT_NAME_2);
 
-        DataRegionTable table = new DataRegionTable("Dataset" + getUrlParam("Dataset.reportId", true), this);
+        WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(1);
+        DataRegionTable region = new DataRegionTable(this, table);
 
         Map<String, Integer> counts = new HashMap<>();
-        for (String value : table.getColumnDataAsText("MouseId"))
+        for (String value : region.getColumnDataAsText("MouseId"))
         {
             if (!counts.containsKey(value))
                 counts.put(value, 1);

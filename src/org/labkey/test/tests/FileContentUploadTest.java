@@ -169,7 +169,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
     private void setupNotifications()
     {
         goToProjectHome();
-        // Setup notificaiton emails
+        // Setup notification emails
         // as they are now digest based.
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Notifications"));
@@ -193,6 +193,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes"));
         waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
 
+        table = new DataRegionTable("Users", this);
         assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
         enableEmailRecorder();

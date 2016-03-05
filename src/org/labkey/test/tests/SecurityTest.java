@@ -29,6 +29,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -105,7 +106,8 @@ public class SecurityTest extends BaseWebDriverTest
         goToModule("Dumbster");
 
         // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
+        WebElement table = DataRegionTable.Locators.dataRegion("EmailRecord").findElement(this.getDriver());
+        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount(table.getAttribute("id")));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 

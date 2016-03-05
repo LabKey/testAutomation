@@ -71,7 +71,7 @@ public class GroupTest extends BaseWebDriverTest
 
     @LogMethod protected void init()
     {
-        for(String group : TEST_USERS_FOR_GROUP)
+        for (String group : TEST_USERS_FOR_GROUP)
         {
             createUser(group, null);
         }
@@ -136,10 +136,10 @@ public class GroupTest extends BaseWebDriverTest
     private void permissionsReportTest()
     {
         clickAndWait(Locator.linkWithText("view permissions report"));
-        DataRegionTable drt = new DataRegionTable("access", this);
+        DataRegionTable drt = new DataRegionTable("access", this); // TODO: This faked up region doesn't work as a real region -- see userAccess.jsp
 
         waitForText("Access Modification History For This Folder");
-        assertTextPresent( "Folder Access Details");
+        assertTextPresent("Folder Access Details");
 
         //this table isn't quite a real Labkey Table Region, so we can't use column names
         int userColumn = 1;
@@ -152,25 +152,8 @@ public class GroupTest extends BaseWebDriverTest
         //confirm correct perms
         assertEquals("Unexpected groups", new HashSet<>(expectedGroups), new HashSet<>(groupsForUser));
 
-
-        //exapnd plus  to check specific groups
+        //expand plus to check specific groups
         click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex));
-//        assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
-//                drt.getDataAsText(rowIndex, accessColumn).split(" "))); //TODO: Fix
-
-        //confirm hover over produces list of groups
-//        Locator groupSpecification = Locator.tagContainingText("span", "Site: " + COMPOUND_GROUP);
-//        String groupHierarchy = getAttribute(groupSpecification, "ext:qtip");
-//        String[] expectedMessagesInHierarchy = new String[] {
-//                displayNameFromEmail(TEST_USERS_FOR_GROUP[0]) + " is a member of <strong>" + SIMPLE_GROUP + "</strong>",
-//                "Which is a member of <strong>" + COMPOUND_GROUP + "</strong><BR/>",
-//                "Which is assigned the Author role",
-//                displayNameFromEmail(TEST_USERS_FOR_GROUP[0]) + " is a member of <strong>" + COMPOUND_GROUP + "</strong>",
-//                "Which is assigned the Author role"};
-//        for (String msg : expectedMessagesInHierarchy)
-//        {
-//                assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
-//        }
 
         //confirm details link leads to right user, page
         clickAndWait(Locator.linkContainingText("details").index(rowIndex));
@@ -198,7 +181,7 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         String[][] nameTitleBody = {{"Name1", "Title1", "Body1"}, {"Name2", "Title2", "Body2"}};
 
-        for(String[] wikiValues : nameTitleBody)
+        for (String[] wikiValues : nameTitleBody)
         {
             wikiHelper.createNewWikiPage();
             wikiHelper.setWikiValuesAndSave(wikiValues[0], wikiValues[1], wikiValues[2]);
@@ -215,16 +198,11 @@ public class GroupTest extends BaseWebDriverTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonatingGroup();
 
-//        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Editor']");
         impersonateRoles("Author");
-//        assertElementNotPresent(unavailableEditorChoice);
         verifyAuthorPermission(nameTitleBody);
         stopImpersonatingRole();
 
         impersonateRoles("Editor");
-//        clickUserMenuItem(false, true, "Impersonate", "Role", "Editor");
-//        waitForElement(unavailableEditorChoice);
-//        assertElementPresent(Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Author']"));
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingRole();
 
@@ -255,11 +233,11 @@ public class GroupTest extends BaseWebDriverTest
 
     private boolean canEditPages(String[][] nameTitleBody)
     {
-        for(String[] wikiValues : nameTitleBody)
+        for (String[] wikiValues : nameTitleBody)
         {
             waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText(wikiValues[1]), WAIT_FOR_PAGE);
             waitForText(wikiValues[2]);
-            if(!isElementPresent(Locator.linkWithText("Edit")))
+            if (!isElementPresent(Locator.linkWithText("Edit")))
                 return false;
             goBack();
         }
@@ -268,9 +246,9 @@ public class GroupTest extends BaseWebDriverTest
 
     private boolean canSeePages(String[][] nameTitleBody)
     {
-        for(String[] wikiValues : nameTitleBody)
+        for (String[] wikiValues : nameTitleBody)
         {
-            if(!isElementPresent(Locator.linkWithText(wikiValues[1])))
+            if (!isElementPresent(Locator.linkWithText(wikiValues[1])))
                 return false;
         }
         return true;
