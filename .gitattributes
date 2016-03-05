@@ -363,11 +363,8 @@ src/org/labkey/test/categories/Git.java -text
 src/org/labkey/test/categories/IDRI.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/LabModule.java -text
-src/org/labkey/test/categories/Luminex.java -text
-src/org/labkey/test/categories/LuminexAll.java -text
 src/org/labkey/test/categories/MS2.java -text
 src/org/labkey/test/categories/Mascot.java -text
-src/org/labkey/test/categories/NLP.java -text
 src/org/labkey/test/categories/NoSuite.java -text
 src/org/labkey/test/categories/OConnor.java -text
 src/org/labkey/test/categories/ONPRC.java -text
@@ -462,9 +459,7 @@ src/org/labkey/test/tests/AdvancedImportOptions.java -text
 src/org/labkey/test/tests/AffymetrixAssayTest.java -text
 src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
-src/org/labkey/test/tests/AncillaryStudyTest.java -text
 src/org/labkey/test/tests/AssayResultsExportTest.java -text
-src/org/labkey/test/tests/AssayTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
 src/org/labkey/test/tests/BaseTermsOfUseTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
@@ -472,7 +467,6 @@ src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
-src/org/labkey/test/tests/CohortTest.java -text
 src/org/labkey/test/tests/ColumnResizeTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
@@ -494,7 +488,6 @@ src/org/labkey/test/tests/ExpTest.java -text
 src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
 src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
-src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileBasedPipelineTest.java -text
@@ -557,7 +550,6 @@ src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/ProjectTermsOfUseTest.java -text
 src/org/labkey/test/tests/ProteinExpresssionMatrixAssayTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
-src/org/labkey/test/tests/QuerySnapshotTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
 src/org/labkey/test/tests/ReportAndDatasetNotificationTest.java -text
@@ -566,8 +558,6 @@ src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
 src/org/labkey/test/tests/ResourceEncodingTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text
-src/org/labkey/test/tests/SCHARPStudyTest.java -text
-src/org/labkey/test/tests/SampleMindedImportTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
 src/org/labkey/test/tests/ScatterPlotTest.java -text
 src/org/labkey/test/tests/SchemaBrowserTest.java -text
@@ -588,16 +578,13 @@ src/org/labkey/test/tests/SpecimenExportTest.java -text
 src/org/labkey/test/tests/SpecimenExtendedTest.java -text
 src/org/labkey/test/tests/SpecimenGridExportTest.java -text
 src/org/labkey/test/tests/SpecimenImportTest.java -text
-src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenMultipleImportTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
-src/org/labkey/test/tests/SpecimenReplaceTest.java -text
 src/org/labkey/test/tests/SpecimenTest.java -text
 src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TabTest.java -text
-src/org/labkey/test/tests/TargetStudyTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartImportTest.java -text
@@ -606,7 +593,6 @@ src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
 src/org/labkey/test/tests/TourTest.java -text
 src/org/labkey/test/tests/TriggerScriptTest.java -text
-src/org/labkey/test/tests/TruncationTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
 src/org/labkey/test/tests/UserTest.java -text
