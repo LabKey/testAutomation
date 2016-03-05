@@ -27,9 +27,9 @@ public class PipelineStatusTable extends DataRegionTable
     private int _rows = -1;
     private Map<String, String> _mapDescriptionStatus;
 
-    public PipelineStatusTable(BaseWebDriverTest test, boolean selectors, boolean cache)
+    public PipelineStatusTable(BaseWebDriverTest test, boolean cache)
     {
-        super("StatusFiles", test, selectors, false);
+        super("StatusFiles", test);
 
         _cache = cache;
     }

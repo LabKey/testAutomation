@@ -398,6 +398,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String emailSubject = link.getText();
         link.click();
 
+        // This points to a "faked up" Data Region -- cannot use DataRegionTable
         WebElement resetLink = shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]")));
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
@@ -412,6 +413,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToHome();
         goToModule("Dumbster");
         String emailSubject = "Reset Password Notification";
+
+        // This points to a "faked up" Data Region -- cannot use DataRegionTable
         WebElement email = getDriver().findElement(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]"));
         email.click();
         WebElement resetLink = shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]")));
@@ -2047,7 +2050,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
     public List<String> getPipelineStatusValues()
     {
-        DataRegionTable status = new DataRegionTable("StatusFiles", this, true, false);
+        DataRegionTable status = new DataRegionTable("StatusFiles", this);
         return status.getColumnDataAsText("Status");
     }
 
@@ -2361,7 +2364,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 goToSiteUsers();
 
-                DataRegionTable users = new DataRegionTable("Users", this, true, true);
+                DataRegionTable users = new DataRegionTable("Users", this);
                 int userRow = users.getRow("Email", email);
                 assertFalse("No such user: " + email, userRow == -1);
                 clickAndWait(users.detailsLink(userRow));
@@ -2458,7 +2461,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         List<String> displayNames = new ArrayList<>();
         beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
 
-        DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
+        DataRegionTable usersTable = new DataRegionTable("Users", this);
 
         for(String userEmail : userEmails)
         {
@@ -2523,7 +2526,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        return new DataRegionTable("Cohort", this, false);
+        return new DataRegionTable("Cohort", this);
     }
 
     /**
@@ -3143,7 +3146,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         goToModule("Pipeline");
 
-        PipelineStatusTable table = new PipelineStatusTable(this, true, false);
+        PipelineStatusTable table = new PipelineStatusTable(this, false);
         int tableJobRow = table.getJobRow(jobDescription, descriptionStartsWith);
         assertNotEquals("Failed to find job rowid", -1, tableJobRow);
         table.checkCheckbox(tableJobRow);

@@ -190,7 +190,7 @@ public class PipelineTestsBase
         private PipelineStatusTable getStatusTable()
         {
             if (_tableStatus == null)
-                _tableStatus = new PipelineStatusTable(_test, false, true);
+                _tableStatus = new PipelineStatusTable(_test, true);
             return _tableStatus;
         }
     }

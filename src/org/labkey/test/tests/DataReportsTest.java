@@ -207,7 +207,7 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Views", QUERY_REPORT_NAME_2);
 
-        DataRegionTable table = new DataRegionTable("Dataset", this);
+        DataRegionTable table = new DataRegionTable("Dataset" + getUrlParam("Dataset.reportId", true), this);
 
         Map<String, Integer> counts = new HashMap<>();
         for (String value : table.getColumnDataAsText("MouseId"))
@@ -229,6 +229,8 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doCrosstabViewTest()
     {
+        String reportName = "TestReport";
+
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
@@ -242,37 +244,32 @@ public class DataReportsTest extends ReportTest
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
-        setFormElement(Locator.name("label"), "TestReport");
+        setFormElement(Locator.name("label"), reportName);
         clickButton("Save");
 
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        assertTextPresent("TestReport");
-        clickAndWait(Locator.linkWithText("TestReport"));
+        assertTextPresent(reportName);
+        clickAndWait(Locator.linkWithText(reportName));
 
         assertTableCellTextEquals("report", 2, 0, "Female");
 
-        //Delete the report
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickTab("Manage");
-        deleteReport("TestReport");
+        deleteReport(reportName);
     }
 
     @Test
     public void doGridViewTest()
     {
+        String viewName = "DRT Eligibility Query";
+
         // create new grid view report:
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        String viewName = "DRT Eligibility Query";
         clickAddReport("Grid View");
         setFormElement(Locator.id("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
         assertElementPresent(Locator.linkWithText("999320016"));
-        assertButtonNotPresent("go");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickTab("Manage");
         deleteReport(viewName);
     }
 
@@ -359,8 +356,6 @@ public class DataReportsTest extends ReportTest
         log("Check saved R script");
         _extHelper.clickMenuButton("Views", "default");
         pushLocation();
-        //clickButton("Reports >>", 0);
-        //clickAndWait(Locator.linkWithText(R_SCRIPTS[0]));
         _extHelper.clickMenuButton("Views", R_SCRIPTS[0]);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);

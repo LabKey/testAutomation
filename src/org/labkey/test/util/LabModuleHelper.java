@@ -167,18 +167,6 @@ public class LabModuleHelper
         return _random.nextInt(10000);
     }
 
-    public String getNameForQueryWebpart(String title)
-    {
-        Locator l = Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + ":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]");
-        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
-        return _test.getAttribute(l, "id").substring(11);
-    }
-
-    public DataRegionTable getDrForQueryWebpart(String title)
-    {
-        return new DataRegionTable(getNameForQueryWebpart(title), _test);
-    }
-
     public void setFormField(String name, String value)
     {
         _test.setFormElement(Locator.name(name), value);
@@ -266,12 +254,6 @@ public class LabModuleHelper
         return text;
     }
 
-    public void switchTabs()
-    {
-        String winHandleBefore = _test.getDriver().getWindowHandle();
-
-    }
-
     public void goToAssayResultImport(String assayName)
     {
         goToAssayResultImport(assayName, true);
@@ -309,11 +291,6 @@ public class LabModuleHelper
     public Locator toolIcon(String name)
     {
         return Locator.tag("div").withClass("tool-icon").append(Locator.tagContainingText("a", name));
-    }
-
-    public void waitForDataRegion(String name)
-    {
-        _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq("dataregion_" + name) + "]"));
     }
 
     public void addDataSource(String type, String label, String reportCategory, String containerPath, String schema, String query)

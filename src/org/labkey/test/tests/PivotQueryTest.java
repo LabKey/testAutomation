@@ -59,10 +59,6 @@ public class PivotQueryTest extends BaseWebDriverTest
     {
         setupProject();
         verifyPivotQuery();
-
-        // UNDONE: customize view (remove columns, reorder columns)
-        // UNDONE: export to excel
-        // UNDONE: LABKEY.Query.selectRows(), check pivot metadata
     }
 
     private void verifyPivotQuery()
@@ -71,31 +67,33 @@ public class PivotQueryTest extends BaseWebDriverTest
         DataRegionTable pivotTable = new DataRegionTable("query", this);
         pivotTable.setSort("ParticipantId", SortDirection.ASC);
 
-        log("** Verifing pivot table headers");
-        Locator AnalyteName_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[2]/td[2]");
+        Locator.XPathLocator region = DataRegionTable.Locators.dataRegion("query");
+
+        log("** Verifying pivot table headers");
+        Locator AnalyteName_header = region.append("/tbody/tr[2]/td[2]");
         assertElementContains(AnalyteName_header, "Analyte Name");
 
-        Locator IL_10_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[3]/td[1]");
+        Locator IL_10_header = region.append("/tbody/tr[3]/td[1]");
         assertElementContains(IL_10_header, "IL-10 (23)");
 
         Locator ConcInRange_MIN_header = DataRegionTable.Locators.columnHeader("query", "IL-10 (23)::ConcInRange_MIN");
         assertElementContains(ConcInRange_MIN_header, "Conc In Range MIN");
 
-        log("** Verifing pivot table contents");
+        log("** Verifying pivot table contents");
         // First "Participant" data cell
-        Locator Participant_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[2]");
+        Locator Participant_cell = region.append("/tbody/tr[5]/td[2]");
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell
-        Locator ParticipantCount_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[3]");
+        Locator ParticipantCount_cell = region.append("/tbody/tr[5]/td[3]");
         assertElementContains(ParticipantCount_cell, "5");
 
         // First "ConcInRange_MIN" data cell
-        Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[4]");
+        Locator ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[4]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // First "ConcInRange_CONCAT" data cell
-        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[7]");
+        Locator ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[7]");
         String contents = getText(ConcInRange_CONCAT_cell);
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");

@@ -245,7 +245,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTrue("Expected rowid on model.html page", rowid > 0);
 
         log("** Testing query of vehicle schema...");
-        beginAt("/query/" + getProjectName() + "/begin.view?");
+        goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
 
         assertTextPresent("Prius", "Camry");
@@ -446,7 +446,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("view history"));
         clickAndWait(Locator.linkContainingText("view history"));
 
-        DataRegionTable table = new DataRegionTable("query", this, false, true);
+        DataRegionTable table = new DataRegionTable("query", this);
         assertEquals("3 row(s) were inserted.", table.getDataAsText(0, "Comment"));
 
         // models should have an audit level of detailed
@@ -458,7 +458,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("view history"));
         clickAndWait(Locator.linkContainingText("view history"));
 
-        table = new DataRegionTable("query", this, true, true);
+        table = new DataRegionTable("query", this);
         assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
@@ -480,11 +480,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("view data"));
         clickAndWait(Locator.linkContainingText("view data"));
 
-        table = new DataRegionTable("query", this, true, true);
+        table = new DataRegionTable("query", this);
         clickAndWait(table.detailsLink(0));
 
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
-        table = new DataRegionTable("query", this, true, true);
+        table = new DataRegionTable("query", this);
         assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 

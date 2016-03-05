@@ -136,7 +136,7 @@ public class GroupTest extends BaseWebDriverTest
     private void permissionsReportTest()
     {
         clickAndWait(Locator.linkWithText("view permissions report"));
-        DataRegionTable drt = new DataRegionTable("access", this, false, false);
+        DataRegionTable drt = new DataRegionTable("access", this);
 
         waitForText("Access Modification History For This Folder");
         assertTextPresent( "Folder Access Details");

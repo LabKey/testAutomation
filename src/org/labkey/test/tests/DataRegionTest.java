@@ -108,11 +108,6 @@ public class DataRegionTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
     @Test
     public void testSteps()
     {
@@ -175,7 +170,7 @@ public class DataRegionTest extends BaseWebDriverTest
         }
         beginAt(url.getFile());
 
-        table = new DataRegionTable(dataRegionName, this, true, true);
+        table = new DataRegionTable(dataRegionName, this);
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
@@ -186,6 +181,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Test 3 per page");
         table.setMaxRows(3);
+        table = new DataRegionTable(dataRegionName, this);
         clickButton("Page Size", 0);
         assertElementPresent(Locator.linkWithText("3 per page"));
         assertElementPresent(Locator.linkWithText("40 per page"));
@@ -200,6 +196,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Test 5 per page");
         table.setMaxRows(5);
+        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
@@ -210,6 +207,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Next Page");
         table.pageNext();
+        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, 3));
@@ -220,6 +218,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Last Page");
         table.pageLast();
+        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(16, 16, 16);
         assertEquals(1, table.getDataRowCount());
         assertEquals("yellow", table.getDataAsText(0, 3));
@@ -230,6 +229,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Previous Page");
         table.pagePrev();
+        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(11, 15, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("purple", table.getDataAsText(0, 3));
@@ -240,6 +240,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
+        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(1, 5, 15);
         assertEquals("black", table.getDataAsText(0, 3));
 
@@ -259,6 +260,7 @@ public class DataRegionTest extends BaseWebDriverTest
             fail("Didn't find 'Selected 5 of 15 rows.' message");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
+        table = new DataRegionTable(dataRegionName, this);
         assertEquals(5, table.getDataRowCount());
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
@@ -268,6 +270,7 @@ public class DataRegionTest extends BaseWebDriverTest
         log("Show All");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show All"));
+        table = new DataRegionTable(dataRegionName, this);
         assertEquals(15, table.getDataRowCount());
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));

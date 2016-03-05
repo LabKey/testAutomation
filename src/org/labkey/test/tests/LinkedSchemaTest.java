@@ -539,7 +539,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         selectQuery(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
         waitAndClick(Locator.linkWithText("view data"));
 
-        waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
         log("** Check template filter is applied");
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
@@ -564,7 +563,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.enableModules(Arrays.asList("linkedschematest"));
         popLocation();
 
-        waitForElement(Locator.id("dataregion_query"));
         table = new DataRegionTable("query", this);
 
         assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
@@ -588,7 +586,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToSchemaBrowser();
         selectQuery(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
         waitAndClick(Locator.linkWithText("view data"));
-        waitForElement(Locator.id("dataregion_query"));
         table = new DataRegionTable("query", this);
 
         log("** Verify query metadata overrides are correctly applied");
@@ -624,7 +621,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         selectQuery(B_PEOPLE_SCHEMA_NAME, LIST_NAME);
         waitAndClick(Locator.linkWithText("view data"));
 
-        waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         // Check Name column is renamed and 'Britt' is the only value
@@ -649,8 +645,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToSchemaBrowser();
         viewQueryData(D_PEOPLE_SCHEMA_NAME, LIST_NAME);
 
-        waitForElement(Locator.id("dataregion_query"));
-        DataRegionTable table = new DataRegionTable("query", this, false);
+        DataRegionTable table = new DataRegionTable("query", this);
         assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         // Check Name column is renamed and 'Dave' is the only value
         assertEquals("Expected to filter table to only Dave", "Dave", table.getDataAsText(0, D_PEOPLE_METADATA_TITLE));
@@ -662,8 +657,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         goToSchemaBrowser();
         viewQueryData(D_PEOPLE_SCHEMA_NAME, QUERY_NAME);
 
-        waitForElement(Locator.id("dataregion_query"));
-        table = new DataRegionTable("query", this, false);
+        table = new DataRegionTable("query", this);
         table.setSort("Name", SortDirection.ASC);
         // Query is executed over the original People table, NOT the 'D_People' filtered People table.
         // So all crazy people are available in the original query (Dave, Adam, Josh),

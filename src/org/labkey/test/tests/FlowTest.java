@@ -603,7 +603,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewSort("Name", "Ascending");
         _customizeViewsHelper.saveCustomView();
 
-        DataRegionTable table = new DataRegionTable("query", this, false);
+        DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(4, table.getDataRowCount());
         assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }

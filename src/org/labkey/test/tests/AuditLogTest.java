@@ -295,7 +295,7 @@ public class AuditLogTest extends BaseWebDriverTest
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch, boolean shouldFindText)
     {
         instance.log("searching for audit entry: " + msg);
-        DataRegionTable table = new DataRegionTable("query", instance, false);
+        DataRegionTable table = new DataRegionTable("query", instance);
         int i = table.getColumn(column);
         if (shouldFindText)
             assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));

@@ -35,7 +35,7 @@ public class ExperimentRunTable extends DataRegionTable
 
     public ExperimentRunTable(String tableName, BaseWebDriverTest test, boolean cache)
     {
-        super(tableName, test, true);
+        super(tableName, test);
 
         _cache = cache;
     }

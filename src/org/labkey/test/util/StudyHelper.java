@@ -91,7 +91,7 @@ public class StudyHelper
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
         if (demographicsPresent)
-            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
         _test.setFormElement(Locator.name("groupLabel"), groupName);
         if( ptids.length > 0 )
         {
@@ -145,7 +145,7 @@ public class StudyHelper
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
         if (demographicsPresent)
-            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
 
         if( newPtids != null && newPtids.length > 0 )
         {
@@ -201,7 +201,7 @@ public class StudyHelper
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
-        _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
 
         String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
         _test.click(Ext4Helper.Locators.ext4Button("Cancel"));

@@ -2958,6 +2958,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertTrue("Button '" + buttonText + "' was not present", isButtonPresent(buttonText));
     }
 
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}. This is slow.
+     * @param buttonText
+     */
+    @Deprecated
     public void assertButtonNotPresent(String buttonText)
     {
         assertFalse("Button '" + buttonText + "' was present", isButtonPresent(buttonText));

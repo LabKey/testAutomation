@@ -50,8 +50,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,7 +59,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -100,9 +98,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         alignmentImportPanelTest();
         readsetImportTest();
-
-        //TODO
-        //analyzeAlignmentPanelTest();
 
         //will also verify UI + pipeline jobs
         createReferenceGenome(this, _startedPipelineJobs);
@@ -165,11 +160,10 @@ public class SequenceTest extends BaseWebDriverTest
     {
         goToProjectHome();
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
-        _helper.waitForDataRegion("query");
+        DataRegionTable.waitForDataRegion(this, "query");
 
         //verify CSV file creation
         _extHelper.clickMenuButton(true, "Views", "All");
-        _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickMenuButton("More Actions", "Create Illumina Sample Sheet");
@@ -266,7 +260,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         //NOTE: use the text generated directly using JS
         saveFile(importTemplate.getParentFile(), importTemplate.getName(), outputTable);
-        beginAt("/project/" + getProjectName() + "/begin.view");
+        goToProjectHome();
     }
 
     private String getIlluminaNames()
@@ -320,7 +314,6 @@ public class SequenceTest extends BaseWebDriverTest
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=sequenceanalysis&query.queryName=readdata");
 
         DataRegionTable dr = new DataRegionTable("query", this);
-        _helper.waitForDataRegion("query");
 
         for (int i = 0; i < dr.getDataRowCount(); i++)
         {
@@ -334,7 +327,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         goToProjectHome();
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
-        _helper.waitForDataRegion("query");
 
         dr = new DataRegionTable("query", this);
 
@@ -344,11 +336,11 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Instrument Run Details");
         waitForText("Run Id"); //crude proxy for loading of the details panel
         waitForText("Readsets");
-        DataRegionTable rs = _helper.getDrForQueryWebpart("Readsets");
+        DataRegionTable rs = DataRegionTable.findDataRegionWithinWebpart(this, "Readsets");
         assertEquals("Incorrect readset count found", 14, rs.getDataRowCount());
 
         waitForText("Quality Metrics");
-        DataRegionTable qm = _helper.getDrForQueryWebpart("Quality Metrics");
+        DataRegionTable qm = DataRegionTable.findDataRegionWithinWebpart(this, "Quality Metrics");
         assertEquals("Incorrect quality metric count found", 30, qm.getDataRowCount());
         String totalSequences = qm.getDataAsText(qm.getRow("File Id", "Illumina-R1-Control.fastq.gz"), "Metric Value");
         assertEquals("Incorrect value for total sequences", "9.0", totalSequences);
@@ -356,7 +348,6 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying readset details page");
         goToProjectHome();
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
-        _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         clickAndWait(dr.link(1, 1));
 
@@ -364,18 +355,17 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Readset Id:"); //crude proxy for details panel
 
         waitForText("Analyses Using This Readset");
-        DataRegionTable dr1 = _helper.getDrForQueryWebpart("Analyses Using This Readset");
+        DataRegionTable dr1 = DataRegionTable.findDataRegionWithinWebpart(this, "Analyses Using This Readset");
         assertEquals("Incorrect analysis count", 0, dr1.getDataRowCount());
 
         waitForText("Quality Metrics");
-        DataRegionTable dr2 = _helper.getDrForQueryWebpart("Quality Metrics");
+        DataRegionTable dr2 = DataRegionTable.findDataRegionWithinWebpart(this, "Quality Metrics");
         assertEquals("Incorrect analysis count", 2, dr2.getDataRowCount());
 
         //verify export
         log("Verifying FASTQ Export");
         goToProjectHome();
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
-        _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Download Sequence Files");
@@ -424,7 +414,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTextPresent("Your upload was successful!");
         clickButton("OK");
 
-        _helper.waitForDataRegion("query");
+        dr = new DataRegionTable("query", this);
         assertEquals("Changed sample name not applied", newName, dr.getDataAsText(1, "Name"));
 
         //note: 'Analyze Selected' option is verified separately
@@ -441,7 +431,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         goToProjectHome();
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
-        _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
@@ -458,26 +447,13 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying analysis UI");
 
         //setup local variables
-        String totalReads = "450";
         String minReadLength = "68";
-        String seedMismatches = "3";
-        String simpleClipThreshould = "0";
         String qualWindowSize = "8";
         String qualAvgQual = "19";
-        //String maskMinQual = "21";
-        //String customRefName = "CustomRef1";
-        //String customRefSeq = "ATGATGATG";
         String jobName = "TestAnalysisJob";
         String analysisDescription = "This is the description for my analysis";
-        String minSnpQual = "23";
-        String minAvgSnpQual = "24";
-        String minDipQual = "25";
-        String minAvgDipQual = "26";
-        String maxAlignMismatch = "5";
         String strain = "HXB2";
         String[][] rocheAdapters = {{"Roche-454 FLX Amplicon A", "GCCTCCCTCGCGCCATCAG"}, {"Roche-454 FLX Amplicon B", "GCCTTGCCAGCCCGCTCAG"}};
-        String assembleUnalignedPct = "90.3";
-        String minContigsForNovel = "7";
 
         waitForText("Readset Name");
         waitForElement(Ext4Helper.Locators.window("Copy Previous Run?"));
@@ -604,56 +580,50 @@ public class SequenceTest extends BaseWebDriverTest
         alignerField.setComboByDisplayValue("Mosaik");
         Ext4FieldRef.getForLabel(this, "Alignment Threshold").setValue(60);
 
-//        Ext4FieldRef.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
-//        Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
-//        Ext4FieldRef.getForLabel(this, "Min DIP Quality").setValue(minDipQual);
-//        Ext4FieldRef.getForLabel(this, "Min Avg DIP Quality").setValue(minAvgDipQual);
-//
-//        Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
-
         Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         Map<String, Object> params = (Map) panel.getEval("getJsonParams()");
+        String invalidJSONError = "Incorrect param in form JSON";
+        
+        assertEquals(invalidJSONError, true, params.get("deleteIntermediateFiles"));
+        assertEquals(invalidJSONError, analysisDescription, params.get("protocolDescription"));
+        assertEquals(invalidJSONError, jobName, params.get("protocolName"));
 
-        assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
-        assertEquals("Incorect param in form JSON", analysisDescription, params.get("protocolDescription"));
-        assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
+        assertEquals(invalidJSONError, "IlluminaAdapterTrimming;AdapterTrimming;CropReads;DownsampleReads;MaxInfoTrim;SlidingWindowTrim;ReadLengthFilter", params.get("fastqProcessing"));
+        assertEquals(invalidJSONError, overlapLength.toString(), params.get("fastqProcessing.AdapterTrimming.overlapLength").toString());
+        assertEquals(invalidJSONError, errorRate.toString(), params.get("fastqProcessing.AdapterTrimming.errorRate").toString());
+        assertEquals(invalidJSONError, minReadLength, params.get("fastqProcessing.AdapterTrimming.minLength").toString());
 
-        assertEquals("Incorect param in form JSON", "IlluminaAdapterTrimming;AdapterTrimming;CropReads;DownsampleReads;MaxInfoTrim;SlidingWindowTrim;ReadLengthFilter", params.get("fastqProcessing"));
-        assertEquals("Incorect param in form JSON", overlapLength.toString(), params.get("fastqProcessing.AdapterTrimming.overlapLength").toString());
-        assertEquals("Incorect param in form JSON", errorRate.toString(), params.get("fastqProcessing.AdapterTrimming.errorRate").toString());
-        assertEquals("Incorect param in form JSON", minReadLength, params.get("fastqProcessing.AdapterTrimming.minLength").toString());
+        assertEquals(invalidJSONError, cropLength.toString(), params.get("fastqProcessing.CropReads.cropLength").toString());
+        assertEquals(invalidJSONError, totalReadsVal.toString(), params.get("fastqProcessing.DownsampleReads.downsampleReadNumber").toString());
+        assertEquals(invalidJSONError, minReadLength, params.get("fastqProcessing.ReadLengthFilter.minLength").toString());
 
-        assertEquals("Incorect param in form JSON", cropLength.toString(), params.get("fastqProcessing.CropReads.cropLength").toString());
-        assertEquals("Incorect param in form JSON", totalReadsVal.toString(), params.get("fastqProcessing.DownsampleReads.downsampleReadNumber").toString());
-        assertEquals("Incorect param in form JSON", minReadLength, params.get("fastqProcessing.ReadLengthFilter.minLength").toString());
+        assertEquals(invalidJSONError, qualAvgQual, params.get("fastqProcessing.SlidingWindowTrim.avgQual").toString());
+        assertEquals(invalidJSONError, qualWindowSize, params.get("fastqProcessing.SlidingWindowTrim.windowSize").toString());
 
-        assertEquals("Incorect param in form JSON", qualAvgQual, params.get("fastqProcessing.SlidingWindowTrim.avgQual").toString());
-        assertEquals("Incorect param in form JSON", qualWindowSize, params.get("fastqProcessing.SlidingWindowTrim.windowSize").toString());
-
-        assertEquals("Incorect param in form JSON", "Virus", params.get("referenceLibraryCreation"));
-        assertEquals("Incorect param in form JSON", "Virus", params.get("referenceLibraryCreation.Virus.category"));
-        assertEquals("Incorect param in form JSON", strain, params.get("referenceLibraryCreation.Virus.subset"));
+        assertEquals(invalidJSONError, "Virus", params.get("referenceLibraryCreation"));
+        assertEquals(invalidJSONError, "Virus", params.get("referenceLibraryCreation.Virus.category"));
+        assertEquals(invalidJSONError, strain, params.get("referenceLibraryCreation.Virus.subset"));
 
         List<Object> adapters = (List) params.get("fastqProcessing.AdapterTrimming.adapters");
         List<Object> adapter1 = (List) adapters.get(0);
-        assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter1.get(0).toString());
-        assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter1.get(1).toString());
-        assertEquals("Incorect param in form JSON", true, adapter1.get(2));
-        assertEquals("Incorect param in form JSON", true, adapter1.get(3));
+        assertEquals(invalidJSONError, rocheAdapters[1][0], adapter1.get(0).toString());
+        assertEquals(invalidJSONError, rocheAdapters[1][1], adapter1.get(1).toString());
+        assertEquals(invalidJSONError, true, adapter1.get(2));
+        assertEquals(invalidJSONError, true, adapter1.get(3));
 
-        assertEquals("Incorect param in form JSON", alignerField.getValue(), params.get("alignment"));
-        assertEquals("Incorect param in form JSON", 60L, params.get("alignment.Mosaik.align_threshold"));
-        assertEquals("Incorect param in form JSON", 32L, params.get("alignment.Mosaik.hash_size"));
-        assertEquals("Incorect param in form JSON", 0.02, params.get("alignment.Mosaik.max_mismatch_pct"));
-        assertEquals("Incorect param in form JSON", true, params.get("alignment.Mosaik.output_multiple"));
+        assertEquals(invalidJSONError, alignerField.getValue(), params.get("alignment"));
+        assertEquals(invalidJSONError, 60L, params.get("alignment.Mosaik.align_threshold"));
+        assertEquals(invalidJSONError, 32L, params.get("alignment.Mosaik.hash_size"));
+        assertEquals(invalidJSONError, 0.02, params.get("alignment.Mosaik.max_mismatch_pct"));
+        assertEquals(invalidJSONError, true, params.get("alignment.Mosaik.output_multiple"));
 
         Map sample = (Map) params.get("readset_0");
-        assertFalse("Incorect param in form JSON", null == sample.get("readset"));
-        assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        assertFalse(invalidJSONError, null == sample.get("readset"));
+        assertFalse(invalidJSONError, null == sample.get("readsetname"));
 
         sample = (Map) params.get("readset_1");
-        assertFalse("Incorect param in form JSON", null == sample.get("readset"));
-        assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        assertFalse(invalidJSONError, null == sample.get("readset"));
+        assertFalse(invalidJSONError, null == sample.get("readsetname"));
     }
 
     /**
@@ -671,12 +641,10 @@ public class SequenceTest extends BaseWebDriverTest
             int count = 0;
             int totalChars = 0;
             String thisLine;
-            List<String> lines = new ArrayList<>();
             while ((thisLine = br.readLine()) != null)
             {
                 count++;
                 totalChars += thisLine.length();
-                lines.add(thisLine);
             }
 
             int expectedLength = 504;

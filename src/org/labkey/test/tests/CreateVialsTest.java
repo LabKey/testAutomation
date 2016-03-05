@@ -87,7 +87,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("Submit");
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
-        DataRegionTable table = new DataRegionTable("query", this, false);
+        DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(2, table.getDataRowCount());
         assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
         assertEquals(" ", table.getDataAsText(0, "External Id"));
@@ -178,7 +178,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** test changing cell counts updates used/remaining columns and vial count column");
-        table = new DataRegionTable("Data", this, false);
+        table = new DataRegionTable("Data", this);
         assertEquals("B02", table.getDataAsText(0, "Participant ID"));
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
@@ -240,7 +240,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** checking new site 'Site A' was added and no duplicate 'Bob's Lab' exist (Issue 12074)");
         pushLocation();
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
-        table = new DataRegionTable("query", this, false);
+        table = new DataRegionTable("query", this);
         assertEquals(4, table.getDataRowCount());
         assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
         assertEquals("-1", table.getDataAsText(0, "External Id"));

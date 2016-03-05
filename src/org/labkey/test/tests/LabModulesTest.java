@@ -1232,8 +1232,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.goToLabHome();
         _helper.clickNavPanelItem("Samples:", "Browse All");
-        _helper.waitForDataRegion("query");
-        DataRegionTable dr = new DataRegionTable("query", this);
+        DataRegionTable.waitForDataRegion(this, "query");
 
         // TODO: DataRegion change.
 //        CustomizeView cv = new CustomizeView(this);
@@ -1243,6 +1242,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         cv.addCustomizeViewColumn("container");
         cv.applyCustomView();
 
+        DataRegionTable dr = new DataRegionTable("query", this);
         dr.setFilter("container", "Does Not Equal", getProjectName());
         dr.setSort("freezerid", SortDirection.ASC);
 

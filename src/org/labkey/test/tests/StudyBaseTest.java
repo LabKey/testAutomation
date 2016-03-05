@@ -361,39 +361,6 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickButton("Study Security", defaultWaitForPage);
     }
 
-    //this assumes a QWP for VisitTag schema has been created and is visible
-    protected void insertVisitTag(String QWPname, VisitTag tag)
-    {
-        clickAndWait(getBtnLocatorFromQWP(QWPname, "Insert New"));
-        waitForElement(Locator.input("quf_Name"));
-        setFormElement(Locator.input("quf_Name"), tag.name);
-        setFormElement(Locator.input("quf_Caption"), tag.caption);
-        setFormElement(Locator.tagWithName("textarea", "quf_Description"), tag.description);
-        if(tag.isSingleUse)
-        {
-            click(Locator.checkboxByName("quf_SingleUse"));
-        }
-        clickAndWait(Locator.linkWithSpan("Submit"));
-    }
-
-    //this assumes a QWP for VisitTagMap schema has been created and is visible
-    protected void insertVisitTagMap(String QWPname, VisitTagMap map)
-    {
-        clickAndWait(getBtnLocatorFromQWP(QWPname, "Insert New"));
-        waitForElement(Locator.name("quf_VisitTag"));
-        selectOptionByValue(Locator.name("quf_VisitTag"), map.visitTag);
-        selectOptionByText(Locator.name("quf_Visit"), map.visit);
-        if(null != map.cohort && !map.cohort.isEmpty())
-            selectOptionByText(Locator.name("quf_Cohort"), map.cohort);
-        clickAndWait(Locator.linkWithSpan("Submit"));
-    }
-
-    protected Locator getBtnLocatorFromQWP(String QWPTitle, String buttonText)
-    {
-        Locator dataRegionLoc = Locator.tagWithName("table", "webpart").withPredicate(Locator.tagWithAttribute("th", "title", QWPTitle)).append(Locator.tagWithClass("table", "labkey-data-region").append("/../.."));
-        return DataRegionTable.Locators.headerButton(dataRegionLoc.findElement(getDriver()).getAttribute("id"), buttonText);
-    }
-
     // TODO Dan Duffek: The following function are in here temporarily. They have been added as part of the goal of removing the SimpleApiTest.java module
     protected void ensureConfigured()
     {
@@ -428,34 +395,4 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     }
 
     // TODO Dan Duffek: End of the inserted functions.
-
-    public class VisitTag
-    {
-        protected String name;
-        protected String caption;
-        protected String description;
-        protected Boolean isSingleUse;
-
-        public VisitTag(String name, String caption, String description, Boolean isSingleUse)
-        {
-            this.name = name;
-            this.caption = caption;
-            this.description = description;
-            this.isSingleUse = isSingleUse;
-        }
-    }
-
-    public class VisitTagMap
-    {
-        protected String visitTag;
-        protected String visit;
-        protected String cohort;
-
-        public VisitTagMap(String visitTag, String visit, String cohort)
-        {
-            this.visitTag = visitTag;
-            this.visit = visit;
-            this.cohort = cohort;
-        }
-    }
 }

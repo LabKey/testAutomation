@@ -881,7 +881,6 @@ public class NabAssayTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", "WellData");
         waitAndClickAndWait(Locator.linkContainingText("view data"));
-        waitForText("dataregion_query");
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> row11 = table.getRowDataAsText(11);
         assertEquals("Row size did not match", expectedRow11.size(), row11.size() - 1 /*selectors*/);
@@ -895,7 +894,6 @@ public class NabAssayTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", "DilutionData");
         waitAndClickAndWait(Locator.linkContainingText("view data"));
-        waitForText("dataregion_query");
         DataRegionTable dilutionTable = new DataRegionTable("query", this);
         List<String> row10 = dilutionTable.getRowDataAsText(10);
         assertEquals("Row size did not match", expectedDilRow10.size(), row10.size() - 1 /*selectors*/);

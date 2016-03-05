@@ -69,7 +69,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
             recallLocation();
         }
 
-        dataRegion = new DataRegionTable(getDataRegionId(), this, hasSelectors());
+        dataRegion = new DataRegionTable(getDataRegionId(), this);
         exportHelper = new DataRegionExportHelper(dataRegion);
 
         if (hasSelectors())

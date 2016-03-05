@@ -42,8 +42,9 @@ import static org.junit.Assert.fail;
 public class DataRegionTable extends Component
 {
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
-    protected final String _tableName;
+    protected final String _regionName;
     protected final WebElement _tableElement;
+    private final String _tableId;
     public BaseWebDriverTest _test;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
@@ -53,46 +54,36 @@ public class DataRegionTable extends Component
 
     /**
      * @param test Necessary while DRT methods live in BWDT
-     * @param el table element that contains data region
+     * @param table table element that contains data region
      */
-    public DataRegionTable(BaseWebDriverTest test, WebElement el)
+    public DataRegionTable(BaseWebDriverTest test, WebElement table)
     {
         _test = test;
-        _tableElement = el;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
-        _tableName = el.getAttribute("id").replace("dataregion_", "");
+
+        _tableElement = table;
+        _tableId = _tableElement.getAttribute("id");
+
+        _regionName = _tableElement.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
+
         _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
-        _floatingHeaders = !Locator.css("*[id~='dataregion_header_row_spacer_']").findElements(_tableElement).isEmpty();
+        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
     }
 
-    public DataRegionTable(String formId, BaseWebDriverTest test)
+    public DataRegionTable(String regionName, BaseWebDriverTest test)
     {
-        this(formId, test, true, true);
-    }
-
-    /**
-     * @deprecated Don't specify selectors. We can auto-detect
-     */
-    @Deprecated
-    public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors)
-    {
-        this(tableName, test, selectors, true);
-    }
-
-    /**
-     * @deprecated Don't specify selectors or floating headers. We can auto-detect
-     */
-    @Deprecated
-    public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors, boolean floatingHeaders)
-    {
-        _tableName = tableName;
-        _selectors = selectors;
         _test = test;
-        _tableElement = _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]"));
+        _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
+
+        _tableElement = waitForDataRegion(test, regionName);
+        _tableId = _tableElement.getAttribute("id");
+
+        _regionName = _tableElement.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
-        _floatingHeaders = floatingHeaders;
-        if (selectors) _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
+
+        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
+        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
     }
 
     @Override
@@ -106,9 +97,9 @@ public class DataRegionTable extends Component
         return 2 + (_floatingHeaders ? 2 : 0);
     }
 
-    public static String getTableNameByTitle(String title, BaseWebDriverTest test)
+    public static WebElement waitForDataRegion(BaseWebDriverTest test, String regionName)
     {
-        return Locator.xpath("//th[@title='" + title +"']/../..//table").findElement(test.getDriver()).getAttribute("id").replace("dataregion_", "");
+        return test.waitForElement(Locators.dataRegion(regionName));
     }
 
     public static DataRegionTable findDataRegion(BaseWebDriverTest test)
@@ -128,44 +119,27 @@ public class DataRegionTable extends Component
 
     public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, SearchContext context, int index)
     {
-        Locator.CssLocator dataRegionLoc = Locator.css("table.labkey-data-region[id^='dataregion_']");
+        Locator.CssLocator dataRegionLoc = Locator.css("table[lk-region-name]");
         List<WebElement> dataRegions = dataRegionLoc.findElements(context);
         if (dataRegions.size() > index)
             return new DataRegionTable(test, dataRegions.get(index));
-        else
-            throw new NoSuchElementException(String.format("Not enough data regions. Index: %d, Count: %d", index, dataRegions.size()));
+
+        throw new NoSuchElementException(String.format("Not enough data regions. Index: %d, Count: %d", index, dataRegions.size()));
     }
 
-    public static String getQueryWebPartName(BaseWebDriverTest test)
+    public static DataRegionTable findDataRegionWithinWebpart(BaseWebDriverTest test, String webPartTitle)
     {
-        return getQueryWebPartName(0, test);
-    }
-
-    public static String getQueryWebPartName(int qwpIndex, BaseWebDriverTest test)
-    {
-        Locator qwpLocator = Locator.tag("table").attributeStartsWith("id", "dataregion_aqwp");
-        test.waitForElement(qwpLocator);
-
-        List<WebElement> qwps = qwpLocator.findElements(test.getDriver());
-        if (qwps.size() > qwpIndex)
-            return qwps.get(qwpIndex).getAttribute("id").replace("dataregion_", "");
-        else
-            throw new NoSuchElementException(String.format("Not enough qwps on page. Looking for: %d, Found: %d", qwpIndex, qwps.size()));
+        return findDataRegionWithin(test, PortalHelper.Locators.webPart(webPartTitle).findElement(test.getDriver()));
     }
 
     public String getTableName()
     {
-        return _tableName;
+        return _regionName;
     }
 
     public String getTableId()
     {
-        return getTableId(_tableName);
-    }
-
-    private static String getTableId(String formId)
-    {
-        return "dataregion_" + formId;
+        return _tableId;
     }
 
     public Locator.IdLocator locator()
@@ -180,7 +154,7 @@ public class DataRegionTable extends Component
 
     private boolean bottomBarPresent()
     {
-        return _test.isElementPresent(Locator.tagWithId("table", "dataregion_footer_" + _tableName));
+        return _test.isElementPresent(Locator.tagWithId("table", _tableId + "-footer"));
     }
 
     public boolean hasAggregateRow()
@@ -190,15 +164,13 @@ public class DataRegionTable extends Component
 
     public List<WebElement> getHeaderButtons()
     {
-        Locator.CssLocator allButtonsLoc = Locator.css("#dataregion_header_row_" + _tableName + " a.labkey-button, #dataregion_header_row_" + _tableName + " a.labkey-menu-button");
-        List<WebElement> headerButtons = allButtonsLoc.findElements(_test.getDriver());
-
-        return headerButtons;
+        String headerId = _tableId + "-header";
+        return Locator.css("#" + headerId + " a.labkey-button, #" + headerId + " a.labkey-menu-button").findElements(_test.getDriver());
     }
 
     public int getDataRowCount()
     {
-        int rows = _test.getTableRowCount(getTableId()) - (getHeaderRowCount() + (bottomBarPresent()?1:0));
+        int rows = _test.getTableRowCount(getTableId()) - (getHeaderRowCount() + (bottomBarPresent() ? 1 : 0));
         if (hasAggregateRow())
             rows -= 1;
 
@@ -216,12 +188,12 @@ public class DataRegionTable extends Component
     public int getRow(int columnIndex, String value)
     {
         int rowCount = getDataRowCount();
-        for(int i=0; i<rowCount; i++)
+        for (int i=0; i < rowCount; i++)
         {
-            if(value.equals(getDataAsText(i, columnIndex)))
+            if (value.equals(getDataAsText(i, columnIndex)))
                 return i;
         }
-          return -1;
+        return -1;
     }
 
     public String getTotal(String columnLabel)
@@ -240,7 +212,7 @@ public class DataRegionTable extends Component
      */
     public void ensureColumnPresent(String columnName)
     {
-        if(getColumn(columnName) < 0)
+        if (getColumn(columnName) < 0)
         {
             _test._customizeViewsHelper.openCustomizeViewPanel();
             _test._customizeViewsHelper.addCustomizeViewColumn(columnName);
@@ -256,11 +228,11 @@ public class DataRegionTable extends Component
     public void ensureColumnsPresent(String... names)
     {
         boolean opened = false;
-        for(String name: names)
+        for (String name: names)
         {
-            if(getColumn(name) == -1)
+            if (getColumn(name) == -1)
             {
-                if(!opened)
+                if (!opened)
                 {
                     _test._customizeViewsHelper.openCustomizeViewPanel();
                     opened = true;
@@ -268,7 +240,7 @@ public class DataRegionTable extends Component
                 _test._customizeViewsHelper.addCustomizeViewColumn(name);
             }
         }
-        if(opened)
+        if (opened)
             _test._customizeViewsHelper.applyCustomView();
     }
 
@@ -350,7 +322,7 @@ public class DataRegionTable extends Component
         {
             String header = getDataAsText(-(getHeaderRowCount()/2), col);
             columnHeaders.add(header);
-            if( header != null )
+            if (header != null)
             {
                 String headerName = header.split("\n")[0];
                 headerName = headerName.replaceAll(" ", "");
@@ -618,12 +590,12 @@ public class DataRegionTable extends Component
 
     public void setSort(String columnName, SortDirection direction)
     {
-        _test.setSort(_tableName, columnName, direction);
+        _test.setSort(_regionName, columnName, direction);
     }
 
     public void clearSort(String columnName)
     {
-        _test.clearSort(_tableName, columnName);
+        _test.clearSort(_regionName, columnName);
     }
 
     public void openFilterDialog(String columnName)
@@ -648,7 +620,7 @@ public class DataRegionTable extends Component
 
     public void setFilter(String columnName, String filterType, String filter, int waitMillis)
     {
-        _test.setFilter(_tableName, columnName, filterType, filter, waitMillis);
+        _test.setFilter(_regionName, columnName, filterType, filter, waitMillis);
     }
 
     public void clearFilter(String columnName)
@@ -658,10 +630,10 @@ public class DataRegionTable extends Component
 
     public void clearFilter(String columnName, int waitMillis)
     {
-        _test.log("Clearing filter in " + _tableName + " for " + columnName);
+        _test.log("Clearing filter in " + _regionName + " for " + columnName);
 
         Runnable clickClearFilter = () ->
-                _test._ext4Helper.clickExt4MenuButton(false, Locators.columnHeader(_tableName, columnName), false, "Clear Filter");
+                _test._ext4Helper.clickExt4MenuButton(false, Locators.columnHeader(_regionName, columnName), false, "Clear Filter");
 
         if (waitMillis == 0)
             _test.doAndWaitForPageSignal(clickClearFilter, SELECTION_SIGNAL);
@@ -672,7 +644,7 @@ public class DataRegionTable extends Component
 
     public void clearAllFilters(String columnName)
     {
-        _test.clearAllFilters(_tableName, columnName);
+        _test.clearAllFilters(_regionName, columnName);
     }
 
     public void checkAllOnPage()
@@ -685,18 +657,21 @@ public class DataRegionTable extends Component
         uncheckAll();
     }
 
+    private WebElement getToggle()
+    {
+        return Locator.tagWithId("table", _tableId).append(Locator.tagWithAttribute("input", "name", ".toggle")).findElement(_test.getDriver());
+    }
+
     public void checkAll()
     {
-        String id = Locator.xq("dataregion_" + _tableName);
-        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
+        WebElement toggle = getToggle();
         if (!toggle.isSelected())
             _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
     }
 
     public void uncheckAll()
     {
-        String id = Locator.xq("dataregion_" + _tableName);
-        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_test.getDriver());
+        WebElement toggle = getToggle();
         if (null != _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL))
             _test.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
     }
@@ -704,7 +679,7 @@ public class DataRegionTable extends Component
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
     public void checkCheckbox(String value)
     {
-        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
                 Locator.tagWithName("input", ".select").withAttribute("value", value)).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
@@ -713,7 +688,7 @@ public class DataRegionTable extends Component
 
     public void checkCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
@@ -722,7 +697,7 @@ public class DataRegionTable extends Component
 
     public void uncheckCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithId("form", _tableName).append(
+        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (checkbox.isSelected())
@@ -731,32 +706,32 @@ public class DataRegionTable extends Component
 
     public void pageFirst()
     {
-        _test.log("Clicking page first on data region '" + _tableName + "'");
+        _test.log("Clicking page first on data region '" + _regionName + "'");
         clickDataRegionPageLink("First Page");
     }
 
     public void pageLast()
     {
-        _test.log("Clicking page last on data region '" + _tableName + "'");
+        _test.log("Clicking page last on data region '" + _regionName + "'");
         clickDataRegionPageLink("Last Page");
     }
 
     public void pageNext()
     {
-        _test.log("Clicking page next on data region '" + _tableName + "'");
+        _test.log("Clicking page next on data region '" + _regionName + "'");
         clickDataRegionPageLink("Next Page");
     }
 
     public void pagePrev()
     {
-        _test.log("Clicking page previous on data region '" + _tableName + "'");
+        _test.log("Clicking page previous on data region '" + _regionName + "'");
         clickDataRegionPageLink("Previous Page");
     }
 
     public void clickDataRegionPageLink(String title)
     {
-        String id = Locator.xq("dataregion_header_" + _tableName);
-        _test.clickAndWait(Locator.xpath("//table[@id=" + id + "]//div/a[@title='" + title + "']"));
+        String headerId = Locator.xq(_tableId + "-header");
+        _test.clickAndWait(Locator.xpath("//table[@id=" + headerId + "]//div/a[@title='" + title + "']"));
     }
 
     public void showAll()
@@ -775,7 +750,7 @@ public class DataRegionTable extends Component
      */
     public void setOffset(int offset)
     {
-        String url = replaceParameter(_tableName + ".offset", String.valueOf(offset));
+        String url = replaceParameter(_regionName + ".offset", String.valueOf(offset));
         _test.beginAt(url);
     }
 
@@ -785,14 +760,14 @@ public class DataRegionTable extends Component
      */
     public void setMaxRows(int size)
     {
-        String url = replaceParameter(_tableName + ".maxRows", String.valueOf(size));
+        String url = replaceParameter(_regionName + ".maxRows", String.valueOf(size));
         _test.beginAt(url);
     }
 
     @LogMethod
     public void createQuickChart(String columnName)
     {
-        _test._ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(_tableName, columnName), false, "Quick Chart");
+        _test._ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(_regionName, columnName), false, "Quick Chart");
         _test.waitForElement(Locator.css("svg"));
     }
 
@@ -820,8 +795,8 @@ public class DataRegionTable extends Component
 
     public void openSideFilterPanel()
     {
-        _test.click(Locators.headerButton(_tableName, "Filter"));
-        _test.waitForElement(Locators.expandedFacetPanel(_tableName));
+        _test.click(Locators.headerButton(_regionName, "Filter"));
+        _test.waitForElement(Locators.expandedFacetPanel(_regionName));
         _test.waitForElement(Locator.css(".lk-filter-panel-label"));
     }
 
@@ -832,7 +807,7 @@ public class DataRegionTable extends Component
 
     public void clickHeaderButtonByText(String buttonText)
     {
-        _test.waitAndClick(Locators.headerButton(_tableName, buttonText));
+        _test.waitAndClick(Locators.headerButton(_regionName, buttonText));
     }
 
     public void clickHeaderButton(String buttonText, String ... subMenuLabels)
@@ -842,14 +817,14 @@ public class DataRegionTable extends Component
 
     public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
     {
-        _test._ext4Helper.clickExt4MenuButton(wait, DataRegionTable.Locators.headerMenuButton(_tableName, buttonText), false, subMenuLabels);
+        _test._ext4Helper.clickExt4MenuButton(wait, DataRegionTable.Locators.headerMenuButton(_regionName, buttonText), false, subMenuLabels);
     }
 
     public List<String> getHeaderButtonSubmenuText(String buttonText)
     {
         List<String> subMenuItems = new ArrayList<>();
-        List<WebElement> buttonElements = _test._ext4Helper.getExt4MenuButtonSubMenu(DataRegionTable.Locators.headerMenuButton(_tableName, buttonText));
-        for(WebElement buttonElement : buttonElements)
+        List<WebElement> buttonElements = _test._ext4Helper.getExt4MenuButtonSubMenu(DataRegionTable.Locators.headerMenuButton(_regionName, buttonText));
+        for (WebElement buttonElement : buttonElements)
         {
             subMenuItems.add(buttonElement.getText());
         }
@@ -860,37 +835,37 @@ public class DataRegionTable extends Component
     {
         public static Locator.XPathLocator dataRegion()
         {
-            return Locator.tagWithClass("table", "labkey-data-region").attributeStartsWith("id", "dataregion_");
+            return Locator.tagWithClass("table", "labkey-data-region").attributeStartsWith("id", "lk-region-");
         }
 
-        public static Locator.XPathLocator dataRegion(String tableName)
+        public static Locator.XPathLocator dataRegion(String regionName)
         {
-            return Locator.tagWithId("table", "dataregion_" + tableName);
+            return Locator.tagWithAttribute("table", "lk-region-name", regionName);
         }
 
-        public static Locator.XPathLocator headerButton(String tableName, String text)
+        public static Locator.XPathLocator headerButton(String regionName, String text)
         {
-            return Locator.xpath("id('dataregion_header_row_" + tableName + "')//a").withClass("labkey-button").withText(text);
+            return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-button").withText(text));
         }
 
-        public static Locator.XPathLocator headerMenuButton(String tableName, String text)
+        public static Locator.XPathLocator headerMenuButton(String regionName, String text)
         {
-            return Locator.xpath("id('dataregion_header_row_" + tableName + "')//a").withClass("labkey-menu-button").withText(text);
+            return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button").withText(text));
         }
 
-        public static Locator.IdLocator facetPanel(String tableName)
+        private static Locator.XPathLocator facetPanel(String regionName)
         {
-            return Locator.id("dataregion_facet_" + tableName);
+            return Locator.tagWithAttribute("div", "lk-region-facet-name", regionName);
         }
 
-        public static Locator.XPathLocator expandedFacetPanel(String tableName)
+        public static Locator.XPathLocator expandedFacetPanel(String regionName)
         {
-            return facetPanel(tableName).withDescendant(Locator.xpath("div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
+            return facetPanel(regionName).withDescendant(Locator.xpath("div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
         }
 
-        public static Locator.XPathLocator collapsedFacetPanel(String tableName)
+        public static Locator.XPathLocator collapsedFacetPanel(String regionName)
         {
-            return facetPanel(tableName).withPredicate(Locator.xpath("div/div").withClass("x4-panel-collapsed").withClass("labkey-data-region-facet"));
+            return facetPanel(regionName).withPredicate(Locator.xpath("div/div").withClass("x4-panel-collapsed").withClass("labkey-data-region-facet"));
         }
 
         public static Locator.XPathLocator facetRow(String category)
@@ -903,12 +878,12 @@ public class DataRegionTable extends Component
             return facetRow(category).withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(group));
         }
 
-        public static Locator.XPathLocator faceRowCheckbox(String category)
+        public static Locator.XPathLocator facetRowCheckbox(String category)
         {
             return facetRow(category).append(Locator.tag("div").withClass("x4-grid-row-checker"));
         }
 
-        public static Locator.XPathLocator faceRowCheckbox(String category, String group)
+        public static Locator.XPathLocator facetRowCheckbox(String category, String group)
         {
             return facetRow(category, group).append(Locator.tag("div").withClass("x4-grid-row-checker"));
         }

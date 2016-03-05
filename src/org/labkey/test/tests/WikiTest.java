@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
@@ -107,7 +108,7 @@ public class WikiTest extends BaseWebDriverTest
         setFormElement(Locator.name("formFiles[0]"), file);
         wikiHelper.saveWikiPage();
 
-        waitForElement(Locator.id(WIKI_PAGE_WEBPART_ID));
+        DataRegionTable.waitForDataRegion(this, WIKI_PAGE_WEBPART_ID);
         assertTextPresent("common.properties", "Some HTML content");
         assertElementPresent(Locator.linkContainingText("_Test Wiki"));
         impersonateRole("Reader");
@@ -204,7 +205,7 @@ public class WikiTest extends BaseWebDriverTest
     {
         WebElement frame = waitForElement(Locator.id(editorId + "_ifr"));
 
-        // swtich to the tinymce iframe
+        // switch to the tinymce iframe
         getDriver().switchTo().frame(frame);
 
         // locate the tinymce body element

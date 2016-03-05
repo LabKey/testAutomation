@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -117,7 +118,7 @@ public class SurveyTest extends BaseWebDriverTest
             clickFolder(folder);
         if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'tab-nav-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
-        waitForElement(Locator.id("dataregion_query"));
+        DataRegionTable.waitForDataRegion(this, "query");
         createSurveyDesign(designName, description, schemaName, queryName, null);
     }
 

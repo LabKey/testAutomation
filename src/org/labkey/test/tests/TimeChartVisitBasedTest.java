@@ -90,9 +90,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertElementNotPresent(Locator.button("Options"));
         assertElementNotPresent(Locator.button("Developer"));
 
-        String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
-        String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
-        DataRegionTable table = new DataRegionTable(tableName, this, false, false);
+        DataRegionTable table = DataRegionTable.findDataRegion(this);
         List displayOrders = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Display Order");
         for (Object str : displayOrders)
         {

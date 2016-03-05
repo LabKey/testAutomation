@@ -30,7 +30,7 @@ public abstract class ReportTest extends StudyBaseTest
     @LogMethod
     protected void deleteReport(String reportName)
     {
-        clickAndWait(Locator.linkWithText("Manage Views"));
+        goToManageViews();
         final Locator report = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName);
 
         // select the report and click the delete button

@@ -172,7 +172,7 @@ public class UserTest extends BaseWebDriverTest
     {
         createUserWithPermissions(DEACTIVATED_USER, getProjectName(), "Editor");
         goToSiteUsers();
-        DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
+        DataRegionTable usersTable = new DataRegionTable("Users", this);
         int row = usersTable.getRow("Email", DEACTIVATED_USER);
         String disabledUserId = usersTable.getDataAsText(row, "User Id");
         String normalUserId = usersTable.getDataAsText(usersTable.getRow("Email", NORMAL_USER), "User Id");
@@ -198,13 +198,13 @@ public class UserTest extends BaseWebDriverTest
         goToSiteUsers();
         assertTextNotPresent(DEACTIVATED_USER);
         clickAndWait(Locator.linkWithText("include inactive users"));
-        usersTable = new DataRegionTable("Users", this, true, true);
+        usersTable = new DataRegionTable("Users", this);
         row = usersTable.getRow("Email", DEACTIVATED_USER);
         assertEquals(DEACTIVATED_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
         usersTable.checkCheckbox(row);
         clickButton("Re-Activate");
         clickButton("Re-activate");
-        usersTable = new DataRegionTable("Users", this, true, true);
+        usersTable = new DataRegionTable("Users", this);
         row = usersTable.getRow("Email", DEACTIVATED_USER);
         assertEquals(DEACTIVATED_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
     }

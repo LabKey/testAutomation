@@ -103,6 +103,8 @@ public class SecurityTest extends BaseWebDriverTest
 
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
+
+        // This points to a "faked up" Data Region -- cannot use DataRegionTable
         assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
@@ -626,7 +628,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
 
-        DataRegionTable table = new DataRegionTable("query", this, false);
+        DataRegionTable table = new DataRegionTable("query", this);
 
         table.getDataAsText(2, 2);
         String createdBy      = table.getDataAsText(2, "Created By");

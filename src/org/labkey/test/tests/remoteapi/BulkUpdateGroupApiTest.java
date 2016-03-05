@@ -75,7 +75,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
             throw new IllegalArgumentException("Use a longer suffix for test user emails.");
 
         beginAt("user/showUsers.view?inactive=true&Users.showRows=all&Users.Email~contains=" + suffix);
-        DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
+        DataRegionTable usersTable = new DataRegionTable("Users", this);
 
         if (usersTable.getDataRowCount() > 0)
         {

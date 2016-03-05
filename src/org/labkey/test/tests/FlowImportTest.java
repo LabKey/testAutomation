@@ -49,7 +49,7 @@ public class FlowImportTest extends BaseFlowTest
         // assert only one analysis run created
         importAnalysis(getContainerPath(), workspacePath, SelectFCSFileOption.None, null, analysisFolder, false, true);
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
-        DataRegionTable table = new DataRegionTable("query", this, true);
+        DataRegionTable table = new DataRegionTable("query", this);
         assertEquals("Expected a single run", table.getDataRowCount(), 1);
         assertEquals("Expected an Analysis run", table.getDataAsText(0, "Protocol Step"), "Analysis");
 
@@ -74,7 +74,7 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis_checkErrors(null);
         // assert one keyword run created, one additional analysis run created
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
-        table = new DataRegionTable("query", this, true);
+        table = new DataRegionTable("query", this);
         assertEquals("Expected three runs", table.getDataRowCount(), 3);
         table.setSort("ProtocolStep", SortDirection.DESC);
         assertEquals("Expected a Keywords run", table.getDataAsText(0, "Protocol Step"), "Keywords");
@@ -110,7 +110,7 @@ public class FlowImportTest extends BaseFlowTest
         importAnalysis_checkErrors(null);
 
         beginAt(WebTestHelper.getContextPath() + "/query" + getContainerPath() + "/executeQuery.view?query.queryName=Runs&schemaName=flow");
-        table = new DataRegionTable("query", this, true);
+        table = new DataRegionTable("query", this);
         assertEquals("Expected four runs", table.getDataRowCount(), 4);
 
     }

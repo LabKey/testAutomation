@@ -32,7 +32,7 @@ public class EmailRecordTable extends DataRegionTable
 
     public EmailRecordTable(BaseWebDriverTest test)
     {
-        super("EmailRecord", test, false, false);
+        super("EmailRecord", test);
     }
 
     @Override

@@ -513,7 +513,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         AssayDesignerPage assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
-        waitForElement(Locator.id("dataregion_Runs"));
+        DataRegionTable.waitForDataRegion(this, "Runs");
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
@@ -549,7 +549,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitForElement(locator);
         click(locator);
         clickButton("Save & Close");
-        waitForElement(Locator.id("dataregion_Runs"));
+        DataRegionTable.waitForDataRegion(this, "Runs");
     }
 
     private final static String FILE4_PLATE_SUMMARY_POST_SUBTRACTION =
@@ -567,7 +567,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         assertTextPresent("Background Subtraction");
-        DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
+        DataRegionTable runTable = new DataRegionTable("Runs", this);
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
@@ -585,7 +585,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("run details").index(3));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
-        DataRegionTable table = new DataRegionTable("AntigenStats", this, true, true);
+        DataRegionTable table = new DataRegionTable("AntigenStats", this);
 //        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);      // TODO: we're not showing by default now
 
         int row = 0;
@@ -633,7 +633,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         selectOptionByText(Locator.name("plateReader"), "AID");
         uploadFile(TEST_ASSAY_ELISPOT_FILE5, "E", "Save and Finish", false, true);
-        DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
+        DataRegionTable runTable = new DataRegionTable("Runs", this);
         assertTextPresent("AID_0161456 W8");
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
@@ -645,7 +645,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitForElement(Locator.css("#plate-summary-div-1 table"));
         //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
-        DataRegionTable detailsTable = new DataRegionTable("AntigenStats", this, true, true);
+        DataRegionTable detailsTable = new DataRegionTable("AntigenStats", this);
         Map<String, String> expectedBackgroundMedians = new HashMap<>();
         expectedBackgroundMedians.put("ptid 1 E", "0.0");
         expectedBackgroundMedians.put("ptid 2 E", "0.0");

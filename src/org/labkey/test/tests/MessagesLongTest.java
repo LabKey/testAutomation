@@ -514,7 +514,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
-        DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
+        DataRegionTable record = new DataRegionTable("EmailRecord", this);
         List<String> subject = record.getColumnDataAsText("Message");
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));

@@ -462,12 +462,7 @@ public class FilterTest extends BaseWebDriverTest
     @LogMethod
     public void validFiltersGenerateCorrectResultsTest()
     {
-        List<FilterArgs> testArgs = generateValidFilterArgsAndResponses();
-
-        for (FilterArgs a : testArgs)
-        {
-            validFilterGeneratesCorrectResultsTest(a);
-        }
+        generateValidFilterArgsAndResponses().forEach(this::validFilterGeneratesCorrectResultsTest);
     }
 
     private static class FilterArgs

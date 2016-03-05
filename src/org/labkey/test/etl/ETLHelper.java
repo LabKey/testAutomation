@@ -723,10 +723,10 @@ public class ETLHelper
         {
             super.verifyResults();
 
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
+            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test);
 
             // just spot check the file log
-            String status = drt.getDataAsText(0, "Last Status");
+            String status = dataRegion.getDataAsText(0, "Last Status");
             verifyLogFileLink(status);
         }
     }
@@ -764,29 +764,29 @@ public class ETLHelper
         {
             super.verifyResults();
 
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
+            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test);
 
             // walk through all the history rows and verify the link to the file log works (just the first one)
             // and the links work for the transform details page, job details, and run details
             for (int row = 0; row < _data.size(); row ++)
             {
-                String status = drt.getDataAsText(row, "Status");
+                String status = dataRegion.getDataAsText(row, "Status");
                 if (0 == row)
                 {
                     verifyLogFileLink(status);
                 }
-                String run = drt.getDataAsText(row, "Name");
+                String run = dataRegion.getDataAsText(row, "Name");
                 verifyTransformDetails(run, status);
                 _test.goBack();
                 // wait for the grid to reload
                 _test.waitForText("Run Details");
 
                 // verify job link
-                String job = drt.getDataAsText(row, "Job Info");
+                String job = dataRegion.getDataAsText(row, "Job Info");
                 waitForTransformLink(job, "Run Details", "Pipeline Jobs", status);
 
                 // verify experiment run link
-                String exp = drt.getDataAsText(row, "Run Info");
+                String exp = dataRegion.getDataAsText(row, "Run Info");
                 waitForTransformLink(exp, "Run Details", "Run Details", run);
             }
         }

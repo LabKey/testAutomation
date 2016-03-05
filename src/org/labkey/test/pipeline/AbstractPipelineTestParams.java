@@ -392,7 +392,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         _test.log("Escalate an error");
         EmailRecordTable emailTable = new EmailRecordTable(_test);
-        PipelineStatusTable statusTable = new PipelineStatusTable(_test, false, false);
+        PipelineStatusTable statusTable = new PipelineStatusTable(_test, false);
         _test.pushLocation();
         statusTable.clickStatusLink(sampleExp);
         _test.clickButton("Escalate Job Failure");
