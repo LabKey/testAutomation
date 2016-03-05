@@ -18,16 +18,19 @@
 <%@ page import="com.dumbster.smtp.SmtpMessage" %>
 <%@ page import="org.apache.commons.lang3.ArrayUtils" %>
 <%@ page import="org.labkey.api.data.Container" %>
+<%@ page import="org.labkey.api.data.DataRegion" %>
+<%@ page import="org.labkey.api.util.MailHelper" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.template.ClientDependency" %>
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
+<%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="org.labkey.api.util.MailHelper" %>
-<%@ page import="org.labkey.dumbster.model.DumbsterManager" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="org.labkey.api.util.UniqueID" %>
+<%@ page import="org.labkey.api.util.PageFlowUtil" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%!
@@ -46,6 +49,11 @@
     SmtpMessage[] messages = pageInfo.getMessages();
     if ("true".equals(request.getParameter("reverse"))) ArrayUtils.reverse(messages);
     boolean recorder = pageInfo.isEnableRecorder();
+
+    DataRegion emailRegion = new DataRegion();
+    emailRegion.setName("EmailRecord");
+
+    String renderId = "emailRecordEmpty-" + UniqueID.getRequestScopedUID(HttpView.currentRequest());
 
     %><p id="emailRecordError" class="labkey-error" style="display: none;">&nbsp;</p><%
 
@@ -97,11 +105,11 @@ function toggleRecorder(checkbox)
 
             if (checked)
             {
-                var t = document.getElementById("dataregion_EmailRecord");
+                var t = document.getElementById(<%=PageFlowUtil.jsString(emailRegion.getDomId())%>);
                 var len = t.rows.length;
                 for (var i = len - 2; i > 0; i--)
                     t.deleteRow(i);
-                Ext4.get("emailRecordEmpty").setDisplayed("");
+                Ext4.get(<%=PageFlowUtil.jsString(renderId)%>).setDisplayed("");
             }
         }
     };
@@ -115,7 +123,7 @@ function toggleRecorder(checkbox)
 }
 </script>
 <!--Fake data region for ease of testing.-->
-<table id="dataregion_EmailRecord" class="labkey-data-region labkey-show-borders">
+<table id=<%=q(emailRegion.getDomId())%> lk-region-name=<%=q(emailRegion.getName())%> class="labkey-data-region labkey-show-borders">
     <colgroup><col width="120"/><col width="120"/><col width="125"/><col width="400"></colgroup>
     <!-- hidden TRs where the header region and message box would normally be in a real data region -->
     <tr style="display:none"><td colspan="5">&nbsp;</td></tr>
@@ -199,7 +207,7 @@ function toggleRecorder(checkbox)
         }
     }
 %>
-    <tr id="emailRecordEmpty" style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="3">No email recorded.</td></tr>
+    <tr id=<%=q(renderId)%> style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
     if (getUser().isSiteAdmin())
