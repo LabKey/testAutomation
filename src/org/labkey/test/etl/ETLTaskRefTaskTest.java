@@ -47,6 +47,8 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
     public static final String LOG_MESSAGE = "Log from test task";
     private static final String TRANSFORM_SLEEP = "{simpletest}/SleepTask";
     private static final String TRANSFORM_SLEEP_NAME = "SleepTask";
+    private static final String TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE = "{simpletest}/SleepTaskAllowDoubleQueue";
+    private static final String TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME = "SleepTask Allow Multiple Queueing";
 
     @Nullable
     @Override
@@ -140,6 +142,60 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
                 "Queued ETL did not COMPLETE. JobId: " + queuedJobId, 21000);
 
     }
+
+//    @Test work in progress
+//    public void testAllowDoubleQueue() throws Exception
+//    {
+//        Pair<Integer, Integer> jobCounts = tryDoubleQueueing(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME);
+//        // Test the quartz scheduler code path.
+//        // Should have 1 additional job for the first run, and one from the first queued job from enabling scheduled run. If there are more from the scheduled
+//        // jobs we're not blocking correctly.
+//        assertEquals("Incorrect number of pipeline jobs- if actual > expected, we didn't block double queuing the job", jobCount + 2, newJobCount);
+//        // Test blocking in the Run Now code path, which is shared by the API call.
+//        RunTransformResponse rtr = _etlHelper.runETL_API(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, false);
+//        assertEquals("Not queuing job because ETL is already pending.", rtr.getStatus());
+//        refresh();
+//        // Check we're showing the correct status- the job that is sleeping should be in a RUNNING state.
+//        assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, "RUNNING", true));
+//
+//        // lastly, wait for the queued job to finish running
+//        waitFor(() -> {
+//                    try
+//                    {
+//                        if ("COMPLETE".equals(_diHelper.getTransformStatus(queuedJobId))) return true;
+//                        else
+//                        {
+//                            log("Waiting for queued job to complete...");
+//                            return false;
+//                        }
+//                    }
+//                    catch (CommandException | IOException e)
+//                    {
+//                        throw new RuntimeException("Exception thrown checking job status", e);
+//                    }
+//                },
+//                "Queued ETL did not COMPLETE. JobId: " + queuedJobId, 21000);
+//
+//    }
+//
+//    private Pair<Integer, Integer> tryDoubleQueueing(String etl, String etlName) throws Exception
+//    {
+//        goToProjectHome();
+//        clickTab("DataIntegration");
+//        int jobCount = getJobCount();
+//        _etlHelper.runETL_API(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, false); // sleeps for 10 second during run
+//        sleep(50);
+//        // trigger a second run, it should go into the queued state
+//        RunTransformResponse rtr = _etlHelper.runETL_API(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, false);
+//        assertEquals("Queued", rtr.getStatus());
+//        final String queuedJobId = rtr.getJobId();
+//        _etlHelper.enableScheduledRun(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME); // this should try queue one, but it won't get queued
+//        sleep(2000); // runs on a 1 sec schedule, so should be trying to queue additional instances.
+//        _etlHelper.disableScheduledRun(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME); // immediately disable, so errors don't leave the ETL in the scheduler.
+//        int newJobCount = getJobCount();
+//
+//        return new Pair<>(jobCount, newJobCount);
+//    }
 
     private int getJobCount() throws Exception
     {

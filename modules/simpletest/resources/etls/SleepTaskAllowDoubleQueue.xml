@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" allowMultipleQueuing="true">
+    <name>SleepTask Allow Multiple Queueing</name>
+    <description>Taskref test with sleep, allow multiple queuing</description>
+    <transforms>
+        <transform id="step1" type="TaskRefTransformStep">
+            <taskref ref="org.labkey.di.steps.TestTaskRefTask">
+                <settings>
+                    <setting name="setting1" value="anything"/>
+                    <setting name="sleep" value="10"/>
+                </settings>
+            </taskref>
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="1s" />
+    </schedule>
+</etl>

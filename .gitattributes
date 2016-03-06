@@ -166,6 +166,7 @@ modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexisten
 modules/simpletest/resources/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/SleepTask.xml -text
+modules/simpletest/resources/etls/SleepTaskAllowDoubleQueue.xml -text
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendAndTaskRefTask.xml -text
@@ -181,6 +182,9 @@ modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text s
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/saveStateMidJobWithSleep.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/tailFile.xml -text
+modules/simpletest/resources/etls/targetBatchedFiles.xml -text
+modules/simpletest/resources/etls/targetBatchedFilesQueueTail.xml -text
+modules/simpletest/resources/etls/targetBatchedFilesWithBatchColumn.xml -text
 modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/targetFileQueueTail.xml -text
 modules/simpletest/resources/etls/targetFileWithSleep.xml -text svneol=unset#application/xml
