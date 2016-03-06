@@ -399,7 +399,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         link.click();
 
         // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        WebElement resetLink = shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]")));
+        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
+        WebElement resetLink = emailRegion.append("//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]").findElement(this.getDriver());
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
         setFormElement(Locator.id("password"), password);
@@ -415,9 +416,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String emailSubject = "Reset Password Notification";
 
         // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        WebElement email = getDriver().findElement(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]"));
+        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
+        WebElement email = emailRegion.append("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(this.getDriver());
         email.click();
-        WebElement resetLink = shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]")));
+
+        WebElement resetLink = emailRegion.append("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(this.getDriver());
+        shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
         return resetLink.getText();
     }
 

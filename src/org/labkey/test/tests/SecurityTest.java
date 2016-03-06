@@ -95,7 +95,7 @@ public class SecurityTest extends BaseWebDriverTest
         clonePermissionsTest();
         displayNameTest();
         tokenAuthenticationTest();
-        if(!isQuickTest())
+        if (!isQuickTest())
         {
             impersonationTest();
             guestTest();
@@ -111,7 +111,7 @@ public class SecurityTest extends BaseWebDriverTest
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 
-        if(!isQuickTest())
+        if (!isQuickTest())
         {
             cantReachAdminToolFromUserAccount(false);
             passwordStrengthTest();

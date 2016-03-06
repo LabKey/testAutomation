@@ -93,6 +93,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 bypassSecondaryAuthentication();
                 String errors = StringUtils.join(getTexts(Locator.css(".labkey-error").findElements(getDriver())), "\n");
 
+                // If we get redirected here the message is not indicated as an error
+                if (errors.length() == 0 && null != getUrlParam("message", true))
+                    errors = getUrlParam("message", true);
+
                 if (errors.contains("The e-mail address and password you entered did not match any accounts on file."))
                     throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
                 else if (errors.contains("Your password does not meet the complexity requirements; please choose a new password."))

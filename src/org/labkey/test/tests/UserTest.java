@@ -361,8 +361,7 @@ public class UserTest extends BaseWebDriverTest
 
         clickButton("Cancel");
 
-        Locator userInfoPanel = Locator.id("SiteUsers");
-        String userInfo = getText(userInfoPanel);
+        String userInfo = getText(DataRegionTable.Locators.dataRegion("SiteUsers"));
         assertFalse("Too-long property persists after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
     }
 
@@ -378,7 +377,8 @@ public class UserTest extends BaseWebDriverTest
 
         clickButton("Submit");
 
-        assertElementPresent(Locator.css("#SiteUsers td.labkey-form-label + td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES), 2);
+        WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
+        assertElementPresent(Locator.css("#" + table.getAttribute("id") + " td.labkey-form-label + td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES), 2);
     }
 
     @Test
@@ -393,7 +393,8 @@ public class UserTest extends BaseWebDriverTest
 
         clickButton("Submit");
 
-        assertElementPresent(Locator.css("#SiteUsers td.labkey-form-label + td").withText(INJECT_CHARS_1), 2);
+        WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
+        assertElementPresent(Locator.css("#" + table.getAttribute("id") + " td.labkey-form-label + td").withText(INJECT_CHARS_1), 2);
     }
 
     private static final String PROP_NAME1 = "Institution";

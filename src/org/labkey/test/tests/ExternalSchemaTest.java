@@ -456,6 +456,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         DataRegionTable table = new DataRegionTable("query", this);
         table.setSort("RowId", SortDirection.DESC);
+        table = new DataRegionTable("query", this);
 
         assertEquals("Expected 'Text' column to contain '" + text + "' for newly inserted row",
                 text, table.getDataAsText(0, table.getColumn("Text")));

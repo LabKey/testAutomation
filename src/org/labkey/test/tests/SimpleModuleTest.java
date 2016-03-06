@@ -410,7 +410,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertFalse("should not be able to select default view", Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default").findElement(getDriver()).isEnabled());
         clickButton("Cancel", 0);
 
-        //DataRegionTable dr = new DataRegionTable("query", this);
         _extHelper.clickMenuButton("Views", "EditableFileBasedView");
         waitForElement(Locator.tagContainingText("span", "Vehicles"));
 
@@ -466,9 +465,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
         pushLocation();
         clickAndWait(table.detailsLink(1));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
-        //assertElementPresent(Locator.xpath("//td[text() = 'Pinto']"));
 
         popLocation();
+        table = new DataRegionTable("query", this);
         clickAndWait(table.detailsLink(5));
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
         assertElementPresent(Locator.xpath("//i[text() = 'A row was inserted.']"));

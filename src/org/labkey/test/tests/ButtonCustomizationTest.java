@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -158,12 +159,12 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), PARAM_ECHO_CONTENT_FILE)));
         clickButton("Save & Close");
 
-        waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));
+        DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
         clickButton("JavaScript Link Button");
         assertTextPresent("No messages");
         clickProject(PROJECT_NAME);
 
-        waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));
+        DataRegionTable buttonRegion = DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
         clickButton("JavaScript OnClick Button", 0);
         assertAlert(JAVASCRIPT_MENU_ONCLICK_ALERT_TEXT);
 
@@ -179,7 +180,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         assertButtonNotPresent(METADATA_GET_BUTTON);
         assertButtonNotPresent(METADATA_LINK_BUTTON);
 
-        checkCheckboxByNameInDataRegion("Portland");
+        buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
         // wait for the button to enable:
         waitForElement(Locator.lkButton(METADATA_LINK_BUTTON), 10000);
 
