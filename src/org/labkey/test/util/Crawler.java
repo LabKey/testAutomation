@@ -558,7 +558,7 @@ public class Crawler
         if (currentDepth >= getMaxDepth() && _actionsVisited.contains(actionId))
             return false;
 
-        // never visit explicity excluded actions:
+        // never visit explicitly excluded actions:
         if (_excludedActions.contains(actionId))
             return false;
 
