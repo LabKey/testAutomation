@@ -369,6 +369,7 @@ src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/LabModule.java -text
 src/org/labkey/test/categories/MS2.java -text
 src/org/labkey/test/categories/Mascot.java -text
+src/org/labkey/test/categories/NLP.java -text
 src/org/labkey/test/categories/NoSuite.java -text
 src/org/labkey/test/categories/OConnor.java -text
 src/org/labkey/test/categories/ONPRC.java -text
