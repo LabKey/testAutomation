@@ -573,12 +573,13 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void lastFilterTest()
     {
+        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+
         // assert both issues are present
-        clearAllFilters("Issues", "IssueId");
+        issuesTable.clearAllFilters("IssueId");
         assertTextPresent(ISSUE_TITLE_0, ISSUE_TITLE_1);
 
         // Filter out all pri-1 bugs; assert newly created issue is filtered out
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
         issuesTable.setFilter("Priority", "Does Not Equal", "1");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
@@ -591,7 +592,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 
-        clearAllFilters("Issues", "IssueId");
+        issuesTable.clearAllFilters("IssueId");
     }
 
     @Test

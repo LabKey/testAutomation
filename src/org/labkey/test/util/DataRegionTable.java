@@ -16,9 +16,11 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,8 +46,6 @@ public class DataRegionTable extends Component
 {
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _regionName;
-    protected final WebElement _tableElement;
-    private final String _tableId;
     public BaseWebDriverTest _test;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
@@ -61,14 +62,11 @@ public class DataRegionTable extends Component
         _test = test;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
 
-        _tableElement = table;
-        _tableId = _tableElement.getAttribute("id");
-
-        _regionName = _tableElement.getAttribute("lk-region-name");
+        _regionName = table.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
 
-        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
-        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
+        _selectors = !Locator.css(".labkey-selectors").findElements(table).isEmpty();
+        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(table).isEmpty();
     }
 
     public DataRegionTable(String regionName, BaseWebDriverTest test)
@@ -76,20 +74,24 @@ public class DataRegionTable extends Component
         _test = test;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
 
-        _tableElement = waitForDataRegion(test, regionName);
-        _tableId = _tableElement.getAttribute("id");
+        WebElement tableElement = waitForDataRegion(test, regionName);
 
-        _regionName = _tableElement.getAttribute("lk-region-name");
+        _regionName = tableElement.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
 
-        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
-        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
+        _selectors = !Locator.css(".labkey-selectors").findElements(tableElement).isEmpty();
+        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(tableElement).isEmpty();
+    }
+
+    private WebElement getTableElement()
+    {
+        return waitForDataRegion(_test, _regionName);
     }
 
     @Override
     public WebElement getComponentElement()
     {
-        return _tableElement;
+        return getTableElement();
     }
 
     private int getHeaderRowCount()
@@ -139,7 +141,7 @@ public class DataRegionTable extends Component
 
     public String getTableId()
     {
-        return _tableId;
+        return getTableElement().getAttribute("id");
     }
 
     public Locator.IdLocator locator()
@@ -154,7 +156,7 @@ public class DataRegionTable extends Component
 
     private boolean bottomBarPresent()
     {
-        return _test.isElementPresent(Locator.tagWithId("table", _tableId + "-footer"));
+        return _test.isElementPresent(Locator.tagWithId("table", getTableId() + "-footer"));
     }
 
     public boolean hasAggregateRow()
@@ -164,7 +166,7 @@ public class DataRegionTable extends Component
 
     public List<WebElement> getHeaderButtons()
     {
-        String headerId = _tableId + "-header";
+        String headerId = getTableId() + "-header";
         return Locator.css("#" + headerId + " a.labkey-button, #" + headerId + " a.labkey-menu-button").findElements(_test.getDriver());
     }
 
@@ -480,7 +482,7 @@ public class DataRegionTable extends Component
     {
         row += getHeaderRowCount();
         column += _selectors ? 1 : 0;
-        return Locator.css("tr:nth-of-type(" + (row + 1) + ") > td:nth-of-type(" + (column + 1) + ")").findElement(_tableElement);
+        return Locator.css("tr:nth-of-type(" + (row + 1) + ") > td:nth-of-type(" + (column + 1) + ")").findElement(getTableElement());
     }
 
     public String getDataAsText(int row, int column)
@@ -613,14 +615,121 @@ public class DataRegionTable extends Component
         _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void setFilter(String columnName, String filterType, String filter)
+    public void setFilter(String columnName, String filterType)
+    {
+        setFilter(columnName, filterType, null, BaseWebDriverTest.WAIT_FOR_PAGE);
+    }
+
+    public void setFilter(String columnName, String filterType, @Nullable String filter)
     {
         setFilter(columnName, filterType, filter, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    public void setFilter(String columnName, String filterType, String filter, int waitMillis)
+    public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis)
     {
-        _test.setFilter(_regionName, columnName, filterType, filter, waitMillis);
+        setUpFilter(columnName, filterType, filter);
+        _test.clickButton("OK", waitMillis);
+    }
+
+    public void setFilter(String columnName, String filterType, @Nullable String filter, @Nullable String filter2Type, @Nullable String filter2)
+    {
+        setUpFilter(columnName, filterType, filter, filter2Type, filter2);
+        _test.clickButton("OK", BaseWebDriverTest.WAIT_FOR_PAGE);
+    }
+
+    public void setFacetedFilter(String columnName, String... values)
+    {
+        setUpFacetedFilter(columnName, values);
+        _test.clickButton("OK");
+    }
+
+    public void setUpFilter(String columnName, String filterType, String filter)
+    {
+        setUpFilter(columnName, filterType, filter, null, null);
+    }
+
+    public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
+    {
+        String log = "Setting filter in " + _regionName + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
+        if (filter2Type != null)
+        {
+            log += " and " + filter2Type.toLowerCase() + (filter2 != null ? " " + filter2 : "");
+        }
+        _test.log(log);
+
+        openFilterDialog(columnName);
+
+        if (_test.isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
+        {
+            _test.log("Switching to advanced filter UI");
+            _test._extHelper.clickExtTab("Choose Filters");
+            _test.waitForElement(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text()='Filter Type:']"), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+
+        //Select combo box item
+        _test._extHelper.selectComboBoxItem("Filter Type:", filter1Type);
+
+        if (filter1 != null && !filter1Type.contains("Blank"))
+        {
+            _test.setFormElement(Locator.id("value_1"), filter1);
+        }
+
+        if (filter2Type != null && !filter2Type.contains("Blank"))
+        {
+            //Select combo box item
+            _test._extHelper.selectComboBoxItem("and:", filter2Type);
+            if (filter2 != null)
+            {
+                _test.setFormElement(Locator.id("value_2"), filter2);
+            }
+        }
+    }
+
+    public void setUpFacetedFilter(String columnName, String... values)
+    {
+        String log;
+        if (values.length > 0)
+        {
+            log = "Setting filter in " + _regionName + " for " + columnName + " to one of: [";
+            for (String v : values)
+            {
+                log += v + ", ";
+            }
+            log = log.substring(0, log.length() - 2) + "]";
+        }
+        else
+        {
+            log = "Clear filter in " + _regionName + " for " + columnName;
+        }
+
+        _test.log(log);
+
+        openFilterDialog(columnName);
+        String columnLabel = _test.getText(DataRegionTable.Locators.columnHeader(_regionName, columnName));
+
+        _test.sleep(500);
+
+        // Clear selections.
+        assertEquals("Faceted filter tab should be selected.", "Choose Values", _test.getText(Locator.css(".x-tab-strip-active")));
+        if (!_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
+        {
+            _test.click(Locator.linkWithText("[All]"));
+        }
+        _test.click(Locator.linkWithText("[All]"));
+
+        if (values.length > 1)
+        {
+            for (String v : values)
+            {
+                _test.click(Locator.xpath(_test._extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...") +
+                        "//div[contains(@class,'x-grid3-row') and .//span[text()='" + v + "']]//div[@class='x-grid3-row-checker']"));
+            }
+        }
+        else if (values.length == 1)
+        {
+            _test.click(Locator.xpath(_test._extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...")+
+                    "//div[contains(@class,'x-grid3-row')]//span[text()='" + values[0] + "']"));
+        }
     }
 
     public void clearFilter(String columnName)
@@ -644,7 +753,9 @@ public class DataRegionTable extends Component
 
     public void clearAllFilters(String columnName)
     {
-        _test.clearAllFilters(_regionName, columnName);
+        _test.log("Clearing filter in " + _regionName + " for " + columnName);
+        openFilterDialog(columnName);
+        _test.clickButton("CLEAR ALL FILTERS");
     }
 
     public void checkAllOnPage()
@@ -659,7 +770,7 @@ public class DataRegionTable extends Component
 
     private WebElement getToggle()
     {
-        return Locator.tagWithId("table", _tableId).append(Locator.tagWithAttribute("input", "name", ".toggle")).findElement(_test.getDriver());
+        return Locator.tagWithId("table", getTableId()).append(Locator.tagWithAttribute("input", "name", ".toggle")).findElement(_test.getDriver());
     }
 
     public void checkAll()
@@ -679,7 +790,7 @@ public class DataRegionTable extends Component
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
     public void checkCheckbox(String value)
     {
-        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
+        WebElement checkbox = Locator.tagWithId("table", getTableId()).append(
                 Locator.tagWithName("input", ".select").withAttribute("value", value)).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
@@ -688,7 +799,7 @@ public class DataRegionTable extends Component
 
     public void checkCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
+        WebElement checkbox = Locator.tagWithId("table", getTableId()).append(
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (!checkbox.isSelected())
@@ -697,7 +808,7 @@ public class DataRegionTable extends Component
 
     public void uncheckCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithId("table", _tableId).append(
+        WebElement checkbox = Locator.tagWithId("table", getTableId()).append(
                 Locator.tagWithName("input", ".select")).index(index).
                 findElement(_test.getDriver());
         if (checkbox.isSelected())
@@ -730,7 +841,7 @@ public class DataRegionTable extends Component
 
     public void clickDataRegionPageLink(String title)
     {
-        String headerId = Locator.xq(_tableId + "-header");
+        String headerId = Locator.xq(getTableId() + "-header");
         _test.clickAndWait(Locator.xpath("//table[@id=" + headerId + "]//div/a[@title='" + title + "']"));
     }
 

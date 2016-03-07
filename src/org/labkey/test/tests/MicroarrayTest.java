@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -105,7 +106,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForFormElementToEqual(Locator.id("idCol1"), "0");
         clickButton("Submit");
-        waitForElement(Locator.id("Material"));
+        DataRegionTable.waitForDataRegion(this, "Material");
 
         // First try importing the runs individually
         clickAndWait(Locator.linkWithText("Microarray Dashboard"));

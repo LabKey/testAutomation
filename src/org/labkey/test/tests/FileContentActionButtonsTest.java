@@ -48,11 +48,6 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         initTest.doSetupSteps();
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
     private void doSetupSteps()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -146,7 +141,7 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testCutomizeToolbar()
+    public void testCustomizeToolbar()
     {
         assertDefaultBrowserButtons();
 

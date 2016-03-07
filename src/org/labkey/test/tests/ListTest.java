@@ -422,12 +422,13 @@ public class ListTest extends BaseWebDriverTest
         setUpList(PROJECT_VERIFY);
 
         log("Test Sort and Filter in Data View");
-        setSort("query", _listCol1.getName(), SortDirection.ASC);
+        DataRegionTable region = new DataRegionTable("query", this);
+        region.setSort(_listCol1.getName(), SortDirection.ASC);
         assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
 
         clearSortTest();
 
-        setFilter("query", _listCol4.getName(), "Is Greater Than", "7");
+        region.setFilter(_listCol4.getName(), "Is Greater Than", "7");
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
@@ -471,7 +472,7 @@ public class ListTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
-        setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
+        (new DataRegionTable("qwp2", this)).setSort(_listCol4.getName(), SortDirection.ASC);
         String source = getHtmlSource();
         int index;
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
@@ -689,18 +690,19 @@ public class ListTest extends BaseWebDriverTest
         portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
 
         log("Test that the right filters are present for each type");
-        openFilter("qwp3", _listCol4.getName());
+        DataRegionTable region = new DataRegionTable("qwp3", this);
+        region.openFilterDialog(_listCol4.getName());
         _extHelper.clickExtTab("Choose Filters");
-        click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
+        click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
-        assertElementNotPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
+        assertElementNotPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
         assertElementPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
         _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
 
         log("Test that filters don't affect multiple web parts");
         assertTextPresent(TEST_DATA[1][0], 2);
-        setFilter("qwp3", _listCol4.getName(), "Is Less Than", "10");
+        region.setFilter(_listCol4.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[1][0], 1);
 
         clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));

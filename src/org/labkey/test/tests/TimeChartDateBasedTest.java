@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -688,7 +689,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickAndWait(Locator.linkWithText("Physical Exam"));
 
         String ptid = "249318596";
-        setFacetedFilter("Dataset", "ParticipantId", ptid);
+        DataRegionTable region = new DataRegionTable("Dataset", this);
+        region.setFilter("ParticipantId", "Equals", ptid);
         assertTextPresent(ptid);
 
         _extHelper.clickMenuButton("Charts", "Create Time Chart");

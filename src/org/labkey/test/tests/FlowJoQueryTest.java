@@ -85,10 +85,6 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
-//        The DeviationFromMean query does not work on SQL server.
-//        "Cannot perform an aggregate function on an expression containing an aggregate or a subquery."
-//        setFormElement("query.queryName", "DeviationFromMean");
-//        waitForPageToLoad();
 
         goToFlowDashboard();
         importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Browse, Arrays.asList("/flowjoquery/miniFCS"), "FlowJoAnalysis", true, false);
@@ -110,7 +106,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
-        setFilter("query", "Name", "Equals", "118795.fcs");
+        (new DataRegionTable("query", this)).setFilter("Name", "Equals", "118795.fcs");
         clickAndWait(Locator.linkContainingText("workspaceScript"));
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement(Locator.name("name"), "LabKeyScript");
@@ -142,10 +138,9 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Analysis Folder"), false, "All Analysis Folders");
         assertTextNotPresent("No data to show");
-        setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
-        // UNDONE: sample '118902.fcs' differs by 2.46%
-        //setFilterAndWait("query", "PercentDifference", "Is Greater Than or Equal To", "1", longWaitForPage);
-        setFilterAndWait("query", "PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
+        DataRegionTable region = new DataRegionTable("query", this);
+        region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
+        region.setFilter("PercentDifference", "Is Greater Than or Equal To", "2.5", longWaitForPage);
         assertTextPresent("No data to show");
     }
 

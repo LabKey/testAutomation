@@ -383,11 +383,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertColumnsNotPresent(SOURCE_FOLDER, "lists", "NIMHDemographics", "EntityId", "LastIndexed");
         assertColumnsNotPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "EntityId", "LastIndexed");
 
-        //Make sure that the lookup columns propogated properly into the linked schema
+        //Make sure that the lookup columns propagated properly into the linked schema
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
 
         // Linked schemas disallow lookups to other folders outside of the current folder.
-        //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propogating
+        //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propagating
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
@@ -395,7 +395,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Create a query over the table with lookups
         createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
-        //Create a new linked schema that includes that query, and ensure that it is propogating lookups in the expected manner
+        //Create a new linked schema that includes that query, and ensure that it is propagating lookups in the expected manner
         _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");

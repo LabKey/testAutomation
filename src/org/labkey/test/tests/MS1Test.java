@@ -24,6 +24,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -277,8 +278,9 @@ public class MS1Test extends BaseWebDriverTest
         clickProject(project);
         clickAndWait(Locator.linkWithText(getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL)));
 
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
-        setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
+        DataRegionTable featuresRegion = new DataRegionTable(DATAREGION_FEATURES, this);
+        featuresRegion.setFilter("MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
+        featuresRegion.setFilter("Scan", "Equals", "1948");
         clickAndWait(Locator.linkWithText("similar"));
         assertFormElementEquals(Locator.name("mzSource"), "733.4119");
         assertFormElementEquals(Locator.name("timeSource"), "1928.3200");
@@ -325,12 +327,13 @@ public class MS1Test extends BaseWebDriverTest
 
         //test filtering
         log("Testing filtering...");
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
-        setFilter(DATAREGION_FEATURES, "TotalIntensity", "Is Greater Than or Equal To", "40000");
+        DataRegionTable featuresRegion = new DataRegionTable(DATAREGION_FEATURES, this);
+        featuresRegion.setFilter("MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
+        featuresRegion.setFilter("TotalIntensity", "Is Greater Than or Equal To", "40000");
 
         //test sort
         log("Testing sort...");
-        setSort(DATAREGION_FEATURES, "Intensity", SortDirection.DESC);
+        featuresRegion.setSort("Intensity", SortDirection.DESC);
         assertTextBefore("66,204.2900", "49,012.0600");
 
         //test customize view
@@ -388,7 +391,7 @@ public class MS1Test extends BaseWebDriverTest
         popLocation();
 
         //filter to just a single scan with peak data so we can test the other views
-        setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
+        featuresRegion.setFilter("Scan", "Equals", "1948");
 
         //verify the data file information
         log("Verifying data file and software information...");
@@ -408,7 +411,7 @@ public class MS1Test extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("peaks"));
 
         //test filtering
-        setFilter(DATAREGION_PEAKS, "MZ", "Is Greater Than or Equal To", "1500");
+        featuresRegion.setFilter("MZ", "Is Greater Than or Equal To", "1500");
 
         //verify the data file info
         assertTextPresent(BASE_FILE_NAME_2 + PEAKS_XML_EXTENSION, BASE_FILE_NAME_2 + MZXML_EXTENSION);
@@ -423,8 +426,8 @@ public class MS1Test extends BaseWebDriverTest
         log("Testing showFeatureDetails...");
         clickProject(project);
         clickAndWait(Locator.linkWithText(run2Title));
-        setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
-        setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
+        featuresRegion.setFilter("MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
+        featuresRegion.setFilter("Scan", "Equals", "1948");
         clickAndWait(Locator.linkWithText("details"));
 
         assertCharts();
@@ -442,7 +445,7 @@ public class MS1Test extends BaseWebDriverTest
         log("showFeatureDetails.view OK");
 
         clickProject(project);
-        log("Finsihed testing features views.");
+        log("Finished testing features views.");
     }
 
     protected void assertCharts()

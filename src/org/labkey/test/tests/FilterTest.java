@@ -184,25 +184,26 @@ public class FilterTest extends BaseWebDriverTest
     @LogMethod
     private void facetedFilterTest()
     {
-        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
+        DataRegionTable region = new DataRegionTable("query", this);
+        verifyColumnValues(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         log("Verifying expected faceted filter elements present");
-        verifyFacetOptions("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
+        verifyFacetOptions(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
-        setFacetedFilter("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
-        verifyColumnValues("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
+        region.setFacetedFilter("Color", "ZanzibarMasinginiTanzaniaAfrica");
+        verifyColumnValues(region, "Color", "ZanzibarMasinginiTanzaniaAfrica");
 
-        setUpFacetedFilter("query", "Color", "Robust");
+        region.setUpFacetedFilter("Color", "Robust");
         _extHelper.clickExtTab("Choose Filters");
         //NOTE: the filter will optimize this to EQUALS, since there is 1 value
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
         assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "Color", "Robust");
+        verifyColumnValues(region, "Color", "Robust");
 
         // Issue 14710: Switching between faceted and logical filters breaks dialog
-        setUpFacetedFilter("query", "Color", "Robust", "Light");
+        region.setUpFacetedFilter("Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
         assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
@@ -212,10 +213,10 @@ public class FilterTest extends BaseWebDriverTest
         waitForFormElementToEqual(Locator.name("filterType_1"), "Is Blank");
         clickButton("CLEAR FILTER");
         //the change above would result in filters being dropped.
-        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
+        verifyColumnValues(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         //now repeat with a filter that should be translated
-        setUpFacetedFilter("query", "Color", "Light");
+        region.setUpFacetedFilter("Color", "Light");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
         assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement(Locator.name("value_1")));
@@ -224,55 +225,55 @@ public class FilterTest extends BaseWebDriverTest
 
         _extHelper.clickExtTab("Choose Values"); //we should get no alerts
         clickButton("CLEAR FILTER");
-        setUpFacetedFilter("query", "Color", "Light", "Robust");
-        _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "Color", "Light", "Robust");
-        verifyColumnValues("query", "year", "1980", "1970");
+        region.setFacetedFilter("Color", "Light", "Robust");
+        verifyColumnValues(region, "Color", "Light", "Robust");
+        verifyColumnValues(region, "year", "1980", "1970");
 
-        setFacetedFilter("query", "Color");
-        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
+        region.setFacetedFilter("Color");
+        verifyColumnValues(region, "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         log("Verifying faceted filter on non-lookup column");
 
-        verifyColumnValues("query", "year", "1980", "1970", "1990");
-        verifyFacetOptions("query", "year", "1970", "1980", "1990");
+        verifyColumnValues(region, "year", "1980", "1970", "1990");
+        verifyFacetOptions(region, "year", "1970", "1980", "1990");
 
-        setFacetedFilter("query", "year", "1980");
-        verifyColumnValues("query", "year", "1980");
+        region.setFacetedFilter("year", "1980");
+        verifyColumnValues(region, "year", "1980");
 
-        setUpFacetedFilter("query", "year", "1990");
+        region.setUpFacetedFilter("year", "1990");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
         assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "year", "1990");
+        verifyColumnValues(region, "year", "1990");
 
-        setUpFacetedFilter("query", "year", "1990", "1980");
+        region.setUpFacetedFilter("year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
         assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "year", "1980", "1970", "1990");
+        verifyColumnValues(region, "year", "1980", "1970", "1990");
 
-        setFacetedFilter("query", "year");
-        verifyColumnValues("query", "year", "1980", "1970", "1990");
+        region.setFacetedFilter("year");
+        verifyColumnValues(region, "year", "1980", "1970", "1990");
     }
 
     @LogMethod
     private void maskedFacetTest()
     {
-        setFacetedFilter("query", "year", "1980", "1990");
-        verifyFacetOptions("query", "Car", "1", "3");
+        DataRegionTable region = new DataRegionTable("query", this);
+        region.setFacetedFilter("year", "1980", "1990");
+        verifyFacetOptions(region, "Car", "1", "3");
 
-        setFacetedFilter("query", "Car", "1");
-        verifyFacetOptions("query", "Color", "Light");
+        region.setFacetedFilter("Car", "1");
+        verifyFacetOptions(region, "Color", "Light");
 
-        clearAllFilters("query", "Car");
-        setFilter("query", "year", "Is Greater Than", "1980");
-        verifyFacetOptions("query", "Car", "3");
+        region.clearAllFilters("Car");
+        region.setFilter("year", "Is Greater Than", "1980");
+        verifyFacetOptions(region, "Car", "3");
     }
 
     @LogMethod
@@ -335,39 +336,41 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        verifyFacetOptions("Issues", "Type",
+        DataRegionTable region = new DataRegionTable("Issues", this);
+        verifyFacetOptions(region, "Type",
                 projectIssue.get("type"),
                 projectIssue2.get("type"),
                 subfolderIssue.get("type"),
                 subfolderIssue2.get("type"));
 
-        verifyFacetOptions("Issues", "Priority",
+        verifyFacetOptions(region, "Priority",
                 projectIssue.get("priority"),
                 projectIssue2.get("priority"),
                 subfolderIssue.get("priority"),
                 subfolderIssue2.get("priority"));
 
-        setFacetedFilter("Issues", "Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
+        region.setFacetedFilter("Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
         assertElementNotPresent(Locator.linkWithText(projectIssue.get("title")));
         assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        verifyFacetOptions("Issues", "Type",
+        verifyFacetOptions(region, "Type",
                 projectIssue2.get("type"),
                 subfolderIssue.get("type"));
     }
 
-    private void verifyFacetOptions(String regionName, String column, String... options)
+    private void verifyFacetOptions(DataRegionTable dataRegion, String column, String... options)
     {
-        openFilter(regionName, column);
+        dataRegion.openFilterDialog(column);
         verifyOptionsInFilterDialog(options);
-        _extHelper.clickExtButton("CANCEL", 0);}
+        _extHelper.clickExtButton("CANCEL", 0);
+    }
 
-    private void verifyColumnValues(String dataregion, String columnName, String... expectedValues)
+    private void verifyColumnValues(DataRegionTable dataRegion, String columnName, String... expectedValues)
     {
         List<String> expectedList = Arrays.asList(expectedValues);
-        assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
+        assertEquals(expectedList, dataRegion.getColumnDataAsText(columnName));
     }
 
     private void verifyOptionsInFilterDialog(String... expectedOptions)
@@ -399,7 +402,6 @@ public class FilterTest extends BaseWebDriverTest
             invalidFiltersGenerateCorrectErrorTest(argSet[0], argSet[1],
                 argSet[2], argSet[3], argSet[4]);
         }
-
     }
 
     @LogMethod
@@ -407,13 +409,11 @@ public class FilterTest extends BaseWebDriverTest
                         regionName, String columnName, String filterType,
                         String filterValue, String expectedError)
     {
-        log("attempt to set filter column: " + columnName + ". With filter type: " + filterType + ".  And fitler value: " + filterValue);
-        if (filterType == null)
-            setFilter(regionName, columnName, filterType);
-        else
-            setUpFilter(regionName, columnName, filterType, filterValue);
+        log("attempt to set filter column: " + columnName + ". With filter type: " + filterType + ".  And filter value: " + filterValue);
+        DataRegionTable region = new DataRegionTable(regionName, this);
+        region.setUpFilter(columnName, filterType, filterValue);
         sleep(300);
-        clickButton("OK",0);
+        clickButton("OK", 0);
         assertElementPresent(Locator.extButton("OK"));
         assertTextPresent(expectedError);
 
@@ -556,7 +556,8 @@ public class FilterTest extends BaseWebDriverTest
     //Issue 12787: Canceling filter dialog requires two clicks
     private void filterCancelButtonWorksTest()
     {
-        openFilter(TABLE_NAME, _listCol4.getName());
+        DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
+        region.openFilterDialog(_listCol4.getName());
         clickButton("CANCEL", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent("Show Rows Where");
@@ -581,7 +582,8 @@ public class FilterTest extends BaseWebDriverTest
             log("** Filtering " + columnName + " with filter type: " + filter1Type + ", value: " + filter1);
             if (null != filter2Type)
                 log("** Second filter: " + filter2Type + ".  value:" + filter2);
-            setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
+            DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
+            region.setFilter(fieldKey, filter1Type, filter1, filter2Type, filter2);
 
             _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
@@ -600,56 +602,56 @@ public class FilterTest extends BaseWebDriverTest
             _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Views"), false, "default");
 
             log("** Checking filter values in filter dialog");
-            openFilter(TABLE_NAME, fieldKey);
+            DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
+            region.openFilterDialog(fieldKey);
             _extHelper.clickExtTab("Choose Filters");
             shortWait().until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(getDriver())));
 
-        if (filter1 != null)
-        {
-            // When we first load the filter panel, we convert single-value filters into a multi-value filter if possible,
-            // then we invert negative filters ("Does Not Equal" becomes "In") and invert the values.
-            // When switching to the 'Choose Filters' tab, we may invert again (if more than half of the values are selected)
-            // and we may change a multi-value filter into a singluar filter if only one value is selected.
+            if (filter1 != null)
+            {
+                // When we first load the filter panel, we convert single-value filters into a multi-value filter if possible,
+                // then we invert negative filters ("Does Not Equal" becomes "In") and invert the values.
+                // When switching to the 'Choose Filters' tab, we may invert again (if more than half of the values are selected)
+                // and we may change a multi-value filter into a singular filter if only one value is selected.
 
-            if (filter1Type.equals("Does Not Equal") && "Light".equals(filter1))
-            {
-                // In this test case, "Does Not Equal" and "Light" are the initial filter type and value.
-                // When showing the dialog, "Does Not Equal" is first converted into "Not In" since "Does Not Equal" is a single value filter.
-                // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
-                // When switching tabs, the number of selected values (1) is less than half of the available values (4),
-                // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
-                waitForFormElementToEqual(Locator.name("value_1"), "Light");
-            }
-            else if (filter1Type.equals("Does Not Equal Any Of (example usage: a;b;c)") && "Light;Mellow".equals(filter1))
-            {
-                // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
-                // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
-                // When switching tabs, nothing changes.
-                //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-                waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
-            }
-            else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
-            {
-                // In this test case, "Does Not Equal" and "false" are the initial filter type and value.
-                // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
-                // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
-                if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
-                    assertFormElementEquals(Locator.id("value_1"), "true");
+                if (filter1Type.equals("Does Not Equal") && "Light".equals(filter1))
+                {
+                    // In this test case, "Does Not Equal" and "Light" are the initial filter type and value.
+                    // When showing the dialog, "Does Not Equal" is first converted into "Not In" since "Does Not Equal" is a single value filter.
+                    // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
+                    // When switching tabs, the number of selected values (1) is less than half of the available values (4),
+                    // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
+                    waitForFormElementToEqual(Locator.name("value_1"), "Light");
+                }
+                else if (filter1Type.equals("Does Not Equal Any Of (example usage: a;b;c)") && "Light;Mellow".equals(filter1))
+                {
+                    // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
+                    // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
+                    // When switching tabs, nothing changes.
+                    waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
+                }
+                else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
+                {
+                    // In this test case, "Does Not Equal" and "false" are the initial filter type and value.
+                    // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
+                    // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
+                    if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
+                        assertFormElementEquals(Locator.id("value_1"), "true");
+                    else
+                        assertFormElementEquals(Locator.id("value_1"), filter1);
+                }
                 else
+                {
                     assertFormElementEquals(Locator.id("value_1"), filter1);
+                }
             }
+
+            if (filter2 != null)
+                assertFormElementEquals(Locator.id("value_2"), filter2);
             else
-            {
-                assertFormElementEquals(Locator.id("value_1"), filter1);
-            }
-        }
+                assertFormElementEquals(Locator.name("filterType_2"), "No Other Filter");
 
-        if(filter2!=null)
-            assertFormElementEquals(Locator.id("value_2"), filter2);
-        else
-            assertFormElementEquals(Locator.name("filterType_2"), "No Other Filter");
-
-        clickButtonContainingText("CANCEL", 0);
+            clickButtonContainingText("CANCEL", 0);
         }
 
         executeScript("LABKEY.DataRegions['" + TABLE_NAME + "'].clearAllFilters();");
@@ -663,7 +665,7 @@ public class FilterTest extends BaseWebDriverTest
         assertTextNotPresent(textNotPresentAfterFilter);
         //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx
         assertFilterTextPresent(columnName, filter1Type, filter1);
-        if(filter2Type!=null)
+        if (filter2Type != null)
         {
             assertFilterTextPresent(columnName, filter2Type, filter2);
         }

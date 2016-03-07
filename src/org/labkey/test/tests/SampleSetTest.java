@@ -72,11 +72,6 @@ public class SampleSetTest extends BaseWebDriverTest
         return Arrays.asList("experiment");
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
     @Override
     protected String getProjectName()
     {
@@ -251,33 +246,38 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit");
 
         clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
+
+        // These two regions are used throughout the remaining jumps comparing parent/child sets
+        DataRegionTable childMaterialsRegion = new DataRegionTable("childMaterials", this);
+        DataRegionTable parentMaterialsRegion = new DataRegionTable("parentMaterials", this);
+
         // Filter out any child materials, though there shouldn't be any
-        setFilter("childMaterials", "Name", "Is Blank");
+        childMaterialsRegion.setFilter("Name", "Is Blank");
         // Check for parents and grandparents
         assertTextPresent("SampleSetBVTChildB", "SampleSetBVT4", "SampleSetBVT11");
 
         // Verify that we've chained things together properly
         clickAndWait(Locator.linkWithText("SampleSetBVTChildA"));
         // Filter out any child materials so we can just check for parents
-        setFilter("childMaterials", "Name", "Is Blank");
+        childMaterialsRegion.setFilter("Name", "Is Blank");
         assertTextPresent("SampleSetBVT11");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
-        setFilter("parentMaterials", "Name", "Is Blank");
-        clearFilter("childMaterials", "Name");
+        parentMaterialsRegion.setFilter("Name", "Is Blank");
+        childMaterialsRegion.clearFilter("Name");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVT11"));
         assertTextPresent("SampleSetBVTGrandchildA");
 
         // Go up the chain one more hop
-        clearAllFilters("parentMaterials", "Name");
+        parentMaterialsRegion.clearAllFilters("Name");
         clickAndWait(Locator.linkWithText("SampleSetBVT11"));
         // Filter out any child materials so we can just check for parents
-        setFilter("childMaterials", "Name", "Is Blank");
+        childMaterialsRegion.setFilter("Name", "Is Blank");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVTChildA"));
         assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
-        setFilter("parentMaterials", "Name", "Is Blank");
-        clearFilter("childMaterials", "Name");
+        parentMaterialsRegion.setFilter("Name", "Is Blank");
+        childMaterialsRegion.clearFilter("Name");
         assertTextPresent("SampleSetBVTChildA", "SampleSetBVTGrandchildA");
 
         clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
@@ -290,20 +290,18 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTextPresent("2.222");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVT4"));
         // Filter out any child materials so we can just check for parents
-        setFilter("childMaterials", "Name", "Is Blank");
+        childMaterialsRegion.setFilter("Name", "Is Blank");
         assertElementPresent(Locator.linkWithText("SampleSetBVT14"));
         assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
-        setFilter("parentMaterials", "Name", "Is Blank");
-        clearFilter("childMaterials", "Name");
+        parentMaterialsRegion.setFilter("Name", "Is Blank");
+        childMaterialsRegion.clearFilter("Name");
         assertElementNotPresent(Locator.linkWithText("SampleSetBVT14"));
         assertElementPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
         // Verify that the event was audited
         goToModule("Query");
-        selectQuery("auditLog", "SampleSetAuditEvent");
-        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText("view data"));
+        viewQueryData("auditLog", "SampleSetAuditEvent");
         assertTextPresent(
                 "Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
                 "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
@@ -338,7 +336,6 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void enableFileInput()
     {
-        String inputFormID =   "name2-input";
         String fileField = "FileAttachment";
         clickButton("Edit Fields");
         waitForElement(Locator.lkButton("Add Field"), defaultWaitForPage);

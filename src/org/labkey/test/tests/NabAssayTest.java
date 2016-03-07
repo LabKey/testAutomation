@@ -405,9 +405,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // Verify that the edit was audited
         goToModule("Query");
-        selectQuery("auditLog", "ExperimentAuditEvent");
-        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText("view data"));
+        viewQueryData("auditLog", "ExperimentAuditEvent");
         assertTextPresent("Run edited",
                 "Plate Number changed from blank to 'EditedPlateNumber'",
                 "Host Cell changed from blank to 'EditedHostCell'",
@@ -433,13 +431,14 @@ public class NabAssayTest extends AbstractQCAssayTest
         executeScript("LABKEY.DataRegions['Data'].clearAllFilters();");
         assertAliasedAUCCellData();
 
-        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
+        DataRegionTable region = new DataRegionTable("Data", this);
+        region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
-        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
+        region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A", "ptid 1 B");
         assertTextNotPresent("ptid 1 C", "ptid 5");
-        checkAllOnPage("Data");
+        region.checkAllOnPage();
         clickButton("Copy to Study");
 
         selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
@@ -469,7 +468,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         // create user with read permissions to study and dataset, but no permissions to source assay
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_STUDY1);
-        pushLocation();  // Save our location because impersonatied user won't have permission to project
+        pushLocation();  // Save our location because impersonated user won't have permission to project
         _permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
         setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
         setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);

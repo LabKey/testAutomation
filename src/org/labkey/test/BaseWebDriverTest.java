@@ -2102,8 +2102,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int complete = 0;
 
         for (String statusValue : statusValues)
+        {
             if ("COMPLETE".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
                 complete++;
+        }
 
         return complete;
     }
@@ -2111,11 +2113,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // Returns count of "COMPLETE" and "ERROR"
     public int getFinishedCount(List<String> statusValues)
     {
-        int finsihed = 0;
+        int finished = 0;
         for (String statusValue : statusValues)
             if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
-                finsihed++;
-        return finsihed;
+                finished++;
+        return finished;
     }
 
     /**
@@ -2126,166 +2128,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         DataRegionTable table = new DataRegionTable(tableName, this);
         return table.getFullColumnValues(columnNames);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String)}
-     */
-    @Deprecated
-    public void setFilter(String regionName, String columnName, String filterType)
-    {
-        setUpFilter(regionName, columnName, filterType, null);
-        clickButton("OK");
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String)}
-     */
-    @Deprecated
-    public void setFilter(String regionName, String columnName, String filterType, String filter)
-    {
-        setFilter(regionName, columnName, filterType, filter, WAIT_FOR_PAGE);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String, int)}
-     */
-    @Deprecated
-    public void setFilter(String regionName, String columnName, String filterType, String filter, int waitMillis)
-    {
-        setUpFilter(regionName, columnName, filterType, filter);
-        clickButton("OK", waitMillis);
-    }
-
-    public void setUpFilter(String regionName, String columnName, String filterType, @Nullable String filter)
-    {
-        setUpFilter(regionName, columnName, filterType, filter, null, null);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String, int)}
-     */
-    @Deprecated
-    public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
-    {
-        setUpFilter(regionName, columnName, filterType, filter);
-        clickButton("OK", milliSeconds);
-    }
-
-    /**
-     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
-     */
-    public void setUpFilter(String regionName, String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable String filter2)
-    {
-        String log = "Setting filter in " + regionName + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
-        if (filter2Type != null)
-        {
-            log += " and " + filter2Type.toLowerCase() + (filter2 != null ? " " + filter2 : "");
-        }
-        log(log);
-
-        openFilter(regionName, columnName);
-
-        if (isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
-        {
-            log("Switching to advanced filter UI");
-            _extHelper.clickExtTab("Choose Filters");
-            waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
-        }
-        _extHelper.selectComboBoxItem("Filter Type:", filter1Type); //Select combo box item.
-        if(filter1 != null && !filter1Type.contains("Blank"))
-            setFormElement(Locator.id("value_1"), filter1);
-        if(filter2Type!=null && !filter2Type.contains("Blank"))
-        {
-            _extHelper.selectComboBoxItem("and:", filter2Type); //Select combo box item.
-            if(filter2 != null) setFormElement(Locator.id("value_2"), filter2);
-        }
-    }
-
-    /**
-     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
-     */
-    public void setFilter(String regionName, String columnName, String filter1Type, String filter1, String filter2Type, String filter2)
-    {
-        setUpFilter(regionName, columnName, filter1Type, filter1, filter2Type, filter2);
-        clickButton("OK");
-    }
-
-    /**
-     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
-     */
-    public void setUpFacetedFilter(String regionName, String columnName, String... values)
-    {
-        String log;
-        if (values.length > 0)
-        {
-            log = "Setting filter in " + regionName + " for " + columnName + " to one of: [";
-            for(String v : values)
-            {
-                log += v + ", ";
-            }
-            log = log.substring(0, log.length() - 2) + "]";
-        }
-        else
-        {
-            log = "Clear filter in " + regionName + " for " + columnName;
-        }
-
-        log(log);
-
-        openFilter(regionName, columnName);
-        String columnLabel = getText(DataRegionTable.Locators.columnHeader(regionName, columnName));
-
-        sleep(500);
-
-        // Clear selections.
-        assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
-        if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
-            click(Locator.linkWithText("[All]"));
-        click(Locator.linkWithText("[All]"));
-
-        if(values.length > 1)
-        {
-            for(String v : values)
-            {
-                click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...") +
-                        "//div[contains(@class,'x-grid3-row') and .//span[text()='" + v + "']]//div[@class='x-grid3-row-checker']"));
-            }
-        }
-        else if (values.length == 1)
-        {
-            click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
-                    "//div[contains(@class,'x-grid3-row')]//span[text()='"+values[0]+"']"));
-        }
-    }
-
-    /**
-     * TODO: Move to {@link org.labkey.test.util.DataRegionTable}
-     */
-    public void setFacetedFilter(String regionName, String columnName, String... values)
-    {
-        setUpFacetedFilter(regionName, columnName, values);
-        clickButton("OK");
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#openFilterDialog(String)}
-     */
-    @Deprecated
-    public void openFilter(String regionName, String columnName)
-    {
-        (new DataRegionTable(regionName, this)).openFilterDialog(columnName);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#clearAllFilters(String)}
-     */
-    @Deprecated
-    public void clearAllFilters(String regionName, String columnName)
-    {
-        log("Clearing filter in " + regionName + " for " + columnName);
-        openFilter(regionName, columnName);
-        clickButton("CLEAR ALL FILTERS");
     }
 
     public String getPropertyXPath(String propertyHeading)
