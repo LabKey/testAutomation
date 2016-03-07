@@ -28,7 +28,7 @@ import java.util.Map;
 @Category({DRT.class})
 public class JUnitDRTTest
 {
-    static boolean accept(Map<String, Object> test)
+    public static boolean accept(Map<String, Object> test)
     {
         return "DRT".equals(JUnitTest.getWhen(test));
     }
