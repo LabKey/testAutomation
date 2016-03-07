@@ -22,12 +22,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.FileBrowserHelper;
-import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.FileBrowserHelper.BrowserAction;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -59,6 +57,30 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     public void preTest()
     {
         goToProjectHome();
+
+        // ensure that the file browser is in the default state
+        resetToDefaultToolbar();
+    }
+
+    @Test
+    public void testDefaultActions()
+    {
+        Collection<BrowserAction> buttonsWithText = new HashSet<>(Arrays.asList(
+                BrowserAction.UPLOAD,
+                BrowserAction.IMPORT_DATA,
+                BrowserAction.AUDIT_HISTORY,
+                BrowserAction.ADMIN)
+        );
+
+        // All icons are present by default
+        for (BrowserAction action : BrowserAction.values())
+        {
+            assertElementPresent(action.getButtonIconLocator());
+            if (buttonsWithText.contains(action))
+                assertElementPresent(action.getButtonTextLocator());
+            else
+                assertElementNotPresent(action.getButtonTextLocator());
+        }
     }
 
     @Test
@@ -67,18 +89,18 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         impersonateRoles("Editor");
 
         assertActionsAvailable(
-                FileBrowserHelper.BrowserAction.FOLDER_TREE,
-                FileBrowserHelper.BrowserAction.UP,
-                FileBrowserHelper.BrowserAction.RELOAD,
-                FileBrowserHelper.BrowserAction.NEW_FOLDER,
-                FileBrowserHelper.BrowserAction.DOWNLOAD,
-                FileBrowserHelper.BrowserAction.DELETE,
-                FileBrowserHelper.BrowserAction.RENAME,
-                FileBrowserHelper.BrowserAction.MOVE,
-                FileBrowserHelper.BrowserAction.EDIT_PROPERTIES,
-                FileBrowserHelper.BrowserAction.UPLOAD,
-                FileBrowserHelper.BrowserAction.IMPORT_DATA,
-                FileBrowserHelper.BrowserAction.EMAIL_SETTINGS
+                BrowserAction.FOLDER_TREE,
+                BrowserAction.UP,
+                BrowserAction.RELOAD,
+                BrowserAction.NEW_FOLDER,
+                BrowserAction.DOWNLOAD,
+                BrowserAction.DELETE,
+                BrowserAction.RENAME,
+                BrowserAction.MOVE,
+                BrowserAction.EDIT_PROPERTIES,
+                BrowserAction.UPLOAD,
+                BrowserAction.IMPORT_DATA,
+                BrowserAction.EMAIL_SETTINGS
         );
 
         stopImpersonatingRole();
@@ -90,15 +112,15 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         impersonateRoles("Submitter", "Reader");
 
         assertActionsAvailable(
-                FileBrowserHelper.BrowserAction.FOLDER_TREE,
-                FileBrowserHelper.BrowserAction.UP,
-                FileBrowserHelper.BrowserAction.RELOAD,
-                FileBrowserHelper.BrowserAction.NEW_FOLDER,
-                FileBrowserHelper.BrowserAction.DOWNLOAD,
-                FileBrowserHelper.BrowserAction.EDIT_PROPERTIES,
-                FileBrowserHelper.BrowserAction.UPLOAD,
-                FileBrowserHelper.BrowserAction.IMPORT_DATA,
-                FileBrowserHelper.BrowserAction.EMAIL_SETTINGS
+                BrowserAction.FOLDER_TREE,
+                BrowserAction.UP,
+                BrowserAction.RELOAD,
+                BrowserAction.NEW_FOLDER,
+                BrowserAction.DOWNLOAD,
+                BrowserAction.EDIT_PROPERTIES,
+                BrowserAction.UPLOAD,
+                BrowserAction.IMPORT_DATA,
+                BrowserAction.EMAIL_SETTINGS
         );
 
         stopImpersonatingRole();
@@ -110,15 +132,15 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         impersonateRoles("Author");
 
         assertActionsAvailable(
-                FileBrowserHelper.BrowserAction.FOLDER_TREE,
-                FileBrowserHelper.BrowserAction.UP,
-                FileBrowserHelper.BrowserAction.RELOAD,
-                FileBrowserHelper.BrowserAction.NEW_FOLDER,
-                FileBrowserHelper.BrowserAction.DOWNLOAD,
-                FileBrowserHelper.BrowserAction.EDIT_PROPERTIES,
-                FileBrowserHelper.BrowserAction.UPLOAD,
-                FileBrowserHelper.BrowserAction.IMPORT_DATA,
-                FileBrowserHelper.BrowserAction.EMAIL_SETTINGS
+                BrowserAction.FOLDER_TREE,
+                BrowserAction.UP,
+                BrowserAction.RELOAD,
+                BrowserAction.NEW_FOLDER,
+                BrowserAction.DOWNLOAD,
+                BrowserAction.EDIT_PROPERTIES,
+                BrowserAction.UPLOAD,
+                BrowserAction.IMPORT_DATA,
+                BrowserAction.EMAIL_SETTINGS
         );
 
         stopImpersonatingRole();
@@ -130,11 +152,11 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
         impersonateRoles("Reader");
 
         assertActionsAvailable(
-                FileBrowserHelper.BrowserAction.FOLDER_TREE,
-                FileBrowserHelper.BrowserAction.UP,
-                FileBrowserHelper.BrowserAction.RELOAD,
-                FileBrowserHelper.BrowserAction.DOWNLOAD,
-                FileBrowserHelper.BrowserAction.EMAIL_SETTINGS
+                BrowserAction.FOLDER_TREE,
+                BrowserAction.UP,
+                BrowserAction.RELOAD,
+                BrowserAction.DOWNLOAD,
+                BrowserAction.EMAIL_SETTINGS
         );
 
         stopImpersonatingRole();
@@ -143,58 +165,40 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @Test
     public void testCustomizeToolbar()
     {
-        assertDefaultBrowserButtons();
-
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.removeToolbarButton("refresh");
         click(Locator.xpath("//tr[@data-recordid='download']/td[2]")); // Unhide text for 'Download' button
         click(Locator.xpath("//tr[@data-recordid='download']/td[3]")); // Hide icon for 'Download' button
         click(Ext4Helper.Locators.ext4Button("submit"));
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.RELOAD.getButtonIconLocator());
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonIconLocator());
-        waitForElement(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonTextLocator());
+        waitForElementToDisappear(BrowserAction.RELOAD.getButtonIconLocator());
+        waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonIconLocator());
+        waitForElement(BrowserAction.DOWNLOAD.getButtonTextLocator());
 
         // Verify custom action buttons
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.removeToolbarButton("download");
         _fileBrowserHelper.addToolbarButton("refresh");
         click(Ext4Helper.Locators.ext4Button("submit"));
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonTextLocator());
-        waitForElementToDisappear(FileBrowserHelper.BrowserAction.DOWNLOAD.getButtonIconLocator());
-        waitForElement(FileBrowserHelper.BrowserAction.RELOAD.getButtonIconLocator());
-        waitForElement(FileBrowserHelper.BrowserAction.RELOAD.getButtonTextLocator());
+        waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonTextLocator());
+        waitForElementToDisappear(BrowserAction.DOWNLOAD.getButtonIconLocator());
+        waitForElement(BrowserAction.RELOAD.getButtonIconLocator());
+        waitForElement(BrowserAction.RELOAD.getButtonTextLocator());
 
+        resetToDefaultToolbar();
+        waitForElement(BrowserAction.UP.getButtonIconLocator());
+    }
+
+    private void assertActionsAvailable(BrowserAction... actions)
+    {
+        assertEquals(Arrays.asList(actions), _fileBrowserHelper.getAvailableBrowserActions());
+    }
+
+    private void resetToDefaultToolbar()
+    {
         _fileBrowserHelper.goToConfigureButtonsTab();
         clickButton("Reset to Default", 0);
         waitAndClick(Ext4Helper.Locators.windowButton("Confirm Reset", "Yes"));
         _ext4Helper.waitForMaskToDisappear();
-        waitForElement(FileBrowserHelper.BrowserAction.UP.getButtonIconLocator());
-        assertDefaultBrowserButtons();
-    }
-
-    @LogMethod(quiet = true)
-    private void assertDefaultBrowserButtons()
-    {
-        Collection<FileBrowserHelper.BrowserAction> buttonsWithText = new HashSet<>(Arrays.asList(
-                FileBrowserHelper.BrowserAction.UPLOAD,
-                FileBrowserHelper.BrowserAction.IMPORT_DATA,
-                FileBrowserHelper.BrowserAction.AUDIT_HISTORY,
-                FileBrowserHelper.BrowserAction.ADMIN));
-
-        // All icons are present by default
-        for (FileBrowserHelper.BrowserAction action : FileBrowserHelper.BrowserAction.values())
-        {
-            assertElementPresent(action.getButtonIconLocator());
-            if (buttonsWithText.contains(action))
-                assertElementPresent(action.getButtonTextLocator());
-            else
-                assertElementNotPresent(action.getButtonTextLocator());
-        }
-    }
-
-    private void assertActionsAvailable(FileBrowserHelper.BrowserAction... actions)
-    {
-        assertEquals(Arrays.asList(actions), _fileBrowserHelper.getAvailableBrowserActions());
     }
 
     @Nullable
