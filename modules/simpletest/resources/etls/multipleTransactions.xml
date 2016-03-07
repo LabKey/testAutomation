@@ -6,7 +6,7 @@
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
         <source schemaName="vehicle" queryName="transactionTest" />
-        <destination schemaName="vehicle" queryName="etl_target2" transactionSize="2" targetOption="truncate"/>
+        <destination schemaName="vehicle" queryName="etl_target2" batchSize="2" targetOption="truncate"/>
     </transform>
 </transforms>
 <incrementalFilter className="SelectAllFilterStrategy" />
