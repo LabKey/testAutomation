@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.Locator;
@@ -37,9 +38,11 @@ import org.labkey.test.pages.dataintegration.ETLScheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -316,7 +319,7 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testPipelineFileAnalysisTask() throws Exception
     {
-        doPipelineFileAnalysis("targetFile", null);
+        doSingleFilePipelineFileAnalysis("targetFile", null);
     }
 
     /**
@@ -325,52 +328,84 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testQueueAnotherEtl() throws Exception
     {
-        doPipelineFileAnalysis("targetFileQueueTail", ETL_OUT);
+        doSingleFilePipelineFileAnalysis("targetFileQueueTail", ETL_OUT);
     }
 
-    private void doPipelineFileAnalysis(String etl, @Nullable String outputSubDir) throws Exception
+    private void doSingleFilePipelineFileAnalysis(String etl, @Nullable String outputSubDir) throws Exception
     {
-        File dir = setupPipelineFileAnalysis();
-        if (null != outputSubDir)
-        {
-            dir = new File(dir, outputSubDir);
-        }
+        insertSingleFileAnalysisSourceData();
+        File dir = setupPipelineFileAnalysis(outputSubDir);
         String jobId = _etlHelper.runETL_API(etl).getJobId();
         validatePipelineFileAnalysis(dir, jobId);
     }
 
     private void validatePipelineFileAnalysis(File dir, String jobId) throws IOException, CommandException
     {
-        String baseName = "report-" + _diHelper.getTransformRunFieldByJobId(jobId, "transformRunId");
-        File etlFile = new File(dir, baseName + ".testIn.tsv");
-        String fileContents = TestFileUtils.getFileContents(etlFile);
-        String[] rows = fileContents.split("[\\n\\r]+");
-        String expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
-                "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified"
-                : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified";
-        assertEquals("ETL output file did not contain header", expected, rows[0]);
-        assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
-        assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
-        //file created by external pipeline
-        File etlFile2 = new File(dir, baseName + ".testOut.tsv");
-        fileContents = TestFileUtils.getFileContents(etlFile2);
-        rows = fileContents.split("[\\n\\r]+");
-        assertEquals("First row was not for 'Subject 2'", "Subject 2", rows[1].split(",")[5]);
-        assertEquals("Second row was not for 'Subject 3'", "Subject 3", rows[2].split(",")[5]);
+        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, null, true);
+        String[] expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
+                "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified".split(",")
+                : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified".split(",");
+        // Validate the initially written tsv file
+        assertArrayEquals("ETL output file did not contain header", expected, fileRows.first.get(0));
+
+        validateFileRow(fileRows.first, 1, "Subject 2");
+        validateFileRow(fileRows.first, 2, "Subject 3");
+        // Validate the file output from the pipeline job
+        validateFileRow(fileRows.second, 1, "Subject 2");
+        validateFileRow(fileRows.second, 2, "Subject 3");
     }
 
     @NotNull
-    private File setupPipelineFileAnalysis() throws IOException
+    private File setupPipelineFileAnalysis(String outputSubDir) throws IOException
     {
-        _etlHelper.insertSourceRow("2", "Subject 2", null);
-        _etlHelper.insertSourceRow("3", "Subject 3", null);
         //file ETL output and external pipeline test
         File dir = TestFileUtils.getTestTempDir();
         FileUtils.deleteDirectory(dir);
         //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
         setPipelineRoot(dir.getAbsolutePath());
+        if (null != outputSubDir)
+        {
+            dir = new File(dir, outputSubDir);
+        }
         return dir;
+    }
+
+    private void insertSingleFileAnalysisSourceData()
+    {
+        _etlHelper.insertSourceRow("2", "Subject 2", null);
+        _etlHelper.insertSourceRow("3", "Subject 3", null);
+    }
+
+    private Pair<List<String[]>, List<String[]>> readFile(File dir, String jobId, @Nullable Integer batchNum, boolean expectOutFile) throws IOException, CommandException
+    {
+        Pair<List<String[]>, List<String[]>> results = new Pair<>(new ArrayList<>(), new ArrayList<>());
+
+        String baseName = "report-" + _diHelper.getTransformRunFieldByJobId(jobId, "transformRunId");
+        if (null != batchNum && batchNum > 0)
+            baseName = baseName + "-" + batchNum;
+        File etlFile = new File(dir, baseName + ".testIn.tsv");
+        String fileContents = TestFileUtils.getFileContents(etlFile);
+
+        List<String> rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
+        for (String row : rows)
+            results.first.add(row.split(","));
+
+        if (expectOutFile)
+        {
+            //file created by external pipeline
+            File etlFile2 = new File(dir, baseName + ".testOut.tsv");
+            fileContents = TestFileUtils.getFileContents(etlFile2);
+            rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
+            for (String row : rows)
+                results.second.add(row.split(","));
+        }
+        return results;
+    }
+
+    private void validateFileRow(List<String[]> rows, int index, String name)
+    {
+        assertEquals("Row " + index + " was not for '" + name +"'", name, rows.get(index)[5]);
     }
 
     /**
@@ -431,7 +466,7 @@ public class ETLTest extends ETLBaseTest
     public void testRetryCancelledPipelineTask() throws IOException, CommandException
     {
         final String TARGET_FILE_WITH_SLEEP = _etlHelper.ensureFullIdString("targetFileWithSleep");
-        File dir = new File(setupPipelineFileAnalysis(), ETL_OUT);
+        File dir = setupPipelineFileAnalysis(ETL_OUT);
         _etlHelper.runETLNoNavNoWait(TARGET_FILE_WITH_SLEEP, true, false);
         refresh();
         clickButton("Cancel");
@@ -522,5 +557,71 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.incrementExpectedErrorCount(normalErrorCount);
         refresh();
         assertTextPresent(expectedError, 2);
+    }
+
+    @Test
+    public void testBatchingToMultipleFiles() throws Exception
+    {
+        final String BATCH_FILES = "targetBatchedFiles";
+        insertMultipleFilesSourceData();
+        File dir = setupPipelineFileAnalysis(ETL_OUT);
+        String jobId = _etlHelper.runETL_API(BATCH_FILES).getJobId();
+
+        log("Validating output file count and content");
+        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, false);
+        validateFileRow(fileRows.first, 1, "row 1");
+        validateFileRow(fileRows.first, 2, "row 2");
+        fileRows = readFile(dir, jobId, 2, false);
+        validateFileRow(fileRows.first, 1, "row 3");
+        validateFileRow(fileRows.first, 2, "row 4");
+        fileRows = readFile(dir, jobId, 3, false);
+        validateFileRow(fileRows.first, 1, "row 5");
+    }
+
+    @Test
+    public void testBatchingMultipleFilesByBatchColumn() throws Exception
+    {
+        final String BATCH_FILES_WITH_BATCH_COLUMN = "targetBatchedFilesWithBatchColumn";
+        insertMultipleFilesSourceData();
+        File dir = setupPipelineFileAnalysis(ETL_OUT);
+        String jobId = _etlHelper.runETL_API(BATCH_FILES_WITH_BATCH_COLUMN).getJobId();
+
+        log("Validating output file count and content");
+        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, false);
+        validateFileRow(fileRows.first, 1, "row 1");
+        validateFileRow(fileRows.first, 2, "row 2");
+        validateFileRow(fileRows.first, 3, "row 3");
+        validateFileRow(fileRows.first, 4, "row 4");
+        fileRows = readFile(dir, jobId, 2, false);
+        validateFileRow(fileRows.first, 1, "row 5");
+    }
+    
+    @Test
+    public void testBatchingMultipleFilesQueuingMultipleTails() throws Exception
+    {
+        final String BATCH_FILES_QUEUE_TAIL = "targetBatchedFilesQueueTail";
+        insertMultipleFilesSourceData();
+        File dir = setupPipelineFileAnalysis(ETL_OUT);
+        String jobId = _etlHelper.runETL_API(BATCH_FILES_QUEUE_TAIL).getJobId();
+
+        // Just validate the final output files, the testBatchingMultipleFilesByBatchColumn test case already validated the intermediate files 
+        log("Validating queued pipeline jobs output file count and content");
+        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, true);
+        validateFileRow(fileRows.second, 1, "row 1");
+        validateFileRow(fileRows.second, 2, "row 2");
+        fileRows = readFile(dir, jobId, 2, true);
+        validateFileRow(fileRows.second, 1, "row 3");
+        validateFileRow(fileRows.second, 2, "row 4");
+        fileRows = readFile(dir, jobId, 3, true);
+        validateFileRow(fileRows.second, 1, "row 5");    
+    }
+    
+    private void insertMultipleFilesSourceData()
+    {
+        _etlHelper.insertSourceRow("1", "row 1", "1");
+        _etlHelper.insertSourceRow("2", "row 2", "1");
+        _etlHelper.insertSourceRow("3", "row 3", "2");
+        _etlHelper.insertSourceRow("4", "row 4", "2");
+        _etlHelper.insertSourceRow("5", "row 5", "3");
     }
 }
