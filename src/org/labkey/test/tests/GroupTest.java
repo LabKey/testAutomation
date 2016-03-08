@@ -145,7 +145,7 @@ public class GroupTest extends BaseWebDriverTest
         int userColumn = 1;
         int accessColumn = 2;
 
-        int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
+        int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0])); // TODO: off by two, but internally consistent
         List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
         List<String> groupsForUser = Arrays.asList(drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(","));
 
@@ -153,10 +153,10 @@ public class GroupTest extends BaseWebDriverTest
         assertEquals("Unexpected groups", new HashSet<>(expectedGroups), new HashSet<>(groupsForUser));
 
         //expand plus to check specific groups
-        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex));
+        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex + 2)); // TODO: Bad index
 
         //confirm details link leads to right user, page
-        clickAndWait(Locator.linkContainingText("details").index(rowIndex));
+        clickAndWait(Locator.linkContainingText("details").index(rowIndex + 2)); // TODO: Bad index
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
         assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();
