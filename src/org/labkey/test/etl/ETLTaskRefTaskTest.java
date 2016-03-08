@@ -92,7 +92,10 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
         assertTrue("Setting1 was not presisted with a value of 'test'.", _diHelper.getTransformState(ETL).contains("\"setting1\":\"test\""));
     }
 
-    // Include this here b/c it only needs basic setup
+    /**
+    * Include this here b/c it only needs basic setup
+    * By default, etl's shouldn't allowed to have multiple instances queued and waiting
+    */
     @Test
     public void testBlockDoubleQueue() throws Exception
     {
@@ -105,6 +108,9 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
 
     }
 
+    /**
+     * For an etl explicitly configured to allow multiple queuing, verify that we can in fact have multiple instances in the queue
+     */
     @Test
     public void testAllowDoubleQueue() throws Exception
     {

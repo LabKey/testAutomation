@@ -595,7 +595,13 @@ public class ETLTest extends ETLBaseTest
         fileRows = readFile(dir, jobId, 2, false);
         validateFileRow(fileRows.first, 1, "row 5");
     }
-    
+
+    /**
+     * Output to multiple files, and queue a pipeline job (tail the file) for each.
+     * Verifies that we implicitly allowing of multiple queuing of etl's that start
+     * with an external pipeline task as their first step.
+     *
+     */
     @Test
     public void testBatchingMultipleFilesQueuingMultipleTails() throws Exception
     {
