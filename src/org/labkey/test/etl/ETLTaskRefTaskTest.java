@@ -94,7 +94,7 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
 
     /**
     * Include this here b/c it only needs basic setup
-    * By default, etl's shouldn't allowed to have multiple instances queued and waiting
+    * By default, etls shouldn't be allowed to have multiple instances queued and waiting
     */
     @Test
     public void testBlockDoubleQueue() throws Exception
@@ -105,7 +105,6 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
         // lastly, wait for the queued job to finish running
         clickTab("Pipeline");
         waitForRunningPipelineJobs(21000);
-
     }
 
     /**

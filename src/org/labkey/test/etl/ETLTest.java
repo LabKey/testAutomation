@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -388,8 +389,7 @@ public class ETLTest extends ETLBaseTest
         String fileContents = TestFileUtils.getFileContents(etlFile);
 
         List<String> rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
-        for (String row : rows)
-            results.first.add(row.split(","));
+        results.first.addAll(rows.stream().map(row -> row.split(",")).collect(Collectors.toList()));
 
         if (expectOutFile)
         {
@@ -397,15 +397,15 @@ public class ETLTest extends ETLBaseTest
             File etlFile2 = new File(dir, baseName + ".testOut.tsv");
             fileContents = TestFileUtils.getFileContents(etlFile2);
             rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
-            for (String row : rows)
-                results.second.add(row.split(","));
+            results.second.addAll(rows.stream().map(row -> row.split(",")).collect(Collectors.toList()));
         }
         return results;
     }
 
     private void validateFileRow(List<String[]> rows, int index, String name)
     {
-        assertEquals("Row " + index + " was not for '" + name +"'", name, rows.get(index)[5]);
+        // The 6th field in the tsv is the name column; verify it's what we expect
+        assertEquals("Row " + index + " was not for name '" + name +"'", name, rows.get(index)[5]);
     }
 
     /**
@@ -466,6 +466,7 @@ public class ETLTest extends ETLBaseTest
     public void testRetryCancelledPipelineTask() throws IOException, CommandException
     {
         final String TARGET_FILE_WITH_SLEEP = _etlHelper.ensureFullIdString("targetFileWithSleep");
+        insertSingleFileAnalysisSourceData();
         File dir = setupPipelineFileAnalysis(ETL_OUT);
         _etlHelper.runETLNoNavNoWait(TARGET_FILE_WITH_SLEEP, true, false);
         refresh();
