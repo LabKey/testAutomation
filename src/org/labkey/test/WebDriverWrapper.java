@@ -1638,12 +1638,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0)
         {
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
-            doAndWaitForElementToRefresh(func, Locator.css("*"), new WebDriverWait(getDriver(), msWait < 1000 ? 1 : (msWait / 1000)));
-            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+            prepForPageLoad();
         }
-        else
+
+        func.run();
+
+        if (msWait > 0)
         {
-            func.run();
+            waitForPageToLoad(msWait);
+            getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         }
 
         return System.currentTimeMillis() - startTime;
