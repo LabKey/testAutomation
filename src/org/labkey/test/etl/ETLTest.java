@@ -631,4 +631,15 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.insertSourceRow("4", "row 4", "2");
         _etlHelper.insertSourceRow("5", "row 5", "3");
     }
+
+    @Test
+    public void truncateWithoutDataTransfer() throws Exception
+    {
+        final String NAME = "row 1";
+        _etlHelper.insertSourceRow("1", NAME, "1");
+        _etlHelper.runETL_API(APPEND);
+        _etlHelper.assertInTarget1(NAME);
+        _etlHelper.runETL_API("truncateWithoutDataTransfer");
+        _etlHelper.assertNotInTarget1(NAME);
+    }
 }

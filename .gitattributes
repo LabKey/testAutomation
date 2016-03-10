@@ -189,6 +189,7 @@ modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/
 modules/simpletest/resources/etls/targetFileQueueTail.xml -text
 modules/simpletest/resources/etls/targetFileWithSleep.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/truncate.xml -text
+modules/simpletest/resources/etls/truncateWithoutDataTransfer.xml -text
 modules/simpletest/resources/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/FolderWithRestrictedModule.folderType.xml -text
