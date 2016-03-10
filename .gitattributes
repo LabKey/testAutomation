@@ -448,6 +448,7 @@ src/org/labkey/test/qc/build.xml -text
 src/org/labkey/test/selenium/EphemeralWebElement.java -text
 src/org/labkey/test/selenium/LazyWaitingWebElement.java -text
 src/org/labkey/test/selenium/LazyWebElement.java -text
+src/org/labkey/test/selenium/RefindingWebElement.java -text
 src/org/labkey/test/selenium/WebElementWrapper.java -text
 src/org/labkey/test/studysampler/Runner.java -text
 src/org/labkey/test/studysampler/words.txt -text
@@ -664,7 +665,6 @@ src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PermissionsHelper.java -text
 src/org/labkey/test/util/PipelineAnalysisHelper.java -text
-src/org/labkey/test/util/PipelineHelper.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/PipelineToolsHelper.java -text
 src/org/labkey/test/util/PortalHelper.java -text

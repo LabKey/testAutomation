@@ -32,7 +32,7 @@ public class EphemeralWebElement extends LazyWebElement
     @Override
     public WebElement getWrappedElement()
     {
-        _webElement = null;
+        _wrappedElement = null;
         return super.getWrappedElement();
     }
 }

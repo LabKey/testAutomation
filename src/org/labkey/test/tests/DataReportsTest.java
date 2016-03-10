@@ -222,10 +222,10 @@ public class DataReportsTest extends ReportTest
                 counts.put(value, count + 1);
             }
         }
-        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[0], 3, counts.get(PTIDS_FOR_CUSTOM_VIEW[0]).intValue());
-        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[1], 1, counts.get(PTIDS_FOR_CUSTOM_VIEW[1]).intValue());
-        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[2], 3, counts.get(PTIDS_FOR_CUSTOM_VIEW[2]).intValue());
-        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[3], 3, counts.get(PTIDS_FOR_CUSTOM_VIEW[3]).intValue());
+        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[0], new Integer(3), counts.get(PTIDS_FOR_CUSTOM_VIEW[0]));
+        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[1], new Integer(1), counts.get(PTIDS_FOR_CUSTOM_VIEW[1]));
+        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[2], new Integer(3), counts.get(PTIDS_FOR_CUSTOM_VIEW[2]));
+        assertEquals("Wrong number of rows for ptid: " + PTIDS_FOR_CUSTOM_VIEW[3], new Integer(3), counts.get(PTIDS_FOR_CUSTOM_VIEW[3]));
     }
 
     @Test

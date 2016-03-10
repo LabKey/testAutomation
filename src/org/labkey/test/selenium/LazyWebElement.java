@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class LazyWebElement extends WebElementWrapper
 {
-    protected WebElement _webElement;
+    protected WebElement _wrappedElement;
     private Locator _locator;
     private SearchContext _searchContext;
     private Long _waitMs;
@@ -44,22 +44,25 @@ public class LazyWebElement extends WebElementWrapper
         return this;
     }
 
+    private WebElement findWrappedElement()
+    {
+        if (_waitMs != null)
+        {
+            FluentWait<SearchContext> wait = new FluentWait<>(getSearchContext());
+            wait.withTimeout(_waitMs, TimeUnit.MILLISECONDS);
+            return getLocator().waitForElement(wait);
+        }
+        else
+            return getLocator().findElement(getSearchContext());
+    }
+
     @Override
     public WebElement getWrappedElement()
     {
-        if (null == _webElement)
-        {
-            if (_waitMs != null)
-            {
-                FluentWait<SearchContext> wait = new FluentWait<>(getSearchContext());
-                wait.withTimeout(_waitMs, TimeUnit.MILLISECONDS);
-                _webElement = getLocator().waitForElement(wait);
-            }
-            else
-                _webElement = getLocator().findElement(getSearchContext());
-        }
+        if (null == _wrappedElement)
+            _wrappedElement = findWrappedElement();
 
-        return _webElement;
+        return _wrappedElement;
     }
 
     protected Locator getLocator()

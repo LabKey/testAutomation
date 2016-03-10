@@ -21,7 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.PipelineHelper;
+import org.labkey.test.util.PipelineStatusTable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,9 +44,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         click(Locator.linkWithText("Validate"));
 
-        waitForElement(Locator.id("StatusFiles"));
-
-        clickAndWait(PipelineHelper.Locators.pipelineStatusLink(0));
+        PipelineStatusTable statusTable = new PipelineStatusTable(this, false);
+        statusTable.clickStatusLink(0);
 
         waitForTextWithRefresh(30000, "Check complete");
         assertTextPresent("Check complete, 0 errors found");

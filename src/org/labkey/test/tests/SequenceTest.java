@@ -368,7 +368,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.clickNavPanelItemAndWait("Readsets:", 1);
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Download Sequence Files");
+        dr.clickHeaderButton("More Actions", "Download Sequence Files");
         waitForElement(Ext4Helper.Locators.window("Export Files"));
         waitForText("Export Files As");
         Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
@@ -390,7 +390,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying FASTQC Report");
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View FASTQC Report");
+        dr.clickHeaderButton("More Actions", "View FASTQC Report");
         waitForElement(Ext4Helper.Locators.window("FastQC"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
@@ -439,7 +439,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Align/Analyze Selected");
+        dr.clickHeaderButton("More Actions", "Align/Analyze Selected");
         waitForElement(Ext4Helper.Locators.window("Import Data"));
         waitForText("Description");
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
@@ -1153,7 +1153,7 @@ public class SequenceTest extends BaseWebDriverTest
         DataRegionTable dr = new DataRegionTable("query", test);
         dr.setFilter("name", "Equals", "SIVmac239");
         dr.checkCheckbox(0);
-        test._extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Create Reference Genome");
+        dr.clickHeaderButton("More Actions", "Create Reference Genome");
         test.waitForElement(Ext4Helper.Locators.window("Create Reference Genome"));
         Ext4FieldRef.getForLabel(test, "Name").setValue(TEST_GENOME_NAME);
         Ext4FieldRef.getForLabel(test, "Description").setValue("This is a reference genome description");

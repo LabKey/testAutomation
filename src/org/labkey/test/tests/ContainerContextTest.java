@@ -294,7 +294,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _extHelper.clickMenuButton("Views", "Create", "R View");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(folder + "-BackgroundReport");
-        waitForElement(Locator.id("query"));
+        DataRegionTable.waitForDataRegion(this, "query");
 
         log("** Executing background R script");
         _extHelper.clickMenuButton("Views", folder + "-BackgroundReport");

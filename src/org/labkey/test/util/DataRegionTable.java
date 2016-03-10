@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.ComponentElements;
+import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -47,6 +49,7 @@ public class DataRegionTable extends Component
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _regionName;
     public BaseWebDriverTest _test;
+    public WebElement _tableElement;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
@@ -62,6 +65,7 @@ public class DataRegionTable extends Component
         _test = test;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
 
+        _tableElement = table;
         _regionName = table.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
 
@@ -74,18 +78,18 @@ public class DataRegionTable extends Component
         _test = test;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
 
-        WebElement tableElement = waitForDataRegion(test, regionName);
+        _tableElement = new RefindingWebElement(Locators.dataRegion(regionName), test.getDriver());
 
-        _regionName = tableElement.getAttribute("lk-region-name");
+        _regionName = _tableElement.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
 
-        _selectors = !Locator.css(".labkey-selectors").findElements(tableElement).isEmpty();
-        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(tableElement).isEmpty();
+        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
+        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
     }
 
     private WebElement getTableElement()
     {
-        return waitForDataRegion(_test, _regionName);
+        return _tableElement;
     }
 
     @Override
@@ -121,17 +125,13 @@ public class DataRegionTable extends Component
 
     public static DataRegionTable findDataRegionWithin(BaseWebDriverTest test, SearchContext context, int index)
     {
-        Locator.CssLocator dataRegionLoc = Locator.css("table[lk-region-name]");
-        List<WebElement> dataRegions = dataRegionLoc.findElements(context);
-        if (dataRegions.size() > index)
-            return new DataRegionTable(test, dataRegions.get(index));
-
-        throw new NoSuchElementException(String.format("Not enough data regions. Index: %d, Count: %d", index, dataRegions.size()));
+        Locator dataRegionLoc = Locator.css("table[lk-region-name]").index(index);
+        return new DataRegionTable(test, new RefindingWebElement(dataRegionLoc, context));
     }
 
     public static DataRegionTable findDataRegionWithinWebpart(BaseWebDriverTest test, String webPartTitle)
     {
-        return findDataRegionWithin(test, PortalHelper.Locators.webPart(webPartTitle).findElement(test.getDriver()));
+        return findDataRegionWithin(test, new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
     }
 
     public String getTableName()
@@ -1007,6 +1007,15 @@ public class DataRegionTable extends Component
         public static Locator.XPathLocator columnHeaderWithLabel(String regionName, String fieldLabel)
         {
             return Locator.id(regionName).append(Locator.tagWithClass("td", "labkey-column-header")).withText(fieldLabel);
+        }
+    }
+
+    protected class Elements extends ComponentElements
+    {
+        @Override
+        protected SearchContext getContext()
+        {
+            return getComponentElement();
         }
     }
 }

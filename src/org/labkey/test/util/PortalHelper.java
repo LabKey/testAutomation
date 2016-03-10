@@ -485,6 +485,11 @@ public class PortalHelper extends WebDriverWrapper
             return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
         }
 
+        public static Locator.XPathLocator webPartWithTitleContaining(String partialTitle)
+        {
+            return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttributeContaining("title", partialTitle));
+        }
+
         public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");
     }
 }
