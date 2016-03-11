@@ -55,7 +55,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private static final String assay2File = "RNA Data.tsv";
     private static final String assay2File2 = "RNA Data 2.tsv";
     private static final String assay2XarPath = "/assays/RNA.xar";
-    private static final String PROGRESS_REPORT_REGION = "ProgressReport";
+    private static final String PROGRESS_REPORT_TABLE_ID = "ProgressReport";
 
     @Override
     public List<String> getAssociatedModules()
@@ -79,7 +79,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        this._containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         // verify RNA assay with ignored sampleminded data
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         ignoreSampleMindedData(assay2);
 
         // verify upload with match on Specimen ID
@@ -226,7 +226,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void verifyAssayResultInvalid(String assayName, String runName)
     {
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         assertEquals(0, getElementCount( Locator.xpath("//td[contains(@class, 'available')]")));
         assertEquals(24, getElementCount( Locator.xpath("//td[contains(@class, 'query')]")));
         assertEquals(2, getElementCount( Locator.xpath("//td[contains(@class, 'collected')]")));
@@ -236,7 +236,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         flagSpecimenForReview(assayName, null);
 
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         assertEquals(1, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         // verify legend text and ordering
@@ -248,10 +248,10 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         waitForText("48 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         waitAndClickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
         assertTextPresent("Result reported with no corresponding specimen collected", 8);
         assertTextPresent("2 results found for this participant and visit combination", 4);
@@ -262,7 +262,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void verifyUnscheduledVisitDisplay(String assayName)
     {
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         configureAssayProgressDashboard(assay2, "3");
         configureAssaySchema(assayName);
 
@@ -283,9 +283,9 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         int query = bySpecimenId ? 0 : 3;
         int expected = bySpecimenId ? 0 : 2;
 
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         assertTextPresentInThisOrder("SR1", "SR2");
         assertEquals(5 - invalid, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
         assertEquals(query, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
@@ -299,7 +299,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void verifySpecimenIdDataUpload(String assayName) throws CommandException, IOException
     {
         clickAndWait(Locator.linkWithText(assayName));
-        checkDataRegionCheckbox("Runs", 0);
+        new DataRegionTable("Runs", this).checkCheckbox(0);
         clickButton("Re-import run");
         clickButton("Next");
         checkRadioButton(Locator.radioButtonById("Fileupload"));
@@ -326,7 +326,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void flagSpecimenForReview(String assayName, @Nullable String collectionDateFilterStr)
     {
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
         clickAndWait(Locator.linkWithText(assayName));
         clickAndWait(Locator.linkWithText("view results"));
 
@@ -341,7 +341,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithAttribute("img", "title", "Flagged for review"));
 
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
     }
 
     @LogMethod
@@ -366,7 +366,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         configureAssayProgressDashboard(assay1, null);
         configureAssaySchema(assay1);
         clickFolder(assayFolder);
-        DataRegionTable.waitForDataRegion(this, PROGRESS_REPORT_REGION);
+        waitForElement(Locator.id(PROGRESS_REPORT_TABLE_ID));
     }
 
     @LogMethod
