@@ -1607,12 +1607,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @Deprecated
     public void waitForPageToLoad(int millis)
     {
-        if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger the expected page load.");
+        if (!_preppedForPageLoad)
+            throw new IllegalStateException("Call prepForPageLoad() before performing the action that would trigger the expected page load.");
         _testTimeout = true;
-        waitFor(() -> (boolean) executeScript(
+        waitFor(() -> {
+            try
+            {
+                return (boolean) executeScript(
                         "try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
-                                "catch(e) {return false;}"),
-                "Page failed to load", millis);
+                        "catch(e) {return false;}");
+            }
+            catch (TimeoutException wait)
+            {
+                return false;
+            }
+        },"Page failed to load", millis);
         _testTimeout = false;
         _preppedForPageLoad = false;
     }
