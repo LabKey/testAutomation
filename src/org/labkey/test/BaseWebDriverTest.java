@@ -478,7 +478,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         clickButton("Change Email");
 
-        setFormElement(Locator.name("newEmail"), newUserEmail);
+        setFormElement(Locator.name("requestedEmail"), newUserEmail);
+        setFormElement(Locator.name("requestedEmailConfirmation"), newUserEmail);
         clickButton("Submit");
     }
 
