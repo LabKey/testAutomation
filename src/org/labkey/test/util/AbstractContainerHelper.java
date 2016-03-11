@@ -329,8 +329,7 @@ public abstract class AbstractContainerHelper
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
-        _test.fireEvent(Locator.id("menubar"), WebDriverWrapper.SeleniumEvent.click);
-        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.id("folderBar_menu")));
+        _test.executeScript("HoverNavigation._folder.hide();");
     }
 
     @LogMethod
