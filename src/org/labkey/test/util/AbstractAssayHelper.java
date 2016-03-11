@@ -102,7 +102,7 @@ public abstract class AbstractAssayHelper
     {
         createAssayAndEdit(type, name).saveAndClose();
 
-        _test.waitForElement(Locator.id("AssayList"));
+        DataRegionTable.waitForDataRegion(_test, "AssayList");
     }
 
     public AssayDesignerPage createAssayAndEdit(String type, String name)
