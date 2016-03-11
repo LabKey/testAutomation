@@ -411,7 +411,7 @@ public class MS1Test extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("peaks"));
 
         //test filtering
-        featuresRegion.setFilter("MZ", "Is Greater Than or Equal To", "1500");
+        new DataRegionTable(DATAREGION_PEAKS, this).setFilter("MZ", "Is Greater Than or Equal To", "1500");
 
         //verify the data file info
         assertTextPresent(BASE_FILE_NAME_2 + PEAKS_XML_EXTENSION, BASE_FILE_NAME_2 + MZXML_EXTENSION);
