@@ -2375,6 +2375,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         builder.clickAndHold(fromEl).moveByOffset(xOffset + 1, yOffset + 1).release().build().perform();
     }
 
+    // This is useful when making a draggin selection in a plot, and there may be many elements ontop of the one you want.
+    public void dragAndDrop(int xOffset, int yOffset)
+    {
+        Actions builder = new Actions(getDriver());
+        builder.clickAndHold().moveByOffset(xOffset + 1, yOffset + 1).release().build().perform();
+    }
+
     /**
      * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
      */
