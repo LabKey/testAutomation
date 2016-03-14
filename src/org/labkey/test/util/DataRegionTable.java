@@ -49,12 +49,15 @@ public class DataRegionTable extends Component
     public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
     protected final String _regionName;
     public BaseWebDriverTest _test;
-    public WebElement _tableElement;
+    private WebElement _tableElement;
+
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
     protected final boolean _selectors;
-    protected boolean _floatingHeaders = true;
+    protected final boolean _floatingHeaders;
+
+    private Elements _elements = new Elements();
 
     /**
      * @param test Necessary while DRT methods live in BWDT
@@ -73,12 +76,17 @@ public class DataRegionTable extends Component
         _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(table).isEmpty();
     }
 
+    /**
+     * @param regionName 'lk-region-name' of the table
+     * @param test Necessary while DRT methods live in BWDT
+     */
     public DataRegionTable(String regionName, BaseWebDriverTest test)
     {
         _test = test;
         _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
 
         _tableElement = new RefindingWebElement(Locators.dataRegion(regionName), test.getDriver());
+        ((RefindingWebElement)_tableElement).addRefindListener((element -> clearCache()));
 
         _regionName = _tableElement.getAttribute("lk-region-name");
         _columnCount = _test.getTableColumnCount(getTableId());
@@ -98,7 +106,17 @@ public class DataRegionTable extends Component
         return getTableElement();
     }
 
-    private int getHeaderRowCount()
+    protected Elements elements()
+    {
+        return _elements;
+    }
+
+    protected void clearCache()
+    {
+        _elements = new Elements();
+    }
+
+    protected int getHeaderRowCount()
     {
         return 2 + (_floatingHeaders ? 2 : 0);
     }
@@ -1016,6 +1034,35 @@ public class DataRegionTable extends Component
         protected SearchContext getContext()
         {
             return getComponentElement();
+        }
+
+        private List<WebElement> rows;
+        private List<List<WebElement>> cells;
+
+        protected List<WebElement> getRows()
+        {
+            if (rows == null)
+                rows = Locator.css(".labkey-alternate-row, .labkey-row").findElements(this);
+            return rows;
+        }
+
+        protected WebElement getRow(int rowIndex)
+        {
+            return getRows().get(rowIndex);
+        }
+
+        protected List<WebElement> getCells(int row)
+        {
+            if (cells == null)
+                cells = new ArrayList<>(getRows().size());
+            if (cells.get(row) == null)
+                cells.add(row, Locator.css("td").findElements(getRow(row)));
+            return cells.get(row);
+        }
+
+        protected WebElement getCell(int row, int col)
+        {
+            return getCells(row).get(col);
         }
     }
 }

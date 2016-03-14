@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.CrosstabDataRegion;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -396,7 +397,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertElementPresent(getLocatorForHilightedWell("labkey-antigenGroup-Antigen-2", "257.0"));
 
         // test the mean and median values
-        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+        DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
         String[] expectedMeans = new String[]{"15555.6", "8888.9", "122222.2", "46666.7"};
         String[] expectedMedians = new String[]{"13333.3", "13333.3", "126666.7", "40000.0"};
 
@@ -414,7 +415,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         // verify customization of the run details view is possible
 /*
-        TODO: uncomment once issue 22960 has been fixed
+        TODO: 25924: CustomizeView doesn't handle aggregate columns in Elispot run details crosstab
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Mean");
         _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Median");
@@ -585,7 +586,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("run details").index(3));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
-        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+        DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
 //        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);      // TODO: we're not showing by default now
 
         int row = 0;
@@ -645,7 +646,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitForElement(Locator.css("#plate-summary-div-1 table"));
         //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
-        DataRegionTable detailsTable = new DataRegionTable("AntigenStats", this);
+        DataRegionTable detailsTable = new CrosstabDataRegion("AntigenStats", this);
         Map<String, String> expectedBackgroundMedians = new HashMap<>();
         expectedBackgroundMedians.put("ptid 1 E", "0.0");
         expectedBackgroundMedians.put("ptid 2 E", "0.0");
@@ -711,7 +712,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     {
         clickAndWait(Locator.linkContainingText("AID_TNTC"));
 
-//        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+//        DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
 //        assertEquals("TNTC", table.getDataAsText());
 
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -756,7 +757,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.applyCustomView();
 
         // test the mean and median values of columns that had a TNTC spot count
-        DataRegionTable table = new DataRegionTable("AntigenStats", this);
+        DataRegionTable table = new CrosstabDataRegion("AntigenStats", this);
         List<String> expectedPtids = Arrays.asList("ptid 1 F", "ptid 2 F", "ptid 3 F", "ptid 4 F");
         List<String> expected2FMeans = Arrays.asList("4000.0", "0.0", "2222.2", "2222.2");
         List<String> expected2FMedians = Arrays.asList("6666.7", "0.0", "0.0", "0.0");
