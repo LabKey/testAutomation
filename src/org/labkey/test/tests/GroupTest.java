@@ -15,12 +15,17 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -44,6 +49,10 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String CHILD_GROUP = "group4";
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
     protected static final String[] TEST_DISPLAY_NAMES_FOR_GROUP = {"user1 grouptest", "user2 grouptest", "user3 grouptest"};
+    protected static final String SITE_USER_IN_GROUP = "useringroup";
+    protected static final String SITE_USER_NOT_IN_GROUP = "usernotingroup";
+    protected static final String SITE_USER_GROUP = "SiteUsersGroup";
+    protected static final String[] SITE_USER_EMAILS = {SITE_USER_IN_GROUP + "@group.test", SITE_USER_NOT_IN_GROUP + "@group.test"};
     protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
     protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
 
@@ -60,23 +69,33 @@ public class GroupTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _permissionsHelper.deleteGroup(COMPOUND_GROUP, afterTest);
-        _permissionsHelper.deleteGroup(SIMPLE_GROUP, afterTest);
-        _permissionsHelper.deleteGroup(BAD_GROUP, afterTest);
-        _permissionsHelper.deleteGroup(CHILD_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(COMPOUND_GROUP);
+        _permissionsHelper.deleteGroup(SIMPLE_GROUP);
+        _permissionsHelper.deleteGroup(BAD_GROUP);
+        _permissionsHelper.deleteGroup(CHILD_GROUP);
+        _permissionsHelper.deleteGroup(SITE_USER_GROUP);
         deleteUsersIfPresent(TEST_USERS_FOR_GROUP);
+        deleteUsersIfPresent(SITE_USER_EMAILS);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
     }
 
+
+    @BeforeClass
+    public static void setup()
+    {
+        GroupTest init = new GroupTest();
+        init._containerHelper.createProject(init.getProjectName(), "Collaboration");
+    }
+
     @LogMethod protected void init()
     {
-        for (String group : TEST_USERS_FOR_GROUP)
+        for (String user : TEST_USERS_FOR_GROUP)
         {
-            createUser(group, null);
+            createUser(user, null);
         }
 
-        _containerHelper.createProject(getProjectName(), "Collaboration");
+//        _containerHelper.createProject(getProjectName(), "Collaboration");
     }
 
     @Test
@@ -368,6 +387,43 @@ public class GroupTest extends BaseWebDriverTest
         clickButton("Start Test", 0);
         waitForText(defaultWaitForPage, "Done!");
         assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
+    }
+
+    @Test
+    public void testSiteUserGroupFilters()
+    {
+        APIUserHelper apiUserHelper = new APIUserHelper(this);
+        for (String user : SITE_USER_EMAILS)
+        {
+            apiUserHelper.createUser(user);
+        }
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.createProjectGroup(SITE_USER_GROUP, null);
+        apiPermissionsHelper.createGlobalPermissionsGroup(SITE_USER_GROUP, SITE_USER_EMAILS[0]);
+
+        goToSiteUsers();
+        DataRegionTable table = new DataRegionTable("Users", this);
+
+        int initialRowCount = table.getDataRowCount();
+        CustomizeViewsHelper helper = new CustomizeViewsHelper(table);
+//      TODO uncomment these lines when Issue 23964 is fixed.
+//        helper.openCustomizeViewPanel();
+//        helper.addCustomizeViewFilter("Groups", "Is Not Blank");
+//        helper.applyCustomView();
+
+//        Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
+//        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRow("Display Name", SITE_USER_NOT_IN_GROUP));
+//        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRow("Display Name", SITE_USER_IN_GROUP));
+
+        // now try the same filtering with a column filter
+//        helper = new CustomizeViewsHelper(table);
+//        helper.revertUnsavedViewGridClosed();
+//        Assert.assertEquals("After removing filters, should have the original number of users", initialRowCount, table.getDataRowCount());
+        table.setFilter("Groups", "Is Not Blank");
+        Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
+        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRow("Display Name", SITE_USER_NOT_IN_GROUP));
+        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRow("Display Name", SITE_USER_IN_GROUP));
+
     }
 
     @Override protected BrowserType bestBrowser()
