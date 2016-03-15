@@ -122,7 +122,7 @@ public class WebTestHelper
     {
         synchronized (DEFAULT_TARGET_SERVER)
         {
-            if (_targetServer == null)
+            if (_targetServer == null || !_targetServer.equals(System.getProperty("labkey.server")))
             {
                 _targetServer = System.getProperty("labkey.server");
                 if (_targetServer == null || _targetServer.length() == 0)
