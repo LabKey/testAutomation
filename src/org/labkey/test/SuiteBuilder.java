@@ -76,6 +76,7 @@ public class SuiteBuilder
                     packageNameParts[3].equalsIgnoreCase("tests") )
             {
                 addTestToSuite(test, packageNameParts[4]);
+                addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
             }
         }
     }
