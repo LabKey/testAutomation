@@ -18,63 +18,48 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.Table;
+import org.labkey.test.selenium.RefindingWebElement;
+import org.openqa.selenium.WebDriver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
-
-public class EmailRecordTable extends DataRegionTable
+public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
-
+    private static final String _regionName = "EmailRecord";
+    private static final String _headerClass = "labkey-column-header labkey-col-header-filter";
+    private static final int _headerRows = 2;
+    private static final int _footerRows = 1;
     private boolean _recordOn;
+
+    public EmailRecordTable(WebDriver driver)
+    {
+        super(driver, new RefindingWebElement(emailLocator(), driver));
+    }
 
     public EmailRecordTable(BaseWebDriverTest test)
     {
-        super("EmailRecord", test);
+        this(test.getDriver());
     }
 
-    @Override
-    public int getDataRowCount()
+    public int getEmailCount()
     {
-        // This mock data region always has a hidden row at the end.
-        return super.getDataRowCount() - 1;
+        //3 rows in the table do not contain email messages
+        return getRowCount() - (_headerRows + _footerRows);
     }
 
     public void startRecording()
     {
-        _test.checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
+        _driver.checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     public void stopRecording()
     {
-        _test.uncheckCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
-    }
-
-    public void saveRecorderState()
-    {
-        _recordOn = _test.isChecked(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
-    }
-
-    public void restoreRecorderState()
-    {
-        if (_recordOn)
-            startRecording();
-        else
-            stopRecording();        
-    }
-
-    public void clearAndRecord()
-    {
-        // Make sure the email recorder is on (to avoid sending mail) and clear
-        // the cache of previously recorded messages.
-        stopRecording();
-        startRecording();
-        
-        _test.sleep(1000);
-        String error = _test.getText(Locator.id("emailRecordError"));
-        assertTrue("Error setting email recorder: " + error, StringUtils.trimToNull(error) == null);
+        _driver.uncheckCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     /**
@@ -83,8 +68,35 @@ public class EmailRecordTable extends DataRegionTable
      */
     public void clickSubject(String subject)
     {
-        _test.click(Locator.linkWithText(subject));
-        _test.sleep(100);   // Should be pretty quick
+        _driver.click(Locator.linkWithText(subject));
+    }
+
+    public void clickSubjectAtIndex(String subject, int index)
+    {
+        _driver.click(Locator.linkWithText(subject).index(index));
+    }
+
+    public void clickSubjectTo(String subject, List<String> recipient)
+    {
+        int index;
+        int rows = getRowCount();
+
+        if (rows > 0)
+        {
+            for (int i = 0; i < rows; i++)
+            {
+                int colTo = getColumnIndex("To");
+                int colMsg = getColumnIndex("Message");
+                String to = getDataAsText(i, colTo);
+                if(recipient.contains(to))
+                {
+                    if(getDataAsText(i, colMsg).contains(subject)){clickSubjectAtIndex(subject, i); return;}
+                }
+            }
+            _driver.log("unable to find message with subject " + subject + "addressed to recipient " + recipient);
+            return;
+        }
+        _driver.log("no rows in mail record table");
     }
 
     public void clickMessage(EmailMessage message)
@@ -94,14 +106,14 @@ public class EmailRecordTable extends DataRegionTable
 
     public EmailMessage getMessage(String subjectPart)
     {
-        int rows = getDataRowCount();
+        int rows = getRowCount() - _footerRows;
 
         if (rows > 0)
         {
-            int colTo      = getColumn("To");
-            int colFrom    = getColumn("From");
-            int colMessage = getColumn("Message");
-            for (int i = 0; i < rows; i++)
+            int colTo      = getColumnIndex("To", _headerRows);
+            int colFrom    = getColumnIndex("From", _headerRows);
+            int colMessage = getColumnIndex("Message", _headerRows);
+            for (int i = _headerRows + 1; i <= rows; i++)
             {
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
@@ -130,11 +142,63 @@ public class EmailRecordTable extends DataRegionTable
         return null;
     }
 
-    private static String[] trimAll(String[] strings)
+    public List<EmailMessage> getMessagesByHeaderAndText(String header, String text)
     {
-        for (int i = 0; i < strings.length; i++)
-            strings[i] = StringUtils.trim(strings[i]);
-        return strings;
+        List<Integer> colsWithText = getTableIndexesWhereTextAppears(header, text);
+        List<EmailMessage> messages = new ArrayList<>();
+        for(Integer i : colsWithText)
+        {
+            messages.add(getEmailAtTableIndex(i));
+        }
+        return messages;
+    }
+
+    public List<Integer> getTableIndexesWhereTextAppears(String header, String text)
+    {
+        List<String> columnText = getColumnAsText(header, _headerRows);
+        List<Integer> colsWithString = new ArrayList<>();
+        for(int i = 1; i <= columnText.size(); i++)
+        {
+            int arrayIndex = i-1;
+            if(columnText.get(arrayIndex).equals(text)){colsWithString.add(i + _headerRows);}
+        }
+        return colsWithString;
+    }
+
+    public EmailMessage getEmailAtTableIndex(int Index)
+    {
+        int colTo      = getColumnIndex("To", _headerRows);
+        int colFrom    = getColumnIndex("From", _headerRows);
+        int colMessage = getColumnIndex("Message", _headerRows);
+        String message = getDataAsText(Index, colMessage);
+        String[] lines = trimAll(StringUtils.split(message, "\n"));
+        String subjectLine = lines[0];
+        EmailMessage em = new EmailMessage();
+        em.setFrom(trimAll(StringUtils.split(getDataAsText(Index, colFrom), ',')));
+        String[] to = trimAll(StringUtils.split(getDataAsText(Index, colTo), ','));
+        for (int j = 0; j < to.length; j++)
+        {
+            // Extract email from : "Display <display@labkey.test>"
+            Pattern pattern = Pattern.compile(".*<(.+)>");
+            Matcher matcher = pattern.matcher(to[j]);
+            if (matcher.find())
+                to[j] = matcher.group(1);
+        }
+        em.setTo(to);
+        em.setSubject(subjectLine);
+        em.setBody(StringUtils.join(lines, "\n", 1, lines.length));
+        return em;
+    }
+
+    @Deprecated //here for backwards compatibility, use getColumnAsText. It doesn't have a misleading name
+    public List<String> getColumnDataAsText(String column)
+    {
+        return getColumnAsText(column , _headerRows);
+    }
+
+    public int getHeaderRowCount()
+    {
+        return _headerRows;
     }
 
     public static class EmailMessage
@@ -183,5 +247,10 @@ public class EmailRecordTable extends DataRegionTable
         {
             _body = body;
         }
+    }
+
+    private static Locator emailLocator()
+    {
+        return Locator.xpath("//table[@lk-region-name='"+ _regionName +"']");
     }
 }

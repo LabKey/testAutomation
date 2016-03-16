@@ -337,9 +337,11 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 6);
         click(Locator.linkWithText(MSG1_TITLE));
+        WebTestHelper.setUseContainerRelativeUrl(false);
         assertTextPresent(
                 "1 <b>x</b>",
                 "<a href=\"/labkey" + WebTestHelper.buildRelativeUrl("list", getProjectName(), "begin") + "?\" class=\"labkey-text-link\">manage lists</a>");
+        WebTestHelper.setUseContainerRelativeUrl(true);
         click(Locator.linkWithText(MSG1_TITLE).index(1));
         assertTextPresent("first message testing");
         assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
