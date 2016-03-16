@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -201,5 +202,18 @@ public abstract class ExcelHelper
             columnData.add(getCellContentsAt(sheet, colIdx, i));
         }
         return columnData;
+    }
+
+    public static List<String> getRowData(Sheet sheet, int rowIdx)
+    {
+        List<String> rowData = new ArrayList<>();
+        Iterator<Cell> row = sheet.getRow(rowIdx).cellIterator();
+        Cell cell;
+        while (row.hasNext())
+        {
+            cell = row.next();
+            rowData.add(getCellStringValue(cell));
+        }
+        return rowData;
     }
 }

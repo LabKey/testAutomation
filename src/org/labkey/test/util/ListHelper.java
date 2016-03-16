@@ -117,13 +117,22 @@ public class ListHelper
     {
         for(String key : data.keySet())
         {
-            _test.setFormElement(Locator.name("quf_" + key), data.get(key));
+            WebElement field = Locator.name("quf_" + key).findElement(_test.getDriver());
+            String inputType = field.getAttribute("type");
+            switch (inputType)
+            {
+                case "file":
+                    _test.setFormElement(field, new File(data.get(key)));
+                    break;
+                default:
+                    _test.setFormElement(field, data.get(key));
+            }
         }
         _test.clickButton("Submit");
 
         if(validateText)
         {
-            _test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
+            _test.assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
         }
 
     }
