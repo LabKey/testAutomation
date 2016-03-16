@@ -2524,7 +2524,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable#getColumn(String)}
+     * @deprecated Use {@link DataRegionTable#getColumnIndex(String)}
      */
     @Deprecated public int getColumnIndex(String tableName, String columnTitle)
     {

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -23,6 +23,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
+import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -51,13 +52,12 @@ public class DataRegionTable extends Component
     public BaseWebDriverTest _test;
     private WebElement _tableElement;
 
-    protected final Map<String, Integer> _mapColumns = new HashMap<>();
+    protected final List<String> _columnLabels = new ArrayList<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
-    protected final int _columnCount;
     protected final boolean _selectors;
     protected final boolean _floatingHeaders;
 
-    private Elements _elements = new Elements();
+    private Elements _elements;
 
     /**
      * @param test Necessary while DRT methods live in BWDT
@@ -70,7 +70,6 @@ public class DataRegionTable extends Component
 
         _tableElement = table;
         _regionName = table.getAttribute("lk-region-name");
-        _columnCount = _test.getTableColumnCount(getTableId());
 
         _selectors = !Locator.css(".labkey-selectors").findElements(table).isEmpty();
         _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(table).isEmpty();
@@ -89,7 +88,6 @@ public class DataRegionTable extends Component
         ((RefindingWebElement)_tableElement).addRefindListener((element -> clearCache()));
 
         _regionName = _tableElement.getAttribute("lk-region-name");
-        _columnCount = _test.getTableColumnCount(getTableId());
 
         _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
         _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
@@ -108,12 +106,18 @@ public class DataRegionTable extends Component
 
     protected Elements elements()
     {
+        getComponentElement().isDisplayed(); // Trigger cache reset
+        if (_elements == null)
+            _elements = new Elements();
         return _elements;
     }
 
-    protected void clearCache()
+    private void clearCache()
     {
-        _elements = new Elements();
+        _tableId = null;
+        _elements = null;
+        _columnLabels.clear();
+        _mapRows.clear();
     }
 
     protected int getHeaderRowCount()
@@ -157,9 +161,12 @@ public class DataRegionTable extends Component
         return _regionName;
     }
 
+    private String _tableId;
     public String getTableId()
     {
-        return getTableElement().getAttribute("id");
+        if (_tableId == null)
+            _tableId = getTableElement().getAttribute("id");
+        return _tableId;
     }
 
     public Locator.IdLocator locator()
@@ -169,7 +176,7 @@ public class DataRegionTable extends Component
 
     public int getColumnCount()
     {
-        return _columnCount;
+        return elements().getColumnHeaders().size() - (_selectors ? 1 : 0);
     }
 
     private boolean bottomBarPresent()
@@ -184,8 +191,7 @@ public class DataRegionTable extends Component
 
     public List<WebElement> getHeaderButtons()
     {
-        String headerId = getTableId() + "-header";
-        return Locator.css("#" + headerId + " a.labkey-button, #" + headerId + " a.labkey-menu-button").findElements(_test.getDriver());
+        return elements().getHeaderButtons();
     }
 
     public int getDataRowCount()
@@ -317,42 +323,41 @@ public class DataRegionTable extends Component
         return findElement(link(row, col));
     }
 
-    public int getColumn(String name)
+    public int getColumnIndex(String name)
     {
         name = name.replaceAll(" ", "");
 
-        if (_mapColumns.containsKey(name))
-            return _mapColumns.get(name);
+        List<String> columnsWithoutWhitespace = new ArrayList<>(getColumnHeaders().size());
+        getColumnHeaders().stream().forEachOrdered(s -> columnsWithoutWhitespace.add(s.replaceAll(" ", "")));
 
-        getColumnHeaders();
+        int i = columnsWithoutWhitespace.indexOf(name);
 
-        if (_mapColumns.containsKey(name))
-            return _mapColumns.get(name);
+        if (i < 0)
+            _test.log("Column '" + name + "' not found");
+        return i;
+    }
 
-        _test.log("Column '" + name + "' not found");
-        return -1;
+    /**
+     * @deprecated Renamed: {@link #getColumnIndex(String)}
+     */
+    @Deprecated
+    public int getColumn(String name)
+    {
+        return getColumnIndex(name);
     }
 
     public List<String> getColumnHeaders()
     {
-        List<String> columnHeaders = new ArrayList<>();
-        _mapColumns.clear(); // Start fresh
+        getComponentElement().isDisplayed(); // validate cached element
 
-        for (int col = 0; col < _columnCount; col++)
+        if (_columnLabels.isEmpty())
         {
-            String header = getDataAsText(-(getHeaderRowCount()/2), col);
-            columnHeaders.add(header);
-            if (header != null)
-            {
-                String headerName = header.split("\n")[0];
-                headerName = headerName.replaceAll(" ", "");
-                if (!StringUtils.isEmpty(headerName)
-                        && !_mapColumns.containsKey(headerName)) // Remember only the first occurrence of each column label
-                    _mapColumns.put(headerName, col);
-            }
+            _columnLabels.addAll(_test.getTexts(elements().getColumnHeaders()));
+            if (_selectors)
+                _columnLabels.remove(0);
         }
 
-        return columnHeaders;
+        return ImmutableList.copyOf(_columnLabels);
     }
 
     public List<String> getColumnDataAsText(int col)
@@ -455,10 +460,17 @@ public class DataRegionTable extends Component
         return rows;
     }
 
-    /** Find the row number for the given primary key. */
     public int getRow(String pk)
     {
-        assertTrue("Need the selector checkbox's value to find the row with the given pk", _selectors);
+        return getRowIndex(pk);
+    }
+
+    /** Find the row number for the given primary key. */
+    public int getRowIndex(String pk)
+    {
+        assertTrue("Need the selector checkboxes value to find row by pk", _selectors);
+
+        getComponentElement().isDisplayed(); // refresh cache
 
         Integer cached = _mapRows.get(pk);
         if (cached != null)
@@ -1038,11 +1050,16 @@ public class DataRegionTable extends Component
 
         private List<WebElement> rows;
         private List<List<WebElement>> cells;
+        private List<WebElement> columnHeaders;
+        private List<WebElement> headerButtons;
+
+        private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
+        private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
 
         protected List<WebElement> getRows()
         {
             if (rows == null)
-                rows = Locator.css(".labkey-alternate-row, .labkey-row").findElements(this);
+                rows = ImmutableList.copyOf(Locator.css(".labkey-alternate-row, .labkey-row").findElements(this));
             return rows;
         }
 
@@ -1056,13 +1073,27 @@ public class DataRegionTable extends Component
             if (cells == null)
                 cells = new ArrayList<>(getRows().size());
             if (cells.get(row) == null)
-                cells.add(row, Locator.css("td").findElements(getRow(row)));
+                cells.add(row, ImmutableList.copyOf(Locator.css("td").findElements(getRow(row))));
             return cells.get(row);
         }
 
         protected WebElement getCell(int row, int col)
         {
             return getCells(row).get(col);
+        }
+
+        protected List<WebElement> getColumnHeaders()
+        {
+            if (columnHeaders == null)
+                columnHeaders = ImmutableList.copyOf(Locator.css("td.labkey-column-header").findElements(columnHeaderRow));
+            return columnHeaders;
+        }
+
+        protected List<WebElement> getHeaderButtons()
+        {
+            if (headerButtons == null)
+                headerButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button").findElements(header));
+            return headerButtons;
         }
     }
 }

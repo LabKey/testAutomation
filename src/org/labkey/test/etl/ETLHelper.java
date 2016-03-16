@@ -680,7 +680,7 @@ public class ETLHelper
         void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
-            assertEquals(_columns.length, drt.getColumnCount()-1);
+            assertEquals(_columns.length, drt.getColumnCount());
             assertEquals(_data.size(), drt.getDataRowCount());
 
             for (int row = 0; row < _data.size(); row++)
@@ -699,7 +699,7 @@ public class ETLHelper
                     String actual = drt.getDataAsText(row, _columns[col]);
                     String expected = _data.get(row)[col];
                     if (null != expected)
-                        assertTrue("Expected value " + expected + " in row " + String.valueOf(row + 1) + " column " + String.valueOf(col + 1) + " of DataRegion " + getDataRegionName() + " but found " + actual, actual.equalsIgnoreCase(expected));
+                        assertTrue("Expected value " + expected + " in row " + String.valueOf(row + 1) + " column " + String.valueOf(col + 1) + " of DataRegion " + drt.getTableName() + " but found " + actual, actual.equalsIgnoreCase(expected));
                 }
             }
         }
@@ -756,7 +756,7 @@ public class ETLHelper
         @Override
         protected String getDataRegionName()
         {
-            return _test.getAttribute(Locator.xpath("//*[starts-with(@id, 'aqwp')]"), "id");
+            return _test.getAttribute(Locator.xpath("//*[starts-with(@lk-region-name, 'aqwp')]"), "lk-region-name");
         }
 
         @Override
@@ -820,7 +820,6 @@ public class ETLHelper
                     "Created By",
                     "Modified",
                     "Modified By",
-//                    "Exprunid",
                     "Job Id",
                     "Transform Run Log"}, null);
 
@@ -830,7 +829,7 @@ public class ETLHelper
         @Override
         protected String getDataRegionName()
         {
-            return _test.getAttribute(Locator.xpath("//*[starts-with(@id, 'aqwp')]"), "id");
+            return _test.getAttribute(Locator.xpath("//*[starts-with(@lk-region-name, 'aqwp')]"), "lk-region-name");
         }
 
         // just verify that we have a single row with the transform id we expect
@@ -838,7 +837,7 @@ public class ETLHelper
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
-            assertTrue("column length mismatch for data region " + getDataRegionName(), _columns.length == drt.getColumnCount()-1);
+            assertEquals("column mismatch for data region " + drt.getTableName(), Arrays.asList(_columns), drt.getColumnHeaders());
             assertEquals(1, drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));
