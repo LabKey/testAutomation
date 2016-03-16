@@ -176,9 +176,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
 
         _ext4Helper.selectComboBoxItem(MessagesLongTest.FILES_DEFAULT_COMBO, "15 minute digest");
-        clickButton("Update", 0);
-        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
+        doAndWaitForPageSignal(() -> clickButton("Update", 0), "notificationSettingUpdate"); // signal in notifySettings.jsp
         waitForElementToDisappear(Ext4Helper.Locators.mask());
 
 
@@ -190,7 +188,9 @@ public class FileContentUploadTest extends BaseWebDriverTest
         waitForElement(Ext4Helper.Locators.window("Update User Settings For Files"));
         _ext4Helper.selectComboBoxItem(MessagesLongTest.NEW_SETTING_LABEL, "No Email");
         clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
-        waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes"));
+        doAndWaitForPageSignal(
+                () -> waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes")),
+                DataRegionTable.SELECTION_SIGNAL);
         waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
 
         table = new DataRegionTable("Users", this);
