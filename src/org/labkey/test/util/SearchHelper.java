@@ -21,12 +21,15 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +38,7 @@ public class SearchHelper
 {
     protected BaseWebDriverTest _test;
 
-    private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
+    private static Map<String, SearchItem> _searchQueue = new HashMap<>();
     public SearchHelper(BaseWebDriverTest test)
     {
         _test = test;
@@ -44,7 +47,7 @@ public class SearchHelper
     public void initialize()
     {
         _searchQueue.clear();
-        deleteIndex();
+        SearchAdminAPIHelper.deleteIndex();
     }
 
     @LogMethod(quiet = true)
@@ -67,10 +70,10 @@ public class SearchHelper
     {
         _test.log("Verify search results.");
 
-        // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retrie below.  TODO: Remove
+        // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
-        List<SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
+        Map<String, SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
 
         if (!notFound.isEmpty())
         {
@@ -90,12 +93,12 @@ public class SearchHelper
     }
 
     // Does not wait for indexer... caller should do so
-    private List<SearchItem> verifySearchItems(List<SearchItem> items, String container, boolean crawlResults)
+    private Map<String, SearchItem> verifySearchItems(Map<String, SearchItem> items, String container, boolean crawlResults)
     {
         _test.log("Verifying " + items.size() + " items");
-        LinkedList<SearchItem> notFound = new LinkedList<>();
+        Map<String, SearchItem> notFound = new HashMap<>();
 
-        for ( SearchItem item : items)
+        for ( SearchItem item : items.values())
         {
             searchFor(item._searchTerm, false);  // We already waited for the indexer in calling method
 
@@ -118,7 +121,7 @@ public class SearchHelper
 
                 if (!success)
                 {
-                    notFound.add(item);
+                    notFound.put(item._searchTerm, item);
                     continue;
                 }
 
@@ -153,7 +156,7 @@ public class SearchHelper
         waitForIndexer();
 
         _test.log("Verify null search results.");
-        for( SearchItem item : _searchQueue )
+        for( SearchItem item : _searchQueue.values() )
         {
             searchFor(item._searchTerm, false);
             for ( Locator loc : item._searchResults )
@@ -187,16 +190,12 @@ public class SearchHelper
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
-        if (_searchQueue.contains(searchTerm))
-            _searchQueue.remove(searchTerm);
-        _searchQueue.add(new SearchItem(searchTerm, false, expectedResults));
+        _searchQueue.put(searchTerm, new SearchItem(searchTerm, false, expectedResults));
     }
 
     public void enqueueSearchItem(String searchTerm, boolean file, Locator... expectedResults)
     {
-        if (_searchQueue.contains(searchTerm))
-            _searchQueue.remove(searchTerm);
-        _searchQueue.add(new SearchItem(searchTerm, file, expectedResults));
+        _searchQueue.put(searchTerm, new SearchItem(searchTerm, file, expectedResults));
     }
 
     // This method always waits for the indexer queue to empty before issuing search query
@@ -237,14 +236,6 @@ public class SearchHelper
 
         _test.setFormElement(Locator.id("query"), searchTerm);
         _test.clickButton("Search");
-    }
-
-    public void deleteIndex()
-    {
-        _test.ensureAdminMode();
-        _test.goToAdmin();
-        _test.clickAndWait(Locator.linkWithText("full-text search"));
-        _test.clickButton("Delete Index");
     }
 
     public static class SearchItem

@@ -231,23 +231,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return _driver;
     }
 
-    public void pauseSearchCrawler()
-    {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("full-text search"));
-        if (isTextPresent("pause crawler"))
-            clickButton("pause crawler");
-    }
-
-
-    public void unpauseSearchCrawler()
-    {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("full-text search"));
-        if (isTextPresent("unpause crawler"))
-            clickButton("unpause crawler");
-    }
-
     protected void setIsPerfTest(boolean isPerfTest)
     {
         this.isPerfTest = isPerfTest;
@@ -1314,7 +1297,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             checkViews();
 
-            if(!isPerfTest)
+            if(!isPerfTest && isTestRunningOnTeamCity())
                 checkActionCoverage();
 
             checkLinks();

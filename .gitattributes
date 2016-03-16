@@ -707,6 +707,7 @@ src/org/labkey/test/util/ext4cmp/Ext4ComboRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FileFieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4GridRef.java -text
+src/org/labkey/test/util/search/SearchAdminAPIHelper.java -text
 /teamcity.modules -text
 /test.credentials.json.template -text
 /test.properties -text
