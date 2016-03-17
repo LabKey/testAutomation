@@ -59,20 +59,37 @@ public class DataRegionTable extends Component
 
     private Elements _elements;
 
+    private DataRegionTable(WebElement table, String name, BaseWebDriverTest test)
+    {
+        _test = test;
+        _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
+
+        if ((table == null) == (name == null))
+            throw new IllegalArgumentException("Specify either a table element or data region name");
+
+        if (table == null)
+        {
+            _tableElement = new RefindingWebElement(Locators.dataRegion(name), test.getDriver());
+            ((RefindingWebElement) _tableElement).addRefindListener((element -> clearCache()));
+            _regionName = name;
+        }
+        else
+        {
+            _tableElement = table;
+            _regionName = table.getAttribute("lk-region-name");
+        }
+
+        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
+        _floatingHeaders = !Locator.xpath("tbody/tr").withClass("dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
+    }
+
     /**
      * @param test Necessary while DRT methods live in BWDT
      * @param table table element that contains data region
      */
     public DataRegionTable(BaseWebDriverTest test, WebElement table)
     {
-        _test = test;
-        _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
-
-        _tableElement = table;
-        _regionName = table.getAttribute("lk-region-name");
-
-        _selectors = !Locator.css(".labkey-selectors").findElements(table).isEmpty();
-        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(table).isEmpty();
+        this(table, null, test);
     }
 
     /**
@@ -81,16 +98,7 @@ public class DataRegionTable extends Component
      */
     public DataRegionTable(String regionName, BaseWebDriverTest test)
     {
-        _test = test;
-        _test.waitForElement(Locators.pageSignal(SELECTION_SIGNAL));
-
-        _tableElement = new RefindingWebElement(Locators.dataRegion(regionName), test.getDriver());
-        ((RefindingWebElement)_tableElement).addRefindListener((element -> clearCache()));
-
-        _regionName = _tableElement.getAttribute("lk-region-name");
-
-        _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
-        _floatingHeaders = !Locator.css(".dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
+        this(null, regionName, test);
     }
 
     private WebElement getTableElement()
@@ -114,7 +122,6 @@ public class DataRegionTable extends Component
 
     private void clearCache()
     {
-        _tableId = null;
         _elements = null;
         _columnLabels.clear();
         _mapRows.clear();
@@ -161,12 +168,13 @@ public class DataRegionTable extends Component
         return _regionName;
     }
 
-    private String _tableId;
-    public String getTableId()
+    /**
+     * @deprecated We should find sub-elements by SearchContext, rather than building up big Locator strings
+     */
+    @Deprecated
+    private String getTableId()
     {
-        if (_tableId == null)
-            _tableId = getTableElement().getAttribute("id");
-        return _tableId;
+        return getTableElement().getAttribute("id");
     }
 
     public Locator.IdLocator locator()
