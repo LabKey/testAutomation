@@ -53,6 +53,7 @@ public class DataRegionTable extends Component
     private WebElement _tableElement;
 
     protected final List<String> _columnLabels = new ArrayList<>();
+    protected final List<String> _columnNames = new ArrayList<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final boolean _selectors;
     protected final boolean _floatingHeaders;
@@ -124,6 +125,7 @@ public class DataRegionTable extends Component
     {
         _elements = null;
         _columnLabels.clear();
+        _columnNames.clear();
         _mapRows.clear();
     }
 
@@ -334,11 +336,17 @@ public class DataRegionTable extends Component
     public int getColumnIndex(String name)
     {
         name = name.replaceAll(" ", "");
+        int i;
 
-        List<String> columnsWithoutWhitespace = new ArrayList<>(getColumnHeaders().size());
-        getColumnHeaders().stream().forEachOrdered(s -> columnsWithoutWhitespace.add(s.replaceAll(" ", "")));
+        i = getColumnNames().indexOf(_regionName + ":" + name);
 
-        int i = columnsWithoutWhitespace.indexOf(name);
+        if (i < 0)
+        {
+            List<String> columnsWithoutWhitespace = new ArrayList<>(getColumnHeaders().size());
+            getColumnHeaders().stream().forEachOrdered(s -> columnsWithoutWhitespace.add(s.replaceAll(" ", "")));
+
+            i = columnsWithoutWhitespace.indexOf(name);
+        }
 
         if (i < 0)
             _test.log("Column '" + name + "' not found");
@@ -366,6 +374,22 @@ public class DataRegionTable extends Component
         }
 
         return ImmutableList.copyOf(_columnLabels);
+    }
+
+    public List<String> getColumnNames()
+    {
+        getComponentElement().isDisplayed(); // validate cached element
+
+        if (_columnNames.isEmpty())
+        {
+            List<WebElement> columnHeaders = elements().getColumnHeaders();
+            for (int i = _selectors ? 1 : 0; i< columnHeaders.size(); i++)
+            {
+                _columnNames.add(columnHeaders.get(i).getAttribute("column-name"));
+            }
+        }
+
+        return ImmutableList.copyOf(_columnNames);
     }
 
     public List<String> getColumnDataAsText(int col)
