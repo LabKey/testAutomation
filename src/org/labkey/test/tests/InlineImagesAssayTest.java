@@ -209,12 +209,12 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Run File Field", "assaydata/" + PNG01_FILE.getName(), "assaydata/" + PNG01_FILE.getName(), "assaydata/" + PNG01_FILE.getName()),
+                Arrays.asList("Run File Field", "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName()),
                 exportedColumn);
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 7);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Batch File Field", "assaydata/" + XLS_FILE.getName(), "assaydata/" + XLS_FILE.getName(), "assaydata/" + XLS_FILE.getName()),
+                Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
                 exportedColumn);
 
         log("Remove the 'File' column from the batch and see that things still work.");
@@ -251,7 +251,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
         assertEquals("Value of 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Run File Field", "assaydata/" + PNG01_FILE.getName(), "assaydata/" + PNG01_FILE.getName(), "assaydata/" + PNG01_FILE.getName()),
+                Arrays.asList("Run File Field", "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName()),
                 exportedColumn);
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 7);
