@@ -28,10 +28,9 @@ public class RefindingWebElement extends LazyWebElement
         catch (StaleElementReferenceException refind)
         {
             _wrappedElement = null;
+            callListeners(super.getWrappedElement());
         }
-        WebElement wrappedElement = super.getWrappedElement();
-        callListeners(wrappedElement);
-        return wrappedElement;
+        return super.getWrappedElement();
     }
 
     public void addRefindListener(Consumer<WebElement> listener)
