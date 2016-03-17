@@ -439,7 +439,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
         verifyMemberList();
-        assertElementPresent(Locator.css("#webpart_-1 td").withText("Assigned To: " + displayNameFromEmail(USER3)));
+        assertElementPresent(Locator.css("table[name=webpart] td").withText("Assigned To: " + displayNameFromEmail(USER3)));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
 
