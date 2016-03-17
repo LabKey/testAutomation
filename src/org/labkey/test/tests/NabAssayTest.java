@@ -882,26 +882,22 @@ public class NabAssayTest extends AbstractQCAssayTest
         waitAndClickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable table = new DataRegionTable("query", this);
         List<String> row11 = table.getRowDataAsText(11);
-        assertEquals("Row size did not match", expectedRow11.size(), row11.size() - 1 /*selectors*/);
-        for (int i = 0; i < expectedRow11.size(); i++)
-            assertEquals("WellData row did not match.", expectedRow11.get(i), row11.get(i));
+        assertEquals("Row size did not match", expectedRow11.size(), row11.size());
+        assertEquals("WellData row did not match.", expectedRow11, row11.subList(0, expectedRow11.size()));
         List<String> row12 = table.getRowDataAsText(12);
-        assertEquals("Row size did not match", expectedRow12.size(), row11.size() - 1 /*selectors*/);
-        for (int i = 0; i < expectedRow12.size(); i++)
-            assertEquals("WellData row did not match.", expectedRow12.get(i), row12.get(i));
+        assertEquals("Row size did not match", expectedRow12.size(), row11.size());
+        assertEquals("WellData row did not match.", expectedRow12, row12.subList(0, expectedRow12.size()));
 
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", "DilutionData");
         waitAndClickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable dilutionTable = new DataRegionTable("query", this);
         List<String> row10 = dilutionTable.getRowDataAsText(10);
-        assertEquals("Row size did not match", expectedDilRow10.size(), row10.size() - 1 /*selectors*/);
-        for (int i = 0; i < expectedDilRow10.size(); i++)
-            assertEquals("DilutionData row did not match.", expectedDilRow10.get(i), row10.get(i));
+        assertEquals("Row size did not match", expectedDilRow10.size(), row10.size());
+        assertEquals("DilutionData row did not match.", expectedDilRow10, row10.subList(0, expectedDilRow10.size()));
         List<String> row40 = dilutionTable.getRowDataAsText(40);
-        assertEquals("Row size did not match", expectedDilRow40.size(), row40.size() - 1 /*selectors*/);
-        for (int i = 0; i < expectedDilRow40.size(); i++)
-            assertEquals("DilutionData row did not match.", expectedDilRow40.get(i), row40.get(i));
+        assertEquals("Row size did not match", expectedDilRow40.size(), row40.size());
+        assertEquals("DilutionData row did not match.", expectedDilRow40, row40.subList(0, expectedDilRow40.size()));
 
         log("Delete assay data file and test that run details still works");
         File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);

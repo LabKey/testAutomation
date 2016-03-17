@@ -2363,11 +2363,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      * Used by CohortTest and StudyCohortExportTest
      * Verifies the enrolled status of a cohort
      */
-    public void verifyCohortStatus(DataRegionTable table, String cohort, boolean  enrolled)
+    public void verifyCohortStatus(DataRegionTable table, String cohort, boolean enrolled)
     {
         int row = getCohortRow(table, cohort);
-        String s = table.getDataAsText(row, "Enrolled");
-        assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+        assertEquals("Enrollment state for cohort " + cohort, String.valueOf(enrolled).toLowerCase(), table.getDataAsText(row, "Enrolled").toLowerCase());
     }
 
     /**
