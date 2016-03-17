@@ -1095,9 +1095,9 @@ public class DataRegionTable extends Component
             return rows;
         }
 
-        protected WebElement getRow(int rowIndex)
+        protected WebElement getRow(int row)
         {
-            return getRows().get(rowIndex);
+            return getRows().get(row);
         }
 
         protected List<WebElement> getCells(int row)
@@ -1105,13 +1105,21 @@ public class DataRegionTable extends Component
             if (cells == null)
                 cells = new ArrayList<>(getRows().size());
             if (cells.get(row) == null)
-                cells.add(row, ImmutableList.copyOf(Locator.css("td").findElements(getRow(row))));
+                cells.set(row, ImmutableList.copyOf(Locator.css("td").findElements(getRow(row))));
             return cells.get(row);
         }
 
         protected WebElement getCell(int row, int col)
         {
             return getCells(row).get(col);
+        }
+
+        protected List<WebElement> getColumn(int col)
+        {
+            List<WebElement> columnCells = new ArrayList<>();
+            for (int row = 0; row < getRows().size(); row++)
+                columnCells.add(getCell(row, col));
+            return columnCells;
         }
 
         protected List<WebElement> getColumnHeaders()
