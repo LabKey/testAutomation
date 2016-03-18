@@ -133,6 +133,7 @@ public abstract class AbstractContainerHelper
         {
             try
             {
+                _test.scrollIntoView(Locator.checkboxByTitle(moduleName));
                 _test.checkCheckbox(Locator.checkboxByTitle(moduleName));
             }
             catch (NoSuchElementException missingModule)
