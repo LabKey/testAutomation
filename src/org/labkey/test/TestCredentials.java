@@ -69,7 +69,7 @@ public class TestCredentials
         {
             return getCredentials().containsKey(serverKey);
         }
-        catch (IOException ignore) {}
+        catch (IOException | IllegalArgumentException ignore) {}
 
         return false;
     }
