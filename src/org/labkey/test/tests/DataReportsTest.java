@@ -528,7 +528,7 @@ public class DataReportsTest extends ReportTest
 
     private void clickDesignerTab(String name)
     {
-        _ext4Helper.clickTabContainingText(name);
+        waitAndClick(Ext4Helper.Locators.tab(name));
         sleep(2000); // TODO
     }
 }
