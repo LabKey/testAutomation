@@ -329,7 +329,7 @@ public abstract class AbstractContainerHelper
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
-        _test.executeScript("HoverNavigation._folder.hide();");
+        _test.refresh();
     }
 
     @LogMethod
