@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriverException;
@@ -38,6 +39,7 @@ import static org.junit.Assert.assertTrue;
 public class ListHelper
 {
     public static final String EDITOR_CHANGE_SIGNAL = "propertiesEditorChange";
+    public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
     BaseWebDriverTest _test;
 
     public ListHelper(BaseWebDriverTest test)
@@ -76,9 +78,13 @@ public class ListHelper
     // null means any error
     public void submitImportTsv_error(String error)
     {
-        _test.clickButton("Submit", 0);
-        if (error == null) error = "";
-        _test.waitForElement(Locator.css(".labkey-error").containing(error));
+        _test.doAndWaitForPageSignal(() -> _test.clickButton("Submit", 0),
+                IMPORT_ERROR_SIGNAL);
+        if (error != null)
+        {
+            String errors = String.join(", ", _test.getTexts(Locators.labkeyError.findElements(_test.getDriver())));
+            assertTrue("Didn't find expected error ['" + error + "'] in [" + errors + "]", errors.contains(error));
+        }
     }
 
     @LogMethod
