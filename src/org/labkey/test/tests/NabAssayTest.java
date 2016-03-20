@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.SortDirection;
@@ -319,6 +320,29 @@ public class NabAssayTest extends AbstractQCAssayTest
                         build()
         );
 
+        // verify that we catch an invalid date prior to upload
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("ptid + date").
+                        visitResolver(AssayImportOptions.VisitResolverType.ParticipantDate).
+                        cutoff1("50").
+                        cutoff2("80").
+                        virusName("Nasty Virus").
+                        virusId("5433211").
+                        curveFitMethod("Five Parameter").
+                        ptids(new String[]{"ptid 1 C", "ptid 2 C", "ptid 3 C", "ptid 4 C", "ptid 5 C"}).
+                        dates(new String[]{"20134-09-05", "2014/2/28", "2014/2/28", "20149/2/28", "2014/2/28"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        runFile(TEST_ASSAY_NAB_FILE2).
+                        build()
+        );
+
+        assertElementPresent(Locators.labkeyError.containing("Only dates between January 1, 1753 and December 31, 9999 are accepted."));
+        clickButton("Cancel");
+
+        // retry the import with a valid date
         importData(
                 new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + date").
