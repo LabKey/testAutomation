@@ -103,6 +103,7 @@ public class DataReportsTest extends ReportTest
             "x <- func2(labkey.data$" + colName + ", labkey.data$" + database + "sex)\n" +
             "x\n";
     }
+
     private final static String R_SCRIPT2_TEXT1 = "999320648";
 
     private final static String DATA_SET = "DEM-1: Demographics";
@@ -316,7 +317,7 @@ public class DataReportsTest extends ReportTest
         log("Execute bad scripts");
         clickViewTab();
         assertTextPresent("Empty script, a script must be provided.");
-        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
+        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
 
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
         assertTextPresent("Error: object ", "badString", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
@@ -378,7 +379,6 @@ public class DataReportsTest extends ReportTest
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
         stopImpersonating();
         popLocation();
-
 
         log("Create second R script");
         _extHelper.clickMenuButton("Views", "Create", "R View");
@@ -469,6 +469,48 @@ public class DataReportsTest extends ReportTest
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
+    }
+
+    @Test
+    public void testRReportShowSource()
+    {
+        final String reportName = "Source Tab Test";
+        final String R_SCRIPT = "write.table(labkey.data, file = \"${tsvout:tsvfile}\", sep = \"\\t\", qmethod = \"double\", col.names=NA)";
+        final String DATA_SET_APX1 = "APX-1: Abbreviated Physical Exam";
+
+        goToProjectHome();
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(DATA_SET_APX1));
+
+        log("Test showing the source tab to all users");
+        createRReport(reportName, R_SCRIPT, true, true, new String[0]);
+
+        impersonateRole("Reader");
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(DATA_SET_APX1));
+        _extHelper.clickMenuButton("Views", reportName);
+        waitForText(WAIT_FOR_PAGE, "Console output");
+        assertElementVisible(Ext4Helper.Locators.tab("Source"));
+        stopImpersonatingRole();
+
+        log("Re-save report disabling showing the source tab to all users");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(DATA_SET_APX1));
+        _extHelper.clickMenuButton("Views", reportName);
+        waitForText(WAIT_FOR_PAGE, "Console output");
+        clickSourceTab();
+        _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
+        resaveReport();
+
+        impersonateRole("Reader");
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(DATA_SET_APX1));
+        _extHelper.clickMenuButton("Views", reportName);
+        waitForText(WAIT_FOR_PAGE, "Console output");
+        assertElementNotVisible(Ext4Helper.Locators.tab("Source"));
+        stopImpersonatingRole();
+        goToProjectHome();
     }
 
     /**create an R report from the dataset page

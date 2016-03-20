@@ -324,12 +324,25 @@ public class RReportHelper
 
     public void selectOption(ReportOption option)
     {
+        _selectOption(option, true);
+    }
+
+    public void clearOption(ReportOption option)
+    {
+        _selectOption(option, false);
+    }
+
+    private void _selectOption(ReportOption option, boolean checked)
+    {
         ensureFieldSetExpanded(option._fieldSet);
         if (option._isCheckbox)
         {
             Locator checkbox = Ext4Helper.Locators.checkbox(_test, option._label);
             _test.waitForElement(checkbox);
-            _test._ext4Helper.checkCheckbox(option._label);
+            if (checked)
+                _test._ext4Helper.checkCheckbox(option._label);
+            else
+                _test._ext4Helper.uncheckCheckbox(option._label);
         }
         else
         {
