@@ -293,7 +293,7 @@ public class DataReportsTest extends ReportTest
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        clickButton("Submit");
+        clickButton("Submit", longWaitForPage);
         assertTextPresent("Female");
         setFormElement(Locator.name("label"), "tsv");
         selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
