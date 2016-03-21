@@ -845,7 +845,7 @@ public class Ext4Helper
 
         public static Locator.XPathLocator ext4Tab(String label)
         {
-            return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner").notHidden();
+            return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-button").withDescendant(Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner")).notHidden();
         }
     }
 }
