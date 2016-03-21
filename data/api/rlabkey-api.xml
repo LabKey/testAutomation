@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.129")
+                print("Latest Rlabkey version: 2.1.130")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.129"
-                [1] "Found Rlabkey version: 2.1.129"
+                [1] "Latest Rlabkey version: 2.1.130"
+                [1] "Found Rlabkey version: 2.1.130"
             ]]>
         </response>
     </test>
@@ -171,6 +171,22 @@
                 updatedRow <- labkey.updateRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toUpdate=updaterow)
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
                         , colFilter=makeFilter(c("DisplayFld", "EQUALS", "Updated via Rlabkey")))
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Updated via Rlabkey
+            ]]>
+        </response>
+    </test>
+    <test name="lower case makeFilter operator" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes"
+                        , colFilter=makeFilter(c("DisplayFld", "equals", "Updated via Rlabkey")))
                 selectedRow
             ]]>
         </url>
