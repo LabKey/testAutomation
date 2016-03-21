@@ -190,7 +190,6 @@ public class EmailRecordTable extends Table
         return em;
     }
 
-    @Deprecated //here for backwards compatibility, use getColumnAsText. It doesn't have a misleading name
     public List<String> getColumnDataAsText(String column)
     {
         return getColumnAsText(column , _headerRows);

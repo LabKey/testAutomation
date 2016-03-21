@@ -516,10 +516,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
         EmailRecordTable record = new EmailRecordTable(this);
-        List<String> subject = record.getColumnAsText("Message");
+        List<String> subject = record.getColumnDataAsText("Message");
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
         assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
-        List<String> to = record.getColumnAsText("To");
+        List<String> to = record.getColumnDataAsText("To");
         assertTrue("Incorrect message notifications.",
                 to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
                 to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
