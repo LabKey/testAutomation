@@ -480,6 +480,7 @@ public class DataReportsTest extends ReportTest
 
         goToProjectHome();
         clickFolder(getFolderName());
+        scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
 
         log("Test showing the source tab to all users");
@@ -487,6 +488,7 @@ public class DataReportsTest extends ReportTest
 
         impersonateRole("Reader");
         clickFolder(getFolderName());
+        scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         _extHelper.clickMenuButton("Views", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
@@ -496,6 +498,7 @@ public class DataReportsTest extends ReportTest
         log("Re-save report disabling showing the source tab to all users");
         goToProjectHome();
         clickFolder(getFolderName());
+        scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         _extHelper.clickMenuButton("Views", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
@@ -505,6 +508,7 @@ public class DataReportsTest extends ReportTest
 
         impersonateRole("Reader");
         clickFolder(getFolderName());
+        scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
         _extHelper.clickMenuButton("Views", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
