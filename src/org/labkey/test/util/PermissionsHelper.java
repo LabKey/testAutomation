@@ -49,7 +49,7 @@ public abstract class PermissionsHelper
         _test = test;
     }
 
-    public String toRole(String perm)
+    public String toRole(final String perm)
     {
         if (perm.contains("."))
             return perm;
@@ -63,7 +63,7 @@ public abstract class PermissionsHelper
                 specialRoleClasses.get(perm),
                 getRoles().get(perm),
                 getRoles().get(roleClassName),
-                "org.labkey.api.security." + roleClassName);
+                "org.labkey.api.security.roles." + roleClassName);
     }
 
     private Map<String, String> _roles;
