@@ -15,13 +15,20 @@
  */
 package org.labkey.test.util;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.labkey.api.security.PrincipalType;
+import org.labkey.remoteapi.Command;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.security.GetRolesCommand;
+import org.labkey.remoteapi.security.GetRolesResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,21 +49,49 @@ public abstract class PermissionsHelper
         _test = test;
     }
 
-    public static String toRole(String perm)
+    public String toRole(String perm)
     {
         if (perm.contains("."))
             return perm;
 
-        String prefix = "org.labkey.api.security.roles.";
-
         Map<String, String> specialRoleClasses = new HashMap<>();
         specialRoleClasses.put("See Audit Log Events", "CanSeeAuditLogRole");
 
-        if (specialRoleClasses.containsKey(perm))
-            return prefix + specialRoleClasses.get(perm);
-
         String roleClassName = perm.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
-        return prefix + roleClassName;
+
+        return ObjectUtils.firstNonNull(
+                specialRoleClasses.get(perm),
+                getRoles().get(perm),
+                getRoles().get(roleClassName),
+                "org.labkey.api.security." + roleClassName);
+    }
+
+    private Map<String, String> _roles;
+    private Map<String, String> getRoles()
+    {
+        if (_roles == null)
+        {
+            _roles = new HashMap<>();
+            GetRolesCommand command = new GetRolesCommand();
+            Connection connection = _test.createDefaultConnection(false);
+
+            try
+            {
+                GetRolesResponse response = command.execute(connection, "/");
+                List<GetRolesResponse.Role> roles = response.getRoles();
+                for (GetRolesResponse.Role role : roles)
+                {
+                    String[] roleParts = role.getUniqueName().split("\\.");
+                    _roles.put(roleParts[roleParts.length - 1], role.getUniqueName());
+                    _roles.put(role.getName(), role.getUniqueName());
+                }
+            }
+            catch (IOException | CommandException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        return _roles;
     }
 
     public abstract Integer createGlobalPermissionsGroup(String groupName, String... users);

@@ -319,6 +319,8 @@ src/org/labkey/remoteapi/security/BulkUpdateGroupCommand.java -text
 src/org/labkey/remoteapi/security/BulkUpdateGroupResponse.java -text
 src/org/labkey/remoteapi/security/ClearAssignedRolesCommand.java -text
 src/org/labkey/remoteapi/security/DeletePolicyCommand.java -text
+src/org/labkey/remoteapi/security/GetRolesCommand.java -text
+src/org/labkey/remoteapi/security/GetRolesResponse.java -text
 src/org/labkey/remoteapi/security/RemoveAssignmentCommand.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
