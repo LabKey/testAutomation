@@ -1621,6 +1621,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 return false;
             }
+            catch (WebDriverException wde)
+            {
+                if (wde.getMessage().contains("waiting for doc.body failed"))
+                    return false;
+                else
+                    throw wde;
+            }
         },"Page failed to load", millis);
         _testTimeout = false;
         _preppedForPageLoad = false;
