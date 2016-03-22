@@ -18,7 +18,7 @@ package org.labkey.test.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.EmailRecordTable;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;

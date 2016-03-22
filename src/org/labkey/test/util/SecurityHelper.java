@@ -38,10 +38,8 @@ public class SecurityHelper
 
     public void setProjectPerm(String userOrGroupName, String folder, String permission)
     {
-        //if(on project?)
-        String projectUrl = "/project/" + folder + "/begin.view?";
-        if(_test.getCurrentRelativeURL().equals(projectUrl))
-            _test.beginAt(projectUrl);
+        if(_test.getCurrentContainerPath().equals("/" + folder))
+            _test.beginAt("/project/" + folder + "/begin.view?");
         _test._permissionsHelper.setPermissions(userOrGroupName, permission);
     }
 }

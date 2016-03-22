@@ -399,6 +399,7 @@ src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
+src/org/labkey/test/components/dumbster/EmailRecordTable.java -text
 src/org/labkey/test/components/ext4/Checkbox.java -text
 src/org/labkey/test/components/ext4/Window.java -text
 src/org/labkey/test/components/html/Table.java -text
