@@ -148,18 +148,8 @@ public class LabModuleHelper
         _test.clickButton("Submit");
         _test.waitForText("Workbook Summary");
 
-        try
-        {
-            String path = _test.getURL().toURI().getPath();
-            String prefix = projectName.replaceAll("begin.view", "");
-            path = path.replaceAll(".*" + Pattern.quote(prefix) + "/", "");
-            path = path.replaceAll("/begin.view", "");
-            return path;
-        }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException(e);
-        }
+        String path[] = _test.getCurrentContainerPath().split("/");
+        return path[path.length - 1];
     }
 
     public int getRandomInt()
