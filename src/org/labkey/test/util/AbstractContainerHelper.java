@@ -24,6 +24,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
@@ -330,6 +331,7 @@ public abstract class AbstractContainerHelper
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
+        new Actions(_test.getDriver()).moveByOffset(-500, -500).build().perform(); // Make sure folder menu doesn't reappear
         _test.refresh();
     }
 
