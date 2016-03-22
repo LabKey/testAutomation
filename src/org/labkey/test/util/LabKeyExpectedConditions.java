@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -142,10 +141,11 @@ public abstract class LabKeyExpectedConditions
             public WebElement apply(WebDriver driver)
             {
                 WebElement el;
-                try{
+                try
+                {
                     el = loc.findElement(driver);
                 }
-                catch (ElementNotFoundException ignore)
+                catch (NoSuchElementException ignore)
                 {
                     return null;
                 }

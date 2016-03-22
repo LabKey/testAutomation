@@ -58,7 +58,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -161,19 +160,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if(oldWebDriver == null)
                 {
                     newWebDriver = new InternetExplorerDriver();
-                }
-                break;
-            }
-            case HTML: //experimental
-            {
-                if(oldWebDriver != null && !(oldWebDriver instanceof HtmlUnitDriver))
-                {
-                    oldWebDriver.quit();
-                    oldWebDriver = null;
-                }
-                if(oldWebDriver == null)
-                {
-                    newWebDriver = new HtmlUnitDriver(true);
                 }
                 break;
             }
