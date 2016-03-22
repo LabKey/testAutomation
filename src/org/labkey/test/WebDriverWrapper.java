@@ -3049,6 +3049,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return checkBoxLocator.findElement(getDriver()).isSelected();
     }
 
+    public boolean isChecked(WebElement checkBoxElement)
+    {
+        return checkBoxElement.isSelected();
+    }
+
     public void selectOptionByValue(Locator locator, String value)
     {
         WebElement selectElement = locator.findElement(getDriver());
