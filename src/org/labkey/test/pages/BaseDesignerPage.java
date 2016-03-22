@@ -92,7 +92,7 @@ public abstract class BaseDesignerPage extends LabKeyPage
             if (alert.getAlertText().contains("data you have entered may not be saved."))
             {
                 dismissAllAlerts();
-                sleep(1000); // Wait for GWT form to not be dirty
+                sleep(2000); // Wait for GWT form to not be dirty
                 clickButton("Save & Close");
             }
             else
