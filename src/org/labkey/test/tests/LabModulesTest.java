@@ -32,13 +32,13 @@ import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -1244,38 +1244,44 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.setFilter("container", "Does Not Equal", getProjectName());
-        dr.setSort("freezerid", SortDirection.ASC);
+        dr.setSort("freezerid", SortDirection.DESC);
 
-        i = 0;
-        while (i < max)
+        i = max;
+        while (i > 0)
         {
+            i--;
+
             //first record for each workbook
             int rowNum = dr.getRow("Folder", "Workbook" + i);
-            String workbook = getProjectName() + "/" + workbookIds[i];
 
-            //NOTE: these URLs should point to the workbook where the record was created, not the current folder
+            String containerPath = getProjectName() + "/" + workbookIds[i];
+
+            // NOTE: these URLs should point to the workbook where the record was created, not the current folder
+            // NOTE: URIUtil.encodePath(containerPath), used in buildRelativeUrl(), swaps + for space in the path.
+            // as a hack, we put it back using replaceAll() to make the string comparisons work
+            boolean useContainerRelativeUrls = (Boolean)executeScript("return LABKEY.ActionURL.getAction().indexOf('-') > -1;");
+            WebTestHelper.setUseContainerRelativeUrl(useContainerRelativeUrls);
 
             //details link
+            String url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("query", containerPath, "recordDetails"), "UTF-8").replaceAll(" ", "+");
             String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected [details] link to go to the container: " + workbook + ", href was: " + href,
-                    href.contains(workbook));
+            assertTrue("Expected [details] link to go to the container: " + containerPath + ", href was: " + href, href.contains(url));
 
             //update link
+            url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("ldk", containerPath, "manageRecord"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
-                    href.contains("/ldk/" + workbook + "/manageRecord.view?"));
+            assertTrue("Expected [edit] link to go to the container: " + containerPath + ", href was: " + href, href.contains(url));
 
             //sample type
+            url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("query", getProjectName(), "recordDetails"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
+            assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href, href.contains(url));
+            assertTrue("Incorrect params in sample type URL: " + href, href.contains("schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
 
             //container column
+            url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("project", containerPath, "begin"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
-            assertTrue("Expected container column to go to the container: " + workbook + ", href was:" + href,
-                    href.contains("/project/" + workbook + "/begin.view?"));
-
-            i++;
+            assertTrue("Expected container column to go to the container: " + containerPath + ", href was:" + href, href.contains(url));
         }
 
         //Test DetailsPanel:
