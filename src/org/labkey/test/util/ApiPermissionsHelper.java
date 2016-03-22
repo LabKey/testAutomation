@@ -306,18 +306,18 @@ public class ApiPermissionsHelper extends PermissionsHelper
     }
 
     @Override
-    public void checkInheritedPermissions()
+    public void uncheckInheritedPermissions()
     {
-        new UIPermissionsHelper(_test).checkInheritedPermissions();
+        new UIPermissionsHelper(_test).uncheckInheritedPermissions();
     }
 
     @Override
-    public void uncheckInheritedPermissions()
+    public void checkInheritedPermissions()
     {
-        unsetInheritPermissions(_test.getContainerId());
+        inheritPermissions(_test.getContainerId());
     }
 
-    public void unsetInheritPermissions(String containerId)
+    public void inheritPermissions(String containerId)
     {
         DeletePolicyCommand  command = new DeletePolicyCommand(containerId);
         Connection connection = _test.createDefaultConnection(true);
