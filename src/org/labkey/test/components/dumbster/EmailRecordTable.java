@@ -106,6 +106,11 @@ public class EmailRecordTable extends Table
 
     public EmailMessage getMessage(String subjectPart)
     {
+        return getMessageRegEx(".*" + subjectPart + ".*");
+    }
+
+    public EmailMessage getMessageRegEx(String regExp)
+    {
         int rows = getRowCount() - _footerRows;
 
         if (rows > 0)
@@ -118,7 +123,7 @@ public class EmailRecordTable extends Table
                 String message = getDataAsText(i, colMessage);
                 String[] lines = trimAll(StringUtils.split(message, "\n"));
                 String subjectLine = lines[0];
-                if (subjectLine.contains(subjectPart))
+                if (subjectLine.matches(regExp))
                 {
                     EmailMessage em = new EmailMessage();
                     em.setFrom(trimAll(StringUtils.split(getDataAsText(i, colFrom), ',')));
