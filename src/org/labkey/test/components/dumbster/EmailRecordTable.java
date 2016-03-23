@@ -106,7 +106,7 @@ public class EmailRecordTable extends Table
 
     public EmailMessage getMessage(String subjectPart)
     {
-        return getMessageRegEx(".*" + subjectPart + ".*");
+        return getMessageRegEx(".*" + Pattern.quote(subjectPart) + ".*");
     }
 
     public EmailMessage getMessageRegEx(String regExp)
