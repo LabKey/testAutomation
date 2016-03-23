@@ -418,15 +418,15 @@ public class ETLTest extends ETLBaseTest
     public void testRequeueJobs() throws Exception
     {
         String FILTER_ERROR_MESSAGE;
-        String SPROC_ERROR_MESSAGE = "ERROR: ";
+        String SPROC_ERROR_MESSAGE = "Intentional SQL Exception From Inside Proc";
         if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
         {
             FILTER_ERROR_MESSAGE = "violates unique constraint";
-            SPROC_ERROR_MESSAGE += "ERROR: ";
         }
         else
+        {
             FILTER_ERROR_MESSAGE = "Violation of UNIQUE KEY constraint";
-        SPROC_ERROR_MESSAGE += "Intentional SQL Exception From Inside Proc";
+        }
 
         _etlHelper.insertSourceRow("2", "Subject 2", "1042");
 
