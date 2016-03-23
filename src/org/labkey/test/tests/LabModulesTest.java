@@ -1265,23 +1265,23 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             //details link
             String url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("query", containerPath, "recordDetails"), "UTF-8").replaceAll(" ", "+");
             String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected [details] link to go to the container: " + containerPath + ", href was: " + href, href.contains(url));
+            assertTrue("Expected [details] link to go to the container: " + url + ", href was: " + href, href.contains(url));
 
             //update link
             url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("ldk", containerPath, "manageRecord"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected [edit] link to go to the container: " + containerPath + ", href was: " + href, href.contains(url));
+            assertTrue("Expected [edit] link to go to the container: " + url + ", href was: " + href, href.contains(url));
 
             //sample type
             url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("query", getProjectName(), "recordDetails"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA").index(rowNum), "href"), "UTF-8");
-            assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href, href.contains(url));
+            assertTrue("Expected sample type column URL to go to the container: " + url + ", href was: " + href, href.contains(url));
             assertTrue("Incorrect params in sample type URL: " + href, href.contains("schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
 
             //container column
             url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("project", containerPath, "begin"), "UTF-8").replaceAll(" ", "+");
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
-            assertTrue("Expected container column to go to the container: " + containerPath + ", href was:" + href, href.contains(url));
+            assertTrue("Expected container column to go to the container: " + url + ", href was:" + href, href.contains(url));
         }
 
         //Test DetailsPanel:
