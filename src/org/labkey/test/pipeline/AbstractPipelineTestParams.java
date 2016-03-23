@@ -335,17 +335,16 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         if (!notifyOwner && notifyOthers.length == 0)
             return; // No email expected.
+
         String userEmail = PasswordUtil.getUsername();
         EmailRecordTable emailTable = new EmailRecordTable(_test);
-        emailTable.clickMessage(emailTable.getMessage(description));
         EmailRecordTable.EmailMessage message = emailTable.getMessage(description);
         assertNotNull("No email message found for " + description, message);
-        //emailTable.clickMessage(message);
-        // Reload after the message has been expanded so Selenium can get the text that it's showing
-        //emailTable = new EmailRecordTable(_test);
-        //message = emailTable.getMessage(description);
+        emailTable.clickMessage(message);
+        // Refetch message after expanding to get entire message text
+        message = emailTable.getMessage(description);
         validateTrue("The test " + description + " does not have expected status " + status,
-                message.getBody().indexOf("Status: " + status) != -1);
+                message.getBody().contains("Status: " + status));
         List<String> recipients = Arrays.asList(message.getTo());
         if (notifyOwner)
         {
@@ -355,6 +354,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         {
             validateTrue("Message not sent to " + notify, recipients.contains(notify));
         }
+
         assertTrue("Could not find link in message with Status: '" + status + "' and Description: '" + description + "'", clickLink(message));
 
         // Make sure we made it to a status page.
