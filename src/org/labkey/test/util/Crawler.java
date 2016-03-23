@@ -17,13 +17,13 @@
 package org.labkey.test.util;
 
 import com.google.common.base.Function;
-import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriverException;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -621,32 +621,26 @@ public class Crawler
     {
         // quick unit-test
         {
-            ControllerActionId a = new ControllerActionId("/controller/project/folder/action.view");
-            assertEquals("controller", a.getController());
-            assertEquals("project/folder", a.getFolder());
-            assertEquals("action", a.getAction());
-        }
-        {
-            ControllerActionId b = new ControllerActionId("/project/folder/controller-action.view");
-            assertEquals("controller", b.getController());
-            assertEquals("project/folder", b.getFolder());
-            assertEquals("action", b.getAction());
-        }
-        {
-            ControllerActionId a = new ControllerActionId("/controller-sub/folder/action.view");
-            assertEquals("controller-sub", a.getController());
-            assertEquals("folder", a.getFolder());
-            assertEquals("action", a.getAction());
-        }
-        {
-            ControllerActionId b = new ControllerActionId("/folder/controller-sub-action.view");
-            assertEquals("controller-sub", b.getController());
-            assertEquals("folder", b.getFolder());
-            assertEquals("action", b.getAction());
-        }
-        {
-            ControllerActionId c = new ControllerActionId("/_webdav/fred");
-            assertEquals("_webdav", c.getController());
+            ControllerActionId oldAction = new ControllerActionId("/controller/project/folder/action.view");
+            assertEquals("controller", oldAction.getController());
+            assertEquals("project/folder", oldAction.getFolder());
+            assertEquals("action", oldAction.getAction());
+            ControllerActionId containerRelativeAction = new ControllerActionId("/project/folder/controller-action.view");
+            assertEquals("controller", containerRelativeAction.getController());
+            assertEquals("project/folder", containerRelativeAction.getFolder());
+            assertEquals("action", containerRelativeAction.getAction());
+            assertEquals(oldAction, containerRelativeAction);
+            ControllerActionId subControllerOldAction = new ControllerActionId("/controller-sub/folder/action.view");
+            assertEquals("controller-sub", subControllerOldAction.getController());
+            assertEquals("folder", subControllerOldAction.getFolder());
+            assertEquals("action", subControllerOldAction.getAction());
+            ControllerActionId subControllerNewAction = new ControllerActionId("/folder/controller-sub-action.view");
+            assertEquals("controller-sub", subControllerNewAction.getController());
+            assertEquals("folder", subControllerNewAction.getFolder());
+            assertEquals("action", subControllerNewAction.getAction());
+            assertEquals(subControllerOldAction, subControllerNewAction);
+            ControllerActionId webdavAction = new ControllerActionId("/_webdav/fred");
+            assertEquals("_webdav", webdavAction.getController());
         }
 
         TestLogger.log("Starting crawl...");
@@ -803,30 +797,6 @@ public class Crawler
         {
             return f.apply(arg);
         }
-        catch (SeleniumException se)
-        {
-            String html = test.getHtmlSource();
-            if (html.contains(maliciousScript))
-                msg = "page contains injected script";
-
-            while (test.isAlertPresent())
-            {
-                if (test.cancelAlert().startsWith(injectedAlert))
-                    msg = " malicious script executed";
-            }
-
-            // see ConnectionWrapper.java
-            if (html.contains("SQL injection test failed"))
-                msg = "SQL injection detected";
-
-            if (msg != null)
-            {
-                String url = test.getCurrentRelativeURL();
-                fail(msg + "\n" + url);
-            }
-
-            throw se;
-        }
         catch (UnhandledAlertException ex)
         {
             String alertText = ex.getAlertText();
@@ -840,6 +810,30 @@ public class Crawler
 
             if (html.contains(maliciousScript))
                 msg = "page contains injected script";
+
+            // see ConnectionWrapper.java
+            if (html.contains("SQL injection test failed"))
+                msg = "SQL injection detected";
+
+            if (msg != null)
+            {
+                String url = test.getCurrentRelativeURL();
+                fail(msg + "\n" + url);
+            }
+
+            throw ex;
+        }
+        catch (WebDriverException ex)
+        {
+            String html = test.getHtmlSource();
+            if (html.contains(maliciousScript))
+                msg = "page contains injected script";
+
+            while (test.isAlertPresent())
+            {
+                if (test.cancelAlert().startsWith(injectedAlert))
+                    msg = " malicious script executed";
+            }
 
             // see ConnectionWrapper.java
             if (html.contains("SQL injection test failed"))

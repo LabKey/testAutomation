@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 import com.google.common.base.Predicate;
-import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +72,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.logging.LogEntry;
@@ -530,6 +530,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
+                WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
 
                 if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {
@@ -542,11 +543,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                             (elapsedMs / 1000)) + " more seconds...");
                 }
             }
-            catch (SeleniumException | TimeoutException e)
+            catch (WebDriverException e)
             {
                 // ignore timeouts that occur during startup; a poorly timed request
                 // as the webapp is loading may hang forever, causing a timeout.
-                log("Ignoring selenium exception: " + e.getMessage());
+                log("Ignoring WebDriver exception: " + e.getMessage());
             }
             finally
             {
@@ -642,7 +643,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
                             throw new RuntimeException("A startup failure occurred.");
                     }
-                    catch (SeleniumException e)
+                    catch (WebDriverException ignore)
                     {
                         // Do nothing -- this page will sometimes auto-navigate out from under selenium
                     }
@@ -1243,7 +1244,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         String lastPage = _lastPageURL.toString();
                         URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
                         log("Re-invoking last action with _debug parameter set: " + url.toString());
-                        url.getContent();
+                        WebTestHelper.getHttpGetResponse(url.toString());
                     }
                     catch (IOException t)
                     {
@@ -1571,7 +1572,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         try{
             goToManageViews();
         }
-        catch (SeleniumException e)
+        catch (WebDriverException ignore)
         {
             log("No manage views option");
             return;
