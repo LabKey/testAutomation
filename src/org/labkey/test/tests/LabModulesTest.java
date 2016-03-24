@@ -1256,14 +1256,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             String containerPath = getProjectName() + "/" + workbookIds[i];
 
-            // NOTE: these URLs should point to the workbook where the record was created, not the current folder
+            // NOTE: These URLs should point to the workbook where the record was created, not the current folder
             // NOTE: URIUtil.encodePath(containerPath), used in buildRelativeUrl(), swaps + for space in the path.
-            // as a hack, we put it back using replaceAll() to make the string comparisons work
-            String path = (String)executeScript("return window.location.pathname");
-            int end = path.lastIndexOf("/");
-            String action = path.substring(end+1);
-            boolean useContainerRelativeUrls = action.contains("-");
-            WebTestHelper.setUseContainerRelativeUrl(useContainerRelativeUrls);
+            // As a hack, we put it back using replaceAll() to make the string comparisons work
+            log("using container relative URLs: " + WebTestHelper.isUseContainerRelativeUrl());
 
             //details link
             String url = URLDecoder.decode(WebTestHelper.buildRelativeUrl("query", containerPath, "recordDetails"), "UTF-8").replaceAll(" ", "+");

@@ -84,6 +84,11 @@ public class WebTestHelper
         USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
     }
 
+    public static boolean isUseContainerRelativeUrl()
+    {
+        return USE_CONTAINER_RELATIVE_URL;
+    }
+
     private static void acceptLocalhostCert() throws Exception
     {
         String keystorePassword = System.getProperty("keystore.password", "changeit");
