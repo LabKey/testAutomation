@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -115,7 +116,6 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         lookupInfo.setTableType(lookupTableType);
 
         _listHelper.addLookupField(name + " Data Fields", 4, SAMPLE_ID_FIELD_NAME, SAMPLE_ID_FIELD_LABEL, lookupInfo);
-        sleep(1000); // GWT timing
         assayDesigner.saveAndClose();
     }
 
@@ -135,7 +135,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private void testAssay(String assayName)
     {
         clickAndWait(Locator.linkContainingText(assayName));
-        clickAndWait(Locator.id("Batches").append(Locator.linkContainingText("batch")));
+        clickAndWait(new DataRegionTable("Batches", this).link(0, "Name"));
         clickAndWait(Locator.tag("img").withAttribute("src", "/labkey/Experiment/images/graphIcon.gif"));
         clickAndWait(Locator.linkWithText("Text View"));
         clickAndWait(Locator.linkContainingText("123456"));

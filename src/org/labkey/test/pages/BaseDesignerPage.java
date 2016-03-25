@@ -18,15 +18,14 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 
 // TODO: Tons of missing functionality
 // TODO: Much ListHelper functionality belongs here
-// TODO: Create subclasses for particular domain editors (e.g. Metadata)
+// TODO: Create subclasses for particular designer pages (e.g. Metadata)
 public abstract class BaseDesignerPage extends LabKeyPage
 {
-    protected static final String DESIGNER_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
+    protected static final String DESIGNER_DIRTY_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
     private static final String ROW_HIGHLIGHT = "238"; // rgb(238,238,238)
 
     public BaseDesignerPage(WebDriver driver)
@@ -43,16 +42,16 @@ public abstract class BaseDesignerPage extends LabKeyPage
 
     protected void doAndExpectDirty(Runnable func)
     {
-        if (Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_SIGNAL)))
+        if (Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_DIRTY_SIGNAL)))
             return;
-        waitForElement(Locators.pageSignal(DESIGNER_SIGNAL, "true"));
+        waitForElement(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "true"));
     }
 
     protected void doAndExpectClean(Runnable func)
     {
-        if (!Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_SIGNAL)))
+        if (!Boolean.valueOf(doAndWaitForPageSignal(func, DESIGNER_DIRTY_SIGNAL)))
             return;
-        waitForElement(Locators.pageSignal(DESIGNER_SIGNAL, "false"));
+        waitForElement(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "false"));
     }
 
     public void selectField(int index)
@@ -75,29 +74,15 @@ public abstract class BaseDesignerPage extends LabKeyPage
 
     public void save()
     {
-        sleep(1000); // Wait for GWT form to have all changes
         doAndExpectClean(() -> clickButton("Save", 0));
         waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
     }
 
     public void saveAndClose()
     {
-        Locators.pageSignal(DESIGNER_SIGNAL).waitForElement(getDriver(), 1000);
-        try
-        {
-            clickButton("Save & Close");
-        }
-        catch (UnhandledAlertException alert)
-        {
-            if (alert.getAlertText().contains("data you have entered may not be saved."))
-            {
-                dismissAllAlerts();
-                sleep(2000); // Wait for GWT form to not be dirty
-                clickButton("Save & Close");
-            }
-            else
-                throw alert;
-        }
+        if (isElementPresent(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "true")))
+            save(); // TODO: 26042: Assay designer 'save & close' doesn't always clear dirty flag
+        clickButton("Save & Close");
     }
 
     public static class Locators extends org.labkey.test.Locators
