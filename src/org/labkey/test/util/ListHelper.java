@@ -87,6 +87,21 @@ public class ListHelper
         }
     }
 
+    public void submitImportTsv_errors(List<String> errors)
+    {
+        _test.clickButton("Submit", 0);
+        if (errors == null || errors.isEmpty()){
+            _test.waitForElement(Locator.css(".labkey-error").containing(""));
+        }
+        else
+        {
+            for (String err : errors)
+            {
+                _test.waitForElement(Locator.css(".labkey-error").containing(err));
+            }
+        }
+    }
+
     @LogMethod
     public void importDataFromFile(@LoggedParam File inputFile)
     {

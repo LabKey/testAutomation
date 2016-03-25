@@ -16,8 +16,17 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.data.ConvertHelper;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -38,11 +47,16 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static org.labkey.test.util.ListHelper.ListColumnType.Boolean;
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
 
@@ -143,6 +157,24 @@ public class ListTest extends BaseWebDriverTest
         return PROJECT_VERIFY;
     }
 
+    @BeforeClass
+    public static void setupProject()
+    {
+        ListTest init = (ListTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        log("Setup project and list module");
+        _containerHelper.createProject(PROJECT_VERIFY, null);
+        setUpList(getProjectName());
+
+        log("Create second project");
+        _containerHelper.createProject(PROJECT_OTHER, null);
+        goToProjectHome();
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
@@ -176,9 +208,6 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     protected void setUpList(String projectName)
     {
-        log("Setup project and list module");
-        _containerHelper.createProject(projectName, null);
-
         log("Add list -- " + LIST_NAME_COLORS);
         _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
@@ -417,9 +446,10 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testCustomViews()
     {
-        setUpList(PROJECT_VERIFY);
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
 
         log("Test Sort and Filter in Data View");
         DataRegionTable region = new DataRegionTable("query", this);
@@ -506,9 +536,6 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("View Design");
         clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
         assertTextPresent("Colors", "Views");
-
-        log("Create second project");
-        _containerHelper.createProject(PROJECT_OTHER, null);
 
         log("Add List -- " + LIST3_NAME_OWNERS);
         _listHelper.createList(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
@@ -615,13 +642,31 @@ public class ListTest extends BaseWebDriverTest
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
-        doRenameFieldsTest();
-        doUploadTest();
-        customFormattingTest();
         customizeURLTest();
         crossContainerLookupTest();
-        listSelfJoinTest();
     }
+
+    /* Issue 23487: add regression coverage for batch insert into list with multiple errors
+    */
+    @Test
+    public void testBatchInsertErrors() throws IOException, CommandException
+    {
+        // create the list for this case
+        String multiErrorListName = "multiErrorBatchList";
+        List<String> expectedErrors = new ArrayList<>();
+            expectedErrors.add("Could not convert 'green' for field ShouldInsertCorrectly, should be of type Boolean");
+            expectedErrors.add("Could not convert 'five' for field Id, should be of type Integer; Missing value for required property: Id");
+
+        createList(multiErrorListName, BatchListColumns, BatchListData);
+        beginAt("/query/" + EscapeUtil.encode(PROJECT_VERIFY) + "/executeQuery.view?schemaName=lists&query.queryName=" + multiErrorListName);
+        _listHelper.clickImportData();
+
+        // insert the new list data and verify the expected errors appear
+        setListImportAsTestDataField(toTSV(BatchListColumns, BatchListExtraData), expectedErrors);
+
+        // no need to query the list; nothing will be inserted if the batch insert fails/errors
+    }
+
 
     /*  Issue 6883: Create test for list self join
         Issue 10394: Test spaces & special characters in table/column names
@@ -632,8 +677,8 @@ public class ListTest extends BaseWebDriverTest
 
         preconditions:  ListVerifyProject
     */
-    @LogMethod
-    private void listSelfJoinTest()
+    @Test
+    public void listSelfJoinTest()
     {
         final String listName = "listSelfJoin" + TRICKY_CHARACTERS;
         final String dummyBase = "dummyCol";
@@ -659,11 +704,12 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     private void crossContainerLookupTest()
     {
+        goToProjectHome(PROJECT_OTHER);
         //create list with look up A
         String lookupColumn = "lookup";
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
         _listHelper.clickImportData();
-        setListImportAsTestDataField(lookupColumn + "\n1");
+        setListImportAsTestDataField(lookupColumn + "\n1", null);
 
         log("verify look column set properly");
         assertTextPresent("one A");
@@ -733,6 +779,13 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
     }
 
+    @Test
+    public void uploadAndCustomFormat()  // customFormattingTest assumes it picks up where doUploadTest leaves off
+    {
+        doUploadTest();
+        customFormattingTest();
+    }
+
     @LogMethod
     private void doUploadTest()
     {
@@ -774,6 +827,7 @@ public class ListTest extends BaseWebDriverTest
     private void customFormattingTest()
     {
         // Assumes we are at the list designer after doUploadTest()
+
         clickButton("Edit Design", 0);
 
         // Set conditional format on boolean column. Bold, italic, strikethrough, cyan text, red background
@@ -859,8 +913,8 @@ public class ListTest extends BaseWebDriverTest
         shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
     }
 
-    @LogMethod
-    private void doRenameFieldsTest()
+    @Test
+    public void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         _listHelper.createList(PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
@@ -934,6 +988,26 @@ public class ListTest extends BaseWebDriverTest
         {"1", "one C"},
     };
 
+    List<ListHelper.ListColumn> BatchListColumns = Arrays.asList(
+            col("Id", Integer),
+            col("FirstName", String),
+            col("LastName", String),
+            col("IceCreamFlavor", String),
+            col("ShouldInsertCorrectly", Boolean)
+    );
+    String[][] BatchListData = new String[][]
+            {
+                    {"1", "Joe", "Test", "Vanilla", "true"},
+                    {"2", "Jane", "Test", "Rum Raisin", "true"},
+                    {"3", "Jeff", "BugCatcher", "Rocky Road", "true"},
+            };
+    String[][] BatchListExtraData = new String[][]
+            {
+                    {"4", "Crash", "Test", "Vanilla", "green"},
+                    {"five", "Crunch", "Test", "Rum Raisin", "false"},
+                    {"6", "Will", "ShouldPass", "Rocky Road", "true"},
+                    {"7", "Liam", "ShouldPass", "Chocolate", "true"},
+            };
 
     String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
     {
@@ -966,6 +1040,11 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.submitImportTsv_error(error);
     }
 
+    void submitImportTsv(List<String> errors)
+    {
+        _listHelper.submitImportTsv_errors(errors);
+    }
+
     void submitImportTsv()
     {
         _listHelper.submitImportTsv_success();
@@ -981,13 +1060,21 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         _listHelper.clickSave();
         _listHelper.clickImportData();
-        setListImportAsTestDataField(toTSV(cols,data));
+        setListImportAsTestDataField(toTSV(cols,data), null);
     }
 
-    private void setListImportAsTestDataField(String data)
+    private void setListImportAsTestDataField(String data, List<String> expectedErrors)
     {
         setFormElement(Locator.name("text"), data);
-        submitImportTsv();
+        if (null==expectedErrors || expectedErrors.isEmpty())
+        {
+            submitImportTsv();
+        }
+        else
+        {
+            submitImportTsv(expectedErrors);
+        }
+
     }
 
 
@@ -997,7 +1084,7 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void customizeURLTest()
+    public void customizeURLTest()
     {
         this.pushLocation();
         {
