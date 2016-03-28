@@ -214,7 +214,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster, make sure the expected email is there and get the url from the message.");
-        resetUrl = getUrlFromEmail("Verification .* Web Site email change.*");
+        resetUrl = getUrlFromEmail("Verification .* Web Site email change*");
 
         goToHome();
 
