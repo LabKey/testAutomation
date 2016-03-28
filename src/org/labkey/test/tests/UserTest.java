@@ -294,7 +294,7 @@ public class UserTest extends BaseWebDriverTest
 
     private URL getUrlFromEmail(String subjectRegEx)
     {
-        final String URL_PART = "home/user-changeEmail.view?userId=";
+        final String URL_PART = "changeEmail.view?userId=";
         String urlString = "";
         URL resetUrl;
         String[] msgLines;
