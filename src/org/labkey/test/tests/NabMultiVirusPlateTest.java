@@ -195,7 +195,7 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
     {
         String assayName = createFileBasedMetadataAssay();
 
-        clickAndWait(Locator.linkWithText(assayName));
+        clickAndWait(Locator.linkContainingText(assayName));
         AssayImporter importer = new AssayImporter(this,
                 new AssayImportOptions.ImportOptionsBuilder().
                         assayId("ptid + date").
