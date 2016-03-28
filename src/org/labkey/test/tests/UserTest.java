@@ -214,7 +214,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster, make sure the expected email is there and get the url from the message.");
-        resetUrl = getUrlFromEmail("Verification .* Web Site email change*");
+        resetUrl = getUrlFromEmail("Verification .* Web Site email change.*");
 
         goToHome();
 
@@ -294,7 +294,7 @@ public class UserTest extends BaseWebDriverTest
 
     private URL getUrlFromEmail(String subjectRegEx)
     {
-        final String URL_PART = "home/changeEmail.view?userId=";
+        final String URL_PART = "home/user-changeEmail.view?userId=";
         String urlString = "";
         URL resetUrl;
         String[] msgLines;
