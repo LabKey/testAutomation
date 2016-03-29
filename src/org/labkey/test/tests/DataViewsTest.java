@@ -89,13 +89,10 @@ public class DataViewsTest extends ParticipantListTest
     {
         log("Data Views Test");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
-        waitForText(someDatasets[3]);
+        waitForText(CATEGORIES[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         assertDataDisplayedAlphabetically();
-
-        //TODO:  waiting on hypermove fix
-//        datasetBrowseClickDataTest();
 
         log("Verify dataset category filtering.");
         setDataBrowseSearch(BITS[3]);
@@ -174,7 +171,6 @@ public class DataViewsTest extends ParticipantListTest
         saveDatasetProperties(EDITED_DATASET);
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForElement(Locator.css(".data-views-tip-content"));
-//        assertEquals("Dataset hover tip not as expected", EDITED_DATASET_TOOLTIP, getText(Locator.css(".data-views-tip-content")));
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(NEW_DESCRIPTION);
 
@@ -189,14 +185,13 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.linkContainingText(REPORT_TO_DELETE));
     }
-    private final static String EDITED_DATASET_TOOLTIP = "Source:Subcategory1-EFGHIJKL></% 1Type:DatasetStatus:NoneDescription:Description set in data views webpart";
 
     @LogMethod
     public void datasetStatusTest()
     {
         log("Testing status settings for datasets");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
-        waitForText(someDatasets[3]);
+        waitForText(CATEGORIES[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
@@ -294,13 +289,11 @@ public class DataViewsTest extends ParticipantListTest
         log("Verify refresh date");
         String refreshDate = "2012-03-01";
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
-        waitForText(someDatasets[3]);
+        waitForText(CATEGORIES[3]);
         // Refresh date not present when not set.
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Type:");
         assertTextNotPresent("Data Cut Date:");
-//        mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
-//        waitForTextToDisappear("Type:");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Modified");
         _ext4Helper.checkCheckbox("Data Cut Date");
@@ -350,8 +343,6 @@ public class DataViewsTest extends ParticipantListTest
         addSubCategory("Subcategory1-" + CATEGORIES[1]);
         addSubCategory("Subcategory2-" + CATEGORIES[1]);
 
-        click(Ext4Helper.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
-        waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
         click(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
@@ -359,8 +350,6 @@ public class DataViewsTest extends ParticipantListTest
         addSubCategory("Subcategory1-" + CATEGORIES[2]);
         addSubCategory("Subcategory2-" + CATEGORIES[2]);
 
-        click(Ext4Helper.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
-        waitForTextToDisappear("Subcategory1-" + CATEGORIES[2]);
         click(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
         waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
