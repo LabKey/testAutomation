@@ -67,6 +67,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view?");
 
+        acceptAllAlerts(); // Just get logged in, ignore '*unload' alerts
+
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
         {
             goToHome();
