@@ -172,8 +172,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1\u00E4\u00F6\u00FC\u00C5";
     public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#\u00E4\u00F6\u00FC\u00C5";
-    public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
-    public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
+    public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>";
+    public static final String INJECT_CHARS_2 = "\"'>--><img src=\"xss\" onerror=\"alert('8(')\">";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
@@ -831,9 +831,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
         request.setRequestMethod("POST");
         request.copySession(getDriver());
-        SimpleHttpResponse response = request.getResponse();
-        assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, response.getResponseCode());
-        smUrl = response.getResponseBody();
+        try
+        {
+            SimpleHttpResponse response = request.getResponse();
+            assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, response.getResponseCode());
+            smUrl = response.getResponseBody();
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public void waitForSystemMaintenanceCompletion()
@@ -2589,8 +2596,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
         logOutRequest.copySession(getDriver());
 
-        SimpleHttpResponse response = logOutRequest.getResponse();
-        assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        try
+        {
+            SimpleHttpResponse response = logOutRequest.getResponse();
+            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /*

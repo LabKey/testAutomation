@@ -16,7 +16,6 @@
 
 package org.labkey.test;
 
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -27,7 +26,6 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -45,6 +43,10 @@ import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.util.InstallCert;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebDriver;
 import org.seleniumhq.jetty9.util.URIUtil;
 
 import java.io.BufferedReader;
@@ -61,8 +63,10 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Static methods for getting properties of and communicating with a running LabKey server
@@ -78,10 +82,19 @@ public class WebTestHelper
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
     private static boolean USE_CONTAINER_RELATIVE_URL = true;
+    private static Set<Cookie> savedCookies = Collections.emptySet();
 
     public static void setUseContainerRelativeUrl(boolean useContainerRelativeUrl)
     {
         USE_CONTAINER_RELATIVE_URL = useContainerRelativeUrl;
+    }
+
+    /**
+     * Save cookies to be used by HTTP requests
+     */
+    public static void setDefaultSession(WebDriver driver)
+    {
+        savedCookies = new HashSet<>(driver.manage().getCookies());
     }
 
     public static boolean isUseContainerRelativeUrl()
@@ -479,116 +492,73 @@ public class WebTestHelper
         return builder.toString();
     }
 
+    @Deprecated
     public static int getHttpGetResponse(String url) throws IOException
     {
-        return getHttpGetResponse(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        return getHttpResponse(url).getResponseCode();
     }
 
-    public static int getHttpGetResponse(String url, String username, String password) throws IOException
+    /**
+     * Get response to GET using default username:password and cached session
+     * @param url Absolute URL or relative LabKey URL
+     */
+    public static SimpleHttpResponse getHttpResponse(String url)
+    {
+        return getHttpResponse(url, "GET", PasswordUtil.getUsername(), PasswordUtil.getPassword(), savedCookies);
+    }
+
+    /**
+     * Get response to request using default username:password and cached session
+     * @param url Absolute URL or relative LabKey URL
+     * @param requestMethod e.g. "GET" or "POST"
+     */
+    public static SimpleHttpResponse getHttpResponse(String url, String requestMethod)
+    {
+        return getHttpResponse(url, requestMethod, PasswordUtil.getUsername(), PasswordUtil.getPassword(), savedCookies);
+    }
+
+    /**
+     * Get response to GET using provided username:password and no session
+     * @param url Absolute URL or relative LabKey URL
+     */
+    public static SimpleHttpResponse getHttpResponse(String url, String username, String password)
+    {
+        return getHttpResponse(url, "GET", username, password, Collections.emptySet());
+    }
+
+    /**
+     * Get response to request using provided username:password and no session
+     * @param url Absolute URL or relative LabKey URL
+     * @param requestMethod e.g. "GET" or "POST"
+     */
+    public static SimpleHttpResponse getHttpResponse(String url, String requestMethod, String username, String password)
+    {
+        return getHttpResponse(url, requestMethod, username, password, Collections.emptySet());
+    }
+
+    /**
+     *
+     * @param url Absolute URL or relative LabKey URL
+     * @param requestMethod e.g. "GET" or "POST"
+     * @param cookies Provided by {@link WebDriver.Options#getCookies()}
+     */
+    public static SimpleHttpResponse getHttpResponse(String url, String requestMethod, String username, String password, Set<Cookie> cookies)
     {
         if (url.startsWith("/"))
             url = getBaseURL() + url;
 
-        HttpResponse response = null;
-        int status;
-
-        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
+        SimpleHttpRequest request = new SimpleHttpRequest(url);
+        request.setRequestMethod(requestMethod);
+        request.setLogin(username, password);
+        request.setCookies(cookies);
+        try
         {
-            HttpGet get = new HttpGet(url);
-
-            response = client.execute(get, getBasicHttpContext());
-            status = response.getStatusLine().getStatusCode();
+            return request.getResponse();
         }
-        finally
+        catch (IOException e)
         {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
+            throw new RuntimeException(e);
         }
-        return status;
-    }
-
-    public static int getHttpPostResponse(String url) throws IOException
-    {
-        return getHttpPostResponse(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
-    }
-
-    public static int getHttpPostResponse(String url, String username, String password) throws IOException
-    {
-        if (url.startsWith("/"))
-            url = getBaseURL() + url;
-
-        HttpResponse response = null;
-        int status;
-
-        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
-        {
-            HttpPost post = new HttpPost(url);
-            HttpClientContext context = getBasicHttpContext();
-            response = client.execute(post, context);
-            status = response.getStatusLine().getStatusCode();
-        }
-        finally
-        {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
-        }
-        return status;
-    }
-
-    public static String getHttpGetResponseBody(String url) throws HttpException, IOException
-    {
-        return getHttpGetResponseBody(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
-    }
-
-    public static String getHttpGetResponseBody(String url, String username, String password) throws HttpException, IOException
-    {
-        if (url.startsWith("/"))
-            url = getBaseURL() + url;
-
-        HttpResponse response = null;
-        String responseBody;
-
-        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
-        {
-            HttpGet method = new HttpGet(url);
-
-            response = client.execute(method, getBasicHttpContext());
-            responseBody = getHttpResponseBody(response);
-        }
-        finally
-        {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
-        }
-        return responseBody;
-    }
-
-    public static String getHttpPostResponseBody(String url) throws HttpException, IOException
-    {
-        return getHttpPostResponseBody(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
-    }
-
-    public static String getHttpPostResponseBody(String url, String username, String password) throws HttpException, IOException
-    {
-        if (url.startsWith("/"))
-            url = getBaseURL() + url;
-
-        HttpResponse response = null;
-        String responseBody;
-
-        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
-        {
-            HttpPost post = new HttpPost(url);
-
-            response = client.execute(post, getBasicHttpContext());
-            responseBody = getHttpResponseBody(response);
-        }
-        finally
-        {
-            if (response != null)
-                EntityUtils.consumeQuietly(response.getEntity());
-        }
-        return responseBody;
     }
 
     public static class FolderIdentifier

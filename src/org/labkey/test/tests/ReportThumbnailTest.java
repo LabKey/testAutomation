@@ -320,14 +320,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         mouseOver(Locator.linkWithText(chart));
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
-        try
-        {
-            THUMBNAIL_DATA = WebTestHelper.getHttpGetResponseBody(getAttribute(thumbnail, "src"));
-        }
-        catch (HttpException | IOException ex)
-        {
-            throw new RuntimeException(ex);
-        }
+        THUMBNAIL_DATA = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
     }
 
     @LogMethod
@@ -345,14 +338,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
         waitForElement(thumbnail);
         String thumbnailData;
-        try
-        {
-            thumbnailData = WebTestHelper.getHttpGetResponseBody(getAttribute(thumbnail, "src"));
-        }
-        catch (HttpException | IOException ex)
-        {
-            throw new RuntimeException(ex);
-        }
+        thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
 
         if (null == expected)
             assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
@@ -430,14 +416,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Images");
         Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
         waitForElement(iconLocator);
-        try
-        {
-            ICON_DATA = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
-        }
-        catch (HttpException | IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        ICON_DATA = WebTestHelper.getHttpResponse(getAttribute(iconLocator, "src")).getResponseBody();
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
@@ -460,14 +439,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
         waitForElement(iconLocator);
         String iconData;
-        try
-        {
-            iconData = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
-        }
-        catch (HttpException | IOException e)
-        {
-            throw new RuntimeException(e);
-        }
+        iconData = WebTestHelper.getHttpResponse(getAttribute(iconLocator, "src")).getResponseBody();
 
         if (null == expected)
             assertFalse("Icon was still default", ICON_DATA.equals(iconData));

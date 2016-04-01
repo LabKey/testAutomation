@@ -47,7 +47,7 @@ public class SearchHelper
     public void initialize()
     {
         _searchQueue.clear();
-        SearchAdminAPIHelper.deleteIndex();
+        SearchAdminAPIHelper.deleteIndex(_test.getDriver());
     }
 
     @LogMethod(quiet = true)

@@ -28,6 +28,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
+import org.labkey.test.util.SimpleHttpResponse;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -116,10 +117,11 @@ public class WebDavTest extends BaseWebDriverTest
      * Regression Test -- 21936: return SC_BAD_REQUEST instead of IllegalArgumentException for bad request
      */
     @Test
-    public void testBadUrlResponse()
+    public void testBadUrlResponse() throws Exception
     {
         SimpleHttpRequest request = new SimpleHttpRequest(WebTestHelper.getBaseURL() + "/_webdav?uf=%uf");
-        assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, request.getResponse().getResponseCode());
+        SimpleHttpResponse response = request.getResponse();
+        assertEquals("Wrong response for unparsable parameter", HttpStatus.SC_BAD_REQUEST, response.getResponseCode());
     }
 
     private List<String> _listNames(Sardine s, String path) throws IOException

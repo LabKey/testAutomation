@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
@@ -27,6 +26,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A test utility for performing arbitrary HTTP requests
@@ -35,11 +35,12 @@ import java.util.Map;
  */
 public class SimpleHttpRequest
 {
-    String _url;
-    String _requestMethod = "GET";
-    String _username = PasswordUtil.getUsername();
-    String _password = PasswordUtil.getPassword();
-    Map<String, String> _cookies = Collections.emptyMap();
+    private String _url;
+    private String _requestMethod = "GET";
+    private String _username = PasswordUtil.getUsername();
+    private String _password = PasswordUtil.getPassword();
+    private int _timeout = 30000;
+    private Map<String, String> _cookies = Collections.emptyMap();
 
     public SimpleHttpRequest(String url)
     {
@@ -73,11 +74,15 @@ public class SimpleHttpRequest
         _requestMethod = requestMethod;
     }
 
-    public SimpleHttpResponse getResponse()
+    public void setTimeout(int timeout)
+    {
+        _timeout = timeout;
+    }
+
+    public SimpleHttpResponse getResponse() throws IOException
     {
         HttpURLConnection con = null;
 
-        int responseCode;
         try
         {
             URL url = new URL(_url);
@@ -93,14 +98,10 @@ public class SimpleHttpRequest
             }
             con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod(_requestMethod);
-            con.setReadTimeout(BaseWebDriverTest.WAIT_FOR_PAGE);
+            con.setReadTimeout(_timeout);
             useCopiedSession(con);
             con.connect();
             return SimpleHttpResponse.readResponse(con);
-        }
-        catch (IOException ex)
-        {
-            throw new RuntimeException(ex);
         }
         finally
         {
@@ -131,8 +132,13 @@ public class SimpleHttpRequest
 
     public void copySession(WebDriver driver)
     {
+        setCookies(driver.manage().getCookies());
+    }
+
+    public void setCookies(Set<Cookie> cookies)
+    {
         _cookies = new HashMap<>();
-        for (Cookie cookie : driver.manage().getCookies())
+        for (Cookie cookie : cookies)
         {
             _cookies.put(cookie.getName(), cookie.getValue());
         }

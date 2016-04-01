@@ -16,6 +16,7 @@
 package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
@@ -39,8 +40,7 @@ import java.util.Stack;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.WebTestHelper.getHttpGetResponse;
-import static org.labkey.test.WebTestHelper.getHttpPostResponse;
+import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 /**
  * TODO: Move non-JUnit related methods from BWDT.
@@ -118,6 +118,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
             clickButton("Next");
         }
+
+        WebTestHelper.setDefaultSession(getDriver());
     }
 
     @Deprecated // TODO: Remove after all 16.1.2 feature branches have been merged
@@ -133,17 +135,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(Locators.USER_MENU);
     }
 
+    @LogMethod
     public void deleteSiteWideTermsOfUsePage()
     {
-        try
-        {
-            log("Removing site-wide terms of use page");
-            getHttpPostResponse(WebTestHelper.getBaseURL() + "/wiki/delete.view?name=_termsOfUse");
-        }
-        catch (IOException e)
-        {
-            log("Problem removing site-wide terms of use page.  Perhaps it does not exist.");
-        }
+        getHttpResponse(WebTestHelper.buildURL("wiki", "delete", Maps.of("name", "_termsOfUse")), "POST").getResponseCode();
     }
 
     protected void bypassSecondaryAuthentication()
@@ -313,14 +308,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod (quiet = true)
     public void enableEmailRecorder()
     {
-        try
-        {
-            assertEquals("Failed to enable email recording", 200, getHttpGetResponse(WebTestHelper.getBaseURL() + "/dumbster/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword()));
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Failed to enable email recorder", e);
-        }
+        assertEquals("Failed to enable email recording", HttpStatus.SC_OK, getHttpResponse(WebTestHelper.buildURL("dumbster", "setRecordEmail", Maps.of("record", "true"))).getResponseCode());
     }
 
     @LogMethod(quiet = true)

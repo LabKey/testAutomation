@@ -32,29 +32,22 @@ public class SimpleHttpResponse
 
     private SimpleHttpResponse(){}
 
-    static SimpleHttpResponse readResponse(HttpURLConnection con)
+    static SimpleHttpResponse readResponse(HttpURLConnection con) throws IOException
     {
+        SimpleHttpResponse response = new SimpleHttpResponse();
+        response.responseCode = con.getResponseCode();
+        response.responseMessage = con.getResponseMessage();
         try
         {
-            SimpleHttpResponse response = new SimpleHttpResponse();
-            response.responseCode = con.getResponseCode();
-            response.responseMessage = con.getResponseMessage();
-            try
-            {
-                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
-            }
-            catch (IOException error)
-            {
-                response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
-            }
-            response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
-
-            return response;
+            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getInputStream());
         }
-        catch (IOException ex)
+        catch (IOException error)
         {
-            throw new RuntimeException(ex);
+            response.responseBody = TestFileUtils.getStreamContentsAsString(con.getErrorStream());
         }
+        response.responseHeaderFields = new HashMap<>(con.getHeaderFields());
+
+        return response;
     }
 
     public int getResponseCode()
