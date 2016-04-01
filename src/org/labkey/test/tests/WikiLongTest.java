@@ -25,12 +25,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
@@ -169,8 +174,10 @@ public class WikiLongTest extends BaseWebDriverTest
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
         log("Test add content to link page");
-        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
-        clickAndWait(Locator.linkWithText(WIKI_PAGE2_NAME));
+        WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
+        assertEquals("Link to other wiki has bad href", WebTestHelper.buildRelativeUrl("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME)), wikiLink.getAttribute("href"));
+        assertFalse("Link to other wiki has 'missing' flag", wikiLink.getAttribute("class").contains("missing"));
+        clickAndWait(wikiLink);
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
         _wikiHelper.convertWikiFormat("RADEOX");
