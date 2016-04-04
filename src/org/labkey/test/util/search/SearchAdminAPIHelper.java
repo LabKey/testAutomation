@@ -80,6 +80,7 @@ public abstract class SearchAdminAPIHelper
 
     public enum DirectoryType // From org.labkey.search.model.LuceneDirectoryType
     {
+        Default,
         MMapDirectory,
         NIOFSDirectory,
         SimpleFSDirectory
