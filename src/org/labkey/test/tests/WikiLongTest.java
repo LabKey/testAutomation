@@ -176,7 +176,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Test add content to link page");
         WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
         assertEquals("Link to other wiki has bad href", WebTestHelper.buildURL("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME.replace(" ", "%20"))), wikiLink.getAttribute("href"));
-        assertFalse("Link to other wiki has 'missing' flag", wikiLink.getAttribute("class").contains("missing"));
+//        assertFalse("Link to other wiki has 'missing' flag", wikiLink.getAttribute("class").contains("missing"));
         clickAndWait(wikiLink);
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
