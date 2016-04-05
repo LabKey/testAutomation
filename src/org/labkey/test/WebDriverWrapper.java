@@ -2870,7 +2870,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator l, String text)
     {
-        WebElement el = l.findElement(getDriver());
+        WebElement el = l.waitForElement(new WebDriverWait(getDriver(), 5));
         setFormElement(el, text);
     }
 
@@ -2923,7 +2923,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElement(Locator loc, File file)
     {
-        WebElement el = loc.findElement(getDriver());
+        WebElement el = loc.waitForElement(new WebDriverWait(getDriver(), 5));
         setFormElement(el, file);
     }
 
