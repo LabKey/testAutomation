@@ -29,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
@@ -47,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends BaseWebDriverTest
@@ -236,27 +238,14 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
-        // Without dependencies, we expect a javascript error.  Behavior is browser dependent
-        if (getBrowserType() == BrowserType.FIREFOX)
+        click(Ext4Helper.Locators.tab("View"));
+        if (getBrowserType() == BrowserType.CHROME && isScriptCheckEnabled())
         {
-            // no exception thrown, so look into the JS errors collection
-            click(Locator.linkWithText("View")); // JS error causes report to not render as RReportHelper expects
-            waitForElement(Locator.linkWithText("DataTables"));
-            verifyJsErrors(expectedError, true);
+            assertAlertContains("$ is not a function");
         }
-        else
-        {
-            // exception thrown, so knock down the alert
-            try
-            {
-                _rReportHelper.clickViewTab();
-                _rReportHelper.clickSourceTab();
-            }
-            catch(UnhandledAlertException e)
-            {
-                acceptAllAlerts();
-            }
-        }
+        waitForElement(Locator.id("mtcars_table"));
+        assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
+        _rReportHelper.clickSourceTab();
 
         // now set the dependencies
         _rReportHelper.clickSourceTab();
@@ -264,12 +253,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         setFormElement(Locator.name("scriptDependencies"), dependencies);
 
         _rReportHelper.clickViewTab();
-        if (getBrowserType() == BrowserType.FIREFOX)
-        {
-            // verify no errors now on FF.  Chrome would have thrown again and we would fail
-            // if there were errors on the page
-            verifyJsErrors(expectedError, false);
-        }
+        waitForElement(Locator.id("mtcars_table_wrapper"));
 
         assertReportContents(reportContains, reportNotContains);
         _rReportHelper.clickSourceTab();
@@ -278,7 +262,7 @@ public class KnitrReportTest extends BaseWebDriverTest
 
     private void verifyJsErrors(String expectedError, boolean shouldBePresent)
     {
-        if (TestProperties.isScriptCheckEnabled())
+        if (isScriptCheckEnabled())
         {
             try
             {
