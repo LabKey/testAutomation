@@ -660,7 +660,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         String emailTemplate;
         goToAdminConsole();
-        click(Locator.linkWithText("email customization"));
+        clickAndWait(Locator.linkWithText("email customization"));
         selectOptionByText(Locator.css("select[id='templateClass']"), "Message board notification");
         if(modify)
         {
