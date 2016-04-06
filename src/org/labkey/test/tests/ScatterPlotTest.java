@@ -301,7 +301,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
-        clickButton("Manage Dataset");
+        clickButton("Manage", WAIT_FOR_PAGE);
         clickButton("Edit Definition");
 
         waitForText("Dataset Fields");
@@ -340,7 +340,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
-        clickButton("Manage Dataset");
+        clickButton("Manage", WAIT_FOR_PAGE);
         clickButton("Edit Definition");
 
         waitForText("Dataset Fields");
@@ -369,7 +369,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
-        clickButton("Manage Dataset");
+        clickButton("Manage", WAIT_FOR_PAGE);
         prepForPageLoad();
         clickButton("Delete Dataset", 0);
         assertAlertContains("Are you sure you want to delete this dataset?");
