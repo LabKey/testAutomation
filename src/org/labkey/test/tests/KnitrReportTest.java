@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
@@ -24,7 +23,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -33,10 +31,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.IOException;
@@ -239,12 +234,8 @@ public class KnitrReportTest extends BaseWebDriverTest
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
         click(Ext4Helper.Locators.tab("Report"));
-        click(Locator.linkWithText("Report")); // JS error causes report to not render as RReportHelper expects
-        waitForElement(Locator.linkWithText("DataTables"));
-        verifyJsErrors(expectedError, true);
         if (getBrowserType() == BrowserType.CHROME && isScriptCheckEnabled())
         {
-            // no exception thrown, so look into the JS errors collection
             assertAlertContains("$ is not a function");
         }
         waitForElement(Locator.id("mtcars_table"));
@@ -262,41 +253,6 @@ public class KnitrReportTest extends BaseWebDriverTest
         assertReportContents(reportContains, reportNotContains);
         _rReportHelper.clickSourceTab();
         saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
-    }
-
-    private void verifyJsErrors(String expectedError, boolean shouldBePresent)
-    {
-        if (isScriptCheckEnabled())
-        {
-            try
-            {
-                boolean foundError = false;
-
-                List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
-                for (LogEntry j : jsErrors)
-                {
-                    String msg = j.getMessage();
-                    if (null != msg)
-                    {
-                        log("found JS error: " + msg);
-                        if (msg.contains(expectedError))
-                        {
-                            foundError = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (shouldBePresent)
-                    assertTrue("expected JS jquery reference error not found!", foundError);
-                else
-                    assertFalse("unexpected JS jquery reference error found!", foundError);
-            }
-            catch(WebDriverException ex)
-            {
-                fail("error checker not enabled!");
-            }
-        }
     }
 
     private String createKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption)
