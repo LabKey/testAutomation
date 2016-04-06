@@ -202,7 +202,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForText("Contains up to one row of HIV Test Results data for each Participant/Date combination.", "Positive", "Negative");
 
         goToManageLists();
-        waitAndClick(Locator.tagWithText("span", "Views"));
+        waitAndClick(Locator.tagWithText("span", "Grid Views"));
         mouseOver(Locator.tagWithText("span", "Folder Filter"));
         waitAndClick(Locator.tagWithText("span", "Current folder and subfolders"));
         sleep(500);
@@ -219,9 +219,10 @@ public class FolderTest extends BaseWebDriverTest
             {
                 pushLocation();
                 Locator.linkWithText(text).findElements(getDriver()).get(i).click();
-                waitForElement(Locator.tagWithText("span", "Views"));
+                waitForElement(Locator.tagWithText("span", "Grid Views"));
+                assertElementPresent(Locator.tagWithText("span", "Reports"));
                 assertElementPresent(Locator.tagWithText("span", "Charts"));
-                assertElementPresent(Locator.tagWithText("span", "View Design"));
+                assertElementPresent(Locator.tagWithText("span", "Design"));
                 assertElementPresent(Locator.linkWithText("edit"));
                 assertElementPresent(Locator.linkWithText("details"));
                 popLocation();

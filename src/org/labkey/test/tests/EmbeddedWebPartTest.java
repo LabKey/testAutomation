@@ -84,14 +84,14 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         clickButton("Save & Close");
         waitForText("Display Name");
 
-        String rViewName = TRICKY_CHARACTERS + "new R view";
-        _customizeViewsHelper.createRView(rViewName);
+        String rReportName = TRICKY_CHARACTERS + "new R report";
+        _customizeViewsHelper.createRReport(rReportName);
 
         waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
 
         resetTracker.startTrackingRefresh();
 
-        _extHelper.clickMenuButton(false, "Views", rViewName);
+        _extHelper.clickMenuButton(false, "Reports", rReportName);
 
         resetTracker.assertWasNotRefreshed();
     }

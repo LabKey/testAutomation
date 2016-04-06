@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
 public class FilterTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_NAME = "FilterVerifyProject";
-    protected final static String R_VIEW = TRICKY_CHARACTERS + "R view";
+    protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
@@ -144,7 +144,7 @@ public class FilterTest extends BaseWebDriverTest
         _listHelper.submitTsvData(testDataFull.toString());
         listUrl = getCurrentRelativeURL();
 
-        _customizeViewsHelper.createRView(R_VIEW);
+        _customizeViewsHelper.createRReport(R_VIEW);
     }
 
     @LogMethod
@@ -330,7 +330,7 @@ public class FilterTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        _extHelper.clickMenuButton("Grid Views", "Folder Filter", "Current folder and subfolders");
         assertElementPresent(Locator.linkWithText(projectIssue.get("title")));
         assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
@@ -589,7 +589,7 @@ public class FilterTest extends BaseWebDriverTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Views"), false, R_VIEW);
+            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Reports"), false, R_VIEW);
         }
         else
             beginAt(url);
@@ -599,7 +599,7 @@ public class FilterTest extends BaseWebDriverTest
 
         if (url == null)
         {
-            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Views"), false, "default");
+            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
 
             log("** Checking filter values in filter dialog");
             DataRegionTable region = new DataRegionTable(TABLE_NAME, this);

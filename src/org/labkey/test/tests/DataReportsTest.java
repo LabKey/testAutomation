@@ -207,7 +207,7 @@ public class DataReportsTest extends ReportTest
         scrollIntoView(Locator.linkWithText(datasetName)); // WORKAROUND: Chrome weirdness
         clickAndWait(Locator.linkWithText(datasetName));
 
-        _extHelper.clickMenuButton("Views", QUERY_REPORT_NAME_2);
+        _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
         WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(1);
         DataRegionTable region = new DataRegionTable(this, table);
@@ -238,7 +238,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
-        _extHelper.clickMenuButton("Views", "Create", "Crosstab View");
+        _extHelper.clickMenuButton("Reports", "Create Crosstab Report");
         selectOptionByValue(Locator.name("rowField"), "DEMsex");
         selectOptionByValue(Locator.name("colField"), "DEMsexor");
         selectOptionByText(Locator.name("statField"), "Visit");
@@ -283,7 +283,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        _extHelper.clickMenuButton("Views", "Create", "Advanced View");
+        _extHelper.clickMenuButton("Reports", "Create Advanced Report");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement(Locator.name("program"), java);
@@ -311,11 +311,11 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Reports", "Create R Report");
         setCodeEditorValue("script-report-editor", " ");
 
         log("Execute bad scripts");
-        clickViewTab();
+        clickReportTab();
         assertTextPresent("Empty script, a script must be provided.");
         assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
 
@@ -345,9 +345,9 @@ public class DataReportsTest extends ReportTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Reports", "Create R Report");
         setCodeEditorValue("script-report-editor", "labkey.data");
-        clickViewTab();
+        clickReportTab();
         waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL, R_FILTERED);
         assertTextBefore(R_SORT1, R_SORT2);
@@ -357,9 +357,9 @@ public class DataReportsTest extends ReportTest
         popLocation();
 
         log("Check saved R script");
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
         pushLocation();
-        _extHelper.clickMenuButton("Views", R_SCRIPTS[0]);
+        _extHelper.clickMenuButton("Reports", R_SCRIPTS[0]);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
@@ -381,14 +381,14 @@ public class DataReportsTest extends ReportTest
         popLocation();
 
         log("Create second R script");
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Reports", "Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         clickSourceTab();
         _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
-        clickViewTab();
+        clickReportTab();
 
         log("Check that R script worked");
         assertTextPresent(R_SCRIPT2_TEXT1);
@@ -415,9 +415,9 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText(DATA_SET));
         pushLocation();
         assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
-        _extHelper.clickMenuButton("Views", R_SCRIPTS[1]);
+        _extHelper.clickMenuButton("Reports", R_SCRIPTS[1]);
         goBack();
-        _extHelper.clickMenuButton("Views", AUTHOR_REPORT);
+        _extHelper.clickMenuButton("Reports", AUTHOR_REPORT);
 
         popLocation();
         log("Change user permission");
@@ -433,7 +433,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Reports", "Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
@@ -454,7 +454,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[1]);
 
-        clickViewTab();
+        clickReportTab();
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
@@ -490,7 +490,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
-        _extHelper.clickMenuButton("Views", reportName);
+        _extHelper.clickMenuButton("Reports", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementVisible(Ext4Helper.Locators.tab("Source"));
         stopImpersonatingRole();
@@ -500,7 +500,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
-        _extHelper.clickMenuButton("Views", reportName);
+        _extHelper.clickMenuButton("Reports", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         clickSourceTab();
         _rReportHelper.clearOption(RReportHelper.ReportOption.showSourceTab);
@@ -510,7 +510,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
-        _extHelper.clickMenuButton("Views", reportName);
+        _extHelper.clickMenuButton("Reports", reportName);
         waitForText(WAIT_FOR_PAGE, "Console output");
         assertElementNotVisible(Ext4Helper.Locators.tab("Source"));
         stopImpersonatingRole();
@@ -528,7 +528,7 @@ public class DataReportsTest extends ReportTest
     private void createRReport(String name, String scriptValue, boolean share, boolean shareSource, @NotNull String[] sharedScripts)
     {
 
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Reports", "Create R Report");
         setCodeEditorValue("script-report-editor", scriptValue);
 
         // if there are any shared scripts, check the check box so they get included when the report is rendered
@@ -565,6 +565,11 @@ public class DataReportsTest extends ReportTest
     private void clickViewTab()
     {
         clickDesignerTab("View");
+    }
+
+    private void clickReportTab()
+    {
+        clickDesignerTab("Report");
     }
 
     private void clickSourceTab()

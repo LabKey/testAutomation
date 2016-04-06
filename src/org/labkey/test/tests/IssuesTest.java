@@ -119,7 +119,7 @@ public class IssuesTest extends BaseWebDriverTest
         issuesTable.clearAllFilters("IssueId");
 
         // reset folder filter
-        _extHelper.clickMenuButton(true, "Views", "Folder Filter", "Current folder");
+        _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder");
     }
 
     public void setupProject()
@@ -653,7 +653,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issues Summary"));
         // Set the container filter to include subfolders
-        _extHelper.clickMenuButton(true, "Views", "Folder Filter", "Current folder and subfolders");
+        _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder and subfolders");
 
         // Verify the URL of issueTitles[0] goes to getProjectName()
         String href = getAttribute(Locator.linkContainingText(issueTitles[0]), "href");

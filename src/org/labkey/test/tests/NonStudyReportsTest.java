@@ -254,7 +254,7 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
 
         goToManageViews();
-        clickAddReport("R View");
+        clickAddReport("R Report");
         RReportHelper RReportHelper = new RReportHelper(this);
         RReportHelper.executeScript("# Placeholder script for discussion", "");
         click(Locator.linkWithText("Source"));

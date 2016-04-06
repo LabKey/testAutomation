@@ -46,7 +46,7 @@ public class CustomizeViewsHelper extends CustomizeView
     {
         if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
-            _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Views")), false, "Customize View");
+            _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Grid Views")), false, "Customize Grid");
             _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(getDataRegion()));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -108,7 +108,7 @@ public class CustomizeViewsHelper extends CustomizeView
         _test.scrollIntoView(_test.findButton("Save")).
                 click();
 
-        _test._extHelper.waitForExtDialog("Save Custom View");
+        _test._extHelper.waitForExtDialog("Save Custom Grid View");
         
         if (shared)
             _test.checkCheckbox(Locator.checkboxByName("saveCustomView_shared"));
@@ -670,9 +670,9 @@ public class CustomizeViewsHelper extends CustomizeView
      * post-conditions:  grid has R view of name name
      * @param name name to give new R view
      */
-    public void createRView(String name)
+    public void createRReport(String name)
     {
-        createRView(name, false);
+        createRReport(name, false);
     }
 
     /**
@@ -682,10 +682,10 @@ public class CustomizeViewsHelper extends CustomizeView
      * @param name name to give new R view
      * @param shareView should this view be available to all users
      */
-    public void createRView(String name, boolean shareView)
+    public void createRReport(String name, boolean shareView)
     {
-        _test.waitForText(("Views"));
-        _test._extHelper.clickMenuButton("Views", "Create", "R View");
+        _test.waitForText(("Reports"));
+        _test._extHelper.clickMenuButton("Reports", "Create R Report");
 
         if (shareView)
             _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);

@@ -909,12 +909,12 @@ public class DataRegionTable extends Component
 
     public void showAll()
     {
-        clickHeaderButton("Page Size", "Show All");
+        clickHeaderButton("Paging", "Show All");
     }
 
     public void setPageSize(int size)
     {
-        clickHeaderButton("Page Size", size + " per page");
+        clickHeaderButton("Paging", size + " per page");
     }
 
     /**
@@ -986,6 +986,11 @@ public class DataRegionTable extends Component
     public void clickHeaderButton(String buttonText, String ... subMenuLabels)
     {
         clickHeaderButton(buttonText, true, subMenuLabels);
+    }
+
+    public void openHeaderMenu(String buttonText, String ... subMenuLabels)
+    {
+        _test._ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(_regionName, buttonText), true, subMenuLabels);
     }
 
     public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)

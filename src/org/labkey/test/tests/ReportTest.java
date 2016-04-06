@@ -118,4 +118,9 @@ public abstract class ReportTest extends StudyBaseTest
     {
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
     }
+
+    protected void clickAddChart(String reportName)
+    {
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), reportName);
+    }
 }

@@ -364,7 +364,7 @@ public class MS1Test extends BaseWebDriverTest
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
         assertTextNotPresent("PepProphet", "Protein", "18protmix|P46406|G3P_RABIT");
 
         //test export

@@ -311,7 +311,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCreateFolderFromTemplate()
     {
-        _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Reports"});
+        _containerHelper.createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[]{"Grid Views"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(3, true);
         verifyFolderExportAsExpected(folderFromTemplate);

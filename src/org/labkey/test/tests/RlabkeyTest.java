@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -119,7 +120,7 @@ public class RlabkeyTest extends BaseWebDriverTest
             {
                 clickProject(PROJECT_NAME);
                 clickAndWait(Locator.linkWithText(LIST_NAME));
-                _extHelper.clickMenuButton("Views", "Create", "R View");
+                DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", "Create R Report");
 
                 // we want to load the Rlabkey package from the override location
                 File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");

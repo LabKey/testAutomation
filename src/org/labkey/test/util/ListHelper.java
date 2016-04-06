@@ -130,7 +130,7 @@ public class ListHelper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        _test.clickButton("Insert New");
+        _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
         setRowData(data, validateText);
     }
 
@@ -242,6 +242,7 @@ public class ListHelper
             Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
             _test.click(lastField);
         }
+        _test.scrollIntoView(Locator.xpath("//a[contains(@class, 'labkey-button')]//span[text()='Add Field']"));
         _test.clickButton("Add Field", 0);
         lastFieldIndex++;
         _test.setFormElement(Locator.name("ff_name" + lastFieldIndex),  col.getName());
@@ -406,7 +407,13 @@ public class ListHelper
 
     public void clickImportData()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        if(_test.isElementPresent(Locator.lkButton("Import Data")))
+            _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        else
+        {
+            _test.log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
+            _test._extHelper.clickMenuButton(true, "Insert", "Import Data");
+        }
         _test.waitForElement(Locator.id("tsv3"));
     }
 

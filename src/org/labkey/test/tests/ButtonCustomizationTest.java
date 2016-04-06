@@ -100,10 +100,10 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton("Done");
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         setFormElement(Locator.name("quf_name"), "Seattle");
         clickButton("Submit");
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         setFormElement(Locator.name("quf_name"), "Portland");
         clickButton("Submit");
         
@@ -125,7 +125,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
-        assertButtonPresent("Insert New");
+        assertButtonPresent("Insert");
 
         // assert custom buttons can REPLACE the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");

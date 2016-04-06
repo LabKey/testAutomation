@@ -109,7 +109,7 @@ public abstract class TimeChartTest extends ReportTest
     {
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Time Chart");
+        clickAddChart("Time Chart");
         clickChooseInitialMeasure();
     }
 

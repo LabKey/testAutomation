@@ -75,12 +75,15 @@ public class ExtHelper
             _test.waitForElement(parentLocator, WAIT_FOR_JAVASCRIPT);
             _test.mouseOver(parentLocator);
         }
-        Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
-        _test.waitForElement(itemLocator, WAIT_FOR_JAVASCRIPT);
-        if (wait)
-            _test.clickAndWait(itemLocator);
-        else
-            _test.click(itemLocator);
+        if(subMenuLabels.length > 0)
+        {
+            Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
+            _test.waitForElement(itemLocator, WAIT_FOR_JAVASCRIPT);
+            if (wait)
+                _test.clickAndWait(itemLocator);
+            else
+                _test.click(itemLocator);
+        }
     }
 
     // Tests for the presence of the last specified submenu. Main menu item plus intervening submenus must exist.

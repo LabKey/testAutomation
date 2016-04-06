@@ -48,7 +48,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Box Plot");
+        clickAddChart("Box Plot");
 
         //TODO: weird timing with these combo boxes.
         _ext4Helper.selectComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");

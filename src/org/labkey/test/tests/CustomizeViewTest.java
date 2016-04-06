@@ -18,10 +18,13 @@ package org.labkey.test.tests;
 import com.google.common.base.Function;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.data.DataRegion;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 
 import java.util.ArrayList;
@@ -207,8 +210,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
             _customizeViewsHelper.saveCustomView(name);
         }
 
-        _extHelper.clickMenuButton("Views", "default");
-        clickButton("Views", 0);
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "default");
+        DataRegionTable.findDataRegion(this).openHeaderMenu("Grid Views", "default");
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 

@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -114,10 +115,10 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -160,12 +161,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickProject(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
-        _extHelper.clickMenuButton("Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        _extHelper.clickMenuButton("Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         stopImpersonating();

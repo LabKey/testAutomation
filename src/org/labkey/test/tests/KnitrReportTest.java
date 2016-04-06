@@ -238,9 +238,13 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
-        click(Ext4Helper.Locators.tab("View"));
+        click(Ext4Helper.Locators.tab("Report"));
+        click(Locator.linkWithText("Report")); // JS error causes report to not render as RReportHelper expects
+        waitForElement(Locator.linkWithText("DataTables"));
+        verifyJsErrors(expectedError, true);
         if (getBrowserType() == BrowserType.CHROME && isScriptCheckEnabled())
         {
+            // no exception thrown, so look into the JS errors collection
             assertAlertContains("$ is not a function");
         }
         waitForElement(Locator.id("mtcars_table"));
@@ -252,7 +256,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         _rReportHelper.ensureFieldSetExpanded("knitr");
         setFormElement(Locator.name("scriptDependencies"), dependencies);
 
-        _rReportHelper.clickViewTab();
+        _rReportHelper.clickReportTab();
         waitForElement(Locator.id("mtcars_table_wrapper"));
 
         assertReportContents(reportContains, reportNotContains);
@@ -302,7 +306,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToManageViews();
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R Report");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
         return reportSource;
@@ -315,7 +319,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         String reportSource = createKnitrReport(reportSourcePath, knitrOption);
 
         // Regression test: Issue #18602
-        _rReportHelper.clickViewTab();
+        _rReportHelper.clickReportTab();
         assertReportContents(reportContains, reportNotContains);
 
         _rReportHelper.clickSourceTab();

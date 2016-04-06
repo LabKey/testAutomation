@@ -175,14 +175,14 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
-        assertButtonPresent("Page Size");
+        assertButtonPresent("Paging");
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
         assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
 
         log("Test 3 per page");
         table.setMaxRows(3);
         table = new DataRegionTable(dataRegionName, this);
-        clickButton("Page Size", 0);
+        clickButton("Paging", 0);
         assertElementPresent(Locator.linkWithText("3 per page"));
         assertElementPresent(Locator.linkWithText("40 per page"));
         assertElementPresent(Locator.linkWithText("100 per page"));
@@ -258,7 +258,7 @@ public class DataRegionTest extends BaseWebDriverTest
         }
         if (!found)
             fail("Didn't find 'Selected 5 of 15 rows.' message");
-        clickButton("Page Size", 0);
+        clickButton("Paging", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
         table = new DataRegionTable(dataRegionName, this);
         assertEquals(5, table.getDataRowCount());
@@ -268,7 +268,7 @@ public class DataRegionTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
 
         log("Show All");
-        clickButton("Page Size", 0);
+        clickButton("Paging", 0);
         clickAndWait(Locator.linkWithText("Show All"));
         table = new DataRegionTable(dataRegionName, this);
         assertEquals(15, table.getDataRowCount());
@@ -278,7 +278,7 @@ public class DataRegionTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
 
         log("Test 1000 per page");
-        clickButton("Page Size", 0);
+        clickButton("Paging", 0);
         clickAndWait(Locator.linkWithText("1000 per page"));
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));

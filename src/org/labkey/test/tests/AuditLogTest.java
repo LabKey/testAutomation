@@ -218,7 +218,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _listHelper.createList(folderName, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
         clickAndWait(Locator.linkWithText(folderName));
         clickAndWait(Locator.linkWithText(listName));
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         setFormElement(Locator.name("quf_Name"), "Data");
         submit();
     }

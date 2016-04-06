@@ -174,7 +174,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected text for " + PDF_FILE.getName(), Locator.xpath("//a[contains(text(), '" + PDF_FILE.getName() + "')]"), 1);
 
         log("Add another attachment field.");
-        click(Locator.linkWithText("View Design"));
+        clickAndWait(Locator.linkWithText("Design"));
         _listHelper.clickEditDesign();
         _listHelper.addField(_listColAttachment02);
         _listHelper.clickSave();
@@ -266,7 +266,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         }
 
         log("Remove one of the attachment columns and validate that everything still works.");
-        click(Locator.linkWithText("View Design"));
+        click(Locator.linkWithText("Design"));
         _listHelper.clickEditDesign();
         _listHelper.deleteField("List Fields", 3);
         _listHelper.clickSave();

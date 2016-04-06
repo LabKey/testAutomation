@@ -163,7 +163,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insert row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(lookupSourceListName));
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
         clickButton("Submit");
@@ -231,11 +231,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insering row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
 
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
         clickButton("Submit");
 
@@ -291,13 +291,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
-        _extHelper.clickMenuButton("Views", "Create", "R View");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", "Create R Report");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(folder + "-BackgroundReport");
         DataRegionTable.waitForDataRegion(this, "query");
 
         log("** Executing background R script");
-        _extHelper.clickMenuButton("Views", folder + "-BackgroundReport");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", folder + "-BackgroundReport");
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
@@ -330,7 +330,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _customizeViewsHelper.addCustomizeViewSort("Created", "Ascending");
         _customizeViewsHelper.saveCustomView("CreatedOnly");
 
-        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "Folder Filter", "Current folder and subfolders");
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(2, table.getDataRowCount());
 

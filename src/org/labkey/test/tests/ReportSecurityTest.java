@@ -120,10 +120,10 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("reportName"), "participant chart");
         clickButton("OK", 0);
 
-        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
-        _extHelper.clickMenuButton("Views", "default");
-        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
+        _extHelper.clickMenuButton("Grid Views", "default");
+        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
@@ -139,7 +139,7 @@ public class ReportSecurityTest extends ReportTest
         checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
 
-        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
         clickFolder(getFolderName());
@@ -178,7 +178,7 @@ public class ReportSecurityTest extends ReportTest
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
         assertTextPresent("User does not have read permission on this dataset.");
 /*
         no longer showing the query button by default.

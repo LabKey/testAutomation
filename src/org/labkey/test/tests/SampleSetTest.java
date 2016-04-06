@@ -326,7 +326,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void insertNewWithFileAttachmentTest()
     {
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         setFormElement(Locator.name("quf_Name"), "SampleSetInsertedManually");
         setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
         clickButton("Submit");

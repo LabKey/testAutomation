@@ -406,22 +406,22 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Color");
         scrollIntoView(findButton("Save")).click();
-        _extHelper.waitForExtDialog("Save Custom View");
+        _extHelper.waitForExtDialog("Save Custom Grid View");
         assertFalse("should not be able to select default view", Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default").findElement(getDriver()).isEnabled());
         clickButton("Cancel", 0);
 
-        _extHelper.clickMenuButton("Views", "EditableFileBasedView");
+        _extHelper.clickMenuButton("Grid Views", "EditableFileBasedView");
         waitForElement(Locator.tagContainingText("span", "Vehicles"));
 
         log("** Try to edit overridable file-based view");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Color");
         scrollIntoView(findButton("Save")).click();
-        _extHelper.waitForExtDialog("Save Custom View");
+        _extHelper.waitForExtDialog("Save Custom Grid View");
 
         click(Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default"));
         clickButtonByIndex("Save", 1, 0);
-        _extHelper.waitForExtDialog("Error saving view");
+        _extHelper.waitForExtDialog("Error saving grid view");
         clickButton("OK", 0);
 
         click(Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "named"));
@@ -656,7 +656,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
-        _extHelper.clickMenuButton("Views", "Crazy People");
+        _extHelper.clickMenuButton("Grid Views", "Crazy People");
         assertTextPresent("Adam", "Dave", "Josh");
         assertTextNotPresent("Britt");
 
@@ -686,7 +686,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing module-based JS reports...");
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        _extHelper.clickMenuButton("Views", "Want To Be Cool");
+        _extHelper.clickMenuButton("Reports", "Want To Be Cool");
         waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
         clickProject(getProjectName());
@@ -710,7 +710,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        _extHelper.clickMenuButton("Views", "Super Cool R Report");
+        _extHelper.clickMenuButton("Reports", "Super Cool R Report");
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         assertTextPresent("\"name\"", "\"age\"", "\"crazy\"");
     }
@@ -724,7 +724,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
-        clickButton("Import Data");
+        _extHelper.clickMenuButton("Insert", "Import Data");
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");

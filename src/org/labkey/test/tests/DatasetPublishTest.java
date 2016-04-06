@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 
@@ -89,7 +90,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        waitAndClick(Locator.xpath("//span[text()='Insert New']"));
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
         waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
         setFormElement(Locator.name("quf_date"), "1/1/2001");
@@ -126,7 +127,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     public void refreshDataset(@LoggedParam String datasetName)
     {
         goToDataset(datasetName);
-        _extHelper.clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Grid Views", "Edit Snapshot");
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
         assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");

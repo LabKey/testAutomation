@@ -62,7 +62,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         log("Create multi-measure time chart.");
         clickFolder(VISIT_FOLDER_NAME);
         goToManageViews();
-        clickAddReport("Time Chart");
+        clickAddChart("Time Chart");
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("1. Weight", 0);
         clickButton("Select", 0);

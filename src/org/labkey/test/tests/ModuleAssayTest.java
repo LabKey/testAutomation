@@ -80,17 +80,17 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Batches: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayDesignBatches");
-        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaBatches");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignBatches");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaBatches");
         assertTextPresent("Modified", "Created By");
         assertTextNotPresent("First Batch", "Target Study", "Target Study", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayTypeBatches");
+        _extHelper.clickMenuButton("Grid Views", "AssayTypeBatches");
         assertTextPresent("First Batch", "Created By");
         assertTextNotPresent("Modified", "Run Count");
 
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
 
         log("Visit batch details page");
         clickAndWait(Locator.linkWithText("details"));
@@ -110,17 +110,17 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Runs: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayDesignRuns");
-        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaRuns");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignRuns");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaRuns");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Assay Id", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayTypeRuns");
+        _extHelper.clickMenuButton("Grid Views", "AssayTypeRuns");
         assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
         assertTextNotPresent("Modified", "Run Count");
 
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
 
         log("Visit run details page");
         setSort("Runs", "Name", SortDirection.ASC);
@@ -136,17 +136,17 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
 
                 // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayDesignData");
-        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaData");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignData");
+        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaData");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Sample Id", "Monkey 1", "Monkey 2", "MetaOverride Double Run", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Views", "AssayTypeData");
+        _extHelper.clickMenuButton("Grid Views", "AssayTypeData");
         assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
         assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
 
-        _extHelper.clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Grid Views", "default");
 
         log("Visit result details page");
         clickAndWait(Locator.linkWithText("details"));

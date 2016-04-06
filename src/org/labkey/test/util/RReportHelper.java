@@ -34,9 +34,9 @@ import static org.junit.Assert.fail;
 public class RReportHelper
 {
     public enum ReportOption {
-        shareReport("Make this view available to all users", null, true),
+        shareReport("Make this report available to all users", null, true),
         showSourceTab("Show source tab to all users", null, true),
-        runInPipeline("Run this view in the background as a pipeline job", null, true),
+        runInPipeline("Run this report in the background as a pipeline job", null, true),
         knitrNone("None", "Knitr Options", false),
         knitrHtml("Html", "Knitr Options", false),
         knitrMarkdown("Markdown", "Knitr Options", false);
@@ -88,7 +88,7 @@ public class RReportHelper
         _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
 
         _test.setCodeEditorValue("script-report-editor", script);
-        _test._ext4Helper.clickTabContainingText("View");
+        _test._ext4Helper.clickTabContainingText("Report");
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
         _test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), _test.getDefaultWaitForPage());
 
@@ -313,11 +313,11 @@ public class RReportHelper
 
         if (null != name)
         {
-            Locator locator = Ext4Helper.Locators.window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
             if (_test.isElementPresent(locator))
             {
                 _test.setFormElement(locator, name);
-                _test._ext4Helper.clickWindowButton("Save View", "OK", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, 0);
+                _test._ext4Helper.clickWindowButton("Save Report", "OK", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, 0);
             }
         }
     }
@@ -352,9 +352,9 @@ public class RReportHelper
         }
     }
 
-    public void clickViewTab()
+    public void clickReportTab()
     {
-        _test.waitAndClick(Ext4Helper.Locators.tab("View"));
+        _test.waitAndClick(Ext4Helper.Locators.tab("Report"));
         _test.waitForElement(Locator.tagWithClass("div", "reportView").notHidden().withPredicate("not(ancestor-or-self::*[contains(@class,'mask')])"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 

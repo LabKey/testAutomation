@@ -334,7 +334,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton(DETAILS_BUTTON_NAME);
 
         log("Test inserting new row");
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
@@ -382,7 +382,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
         clickButton(DETAILS_BUTTON_NAME);
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
@@ -402,7 +402,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
         clickButton(DETAILS_BUTTON_NAME);
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
 
@@ -421,7 +421,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickButton("Cancel");
         clickButton(DETAILS_BUTTON_NAME);
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
 
@@ -440,7 +440,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
         clickButton(DETAILS_BUTTON_NAME);
-        clickButton("Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
     }
@@ -601,7 +601,7 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
-        _extHelper.clickMenuButton("Views", "default");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
@@ -614,7 +614,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        clickAndWait(Locator.linkWithText("View Design"));
+        clickAndWait(Locator.linkWithText("Design"));
         _listHelper.clickDeleteList();
         assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
         clickButton("OK");
@@ -816,7 +816,7 @@ public class ListTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabKeyErrors();
         log("Verify correct types are inferred from file");
-        clickButton("View Design");
+        clickButton("Design");
         waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='IntCol'] and ./td/div[text()='Integer']]"));
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='NumCol'] and ./td/div[text()='Number (Double)']]"));
@@ -1131,7 +1131,7 @@ public class ListTest extends BaseWebDriverTest
 
     void dataregionToEditDesign()
     {
-        clickButton("View Design");
+        clickButton("Design");
         _listHelper.clickEditDesign();
     }
 

@@ -733,9 +733,9 @@ public class CustomizeView extends Component
      * post-conditions:  grid has R view of name name
      * @param name name to give new R view
      */
-    public void createRView(String name)
+    public void createRReport(String name)
     {
-        createRView(name, false);
+        createRReport(name, false);
     }
 
     /**
@@ -745,10 +745,10 @@ public class CustomizeView extends Component
      * @param name name to give new R view
      * @param shareView should this view be available to all users
      */
-    public void createRView(String name, boolean shareView)
+    public void createRReport(String name, boolean shareView)
     {
-        _test.waitForText(("Views"));
-        _test._extHelper.clickMenuButton("Views", "Create", "R View");
+        _test.waitForText(("Reports"));
+        _test._extHelper.clickMenuButton("Reports", "Create R Report");
 
         if (shareView)
             _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
