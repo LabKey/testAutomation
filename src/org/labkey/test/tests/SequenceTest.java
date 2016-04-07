@@ -163,7 +163,7 @@ public class SequenceTest extends BaseWebDriverTest
         DataRegionTable.waitForDataRegion(this, "query");
 
         //verify CSV file creation
-        _extHelper.clickMenuButton(true, "Views", "All");
+        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "All");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickMenuButton("More Actions", "Create Illumina Sample Sheet");
