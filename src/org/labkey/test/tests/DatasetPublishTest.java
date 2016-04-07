@@ -34,19 +34,18 @@ import java.util.List;
 @Category({DailyA.class})
 public class DatasetPublishTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "DatasetPublishTestProject";
     private static final String SUBFOLDER_NAME = "TargetDatasets";
 
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "DatasetPublishTestProject";
     }
 
     @Test
     public void testSteps()
     {
-        _containerHelper.createProject(PROJECT_NAME, "Study");
+        _containerHelper.createProject(getProjectName(), "Study");
 
         importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
         goToProjectHome();
