@@ -89,9 +89,10 @@ public class ListHelper
 
     public void submitImportTsv_errors(List<String> errors)
     {
-        _test.clickButton("Submit", 0);
+        _test.doAndWaitForPageSignal(() -> _test.clickButton("Submit", 0),
+                IMPORT_ERROR_SIGNAL);
         if (errors == null || errors.isEmpty()){
-            _test.waitForElement(Locator.css(".labkey-error").containing(""));
+            _test.waitForElement(Locator.css(".labkey-error"));
         }
         else
         {
