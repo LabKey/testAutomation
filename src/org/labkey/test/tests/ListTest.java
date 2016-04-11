@@ -19,14 +19,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.data.ConvertHelper;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.InsertRowsCommand;
-import org.labkey.remoteapi.query.SaveRowsResponse;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -48,19 +41,16 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.ListHelper.ListColumnType.Boolean;
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
-
-import static org.junit.Assert.*;
 
 @Category({DailyA.class, Data.class})
 public class ListTest extends BaseWebDriverTest
@@ -177,8 +167,8 @@ public class ListTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(PROJECT_OTHER, afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
     }
 
     @Override
@@ -195,10 +185,10 @@ public class ListTest extends BaseWebDriverTest
         // delete existing rows
         log("Test deleting rows");
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        prepForPageLoad();
-        clickButton("Delete", 0);
-        assertAlert("Are you sure you want to delete the selected rows?");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> {
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete the selected rows?");
+        });
         // load test data
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), LIST_DATA2);
@@ -528,7 +518,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY).index(3));
 
         log("Test single list web part");
-        addWebPart("List - Single");
+        new PortalHelper(this).addWebPart("List - Single");
         setFormElement(Locator.name("title"), "This is my single list web part title");
         _ext4Helper.selectComboBoxItem("List:", LIST_NAME_COLORS);
         clickButton("Submit");
@@ -653,9 +643,10 @@ public class ListTest extends BaseWebDriverTest
     {
         // create the list for this case
         String multiErrorListName = "multiErrorBatchList";
-        List<String> expectedErrors = new ArrayList<>();
-            expectedErrors.add("Could not convert 'green' for field ShouldInsertCorrectly, should be of type Boolean");
-            expectedErrors.add("Could not convert 'five' for field Id, should be of type Integer; Missing value for required property: Id");
+        String[] expectedErrors = new String[]{
+                "Could not convert 'green' for field ShouldInsertCorrectly, should be of type Boolean",
+                "Could not convert 'five' for field Id, should be of type Integer; Missing value for required property: Id"
+        };
 
         createList(multiErrorListName, BatchListColumns, BatchListData);
         beginAt("/query/" + EscapeUtil.encode(PROJECT_VERIFY) + "/executeQuery.view?schemaName=lists&query.queryName=" + multiErrorListName);
@@ -709,7 +700,7 @@ public class ListTest extends BaseWebDriverTest
         String lookupColumn = "lookup";
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
         _listHelper.clickImportData();
-        setListImportAsTestDataField(lookupColumn + "\n1", null);
+        setListImportAsTestDataField(lookupColumn + "\n1");
 
         log("verify look column set properly");
         assertTextPresent("one A");
@@ -770,12 +761,14 @@ public class ListTest extends BaseWebDriverTest
 
         String encodedName = EscapeUtil.fieldKeyEncodePart(_listCol6.getName());
 
+        DataRegionTable query = new DataRegionTable("query", this);
+
         //sort  by element and verify it worked
-        setSort("query", encodedName, SortDirection.DESC);
+        query.setSort(encodedName, SortDirection.DESC);
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][2], TEST_DATA[5][1]);
 
         //remove sort and verify we return to initial state
-        clearSort("query", encodedName);
+        query.clearSort(encodedName);
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
     }
 
@@ -1040,11 +1033,6 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.submitImportTsv_error(error);
     }
 
-    void submitImportTsv(List<String> errors)
-    {
-        _listHelper.submitImportTsv_errors(errors);
-    }
-
     void submitImportTsv()
     {
         _listHelper.submitImportTsv_success();
@@ -1060,19 +1048,19 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         _listHelper.clickSave();
         _listHelper.clickImportData();
-        setListImportAsTestDataField(toTSV(cols,data), null);
+        setListImportAsTestDataField(toTSV(cols,data));
     }
 
-    private void setListImportAsTestDataField(String data, List<String> expectedErrors)
+    private void setListImportAsTestDataField(String data, String... expectedErrors)
     {
         setFormElement(Locator.name("text"), data);
-        if (null==expectedErrors || expectedErrors.isEmpty())
+        if (expectedErrors.length == 0)
         {
             submitImportTsv();
         }
         else
         {
-            submitImportTsv(expectedErrors);
+            _listHelper.submitImportTsv_errors(Arrays.asList(expectedErrors));
         }
 
     }
