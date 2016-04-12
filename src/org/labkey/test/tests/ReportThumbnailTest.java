@@ -26,8 +26,11 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +50,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private static final String PROJECT_NAME_ROUNDTRIP = "ReportThumbnailTest_Roundtrip";
     private static final File TEST_STUDY = TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip");
     private static final File TEST_THUMBNAIL = TestFileUtils.getSampleData("Microarray/test1.jpg");
-    private static final File TEST_ICON = TestFileUtils.getSampleData("icemr/piggy.JPG");
+    private static final File TEST_ICON = TestFileUtils.getSampleData("fileTypes/jpg_sample.jpg");
     private static final String BOX_PLOT = "Example Box Plot";
     private static final String SCATTER_PLOT = "Example Scatter Plot";
     private static final String R_PARTICIPANT_VIEWS = "R Participant Views: Physical Exam";
@@ -373,7 +376,6 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForTextToDisappear("Saving...");
     }
 
-    // NOTE: avoid 'assert' name
     protected boolean checkRevisionNumber(Locator loc, int num)
     {
         waitForElement(loc);
@@ -413,10 +415,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
-        _ext4Helper.clickExt4Tab("Images");
-        Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
-        waitForElement(iconLocator);
-        ICON_DATA = WebTestHelper.getHttpResponse(getAttribute(iconLocator, "src")).getResponseBody();
+        ICON_DATA = getIconDataFromPropertiesPanel();
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
@@ -435,11 +434,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitAndClick(Locator.xpath("//span[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.name("viewName"));
-        _ext4Helper.clickExt4Tab("Images");
-        Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
-        waitForElement(iconLocator);
-        String iconData;
-        iconData = WebTestHelper.getHttpResponse(getAttribute(iconLocator, "src")).getResponseBody();
+        String iconData = getIconDataFromPropertiesPanel();
 
         if (null == expected)
             assertFalse("Icon was still default", ICON_DATA.equals(iconData));
@@ -449,6 +444,21 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         ICON_DATA = iconData;
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
+    }
+
+    private String getIconDataFromPropertiesPanel()
+    {
+        _ext4Helper.clickExt4Tab("Images");
+        WebElement iconRow = waitForElement(Ext4Helper.Locators.formItemWithLabel("Icon").notHidden());
+        try
+        {
+            String iconSrc = waitForElement(Locator.xpath("//div[@class=\"icon\"]/img").notHidden()).getAttribute("src");
+            return WebTestHelper.getHttpResponse(iconSrc).getResponseBody();
+        }
+        catch (NoSuchElementException fontIcon) // font-awesome icon
+        {
+            return Locator.css("div.x4-form-display-field span").findElement(iconRow).getAttribute("class"); // e.g. "fa fa-sliders fa-rotate-90"
+        }
     }
 
     @LogMethod
