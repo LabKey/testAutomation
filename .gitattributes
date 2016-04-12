@@ -469,7 +469,7 @@ src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
-src/org/labkey/test/tests/AdvancedImportOptions.java -text
+src/org/labkey/test/tests/AdvancedImportOptionsTest.java -text
 src/org/labkey/test/tests/AffymetrixAssayTest.java -text
 src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text

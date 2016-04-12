@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 @Category(DailyB.class)
-public class AdvancedImportOptions extends BaseWebDriverTest
+public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
-
     private static final String IMPORT_STUDY_FILE = "/sampledata/AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip";
     private static final String IMPORT_PROJECT_FILE01 = "Advanced Import By File";
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
@@ -220,7 +219,5 @@ public class AdvancedImportOptions extends BaseWebDriverTest
 
         log("Cleanup and remove the project.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03);
-
     }
-
 }
