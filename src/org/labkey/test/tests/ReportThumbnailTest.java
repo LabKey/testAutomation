@@ -231,11 +231,11 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         ICON_R_NONE_DATA = ICON_DATA;
 
         goToDataViews();
-        assignCustomIcon(R_REGRESSION_BP_ALL, TEST_ICON, CORE_REV_NUM, 1);
+        assignCustomIcon(R_REGRESSION_BP_ALL, TEST_ICON, 1);
         verifyIcon(R_REGRESSION_BP_ALL, ICON_CUSTOM_DATA);
 
         goToDataViews();
-        assignCustomIcon(R_REGRESSION_BP_MEANS, TEST_ICON, CORE_REV_NUM, 1);
+        assignCustomIcon(R_REGRESSION_BP_MEANS, TEST_ICON, 1);
         verifyIcon(R_REGRESSION_BP_MEANS, ICON_CUSTOM_DATA);
     }
 
@@ -243,7 +243,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         setIconSRC(BOX_PLOT);
-        assignCustomIcon(BOX_PLOT, TEST_ICON, CORE_REV_NUM, 1);
+        assignCustomIcon(BOX_PLOT, TEST_ICON, 1);
         assertNewIcon(BOX_PLOT);
         ICON_CUSTOM_DATA = ICON_DATA;
 
@@ -462,7 +462,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void assignCustomIcon(String chart, File icon, int currentRevNum, int nextRevNum)
+    protected void assignCustomIcon(String chart, File icon, int customRevNum)
     {
         goToDataViews();
         waitAndClick(Locator.xpath("//span[@title='Edit']"));
@@ -470,7 +470,6 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
-        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), currentRevNum));
         setFormElement(Locator.xpath("//input[@id='customIcon-button-fileInputEl']"), icon);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
@@ -479,7 +478,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.name("viewName"));
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customIcon"));
-        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), nextRevNum));
+        assertTrue("Icon Revision number is not correct", checkRevisionNumber(Locator.xpath("//div[contains(@class, 'icon')]//img"), customRevNum));
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
