@@ -16,21 +16,24 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.reports.GetCategoriesCommand;
+import org.labkey.remoteapi.reports.GetCategoriesResponse;
+import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-//TODO: Add to DailyA suite: 20994: DataViewsTest is unreliable on TeamCity
-@Category({InDevelopment.class})
+@Category({DailyA.class})
 public class DataViewsTest extends ParticipantListTest
 {
     private static final String REPORT_NAME = "TestReport";
@@ -63,19 +66,19 @@ public class DataViewsTest extends ParticipantListTest
         log("Create report for data view webpart test.");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
-        clickButton("Save", "Please enter a view name:");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R Report");
+        clickButton("Save", "Please enter a report name:");
 
-        Locator locator = Ext4Helper.Locators.window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
         if (isElementPresent(locator))
         {
             setFormElement(locator, REPORT_NAME);
-            _ext4Helper.clickWindowButton("Save View", "OK", WAIT_FOR_JAVASCRIPT, 0);
+            _ext4Helper.clickWindowButton("Save Report", "OK", WAIT_FOR_JAVASCRIPT, 0);
         }
     }
 
     @Override
-    protected void doVerifySteps()
+    protected void doVerifySteps() throws Exception
     {   
         subcategoryTest();
         basicTest();
@@ -98,9 +101,9 @@ public class DataViewsTest extends ParticipantListTest
         setDataBrowseSearch(BITS[3]);
         waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(BITS[1]).notHidden());
         assertEquals("Incorrect number of dataset categories visible.", 4, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
-        assertEquals("Incorrect number of datasets after filter", 22, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after filter", 20, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         collapseCategory("Subcategory1-" + CATEGORIES[2]);
-        assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after collapsing subcategory.", 19, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         collapseCategory(CATEGORIES[2]);
         assertEquals("Incorrect number of datasets after collapsing category.", 10, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
@@ -208,12 +211,14 @@ public class DataViewsTest extends ParticipantListTest
 
             clickButton("Save", 0);
 
-            Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../../..//div//img[@alt='" + entry[1] + "']");
+            Locator statusLink = Locator.linkContainingText(entry[0]);
             waitForElement(statusLink, WAIT_FOR_JAVASCRIPT);
 
             // visit the dataset page and make sure we inject the correct class onto the page
             log("Verify dataset view has the watermark class");
-            click(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
+            scrollIntoView(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
+            // navigate directly; hover-tooltips sometimes prevent the click from happening
+            beginAt(Locator.linkWithText(entry[0]).findElement(getDriver()).getAttribute("href"), WAIT_FOR_JAVASCRIPT);
 
             waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
             clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
@@ -299,9 +304,8 @@ public class DataViewsTest extends ParticipantListTest
         _ext4Helper.checkCheckbox("Data Cut Date");
         WebElement manageButton = findButton("Manage Categories");
         clickButton("Save", 0);
-        shortWait().until(ExpectedConditions.stalenessOf(manageButton));
-        waitForText("Data Cut Date");
-        waitForText("Modified");
+        //shortWait().until(ExpectedConditions.stalenessOf(manageButton)); // TODO
+        waitForText("Data Cut Date", "Modified");
         enableEditMode();
         openEditPanel(EDITED_DATASET);
         _extHelper.waitForExtDialog(EDITED_DATASET);
@@ -310,7 +314,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(refreshDate, 1, WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Data Cut Date:");
+        waitForText("Data Cut Date");
         assertTextPresent("2012-03-01");
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent("2012-03-01");
@@ -328,7 +332,7 @@ public class DataViewsTest extends ParticipantListTest
             CATEGORIES[4];
 
     @LogMethod
-    public void subcategoryTest()
+    public void subcategoryTest() throws Exception
     {
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
@@ -395,6 +399,31 @@ public class DataViewsTest extends ParticipantListTest
                 datasets[3][0],
             CATEGORIES[3],
             CATEGORIES[4]);
+
+        GetCategoriesCommand cmd = new GetCategoriesCommand();
+        Connection conn = this.createDefaultConnection(false);
+
+        GetCategoriesResponse response = cmd.execute(conn, getProjectName() + "/" + getFolderName());
+
+        // now re-order subcategories
+        org.labkey.remoteapi.reports.Category subCategory1 = response.getCategory("Subcategory1-"+CATEGORIES[2]);
+        org.labkey.remoteapi.reports.Category subCategory2 = response.getCategory("Subcategory2-"+CATEGORIES[2]);
+        Long subCat1Ordinal = subCategory1.getDisplayOrder();
+        Long subCat2Ordinal = subCategory2.getDisplayOrder();
+        subCategory1.setDisplayOrder(subCat2Ordinal);
+        subCategory2.setDisplayOrder(subCat1Ordinal);
+
+        // save the re-ordered categories
+        SaveCategoriesCommand scmd = new SaveCategoriesCommand();
+        scmd.setCategories(subCategory1, subCategory2);
+        CommandResponse setCmdResponse = scmd.execute(conn, getProjectName() + "/" + getFolderName());
+        assertEquals(200, setCmdResponse.getStatusCode());
+
+        // now confirm re-ordering
+        GetCategoriesCommand confirmCmd = new GetCategoriesCommand();
+        GetCategoriesResponse confirmResponse = confirmCmd.execute(conn, getProjectName() + "/" + getFolderName());
+        assertEquals(subCat2Ordinal, confirmResponse.getCategory(subCategory1.getRowId()).getDisplayOrder());
+        assertEquals(subCat1Ordinal, confirmResponse.getCategory(subCategory2.getRowId()).getDisplayOrder());
     }
 
     private void exportImportTest()

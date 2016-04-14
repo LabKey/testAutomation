@@ -65,7 +65,7 @@ public class ParticipantListTest extends StudyBaseTest
     }
 
     @Override @LogMethod
-    protected void doVerifySteps()
+    protected void doVerifySteps() throws Exception
     {
         doParticipantListWebPartTest();
     }

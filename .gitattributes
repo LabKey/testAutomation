@@ -313,6 +313,10 @@ src/org/labkey/remoteapi/getdata/GetDataCommand.java -text
 src/org/labkey/remoteapi/getdata/GetDataResponse.java -text
 src/org/labkey/remoteapi/olap/MdxCommand.java -text
 src/org/labkey/remoteapi/olap/MdxResponse.java -text
+src/org/labkey/remoteapi/reports/Category.java -text
+src/org/labkey/remoteapi/reports/GetCategoriesCommand.java -text
+src/org/labkey/remoteapi/reports/GetCategoriesResponse.java -text
+src/org/labkey/remoteapi/reports/SaveCategoriesCommand.java -text
 src/org/labkey/remoteapi/security/AddAssignmentCommand.java -text
 src/org/labkey/remoteapi/security/BaseUpdateAssignmentCommand.java -text
 src/org/labkey/remoteapi/security/BulkUpdateGroupCommand.java -text

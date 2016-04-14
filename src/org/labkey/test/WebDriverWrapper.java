@@ -1279,17 +1279,39 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
         };
         TextSearcher searcher = new TextSearcher(this);
+        searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
+        searcher.setSourceTransformer(TextSearcher.TextTransformers.IDENTITY);
         searcher.searchForTexts(handler, texts);
 
         return present.getValue();
+    }
+
+    public List<String> getTextOrder(TextSearcher searcher, String... texts)
+    {
+        final List<Pair<String, Integer>> foundTexts = new ArrayList<>();
+
+        TextSearcher.TextHandler handler = (textSource, text) -> {
+            if (textSource.contains(text))
+                foundTexts.add(new Pair<>(text, textSource.indexOf(text)));
+            return true;
+        };
+
+        searcher.searchForTexts(handler, texts);
+
+        List<String> orderedTexts = new ArrayList<>();
+        foundTexts.stream()
+                .sorted((o1, o2) -> o1.getValue().compareTo(o2.getValue()))
+                .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
+
+        return orderedTexts;
     }
 
     public List<String> getMissingTexts(TextSearcher searcher, String... texts)
     {
         final List<String> missingTexts = new ArrayList<>();
 
-        TextSearcher.TextHandler handler = (htmlSource, text) -> {
-            if (!htmlSource.contains(text))
+        TextSearcher.TextHandler handler = (textSource, text) -> {
+            if (!textSource.contains(text))
                 missingTexts.add(text);
             return true;
         };
@@ -1563,10 +1585,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     // Searches only the displayed text in the body of the page, not the HTML source.
-    public void assertTextPresentInThisOrder(String... text)
+    public void assertTextPresentInThisOrder(String... texts)
     {
-        String success = isPresentInThisOrder(text);
-        assertTrue(success, success == null);
+        TextSearcher searcher = new TextSearcher(() -> getBodyText());
+        searcher.setSearchTransformer(TextSearcher.TextTransformers.IDENTITY);
+        searcher.setSourceTransformer(TextSearcher.TextTransformers.IDENTITY);
+        assertTextPresentInThisOrder(searcher, texts);
+    }
+
+    public void assertTextPresentInThisOrder(TextSearcher searcher, String... texts)
+    {
+        List<String> foundTextInOrder = getTextOrder(searcher, texts);
+        assertEquals("Text found out of order.", Arrays.asList(texts), foundTextInOrder);
     }
 
     public void assertTextBefore(String text1, String text2)
