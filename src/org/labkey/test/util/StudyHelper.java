@@ -315,13 +315,13 @@ public class StudyHelper
         _test.click(Locator.css(".studyWizardListList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard page 8 : Views
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
+        // Wizard page 8 : Grid Views
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Grid Views']"));
         _test.click(Locator.css(".studyWizardViewList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
-        // Wizard Page 9 : Reports
-        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
+        // Wizard Page 9 : Reports and Charts
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports and Charts']"));
         _test.click(Locator.css(".studyWizardReportList .x-grid3-hd-checker  div"));
         _test.clickButton("Next", 0);
 
