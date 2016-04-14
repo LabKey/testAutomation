@@ -69,6 +69,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_FLUOROSPOT_FILE2 = TestFileUtils.getLabKeyRoot() + "/sampledata/Elispot/" + TEST_ASSAY_FLUOROSPOT_FILENAME2;
     private static final String FLUOROSPOT_DETECTION_METHOD = "fluorescent";
 
+    public static final String STUDY_FOLDER = "Fluorospot";
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("nab");
@@ -158,6 +160,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     @Test @LogMethod
     public void fluorospotTests()
     {
+        log("** Initialize Study Folder");
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
+        clickButton("Create Study");
+        clickButton("Create Study");
+
         //create a new fluorospot assay
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickButton("Manage Assays");
@@ -180,6 +187,9 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         log("Uploading Fluorospot Runs");
         clickButton("Import Data");
+        String projectFolder = "/" + getProjectName() + "/" + STUDY_FOLDER;
+        String targetStudy = projectFolder + " (" + STUDY_FOLDER + " Study)";
+        selectOptionByText(Locator.name("targetStudy"), targetStudy);
         clickButton("Next");
         selectOptionByText(Locator.name("plateReader"), "AID");
         uploadFluorospotFile(TEST_ASSAY_FLUOROSPOT_FILE1, "F1", "Save and Import Another Run");
@@ -216,8 +226,18 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
         results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
-        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", " "}), results.getRowDataAsText(0));
-    }
+        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", "Fluorospot Study"}), results.getRowDataAsText(0));
+
+        DataRegionTable table = new DataRegionTable("Data", this);
+
+        table.setFilter("WellgroupName", "Equals One Of (example usage: a;b;c)", "Specimen 4");
+        table.setFilter("WellgroupLocation", "Equals One Of (example usage: a;b;c)", "(7, 8)");
+        table.checkAllOnPage();
+
+        clickButton("Copy to Study");
+        assertTextPresent("All data is marked for copying to study");
+        assertTextPresent(STUDY_FOLDER);
+}
 
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
