@@ -140,12 +140,12 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
-        click(Locator.linkWithText("Manage Locations"));
+        clickAndWait(Locator.linkWithText("Manage Locations"));
         assertTextPresent("Jimmy Neutron Lab", "Dexter's Lab");
 
         log("Validate QC State.");
         clickTab("Manage");
-        click(Locator.linkWithText("Manage Dataset QC States"));
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         assertFormElementEquals(Locator.css("td:nth-child(2) > input[type=\"text\"]:nth-child(2)"), "QC State Name 01");
 
         log("Validate wiki content are not imported");
