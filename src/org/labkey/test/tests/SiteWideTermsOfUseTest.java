@@ -128,7 +128,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         doNotAcceptSiteWideTerms();
         goToProjectBegin(PUBLIC_NO_TERMS_PROJECT_NAME);
-        assertTextPresent(SITE_WIDE_TERMS_TEXT);
+        waitForText(SITE_WIDE_TERMS_TEXT);
     }
 
 
@@ -138,7 +138,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         doNotAcceptSiteWideTerms();
         goToProjectBegin(PUBLIC_TERMS_PROJECT_NAME);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
     }
 
     // Do not accept site-wide terms. Go to non-public project with terms.  Should show project terms.
@@ -147,7 +147,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         doNotAcceptSiteWideTerms();
         goToProjectBegin(NON_PUBLIC_TERMS_PROJECT_NAME);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
     }
 
     // Do not accept site-wide terms. Go to non-public project without terms.  Should show side-wide terms.
@@ -156,7 +156,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         doNotAcceptSiteWideTerms();
         goToProjectBegin(NON_PUBLIC_NO_TERMS_PROJECT_NAME);
-        assertTextPresent(SITE_WIDE_TERMS_TEXT);
+        waitForText(SITE_WIDE_TERMS_TEXT);
     }
 
     // Accept site-wide terms.  Go to public project with terms. Should show project-level terms.
@@ -166,7 +166,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         acceptSiteWideTerms(false);
         log("Going to project page");
         clickProject(PUBLIC_TERMS_PROJECT_NAME, false);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
     }
 
     // Accept site-wide terms.  Go to public project without terms and should not show terms.
@@ -186,7 +186,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         acceptSiteWideTerms(false);
         goToProjectBegin(NON_PUBLIC_TERMS_PROJECT_NAME);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
     }
 
     // Accept site-wide terms.  Go to non-public project without terms. Should show site-level terms.
@@ -196,7 +196,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         acceptSiteWideTerms(false);
         log("Going to project page");
         goToProjectBegin(NON_PUBLIC_NO_TERMS_PROJECT_NAME);
-        assertTextPresent(SITE_WIDE_TERMS_TEXT);
+        waitForText(SITE_WIDE_TERMS_TEXT);
     }
 
     // Accept site-wide terms logging in.  Go to non-public project with terms and should show project-level terms.
@@ -205,7 +205,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         acceptSiteWideTerms(true);
         clickProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
         acceptTermsOfUse(PROJECT_TERMS_SNIPPET, true);
         // now go home and make sure we don't see the site-wide terms again
         goToHome();
@@ -215,7 +215,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         assertTextNotPresent(PROJECT_TERMS_SNIPPET);
         // go to separate project with terms
         clickProject(PUBLIC_TERMS_PROJECT_NAME, false);
-        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        waitForText(PROJECT_TERMS_SNIPPET);
     }
 
     // Accept site-wide terms logging in.  Go to non-public project without terms and should not show terms.
@@ -233,7 +233,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
         signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "To use this site, you must check the box to approve the terms of use.");
-        assertTextPresent(SITE_WIDE_TERMS_TEXT); // should show
+        waitForText(SITE_WIDE_TERMS_TEXT); // should show
     }
 
     // Attempt to log in with bad password.  Should show the terms of use again.
@@ -242,7 +242,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
         signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "To use this site, you must check the box to approve the terms of use.");
-        assertTextPresent(SITE_WIDE_TERMS_TEXT); // should show
+        waitForText(SITE_WIDE_TERMS_TEXT); // should show
     }
 
     protected void signOutWithSiteWideTerms(String termsText, boolean acceptTerms)
