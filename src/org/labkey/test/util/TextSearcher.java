@@ -80,7 +80,7 @@ public class TextSearcher
     public interface TextHandler
     {
         // Return true to continue searching
-        boolean handle(String htmlSource, String text);
+        boolean handle(String textSource, String text);
     }
 
     public static abstract class TextTransformers

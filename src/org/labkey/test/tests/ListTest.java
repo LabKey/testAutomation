@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
@@ -35,6 +36,7 @@ import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -478,15 +480,15 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.closeCustomizeViewPanel();
 
         log("Test Export");
-        addUrlParameter("exportAsWebPage=true");
-        pushLocation();
-        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
-        clickExportToText();
-        assertTextPresent(TEST_DATA[0][3]);
-        assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(TEST_DATA[0][0], _listCol4.getLabel());
-        popLocation();
 
+        File tableFile = new DataRegionExportHelper(new DataRegionTable("query", this)).exportText();
+        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
+        String tsv = TestFileUtils.getFileContents(tableFile);
+        TextSearcher tsvSearcher = new TextSearcher(() -> tsv).setSearchTransformer(t -> t);
+
+        assertTextPresent(tsvSearcher, TEST_DATA[0][3]);
+        assertTextPresent(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
+        assertTextNotPresent(tsvSearcher, TEST_DATA[0][0]);
         filterTest();
 
         clickProject(getProjectName());
@@ -572,18 +574,20 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(LIST2_KEY4);
 
         log("Test export");
-        addUrlParameter("exportAsWebPage=true");
-        pushLocation();
+        DataRegionTable list = new DataRegionTable("query", this);
         waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
-        clickExportToText();
-        assertTextPresent(
-                LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
+
+        DataRegionExportHelper helper = new DataRegionExportHelper(list);
+        File expFile = helper.exportText(DataRegionExportHelper.TextSeparator.COMMA);
+        TextSearcher srch = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
+        assertTextPresent(srch, LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
                 LIST_KEY_NAME2.toLowerCase() + _listCol2.getName(),
                 LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
-                LIST2_FOREIGN_KEY_OUTSIDE, LIST3_COL2);
-        assertTextNotPresent(LIST2_KEY, LIST2_KEY4);
-        assertTextBefore(LIST2_KEY3, LIST2_KEY2);
-        popLocation();
+                LIST2_FOREIGN_KEY_OUTSIDE,
+                LIST3_COL2);
+        assertTextNotPresent(srch, LIST2_KEY);
+        assertTextNotPresent(srch, LIST2_KEY4);
+        assertTextPresentInThisOrder(srch, LIST2_KEY3, LIST2_KEY2);
 
         log("Test edit row");
         clickAndWait(Locator.linkWithText("edit"));

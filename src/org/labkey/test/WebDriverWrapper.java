@@ -1489,6 +1489,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertEquals("Text '" + text + "' was not present the correct number of times", amount, countText(text));
     }
 
+    public void assertTextPresent(TextSearcher searcher, String text, int amount)
+    {
+        assertEquals("Text '" + text + "' was not present the correct number of times", amount, countText(searcher, text));
+    }
+
     public int countText(String text)
     {
         text = text.replace("&nbsp;", " ");
@@ -1501,6 +1506,29 @@ public abstract class WebDriverWrapper implements WrapsDriver
         while ((current_index = source.indexOf(text, current_index + 1)) != -1)
             count++;
         return count;
+    }
+
+    public int countText(TextSearcher searcher, String text)
+    {
+        final List<Integer> foundIndices = new ArrayList<>();
+
+        TextSearcher.TextHandler handler = new TextSearcher.TextHandler()
+        {
+            @Override
+            public boolean handle (String source, String text)
+            {
+                int current_index = 0;
+                while ((source.indexOf(text, current_index + 1)) != -1)
+                {
+                    current_index = source.indexOf(text, current_index +1);
+                    foundIndices.add(current_index);
+                }
+                return true;
+            }
+        };
+
+        searcher.searchForTexts(handler, new String[]{text});
+        return foundIndices.size();
     }
 
     public void assertTextNotPresent(TextSearcher searcher, String... texts)
