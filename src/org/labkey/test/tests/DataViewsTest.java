@@ -220,7 +220,9 @@ public class DataViewsTest extends ParticipantListTest
             // navigate directly; hover-tooltips sometimes prevent the click from happening
             beginAt(Locator.linkWithText(entry[0]).findElement(getDriver()).getAttribute("href"), WAIT_FOR_JAVASCRIPT);
 
-            waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
+            refresh();
+            waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"),
+                    WAIT_FOR_PAGE);
             clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         }
     }
