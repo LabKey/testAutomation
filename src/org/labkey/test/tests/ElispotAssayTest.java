@@ -161,7 +161,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     public void fluorospotTests()
     {
         log("** Initialize Study Folder");
-        _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
         clickButton("Create Study");
         clickButton("Create Study");
 
