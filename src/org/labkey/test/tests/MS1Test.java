@@ -24,7 +24,9 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -225,11 +227,11 @@ public class MS1Test extends BaseWebDriverTest
         _customizeViewsHelper.applyCustomView();
         assertElementNotPresent(Locator.linkWithText("1"));
 
-        pushLocation();
-        addUrlParameter("exportAsWebPage=true");
-        clickExportToText();
-        assertTextPresent("K.GAGAFGYFEVTHDITR.Y");
-        popLocation();
+        DataRegionTable list = new DataRegionTable("query", this);
+        File expFile = new DataRegionExportHelper(list).exportText(DataRegionExportHelper.TextSeparator.TAB);
+        TextSearcher tsvSearcher = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
+
+        assertTextPresent(tsvSearcher, "K.GAGAFGYFEVTHDITR.Y");
 
         //test fk table column filtering
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -369,16 +371,16 @@ public class MS1Test extends BaseWebDriverTest
 
         //test export
         log("Testing export...");
-        addUrlParameter("exportAsWebPage=true");
-        pushLocation();
-        clickExportToText();
-        assertTextPresent("Scan", "1948", "1585");
+
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(new DataRegionTable("fv", this));
+        File exportFile = exportHelper.exportText(DataRegionExportHelper.TextSeparator.TAB);
+        String fileContents = TestFileUtils.getFileContents(exportFile);
+        TextSearcher tsvSearcher = new TextSearcher(() -> fileContents).setSearchTransformer(t -> t);
+        assertTextPresent(tsvSearcher, "Scan", "1948", "1585");
 
         //ensure filtering and sorting are still in effect
-        assertTextNotPresent("5,972.8930");
-        assertTextBefore("66,204.2900", "49,012.0600");
-
-        popLocation();
+        assertTextNotPresent(tsvSearcher, "5,972.8930");
+        assertTextPresentInThisOrder(tsvSearcher, "66,204.2900", "49,012.0600");
 
         //test printing
         pushLocation();
