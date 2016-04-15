@@ -39,6 +39,7 @@ import org.openqa.selenium.WebElement;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -310,12 +311,25 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         clickAndWait(Locator.linkWithText(FCS_FILE_1 + " analysis"));
 
-        DataRegionTable runTable = new DataRegionTable("query", this);
-        runTable.clickHeaderButton("Charts", "Create Box Plot");
+        List<String> expectedMeasures = Arrays.asList(
+                "Count",
+                "4+/(!IFNg+&!IL2+&!IL4+&!TNF+):Count",
+                "4+/(!IFNg+&!IL2+&!IL4+&!TNF+):%P",
+                "4+/(!IFNg+&!IL2+&!IL4+&TNF+):Count"
+        );
 
-        Locator.XPathLocator measurePicker = Ext4Helper.Locators.window("Y Axis");
-        waitForElement(measurePicker);
-        waitForElements(measurePicker.append(Locator.tag("tr").startsWith("comp:")), 4);
+        DataRegionTable fcsAnalysisTable = new DataRegionTable("query", this);
+        List<String> columnHeaders = fcsAnalysisTable.getColumnHeaders();
+        List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
+        assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
+        fcsAnalysisTable.clickHeaderButton("Charts", "Create Box Plot");
+
+        Locator.XPathLocator measurePickerLoc = Ext4Helper.Locators.window("Y Axis");
+        WebElement measurePicker = waitForElement(measurePickerLoc);
+        Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
+        waitForElement(rowLoc.withText());
+        List<WebElement> pickerRows = rowLoc.waitForElements(measurePicker, 1000);
+        assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(getTexts(pickerRows)));
     }
 
     // Test sample set and ICS metadata
