@@ -39,6 +39,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -68,8 +69,15 @@ public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String _pipelineRoot = null;
-    protected final String _sequencePipelineLoc = TestFileUtils.getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
-    protected final String _illuminaPipelineLoc = TestFileUtils.getLabKeyRoot() + "/sampledata/sequenceAnalysis";
+    protected final String _sequencePipelineLoc = TestFileUtils.getLabKeyRoot() +
+            File.separatorChar +"externalModules" +
+            File.separatorChar + "labModules" +
+            File.separatorChar + "SequenceAnalysis" +
+            File.separatorChar + "resources" +
+            File.separatorChar + "sampleData";
+    protected final String _illuminaPipelineLoc = TestFileUtils.getLabKeyRoot() +
+            File.separatorChar + "sampledata" +
+            File.separatorChar + "sequenceAnalysis";
     protected final String _readsetPipelineName = "Import sequence data";
     protected final String _alignmentImportPipelineName = "Import Alignment(s)";
 
@@ -104,7 +112,13 @@ public class SequenceTest extends BaseWebDriverTest
         _startedPipelineJobs++;
         addReferenceGenomeTracks(this, TEST_GENOME_NAME);
 
-        File testBam = new File(TestFileUtils.getLabKeyRoot(), "/externalModules/labModules/SequenceAnalysis/resources/sampleData/test.bam");
+        File testBam = new File(TestFileUtils.getLabKeyRoot(),
+            File.separatorChar + "externalModules" +
+                File.separatorChar +     "labModules" +
+                File.separatorChar + "SequenceAnalysis" +
+                File.separatorChar + "resources" +
+                File.separatorChar + "sampleData" +
+                File.separatorChar + "test.bam");
         SequenceTest.addOutputFile(this, testBam, SequenceTest.TEST_GENOME_NAME, "TestBAM", "This is an output file", false);
     }
 
@@ -171,9 +185,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");
 
-        //this is used later to view the download
         String url = getCurrentRelativeURL();
-        url += "&exportAsWebPage=1";
         beginAt(url);
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");
@@ -231,27 +243,21 @@ public class SequenceTest extends BaseWebDriverTest
         int expectRows = (11 * (14 + 1));  //11 cols, 14 rows, plus header
         assertEquals(expectRows, getElementCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
 
-        //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
-        //to directly get the output
+        //NOTE: hitting download will download the file.
         Ext4CmpRef panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRef.class);
         String outputTable = panel.getEval("getTableOutput().join(\"<>\")").toString();
         outputTable = outputTable.replaceAll("<>", System.getProperty("line.separator"));
 
-        //then we download anyway
-        clickButton("Download For Instrument");
-
-        //the browser converts line breaks to spaces.  this is a hack to get them back
-        String text = _helper.getPageText();
+        //download the file and validate the contents
+        File downloadCSV = doAndWaitForDownload(() -> clickButton("Download For Instrument", 0));
+        TextSearcher fileSearcher = new TextSearcher(()-> TestFileUtils.getFileContents(downloadCSV));
         for (String[] a : fieldPairs)
         {
             String propName = a.length == 3 ? a[2] : a[0];
             String line = propName + "," + a[1];
-            assertTextPresent(line);
-
-            text.replaceAll(line, line + System.getProperty("line.separator"));
+            assertTextPresent(fileSearcher, line);
         }
-
-        assertTextPresent(prop_name + "," + prop_value);
+        assertTextPresent(fileSearcher, prop_name + "," + prop_value);
 
         File importTemplate = new File(_illuminaPipelineLoc, ILLUMINA_CSV);
         if (importTemplate.exists())
