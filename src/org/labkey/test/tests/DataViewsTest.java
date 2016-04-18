@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.json.JSONString;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -402,20 +404,29 @@ public class DataViewsTest extends ParticipantListTest
             CATEGORIES[3],
             CATEGORIES[4]);
 
+        //capture the categories and subcategories via Java api
         GetCategoriesCommand cmd = new GetCategoriesCommand();
         Connection conn = this.createDefaultConnection(false);
-
         GetCategoriesResponse response = cmd.execute(conn, getProjectName() + "/" + getFolderName());
+        log("Categories present in query response:");
+        for ( org.labkey.remoteapi.reports.Category cat : response.getCategoryList())
+        {
+            log("    " + cat.getLabel());
+        }
 
-        // now re-order subcategories
+        // now parse the categories out of the response object
         org.labkey.remoteapi.reports.Category subCategory1 = response.getCategory("Subcategory1-"+CATEGORIES[2]);
         org.labkey.remoteapi.reports.Category subCategory2 = response.getCategory("Subcategory2-"+CATEGORIES[2]);
+        Assert.assertFalse("missing " + "Subcategory1-"+CATEGORIES[2], null == subCategory1);
+        Assert.assertFalse("missing " + "Subcategory2-"+CATEGORIES[2], null == subCategory2);
+
+        // prepare args to switch display order (as the UI will)
         Long subCat1Ordinal = subCategory1.getDisplayOrder();
         Long subCat2Ordinal = subCategory2.getDisplayOrder();
         subCategory1.setDisplayOrder(subCat2Ordinal);
         subCategory2.setDisplayOrder(subCat1Ordinal);
 
-        // save the re-ordered categories
+        // construct the saveCategories command, give it the re-ordered categories as arguments
         SaveCategoriesCommand scmd = new SaveCategoriesCommand();
         scmd.setCategories(subCategory1, subCategory2);
         CommandResponse setCmdResponse = scmd.execute(conn, getProjectName() + "/" + getFolderName());
