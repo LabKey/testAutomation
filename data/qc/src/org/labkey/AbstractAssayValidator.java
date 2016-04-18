@@ -1,6 +1,6 @@
 package org.labkey;
 
-import org.labkey.remoteapi.sas.NetrcFileParser;
+import org.labkey.remoteapi.NetrcFileParser;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 
