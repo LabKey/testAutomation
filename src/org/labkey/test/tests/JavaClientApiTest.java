@@ -68,9 +68,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Starting security portion of test...");
         clickProject(PROJECT_NAME);
 
-        Connection cn = new Connection(getBaseURL());
-        cn.setEmail(PasswordUtil.getUsername());
-        cn.setPassword(PasswordUtil.getPassword());
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         cn.setAcceptSelfSignedCerts(true);
 
         log("creating a new user...");
