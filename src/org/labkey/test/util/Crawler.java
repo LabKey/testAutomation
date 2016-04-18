@@ -174,6 +174,7 @@ public class Crawler
             new ControllerActionId("NAb", "download"),           // TODO: I think this controller is gone
             new ControllerActionId("wiki", "download"),
             new ControllerActionId("harvest", "sickSafeTime"),
+            new ControllerActionId("harvest", "formatInvoice"),
 
             // Actions from external modules
             new ControllerActionId("targetedms", "downloadDocument")
