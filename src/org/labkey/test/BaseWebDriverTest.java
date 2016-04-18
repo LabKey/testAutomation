@@ -2687,18 +2687,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         selectSchema(schemaName);
         // wait for tool tip to disappear, in case it is covering the element we want to click on
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
-        Locator loc = Locator.queryTreeNode(queryName);
-        shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
-
+        Locator loc = Locator.css(".labkey-link").withText(queryName);
+        waitAndClick(loc);
         // NOTE: consider abstracting this.
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
-        // select/expand tree node
-        try{
-            scrollIntoView(loc);
-        }
-        catch (StaleElementReferenceException ignore) {}
-        clickAt(loc, 5, 5, 0);
-
         waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
     }
 
@@ -2716,7 +2708,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
         selectQuery(schemaName, queryName);
-        Locator loc = Locator.xpath("//div[contains(@class, 'lk-qd-name')]/a[text()='" + schemaName + "." + queryName + "']");
+        //Locator loc = Locator.xpath("//div[contains(@class, 'lk-qd-name')]/a[text()='" + schemaName + "." + queryName + "']");
+        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
