@@ -81,7 +81,7 @@ public class PortalTest extends BaseWebDriverTest
         // Verify that the asynchronous save worked by refreshing:
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
-        WebPart wikiWebPart = new BodyWebPart(this, "Wiki");
+        WebPart wikiWebPart = new BodyWebPart(getDriver(), "Wiki");
         wikiWebPart.delete();
 
         refresh();
@@ -127,14 +127,14 @@ public class PortalTest extends BaseWebDriverTest
         currentPreferredWebparts = new ArrayList<>(microarrayRequiredWebparts);
         currentPreferredWebparts.addAll(microarrayPreferredWebparts);
         currentPreferredWebparts.addAll(collaborationPreferredWebparts);
-        assertWebparts(Collections.<String>emptyList(), currentPreferredWebparts);
+        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
 
         for (String webpartTitle : microarrayRequiredWebparts)
         {
             portalHelper.removeWebPart(webpartTitle);
         }
         currentPreferredWebparts.removeAll(microarrayRequiredWebparts);
-        assertWebparts(Collections.<String>emptyList(), currentPreferredWebparts);
+        assertWebparts(Collections.emptyList(), currentPreferredWebparts);
 
         log("Verify that required webparts get re-added");
         _containerHelper.setFolderType("Microarray");
