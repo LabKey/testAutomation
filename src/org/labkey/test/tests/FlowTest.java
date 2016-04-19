@@ -313,9 +313,9 @@ public class FlowTest extends BaseFlowTest
 
         List<String> expectedMeasures = Arrays.asList(
                 "Count",
-                "4+/(!IFNg+&!IL2+&!IL4+&!TNF+):Count",
-                "4+/(!IFNg+&!IL2+&!IL4+&!TNF+):%P",
-                "4+/(!IFNg+&!IL2+&!IL4+&TNF+):Count"
+                "Singlets:Count",
+                "Singlets:%P",
+                "L:Count"
         );
 
         DataRegionTable fcsAnalysisTable = new DataRegionTable("query", this);
