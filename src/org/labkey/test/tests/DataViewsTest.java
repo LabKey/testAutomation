@@ -211,10 +211,7 @@ public class DataViewsTest extends ParticipantListTest
 
             _ext4Helper.selectComboBoxItem("Status", entry[1]);
 
-            clickButton("Save", 0);
-
-            Locator statusLink = Locator.linkContainingText(entry[0]);
-            waitForElement(statusLink, WAIT_FOR_JAVASCRIPT);
+            doAndWaitForElementToRefresh(() -> clickButton("Save", 0), Locator.linkContainingText(entry[0]), shortWait());
 
             // visit the dataset page and make sure we inject the correct class onto the page
             log("Verify dataset view has the watermark class");
