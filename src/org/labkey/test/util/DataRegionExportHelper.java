@@ -43,6 +43,11 @@ public class DataRegionExportHelper
         _expectedFileCount = count;
     }
 
+    protected int getExpectedFileCount()
+    {
+        return _expectedFileCount;
+    }
+
     public File exportExcel(ExcelFileType type)
     {
         return exportExcel(type, null);
@@ -110,7 +115,7 @@ public class DataRegionExportHelper
         }
     }
 
-    private void chooseExportSelectedRows(boolean exportSelected)
+    protected void chooseExportSelectedRows(boolean exportSelected)
     {
         Locator exportSelectedCheckbox = Locator.tagWithAttribute("input", "value", "exportSelected").notHidden();
 
@@ -120,12 +125,27 @@ public class DataRegionExportHelper
             _test.uncheckCheckbox(exportSelectedCheckbox);
     }
 
-    private void clickTab(String text)
+    protected void clickTab(String text)
     {
         if (newRegion)
             _test.click(Locator.xpath("//div[contains(@class, 'tabs-left')]").append(Locator.xpath("//a[@data-toggle='tab' and text()='" + text + "']")));
         else
             _test._extHelper.clickSideTab(text);
+    }
+
+    protected BaseWebDriverTest getTest()
+    {
+        return _test;
+    }
+
+    protected DataRegionTable getDataRegionTable()
+    {
+        return _drt;
+    }
+
+    protected Boolean getIsNewRegion()
+    {
+        return newRegion;
     }
 
     public static enum ExcelFileType
