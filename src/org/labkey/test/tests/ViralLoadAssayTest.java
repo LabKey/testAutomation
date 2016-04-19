@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
@@ -35,9 +36,11 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.TextSearcher;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -293,11 +296,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         //test download
         String url = getCurrentRelativeURL();
-        url += "&exportAsWebPage=1";
         beginAt(url);
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
 
-        waitAndClick(Ext4Helper.Locators.ext4Button("Download"));
+        File export = doAndWaitForDownload(() -> waitAndClick(WAIT_FOR_JAVASCRIPT, Ext4Helper.Locators.ext4Button("Download"), 0));
+        TextSearcher exportSearcher = new TextSearcher(() -> TestFileUtils.getFileContents(export));
 
         int i = 1;
 
@@ -307,8 +310,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         categoryMap.put("Pos Control", "UNKN");
         categoryMap.put("Neg Control", "NTC");
         String delim = "\t";
-
-        waitForText("SDS Setup File");
 
         while (i < TEMPLATE_DATA.length)
         {
@@ -330,7 +331,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
                 sb.append(delim).append(parts[1]);
             }
 
-            assertTextPresent(sb.toString());
+            assertTextPresent(exportSearcher, sb.toString());
 
             i++;
         }
@@ -338,7 +339,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         i = 1;
         while (i < 5)
         {
-            assertTextPresent(i + delim + "empty");
+            assertTextPresent(exportSearcher, i + delim + "empty");
             i++;
         }
 
