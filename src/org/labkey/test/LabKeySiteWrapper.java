@@ -65,9 +65,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         if (!isTitleEqual("Sign In"))
+        {
+            executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt("/login/login.view?");
-
-        acceptAllAlerts(); // Just get logged in, ignore '*unload' alerts
+        }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
         {
