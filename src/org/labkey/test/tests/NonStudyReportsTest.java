@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -169,8 +170,8 @@ public class NonStudyReportsTest extends ReportTest
         waitForText("Manage Views");
         clickReportDetailsLink(ATTACHMENT_REPORT_NAME);
         waitForElement(Locator.lkButton("View Report"));
-        assertElementPresent(Locator.lkButton("Edit Report"));
-        clickButton("Edit Report");
+        clickAndWait(Locator.lkButton("Edit Report"));
+        waitForElement(Locators.pageSignal("category-loaded")); // DataViewPropertiesPanel.js
         clickButton("Save");
         waitForText("Report Details");
 
