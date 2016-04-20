@@ -1719,8 +1719,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         // Download full action coverage table and add to TeamCity artifacts.
-        beginAt("/admin/exportActions.view?asWebPage=true");
-        getArtifactCollector().publishArtifact(saveTsv(TestProperties.getDumpDir(), "ActionCoverage"));
+        File download = doAndWaitForDownload(() -> getDriver().get(WebTestHelper.buildURL("admin", "exportActions")));
+        File actionCoverageFile = new File(TestProperties.getDumpDir(), "ActionCoverage.tsv");
+        actionCoverageFile.delete();
+        download.renameTo(actionCoverageFile);
+        getArtifactCollector().publishArtifact(actionCoverageFile);
+
         popLocation();
     }
 
