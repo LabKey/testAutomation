@@ -991,6 +991,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+        deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
         reenableMiniProfiler = disableMiniProfiler();
         resetErrors();
@@ -1203,7 +1204,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 error instanceof TestTimedOutException ||
                 error instanceof InterruptedException ||
                 error.getCause() != null && error.getCause() instanceof InterruptedException)
+        {
+            _testTimeout = true;
             return;
+        }
 
         System.err.println("ERROR: " + error.getMessage());
 
@@ -2712,7 +2716,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
         selectQuery(schemaName, queryName);
-        //Locator loc = Locator.xpath("//div[contains(@class, 'lk-qd-name')]/a[text()='" + schemaName + "." + queryName + "']");
         Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
