@@ -30,6 +30,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PostgresOnlyTest;
@@ -278,11 +279,6 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
     {
         log("** Ensure ExternalSchema: " + USER_SCHEMA_NAME);
 
-
-        //beginAt("/query/" + containerPath + "/begin.view");
-        //_extHelper.clickExtButton("Schema Administration");
-        // _ext4Helper.clickWindowButton(null, "Schema Administration",0,1);
-
         beginAt("/query/" + containerPath + "/admin.view");
 
         if (!isTextPresent("reload"))
@@ -293,6 +289,7 @@ public class PepDBModuleTest extends BaseWebDriverTest implements PostgresOnlyTe
             checkCheckbox(Locator.name("includeSystem"));
             setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
             setFormElement(Locator.name("sourceSchemaName"), USER_SCHEMA_NAME);
+            pressEnter(Locator.name("sourceSchemaName"));
             checkCheckbox(Locator.name("editable"));
             uncheckCheckbox(Locator.name("indexable"));
             clickButton("Create");
