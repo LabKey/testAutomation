@@ -30,6 +30,7 @@ import org.labkey.test.TestTimeoutException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class APIContainerHelper extends AbstractContainerHelper
@@ -86,11 +87,20 @@ public class APIContainerHelper extends AbstractContainerHelper
             command.setName(name);
 
         command.setFolderType(folderType);
-        String path = (parentPath.startsWith("/") ? "" : "/") + parentPath;
+        parentPath = (parentPath.startsWith("/") ? "" : "/") + parentPath;
 
         try
         {
-            return command.execute(connection, path);
+            CreateContainerResponse response = command.execute(connection, parentPath);
+            if (!isWorkbook)
+            {
+                assertEquals("Unexpected name for created container", name, response.getName());
+                String path = String.join("/", parentPath, name).replace("//", "/");
+                assertEquals("Unexpected path for created container", path, response.getPath());
+            }
+            assertEquals("Wrong folder type for " + response.getPath() + ". Defining module may be missing.",
+                    folderType == null ? "None" : folderType, response.getProperty("folderType"));
+            return response;
         }
         catch (CommandException | IOException e)
         {
