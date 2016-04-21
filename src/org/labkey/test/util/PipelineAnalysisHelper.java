@@ -113,7 +113,7 @@ public class PipelineAnalysisHelper
 
         if (runName != null)
         {
-            _test.click(Locator.linkWithText("Run"));
+            _test.clickAndWait(Locator.linkWithText("Run"));
 
             _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Name')]/../td[2]"), runName);
             if (description != null)
