@@ -126,7 +126,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
     private void doInit()
     {
-        _containerHelper.createProject(getProjectName(), "List");
+        _containerHelper.createProject(getProjectName(), null);
     }
 
     @Test
