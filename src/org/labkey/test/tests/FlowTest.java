@@ -34,6 +34,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -327,8 +328,9 @@ public class FlowTest extends BaseFlowTest
         Locator.XPathLocator measurePickerLoc = Ext4Helper.Locators.window("Y Axis");
         WebElement measurePicker = waitForElement(measurePickerLoc);
         Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
-        waitForElement(rowLoc.withText());
-        List<WebElement> pickerRows = rowLoc.waitForElements(measurePicker, 1000);
+        try {rowLoc.index(1).waitForElement(measurePicker, 1000);}
+        catch (NoSuchElementException ignore) {}
+        List<WebElement> pickerRows = rowLoc.findElements(measurePicker);
         assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(getTexts(pickerRows)));
     }
 
