@@ -44,6 +44,7 @@ public class EmailRecordTable extends Table
     public EmailRecordTable(BaseWebDriverTest test)
     {
         this(test.getDriver());
+        test.waitForText("Mail Record");
     }
 
     public int getEmailCount()
