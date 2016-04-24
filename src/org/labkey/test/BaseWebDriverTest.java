@@ -2776,7 +2776,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void validateQueries(boolean validateSubfolders)
+    public void validateQueries(boolean validateSubfolders, int waitTime)
     {
         click(Locator.xpath("//a[contains(@class, 'x4-btn')]//span[contains(text(), 'Validate Queries')]"));
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
@@ -2788,12 +2788,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         checkCheckbox(Locator.tagWithClass("table", "lk-vq-systemqueries"));
         clickButton("Start Validation", 0);
-        waitForElement(locFinishMsg, 120000);
+        waitForElement(locFinishMsg, waitTime);
         //test for success
         if (!isElementPresent(Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok')]")))
         {
             fail("Some queries did not pass validation. See error log for more details.");
         }
+    }
+
+    public void validateQueries(boolean validateSubfolders)
+    {
+        validateQueries(validateSubfolders, 120000);
     }
 
     // This class makes it easier to start a specimen import early in a test and wait for completion later.
