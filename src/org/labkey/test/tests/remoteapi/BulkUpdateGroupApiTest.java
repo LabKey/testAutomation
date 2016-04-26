@@ -19,11 +19,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.security.PrincipalType;
+import org.labkey.remoteapi.ApiKeyCredentialsProvider;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.GetSchemasCommand;
+import org.labkey.remoteapi.query.GetSchemasResponse;
 import org.labkey.remoteapi.security.BulkUpdateGroupCommand;
 import org.labkey.remoteapi.security.BulkUpdateGroupResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.tests.AuditLogTest;
@@ -31,6 +35,7 @@ import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -336,7 +341,7 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         command.addMemberGroup(id2);
         response = command.execute(connection, getProjectName());
         List<String> errors = collectErrors(response);
-        assertEquals("Wong error(s) for circular group membership:",
+        assertEquals("Wrong error(s) for circular group membership:",
                 Arrays.asList("Can't add a group that results in a circular group relation"), errors);
 
         _permissionsHelper.assertUserNotInGroup(cGroup2, cGroup1, getProjectName(), PrincipalType.GROUP);
@@ -497,6 +502,65 @@ public class BulkUpdateGroupApiTest extends BaseWebDriverTest
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", groupName, 1);
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", email, 2);
         AuditLogTest.verifyAuditEvent(this, AuditLogTest.GROUP_AUDIT_EVENT, "Comment", GROUP1, 2);
+    }
+
+    @Test
+    public void testSessionKey()
+    {
+        log("Get API session key and use it in a command.");
+        goToSiteSettings();
+        checkCheckbox(Locator.checkboxById("allowSessionKeys"));
+        clickButton("Save");
+        clickUserMenuItem("API Key");
+        waitForText("This API key can be used");
+        String apiKey = Locator.inputById("session-token").findElement(getDriver()).getAttribute("value");
+        Connection cn = new Connection(getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+
+        try
+        {
+            GetSchemasCommand cmd = new GetSchemasCommand();
+            GetSchemasResponse resp = cmd.execute(cn, getProjectName());
+            List<String> schemaNames = resp.getSchemaNames();
+            StringBuilder stringBuilder = new StringBuilder("Schema names: ");
+            String sep = "";
+            boolean hasPipeline = false;
+            boolean hasLists = false;
+            boolean hasCore = false;
+            for (String schemaName : schemaNames)
+            {
+                stringBuilder.append(sep).append(schemaName);
+                sep = ", ";
+                if ("pipeline".equalsIgnoreCase(schemaName))
+                    hasPipeline = true;
+                if ("lists".equalsIgnoreCase(schemaName))
+                    hasLists = true;
+                if ("core".equalsIgnoreCase(schemaName))
+                    hasCore = true;
+            }
+            assertTrue("Some expected schemas missing. Schemas found: " + stringBuilder.toString(), hasPipeline && hasLists && hasCore);
+        }
+        catch (IOException | CommandException e)
+        {
+            fail("Remote command failed: " + e.getMessage());
+        }
+
+        // Logout and using session key, which should fail
+        signOut();
+        cn = new Connection(getBaseURL(), new ApiKeyCredentialsProvider(apiKey));
+        try
+        {
+            GetSchemasCommand cmd = new GetSchemasCommand();
+            GetSchemasResponse resp = cmd.execute(cn, getProjectName());
+        }
+        catch (IOException e)
+        {
+            fail("Expected different failure: " + e.getMessage());
+        }
+        catch(CommandException e)
+        {
+            log("Success: command failed as expected.");
+        }
+
     }
 
     protected List<String> collectErrors(BulkUpdateGroupResponse response)
