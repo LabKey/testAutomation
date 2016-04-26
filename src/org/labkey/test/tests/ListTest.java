@@ -475,7 +475,7 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.removeCustomizeViewColumn(_listCol2.getName());
         _customizeViewsHelper.removeCustomizeViewColumn(_listCol3.getName());
         _customizeViewsHelper.removeCustomizeViewColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
-        _customizeViewsHelper.applyCustomView(0);
+        _customizeViewsHelper.clickViewGrid();
         assertAlert("You must select at least one field to display in the grid.");
         _customizeViewsHelper.closeCustomizeViewPanel();
 

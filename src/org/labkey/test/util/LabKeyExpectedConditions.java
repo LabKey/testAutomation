@@ -112,28 +112,6 @@ public abstract class LabKeyExpectedConditions
         };
     }
 
-    /**
-     * An expectation for checking that a row of the dumbster data region is expanded
-     *
-     * @param emailIndex one-based index of the expanding email table row
-     * @return true when email body is visible
-     */
-    public static ExpectedCondition<Boolean> emailIsExpanded(final int emailIndex) {
-        return new ExpectedCondition<Boolean>(){
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                return !driver.findElement(By.id("email_body_" + emailIndex)).getCssValue("display").equals("none");
-            }
-
-            @Override
-            public String toString()
-            {
-                return "expansion of dumbster row " + emailIndex;
-            }
-        };
-    }
-
     public static ExpectedCondition<WebElement> elementIsEnabled(final Locator loc) {
         return new ExpectedCondition<WebElement>()
         {
@@ -160,73 +138,6 @@ public abstract class LabKeyExpectedConditions
             public String toString()
             {
                 return "element to be enabled: " + loc.getLoggableDescription();
-            }
-        };
-    }
-
-    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(DataRegionTable dataRegion)
-    {
-        final WebElement dataRegionEl = dataRegion.locator().findElement(dataRegion._test.getDriver());
-        return new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver d)
-            {
-                List<WebElement> els = dataRegionEl.findElements(By.cssSelector(".labkey-data-region-header td.labkey-ribbon > div:not(.x-hide-display)"));
-                for (WebElement el : els)
-                {
-                    try
-                    {
-                        // TODO: DataRegion change. This shouldn't need the css value check, is displayed is enough.
-//                        if (el.isDisplayed())
-                        if ("static".equalsIgnoreCase(el.getCssValue("position")) && el.isDisplayed())
-                            return el;
-                    }
-                    catch (StaleElementReferenceException retry)
-                    {
-                        return null;
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            public String toString()
-            {
-                return "data region panel to open";
-            }
-        };
-    }
-
-    public static ExpectedCondition<WebElement> newDataRegionPanelIsExpanded(DataRegionTable dataRegion)
-    {
-        final WebElement dataRegionEl = dataRegion.locator().findElement(dataRegion._test.getDriver());
-        return new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver d)
-            {
-                //List<WebElement> els = dataRegionEl.findElements(By.cssSelector("div.customize-view-designer:not([style*='display:none']):not([style*='display: none'])"));
-                List<WebElement> els = dataRegionEl.findElements(By.cssSelector("div.customize-view-designer"));
-                for (WebElement el : els)
-                {
-                    try
-                    {
-                        if (el.isDisplayed())
-                            return el;
-                    }
-                    catch (StaleElementReferenceException retry)
-                    {
-                        return null;
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            public String toString()
-            {
-                return "data region panel to open";
             }
         };
     }

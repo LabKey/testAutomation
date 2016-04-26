@@ -110,7 +110,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public void clickStatusLink(int row)
     {
-        _test.clickAndWait(link(row, getStatusColumn()));
+        _driver.clickAndWait(link(row, getStatusColumn()));
     }
 
     private int getExpectedJobRow(String name)

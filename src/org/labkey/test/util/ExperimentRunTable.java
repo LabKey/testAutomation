@@ -16,17 +16,13 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
-
-import java.util.List;
-import java.util.ArrayList;
-
 import org.labkey.test.Locator;
 
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * <code>ExperimentRunTable</code>
-*/
+import static org.junit.Assert.assertTrue;
+
 public class ExperimentRunTable extends DataRegionTable
 {
     private boolean _cache;
@@ -100,7 +96,7 @@ public class ExperimentRunTable extends DataRegionTable
 
     public void clickRunLink(int row)
     {
-        _test.clickAndWait(Locator.linkWithText(getRunName(row)));
+        _driver.clickAndWait(Locator.linkWithText(getRunName(row)));
     }
 
     public void clickGraphLink(String name)
@@ -111,7 +107,7 @@ public class ExperimentRunTable extends DataRegionTable
     public void clickGraphLink(int row)
     {
         // todo: not hardcoded!
-        _test.clickAndWait(link(row, 2));
+        _driver.clickAndWait(link(row, 2));
     }
 
     private int getExpectedRunRow(String name)

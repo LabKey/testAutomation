@@ -46,8 +46,9 @@ public class CustomizeViewsHelper extends CustomizeView
     {
         if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
-            _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Grid Views")), false, "Customize Grid");
-            _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(getDataRegion()));
+            _test.doAndWaitForPageSignal(() ->
+                    _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Grid Views")), false, "Customize Grid"),
+                    DataRegionTable.PANEL_SHOW_SIGNAL);
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(Locator.css(".customizeViewPanel"))));
@@ -476,16 +477,6 @@ public class CustomizeViewsHelper extends CustomizeView
 
         String folderFilterComboXPath = folderFilterComboXPath();
         _test._extHelper.selectComboBoxItem(Locator.xpath(folderFilterComboXPath), folderFilter);
-    }
-
-    public void togglePaperclipFolderFilter()
-    {
-        Locator loc = Locator.xpath(folderFilterPaperclipXPath());
-        String attr = _test.getAttribute(loc, "class");
-        if (attr.contains("x-btn-pressed"))
-            unclipFolderFilter();
-        else
-            clipFolderFilter();
     }
 
     public void clipFolderFilter()

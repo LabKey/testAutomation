@@ -189,9 +189,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
-        _customizeViewsHelper = new CustomizeViewsHelper(this);
-        //TODO: DataRegion change. Use this declaration.
-//        _customizeViewsHelper = new CustomizeView(this);
+        _customizeViewsHelper = DataRegionTable.isNewDataRegion ? new CustomizeView(this) : new CustomizeViewsHelper(this);
         _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
@@ -1272,7 +1270,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             try
             {
-
                 getArtifactCollector().dumpPageSnapshot(testName, null);
             }
             catch (RuntimeException | Error e)
@@ -1914,8 +1911,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Deprecated
     protected void clickExportToText()
     {
-        clickButton("Export", 0);
-        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(DataRegionTable.findDataRegion(this)));
+        doAndWaitForPageSignal(() ->
+                clickButton("Export", 0),
+                DataRegionTable.PANEL_SHOW_SIGNAL);
         _extHelper.clickSideTab("Text");
         clickButton("Export to Text");
     }

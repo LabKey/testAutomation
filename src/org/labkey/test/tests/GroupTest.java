@@ -23,9 +23,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -405,7 +405,7 @@ public class GroupTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Users", this);
 
         int initialRowCount = table.getDataRowCount();
-        CustomizeViewsHelper helper = new CustomizeViewsHelper(table);
+        CustomizeView helper = table.getCustomizeView();
 //      TODO uncomment these lines when Issue 23964 is fixed.
 //        helper.openCustomizeViewPanel();
 //        helper.addCustomizeViewFilter("Groups", "Is Not Blank");

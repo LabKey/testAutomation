@@ -32,7 +32,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -385,18 +384,15 @@ public class ContainerContextTest extends BaseWebDriverTest
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rehecking lookup URLs...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
-        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
-        // TODO: DataRegion change. Use this declaration.
-//        CustomizeView cv = new CustomizeView(this);
-        cv.openCustomizeViewPanel();
-        cv.showHiddenItems();
-        cv.removeCustomizeViewColumn("Container");
-        cv.applyCustomView();
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.removeCustomizeViewColumn("Container");
+        _customizeViewsHelper.applyCustomView();
 
         verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
 
-        cv.openCustomizeViewPanel();
-        cv.revertUnsavedView();
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.revertUnsavedView();
 
 
         log("** Override detailsURL in metadata...");

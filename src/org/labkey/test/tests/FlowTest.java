@@ -494,9 +494,10 @@ public class FlowTest extends BaseFlowTest
 
         assertTextPresent("Matched 0 of 59 samples.");
 
-        //TODO:  how many to select?
-        doAndWaitForPageSignal(() -> click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected")), DataRegionTable.SELECTION_SIGNAL);
-        selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
+        DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", this);
+        samplesConfirm.checkCheckbox(0);
+        WebElement matchedFileInput = samplesConfirm.findCell(0, "MatchedFile").findElement(By.cssSelector("select"));
+        selectOptionByText(matchedFileInput,"91745.fcs (L02-060120-QUV-JS)" );
         clickButton("Next");
         waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");

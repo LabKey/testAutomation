@@ -15,16 +15,15 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.Constructor;
@@ -619,14 +618,18 @@ public class Ext4Helper
 
     public void waitForOnReady()
     {
-        ((JavascriptExecutor) _test.getDriver()).executeAsyncScript(
-                "var callback = arguments[arguments.length - 1];" +
-                "if(window['Ext4'])" +
-                "   Ext4.onReady(callback);" +
-                "else if(window['Ext'])" +
-                "   Ext.onReady(callback);" +
-                "else" +
-                "   callback();");
+        _test.waitFor(() ->
+        {
+            try
+            {
+                _test.executeAsyncScript("Ext4.onReady(callback);");
+                return true;
+            }
+            catch (WebDriverException scriptError)
+            {
+                return false;
+            }
+        }, 10000);
     }
 
     @LogMethod(quiet = true)
@@ -711,6 +714,11 @@ public class Ext4Helper
         public static Locator.XPathLocator window(String title)
         {
             return window().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
+        }
+
+        public static Locator.XPathLocator windowWithTitleContaining(String partialTitle)
+        {
+            return window().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").containing(partialTitle));
         }
 
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)

@@ -16,36 +16,53 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
+import org.labkey.test.components.ComponentElements;
+import org.labkey.test.selenium.EphemeralWebElement;
+import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.selenium.RefindingWebElement;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
-public class DataRegionExportHelper
+public class DataRegionExportHelper extends Component
 {
-    private BaseWebDriverTest _test;
+    private WebDriverWrapper _driver;
     private DataRegionTable _drt;
     private int _expectedFileCount;
-    // TODO: DataRegion change.
-//    private final boolean newRegion = true;
-    private final boolean newRegion = false;
+    private WebElement panelEl;
+    private Elements _elements;
 
     public DataRegionExportHelper(DataRegionTable drt)
     {
-        _test = drt._test;
+        panelEl = new RefindingWebElement(DataRegionTable.isNewDataRegion ? Locator.name("Export-panel")
+                : Locator.tagWithClass("div", "x-grouptabs-panel").withoutClass("customizeViewPanel"), drt.getComponentElement())
+                .withRefindListener(el -> _elements = null);
+        _driver = drt._driver;
         _drt = drt;
         _expectedFileCount = 1;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return panelEl;
+    }
+
+    protected Elements elements()
+    {
+        if (_elements == null)
+            _elements = new Elements();
+        return _elements;
     }
 
     public void setExpectedFileCount(int count)
     {
         _expectedFileCount = count;
-    }
-
-    protected int getExpectedFileCount()
-    {
-        return _expectedFileCount;
     }
 
     public File exportExcel(ExcelFileType type)
@@ -56,11 +73,11 @@ public class DataRegionExportHelper
     public File exportExcel(ExcelFileType type, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
-        clickTab("Excel");
+        elements().excelTab.click();
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        _test.checkRadioButton(type.getRadioLocator());
-        _test.scrollIntoView(Locator.lkButton("Export to Excel"));
-        return _test.clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
+        _driver.checkRadioButton(type.getRadioLocator());
+        _driver.scrollIntoView(Locator.lkButton("Export to Excel"));
+        return _driver.clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
     }
 
     public File exportText()
@@ -76,66 +93,62 @@ public class DataRegionExportHelper
     public File exportText(TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
-        clickTab("Text");
+        elements().textTab.click();
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        _test.selectOptionByValue(Locator.name("delim"), delim.toString());
-        _test.selectOptionByValue(Locator.name("quote"), quote.toString());
-        return _test.clickAndWaitForDownload(Locator.lkButton("Export to Text"), _expectedFileCount)[0];
+        _driver.selectOptionByValue(Locator.name("delim"), delim.toString());
+        _driver.selectOptionByValue(Locator.name("quote"), quote.toString());
+        return _driver.clickAndWaitForDownload(Locator.lkButton("Export to Text"), _expectedFileCount)[0];
     }
 
     public String exportScript(ScriptExportType type)
     {
         expandExportPanel();
-        clickTab("Script");
-        _test.checkRadioButton(type.getRadioLocator());
-        _test.click(Locator.lkButton("Create Script"));
-        // it takes time to create the script before the new window is available
-        // todo: figure a way to wait for new browser tab because this access of windows[1] happens too soon and throws npe without the sleep
-        _test.sleep(1000);
-        Object[] windows = _test.getDriver().getWindowHandles().toArray();
-        _test.getDriver().switchTo().window((String)windows[1]);
+        elements().scriptTab.click();
+        _driver.checkRadioButton(type.getRadioLocator());
+        _driver.click(Locator.lkButton("Create Script"));
 
-        String scriptText = _test.getDriver().getPageSource();
+        _driver.switchToWindow(1);
+        String scriptText = _driver.getDriver().getPageSource();
 
-        _test.getDriver().close();
-        _test.getDriver().switchTo().window((String)windows[0]);
+        _driver.getDriver().close();
+        _driver.switchToMainWindow();
 
         return scriptText;
     }
 
     public void expandExportPanel()
     {
-        ExpectedCondition expandedPanel = LabKeyExpectedConditions.dataRegionPanelIsExpanded(_drt);
-        if (expandedPanel.apply(_test.getDriver()) == null || !_test.isElementPresent(Locator.tagWithClass("table", "labkey-export-tab-contents").notHidden()))
+        if (!isExportPanelExpanded())
         {
-            _test.clickButton("Export", 0);
-            _test.shortWait().until(expandedPanel);
-            if (newRegion)
-                _test.sleep(1000); // wait for animation to complete
+            _driver.doAndWaitForPageSignal(() ->
+                    _drt.clickHeaderButtonByText("Export"),
+                    DataRegionTable.PANEL_SHOW_SIGNAL);
         }
     }
 
-    protected void chooseExportSelectedRows(boolean exportSelected)
+    private boolean isExportPanelExpanded()
     {
-        Locator exportSelectedCheckbox = Locator.tagWithAttribute("input", "value", "exportSelected").notHidden();
+        try
+        {
+            return getComponentElement().isDisplayed();
+        }
+        catch (NoSuchElementException notCreated)
+        {
+            return false;
+        }
+    }
 
+    private void chooseExportSelectedRows(boolean exportSelected)
+    {
         if (exportSelected)
-            _test.checkCheckbox(exportSelectedCheckbox);
+            _driver.checkCheckbox(elements().exportSelectedCheckbox);
         else
-            _test.uncheckCheckbox(exportSelectedCheckbox);
+            _driver.uncheckCheckbox(elements().exportSelectedCheckbox);
     }
 
-    protected void clickTab(String text)
+    protected WebDriverWrapper getTest()
     {
-        if (newRegion)
-            _test.click(Locator.xpath("//div[contains(@class, 'tabs-left')]").append(Locator.xpath("//a[@data-toggle='tab' and text()='" + text + "']")));
-        else
-            _test._extHelper.clickSideTab(text);
-    }
-
-    protected BaseWebDriverTest getTest()
-    {
-        return _test;
+        return _driver;
     }
 
     protected DataRegionTable getDataRegionTable()
@@ -143,12 +156,7 @@ public class DataRegionExportHelper
         return _drt;
     }
 
-    protected Boolean getIsNewRegion()
-    {
-        return newRegion;
-    }
-
-    public static enum ExcelFileType
+    public enum ExcelFileType
     {
         XLSX(0),
         XLS(1),
@@ -156,7 +164,7 @@ public class DataRegionExportHelper
 
         private Locator fileTypeRadio;
 
-        private ExcelFileType(int radioIndex)
+        ExcelFileType(int radioIndex)
         {
             fileTypeRadio = Locator.radioButtonByName("excelExportType").index(radioIndex);
         }
@@ -172,7 +180,7 @@ public class DataRegionExportHelper
         }
     }
 
-    public static enum TextSeparator
+    public enum TextSeparator
     {
         TAB("tsv"),
         COMMA("csv"),
@@ -181,7 +189,7 @@ public class DataRegionExportHelper
 
         private String fileExtension;
 
-        private TextSeparator(String ext)
+        TextSeparator(String ext)
         {
             fileExtension = ext;
         }
@@ -192,13 +200,13 @@ public class DataRegionExportHelper
         }
     }
 
-    public static enum TextQuote
+    public enum TextQuote
     {
         DOUBLE,
         SINGLE
     }
 
-    public static enum ScriptExportType
+    public enum ScriptExportType
     {
         JAVA(0),
         JAVASCRIPT(1),
@@ -210,7 +218,7 @@ public class DataRegionExportHelper
 
         private Locator fileTypeRadio;
 
-        private ScriptExportType(int radioIndex)
+        ScriptExportType(int radioIndex)
         {
             fileTypeRadio = Locator.radioButtonByName("scriptExportType").index(radioIndex);
         }
@@ -219,5 +227,24 @@ public class DataRegionExportHelper
         {
             return fileTypeRadio;
         }
+    }
+
+    protected class Elements extends ComponentElements
+    {
+        @Override
+        protected SearchContext getContext()
+        {
+            return getComponentElement();
+        }
+
+        public WebElement navTabs = new LazyWebElement(DataRegionTable.isNewDataRegion ? Locator.css("ul.nav-tabs")
+                : Locator.css(".x-grouptabs-strip"), this);
+        public WebElement excelTab = new LazyWebElement(DataRegionTable.isNewDataRegion ? Locator.linkWithText("Excel")
+                : Locator.css(".x-grouptabs-main").withText("Excel"), navTabs);
+        public WebElement textTab = new LazyWebElement(DataRegionTable.isNewDataRegion ? Locator.linkWithText("Text")
+                : Locator.css(".x-grouptabs-main").withText("Text"), navTabs);
+        public WebElement scriptTab = new LazyWebElement(DataRegionTable.isNewDataRegion ? Locator.linkWithText("Script")
+                : Locator.css(".x-grouptabs-main").withText("Script"), navTabs);
+        public WebElement exportSelectedCheckbox = new EphemeralWebElement(Locator.tagWithAttribute("input", "value", "exportSelected").notHidden(), this);
     }
 }

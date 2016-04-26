@@ -27,10 +27,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.CrosstabDataRegion;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.PlateSummary;
 import org.labkey.test.pages.AssayDesignerPage;
-import org.labkey.test.util.CustomizeViewsHelper;
-import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
@@ -244,7 +243,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         log("add the analyte field to the table and adding sorts");
         // TODO DataRegion change. Add this to use new dataregion helper.
 //        CustomizeView cvHelper = new CustomizeView(table);
-        CustomizeViewsHelper cvHelper = new CustomizeViewsHelper(table);
+        CustomizeView cvHelper = table.getCustomizeView();
         cvHelper.openCustomizeViewPanel();
         cvHelper.addCustomizeViewColumn("Analyte");
 

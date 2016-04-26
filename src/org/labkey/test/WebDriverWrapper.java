@@ -536,7 +536,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         HTML
     }
 
-    public void sleep(long ms)
+    public static void sleep(long ms)
     {
         try
         {
@@ -1707,10 +1707,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0)
         {
             waitForPageToLoad(msWait);
+            _listeners.forEach(Runnable::run);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         }
 
         return System.currentTimeMillis() - startTime;
+    }
+
+    private List<Runnable> _listeners = new ArrayList<>();
+
+    public void addPageLoadListener(Runnable listener)
+    {
+        _listeners.add(listener);
     }
 
     /**
@@ -1757,7 +1765,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param wait milliseconds
      * @return false if Supplier.get() doesn't return true within 'wait' ms
      */
-    public boolean waitFor(Supplier<Boolean> checker, int wait)
+    public static boolean waitFor(Supplier<Boolean> checker, int wait)
     {
         long startTime = System.currentTimeMillis();
         do

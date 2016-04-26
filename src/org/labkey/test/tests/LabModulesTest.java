@@ -36,9 +36,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
+import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -1232,17 +1232,14 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.goToLabHome();
         _helper.clickNavPanelItem("Samples:", "Browse All");
-        DataRegionTable.waitForDataRegion(this, "query");
 
-        // TODO: DataRegion change.
-//        CustomizeView cv = new CustomizeView(this);
-        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+        DataRegionTable dr = new DataRegionTable("query", this);
+        CustomizeView cv = dr.getCustomizeView();
         cv.openCustomizeViewPanel();
         cv.showHiddenItems();
         cv.addCustomizeViewColumn("container");
         cv.applyCustomView();
 
-        DataRegionTable dr = new DataRegionTable("query", this);
         dr.setFilter("container", "Does Not Equal", getProjectName());
         dr.setSort("freezerid", SortDirection.DESC);
 

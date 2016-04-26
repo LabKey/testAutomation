@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public class RefindingWebElement extends LazyWebElement
 {
-    List<Consumer<WebElement>> _listeners = new ArrayList<>();
+    private List<Consumer<WebElement>> _listeners = new ArrayList<>();
 
     public RefindingWebElement(Locator locator, SearchContext searchContext)
     {
@@ -33,9 +33,10 @@ public class RefindingWebElement extends LazyWebElement
         return super.getWrappedElement();
     }
 
-    public void addRefindListener(Consumer<WebElement> listener)
+    public RefindingWebElement withRefindListener(Consumer<WebElement> callback)
     {
-        _listeners.add(listener);
+        _listeners.add(callback);
+        return this;
     }
 
     private void callListeners(WebElement newElement)
