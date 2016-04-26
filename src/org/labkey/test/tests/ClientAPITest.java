@@ -721,10 +721,9 @@ public class ClientAPITest extends BaseWebDriverTest
     public void usernameAutocompleteValuesTest()
     {
         Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        verifyAutocompletionResponse(cn, "security", false, true);
-        verifyAutocompletionResponse(cn, "issues", false, true);
-        verifyAutocompletionResponse(cn, "announcements", false, true);
-        verifyAutocompletionResponse(cn, "pipeline", false, true);
+        verifyAutocompletionResponse(cn, "security", "completeUser", false, true);
+        verifyAutocompletionResponse(cn, "security", "completeUserRead", false, true);
+        verifyAutocompletionResponse(cn, "announcements", "completeUser", false, true);
 
         // Impersonate a role that shouldn't be allowed to see emails, and shouldn't even be allowed the action for security & pipeline
         PostCommand command = new PostCommand("user", "impersonateRoles") {
@@ -744,10 +743,9 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             throw new RuntimeException("Impersonation error", e);
         }
-        verifyAutocompletionResponse(cn, "security", true, false);
-        verifyAutocompletionResponse(cn, "issues", true, true);
-        verifyAutocompletionResponse(cn, "announcements", true, true);
-        verifyAutocompletionResponse(cn, "pipeline", true, false);
+        verifyAutocompletionResponse(cn, "security", "completeUser", true, false);
+        verifyAutocompletionResponse(cn, "security", "completeUserRead", true, true);
+        verifyAutocompletionResponse(cn, "announcements", "completeUser", true, true);
         // Probably overkill to stop impersonating on the connection as it's about to go out of scope, but just to be safe...
         try
         {
@@ -760,9 +758,9 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyAutocompletionResponse(Connection cn, String controller, boolean displayNameOnly, boolean actionAllowed)
+    private void verifyAutocompletionResponse(Connection cn, String controller, String action, boolean displayNameOnly, boolean actionAllowed)
     {
-        Command command = new Command(controller, "completeUser");
+        Command command = new Command(controller, action);
         Map<String, Object> completionValues;
         String errMsg =  " for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
         try
