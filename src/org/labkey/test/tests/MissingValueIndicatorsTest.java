@@ -179,10 +179,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void deleteListData(int rowCount)
     {
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        prepForPageLoad();
-        clickButton("Delete", 0);
-        assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
+        });
     }
 
     @Test
@@ -476,10 +477,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void deleteDatasetData(int rowCount)
     {
         checkCheckbox(Locator.checkboxByName(".toggle"));
-        prepForPageLoad();
-        clickButton("Delete", 0);
-        assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Delete", 0);
+            assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
+        });
     }
 
     @Override

@@ -1635,22 +1635,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private boolean _preppedForPageLoad = false;
 
-    /**
-     * @deprecated Use {@link #doAndWaitForPageToLoad(Runnable)}
-     * To be made private
-     */
-    @Deprecated
-    public void prepForPageLoad()
+    private void prepForPageLoad()
     {
         executeScript("window.preppedForPageLoadMarker = true;");
         _preppedForPageLoad = true;
     }
 
-    /**
-     * @deprecated Use {@link #doAndWaitForPageToLoad(Runnable, int)}
-     */
-    @Deprecated
-    public void waitForPageToLoad(int millis)
+    private void waitForPageToLoad(int millis)
     {
         if (!_preppedForPageLoad)
             throw new IllegalStateException("Call prepForPageLoad() before performing the action that would trigger the expected page load.");
@@ -1674,6 +1665,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     throw wde;
             }
         },"Page failed to load", millis);
+        mouseOut();
         _testTimeout = false;
         _preppedForPageLoad = false;
     }
@@ -1707,18 +1699,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0)
         {
             waitForPageToLoad(msWait);
-            _listeners.forEach(Runnable::run);
+            _pageLoadListeners.forEach(Runnable::run);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         }
 
         return System.currentTimeMillis() - startTime;
     }
 
-    private List<Runnable> _listeners = new ArrayList<>();
+    private List<Runnable> _pageLoadListeners = new ArrayList<>();
 
     public void addPageLoadListener(Runnable listener)
     {
-        _listeners.add(listener);
+        _pageLoadListeners.add(listener);
     }
 
     /**
@@ -2358,6 +2350,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void selectFolderTreeItem(String folderName)
     {
         click(Locator.permissionsTreeNode(folderName));
+    }
+
+    public void mouseOut()
+    {
+        new Actions(getDriver()).moveByOffset(-9999,-9999).build().perform();
     }
 
     public void mouseOver(Locator l)

@@ -125,17 +125,18 @@ public abstract class AbstractAssayHelper
 
     public AssayDesignerPage clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
-        _test.prepForPageLoad();
-        _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
-        if (confirmEditInOtherContainer)
+        _test.doAndWaitForPageToLoad(() ->
         {
-            String alertText = _test.acceptAlert();
-            assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
-                    alertText.contains("This assay is defined in the"));
-            assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
-                    alertText.contains("Would you still like to edit it?"));
-        }
-        _test.waitForPageToLoad(BaseWebDriverTest.WAIT_FOR_PAGE);
+            _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
+            if (confirmEditInOtherContainer)
+            {
+                String alertText = _test.acceptAlert();
+                assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
+                        alertText.contains("This assay is defined in the"));
+                assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
+                        alertText.contains("Would you still like to edit it?"));
+            }
+        });
         _test.waitForElement(Locator.id("AssayDesignerDescription"));
 
         return new AssayDesignerPage(_test);

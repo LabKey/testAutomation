@@ -269,18 +269,12 @@ public class FlowTest extends BaseFlowTest
         click(Locator.linkWithText("Analyze some runs"));
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
-        prepForPageLoad();
-        selectOptionByText(ff_targetExperimentId, "<create new>");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByText(ff_targetExperimentId, "<create new>"));
         assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        prepForPageLoad();
-        selectOptionByText(ff_targetExperimentId, "FlowExperiment2");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByText(ff_targetExperimentId, "FlowExperiment2"));
 
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        prepForPageLoad();
-        selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix"));
 
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Analyze selected runs");

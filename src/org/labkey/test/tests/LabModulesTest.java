@@ -1461,10 +1461,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.waitForCmp("#cancelBtn");
         Ext4CmpRef btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRef.class);
         btn.waitForEnabled();
-        prepForPageLoad();
-        waitAndClick(Locator.id(btn.getId() + "-btnEl"));
-        acceptAlert();
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            waitAndClick(Locator.id(btn.getId() + "-btnEl"));
+            acceptAlert();
+        });
         waitForText(WAIT_FOR_PAGE, LabModuleHelper.LAB_HOME_TEXT);
     }
 

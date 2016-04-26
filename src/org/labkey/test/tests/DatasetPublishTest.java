@@ -127,10 +127,11 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToDataset(datasetName);
         _extHelper.clickMenuButton("Grid Views", "Edit Snapshot");
-        prepForPageLoad();
-        clickButton("Update Snapshot", 0);
-        assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Update Snapshot", 0);
+            assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");
+        });
     }
 
     @LogMethod

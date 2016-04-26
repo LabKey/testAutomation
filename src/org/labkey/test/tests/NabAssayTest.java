@@ -284,12 +284,11 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkWithText("configure templates"));
 
-        prepForPageLoad();
-        click(Locator.linkWithText("delete"));
-
-        assertAlert("Permanently delete this plate template?");
-
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            click(Locator.linkWithText("delete"));
+            assertAlert("Permanently delete this plate template?");
+        });
 
         assertTextPresent(PLATE_TEMPLATE_NAME);
         assertTextNotPresent("NAb: 5 specimens in duplicate");
@@ -406,10 +405,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("View Runs"));
         assertElementNotPresent(Locator.linkWithText("edit"));
         click(Locator.linkWithText("manage assay design"));
-        prepForPageLoad();
-        click(Locator.linkWithText("edit assay design"));
-        assertAlert("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            click(Locator.linkWithText("edit assay design"));
+            assertAlert("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
+        });
 
         waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));

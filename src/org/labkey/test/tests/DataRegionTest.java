@@ -125,9 +125,7 @@ public class DataRegionTest extends BaseWebDriverTest
         DataRegionExportHelper exportHelper = new DataRegionExportHelper(list);
         exportHelper.exportText();
         goToAuditLog();
-        prepForPageLoad();
-        selectOptionByText(Locator.name("view"), "Query export events");
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Query export events"));
 
         DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},

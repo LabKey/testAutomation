@@ -106,10 +106,11 @@ public class CreateVialsTest extends AbstractViabilityTest
         
         log("** Upload run without a TargetStudy set and try to create vials.");
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run1", false);
-        prepForPageLoad();
-        clickButton("Save and Finish", 0);
-        acceptAlert();
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Save and Finish", 0);
+            acceptAlert();
+        });
         clickAndWait(Locator.linkContainingText("run1"));
 
         // Add the hidden 'TargetStudy' column on the results table and the actual 'TargetStudy' column from batch
@@ -141,10 +142,11 @@ public class CreateVialsTest extends AbstractViabilityTest
         setFormElement(Locator.name("_pool_B01_0_VisitID"), "1.0");
         click(Locator.checkboxById("_pool_B01_0_VisitIDCheckBox"));
         addSpecimenIds("_pool_B01_0_SpecimenIDs", "vial1");
-        prepForPageLoad();
-        clickButton("Save and Finish", 0);
-        acceptAlert();
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Save and Finish", 0);
+            acceptAlert();
+        });
 
         clickAndWait(Locator.linkContainingText("run2"));
         table = new DataRegionTable("Data", this);

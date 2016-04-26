@@ -257,9 +257,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
         {
-            instance.prepForPageLoad();
-            instance.selectOptionByText(Locator.name("view"), eventType);
-            instance.waitForPageToLoad();
+            instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
         }
 
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
@@ -277,9 +275,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
         {
-            instance.prepForPageLoad();
-            instance.selectOptionByText(Locator.name("view"), eventType);
-            instance.waitForPageToLoad();
+            instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
         }
 
         assertEquals(columns.size(), msgs.size());

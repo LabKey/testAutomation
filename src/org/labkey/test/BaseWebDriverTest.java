@@ -75,6 +75,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -2675,7 +2676,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (isElementPresent(selectedSchema))
                 continue; // already selected
             log("Selecting schema " + schemaWithParents + " in the schema browser...");
-            click(Locator.css("body")); // Dismiss tooltip
+            mouseOut(); // Dismiss tooltip
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try{

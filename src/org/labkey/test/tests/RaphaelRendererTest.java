@@ -226,9 +226,7 @@ public class RaphaelRendererTest extends BaseWebDriverTest
         verifyGenericChart(SCATTER_SEPARATE_SHAPE_COLOR_NAME, SCATTER_SEPARATE_SHAPE_COLOR);
         verifyGenericChart(SCATTER_OPACITY_SIZE_COLOR_NAME, SCATTER_OPACITY_SIZE_COLOR);
         verifyGenericChart(SCATTER_SHAPE_COLOR_POINTCLICKFN_NAME, SCATTER_SHAPE_COLOR_POINTCLICKFN);
-        prepForPageLoad();
-        fireEvent(Locator.css("svg a path"), SeleniumEvent.click);
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> fireEvent(Locator.css("svg a path"), SeleniumEvent.click));
 
 
         clickFolder(GENERIC_CHARTS_FOLDER_NAME);

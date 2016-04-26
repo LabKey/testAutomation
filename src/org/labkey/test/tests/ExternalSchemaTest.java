@@ -511,10 +511,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
-        prepForPageLoad();
-        clickButton("Delete", 0);
-        assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
+        });
     }
 
     public void deleteViaFormNoPerms(String containerPath, int[] pk)

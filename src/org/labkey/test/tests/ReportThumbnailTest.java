@@ -310,9 +310,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(report));
         clickAndWait(Locator.linkWithText(report));
         _rReportHelper.clickSourceTab();
-        prepForPageLoad();
-        _rReportHelper.saveReport(null);
-        waitForPageToLoad();
+        doAndWaitForPageToLoad(() -> _rReportHelper.saveReport(null));
     }
 
 
