@@ -159,6 +159,12 @@ public class FileBrowserHelper
         checkFileBrowserFileCheckbox(firstMatch);
     }
 
+    public boolean fileIsPresent(String nodeIdEndsWith)
+    {
+        Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
+        return _test.isElementPresent(targetFile);
+    }
+
     //In case desired element is not present due to infinite scrolling
     private void scrollToGridRow(String nodeIdEndsWith)
     {
