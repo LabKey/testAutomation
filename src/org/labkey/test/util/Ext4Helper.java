@@ -627,6 +627,7 @@ public class Ext4Helper
             }
             catch (WebDriverException scriptError)
             {
+                _test.dismissAllAlerts();
                 return false;
             }
         }, 10000);
