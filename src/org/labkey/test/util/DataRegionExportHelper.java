@@ -40,7 +40,7 @@ public class DataRegionExportHelper extends Component
     public DataRegionExportHelper(DataRegionTable drt)
     {
         panelEl = new RefindingWebElement(DataRegionTable.isNewDataRegion ? Locator.name("Export-panel")
-                : Locator.tagWithClass("div", "x-grouptabs-panel").withoutClass("customizeViewPanel"), drt.getComponentElement())
+                : Locator.tagWithClass("div", "x-grouptabs-panel").withoutClass("customize-grid-panel"), drt.getComponentElement())
                 .withRefindListener(el -> _elements = null);
         _driver = drt._driver;
         _drt = drt;

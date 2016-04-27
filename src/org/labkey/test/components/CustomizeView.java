@@ -44,6 +44,8 @@ import java.util.Map;
 
 public class CustomizeView extends Component
 {
+    protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".customize-grid-panel");
+
     protected final BaseWebDriverTest _test;
     protected final DataRegionTable _dataRegion;
     protected final Locator.IdLocator _dataRegionLoc;
@@ -65,14 +67,14 @@ public class CustomizeView extends Component
         _dataRegion = dataRegion;
         _dataRegionLoc = dataRegion.locator();
         _reportHelper = new RReportHelper(_test);
-        panelEl = new RefindingWebElement(Locator.css(".customize-view-designer"), _dataRegion.getComponentElement());
+        panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _dataRegion.getComponentElement());
     }
 
     public DataRegionTable getDataRegion()
     {
         if (_dataRegion != null)
             return _dataRegion;
-        return DataRegionTable.findDataRegion(_test);
+        return DataRegionTable.findDataRegion(_test); // Not tied to a specific DataRegion
     }
 
     private Elements elements()
@@ -284,8 +286,8 @@ public class CustomizeView extends Component
     @Override
     public WebElement getComponentElement()
     {
-        if (panelEl == null)
-            panelEl = new RefindingWebElement(Locator.css(".customize-view-designer"), _test.getDriver());
+        if (panelEl == null) // Not tied to a specific DataRegionTable
+            panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _test.getDriver());
         return panelEl;
     }
 

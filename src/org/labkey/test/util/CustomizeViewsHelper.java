@@ -32,6 +32,7 @@ import java.util.Map;
 
 public class CustomizeViewsHelper extends CustomizeView
 {
+
     public CustomizeViewsHelper(BaseWebDriverTest test)
     {
         super(test);
@@ -50,8 +51,8 @@ public class CustomizeViewsHelper extends CustomizeView
                     _test._ext4Helper.clickExt4MenuButton(false, _dataRegionLoc.append(Locator.lkButton("Grid Views")), false, "Customize Grid"),
                     DataRegionTable.PANEL_SHOW_SIGNAL);
         }
-        _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(Locator.css(".customizeViewPanel"))));
+        _test.waitForElement(CUSTOMIZE_VIEW_LOCATOR, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegionLoc.toCssLocator().append(CUSTOMIZE_VIEW_LOCATOR)));
     }
 
     public void closeCustomizeViewPanel()
