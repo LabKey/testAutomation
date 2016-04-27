@@ -89,7 +89,7 @@ public class AuditLogTest extends BaseWebDriverTest
         if (!afterTest)
         {
             deleteUsers(false, AUDIT_TEST_USER);
-            deleteProject(getProjectName(), false);
+            _containerHelper.deleteProject(getProjectName(), false);
         }
     }
 
@@ -137,7 +137,7 @@ public class AuditLogTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         deleteUsers(true, AUDIT_TEST_USER);
-        deleteProject(AUDIT_TEST_PROJECT, true);
+        _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The group Testers was assigned to the security role Editor.", 10);
@@ -209,7 +209,7 @@ public class AuditLogTest extends BaseWebDriverTest
         deleteUsers(true, AUDIT_TEST_USER);
         deleteUsers(true, AUDIT_TEST_USER2);
         deleteUsers(true, AUDIT_TEST_USER3);
-        deleteProject(AUDIT_TEST_PROJECT, true);
+        _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
     }
 
     private void createList(String folderName, String listName)
@@ -292,7 +292,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("query", instance);
-        int i = table.getColumn(column);
+        int i = table.getColumnIndex(column);
         if (shouldFindText)
             assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
         else
@@ -301,6 +301,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static boolean findTextInDataRegion(DataRegionTable table, int column, String txt, int rowsToSearch)
     {
+        rowsToSearch = Math.min(table.getDataRowCount(), rowsToSearch);
         for (int row = 0; row < rowsToSearch; row++)
         {
             String value = table.getDataAsText(row, column);
