@@ -858,7 +858,7 @@ public class DataRegionTable extends Component
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
     public void checkCheckbox(String value)
     {
-        WebElement checkbox = Locator.tagWithName("input", ".select").withAttribute("value", value)
+        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.xq(value) + "]")
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
             _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
@@ -866,7 +866,7 @@ public class DataRegionTable extends Component
 
     public void checkCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithName("input", ".select").index(index)
+        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
             _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
@@ -874,7 +874,7 @@ public class DataRegionTable extends Component
 
     public void uncheckCheckbox(int index)
     {
-        WebElement checkbox = Locator.tagWithName("input", ".select").index(index)
+        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (checkbox.isSelected())
             _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
