@@ -228,7 +228,7 @@ public class DataRegionTable extends Component
 
     public boolean hasAggregateRow()
     {
-        return _driver.isElementPresent(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]//tr[contains(@class, 'labkey-col-total')]"));
+        return Locator.css("tr.labkey-col-total").findElements(getComponentElement()).size() > 0;
     }
 
     public List<WebElement> getHeaderButtons()
@@ -238,7 +238,7 @@ public class DataRegionTable extends Component
 
     public int getDataRowCount()
     {
-        return elements().getRows().size();
+        return elements().getRows().size() - (hasAggregateRow() ? 1 : 0);
     }
 
     public int getRow(String columnLabel, String value)
