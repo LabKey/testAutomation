@@ -43,11 +43,17 @@ public class SearchHelper
     {
         _test = test;
     }
+    private static final Locator noResultsLocator = Locator.css("table.labkey-search-results-counts").withText("Found 0 results");
 
     public void initialize()
     {
-        _searchQueue.clear();
+        clearSearchQueue();
         SearchAdminAPIHelper.deleteIndex(_test.getDriver());
+    }
+
+    public void clearSearchQueue()
+    {
+        _searchQueue.clear();
     }
 
     @LogMethod(quiet = true)
@@ -102,44 +108,41 @@ public class SearchHelper
         {
             searchFor(item._searchTerm, false);  // We already waited for the indexer in calling method
 
-            if(item._searchResults.length == 0)
+            boolean success = true;
+            boolean skipContainerCheck = false;
+
+            for( Locator loc : item._searchResults )
             {
-                _test.assertTextPresent("Found 0 results");
+                if (loc == noResultsLocator)
+                    skipContainerCheck = true;  // skip container check when not expecting results
+
+                if (!_test.isElementPresent(loc))
+                {
+                    success = false;
+                    break;
+                }
             }
-            else
+
+            if ( !success )
             {
-                boolean success = true;
+                notFound.put(item._searchTerm, item);
+                continue;
+            }
 
-                for( Locator loc : item._searchResults )
-                {
-                    if (!_test.isElementPresent(loc))
-                    {
-                        success = false;
-                        break;
-                    }
-                }
-
-                if (!success)
-                {
-                    notFound.put(item._searchTerm, item);
-                    continue;
-                }
-
-                if ( container != null )
-                {
-                    if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
-                        if(container.contains("@files"))
-                            _test.assertElementPresent(Locator.linkWithText(container));
-                        else
-                            _test.assertElementPresent(Locator.linkWithText(container + (item._file ? "/@files" : "")));
-                    else
+            if ( !skipContainerCheck && (container != null) )
+            {
+                if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
+                    if(container.contains("@files"))
                         _test.assertElementPresent(Locator.linkWithText(container));
-                }
+                    else
+                        _test.assertElementPresent(Locator.linkWithText(container + (item._file ? "/@files" : "")));
+                else
+                    _test.assertElementPresent(Locator.linkWithText(container));
+            }
 
-                if ( crawlResults )
-                {
-                    throw new IllegalArgumentException("Search result crawling not yet implemented");
-                }
+            if ( crawlResults )
+            {
+                throw new IllegalArgumentException("Search result crawling not yet implemented");
             }
         }
 
@@ -159,10 +162,7 @@ public class SearchHelper
         for( SearchItem item : _searchQueue.values() )
         {
             searchFor(item._searchTerm, false);
-            for ( Locator loc : item._searchResults )
-            {
-                _test.assertElementNotPresent(loc);
-            }
+            _test.assertElementPresent(noResultsLocator);
         }
     }
 
@@ -190,12 +190,16 @@ public class SearchHelper
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
-        _searchQueue.put(searchTerm, new SearchItem(searchTerm, false, expectedResults));
+        enqueueSearchItem(searchTerm, false, expectedResults);
     }
 
-    public void enqueueSearchItem(String searchTerm, boolean file, Locator... expectedResults)
+    public void enqueueSearchItem(String searchTerm, boolean isFile, Locator... expectedResults)
     {
-        _searchQueue.put(searchTerm, new SearchItem(searchTerm, file, expectedResults));
+        if(expectedResults.length == 0)
+        {
+            expectedResults = new Locator[] {noResultsLocator};
+        }
+        _searchQueue.put(searchTerm, new SearchItem(searchTerm, isFile, expectedResults));
     }
 
     // This method always waits for the indexer queue to empty before issuing search query
