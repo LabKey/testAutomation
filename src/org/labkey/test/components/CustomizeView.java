@@ -800,7 +800,7 @@ public class CustomizeView extends Component
             return getComponentElement();
         }
 
-        protected final WebElement viewGridButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("View Grid"), this);
+        protected final WebElement viewGridButton = new RefindingWebElement(Locator.button("View Grid"), this);
     }
 
     private class SelectedItemRow extends Component
