@@ -482,13 +482,11 @@ public class ListTest extends BaseWebDriverTest
         log("Test Export");
 
         File tableFile = new DataRegionExportHelper(new DataRegionTable("query", this)).exportText();
-        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
         String tsv = TestFileUtils.getFileContents(tableFile);
         TextSearcher tsvSearcher = new TextSearcher(() -> tsv).setSearchTransformer(t -> t);
 
-        assertTextPresent(tsvSearcher, TEST_DATA[0][3]);
-        assertTextPresent(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
-        assertTextNotPresent(tsvSearcher, TEST_DATA[0][0]);
+        assertTextPresentInThisOrder(tsvSearcher, TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
+        assertTextNotPresent(tsvSearcher, TEST_DATA[0][0], _listCol4.getLabel());
         filterTest();
 
         clickProject(getProjectName());
@@ -585,8 +583,7 @@ public class ListTest extends BaseWebDriverTest
                 LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
-        assertTextNotPresent(srch, LIST2_KEY);
-        assertTextNotPresent(srch, LIST2_KEY4);
+        assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
         assertTextPresentInThisOrder(srch, LIST2_KEY3, LIST2_KEY2);
 
         log("Test edit row");
