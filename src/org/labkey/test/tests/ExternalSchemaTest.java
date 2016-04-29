@@ -37,7 +37,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -494,7 +493,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         assertTitleEquals(TABLE_NAME + ": /" + containerPath);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        int row = table.getRow(String.valueOf(pk));
+        int row = table.getRowIndex(String.valueOf(pk));
         assertTrue("Expected to find row with pk='" + pk + "'", row > -1);
         
         assertEquals("Expected 'Text' column to contain '" + text + "' for updated row",
@@ -567,7 +566,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         DataRegionTable table = new DataRegionTable("query", this);
         for (int aPk : pk)
-            assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRow(String.valueOf(aPk)));
+            assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRowIndex(String.valueOf(aPk)));
     }
 
     @Override public BrowserType bestBrowser()

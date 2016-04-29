@@ -236,28 +236,28 @@ public class ListTest extends BaseWebDriverTest
                 TEST_DATA[3][2]);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
-        assertEquals(1, table.getRow(TEST_DATA[0][1]));
+        assertEquals(1, table.getRowIndex(TEST_DATA[0][1]));
         clickAndWait(Locator.linkWithText("edit").index(1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
         // Third row (Red)
-        assertEquals(2, table.getRow(TEST_DATA[0][2]));
+        assertEquals(2, table.getRowIndex(TEST_DATA[0][2]));
         clickAndWait(Locator.linkWithText("edit").index(2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
 
         table = new DataRegionTable("query", this);
-        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
-        assertEquals("true", table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        assertEquals("false", table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
+        assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
@@ -352,7 +352,7 @@ public class ListTest extends BaseWebDriverTest
                 TEST_DATA[3][3]);
         table = new DataRegionTable("query", this);
         assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
-        assertEquals(3, table.getRow(TEST_DATA[0][3]));
+        assertEquals(3, table.getRowIndex(TEST_DATA[0][3]));
         assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");

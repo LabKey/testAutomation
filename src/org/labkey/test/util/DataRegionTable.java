@@ -238,15 +238,24 @@ public class DataRegionTable extends Component
 
     public int getDataRowCount()
     {
-        return elements().getRows().size() - (hasAggregateRow() ? 1 : 0);
+        return elements().getDataRows().size() - (hasAggregateRow() ? 1 : 0);
     }
 
+    /**
+     * @deprecated Renamed. Use {@link #getRowIndex(String, String)}
+     */
+    @Deprecated
     public int getRow(String columnLabel, String value)
     {
-        return getRow(getColumnIndex(columnLabel), value);
+        return getRowIndex(columnLabel, value);
     }
 
-    public int getRow(int columnIndex, String value)
+    public int getRowIndex(String columnLabel, String value)
+    {
+        return getRowIndex(getColumnIndex(columnLabel), value);
+    }
+
+    public int getRowIndex(int columnIndex, String value)
     {
         int rowCount = getDataRowCount();
         for (int i=0; i < rowCount; i++)
@@ -513,12 +522,21 @@ public class DataRegionTable extends Component
         return rows;
     }
 
+    public WebElement findRow(int index)
+    {
+        return elements().getDataRow(index);
+    }
+
+    /**
+     * @deprecated Misleading method name. Use {@link #getRowIndex(String)}
+     * TODO: Remove in 16.2.3. In use by NLP feature branches
+     */
+    @Deprecated
     public int getRow(String pk)
     {
         return getRowIndex(pk);
     }
 
-    /** Find the row number for the given primary key. */
     public int getRowIndex(String pk)
     {
         assertTrue("Need the selector checkboxes value to find row by pk", _selectors);
@@ -582,7 +600,7 @@ public class DataRegionTable extends Component
 
     public String getDataAsText(String pk, String columnName)
     {
-        int row = getRow(pk);
+        int row = getRowIndex(pk);
         if (row == -1)
             return null;
         int col = getColumnIndex(columnName);
@@ -625,7 +643,7 @@ public class DataRegionTable extends Component
 
     public String getHref(String pk, String columnName)
     {
-        int row = getRow(pk);
+        int row = getRowIndex(pk);
         if (row == -1)
             return null;
         int col = getColumnIndex(columnName);
@@ -1096,16 +1114,16 @@ public class DataRegionTable extends Component
         private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
 
-        protected List<WebElement> getRows()
+        protected List<WebElement> getDataRows()
         {
             if (rows == null)
-                rows = ImmutableList.copyOf(Locator.css(".labkey-alternate-row, .labkey-row").findElements(this));
+                rows = ImmutableList.copyOf(Locator.css(".labkey-alternate-row, .labkey-row, .labkey-error-row").findElements(this));
             return rows;
         }
 
-        protected WebElement getRow(int row)
+        protected WebElement getDataRow(int row)
         {
-            return getRows().get(row);
+            return getDataRows().get(row);
         }
 
         protected List<WebElement> getCells(int row)
@@ -1113,7 +1131,7 @@ public class DataRegionTable extends Component
             if (cells == null)
                 cells = new TreeMap<>();
             if (cells.get(row) == null)
-                cells.put(row, ImmutableList.copyOf(Locator.css("td").findElements(getRow(row))));
+                cells.put(row, ImmutableList.copyOf(Locator.css("td").findElements(getDataRow(row))));
             return cells.get(row);
         }
 
@@ -1125,7 +1143,7 @@ public class DataRegionTable extends Component
         protected List<WebElement> getColumn(int col)
         {
             List<WebElement> columnCells = new ArrayList<>();
-            for (int row = 0; row < getRows().size(); row++)
+            for (int row = 0; row < getDataRows().size(); row++)
                 columnCells.add(getCell(row, col));
             return columnCells;
         }

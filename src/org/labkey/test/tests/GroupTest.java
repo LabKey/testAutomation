@@ -164,7 +164,7 @@ public class GroupTest extends BaseWebDriverTest
         int userColumn = 1;
         int accessColumn = 2;
 
-        int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0])); // TODO: off by two, but internally consistent
+        int rowIndex = drt.getRowIndex(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0])); // TODO: off by two, but internally consistent
         List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
         List<String> groupsForUser = Arrays.asList(drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(","));
 
