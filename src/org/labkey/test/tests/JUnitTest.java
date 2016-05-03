@@ -209,7 +209,7 @@ public class JUnitTest extends TestSuite
 
             long startTime = System.currentTimeMillis();
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setSocketTimeout(_timeout * 1000)
+                    .setSocketTimeout(_timeout * 1000 * 2)
                     .build();
 
             HttpResponse response = null;
