@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.study.CreateStudyPage;
@@ -29,7 +30,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class StudyHelper
 {
@@ -89,7 +89,7 @@ public class StudyHelper
         _test.log("Create "+participantString+" Group: " + groupName);
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
-        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
+        _test.waitForElement(Locators.pageSignal(DataRegionTable.UPDATE_SIGNAL));
         if (demographicsPresent)
             DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
         _test.setFormElement(Locator.name("groupLabel"), groupName);
@@ -122,7 +122,6 @@ public class StudyHelper
         }
 
         _test.click(Ext4Helper.Locators.ext4Button("Save"));
-//        _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -143,7 +142,7 @@ public class StudyHelper
 
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
-        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
+        _test.waitForElement(Locators.pageSignal(DataRegionTable.UPDATE_SIGNAL));
         if (demographicsPresent)
             DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
 
@@ -200,7 +199,6 @@ public class StudyHelper
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
-        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
         DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
 
         String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
@@ -366,7 +364,7 @@ public class StudyHelper
 
         _test.clickButton("Next");
 
-        return new DatasetDesignerPage(_test);
+        return new DatasetDesignerPage(_test.getDriver());
     }
 
     @LogMethod

@@ -190,7 +190,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
         doAndWaitForPageSignal(
                 () -> waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes")),
-                DataRegionTable.SELECTION_SIGNAL);
+                DataRegionTable.UPDATE_SIGNAL);
         waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
 
         table = new DataRegionTable("Users", this);

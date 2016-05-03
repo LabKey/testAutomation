@@ -51,7 +51,7 @@ public class DataRegionTable extends Component
 {
     public static final boolean isNewDataRegion = false; // TODO: Remove flag once conversion is complete
 
-    public static final String SELECTION_SIGNAL = "dataRegionSelectionChange";
+    public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
     private static final int DEFAULT_WAIT = 30000;
@@ -75,7 +75,7 @@ public class DataRegionTable extends Component
         if (driverWrapper instanceof BaseWebDriverTest)
             _test = (BaseWebDriverTest)driverWrapper;
         _driver = driverWrapper;
-        _driver.waitForElement(Locators.pageSignal(SELECTION_SIGNAL), DEFAULT_WAIT);
+        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
 
         if ((table == null) == (name == null))
             throw new IllegalArgumentException("Specify either a table element or data region name");
@@ -86,7 +86,7 @@ public class DataRegionTable extends Component
                     withRefindListener(element ->
                     {
                         clearCache();
-                        _driver.waitForElement(Locators.pageSignal(SELECTION_SIGNAL), DEFAULT_WAIT);
+                        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
                     });
             _regionName = name;
         }
@@ -831,7 +831,7 @@ public class DataRegionTable extends Component
                 _driver._ext4Helper.clickExt4MenuButton(false, Locators.columnHeader(_regionName, columnName), false, "Clear Filter");
 
         if (waitMillis == 0)
-            _driver.doAndWaitForPageSignal(clickClearFilter, SELECTION_SIGNAL);
+            _driver.doAndWaitForPageSignal(clickClearFilter, UPDATE_SIGNAL);
         else
             _driver.doAndWaitForPageToLoad(clickClearFilter, waitMillis);
 
@@ -863,14 +863,14 @@ public class DataRegionTable extends Component
     {
         WebElement toggle = getToggle();
         if (!toggle.isSelected())
-            _driver.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
+            _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL);
     }
 
     public void uncheckAll()
     {
         WebElement toggle = getToggle();
-        if (null != _driver.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL))
-            _driver.doAndWaitForPageSignal(toggle::click, SELECTION_SIGNAL);
+        if (null != _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL))
+            _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL);
     }
 
     // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
@@ -879,7 +879,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.xq(value) + "]")
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
+            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
     }
 
     public void checkCheckbox(int index)
@@ -887,7 +887,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
+            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
     }
 
     public void uncheckCheckbox(int index)
@@ -895,7 +895,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, SELECTION_SIGNAL);
+            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
     }
 
     public void pageFirst()
