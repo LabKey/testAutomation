@@ -153,6 +153,7 @@ public class Crawler
             new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("reports", "download"),
+            new ControllerActionId("security", "group"), // TODO: Issue 26351: Bad links for specimen request groups in User audit table
             new ControllerActionId("security", "resetPassword"),
             new ControllerActionId("study", "confirmDeleteVisit"),
             new ControllerActionId("study", "template"),
