@@ -2994,7 +2994,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         goToModule("Pipeline");
 
-        PipelineStatusTable table = new PipelineStatusTable(this, false);
+        PipelineStatusTable table = new PipelineStatusTable(this);
         int tableJobRow = table.getJobRow(jobDescription, descriptionStartsWith);
         assertNotEquals("Failed to find job rowid", -1, tableJobRow);
         table.checkCheckbox(tableJobRow);

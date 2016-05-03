@@ -17,59 +17,65 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class PipelineStatusTable extends DataRegionTable
 {
-    private boolean _cache;
-    private int _rows = -1;
-    private Map<String, String> _mapDescriptionStatus;
+    private final Map<String, String> _mapDescriptionStatus;
 
-    public PipelineStatusTable(BaseWebDriverTest test, boolean cache)
+    public PipelineStatusTable(BaseWebDriverTest test)
     {
         super("StatusFiles", test);
-
-        _cache = cache;
+        _mapDescriptionStatus = new LinkedHashMap<>();
     }
 
-    public int getDataRowCount()
+    /**
+     * @deprecated No longer need to specify caching. Retain for 16.2.3 feature branches
+     */
+    @Deprecated
+    public PipelineStatusTable(BaseWebDriverTest test, boolean cache)
     {
-        if (!_cache || _rows == -1)
-            _rows = super.getDataRowCount();
-        return _rows;
+        this(test);
+    }
+
+    @Override
+    protected void clearCache()
+    {
+        super.clearCache();
+        _mapDescriptionStatus.clear();
     }
 
     public int getStatusColumn()
     {
-        return getColumn("Status");
+        return getColumnIndex("Status");
     }
 
     public int getDescriptionColumn()
     {
-        return getColumn("Description");
+        return getColumnIndex("Description");
     }
 
-    public boolean hasJob(String name)
+    public boolean hasJob(String description)
     {
-        return getJobStatus(name) != null;
+        return getJobStatus(description) != null;
     }
 
-    public String getJobStatus(String name)
+    public String getJobStatus(String description)
     {
-        return getMapDescriptionStatus().get(name);
+        return getMapDescriptionStatus().get(description);
     }
 
     private Map<String, String> getMapDescriptionStatus()
     {
-        if (!_cache || _mapDescriptionStatus == null)
+        if (_mapDescriptionStatus.isEmpty())
         {
             int rows = getDataRowCount();
             int colStatus = getStatusColumn();
             int colDescripton = getDescriptionColumn();
 
-            _mapDescriptionStatus = new LinkedHashMap<>();
             for (int i = 0; i < rows; i++)
             {
                 _mapDescriptionStatus.put(getDataAsText(i, colDescripton),
@@ -80,17 +86,17 @@ public class PipelineStatusTable extends DataRegionTable
         return _mapDescriptionStatus;
     }
 
-    public int getJobRow(String name)
+    public int getJobRow(String description)
     {
-        return getJobRow(name, false);
+        return getJobRow(description, false);
     }
 
-    public int getJobRow(String name, boolean descriptionStartsWith)
+    public int getJobRow(String description, boolean descriptionStartsWith)
     {
         int i = 0;
-        for (String description : getMapDescriptionStatus().keySet())
+        for (String actualDescription : getMapDescriptionStatus().keySet())
         {
-            if (name.equals(description) || (descriptionStartsWith && description.startsWith(name)))
+            if (description.equals(actualDescription) || (descriptionStartsWith && actualDescription.startsWith(description)))
                 return i;
             i++;
         }
@@ -100,12 +106,12 @@ public class PipelineStatusTable extends DataRegionTable
 
     public String getJobDescription(int row)
     {
-        return getDataAsText(row, getDescriptionColumn() + (_selectors ? 1 : 0));
+        return getDataAsText(row, getDescriptionColumn());
     }
 
-    public void clickStatusLink(String name)
+    public void clickStatusLink(String description)
     {
-        clickStatusLink(getExpectedJobRow(name));
+        clickStatusLink(getExpectedJobRow(description));
     }
 
     public void clickStatusLink(int row)
@@ -113,10 +119,10 @@ public class PipelineStatusTable extends DataRegionTable
         _driver.clickAndWait(link(row, getStatusColumn()));
     }
 
-    private int getExpectedJobRow(String name)
+    private int getExpectedJobRow(String description)
     {
-        int row = getJobRow(name);
-        assertTrue("Job not found " + name, row != -1);
+        int row = getJobRow(description);
+        assertTrue("Job not found " + description, row != -1);
         return row;
     }
 }

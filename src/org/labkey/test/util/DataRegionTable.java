@@ -134,7 +134,7 @@ public class DataRegionTable extends Component
         return _elements;
     }
 
-    private void clearCache()
+    protected void clearCache()
     {
         _elements = null;
         _customizeView = null;

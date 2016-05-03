@@ -44,7 +44,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         click(Locator.linkWithText("Validate"));
 
-        PipelineStatusTable statusTable = new PipelineStatusTable(this, false);
+        PipelineStatusTable statusTable = new PipelineStatusTable(this);
         statusTable.clickStatusLink(0);
 
         waitForTextWithRefresh(30000, "Check complete");

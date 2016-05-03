@@ -107,7 +107,7 @@ public class PipelineAnalysisHelper
         _test.waitForPipelineJobsToComplete(expectedJobCount, jobDescription(pipelineName, protocolName), false);
 
         // Go to the run details graph page
-        PipelineStatusTable jobStatus = new PipelineStatusTable(_test, true);
+        PipelineStatusTable jobStatus = new PipelineStatusTable(_test);
         jobStatus.clickStatusLink(0);
         _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
 
