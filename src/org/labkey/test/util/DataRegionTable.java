@@ -238,7 +238,7 @@ public class DataRegionTable extends Component
 
     public int getDataRowCount()
     {
-        return elements().getDataRows().size() - (hasAggregateRow() ? 1 : 0);
+        return elements().getDataRows().size();
     }
 
     /**
@@ -273,8 +273,8 @@ public class DataRegionTable extends Component
 
     public String getTotal(int columnIndex)
     {
-        return Locator.css("#" + getTableId() + " tr.labkey-col-total > td:nth-of-type(" + (columnIndex + (_selectors ? 2 : 1)) + ")")
-                .findElement(getComponentElement()).getText();
+        columnIndex += _selectors ? 1 : 0;
+        return elements().getAggregateCells().get(columnIndex).getText();
     }
 
     /**
@@ -1106,18 +1106,22 @@ public class DataRegionTable extends Component
             return getComponentElement();
         }
 
+        private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
+        private List<WebElement> headerButtons;
+        private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
+        private List<WebElement> columnHeaders;
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
-        private List<WebElement> columnHeaders;
-        private List<WebElement> headerButtons;
-
-        private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
-        private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
+        private WebElement aggregateRow = new LazyWebElement(Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total"), _driver.getDriver());
+        private List<WebElement> aggregateCells;
 
         protected List<WebElement> getDataRows()
         {
             if (rows == null)
-                rows = ImmutableList.copyOf(Locator.css(".labkey-alternate-row, .labkey-row, .labkey-error-row").findElements(this));
+                rows = ImmutableList.copyOf(Locator.css(""+
+                        "#" + getTableId() + " > tbody > tr.labkey-alternate-row:not(.labkey-col-total)," +
+                        "#" + getTableId() + " > tbody > tr.labkey-row:not(.labkey-col-total)," +
+                        "#" + getTableId() + " > tbody > tr.labkey-error-row:not(.labkey-col-total)").findElements(_driver.getDriver()));
             return rows;
         }
 
@@ -1131,7 +1135,7 @@ public class DataRegionTable extends Component
             if (cells == null)
                 cells = new TreeMap<>();
             if (cells.get(row) == null)
-                cells.put(row, ImmutableList.copyOf(Locator.css("td").findElements(getDataRow(row))));
+                cells.put(row, ImmutableList.copyOf(Locator.xpath("td").findElements(getDataRow(row))));
             return cells.get(row);
         }
 
@@ -1146,6 +1150,13 @@ public class DataRegionTable extends Component
             for (int row = 0; row < getDataRows().size(); row++)
                 columnCells.add(getCell(row, col));
             return columnCells;
+        }
+
+        protected List<WebElement> getAggregateCells()
+        {
+            if (aggregateCells == null)
+                aggregateCells = ImmutableList.copyOf(Locator.xpath("td").findElements(aggregateRow));
+            return aggregateCells;
         }
 
         protected List<WebElement> getColumnHeaders()
