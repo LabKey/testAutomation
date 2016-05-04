@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -476,7 +477,13 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.removeCustomizeViewColumn(_listCol3.getName());
         _customizeViewsHelper.removeCustomizeViewColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
         _customizeViewsHelper.clickViewGrid();
-        assertAlert("You must select at least one field to display in the grid.");
+        if (DataRegionTable.isNewDataRegion)
+        {
+            Window warning = new Window("Selection required", getDriver());
+            assertEquals("Wrong warning message", "You must select at least one field to display in the grid.", warning.getBody());
+        }
+        else
+            assertAlert("You must select at least one field to display in the grid.");
         _customizeViewsHelper.closeCustomizeViewPanel();
 
         log("Test Export");
