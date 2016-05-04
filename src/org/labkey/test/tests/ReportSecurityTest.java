@@ -21,9 +21,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.WebElement;
-
-import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
@@ -89,7 +86,7 @@ public class ReportSecurityTest extends ReportTest
         enterStudySecurity();
 
         // enable advanced study security
-        doAndWaitForPageToLoad(() -> selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"));
+        doAndWaitForPageToLoad(() -> { selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"); click(Locator.lkButton("Update Type")); } );
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));

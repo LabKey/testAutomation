@@ -221,7 +221,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         clickFolder(folder);
         enterStudySecurity();
 
-        doAndWaitForPageToLoad(() -> selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"));
+        doAndWaitForPageToLoad(() -> { selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ"); click(Locator.lkButton("Update Type")); });
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
