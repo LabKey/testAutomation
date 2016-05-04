@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
  */
 public class DataRegionTable extends Component
 {
-    public static final boolean isNewDataRegion = false; // TODO: Remove flag once conversion is complete
+    public static final boolean isNewDataRegion = true; // TODO: Remove flag once conversion is complete
 
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
