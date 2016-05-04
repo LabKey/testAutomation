@@ -23,6 +23,7 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
@@ -170,17 +171,21 @@ public class CustomizeView extends Component
      */
     public void saveCustomView(String name, boolean shared, boolean inherit)
     {
-        _test.scrollIntoView(_test.findButton("Save")).
-                click();
+        _test.scrollIntoView(elements().saveButton)
+                .click();
 
         final WebElement saveWindow = _test.waitForElement(Ext4Helper.Locators.windowWithTitleContaining("Save Custom Grid View"));
 
         if (shared)
-            _test.checkCheckbox(Locator.checkboxByName("saveCustomView_shared").findElement(saveWindow));
+        {
+            Checkbox shareCheckbox = new Checkbox("Make this grid view available to all users",saveWindow);
+            shareCheckbox.check();
+        }
 
         if (inherit)
         {
-            _test.checkCheckbox(Locator.checkboxByName("saveCustomView_inherit").findElement(saveWindow));
+            Checkbox inheritCheckbox = new Checkbox("Make this grid view available in child folders",saveWindow);
+            inheritCheckbox.check();
             // TODO: select folder to save custom view into
         }
 
@@ -208,7 +213,7 @@ public class CustomizeView extends Component
 
     public void deleteView()
     {
-        Ext4Helper.Locators.ext4Button("Delete").findElement(getComponentElement()).click();
+        elements().deleteButton.click();
         _test.clickAndWait(Ext4Helper.Locators.windowButton("Delete your view", "Yes"));
     }
 
@@ -252,7 +257,7 @@ public class CustomizeView extends Component
 
     public void revertUnsavedView()
     {
-        _test.clickButton("Revert");
+        _test.clickAndWait(elements().revertButton);
     }
 
     /**
@@ -800,7 +805,10 @@ public class CustomizeView extends Component
             return getComponentElement();
         }
 
-        protected final WebElement viewGridButton = new RefindingWebElement(Locator.button("View Grid"), this);
+        protected final WebElement deleteButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Delete"), this);
+        protected final WebElement revertButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Revert"), this);
+        protected final WebElement viewGridButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("View Grid"), this);
+        protected final WebElement saveButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Save"), this);
     }
 
     private class SelectedItemRow extends Component
