@@ -750,6 +750,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         clickAdminMenuItem("Folder", "Management");
     }
 
+    public void goToFolderPermissions()
+    {
+        clickAdminMenuItem("Folder", "Permissions");
+    }
+
     public void goToProjectSettings()
     {
         clickAdminMenuItem("Folder", "Project Settings");
