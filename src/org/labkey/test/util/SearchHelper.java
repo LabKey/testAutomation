@@ -27,7 +27,6 @@ import org.openqa.selenium.WebElement;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,27 +73,23 @@ public class SearchHelper
     @LogMethod
     public void verifySearchResults(@LoggedParam String container, boolean crawlResults)
     {
-        _test.log("Verify search results.");
 
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
-        Map<String, SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
-
-        if (!notFound.isEmpty())
+        final int maxTries = 4;
+        for (int i = 1; i <= maxTries; i++)
         {
-            _test.log(String.format("Bad search results for %s. Wait and retry.", notFound.toString()));
-            _test.sleep(5000);
-            notFound = verifySearchItems(notFound, container, crawlResults);
+            _test.log("Verify search results, attempt " + i);
+            Map<String, SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
+            if (notFound.isEmpty())
+                break;
 
-            if (!notFound.isEmpty())
-            {
-                _test.log(String.format("Bad search results for %s. Wait and retry", notFound.toString()));
-                _test.sleep(10000);
-                notFound = verifySearchItems(notFound, container, crawlResults);
-
+            if (i == maxTries)
                 assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
-            }
+
+            _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
+            _test.sleep(i*5000);
         }
     }
 
@@ -111,7 +106,7 @@ public class SearchHelper
             boolean success = true;
             boolean skipContainerCheck = false;
 
-            for( Locator loc : item._searchResults )
+            for (Locator loc : item._searchResults)
             {
                 if (loc == noResultsLocator)
                     skipContainerCheck = true;  // skip container check when not expecting results
@@ -123,13 +118,13 @@ public class SearchHelper
                 }
             }
 
-            if ( !success )
+            if (!success)
             {
                 notFound.put(item._searchTerm, item);
                 continue;
             }
 
-            if ( !skipContainerCheck && (container != null) )
+            if (!skipContainerCheck && (container != null))
             {
                 if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
                     if(container.contains("@files"))
@@ -140,10 +135,8 @@ public class SearchHelper
                     _test.assertElementPresent(Locator.linkWithText(container));
             }
 
-            if ( crawlResults )
-            {
+            if (crawlResults)
                 throw new IllegalArgumentException("Search result crawling not yet implemented");
-            }
         }
 
         if (notFound.isEmpty())

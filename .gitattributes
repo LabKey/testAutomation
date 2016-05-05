@@ -385,6 +385,7 @@ src/org/labkey/test/categories/OConnor.java -text
 src/org/labkey/test/categories/ONPRC.java -text
 src/org/labkey/test/categories/Perf.java -text
 src/org/labkey/test/categories/Reports.java -text
+src/org/labkey/test/categories/Search.java -text
 src/org/labkey/test/categories/Sequest.java -text
 src/org/labkey/test/categories/Specimen.java -text
 src/org/labkey/test/categories/Study.java -text
