@@ -293,12 +293,12 @@ public class DataReportsTest extends ReportTest
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        fireEvent(Locator.name("fileExtension"), SeleniumEvent.blur); // Try to prevent intermittent submit no-op
+        fireEvent(Locator.name("program"), SeleniumEvent.blur); // Try to prevent intermittent submit no-op
         clickButton("Submit");
         assertTextPresent("Female");
         setFormElement(Locator.name("label"), "tsv");
         selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
-        fireEvent(Locator.name("showWithDataset"), SeleniumEvent.blur); // Try to prevent intermittent save no-op
+        fireEvent(Locator.name("label"), SeleniumEvent.blur); // Try to prevent intermittent save no-op
         clickButton("Save");
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("tsv"));
