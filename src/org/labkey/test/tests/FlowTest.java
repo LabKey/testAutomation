@@ -633,8 +633,9 @@ public class FlowTest extends BaseFlowTest
     private void verifyDeleted(@LoggedParam String reportName)
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
-        waitForText("Ignoring filter/sort on column");
-        assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
+        DataRegionTable drt = new DataRegionTable("query", this);
+        String error = Locators.labkeyError.findElement(drt.getComponentElement()).getText();
+        assertEquals("Ignoring filter/sort on column '" + reportName.toUpperCase() + ".Response' because it does not exist.", error);
     }
 
     private void clickButtonWithText(String text)
