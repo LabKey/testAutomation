@@ -3080,9 +3080,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setCheckbox(WebElement el, boolean check)
     {
-        if (check && !el.isSelected())
-            el.click();
-        else if (!check && el.isSelected())
+        String type = el.getAttribute("type");
+        if (!"checkbox".equals(type) && !"radio".equals(type))
+            throw new IllegalArgumentException("Element not a radio button or checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
+
+        boolean selected = el.isSelected();
+        if (check != selected)
             el.click();
     }
 
