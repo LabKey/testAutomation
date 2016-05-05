@@ -342,7 +342,7 @@ public class CustomizeView extends Component
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
-        _test.checkCheckbox(checkbox);
+        new Checkbox(checkbox).check();
     }
 
     public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
