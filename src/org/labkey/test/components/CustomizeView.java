@@ -420,6 +420,8 @@ public class CustomizeView extends Component
 
     private String itemXPath(ViewItemType type, String[] fieldKeyParts)
     {
+        for (int i = 0; i < fieldKeyParts.length - 1; i++)
+            fieldKeyParts[i] = fieldKeyParts[i].toUpperCase();
         return itemXPath(type, StringUtils.join(fieldKeyParts, "/"));
     }
 
