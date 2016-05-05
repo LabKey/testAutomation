@@ -318,15 +318,18 @@ public class CustomizeView extends Component
             nodePath += fieldKeyParts[i].toUpperCase();
             WebElement fieldRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
 
+            _test.scrollIntoView(fieldRow, false);
             if (!fieldRow.getAttribute("class").contains("expanded"))
             {
                 Locator.css("img.x4-tree-elbow-plus").findElement(fieldRow).click();
             }
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
+            WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).size() == 0, 2000); // Spacer row appears during expansion animation
             nodePath += "/";
         }
 
-        return Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).waitForElement(getComponentElement(), 10000);
+        WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).waitForElement(getComponentElement(), 10000);
+        return _test.scrollIntoView(tr, false);
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
@@ -339,8 +342,6 @@ public class CustomizeView extends Component
         // Expand all nodes necessary to reveal the desired node.
         WebElement fieldRow = expandPivots(fieldKeyParts);
         WebElement checkbox = Locator.css("input[type=button]").findElement(fieldRow);
-        //note: if the column is not in view, it does not seem to get checked
-        _test.scrollIntoView(checkbox);
         _test.checkCheckbox(checkbox);
     }
 
