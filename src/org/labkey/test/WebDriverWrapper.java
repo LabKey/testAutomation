@@ -2215,7 +2215,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement scrollIntoView(Locator loc)
     {
-        return scrollIntoView(loc.findElement(getDriver()), true);
+        return scrollIntoView(loc.findElement(getDriver()));
     }
 
     public WebElement scrollIntoView(Locator loc, Boolean alignToTop)
@@ -2225,19 +2225,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public WebElement scrollIntoView(WebElement el)
     {
-        return scrollIntoView(el, true);
+        return scrollIntoView(el, false);
     }
 
     public WebElement scrollIntoView(WebElement el, Boolean alignToTop)
     {
-        if(alignToTop)
-        {
-            executeScript("arguments[0].scrollIntoView(true);", el);
-        }
-        else
-        {
-            executeScript("arguments[0].scrollIntoView(false);", el);
-        }
+        executeScript("arguments[0].scrollIntoView(arguments[1]);", el, alignToTop);
         return el;
     }
 
