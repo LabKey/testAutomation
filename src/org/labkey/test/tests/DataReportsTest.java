@@ -203,9 +203,9 @@ public class DataReportsTest extends ReportTest
         String datasetName = "AE-1:(VTN) AE Log";
 
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(datasetName));
-        scrollIntoView(Locator.linkWithText(datasetName)); // WORKAROUND: Chrome weirdness
-        clickAndWait(Locator.linkWithText(datasetName));
+        WebElement link = waitForElement(Locator.linkWithText(datasetName));
+        scrollIntoView(link, true); // WORKAROUND: Chrome weirdness
+        clickAndWait(link);
 
         _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
