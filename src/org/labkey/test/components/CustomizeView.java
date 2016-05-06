@@ -321,15 +321,7 @@ public class CustomizeView extends Component
             _test.scrollIntoView(fieldRow, false);
             if (!fieldRow.getAttribute("class").contains("expanded"))
             {
-                try
-                {
-                    Locator.css("img.x4-tree-elbow-plus").findElement(fieldRow).click();
-                }
-                catch (NoSuchElementException e)
-                {
-                    // try again with slightly different Ext4 class name (if fieldRow is the last of its siblings)
-                    Locator.css("img.x4-tree-elbow-end-plus").findElement(fieldRow).click();
-                }
+                Locator.css(".x4-tree-expander").findElement(fieldRow).click();
             }
             Locator.tag("tr").withClass("x4-grid-tree-node-expanded").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
             WebDriverWrapper.waitFor(() -> Locator.css("tr[data-recordid] + tr:not(.x4-grid-row)").findElements(getComponentElement()).size() == 0, 2000); // Spacer row appears during expansion animation
