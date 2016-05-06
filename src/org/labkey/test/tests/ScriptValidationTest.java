@@ -62,7 +62,7 @@ public class ScriptValidationTest extends SimpleModuleTest
 
         public Map<String, Object> toMap()
         {
-            return Maps.<String, Object>of("Name", name, "Hex", hex);
+            return Maps.of("Name", name, "Hex", hex);
         }
 
         public static ColorRecord fromMap(Map<String, Object> map)
@@ -128,7 +128,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         try
         {
             log("** Test errors: Field='message' and test extraContext is echoed back");
-            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)), Maps.<String, Object>of("A", "a", "B", 3));
+            insertColors(Arrays.asList(new ColorRecord("TestFieldErrorMessage", null)), Maps.of("A", "a", "B", 3));
             fail("Should throw an exception");
         }
         catch (CommandException e)

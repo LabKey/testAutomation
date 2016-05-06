@@ -140,11 +140,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         clickFolder(SUB_FOLDER_A);
         clickAndWait(Locator.linkWithText(lookupTargetListName));
-        _listHelper.insertNewRow(Maps.<String, String>of(
+        _listHelper.insertNewRow(Maps.of(
                 "LookupName", "MyLookupItem1",
                 "LookupAge", "100"
         ));
-        _listHelper.insertNewRow(Maps.<String, String>of(
+        _listHelper.insertNewRow(Maps.of(
                 "LookupName", "MyLookupItem2",
                 "LookupAge", "200"
         ));
@@ -733,7 +733,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (resp2.getRowCount().intValue() > 0)
             {
                 DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
-                del2.addRow(Maps.<String, Object>of("rowid", resp2.getRows().get(0).get("rowid")));
+                del2.addRow(Maps.of("rowid", resp2.getRows().get(0).get("rowid")));
                 del2.execute(cn, getProjectName());
             }
 
@@ -744,12 +744,12 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (resp.getRowCount().intValue() > 0)
             {
                 DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
-                del1.addRow(Maps.<String, Object>of("rowid", resp.getRows().get(0).get("rowid")));
+                del1.addRow(Maps.of("rowid", resp.getRows().get(0).get("rowid")));
                 del1.execute(cn, getProjectName());
             }
 
             DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
-            del2.addRow(Maps.<String, Object>of("name", COLOR + "!"));
+            del2.addRow(Maps.of("name", COLOR + "!"));
             del2.execute(cn, getProjectName());
     }
 
@@ -762,7 +762,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
             //look like we need to create this too
             InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
-            insertCmd0.addRow(Maps.<String, Object>of("Name", COLOR, "Hex", "#FF0000"));
+            insertCmd0.addRow(Maps.of("Name", COLOR, "Hex", "#FF0000"));
             insertCmd0.execute(cn, getProjectName());
 
             //then create manufacturer

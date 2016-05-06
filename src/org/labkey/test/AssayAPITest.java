@@ -81,8 +81,8 @@ public class AssayAPITest extends BaseWebDriverTest
         log("create run via saveBatch");
         String runName = "created-via-saveBatch";
         List<Map<String, Object>> resultRows = new ArrayList<>();
-        resultRows.add(Maps.<String, Object>of("ptid", "188438418", "SpecimenID", "K770K3VY-19"));
-        resultRows.add(Maps.<String, Object>of("ptid", "188487431", "SpecimenID", "A770K4W1-15"));
+        resultRows.add(Maps.of("ptid", "188438418", "SpecimenID", "K770K3VY-19"));
+        resultRows.add(Maps.of("ptid", "188487431", "SpecimenID", "A770K4W1-15"));
         ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, resultRows, getProjectName());
 
         log("verify assay saveBatch worked");
@@ -98,7 +98,7 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
-        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
 
         log("verify import worked");
         goToProjectHome();

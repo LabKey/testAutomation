@@ -88,10 +88,10 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
             "protocolDescription", description);
 
         final Map<String, Set<String>> outputFiles = Maps.of(
-            "r-copy.xml", Collections.<String>emptySet(),
-            "sample.log", Collections.<String>emptySet(),
-            "sample-taskInfo.tsv", Collections.<String>emptySet(),
-            "sample.xxx", Collections.<String>emptySet());
+            "r-copy.xml", Collections.emptySet(),
+            "sample.log", Collections.emptySet(),
+            "sample-taskInfo.tsv", Collections.emptySet(),
+            "sample.xxx", Collections.emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
@@ -116,11 +116,11 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
                 "skipLines", "5");
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
-        outputFiles.put("r-copy-inline.xml", Collections.<String>emptySet());
-        outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
-        outputFiles.put("sample.pipe.xar.xml", Collections.<String>emptySet());
-        outputFiles.put("sample.log", Collections.<String>emptySet());
-        outputFiles.put("sample.xxx", Collections.<String>emptySet());
+        outputFiles.put("r-copy-inline.xml", Collections.emptySet());
+        outputFiles.put("sample-taskInfo.tsv", Collections.emptySet());
+        outputFiles.put("sample.pipe.xar.xml", Collections.emptySet());
+        outputFiles.put("sample.log", Collections.emptySet());
+        outputFiles.put("sample.xxx", Collections.emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");
@@ -162,10 +162,10 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
             "protocolName", protocolName);
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
-        outputFiles.put("r-localtask-assayimport.xml", Collections.<String>emptySet());
-        outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
-        outputFiles.put("sample.log", Collections.<String>emptySet());
-        outputFiles.put("sample.tsv", Collections.<String>emptySet());
+        outputFiles.put("r-localtask-assayimport.xml", Collections.emptySet());
+        outputFiles.put("sample-taskInfo.tsv", Collections.emptySet());
+        outputFiles.put("sample.log", Collections.emptySet());
+        outputFiles.put("sample.tsv", Collections.emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
 
@@ -215,12 +215,12 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         final Map<String, String> protocolProperties = Maps.of(
                 "protocolName", protocolName);
         final Map<String, Set<String>> outputFiles = new HashMap<>();
-        outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
-        outputFiles.put("sample.log", Collections.<String>emptySet());
-        outputFiles.put("with-output-location.xml", Collections.<String>emptySet());
-        outputFiles.put("relative-to-analysis/sample.xxx", Collections.<String>emptySet());
-        outputFiles.put("/relative-to-root/sample.xxx", Collections.<String>emptySet());
-        outputFiles.put("/sample.xxx", Collections.<String>emptySet());
+        outputFiles.put("sample-taskInfo.tsv", Collections.emptySet());
+        outputFiles.put("sample.log", Collections.emptySet());
+        outputFiles.put("with-output-location.xml", Collections.emptySet());
+        outputFiles.put("relative-to-analysis/sample.xxx", Collections.emptySet());
+        outputFiles.put("/relative-to-root/sample.xxx", Collections.emptySet());
+        outputFiles.put("/sample.xxx", Collections.emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName);
         goToModule("FileContent");

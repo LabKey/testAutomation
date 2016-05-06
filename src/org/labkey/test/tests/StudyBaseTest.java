@@ -225,7 +225,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void exportStudy(boolean zipFile, boolean exportProtected)
     {
-        exportStudy(zipFile, exportProtected, false, false, false, Collections.<String>emptySet());
+        exportStudy(zipFile, exportProtected, false, false, false, Collections.emptySet());
     }
 
     @LogMethod protected void exportStudy(boolean zipFile, boolean exportProtected,

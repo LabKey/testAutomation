@@ -78,7 +78,7 @@ public class ListPublishTest extends BaseWebDriverTest
     {
         for(String ptid : _Ptids)
         {
-            _listHelper.insertNewRow(Maps.<String, String>of(
+            _listHelper.insertNewRow(Maps.of(
                     "ParticipantId", ptid
             ));
         }

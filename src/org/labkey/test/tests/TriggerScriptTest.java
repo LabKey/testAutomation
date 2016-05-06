@@ -130,7 +130,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
 
         public Map<String, Object> toMap()
         {
-            return Maps.<String, Object>of("Name", name, "SSN", ssn, "Company", company, "Key", key);
+            return Maps.of("Name", name, "SSN", ssn, "Company", company, "Key", key);
         }
 
         public Map<String, String> toStringMap()

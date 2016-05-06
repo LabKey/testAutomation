@@ -138,10 +138,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         final String pipelineName = PIPELINE_NAME;
         final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
-                pipelineName + ".xml", Collections.<String>emptySet(),
-                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
-                protocolName + ".log", Collections.<String>emptySet(),
-                protocolName + ".tsv", Collections.<String>emptySet());
+                pipelineName + ".xml", Collections.emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.emptySet(),
+                protocolName + ".log", Collections.emptySet(),
+                protocolName + ".tsv", Collections.emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
 
@@ -183,10 +183,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         final String pipelineName = PIPELINE_NAME;
         final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
-                pipelineName + ".xml", Collections.<String>emptySet(),
-                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
-                protocolName + ".log", Collections.<String>emptySet(),
-                protocolName + ".tsv", Collections.<String>emptySet());
+                pipelineName + ".xml", Collections.emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.emptySet(),
+                protocolName + ".log", Collections.emptySet(),
+                protocolName + ".tsv", Collections.emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
 
@@ -220,10 +220,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         final String pipelineName = PIPELINE_NAME;
         final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
-                pipelineName + ".xml", Collections.<String>emptySet(),
-                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
-                protocolName + ".log", Collections.<String>emptySet(),
-                protocolName + ".tsv", Collections.<String>emptySet());
+                pipelineName + ".xml", Collections.emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.emptySet(),
+                protocolName + ".log", Collections.emptySet(),
+                protocolName + ".tsv", Collections.emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
     }
@@ -247,10 +247,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         final String pipelineName = PIPELINE_NAME;
         final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
-                pipelineName + ".xml", Collections.<String>emptySet(),
-                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
-                protocolName + ".log", Collections.<String>emptySet(),
-                protocolName + ".tsv", Collections.<String>emptySet());
+                pipelineName + ".xml", Collections.emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.emptySet(),
+                protocolName + ".log", Collections.emptySet(),
+                protocolName + ".tsv", Collections.emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
     }
@@ -278,10 +278,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         final String pipelineName = PIPELINE_NAME;
         final File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         final Map<String, Set<String>> outputFiles = Maps.of(
-                pipelineName + ".xml", Collections.<String>emptySet(),
-                protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
-                protocolName + ".log", Collections.<String>emptySet(),
-                protocolName + ".tsv", Collections.<String>emptySet());
+                pipelineName + ".xml", Collections.emptySet(),
+                protocolName + "-taskInfo.tsv", Collections.emptySet(),
+                protocolName + ".log", Collections.emptySet(),
+                protocolName + ".tsv", Collections.emptySet());
         PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, runName, description, fileRoot, outputFiles);
 

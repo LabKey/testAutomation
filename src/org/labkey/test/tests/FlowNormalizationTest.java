@@ -66,7 +66,7 @@ public class FlowNormalizationTest extends BaseFlowTest
                 "RAnalysis",
                 false,
                 true,
-                Collections.<String>emptyList()
+                Collections.emptyList()
         );
         importAnalysis(options);
 

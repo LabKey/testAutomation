@@ -55,7 +55,7 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
-        importAssay(assayName, file, projectPath, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
+        importAssay(assayName, file, projectPath, Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
     }
 
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
