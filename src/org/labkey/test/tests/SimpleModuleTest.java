@@ -162,9 +162,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Inserting new Manufacturers via java client api...");
         InsertRowsCommand insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Manufacturers");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of("Name", "Ford"),
-                Maps.<String, Object>of("Name", "Toyota"),
-                Maps.<String, Object>of("Name", "Honda")
+                Maps.of("Name", "Ford"),
+                Maps.of("Name", "Toyota"),
+                Maps.of("Name", "Honda")
         ));
         SaveRowsResponse insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
@@ -191,15 +191,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Inserting new Models via javas client api...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of("ManufacturerId", toyotaId,
+                Maps.of("ManufacturerId", toyotaId,
                         "Name", "Prius C"),
-                Maps.<String, Object>of("ManufacturerId", toyotaId,
+                Maps.of("ManufacturerId", toyotaId,
                         "Name", "Camry"),
-                Maps.<String, Object>of("ManufacturerId", fordId,
+                Maps.of("ManufacturerId", fordId,
                         "Name", "Focus"),
-                Maps.<String, Object>of("ManufacturerId", fordId,
+                Maps.of("ManufacturerId", fordId,
                         "Name", "F150"),
-                Maps.<String, Object>of("ManufacturerId", fordId,
+                Maps.of("ManufacturerId", fordId,
                         "Name", "Pinto")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
@@ -223,7 +223,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // update a row in models
         UpdateRowsCommand updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Models");
         updateCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of(
+                Maps.of(
                         "RowId", priusId,
                         "Name", "Prius"
                 )
@@ -260,9 +260,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Inserting colors...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of("Name", "Red", "Hex", "#FF0000"),
-                Maps.<String, Object>of("Name", "Green", "Hex", "#00FF00"),
-                Maps.<String, Object>of("Name", "Blue", "Hex", "#0000FF")
+                Maps.of("Name", "Red", "Hex", "#FF0000"),
+                Maps.of("Name", "Green", "Hex", "#00FF00"),
+                Maps.of("Name", "Blue", "Hex", "#0000FF")
         ));
         insertResp = insertCmd.execute(cn, getProjectName());
         assertEquals("Expected to insert 3 rows.", 3, insertResp.getRowsAffected().intValue());
@@ -270,14 +270,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Inserting vechicles...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of(
+                Maps.of(
                         "ModelId", priusId,
                         "Color", "Green!",
                         "ModelYear", Integer.valueOf(2000),
                         "Milage", Integer.valueOf(3),
                         "LastService", new Date(2009, 9, 9)
                 ),
-                Maps.<String, Object>of(
+                Maps.of(
                         "ModelId", f150Id,
                         "Color", "Red!",
                         "ModelYear", Integer.valueOf(2001),
@@ -295,7 +295,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Trying to update Vehicle from wrong container...");
         updateCmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         updateCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of(
+                Maps.of(
                         "RowId", vehicleIds[1],
                         "Milage", Integer.valueOf(4),
                         "LastService", new Date(2009, 9, 10)
@@ -342,7 +342,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Insert vehicle into subfolder...");
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Vehicles");
         insertCmd.getRows().addAll(Arrays.asList(
-                Maps.<String, Object>of(
+                Maps.of(
                         "ModelId", priusId,
                         "Color", "Red!",
                         "ModelYear", Integer.valueOf(3000),
@@ -728,7 +728,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
-        assertTrue("Wrong number of templates found", getElementCount((Locator.XPathLocator) l) == 2);
+        assertTrue("Wrong number of templates found", getElementCount(l) == 2);
     }
 
     @LogMethod
