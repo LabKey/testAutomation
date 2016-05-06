@@ -354,9 +354,9 @@ public class TimeChartAPITest extends TimeChartTest
                 for (int i = 0; i < stringCheck[testIndex].length; i++)
                 {
                     // visit label column may not have dataset name prefix
-                    int colIndex = table.getColumn("Study Lab Results Participant Visit Visit Label");
+                    int colIndex = table.getColumnIndex("Study Lab Results Participant Visit Visit Label");
                     if (colIndex == -1)
-                        colIndex = table.getColumn("Visit Label");
+                        colIndex = table.getColumnIndex("Visit Label");
 
                     String colData = table.getDataAsText(i, colIndex);
                     assertEquals(stringCheck[testIndex][i], colData);
