@@ -50,9 +50,9 @@ function doTest()
     result = LABKEY.Utils.textLink({
         href:"www.labkey.com",
         style:"awesome",
-        text:"LabKey Software"
+        text:"LabKey"
     });
-    if( result != "<a href='www.labkey.com' style='awesome'>LabKey Software</a>" )
+    if( result != "<a href='www.labkey.com' style='awesome'>LabKey</a>" )
         errors[errors.length] = new Error("Utils.testLink() = "+Ext.util.JSON.encode(result));
 
     doAsyncTests();
