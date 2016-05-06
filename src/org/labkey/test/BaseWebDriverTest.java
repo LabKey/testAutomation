@@ -60,6 +60,7 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.SideWebPart;
+import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.search.SearchSideWebPart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -2783,9 +2784,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (validateSubfolders)
         {
             shortWait().until(ExpectedConditions.elementToBeClickable(By.className("lk-vq-subfolders")));
-            checkCheckbox(Locator.tagWithClass("table", "lk-vq-subfolders"));
+            new Checkbox(Locator.css("table.lk-vq-subfolders input").findElement(getDriver())).check();
         }
-        checkCheckbox(Locator.tagWithClass("table", "lk-vq-systemqueries"));
+        new Checkbox(Locator.css("table.lk-vq-systemqueries input").findElement(getDriver())).check();
         clickButton("Start Validation", 0);
         waitForElement(locFinishMsg, waitTime);
         //test for success
