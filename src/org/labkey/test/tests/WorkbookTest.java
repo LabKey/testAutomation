@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
@@ -60,8 +61,8 @@ public class WorkbookTest extends BaseWebDriverTest
     @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(PROJECT_NAME2, afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME2, afterTest);
     }
 
     @Test
@@ -109,7 +110,7 @@ public class WorkbookTest extends BaseWebDriverTest
         assertTextPresentInThisOrder(FILE_WORKBOOK_NAME, ASSAY_WORKBOOK_NAME, "Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Delete a workbook
-        checkDataRegionCheckbox("query", 2); // Select renamed workbook
+        new DataRegionTable("query", this).checkCheckbox(2);
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row?");
         waitForTextToDisappear("Renamed"+DEFAULT_WORKBOOK_NAME);

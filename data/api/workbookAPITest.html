@@ -53,18 +53,5 @@
         createContainer(true);    // Create then delete
     }
 
-
-    function init(){
-        var btn = new Ext.Button({
-            id : 'testButton',
-            renderTo : 'testButtonDiv',
-            text     : 'RunAPITest',
-            handler  : run
-        });
-    }
-
-    Ext.onReady(init);
-
-
 </script>
-
+<button onclick="run();">RunAPITest</button>
