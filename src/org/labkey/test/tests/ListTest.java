@@ -481,6 +481,7 @@ public class ListTest extends BaseWebDriverTest
         {
             Window warning = new Window("Selection required", getDriver());
             assertEquals("Wrong warning message", "You must select at least one field to display in the grid.", warning.getBody());
+            warning.close();
         }
         else
             assertAlert("You must select at least one field to display in the grid.");
