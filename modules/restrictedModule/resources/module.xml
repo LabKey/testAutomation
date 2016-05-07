@@ -15,4 +15,7 @@
         <requiredModule name="Core" />
     </requiredModuleContext>
     <enableOptions requireSitePermission="true"/>
+    <clientDependencies>
+        <dependency path="Ext3"/>
+    </clientDependencies>
 </module>
