@@ -296,7 +296,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         String expectedString = stdFormat.format(expectedDate);
 
         String clientDateStr = (String)executeScript("return (new Date()).toString()");
-        String clientFormattedString = (String)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').format('Y-m-d');");
+        String clientFormattedString = (String)executeScript("return Ext4.Date.format(LDK.ConvertUtils.parseDate('" + dateStr + "'), 'Y-m-d');");
 
         String clientTimezone = (String)executeScript("return Ext4.Date.getTimezone(LDK.ConvertUtils.parseDate('" + dateStr + "'));");
         String serverTimezone = Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT);
