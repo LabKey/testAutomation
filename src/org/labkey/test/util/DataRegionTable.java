@@ -377,14 +377,9 @@ public class DataRegionTable extends Component
 
         if (i < 0)
         {
-            List<String> columnLabels = new ArrayList<>(getColumnLabels().size());
-            i = columnLabels.indexOf(name);
-
-            if (i < 0)
-            {
-                getColumnLabels().stream().forEachOrdered(s -> columnLabels.add(s.replaceAll(" ", "")));
-                i = columnLabels.indexOf(name.replaceAll(" ", ""));
-            }
+            List<String> columnLabelsWithoutSpaces = new ArrayList<>(getColumnLabels().size());
+            getColumnLabels().stream().forEachOrdered(s -> columnLabelsWithoutSpaces.add(s.replaceAll(" ", "")));
+            i = columnLabelsWithoutSpaces.indexOf(name.replaceAll(" ", ""));
         }
 
         if (i < 0)
