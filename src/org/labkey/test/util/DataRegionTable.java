@@ -363,19 +363,28 @@ public class DataRegionTable extends Component
         return findElement(link(row, col));
     }
 
+    /**
+     * Get column index for
+     * @param name or label for desired column
+     * @return column index or -1 if column isn't present
+     */
     public int getColumnIndex(String name)
     {
-        name = name.replaceAll(" ", "");
-        int i;
+        int i = getColumnNames().indexOf(name);
 
-        i = getColumnNames().indexOf(_regionName + ":" + name);
+        if (i < 0)
+            i = getColumnNames().indexOf(name.replaceAll(" ", ""));
 
         if (i < 0)
         {
-            List<String> columnsWithoutWhitespace = new ArrayList<>(getColumnHeaders().size());
-            getColumnHeaders().stream().forEachOrdered(s -> columnsWithoutWhitespace.add(s.replaceAll(" ", "")));
+            List<String> columnLabels = new ArrayList<>(getColumnLabels().size());
+            i = columnLabels.indexOf(name);
 
-            i = columnsWithoutWhitespace.indexOf(name);
+            if (i < 0)
+            {
+                getColumnLabels().stream().forEachOrdered(s -> columnLabels.add(s.replaceAll(" ", "")));
+                i = columnLabels.indexOf(name.replaceAll(" ", ""));
+            }
         }
 
         if (i < 0)
@@ -392,7 +401,16 @@ public class DataRegionTable extends Component
         return getColumnIndex(name);
     }
 
+    /**
+     * @deprecated Use more accurately named {@link #getColumnLabels()}
+     */
+    @Deprecated
     public List<String> getColumnHeaders()
+    {
+        return getColumnLabels();
+    }
+
+    public List<String> getColumnLabels()
     {
         getComponentElement().isDisplayed(); // validate cached element
 
@@ -413,9 +431,12 @@ public class DataRegionTable extends Component
         if (_columnNames.isEmpty())
         {
             List<WebElement> columnHeaders = elements().getColumnHeaders();
-            for (int i = _selectors ? 1 : 0; i< columnHeaders.size(); i++)
+            for (int i = _selectors ? 1 : 0; i < columnHeaders.size(); i++)
             {
-                _columnNames.add(columnHeaders.get(i).getAttribute("column-name"));
+                String columnName = columnHeaders.get(i).getAttribute("column-name");
+                if (columnName.startsWith(_regionName + ":"))
+                    columnName = columnName.substring(_regionName.length() + 1);
+                _columnNames.add(columnName);
             }
         }
 
