@@ -68,6 +68,7 @@ import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -3175,5 +3176,24 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         clickButton("Save Survey");
         waitForElement(Locator.tagWithText("td", label));
+    }
+
+    protected void flash(WebElement element)
+    {
+        String borderStyle  = element.getCssValue("border");
+        for (int i = 0; i <  3; i++) {
+            changeStyle("2px solid yellow", element);
+            changeStyle(borderStyle, element);
+        }
+    }
+
+    private void changeStyle(String style, WebElement element) {
+        JavascriptExecutor js = ((JavascriptExecutor) getDriver());
+        js.executeScript("arguments[0].style.border='" + style + "'", element);
+
+        try {
+            Thread.sleep(75);
+        }  catch (InterruptedException e) {
+        }
     }
 }
