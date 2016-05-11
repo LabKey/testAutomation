@@ -650,19 +650,20 @@ public class ETLTest extends ETLBaseTest
         // This ETL xml uses a CurrentAndSubfolders containerFilter
         final String APPEND_CONTAINER_FILTER = "{simpletest}/appendContainerFilter";
         final String MY_ROW = "own row";
+        final String CHILD_FOLDER = "child";
         _etlHelper.insertSourceRow("1", MY_ROW, "1");
-        _containerHelper.createSubfolder(getProjectName(), "child");
-        clickFolder("child");
+        _containerHelper.createSubfolder(getProjectName(), CHILD_FOLDER);
+        clickFolder(CHILD_FOLDER);
         new PortalHelper(this).addQueryWebPart("Source", ETLHelper.VEHICLE_SCHEMA, ETLHelper.ETL_SOURCE, null);
         final String CHILD_ROW = "child row";
-        _etlHelper.insertSourceRow("2", CHILD_ROW, "1");
+        _etlHelper.insertSourceRow("2", CHILD_ROW, "1", CHILD_FOLDER);
         _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
         goToProjectHome();
         log("Validating ETL respects containerFilter.");
         _etlHelper.assertInTarget1(MY_ROW);
         _etlHelper.assertInTarget1(CHILD_ROW);
         final String CHILD_ROW_2 = "child row 2";
-        _etlHelper.insertSourceRow("3", CHILD_ROW_2, "1");
+        _etlHelper.insertSourceRow("3", CHILD_ROW_2, "1", CHILD_FOLDER);
         _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
         goToProjectHome();
         log("Validating modifiedSinceFilterStrategy is containerFilter aware.");
