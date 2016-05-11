@@ -40,6 +40,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -328,7 +329,7 @@ public class CustomizeView extends Component
             nodePath += "/";
         }
 
-        WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).waitForElement(getComponentElement(), 10000);
+        WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
         return _test.scrollIntoView(tr, false);
     }
 
@@ -420,14 +421,13 @@ public class CustomizeView extends Component
 
     private String itemXPath(ViewItemType type, String[] fieldKeyParts)
     {
-        for (int i = 0; i < fieldKeyParts.length - 1; i++)
-            fieldKeyParts[i] = fieldKeyParts[i].toUpperCase();
         return itemXPath(type, StringUtils.join(fieldKeyParts, "/"));
     }
 
     private String itemXPath(ViewItemType type, String fieldKey)
     {
-        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) + "]").toXpath();
+        FieldKey parsedFieldKey = new FieldKey(fieldKey);
+        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(parsedFieldKey.toString()) + "]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, int item_index)
@@ -451,6 +451,42 @@ public class CustomizeView extends Component
             builder.moveToElement(el).click().build().perform();
             try {el.click();} catch (StaleElementReferenceException ignore) {}
             _test.shortWait().until(ExpectedConditions.stalenessOf(el));
+        }
+    }
+
+    private class FieldKey
+    {
+        private final String fieldName;
+        private final String fieldKey;
+        private final List<String> lookupParts;
+
+        FieldKey(String fieldKey)
+        {
+            List<String> allParts = Arrays.asList(fieldKey.split("/"));
+            lookupParts = allParts.subList(0, allParts.size() - 1);
+            for (int i = 0; i < lookupParts.size(); i++)
+            {
+                lookupParts.set(i, lookupParts.get(i).toUpperCase());
+            }
+            fieldName = allParts.get(allParts.size() - 1);
+            allParts = new ArrayList<>(lookupParts);
+            allParts.add(fieldName);
+            this.fieldKey = String.join("/", allParts);
+        }
+
+        public String getFieldName()
+        {
+            return fieldName;
+        }
+
+        public List<String> getLookupParts()
+        {
+            return lookupParts;
+        }
+
+        public String toString()
+        {
+            return fieldKey;
         }
     }
 
@@ -490,6 +526,7 @@ public class CustomizeView extends Component
         addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
         _test._ext4Helper.selectComboBoxItem(Locator.xpath(itemXPath), order);
+        Locator.xpath(itemXPath).append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
     }
 
     public void removeCustomizeViewColumn(String fieldKey)
