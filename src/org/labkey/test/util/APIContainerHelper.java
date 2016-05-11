@@ -96,8 +96,9 @@ public class APIContainerHelper extends AbstractContainerHelper
 //                String path = String.join("/", parentPath, name).replace("//", "/");
 //                assertEquals("Unexpected path for created container", path, response.getPath());
 //            }
-            assertEquals("Wrong folder type for " + response.getPath() + ". Defining module may be missing.",
-                    folderType == null || "Custom".equals(folderType) ? (isWorkbook ? "Workbook" : "None") : folderType, response.getProperty("folderType"));
+            if (folderType == null || "custom".equals(folderType.toLowerCase()) || "none".equals(folderType))
+                folderType = (isWorkbook ? "Workbook" : "None");
+            assertEquals("Wrong folder type for " + response.getPath() + ". Defining module may be missing.", folderType, response.getProperty("folderType"));
             return response;
         }
         catch (CommandException | IOException e)
