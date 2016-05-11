@@ -49,7 +49,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ETLHelper
 {
-    private static final String VEHICLE_SCHEMA = "vehicle";
+    static final String VEHICLE_SCHEMA = "vehicle";
     public static final String ETL_SOURCE = "etl_source";
     public static final String ETL_TARGET = "etl_target";
     public static final String ETL_TARGET_2 = "etl_target2";
@@ -318,8 +318,16 @@ public class ETLHelper
 
     protected void insertQueryRow(String id, String name, String RunId, String query)
     {
+        insertQueryRow(id, name, RunId, query, null);
+    }
+
+    protected void insertQueryRow(String id, String name, String RunId, String query, String subFolder)
+    {
         _test.log("inserting " + query + " row " + name);
-        _test.clickTab("Portal");
+        if (null == subFolder)
+            _test.clickTab("Portal");
+        else
+            _test.clickFolder(subFolder);
         _test.click(new Locator.LinkLocator(StringUtils.capitalize(query)));
         _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
         _test.waitForElement(Locator.name("quf_id"));
@@ -330,8 +338,16 @@ public class ETLHelper
             _test.setFormElement(Locator.name("quf_transformrun"), RunId);
         }
         _test.clickButton("Submit");
-        _test.log("returning to project home");
-        _test.clickTab("Portal");
+        _test.log("returning to project home or folder");
+        if (null == subFolder)
+            _test.clickTab("Portal");
+        else
+            _test.clickFolder(subFolder);
+    }
+
+    protected void insertSourceRow(String id, String name, String RunId, String subFolder)
+    {
+        insertQueryRow(id, name, RunId, "source", subFolder);
     }
 
     protected void insertSourceRow(String id, String name, String RunId)

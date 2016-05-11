@@ -170,6 +170,7 @@ modules/simpletest/resources/etls/SleepTaskAllowDoubleQueue.xml -text
 modules/simpletest/resources/etls/TaskRefTask.xml -text
 modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendAndTaskRefTask.xml -text
+modules/simpletest/resources/etls/appendContainerFilter.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
 modules/simpletest/resources/etls/appendMappedColumns.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#application/xml

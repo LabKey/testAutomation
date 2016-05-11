@@ -34,6 +34,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
 import org.labkey.test.pages.dataintegration.ETLScheduler;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -641,5 +642,31 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.assertInTarget1(NAME);
         _etlHelper.runETL_API("truncateWithoutDataTransfer");
         _etlHelper.assertNotInTarget1(NAME);
+    }
+
+    @Test
+    public void customContainerFilter() throws Exception
+    {
+        // This ETL xml uses a CurrentAndSubfolders containerFilter
+        final String APPEND_CONTAINER_FILTER = "{simpletest}/appendContainerFilter";
+        final String MY_ROW = "own row";
+        _etlHelper.insertSourceRow("1", MY_ROW, "1");
+        _containerHelper.createSubfolder(getProjectName(), "child");
+        clickFolder("child");
+        new PortalHelper(this).addQueryWebPart("Source", ETLHelper.VEHICLE_SCHEMA, ETLHelper.ETL_SOURCE, null);
+        final String CHILD_ROW = "child row";
+        _etlHelper.insertSourceRow("2", CHILD_ROW, "1");
+        _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
+        goToProjectHome();
+        log("Validating ETL respects containerFilter.");
+        _etlHelper.assertInTarget1(MY_ROW);
+        _etlHelper.assertInTarget1(CHILD_ROW);
+        final String CHILD_ROW_2 = "child row 2";
+        _etlHelper.insertSourceRow("3", CHILD_ROW_2, "1");
+        _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
+        goToProjectHome();
+        log("Validating modifiedSinceFilterStrategy is containerFilter aware.");
+        _etlHelper.assertInTarget1(CHILD_ROW_2);
+
     }
 }
