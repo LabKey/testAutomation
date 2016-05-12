@@ -407,6 +407,8 @@ src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/SideWebPart.java -text
 src/org/labkey/test/components/WebPart.java -text
+src/org/labkey/test/components/core/NotificationPanelItem.java -text
+src/org/labkey/test/components/core/UserNotificationsPanel.java -text
 src/org/labkey/test/components/dumbster/EmailRecordTable.java -text
 src/org/labkey/test/components/ext4/Checkbox.java -text
 src/org/labkey/test/components/ext4/Window.java -text
@@ -447,6 +449,7 @@ src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/StartImportPage.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
+src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/query/ExecuteQueryParameterized.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
@@ -506,7 +509,6 @@ src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
-src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
 src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
@@ -659,6 +661,7 @@ src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text
 src/org/labkey/test/util/ExcelHelper.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
+src/org/labkey/test/util/ExperimentalFeaturesHelper.java -text
 src/org/labkey/test/util/Ext4Helper.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/FileBrowserExtendedProperty.java -text
