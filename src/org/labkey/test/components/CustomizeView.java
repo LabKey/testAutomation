@@ -454,13 +454,13 @@ public class CustomizeView extends Component
         }
     }
 
-    private class FieldKey
+    public static class FieldKey
     {
         private final String fieldName;
         private final String fieldKey;
         private final List<String> lookupParts;
 
-        FieldKey(String fieldKey)
+        public FieldKey(String fieldKey)
         {
             List<String> allParts = Arrays.asList(fieldKey.split("/"));
             lookupParts = allParts.subList(0, allParts.size() - 1);
