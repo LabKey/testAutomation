@@ -408,8 +408,8 @@ public class CustomizeView extends Component
 
         if ( !(filter.compareTo("") == 0) )
         {
-            _test.setFormElement(Locator.xpath(newClauseXPath + "//input[contains(@id, 'filterValue')]"), filter);
-            _test.fireEvent(Locator.xpath(newClauseXPath + "//input[contains(@id, 'filterOpCombo')]"), BaseWebDriverTest.SeleniumEvent.blur);
+            _test.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
+            itemXPath.append("//tr").findElement(this).click(); // Filter doesn't stick without this
         }
         _test.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
     }
@@ -681,7 +681,7 @@ public class CustomizeView extends Component
     private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
     {
         Locator fromItemXPath = itemXPath(type, field_index);
-        Locator toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ).append("/tbody/" + (moveUp ? "tr[1]" : "tr[2]"));
+        Locator toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ).append("/tbody/tr" + (moveUp ? "[1]" : "[last()]"));
 
         changeTab(type);
         _test.dragAndDrop(fromItemXPath, toItemXPath);
