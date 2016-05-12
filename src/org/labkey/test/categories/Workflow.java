@@ -1,5 +1,5 @@
 package org.labkey.test.categories;
 
-public class Workflow extends Test
+public abstract class Workflow extends Test
 {
 }
