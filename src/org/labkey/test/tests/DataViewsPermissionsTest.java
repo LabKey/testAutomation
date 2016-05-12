@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
@@ -32,6 +33,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
 
         clickFolder("My Study");
         portalHelper.addWebPart("Data Views");
+        BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), "Data Views");
+        dataViewsWebPart.moveUp();
+        dataViewsWebPart.moveUp();
+        dataViewsWebPart.moveUp();
+        dataViewsWebPart.moveUp();
+        dataViewsWebPart.moveUp();
+
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save and Finish", defaultWaitForPage);
@@ -77,32 +85,36 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         openEditPanel("Report 1");
         //_ext4Helper.selectRadioButton ("Visibility","Hidden");
         _ext4Helper.uncheckCheckbox("Shared");
+        sleep(1000);
         _ext4Helper.clickWindowButton("Report 1","Save",0,0);
-        sleep(500);
+        _ext4Helper.waitForMaskToDisappear();
         clickFolder("My Study");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 2");
         _ext4Helper.selectComboBoxItem("Author","author");
         _ext4Helper.checkCheckbox("Shared");
+        sleep(1000);
         _ext4Helper.clickWindowButton("Report 2","Save",0,0);
-        sleep(500);
+        _ext4Helper.waitForMaskToDisappear();
         clickFolder("My Study");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 3");
         _ext4Helper.selectComboBoxItem("Author","editor");
         _ext4Helper.checkCheckbox("Shared");
+        sleep(1000);
         _ext4Helper.clickWindowButton("Report 3","Save",0,0);
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     protected void doVerifySteps()
 
     {
-        sleep(500);
         impersonate ("editor@test.com");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 4");
+        sleep(1000);
         _ext4Helper.clickWindowButton("Report 4","Save",0,0);
-        sleep(500);
+        _ext4Helper.waitForMaskToDisappear();
         stopImpersonating();
 
         clickProject("StudyVerifyProject");
@@ -113,13 +125,14 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), "Report 5");
         setFormElement(Locator.name("linkUrl"), "http://www.google.com");
+        sleep(1000);
         clickButton("Save", defaultWaitForPage);
 
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 5");
+        sleep(1000);
         _ext4Helper.clickWindowButton("Report 5","Save",0,0);
-
-
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void openEditPanel(String itemName)
