@@ -235,7 +235,7 @@ public abstract class Locator
     {
         try
         {
-            return wait.ignoring(NotFoundException.class).until(new Function<SearchContext, WebElement>()
+            return wait.ignoring(NoSuchElementException.class).until(new Function<SearchContext, WebElement>()
             {
                 @Override
                 public WebElement apply(SearchContext context)
