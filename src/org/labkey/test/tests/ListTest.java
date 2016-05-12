@@ -586,9 +586,9 @@ public class ListTest extends BaseWebDriverTest
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(DataRegionExportHelper.TextSeparator.COMMA);
         TextSearcher srch = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
-        assertTextPresent(srch, LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
-                LIST_KEY_NAME2.toLowerCase() + _listCol2.getName(),
-                LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
+        assertTextPresent(srch, LIST_KEY_NAME2.toUpperCase() + _listCol1.getName(),
+                LIST_KEY_NAME2.toUpperCase() + _listCol2.getName(),
+                LIST_KEY_NAME2.toUpperCase() + _listCol4.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
