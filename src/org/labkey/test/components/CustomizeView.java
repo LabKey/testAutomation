@@ -382,29 +382,29 @@ public class CustomizeView extends Component
             _test.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
 
         changeTab(ViewItemType.Filter);
-        String itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
+        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
 
-        if (!_test.isElementPresent(Locator.xpath(itemXPath)))
+        if (!_test.isElementPresent(itemXPath))
         {
             // Add filter if it doesn't exist
             addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Filter);
-            _test.assertElementPresent(Locator.xpath(itemXPath));
+            _test.assertElementPresent(itemXPath);
         }
         else
         {
             // Add new clause
-            _test.click(Locator.xpath(itemXPath + "//a[text() = 'Add']"));
+            _test.click(itemXPath.append("//a[text() = 'Add']"));
         }
 
         // XXX: why doesn't 'clauseIndex' work?
-        String clauseXPath = itemXPath + "//tr[@clauseindex]";
-        int clauseIndex = _test.getElementCount(new Locator.XPathLocator(clauseXPath)) -1;
+        Locator.XPathLocator clauseXPath = itemXPath.append("//tr[@clauseindex]");
+        int clauseIndex = _test.getElementCount(clauseXPath) -1;
 
-        String newClauseXPath = itemXPath + "//tr[@clauseindex='" + clauseIndex + "']";
-        _test.assertElementPresent(Locator.xpath(newClauseXPath));
+        Locator.XPathLocator newClauseXPath = itemXPath.append("//tr[@clauseindex='" + clauseIndex + "']");
+        _test.assertElementPresent(newClauseXPath);
 
-        _test._ext4Helper.selectComboBoxItem(Locator.xpath(newClauseXPath), filter_type);
-        _test.fireEvent(Locator.xpath(newClauseXPath), BaseWebDriverTest.SeleniumEvent.blur);
+        _test._ext4Helper.selectComboBoxItem(newClauseXPath, filter_type);
+        _test.fireEvent(newClauseXPath, BaseWebDriverTest.SeleniumEvent.blur);
 
         if ( !(filter.compareTo("") == 0) )
         {
@@ -414,37 +414,37 @@ public class CustomizeView extends Component
         _test.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
     }
 
-    private String tabContentXPath(ViewItemType type)
+    private Locator.XPathLocator tabContentXPath(ViewItemType type)
     {
-        return _dataRegionLoc.append("//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
+        return _dataRegionLoc.append("//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]");
     }
 
-    private String itemXPath(ViewItemType type, String[] fieldKeyParts)
+    private Locator.XPathLocator itemXPath(ViewItemType type, String[] fieldKeyParts)
     {
         return itemXPath(type, StringUtils.join(fieldKeyParts, "/"));
     }
 
-    private String itemXPath(ViewItemType type, String fieldKey)
+    private Locator.XPathLocator itemXPath(ViewItemType type, String fieldKey)
     {
         FieldKey parsedFieldKey = new FieldKey(fieldKey);
-        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(parsedFieldKey.toString()) + "]").toXpath();
+        return _dataRegionLoc.append(Locator.tagWithClass("table", "labkey-customview-" + type.toString().toLowerCase() + "-item")
+                .withPredicate("@fieldkey=" + Locator.xq(fieldKey) + " or @fieldkey=" + Locator.xq(parsedFieldKey.toString())));
     }
 
-    private String itemXPath(ViewItemType type, int item_index)
+    private Locator.XPathLocator itemXPath(ViewItemType type, int item_index)
     {
-        return _dataRegionLoc.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]").toXpath();
+        return _dataRegionLoc.append(Locator.tagWithClass("table", "labkey-customview-" + type.toString().toLowerCase() + "-item").index(item_index));
     }
 
     private void removeCustomizeViewItem(String fieldKey, ViewItemType type)
     {
         changeTab(type);
 
-        String itemXPath = itemXPath(type, fieldKey);
-        String closeXPath = "//*[contains(@class, 'labkey-tool-close')]";
+        Locator closeButtonLoc = itemXPath(type, fieldKey).append(Locator.tagWithClass("*", "labkey-tool-close"));
 
         Actions builder = new Actions(_test.getDriver());
 
-        List<WebElement> elements = _test.getDriver().findElements(By.xpath(itemXPath + closeXPath));
+        List<WebElement> elements = closeButtonLoc.findElements(_test.getDriver());
 
         for (WebElement el : elements)
         {
@@ -501,8 +501,7 @@ public class CustomizeView extends Component
     {
         changeTab(type);
 
-        String itemXPath = itemXPath(type, item_index);
-        String fieldKey = _test.getAttribute(Locator.xpath(itemXPath), "fieldkey");
+        String fieldKey = _test.getAttribute(itemXPath(type, item_index), "fieldkey");
 
         removeCustomizeViewItem(fieldKey, type); // Need to remove by key to avoid unintentional removals
     }
@@ -520,13 +519,13 @@ public class CustomizeView extends Component
     public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
     {
         _test.log("Adding " + column_name + " sort");
-        String itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
+        Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
-        _test.assertElementNotPresent(Locator.xpath(itemXPath));
+        _test.assertElementNotPresent(itemXPath);
         addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
-        _test._ext4Helper.selectComboBoxItem(Locator.xpath(itemXPath), order);
-        Locator.xpath(itemXPath).append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
+        _test._ext4Helper.selectComboBoxItem(itemXPath, order);
+        itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
     }
 
     public void removeCustomizeViewColumn(String fieldKey)
@@ -574,11 +573,10 @@ public class CustomizeView extends Component
     private void clearAllCustomizeViewItems(ViewItemType type)
     {
         changeTab(type);
-        String tabXPath = tabContentXPath(type);
 
-        String deleteButtonXPath = tabXPath + "//*[contains(@class, 'labkey-tool-close')]";
-        while (_test.isElementPresent(Locator.xpath(deleteButtonXPath)))
-            _test.click(Locator.xpath(deleteButtonXPath));
+        Locator.XPathLocator deleteButtonXPath = tabContentXPath(type).append(Locator.tagWithClass("*", "labkey-tool-close"));
+        while (_test.isElementPresent(deleteButtonXPath))
+            _test.click(deleteButtonXPath);
     }
 
     @LogMethod(quiet = true)
@@ -671,23 +669,22 @@ public class CustomizeView extends Component
 
     private void moveCustomizeViewItem(String fieldKey, boolean moveUp, ViewItemType type)
     {
-        final String itemXPath = itemXPath(type, fieldKey);
         changeTab(type);
-        final int itemIndex = _test.getElementIndex(Locator.xpath(itemXPath));
+        final int itemIndex = _test.getElementIndex(itemXPath(type, fieldKey));
 
         moveCustomizeViewItem(itemIndex, moveUp, type);
 
-        _test.waitFor(() -> itemIndex != _test.getElementIndex(Locator.xpath(itemXPath)),
+        _test.waitFor(() -> itemIndex != _test.getElementIndex(itemXPath(type, fieldKey)),
                 "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
     {
-        String fromItemXPath = itemXPath(type, field_index);
-        String toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ) + "/tbody/" + (moveUp ? "tr[1]" : "tr[2]");
+        Locator fromItemXPath = itemXPath(type, field_index);
+        Locator toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ).append("/tbody/" + (moveUp ? "tr[1]" : "tr[2]"));
 
         changeTab(type);
-        _test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));
+        _test.dragAndDrop(fromItemXPath, toItemXPath);
     }
 
     public void removeColumnProperties(String fieldKey)
