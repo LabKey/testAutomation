@@ -26,6 +26,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.Maps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,47 +119,39 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
 
+        final String defaultSumLabel = "Sum";
+        final String customSumLabel = "Total Age";
+        final String aggregateColumn = "Age";
+
         List<Map<String, String>> aggregates = new ArrayList<>();
-        aggregates.add(new HashMap<String, String>()
-        {{
-                put("type", "SUM");
-            }});
-        aggregates.add(new HashMap<String, String>()
-        {{
-                put("type", "COUNT");
-            }});
-        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
+        aggregates.add(Maps.of("type", "SUM"));
+        aggregates.add(Maps.of("type", "COUNT"));
+        setColumnProperties(aggregateColumn, "Oldness Factor" + INJECT_CHARS_2, aggregates);
         assertTextPresent(
                 "Oldness Factor" + INJECT_CHARS_2,
-                "Sum:",
-                "Count:");
-        assertTextNotPresent("Total Age:");
-        assertTextPresent("279");
+                defaultSumLabel + ":",
+                "Count:",
+                "279");
+        assertTextNotPresent(customSumLabel);
 
         log("** Set custom aggregate label");
         aggregates.remove(0);
-        aggregates.add(new HashMap<String, String>()
-        {{
-                put("type", "SUM");
-                put("label", "Total Age");
-            }});
-        setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
-        assertTextPresent("Oldness Factor" + INJECT_CHARS_2);
-
-        assertTextNotPresent("Total:");
-        assertTextPresent("Total Age:");
+        aggregates.add(Maps.of(
+                "type", "SUM",
+                "label", customSumLabel));
+        setColumnProperties(aggregateColumn, "Oldness Factor" + INJECT_CHARS_2, aggregates);
+        assertTextPresent("Oldness Factor" + INJECT_CHARS_2, customSumLabel);
+        assertTextNotPresent(defaultSumLabel);
 
         log("** Clear column title and SUM aggregate");
-        setColumnProperties("Age", null, null);
-        assertTextNotPresent("Oldness Factor", "Total Age:");
+        setColumnProperties(aggregateColumn, null, null);
+        assertTextNotPresent("Oldness Factor", defaultSumLabel, customSumLabel);
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);
 
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause
         saveFilterTest();
-//        saveFilter
-
 
         log("** Test HTML/JavaScript escaping");
         Crawler.tryInject(this, new Function<Void, Void>()
