@@ -88,7 +88,7 @@ public class SearchHelper
             if (i == maxTries)
                 assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
 
-            _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.toString(), i*5));
+            _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.keySet().toString(), i*5));
             _test.sleep(i*5000);
         }
     }
