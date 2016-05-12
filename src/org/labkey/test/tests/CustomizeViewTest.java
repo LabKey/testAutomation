@@ -130,7 +130,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);
         assertTextPresent(
                 "Oldness Factor" + INJECT_CHARS_2,
-                "Sum:",
+                "Total:",
                 "Count:");
         assertTextNotPresent("Total Age:");
         assertTextPresent("279");
