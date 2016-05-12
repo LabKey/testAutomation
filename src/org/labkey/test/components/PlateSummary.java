@@ -15,87 +15,151 @@
  */
 package org.labkey.test.components;
 
+import com.google.common.collect.ImmutableList;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class PlateSummary
+public class PlateSummary extends Component
 {
-    protected BaseWebDriverTest _test;
+    protected final BaseWebDriverTest _test;
     protected Measurement _measurement;
-    protected int _index;
+    private final WebElement summaryGrid;
+    private Elements _elements;
 
     public PlateSummary(BaseWebDriverTest test, int plateSummaryIndex)
     {
         _test = test;
-        _test.waitForElement(Locator.css("#plate-summary-div-1 table"));
+        summaryGrid = _test.waitForElement(Locator.css("#plate-summary-div-1 div.x4-panel[id^='lk_platepanel-']").index(plateSummaryIndex));
         _measurement = Measurement.SPOTCOUNT;
-        _index = plateSummaryIndex;
     }
 
-    public String getCellValue(int row, int col)
+    @Override
+    public WebElement getComponentElement()
     {
-        return getRowValues(row).get(col);
+        return summaryGrid;
     }
 
-    public List<String> getRowValues(int row)
+    public String getCellValue(Row row, int col)
     {
-        //first row is header, so add 1 to skip it
-        row = row + 1;
-        List<String> values = new ArrayList<>();
-        List<WebElement> rowEl = Locator.xpath("(//table[@class='plate-summary-grid'])[" + _index +  "]//tr[" + row + "]/td/div/a[@class='" + _measurement.locatorClass + "']").findElements(_test.getDriver());
-        for(WebElement el : rowEl)
-        {
-            values.add(el.getText());
-        }
-        return values;
+        return elements().getCells(row.index).get(col).getText();
+    }
+
+    public List<String> getRowValues(Row row)
+    {
+        return _test.getTexts(elements().getCells(row.index));
     }
 
     public List<String> getColumnValues(int col)
     {
         List<String> values = new ArrayList<>();
-        for(int row = 2; row < getRowCount(); row++)
+        for(Row row : Row.values())
         {
-            values.add(getRowValues(row).get(col));
+            values.add(getCellValue(row, col));
         }
         return values;
     }
 
     public void selectSampleWellGroup(String sampleWellGroup)
     {
-        _test._ext4Helper.selectRadioButton(sampleWellGroup);
+        _test._ext4Helper.selectRadioButton("Sample Well Groups", sampleWellGroup);
     }
 
     public void selectAntigenWellGroup(String antigenWellGroup)
     {
-        _test._ext4Helper.selectRadioButton(antigenWellGroup);
+        _test._ext4Helper.selectRadioButton("Antigen Well Groups", antigenWellGroup);
     }
 
     public void selectMeasurement(Measurement measurement)
     {
-        _test._ext4Helper.selectRadioButton(measurement.label);
+        _test._ext4Helper.selectRadioButton("Measurement", measurement.label);
         _measurement = measurement;
-        //_test.longWait().until(ExpectedConditions.visibilityOfElementLocated(Locator.tagWithClass("a", measurement.locatorClass).toBy()));
-        _test.waitForElement(Locator.tagWithClass("a", measurement.locatorClass).notHidden());
+        _test.shortWait().until(ExpectedConditions.visibilityOf(elements().getCells(0).get(0)));
     }
 
     private int getRowCount()
     {
-        return Locator.xpath("(//table[@class='plate-summary-grid'])[" + _index + "]//tr").findElements(_test.getDriver()).size();
+        return elements().getDataRows().size();
+    }
+
+    public enum Row
+    {
+        A(0), B(1), C(2), D(3), E(4), F(5), G(6), H(7);
+
+        public final int index;
+        Row(int index)
+        {
+            this.index = index;
+        }
     }
 
     public enum Measurement
     {
-        SPOTCOUNT("labkey-cls-spotcount", "Spot Count"), ACTIVITY("labkey-cls-activity", "Activity"), INTENSITY("labkey-cls-intensity", "Intensity");
-        public String locatorClass;
-        public String label;
-        private Measurement(String locatorClass, String label)
+        SPOTCOUNT("labkey-cls-spotcount", "Spot Count"),
+        ACTIVITY("labkey-cls-activity", "Activity"),
+        INTENSITY("labkey-cls-intensity", "Intensity (fluorescence)"),
+        SPOT_SIZE("labkey-cls-spotsize", "Spot Size (microns)");
+
+        public final String locatorClass;
+        public final String label;
+        Measurement(String locatorClass, String label)
         {
             this.locatorClass = locatorClass;
             this.label = label;
+        }
+    }
+
+    private Elements elements()
+    {
+        if (_elements == null)
+            _elements = new Elements();
+        return _elements;
+    }
+
+    protected class Elements extends ComponentElements
+    {
+        private List<WebElement> dateRows;
+        private Map<Measurement, Map<Integer, List<WebElement>>> dataCells;
+
+        @Override
+        protected SearchContext getContext()
+        {
+            return getComponentElement();
+        }
+
+        public List<WebElement> getDataRows()
+        {
+            if (dateRows == null)
+                dateRows = Locator.css("tr:not(:first-child)").findElements(this);
+            return dateRows;
+        }
+
+        protected WebElement getDataRow(int row)
+        {
+            return getDataRows().get(row);
+        }
+
+        protected List<WebElement> getCells(int row)
+        {
+            if (dataCells == null)
+                dataCells = new TreeMap<>();
+            if (dataCells.get(_measurement) == null)
+                dataCells.put(_measurement, new TreeMap<>());
+            if (dataCells.get(_measurement).get(row) == null)
+                dataCells.get(_measurement).put(row, ImmutableList.copyOf(Locator.css("td:not(:first-child) a." + _measurement.locatorClass).findElements(getDataRow(row))));
+            return dataCells.get(_measurement).get(row);
+        }
+
+        protected WebElement getCell(int row, int col)
+        {
+            return getCells(row).get(col);
         }
     }
 }

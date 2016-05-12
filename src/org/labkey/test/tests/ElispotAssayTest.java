@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.components.PlateSummary.Row.*;
 
 @Category({DailyB.class, Assays.class})
 public class ElispotAssayTest extends AbstractQCAssayTest
@@ -156,7 +157,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         testTNTCdata();
     }
 
-    @Test @LogMethod
+    @Test
     public void fluorospotTests()
     {
         log("** Initialize Study Folder");
@@ -217,15 +218,15 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent("ptid 1 F2", "ptid 2 F2", "ptid 3 F2", "ptid 4 F2", "Antigen 5", "Antigen 6", "Cy3", "FITC");
         click(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("run details"));
-        PlateSummary plateSummary = new PlateSummary(this, 4);
-        assertEquals(Arrays.asList(new String[]{"244.0","544.0","210.0","449.0","333.0","429.0","393.0","689.0","400.0","159.0","130.0","94.0"}), plateSummary.getRowValues(5));
+        PlateSummary plateSummary = new PlateSummary(this, 3);
+        assertEquals(Arrays.asList("244.0","544.0","210.0","449.0","333.0","429.0","393.0","689.0","400.0","159.0","130.0","94.0"), plateSummary.getRowValues(E));
         plateSummary.selectMeasurement(PlateSummary.Measurement.ACTIVITY);
-        assertEquals(Arrays.asList(new String[]{"668.0","1610.0","1464.0","3945.0","3781.0","3703.0","8713.0","2222.0","2856.0","1208.0","880.0","1006.0"}), plateSummary.getRowValues(7));
+        assertEquals(Arrays.asList("668.0","1610.0","1464.0","3945.0","3781.0","3703.0","8713.0","2222.0","2856.0","1208.0","880.0","1006.0"), plateSummary.getRowValues(G));
         click(Locator.linkWithText("view runs"));
         waitAndClick(Locator.linkWithText("view results"));
         DataRegionTable results = new DataRegionTable("Data", this);
         results.ensureColumnsPresent("Wellgroup Name", "Antigen Wellgroup Name", "Antigen Name", "Cells per Well", "Wellgroup Location", "Spot Count", "Normalized Spot Count", "Spot Size", "Analyte", "Cytokine", "Activity", "Intensity", "Specimen ID", "Participant ID", "Visit ID", "Date", "Sample Description", "ProtocolName", "Plate Reader", "Target Study");
-        assertEquals(Arrays.asList(new String[]{"Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", "Fluorospot Study"}), results.getRowDataAsText(0));
+        assertEquals(Arrays.asList("Specimen 4", "Antigen 6", "atg_6F2", "150", "(7, 8)", "0.0", "0.0", " ", "FITC+Cy5", " ", " ", " ", " ", "ptid 4 F2", "4.0", " ", "blood", " ", "AID", "Fluorospot Study"), results.getRowDataAsText(0));
 
         DataRegionTable table = new DataRegionTable("Data", this);
 
@@ -241,26 +242,36 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
         log("add the analyte field to the table and adding sorts");
-        // TODO DataRegion change. Add this to use new dataregion helper.
-//        CustomizeView cvHelper = new CustomizeView(table);
         CustomizeView cvHelper = table.getCustomizeView();
         cvHelper.openCustomizeViewPanel();
         cvHelper.addCustomizeViewColumn("Analyte");
 
-        // TODO: DataRegion change. Case issue, is this a bug?
-//        cvHelper.removeCustomizeViewSort("ANTIGENLSID/AntigenName");
         cvHelper.removeCustomizeViewSort("AntigenLsid/AntigenName");
         cvHelper.removeCustomizeViewSort("Analyte");
         cvHelper.removeCustomizeViewSort("WellgroupLocation");
 
-        // TODO: DataRegion change. Case issue, is this a bug?
-//        cvHelper.addCustomizeViewSort("ANTIGENLSID/AntigenName", "AntigenName", sortDir);
         cvHelper.addCustomizeViewSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
         cvHelper.addCustomizeViewSort("Analyte", "Analyte", sortDir);
         cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
 
-        checkFluorospotRunData(expectedSpotCount, expectedActivity, expectedIntensity, expectedCytokine, table);
+        pushLocation();
+        {
+            assert expectedSpotCount.size() == expectedActivity.size();
+            assert expectedSpotCount.size() == expectedIntensity.size();
+
+            table.setMaxRows(expectedSpotCount.size());
+            List<String> spotCount = table.getColumnDataAsText("SpotCount");
+            List<String> activity = table.getColumnDataAsText("Activity");
+            List<String> intensity = table.getColumnDataAsText("Intensity");
+            List<String> cytokine = table.getColumnDataAsText("Cytokine");
+
+            assertEquals("Wrong spot count", expectedSpotCount, spotCount);
+            assertEquals("Wrong activity", expectedActivity, activity);
+            assertEquals("Wrong intensity", expectedIntensity, intensity);
+            assertEquals("Wrong cytokine", expectedCytokine, cytokine);
+        }
+        popLocation();
     }
 
     @LogMethod
@@ -429,8 +440,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         columnIdx++; //Increment column to look at median column
         for (String median : expectedMedians)
             assertEquals(median, table.getDataAsText(row++, columnIdx));
-        PlateSummary plateSummary = new PlateSummary(this, 1);
-        assertEquals(Arrays.asList(new String[]{"0.0","5.0","2.0","2.0","1.0","0.0","689.0","641.0","726.0","746.0","621.0","727.0"}), plateSummary.getRowValues(1));
+        PlateSummary plateSummary = new PlateSummary(this, 0);
+        assertEquals(Arrays.asList("0.0","5.0","2.0","2.0","1.0","0.0","689.0","641.0","726.0","746.0","621.0","727.0"), plateSummary.getRowValues(A));
 
         // verify customization of the run details view is possible
 /*
@@ -619,8 +630,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         String[] expectedMedians = new String[]{"0.0", "2376666.7", "3333.3", "6666.7"};
         for (String median : expectedMedians)
             assertEquals(median, table.getDataAsText(row++, columnIdx));
-        PlateSummary plateSummary = new PlateSummary(this, 1);
-        assertEquals(Arrays.asList(new String[]{"809.0","859.0","821.0","924.0","799.0","833.0","805.0","781.0","782.0","673.0","303.0","TNTC"}), plateSummary.getRowValues(3));
+        PlateSummary plateSummary = new PlateSummary(this, 0);
+        assertEquals(Arrays.asList("809.0","859.0","821.0","924.0","799.0","833.0","805.0","781.0","782.0","673.0","303.0","TNTC"), plateSummary.getRowValues(C));
         //assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
@@ -679,8 +690,8 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 //            assertEquals("Incorrect background value for " + ptid, expectedBackgroundMedian, detailsTable.getDataAsText(row, "Background Median"));   // TODO: crosstab
         }
 
-        PlateSummary plateSummary = new PlateSummary(this, 1);
-        assertEquals(Arrays.asList(new String[]{"10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"}), plateSummary.getRowValues(5));
+        PlateSummary plateSummary = new PlateSummary(this, 0);
+        assertEquals(Arrays.asList("10.0","9.0","6.0","10.0","18.0","7.0","11.0","244.0","0.0","0.0","0.0","0.0"), plateSummary.getRowValues(E));
     }
 
     protected void highlightWell(String type, String group, String cell)
@@ -803,27 +814,5 @@ public class ElispotAssayTest extends AbstractQCAssayTest
                 "Atg6FMedian"));
 
         assertEquals(expectedRows, actualRows);       */
-    }
-
-    private void checkFluorospotRunData(List<String> expectedSpotCount, List<String> expectedActivity,
-                                        List<String> expectedIntesity, List<String> expectedCytokine, DataRegionTable dataTable)
-    {
-        List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
-        List<String> activity = dataTable.getColumnDataAsText("Activity");
-        List<String> intensity = dataTable.getColumnDataAsText("Intensity");
-        List<String> cytokine = dataTable.getColumnDataAsText("Cytokine");
-
-        assert expectedSpotCount.size() == expectedActivity.size();
-        assert expectedSpotCount.size() == expectedIntesity.size();
-        assert expectedSpotCount.size() <= spotCount.size();
-        assert expectedSpotCount.size() <= activity.size();
-        assert expectedSpotCount.size() <= intensity.size();
-        for (int i = 0; i < expectedSpotCount.size(); i++)
-        {
-            assertEquals(expectedSpotCount.get(i), spotCount.get(i));
-            assertEquals(expectedActivity.get(i), activity.get(i));
-            assertEquals(expectedIntesity.get(i), intensity.get(i));
-            assertEquals(expectedCytokine.get(i), cytokine.get(i));
-        }
     }
 }
