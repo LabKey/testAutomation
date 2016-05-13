@@ -457,13 +457,14 @@ public class CustomizeView extends Component
 
     public static class FieldKey
     {
+        public static final String SEPARATOR = "/";
         private final String fieldName;
         private final String fieldKey;
         private final List<String> lookupParts;
 
         public FieldKey(String fieldKey)
         {
-            List<String> allParts = Arrays.asList(fieldKey.split("/"));
+            List<String> allParts = Arrays.asList(fieldKey.split(SEPARATOR));
             lookupParts = allParts.subList(0, allParts.size() - 1);
             for (int i = 0; i < lookupParts.size(); i++)
             {
@@ -472,7 +473,7 @@ public class CustomizeView extends Component
             fieldName = allParts.get(allParts.size() - 1);
             allParts = new ArrayList<>(lookupParts);
             allParts.add(fieldName);
-            this.fieldKey = String.join("/", allParts);
+            this.fieldKey = String.join(SEPARATOR, allParts);
         }
 
         public String getFieldName()
@@ -681,11 +682,13 @@ public class CustomizeView extends Component
 
     private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
     {
-        Locator fromItemXPath = itemXPath(type, field_index);
-        Locator toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ).append("/tbody/tr" + (moveUp ? "[1]" : "[last()]"));
-
         changeTab(type);
-        _test.dragAndDrop(fromItemXPath, toItemXPath);
+        if (!moveUp) field_index++; // dragAndDrop only moves items up
+        WebElement fromItem = itemXPath(type, field_index).findElement(getComponentElement());
+        WebElement toItem= itemXPath(type, field_index - 1).findElement(getComponentElement());
+
+        Actions builder = new Actions(_test.getDriver());
+        builder.dragAndDrop(fromItem, toItem).build().perform();
     }
 
     public void removeColumnProperties(String fieldKey)
