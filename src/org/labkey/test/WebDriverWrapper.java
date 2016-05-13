@@ -2338,10 +2338,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void doubleClickAndWait(final Locator l, int millis)
     {
+        doubleClickAndWait(l.findElement(getDriver()), millis);
+    }
+
+    public void doubleClick(WebElement l)
+    {
+        doubleClickAndWait(l, 0);
+    }
+
+    public void doubleClickAndWait(final WebElement l, int millis)
+    {
         doAndWaitForPageToLoad(() ->
         {
             Actions action = new Actions(getDriver());
-            action.doubleClick(l.findElement(getDriver())).perform();
+            action.doubleClick(l).perform();
         }, millis);
     }
 

@@ -409,7 +409,8 @@ public class CustomizeView extends Component
         if ( !(filter.compareTo("") == 0) )
         {
             _test.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
-            itemXPath.append("//tr").findElement(this).click(); // Filter doesn't stick without this
+            _test.fireEvent(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), BaseWebDriverTest.SeleniumEvent.blur);
+//            itemXPath.append("//tr").findElement(this).click(); // Filter doesn't stick without this
         }
         _test.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
     }
@@ -742,19 +743,20 @@ public class CustomizeView extends Component
                     continue;
 
                 _test.clickButton("Add Aggregate", 0);
-                Locator.XPathLocator row = Locator.xpath("//div[contains(@class, 'x4-window')]//tr[contains(@class,' x4-grid-data-row')][" + idx + "]");
+                Locator.XPathLocator row = Locator.xpath("//tr[contains(@class,' x4-grid-data-row')][" + idx + "]");
 
-                Locator comboCell = row.append(Locator.xpath("/td[1]"));
+                WebElement comboCell = row.append(Locator.xpath("/td[1]")).findElement(window);
                 _test.doubleClick(comboCell);
                 _test._ext4Helper.selectComboBoxItem(Locator.id(grid.getAttribute("id")), aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
-                    Locator labelCell = row.append(Locator.xpath("/td[2]/div"));
+                    WebElement labelCell = row.append(Locator.xpath("/td[2]/div")).findElement(window);
                     _test.doubleClick(labelCell);
 
-                    Locator fieldPath = Locator.xpath("//input[@name='label']");//(grid).child("/input[contains(@class, 'x4-form-text') and not(../img)]");
+                    WebElement fieldPath = Locator.xpath("//input[@name='label']").findElement(window);//(grid).child("/input[contains(@class, 'x4-form-text') and not(../img)]");
                     _test.setFormElement(fieldPath, aggregate.get("label"));
                 }
+                _test.fireEvent(_test.getDriver().switchTo().activeElement(), WebDriverWrapper.SeleniumEvent.blur);
                 idx++;
             }
         }

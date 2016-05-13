@@ -33,6 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @Category({DailyB.class})
 public class CustomizeViewTest extends BaseWebDriverTest
 {
@@ -122,30 +126,30 @@ public class CustomizeViewTest extends BaseWebDriverTest
         final String defaultSumLabel = "Sum";
         final String customSumLabel = "Total Age";
         final String aggregateColumn = "Age";
+        final String customTitle = "Oldness Factor" + INJECT_CHARS_2;
+        DataRegionTable drt = new DataRegionTable("query", this);
 
         List<Map<String, String>> aggregates = new ArrayList<>();
         aggregates.add(Maps.of("type", "SUM"));
         aggregates.add(Maps.of("type", "COUNT"));
-        setColumnProperties(aggregateColumn, "Oldness Factor" + INJECT_CHARS_2, aggregates);
-        assertTextPresent(
-                "Oldness Factor" + INJECT_CHARS_2,
-                defaultSumLabel + ":",
-                "Count:",
-                "279");
-        assertTextNotPresent(customSumLabel);
+        setColumnProperties(aggregateColumn, customTitle, aggregates);
+        assertTrue("Aggregate row didn't appear", drt.hasAggregateRow());
+        assertEquals("Wrong aggregates", defaultSumLabel + ": 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        assertTextPresent(customTitle);
 
         log("** Set custom aggregate label");
-        aggregates.remove(0);
-        aggregates.add(Maps.of(
+        aggregates.set(0, Maps.of(
                 "type", "SUM",
                 "label", customSumLabel));
-        setColumnProperties(aggregateColumn, "Oldness Factor" + INJECT_CHARS_2, aggregates);
-        assertTextPresent("Oldness Factor" + INJECT_CHARS_2, customSumLabel);
-        assertTextNotPresent(defaultSumLabel);
+        setColumnProperties(aggregateColumn, customTitle, aggregates);
+        assertEquals("Wrong aggregates", customSumLabel + ": 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        assertTextPresent(customTitle);
+        assertTextNotPresent(defaultSumLabel + ":");
 
         log("** Clear column title and SUM aggregate");
         setColumnProperties(aggregateColumn, null, null);
-        assertTextNotPresent("Oldness Factor", defaultSumLabel, customSumLabel);
+        assertFalse("Aggregate row still present", drt.hasAggregateRow());
+        assertTextNotPresent("Oldness Factor");
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);
