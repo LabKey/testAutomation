@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
@@ -215,7 +216,8 @@ public class CustomizeView extends Component
     public void deleteView()
     {
         elements().deleteButton.click();
-        _test.clickAndWait(Ext4Helper.Locators.windowButton("Delete your view", "Yes"));
+        Window confirm = new Window(Ext4Helper.Locators.windowWithTitleContaining("Delete").findElement(_test.getDriver()), _test.getDriver());
+        confirm.clickButton("Yes");
     }
 
     /**
