@@ -621,11 +621,9 @@ public class ListTest extends BaseWebDriverTest
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
         clickAndWait(Locator.linkWithText(LIST2_NAME_CARS));
-        pushLocation();
         _customizeViewsHelper.openCustomizeViewPanel();
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
-        assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
-        popLocation();
+        waitForElement(Locator.tagWithAttribute("tr", "data-recordid", LIST3_KEY_NAME.toUpperCase()));
+        assertElementNotPresent(Locator.tagWithAttribute("tr", "data-recordid", LIST_KEY_NAME.toUpperCase()));
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY));
         assertTextPresent("query not found");
 
