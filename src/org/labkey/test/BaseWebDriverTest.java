@@ -3003,7 +3003,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         clickButton("Delete");
         assertElementPresent(Locator.linkContainingText(jobDescription));
-        if (deleteRuns)
+        if (deleteRuns && isElementPresent(Locator.id("deleteRuns")))
             checkCheckbox(Locator.id("deleteRuns"));
         clickButton("Confirm Delete");
     }
