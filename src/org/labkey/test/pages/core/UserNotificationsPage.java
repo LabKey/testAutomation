@@ -1,14 +1,16 @@
 package org.labkey.test.pages.core;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserNotificationsPage extends LabKeyPage
 {
@@ -81,6 +83,47 @@ public class UserNotificationsPage extends LabKeyPage
         }
 
         return notifications;
+    }
+
+    public NotificationItem findNotificationInPage(String searchBody, @Nullable NotificationTypes notificationType)
+    {
+        int noticeIndex;
+        boolean noticeFound;
+        List<NotificationItem> notificationItemList = new ArrayList<>();
+
+        if(notificationType == null)
+        {
+            notificationItemList = getAllNotifications();
+        }
+        else
+        {
+            notificationItemList = getNotificationsOfType(notificationType);
+        }
+
+        Pattern pattern = Pattern.compile(searchBody);
+        Matcher matcher;
+        noticeIndex = 0;
+        noticeFound = false;
+        for(NotificationItem ni : notificationItemList)
+        {
+            matcher = pattern.matcher(ni.getBodyText());
+            if(matcher.find())
+            {
+                noticeFound = true;
+                break;
+            }
+            else
+            {
+                noticeIndex++;
+            }
+
+        }
+
+        if(noticeFound)
+            return notificationItemList.get(noticeIndex);
+        else
+            return null;
+
     }
 
     public void toggleNotificationPanel()

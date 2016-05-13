@@ -1,5 +1,9 @@
 package org.labkey.test.components.core;
 
+import org.jetbrains.annotations.Nullable;
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
@@ -71,6 +75,17 @@ public class UserNotificationsPanel extends Component
         return count;
     }
 
+    public List<NotificationPanelItem> getAllNotifications()
+    {
+        List<NotificationPanelItem> notifications = new ArrayList<>();
+        for(WebElement we : _notificationPanel.findElements(By.cssSelector(" div.labkey-notification:not([style='display: none;'])")))
+        {
+            notifications.add(new NotificationPanelItem(we));
+        }
+
+        return notifications;
+    }
+
     public NotificationPanelItem getNotificationAtIndex(int idx)
     {
         List<WebElement> notifications;
@@ -78,7 +93,7 @@ public class UserNotificationsPanel extends Component
         return new NotificationPanelItem(notifications.get(idx));
     }
 
-    public List<NotificationPanelItem> getNotificationOfType(NotificationTypes notificationType)
+    public List<NotificationPanelItem> getNotificationsOfType(NotificationTypes notificationType)
     {
         List<NotificationPanelItem> notificationItemListlist = new ArrayList<>();
         List<WebElement> notifications;
@@ -118,6 +133,48 @@ public class UserNotificationsPanel extends Component
 
         return notificationItemListlist;
     }
+
+    public NotificationPanelItem findNotificationInList(String searchBody, @Nullable NotificationTypes notificationType)
+    {
+        int noticeIndex;
+        boolean noticeFound;
+        List<NotificationPanelItem> notificationItemList = new ArrayList<>();
+
+        if(notificationType == null)
+        {
+            notificationItemList =getAllNotifications();
+        }
+        else
+        {
+            notificationItemList = getNotificationsOfType(notificationType);
+        }
+
+        Pattern pattern = Pattern.compile(searchBody);
+        Matcher matcher;
+        noticeIndex = 0;
+        noticeFound = false;
+        for(NotificationPanelItem ni : notificationItemList)
+        {
+            matcher = pattern.matcher(ni.getBody());
+            if(matcher.find())
+            {
+                noticeFound = true;
+                break;
+            }
+            else
+            {
+                noticeIndex++;
+            }
+
+        }
+
+        if(noticeFound)
+            return notificationItemList.get(noticeIndex);
+        else
+            return null;
+
+    }
+
 
     @Override
     public WebElement getComponentElement()
