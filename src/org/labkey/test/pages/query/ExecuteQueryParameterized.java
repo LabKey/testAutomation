@@ -17,11 +17,14 @@ package org.labkey.test.pages.query;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Map;
@@ -30,9 +33,15 @@ public class ExecuteQueryParameterized extends LabKeyPage
 {
     private final Elements _elements;
 
+    @Deprecated
     public ExecuteQueryParameterized(BaseWebDriverTest test)
     {
-        super(test);
+        this(test.getDriver());
+    }
+
+    public ExecuteQueryParameterized(WebDriver driver)
+    {
+        super(driver);
         _elements = new Elements();
     }
 
@@ -40,15 +49,15 @@ public class ExecuteQueryParameterized extends LabKeyPage
     {
         for(String key : data.keySet())
         {
-            _test.setFormElement(elements().findInputField(key), data.get(key));
+            setFormElement(elements().findInputField(key), data.get(key));
         }
         return this;
     }
 
     public DataRegionTable submit()
     {
-        _test.clickAndWait(elements().submitButton);
-        return new DataRegionTable("query", _test);
+        clickAndWait(elements().submitButton);
+        return new DataRegionTable("query", new WebDriverWrapperImpl(getDriver()));
     }
 
     private Elements elements()
@@ -68,6 +77,6 @@ public class ExecuteQueryParameterized extends LabKeyPage
         {
             return Locator.tag("input").attributeEndsWith("name", ".param." + fieldKey).findElement(this);
         }
-        WebElement submitButton = new LazyWebElement(Locator.button("Submit"), this);
+        WebElement submitButton = new LazyWebElement(Ext4Helper.Locators.ext4Button("Submit"), this);
     }
 }
