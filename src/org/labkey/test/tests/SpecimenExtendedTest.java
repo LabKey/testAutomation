@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Specimen;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -96,9 +97,10 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
 
     private void selectSpecimens(String... specimens)
     {
-        for (String specimen : specimens)
+        DataRegionTable specimenDetail = new DataRegionTable("SpecimenDetail", this);
+        for(String specimen : specimens)
         {
-            checkCheckboxByNameInDataRegion(specimen);
+            specimenDetail.checkCheckbox(specimenDetail.getRowIndex("MouseId", specimen));
         }
     }
 }

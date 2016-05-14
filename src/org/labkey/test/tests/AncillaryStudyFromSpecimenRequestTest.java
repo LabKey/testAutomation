@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataRegionTable;
 
 @Category({DailyB.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
@@ -109,9 +110,10 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         sleep(2000); // the link moves while the specimen search form finishes layout
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
 
+        DataRegionTable specimenDetail = new DataRegionTable("SpecimenDetail", this);
         for(String specimen : specimensToSelect)
         {
-            checkCheckboxByNameInDataRegion(specimen);
+            specimenDetail.checkCheckbox(specimenDetail.getRowIndex("MouseId", specimen));
         }
     }
 

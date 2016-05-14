@@ -3053,14 +3053,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertFalse("Button '" + buttonText + "' was present", isButtonPresent(buttonText));
     }
 
-    /**
-     * @deprecated Use {@link #checkCheckbox(Locator)}
-     */
-    @Deprecated public void checkCheckboxByNameInDataRegion(String name)
-    {
-        checkCheckbox(Locator.xpath("//a[contains(text(), '" + name + "')]/../..//td/input"));
-    }
-
     public void checkRadioButton(Locator radioButtonLocator)
     {
         checkCheckbox(radioButtonLocator);
