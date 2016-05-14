@@ -248,7 +248,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     @Deprecated
     public void enterPermissionsUI()
     {
-        new PermissionsEditor(_test).enterPermissionsUI();
+        PermissionsEditor.enterPermissionsUI(_test);
     }
 
     public void exitPermissionsUI()

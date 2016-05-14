@@ -28,9 +28,6 @@ import org.openqa.selenium.interactions.Actions;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by RyanS on 4/22/2015.
- */
 public class PermissionsEditor
 {
     protected BaseWebDriverTest _test;
@@ -188,11 +185,17 @@ public class PermissionsEditor
 
     public void enterPermissionsUI()
     {
-        if (!_test.isElementPresent(Locator.permissionRendered()))
+        enterPermissionsUI(_test);
+    }
+
+    public static PermissionsEditor enterPermissionsUI(BaseWebDriverTest test)
+    {
+        if (!test.isElementPresent(Locator.permissionRendered()))
         {
-            _test.clickAdminMenuItem("Folder", "Permissions");
-            _test.waitForElement(Locator.permissionRendered());
+            test.clickAdminMenuItem("Folder", "Permissions");
+            test.waitForElement(Locator.permissionRendered());
         }
+        return new PermissionsEditor(test);
     }
 
     public void exitPermissionsUI()
