@@ -25,6 +25,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
@@ -862,7 +863,7 @@ public abstract class Locator
         @Override
         public WebElement findElement(SearchContext context)
         {
-            if (context instanceof WebElement && _loc.startsWith("//"))
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && _loc.startsWith("//"))
                 return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElement(context);
             else
                 return super.findElement(context);
@@ -871,7 +872,7 @@ public abstract class Locator
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            if (context instanceof WebElement && _loc.startsWith("//"))
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && _loc.startsWith("//"))
                 return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElements(context);
             else
                 return super.findElements(context);

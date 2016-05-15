@@ -3,21 +3,20 @@ package org.labkey.test.components.ext4;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
-public class Checkbox extends FormItem
+public class RadioButton extends FormItem
 {
     WebElement _el;
 
-    public Checkbox(WebElement checkbox)
+    private RadioButton(WebElement radio)
     {
-        this._el = checkbox;
+        this._el = radio;
     }
 
-    public static CheckboxBuilder builder()
+    public static RadioButtonBuilder builder()
     {
-        return new CheckboxBuilder();
+        return new RadioButtonBuilder();
     }
 
     @Override
@@ -56,37 +55,23 @@ public class Checkbox extends FormItem
             _el.click();
     }
 
-    public void uncheck()
-    {
-        if (isChecked())
-            _el.click();
-    }
-
-    public void set(boolean checked)
-    {
-        if (checked)
-            check();
-        else
-            uncheck();
-    }
-
     protected void assertElementType()
     {
         String backgroundImage = _el.getCssValue("background-image");
-        Assert.assertTrue("Not a checkbox or radio button: " + _el.toString(), backgroundImage.contains("checkbox") || backgroundImage.contains("radio"));
+        Assert.assertTrue("Not a radio button: " + _el.toString(), backgroundImage.contains("radio"));
     }
 
-    public static class CheckboxBuilder extends FormItemBuilder<Checkbox>
+    public static class RadioButtonBuilder extends FormItemBuilder<RadioButton>
     {
         @Override
-        protected Checkbox doBuild(WebElement el)
+        protected RadioButton doBuild(WebElement el)
         {
-            return new Checkbox(el);
+            return new RadioButton(el);
         }
 
         protected Locator.XPathLocator itemLoc()
         {
-            return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-checkbox");
+            return Locator.tagWithClass("input", Ext4Helper.getCssPrefix() + "form-radio");
         }
     }
 }

@@ -35,6 +35,8 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -400,36 +402,33 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestViewEditing() throws Exception
     {
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Vehicles");
-        waitForElement(Locator.tagContainingText("span", "Vehicles"));
+
+        DataRegionTable dr = new DataRegionTable("query", this);
 
         log("** Try to edit file-based default view");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Color");
-        scrollIntoView(findButton("Save")).click();
-        _extHelper.waitForExtDialog("Save Custom Grid View");
-        assertFalse("should not be able to select default view", Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default").findElement(getDriver()).isEnabled());
-        clickButton("Cancel", 0);
+        CustomizeView.SaveWindow saveWindow = _customizeViewsHelper.clickSave();
+        assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
+        saveWindow.cancel();
 
-        _extHelper.clickMenuButton("Grid Views", "EditableFileBasedView");
-        waitForElement(Locator.tagContainingText("span", "Vehicles"));
+        dr.clickHeaderButton("Grid Views", "EditableFileBasedView");
 
         log("** Try to edit overridable file-based view");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Color");
-        scrollIntoView(findButton("Save")).click();
-        _extHelper.waitForExtDialog("Save Custom Grid View");
+        saveWindow = _customizeViewsHelper.clickSave();
 
-        click(Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "default"));
-        clickButtonByIndex("Save", 1, 0);
-        _extHelper.waitForExtDialog("Error saving grid view");
-        clickButton("OK", 0);
+        assertTrue("should be able to select default view", saveWindow.defaultViewRadio.isEnabled());
+        saveWindow.defaultViewRadio.check();
+        Window saveError = saveWindow.saveError();
+        saveError.clickButton("OK", 0);
+        saveError.waitForClose();
 
-        click(Locator.tagWithAttribute("input", "name", "saveCustomView_namedView").withAttribute("value", "named"));
-        clickButtonByIndex("Save", 1);
-        waitForElement(Locator.tagContainingText("span", "Vehicles"));
+        saveWindow.namedViewRadio.check();
+        saveWindow.save();
 
-        DataRegionTable dr = new DataRegionTable("query", this);
-        assertEquals("column not found", 4, dr.getColumn("Color"));
+        assertEquals("column not found", 4, dr.getColumnIndex("Color"));
     }
 
     @LogMethod
@@ -671,7 +670,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//table//div[contains(@class, 'labkey-dataregion-msg')]/span[contains(@class, 'unsavedview-save')]"));
         _customizeViewsHelper.saveUnsavedViewGridClosed(null);
         waitForText("Crazy People Copy");
-
     }
 
     @LogMethod

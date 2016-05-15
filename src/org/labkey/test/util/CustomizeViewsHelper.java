@@ -32,15 +32,18 @@ import java.util.Map;
 
 public class CustomizeViewsHelper extends CustomizeView
 {
+    protected final Locator.IdLocator _dataRegionLoc;
 
     public CustomizeViewsHelper(BaseWebDriverTest test)
     {
         super(test);
+        _dataRegionLoc = Locator.id("");
     }
 
     public CustomizeViewsHelper(DataRegionTable dataRegion)
     {
         super(dataRegion);
+        _dataRegionLoc = dataRegion.locator();
     }
 
     public void openCustomizeViewPanel()

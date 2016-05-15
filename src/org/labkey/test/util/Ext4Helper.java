@@ -19,6 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -236,6 +237,10 @@ public class Ext4Helper
         _test.click(l);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.ext4.RadioButton}
+     */
+    @Deprecated
     public void selectRadioButton(String selection)
     {
         Locator l = Locators.radiobutton(_test, selection);
@@ -243,9 +248,9 @@ public class Ext4Helper
     }
 
     @LogMethod(quiet = true)
-    public void selectRadioButtonWithLabelContaining(@LoggedParam String label, @LoggedParam String selection)
+    public void selectRadioButtonWithLabelContaining(@LoggedParam String groupLabel, @LoggedParam String selection)
     {
-        Locator l = Locator.xpath("//table/tbody/tr[td/label/span[contains(text(), '" + label + "')]]//label[text()='" + selection + "']");
+        Locator l = Locator.xpath("//table/tbody/tr[td/label/span[contains(text(), '" + groupLabel + "')]]//label[text()='" + selection + "']");
         _test.click(l);
     }
 
@@ -359,38 +364,62 @@ public class Ext4Helper
         new Checkbox(checkboxLocator.findElement(_test.getDriver())).uncheck();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label)
     {
-        new Checkbox(label, _test.getDriver()).check();
+        Checkbox.builder().withLabel(label).build(_test.getDriver()).check();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label, @LoggedParam int index)
     {
-        new Checkbox(label, index, _test.getDriver()).check();
+        Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).check();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label)
     {
-        new Checkbox(label, _test.getDriver()).uncheck();
+        Checkbox.builder().withLabel(label).build(_test.getDriver()).uncheck();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label, @LoggedParam int index)
     {
-        new Checkbox(label, index, _test.getDriver()).uncheck();
+        Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).uncheck();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     public boolean isChecked(String label)
     {
-        return new Checkbox(label, _test.getDriver()).isChecked();
+        return Checkbox.builder().withLabel(label).build(_test.getDriver()).isChecked();
     }
 
+    /**
+     * @deprecated Use {@link Checkbox}
+     */
+    @Deprecated
     public boolean isChecked(String label, int index)
     {
-        return new Checkbox(label, index, _test.getDriver()).isChecked();
+        return Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).isChecked();
     }
 
     public boolean isChecked(Locator checkboxLoc)
@@ -699,6 +728,10 @@ public class Ext4Helper
             return l;
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.RadioButton}
+         */
+        @Deprecated
         public static Locator.XPathLocator radiobutton(WebDriverWrapper test, String label)
         {
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'" + _cssPrefix + "form-radio')][../label[contains(text(), '" + label + "')]]");
@@ -707,26 +740,46 @@ public class Ext4Helper
             return l;
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         */
+        @Deprecated
         public static Locator.XPathLocator window()
         {
-            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden();
+            return Window.Locators.window();
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         */
+        @Deprecated
         public static Locator.XPathLocator window(String title)
         {
-            return window().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
+            return window().withDescendant(Window.Locators.title().withText(title));
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         */
+        @Deprecated
         public static Locator.XPathLocator windowWithTitleContaining(String partialTitle)
         {
-            return window().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").containing(partialTitle));
+            return window().withDescendant(Window.Locators.title().containing(partialTitle));
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         */
+        @Deprecated
         public static Locator.XPathLocator windowButton(String windowTitle, String buttonText)
         {
             return window(windowTitle).append(ext4Button(buttonText));
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.Window}
+         */
+        @Deprecated
         public static Locator.XPathLocator windowBody(String title)
         {
             return window(title).append(Locator.tagWithClass("div", _cssPrefix + "window-body"));
@@ -802,16 +855,28 @@ public class Ext4Helper
             return Locator.tag("a").withClass(_cssPrefix + "btn").containing(text);
         }
 
+        /**
+         * @deprecated Use {@link Checkbox}
+         */
+        @Deprecated
         public static Locator.XPathLocator ext4Checkbox(String label)
         {
             return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
         }
 
+        /**
+         * @deprecated Use {@link Checkbox}
+         */
+        @Deprecated
         public static Locator.XPathLocator ext4CheckboxById(String label)
         {
             return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
         }
 
+        /**
+         * @deprecated Use {@link org.labkey.test.components.ext4.RadioButton}
+         */
+        @Deprecated
         public static Locator.XPathLocator ext4Radio(String label)
         {
             return Locator.xpath("//input[" + Locator.NOT_HIDDEN + " and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");

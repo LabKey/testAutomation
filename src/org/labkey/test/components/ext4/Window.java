@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.ext4;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -44,6 +45,11 @@ public class Window extends Component
         _window = window;
         _driver = new WebDriverWrapperImpl(driver);
         _elements = new Elements();
+    }
+
+    public static WindowBuilder builder()
+    {
+        return new WindowBuilder();
     }
 
     protected WebDriverWrapper getWrapper()
@@ -121,6 +127,75 @@ public class Window extends Component
         WebElement findButton(String buttonText)
         {
             return Ext4Helper.Locators.ext4Button(buttonText).findElement(this);
+        }
+    }
+
+    public static class WindowBuilder
+    {
+        private String titleText = "";
+        private boolean partialText = true;
+        private int index = 0;
+
+        public WindowBuilder withTitle(@NotNull String text)
+        {
+            this.titleText = text;
+            partialText = false;
+            return this;
+        }
+
+        public WindowBuilder withTitleContaining(@NotNull String text)
+        {
+            this.titleText = text;
+            partialText = true;
+            return this;
+        }
+
+        public WindowBuilder index(int index)
+        {
+            this.index = index;
+            return this;
+        }
+
+        public Window build(@NotNull WebDriver driver)
+        {
+            return new Window(buildLocator().waitForElement(driver, 10000), driver);
+        }
+
+        public Window buildLazy(@NotNull WebDriver driver)
+        {
+            return new Window(new LazyWebElement(buildLocator(), driver).withTimeout(10000), driver);
+        }
+
+        protected Locator buildLocator()
+        {
+            Locator.XPathLocator loc = windowLoc;
+            if (!partialText)
+                loc = loc.withPredicate(titleLoc.withText(titleText));
+            else if (!titleText.isEmpty())
+                loc = loc.withPredicate(titleLoc.containing(titleText));
+            if (index > 0)
+                loc = loc.index(index);
+            return loc;
+        }
+
+        static final Locator.XPathLocator windowLoc = Locator.tagWithClass("div", Ext4Helper.getCssPrefix() + "window").notHidden();
+        static final Locator.XPathLocator titleLoc = Locator.tagWithClass("span", Ext4Helper.getCssPrefix() + "window-header-text");
+    }
+
+    /**
+     * @deprecated Use {@link Window}
+     */
+    @Deprecated
+    public static class Locators
+    {
+        public static Locator.XPathLocator window()
+        {
+            return WindowBuilder.windowLoc;
+        }
+
+        public static Locator.XPathLocator title()
+        {
+            return WindowBuilder.titleLoc;
         }
     }
 }

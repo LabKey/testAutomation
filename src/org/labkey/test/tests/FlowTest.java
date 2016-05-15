@@ -25,6 +25,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
@@ -319,10 +320,9 @@ public class FlowTest extends BaseFlowTest
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
         fcsAnalysisTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        Locator.XPathLocator measurePickerLoc = Ext4Helper.Locators.window("Y Axis");
-        WebElement measurePicker = waitForElement(measurePickerLoc);
+        Window measurePicker = Window.builder().withTitle("Y Axis").build(getDriver());
         Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
-        try {rowLoc.withText(expectedMeasures.get(0)).waitForElement(measurePicker, 10000);}
+        try {rowLoc.withText().index(expectedMeasures.size() - 1).waitForElement(measurePicker, 10000);}
         catch (NoSuchElementException ignore) {}
         List<WebElement> pickerRows = rowLoc.findElements(measurePicker);
         assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(getTexts(pickerRows)));
