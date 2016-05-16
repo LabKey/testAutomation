@@ -14,7 +14,7 @@
             ]]>
         </response>
     </test>
-    <test name="list schemas" type="post">
+    <test name="get schema queries" type="post">
         <url>
             <![CDATA[
                 library(Rlabkey)
@@ -30,6 +30,71 @@
                 AllTypes
                 AllTypesComments
                 AllTypesCategoryGroups
+            ]]>
+        </response>
+    </test>
+    <test name="get queries" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getQueries("%baseUrl%", "/RlabkeyVerifyProject", "lists")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                queryName fieldName
+                AllTypesCategoryGroups container
+                AllTypesComments container
+                AllTypes container
+                AllTypesCategories container
+            ]]>
+        </response>
+    </test>
+    <test name="ls schemas" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                lsSchemas(getSession(baseUrl="%baseUrl%", "/RlabkeyVerifyProject"))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                announcement
+                assay
+                auditLog
+                core
+                exp
+                flow
+                issues
+                lists
+                pipeline
+                samples
+                study
+                wiki
+            ]]>
+        </response>
+    </test>
+    <test name="get schemas" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getSchemas("%baseUrl%", "/RlabkeyVerifyProject")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                announcement
+                assay
+                auditLog
+                core
+                exp
+                flow
+                issues
+                lists
+                pipeline
+                samples
+                study
+                wiki
             ]]>
         </response>
     </test>
@@ -77,6 +142,25 @@
             ]]>
         </response>
     </test>
+    <test name="get lookups alternate" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getLookupDetails("%baseUrl%", "/RlabkeyVerifyProject", "lists", "AllTypes", "Category")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                queryName fieldName caption fieldKey type
+                AllTypes Category/container Folder container Text (String)
+                AllTypes Category/Category Category Category Text (String)
+                AllTypes Category/CategorySort Sort Ordinal CategorySort Number (Double)
+                AllTypes Category/Group Category Group Group Text (String)
+                AllTypes Category/EntityId Entity Id EntityId Text (String)
+                lists GroupName AllTypesCategoryGroups TRUE
+            ]]>
+        </response>
+    </test>
     <test name="get rows with options" type="post">
         <url>
             <![CDATA[
@@ -106,7 +190,44 @@
             ]]>
         </response>
     </test>
-    <test name="get folders" type="post">
+    <test name="get query details" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getQueryDetails("%baseUrl%", "/RlabkeyVerifyProject", "lists", "AllTypesCategories")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                queryName fieldName caption fieldKey type
+                AllTypesCategories container Folder container Text (String)
+                AllTypesCategories Category Category Category Text (String)
+                AllTypesCategories CategorySort Sort Ordinal CategorySort Number (Double)
+                AllTypesCategories Group Category Group Group Text (String)
+                AllTypesCategories EntityId Entity Id EntityId Text (String)
+                lists GroupName AllTypesCategoryGroups TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="get default view details" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getDefaultViewDetails("%baseUrl%", "/RlabkeyVerifyProject", "lists", "AllTypesCategories")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                queryName fieldName caption fieldKey type
+                AllTypesCategories TextKey Text Key TextKey Text (String)
+                AllTypesCategories Category Category Category Text (String)
+                AllTypesCategories CategorySort Sort Ordinal CategorySort Number (Double)
+                AllTypesCategories Group Category Group Group Text (String)
+                lists GroupName AllTypesCategoryGroups TRUE
+            ]]>
+        </response>
+    </test>
+    <test name="ls folders" type="post">
         <url>
             <![CDATA[
                 library(Rlabkey)
@@ -117,6 +238,20 @@
             <![CDATA[
                 "/RlabkeyVerifyProject"
                 "/RlabkeyVerifyProject/RlabkeyTest"
+            ]]>
+        </response>
+    </test>
+    <test name="get folders" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                labkey.getFolders("%baseUrl%", "/RlabkeyVerifyProject", includeEffectivePermissions=FALSE)
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                RlabkeyVerifyProject /RlabkeyVerifyProject
+                RlabkeyTest /RlabkeyVerifyProject/RlabkeyTest
             ]]>
         </response>
     </test>
