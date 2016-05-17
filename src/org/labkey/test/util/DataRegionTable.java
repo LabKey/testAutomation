@@ -895,7 +895,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.xq(value) + "]")
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
+            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
     }
 
     public void checkCheckbox(int index)
@@ -903,7 +903,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
+            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
     }
 
     public void uncheckCheckbox(int index)
@@ -911,7 +911,7 @@ public class DataRegionTable extends Component
         WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
                 .findElement(getComponentElement());
         if (checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(checkbox::click, UPDATE_SIGNAL);
+            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
     }
 
     public void pageFirst()
