@@ -104,7 +104,7 @@ public class Ext4Helper
         _test.waitForElement(Locators.comboListItem());
     }
 
-    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
+    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique, boolean clickAt)
     {
         Locator.XPathLocator listItem = Locators.comboListItem();
 
@@ -129,8 +129,15 @@ public class Ext4Helper
         if (!isOpenComboBoxMultiSelect() || !elementAlreadySelected)
         {
             _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
-            _test.click(listItem);
+            if(clickAt)
+            _test.clickAt(listItem,0,0,0);
+            else _test.click(listItem);
         }
+    }
+
+    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
+    {
+        selectItemFromOpenComboList(itemText, matchTechnique,false);
     }
 
     public void closeComboList(Locator.XPathLocator comboBox)
