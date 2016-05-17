@@ -39,7 +39,8 @@ public class ViabilityTest extends AbstractViabilityTest
     public static final String FOLDER_NAME = "Viability Folder";
     private static final String ASSAY_NAME = "Guava Assay";
     private static final String STUDY2_NAME = "Study2 Folder";
-
+    private static final String SAVE_AND_FINISH = "Save and Finish";
+    private static final String SAVE_AND_IMPORT = "Save and Import Another Run";
 
     @Override
     protected String getProjectName()
@@ -91,6 +92,16 @@ public class ViabilityTest extends AbstractViabilityTest
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
         assertFormElementEquals(Locator.name("_pool_1604505335_0_IntValue"), "");
 
+        clickButton(SAVE_AND_FINISH, 0);
+        String alertText = cancelAlert();
+        assertTrue(alertText.contains("Save anyway"));
+        assertElementNotPresent(Locator.lkButtonDisabled(SAVE_AND_FINISH));
+
+        clickButton(SAVE_AND_IMPORT, 0);
+        alertText = cancelAlert();
+        assertTrue(alertText.contains("Save anyway"));
+        assertElementNotPresent(Locator.lkButtonDisabled(SAVE_AND_IMPORT));
+
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
         addSpecimenIds("_pool_1594020325_1_SpecimenIDs", "vial1");
@@ -104,7 +115,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Save and Finish", 0);
+            clickButton(SAVE_AND_FINISH, 0);
             String actualConfirmation = acceptAlert();
             log("** Got confirmation: " + actualConfirmation);
         });
@@ -182,7 +193,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Save and Finish", 0);
+            clickButton(SAVE_AND_FINISH, 0);
             String actualConfirmation = acceptAlert();
             log("** Got confirmation: " + actualConfirmation);
         });
@@ -257,7 +268,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Save and Finish", 0);
+            clickButton(SAVE_AND_FINISH, 0);
             String actualConfirmation = acceptAlert();
             log("** Got confirmation: " + actualConfirmation);
         });
@@ -332,7 +343,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Save and Finish", 0);
+            clickButton(SAVE_AND_FINISH, 0);
             String actualConfirmation = acceptAlert();
             log("** Got confirmation: " + actualConfirmation);
         });
