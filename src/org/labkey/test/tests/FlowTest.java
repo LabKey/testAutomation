@@ -28,18 +28,18 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -315,17 +315,28 @@ public class FlowTest extends BaseFlowTest
         );
 
         DataRegionTable fcsAnalysisTable = new DataRegionTable("query", this);
-        List<String> columnHeaders = fcsAnalysisTable.getColumnHeaders();
+        List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
         List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
         fcsAnalysisTable.clickHeaderButton("Charts", "Create Box Plot");
 
         Window measurePicker = Window.builder().withTitle("Y Axis").build(getDriver());
         Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
-        try {rowLoc.withText().index(expectedMeasures.size() - 1).waitForElement(measurePicker, 10000);}
-        catch (NoSuchElementException ignore) {}
-        List<WebElement> pickerRows = rowLoc.findElements(measurePicker);
-        assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(getTexts(pickerRows)));
+        List<String> availableMeasures = new ArrayList<>();
+        waitFor(() -> {
+            List<WebElement> pickerRows = rowLoc.findElements(measurePicker);
+            availableMeasures.clear();
+            try
+            {
+                availableMeasures.addAll(getTexts(pickerRows));
+            }
+            catch (StaleElementReferenceException retry)
+            {
+                return false;
+            }
+            return availableMeasures.size() == expectedMeasures.size() && !String.join("", availableMeasures).isEmpty();
+        }, 10000);
+        assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(availableMeasures));
     }
 
     // Test sample set and ICS metadata
