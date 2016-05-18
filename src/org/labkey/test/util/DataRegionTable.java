@@ -59,9 +59,8 @@ public class DataRegionTable extends Component
     private static final int DEFAULT_WAIT = 30000;
 
     protected final String _regionName;
-    @Deprecated public BaseWebDriverTest _test;
-    protected WebDriverWrapper _driver;
-    private WebElement _tableElement;
+    protected final WebDriverWrapper _driver;
+    private final WebElement _tableElement;
     protected final boolean _selectors;
     protected final boolean _floatingHeaders;
 
@@ -71,11 +70,11 @@ public class DataRegionTable extends Component
     protected final List<String> _columnNames = new ArrayList<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     private Elements _elements;
+    private String _tableId;
+    private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
     private DataRegionTable(WebElement table, String name, WebDriverWrapper driverWrapper)
     {
-        if (driverWrapper instanceof BaseWebDriverTest)
-            _test = (BaseWebDriverTest)driverWrapper;
         _driver = driverWrapper;
         _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
 
@@ -149,13 +148,20 @@ public class DataRegionTable extends Component
         return _elements;
     }
 
+    public WebDriverWrapper getDriver()
+    {
+        return _driver;
+    }
+
     protected void clearCache()
     {
         _elements = null;
         _customizeView = null;
+        _tableId = null;
         _columnLabels.clear();
         _columnNames.clear();
         _mapRows.clear();
+        _dataCache.clear();
     }
 
     public CustomizeView getCustomizeView()
@@ -170,9 +176,31 @@ public class DataRegionTable extends Component
         return _customizeView;
     }
 
+    public CustomizeView openCustomizeGrid()
+    {
+        if (!getCustomizeView().isPanelExpanded())
+        {
+            _driver.doAndWaitForPageSignal(() ->
+                    clickHeaderButton("Grid Views", false, "Customize Grid"),
+                    DataRegionTable.PANEL_SHOW_SIGNAL);
+        }
+        return getCustomizeView();
+    }
+
+    public DataRegionTable closeCustomizeGrid()
+    {
+        getCustomizeView().closeCustomizeViewPanel();
+        return this;
+    }
+
     protected int getHeaderRowCount()
     {
         return 2 + (_floatingHeaders ? 2 : 0);
+    }
+
+    protected int getFooterRowCount()
+    {
+        return hasAggregateRow() ? 1 : 0;
     }
 
     public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName)
@@ -217,18 +245,11 @@ public class DataRegionTable extends Component
         return _regionName;
     }
 
-    /**
-     * @deprecated We should find sub-elements by SearchContext, rather than building up big Locator strings
-     */
-    @Deprecated
     private String getTableId()
     {
-        return getComponentElement().getAttribute("id");
-    }
-
-    public Locator.IdLocator locator()
-    {
-        return Locator.id(getTableId());
+        if (_tableId == null)
+            _tableId = getComponentElement().getAttribute("id");
+        return _tableId;
     }
 
     public int getColumnCount()
@@ -337,37 +358,20 @@ public class DataRegionTable extends Component
         return allData.indexOf(data);
     }
 
-    public Locator.XPathLocator detailsXpath(int row)
+    public WebElement detailsLink(int row)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-details')]");
+        return Locator.xpath("td").withClass("labkey-details").child("a").findElement(elements().getDataRow(row));
     }
 
-    public Locator.XPathLocator detailsLink(int row)
+    public WebElement updateLink(int row)
     {
-        Locator.XPathLocator cell = detailsXpath(row);
-        return cell.child("a[1]");
+        return Locator.xpath("td").withClass("labkey-update").child("a").findElement(elements().getDataRow(row));
     }
 
-    public Locator.XPathLocator updateXpath(int row)
+    public WebElement link(int row, int col)
     {
-        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[contains(@class, 'labkey-update')]");
-    }
-
-    public Locator.XPathLocator updateLink(int row)
-    {
-        Locator.XPathLocator cell = updateXpath(row);
-        return cell.child("a[1]");
-    }
-
-    public Locator.XPathLocator xpath(int row, int col)
-    {
-        return Locator.xpath("//table[@id=" + Locator.xq(getTableId()) + "]/tbody/tr[" + (row + getHeaderRowCount() + 1) + "]/td[" + (col + 1 + (_selectors ? 1 : 0)) + "]");
-    }
-
-    public Locator.XPathLocator link(int row, int col)
-    {
-        Locator.XPathLocator cell = xpath(row, col);
-        return cell.child("a[1]");
+        col += _selectors ? 1 : 0;
+        return Locator.xpath("a").findElement(elements().getCell(row, col));
     }
 
     public WebElement link(int row, String columnName)
@@ -375,7 +379,7 @@ public class DataRegionTable extends Component
         int col = getColumnIndex(columnName);
         if (col == -1)
             fail("Couldn't find column '" + columnName + "'");
-        return findElement(link(row, col));
+        return link(row, col);
     }
 
     /**
@@ -618,7 +622,11 @@ public class DataRegionTable extends Component
 
     public String getDataAsText(int row, int column)
     {
-        return findCell(row, column).getText();
+        _dataCache.putIfAbsent(row, new TreeMap<>());
+        if (_dataCache.get(row).get(column) == null)
+            _dataCache.get(row).put(column, findCell(row, column).getText());
+
+        return _dataCache.get(row).get(column);
     }
 
     public String getDataAsText(int row, String columnName)
@@ -642,14 +650,12 @@ public class DataRegionTable extends Component
 
     public String getDetailsHref(int row)
     {
-        Locator l = detailsLink(row);
-        return _driver.getAttribute(l, "href");
+        return detailsLink(row).getAttribute("href");
     }
 
     public String getUpdateHref(int row)
     {
-        Locator l = updateLink(row);
-        return _driver.getAttribute(l, "href");
+        return updateLink(row).getAttribute("href");
     }
 
     public String getHref(int row, int column)
@@ -660,8 +666,7 @@ public class DataRegionTable extends Component
 
     private String _getHref(int row, int column)
     {
-        Locator l = link(row, column);
-        return _driver.getAttribute(l, "href");
+        return link(row, column).getAttribute("href");
     }
 
     public String getHref(int row, String columnName)
@@ -692,11 +697,9 @@ public class DataRegionTable extends Component
     private boolean _hasHref(int row, int column)
     {
         // Check the td cell is present, but has no link.
-        Locator.XPathLocator cell = xpath(row, column);
-        _driver.assertElementPresent(cell);
+        WebElement cell = findCell(row, column);
 
-        Locator link = link(row, column);
-        return _driver.isElementPresent(link);
+        return !Locator.xpath("a").findElements(cell).isEmpty();
     }
 
     public boolean hasHref(int row, String columnName)
@@ -1139,6 +1142,7 @@ public class DataRegionTable extends Component
 
         private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
         private List<WebElement> headerButtons;
+        private Map<String, WebElement> headerButtonMap;
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
         private List<WebElement> columnHeaders;
         private List<WebElement> rows;

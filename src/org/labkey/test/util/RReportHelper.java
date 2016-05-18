@@ -376,4 +376,33 @@ public class RReportHelper
             }
         }
     }
+
+    /**
+     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
+     *      or at least first element on page)
+     * post-conditions:  grid has R view of name name
+     * @param name name to give new R view
+     */
+    public void createRReport(String name)
+    {
+        createRReport(name, false);
+    }
+
+    /**
+     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
+     *      or at least first element on page)
+     * post-conditions:  grid has R view of name name
+     * @param name name to give new R view
+     * @param shareView should this view be available to all users
+     */
+    public void createRReport(String name, boolean shareView)
+    {
+        _test.waitForText(("Reports"));
+        _test._extHelper.clickMenuButton("Reports", "Create R Report");
+
+        if (shareView)
+            selectOption(RReportHelper.ReportOption.shareReport);
+
+        saveReport(name);
+    }
 }

@@ -1133,7 +1133,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         //Under Inherit From Container: Choose Folder : Folders that have inherited settings from a different folder shouldn't be listed, in this case, Folder_B.
         checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
-        assertFormElementNotEquals(Locator.name("inheritFromContainerSelect"), pathToB);
+        assertNotEquals(pathToB, getFormElement(Locator.name("inheritFromContainerSelect")));
 
         /***** End: Test for chaining - which is disallowed *****/
 

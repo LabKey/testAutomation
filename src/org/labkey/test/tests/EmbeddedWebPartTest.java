@@ -85,7 +85,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         waitForText("Display Name");
 
         String rReportName = TRICKY_CHARACTERS + "new R report";
-        _customizeViewsHelper.createRReport(rReportName);
+        new RReportHelper(this).createRReport(rReportName);
 
         waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
 

@@ -2150,16 +2150,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (String) executeScript("return arguments[0].value;", el);
     }
 
+    /**
+     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object) and {@link #getFormElement(Locator)}}
+     */
+    @Deprecated
     public void assertFormElementEquals(Locator loc, String value)
     {
         assertEquals(value, getFormElement(loc));
     }
 
-    public void assertFormElementNotEquals(Locator loc, String value)
-    {
-        assertNotEquals(value, getFormElement(loc));
-    }
-
+    /**
+     * @deprecated Use {@link org.junit.Assert#assertEquals(String, Object, Object) and {@link #getSelectedOptionText(Locator)}
+     */
+    @Deprecated
     public void assertOptionEquals(Locator loc, String value)
     {
         assertEquals(value, getSelectedOptionText(loc));
@@ -2167,13 +2170,23 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getSelectedOptionText(Locator loc)
     {
-        Select select = new Select(loc.findElement(getDriver()));
+        return getSelectedOptionText(loc.findElement(getDriver()));
+    }
+
+    public String getSelectedOptionText(WebElement el)
+    {
+        Select select = new Select(el);
         return select.getFirstSelectedOption().getText();
     }
 
     public String getSelectedOptionValue(Locator loc)
     {
-        Select select = new Select(loc.findElement(getDriver()));
+        return getSelectedOptionValue(loc.findElement(getDriver()));
+    }
+
+    public String getSelectedOptionValue(WebElement el)
+    {
+        Select select = new Select(el);
         return select.getFirstSelectedOption().getAttribute("value");
     }
 
@@ -2233,6 +2246,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         executeScript("arguments[0].scrollIntoView(arguments[1]);", el, alignToTop);
         return el;
+    }
+
+    public void click(WebElement el)
+    {
+        clickAndWait(el, 0); // WebElement#click() doesn't use our scroll/retry logic
     }
 
     public void click(Locator l)
@@ -2300,23 +2318,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             try
             {
-                try
-                {
-                    el.click();
-                }
-                catch (ElementNotVisibleException tryAgain)
-                {
-                    scrollIntoView(el);
-                    shortWait().until(ExpectedConditions.elementToBeClickable(el));
-                    el.click();
-                }
-
+                el.click();
             }
             catch (WebDriverException tryAgain)
             {
-                if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+                if (tryAgain instanceof ElementNotVisibleException || tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
                 {
-                    sleep(2500);
+                    scrollIntoView(el);
+                    shortWait().until(ExpectedConditions.elementToBeClickable(el));
                     el.click();
                 }
                 else

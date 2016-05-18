@@ -32,7 +32,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -50,24 +49,21 @@ public class CustomizeView extends Component
 {
     protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".customize-grid-panel");
 
-    protected final BaseWebDriverTest _test;
+    protected final WebDriverWrapper _driver;
     protected final DataRegionTable _dataRegion;
-    protected final RReportHelper _reportHelper;
     private WebElement panelEl;
     private Elements _elements;
 
-    public CustomizeView(BaseWebDriverTest test)
+    public CustomizeView(WebDriverWrapper driver)
     {
-        _test = test;
+        _driver = driver;
         _dataRegion = null;
-        _reportHelper = new RReportHelper(test);
     }
 
     public CustomizeView(DataRegionTable dataRegion)
     {
-        _test = dataRegion._test;
+        _driver = dataRegion.getDriver();
         _dataRegion = dataRegion;
-        _reportHelper = new RReportHelper(_test);
         panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _dataRegion.getComponentElement());
     }
 
@@ -75,7 +71,7 @@ public class CustomizeView extends Component
     {
         if (_dataRegion != null)
             return _dataRegion;
-        return DataRegionTable.findDataRegion(_test); // Not tied to a specific DataRegion
+        return DataRegionTable.findDataRegion(_driver); // Not tied to a specific DataRegion
     }
 
     private Elements elements()
@@ -87,15 +83,10 @@ public class CustomizeView extends Component
 
     public void openCustomizeViewPanel()
     {
-        if (!isPanelExpanded())
-        {
-            _test.doAndWaitForPageSignal(() ->
-                    getDataRegion().clickHeaderButton("Grid Views", false, "Customize Grid"),
-                    DataRegionTable.PANEL_SHOW_SIGNAL);
-        }
+        getDataRegion().openCustomizeGrid();
     }
 
-    private boolean isPanelExpanded()
+    public boolean isPanelExpanded()
     {
         try
         {
@@ -111,7 +102,7 @@ public class CustomizeView extends Component
     {
         if (isPanelExpanded())
         {
-            _test.doAndWaitForPageSignal(() ->
+            _driver.doAndWaitForPageSignal(() ->
                     Locator.css(".x4-panel-header .x4-tool-after-title").findElement(this).click(),
                     DataRegionTable.PANEL_HIDE_SIGNAL);
         }
@@ -119,15 +110,15 @@ public class CustomizeView extends Component
 
     public void applyCustomView()
     {
-        applyCustomView(_test.getDefaultWaitForPage());
+        applyCustomView(_driver.getDefaultWaitForPage());
     }
 
     public void applyCustomView(int waitMillis)
     {
         if (waitMillis > 0)
-            _test.clickAndWait(elements().viewGridButton, waitMillis);
+            _driver.clickAndWait(elements().viewGridButton, waitMillis);
         else
-            _test.doAndWaitForPageSignal(() -> clickViewGrid(), DataRegionTable.PANEL_HIDE_SIGNAL);
+            _driver.doAndWaitForPageSignal(() -> clickViewGrid(), DataRegionTable.PANEL_HIDE_SIGNAL);
     }
 
     public void clickViewGrid()
@@ -138,7 +129,7 @@ public class CustomizeView extends Component
     public SaveWindow clickSave()
     {
         elements().saveButton.click();
-        return new SaveWindow(_test.getDriver());
+        return new SaveWindow(_driver.getDriver());
     }
 
     public void saveDefaultView()
@@ -194,19 +185,19 @@ public class CustomizeView extends Component
         {
             if ("".equals(name))
             {
-                _test.log("Saving default custom view");
+                _driver.log("Saving default custom view");
                 saveWindow.defaultViewRadio.check();
             }
             else
             {
-                _test.log("Saving custom view '" + name + "'");
+                _driver.log("Saving custom view '" + name + "'");
                 saveWindow.namedViewRadio.check();
                 saveWindow.setName(name);
             }
         }
         else
         {
-            _test.log("Saving current custom view");
+            _driver.log("Saving current custom view");
         }
         saveWindow.save();
     }
@@ -256,7 +247,7 @@ public class CustomizeView extends Component
     public void deleteView()
     {
         elements().deleteButton.click();
-        Window confirm = new Window(Ext4Helper.Locators.windowWithTitleContaining("Delete").findElement(_test.getDriver()), _test.getDriver());
+        Window confirm = new Window(Ext4Helper.Locators.windowWithTitleContaining("Delete").findElement(_driver.getDriver()), _driver.getDriver());
         confirm.clickButton("Yes");
     }
 
@@ -300,7 +291,7 @@ public class CustomizeView extends Component
 
     public void revertUnsavedView()
     {
-        _test.clickAndWait(elements().revertButton);
+        _driver.clickAndWait(elements().revertButton);
     }
 
     /**
@@ -323,19 +314,14 @@ public class CustomizeView extends Component
 
     public void changeTab(ViewItemType tab)
     {
-//        if (Locator.tagWithClass("a", "x-grouptabs-text").withPredicate("span[contains(text(), '" + tab.toString() + "')]]").findElements(this).isEmpty())
-//            // Tab hasn't rendered yet
-//            Locator.tag("li").withClass("labkey-customview-tab").containing(tab.toString()).findElement(this).click();
-//        else
-//            // Tab has rendered
-            Locator.tag("ul").child(Locator.tag("li").withClass("labkey-customview-tab").containing(tab.toString())).findElement(this).click();
+        Locator.tag("ul").child(Locator.tag("li").withClass("labkey-customview-tab").containing(tab.toString())).findElement(this).click();
     }
 
     @Override
     public WebElement getComponentElement()
     {
         if (panelEl == null) // Not tied to a specific DataRegionTable
-            panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _test.getDriver());
+            panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _driver.getDriver());
         return panelEl;
     }
 
@@ -361,7 +347,7 @@ public class CustomizeView extends Component
             nodePath += fieldKeyParts[i].toUpperCase();
             WebElement fieldRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", nodePath).waitForElement(getComponentElement(), 10000);
 
-            _test.scrollIntoView(fieldRow, false);
+            _driver.scrollIntoView(fieldRow, false);
             if (!fieldRow.getAttribute("class").contains("expanded"))
             {
                 Locator.css(".x4-tree-expander").findElement(fieldRow).click();
@@ -372,13 +358,13 @@ public class CustomizeView extends Component
         }
 
         WebElement tr = Locator.tag("tr").withClass("x4-grid-data-row").withAttribute("data-recordid", fieldKey).findElement(getComponentElement());
-        return _test.scrollIntoView(tr, false);
+        return _driver.scrollIntoView(tr, false);
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
     {
         // fieldKey is the value contained in @fieldkey
-        _test.log("Adding " + column_name + " " + type.toString());
+        _driver.log("Adding " + column_name + " " + type.toString());
 
         changeTab(type);
 
@@ -396,7 +382,7 @@ public class CustomizeView extends Component
     public void addCustomizeViewColumn(String fieldKey, String column_name)
     {
         // fieldKey is the value contained in @fieldkey
-        _test.log("Adding " + column_name + " column");
+        _driver.log("Adding " + column_name + " column");
 
         addCustomizeViewItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
     }
@@ -419,42 +405,42 @@ public class CustomizeView extends Component
     public void addCustomizeViewFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
     {
         if (filter.equals(""))
-            _test.log("Adding " + column_name + " filter of " + filter_type);
+            _driver.log("Adding " + column_name + " filter of " + filter_type);
         else
-            _test.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
+            _driver.log("Adding " + column_name + " filter of " + filter_type + " " + filter);
 
         changeTab(ViewItemType.Filter);
         Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Filter, fieldKeyParts);
 
-        if (!_test.isElementPresent(itemXPath))
+        if (!_driver.isElementPresent(itemXPath))
         {
             // Add filter if it doesn't exist
             addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Filter);
-            _test.assertElementPresent(itemXPath);
+            _driver.assertElementPresent(itemXPath);
         }
         else
         {
             // Add new clause
-            _test.click(itemXPath.append("//a[text() = 'Add']"));
+            _driver.click(itemXPath.append("//a[text() = 'Add']"));
         }
 
         // XXX: why doesn't 'clauseIndex' work?
         Locator.XPathLocator clauseXPath = itemXPath.append("//tr[@clauseindex]");
-        int clauseIndex = _test.getElementCount(clauseXPath) -1;
+        int clauseIndex = _driver.getElementCount(clauseXPath) -1;
 
         Locator.XPathLocator newClauseXPath = itemXPath.append("//tr[@clauseindex='" + clauseIndex + "']");
-        _test.assertElementPresent(newClauseXPath);
+        _driver.assertElementPresent(newClauseXPath);
 
-        _test._ext4Helper.selectComboBoxItem(newClauseXPath, filter_type);
-        _test.fireEvent(newClauseXPath, BaseWebDriverTest.SeleniumEvent.blur);
+        _driver._ext4Helper.selectComboBoxItem(newClauseXPath, filter_type);
+        _driver.fireEvent(newClauseXPath, BaseWebDriverTest.SeleniumEvent.blur);
 
         if ( !(filter.compareTo("") == 0) )
         {
-            _test.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
-            _test.fireEvent(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), BaseWebDriverTest.SeleniumEvent.blur);
+            _driver.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
+            _driver.fireEvent(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), BaseWebDriverTest.SeleniumEvent.blur);
 //            itemXPath.append("//tr").findElement(this).click(); // Filter doesn't stick without this
         }
-        _test.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
+        _driver.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
     }
 
     private Locator.XPathLocator tabContentXPath(ViewItemType type)
@@ -489,7 +475,7 @@ public class CustomizeView extends Component
 
         Locator closeButtonLoc = itemXPath(type, fieldKey).append(Locator.tagWithClass("*", "labkey-tool-close"));
 
-        Actions builder = new Actions(_test.getDriver());
+        Actions builder = new Actions(_driver.getDriver());
 
         List<WebElement> elements = closeButtonLoc.findElements(this);
 
@@ -497,7 +483,7 @@ public class CustomizeView extends Component
         {
             builder.moveToElement(el).click().build().perform();
             try {el.click();} catch (StaleElementReferenceException ignore) {}
-            _test.shortWait().until(ExpectedConditions.stalenessOf(el));
+            _driver.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
     }
 
@@ -541,8 +527,8 @@ public class CustomizeView extends Component
     //enable customize view grid to show hidden fields
     public void showHiddenItems()
     {
-        _test.click(Locator.tagWithText("Label", "Show Hidden Fields"));
-        _test.sleep(250); // wait for columns to display
+        _driver.click(Locator.tagWithText("Label", "Show Hidden Fields"));
+        BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
     private void removeCustomizeViewItem(int item_index, ViewItemType type)
@@ -566,55 +552,55 @@ public class CustomizeView extends Component
 
     public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
     {
-        _test.log("Adding " + column_name + " sort");
+        _driver.log("Adding " + column_name + " sort");
         Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
-        _test.assertElementNotPresent(itemXPath);
+        _driver.assertElementNotPresent(itemXPath);
         addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
-        _test._ext4Helper.selectComboBoxItem(itemXPath, order);
+        _driver._ext4Helper.selectComboBoxItem(itemXPath, order);
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
     }
 
     public void removeCustomizeViewColumn(String fieldKey)
     {
-        _test.log("Removing " + fieldKey + " column");
+        _driver.log("Removing " + fieldKey + " column");
         removeCustomizeViewItem(fieldKey, ViewItemType.Columns);
     }
 
     public void removeCustomizeViewFilter(String fieldKey)
     {
-        _test.log("Removing " + fieldKey + " filter");
+        _driver.log("Removing " + fieldKey + " filter");
         removeCustomizeViewItem(fieldKey, ViewItemType.Filter);
     }
 
     public void removeCustomizeViewFilter(int item_index)
     {
-        _test.log("Removing filter at position " + item_index);
+        _driver.log("Removing filter at position " + item_index);
         removeCustomizeViewItem(item_index, ViewItemType.Filter);
     }
 
     public void removeCustomizeViewSort(String fieldKey)
     {
-        _test.log("Removing " + fieldKey + " sort");
+        _driver.log("Removing " + fieldKey + " sort");
         removeCustomizeViewItem(fieldKey, ViewItemType.Sort);
     }
 
     public void clearCustomizeViewColumns()
     {
-        _test.log("Clear all Customize View columns.");
+        _driver.log("Clear all Customize View columns.");
         clearAllCustomizeViewItems(ViewItemType.Columns);
     }
 
     public void clearCustomizeViewFilters()
     {
-        _test.log("Clear all Customize View filters.");
+        _driver.log("Clear all Customize View filters.");
         clearAllCustomizeViewItems(ViewItemType.Filter);
     }
 
     public void clearCustomizeViewSorts()
     {
-        _test.log("Clear all Customize View sorts.");
+        _driver.log("Clear all Customize View sorts.");
         clearAllCustomizeViewItems(ViewItemType.Sort);
     }
 
@@ -626,7 +612,7 @@ public class CustomizeView extends Component
         for (WebElement closeButton : closeButtons)
         {
             closeButton.click();
-            _test.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
+            _driver.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
         }
     }
 
@@ -636,7 +622,7 @@ public class CustomizeView extends Component
         changeTab(ViewItemType.Filter);
 
         WebElement folderFilterCombo = Locator.css("div.labkey-folder-filter-combo").findElement(getComponentElement());
-        _test._ext4Helper.selectComboBoxItem(Locator.id(folderFilterCombo.getAttribute("id")), folderFilter);
+        _driver._ext4Helper.selectComboBoxItem(Locator.id(folderFilterCombo.getAttribute("id")), folderFilter);
     }
 
     private void setFolderFilterClip(boolean clip)
@@ -690,30 +676,30 @@ public class CustomizeView extends Component
 
     public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
     {
-        _test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Columns);
     }
 
     public void moveCustomizeViewFilter(String fieldKey, boolean moveUp)
     {
-        _test.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Filter);
     }
 
     public void moveCustomizeViewSort(String fieldKey, boolean moveUp)
     {
-        _test.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
+        _driver.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
         moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Sort);
     }
 
     private void moveCustomizeViewItem(String fieldKey, boolean moveUp, ViewItemType type)
     {
         changeTab(type);
-        final int itemIndex = _test.getElementIndex(itemXPath(type, fieldKey).findElement(this));
+        final int itemIndex = _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this));
 
         moveCustomizeViewItem(itemIndex, moveUp, type);
 
-        _test.waitFor(() -> itemIndex != _test.getElementIndex(itemXPath(type, fieldKey).findElement(this)),
+        _driver.waitFor(() -> itemIndex != _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this)),
                 "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -724,7 +710,7 @@ public class CustomizeView extends Component
         WebElement fromItem = itemXPath(type, field_index).findElement(getComponentElement());
         WebElement toItem= itemXPath(type, field_index - 1).findElement(getComponentElement());
 
-        Actions builder = new Actions(_test.getDriver());
+        Actions builder = new Actions(_driver.getDriver());
         builder.dragAndDrop(fromItem, toItem).build().perform();
     }
 
@@ -753,7 +739,7 @@ public class CustomizeView extends Component
             msg = msg + " caption to '" + caption + "'";
         if (aggregates != null && aggregates.size() > 0)
             msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
-        _test.log(msg);
+        _driver.log(msg);
 
         changeTab(ViewItemType.Columns);
 
@@ -761,7 +747,7 @@ public class CustomizeView extends Component
 
         if (caption == null)
             caption = "";
-        _test.setFormElement(Locator.xpath("//input[contains(@name, 'title')]").findElement(window), caption);
+        _driver.setFormElement(Locator.xpath("//input[contains(@name, 'title')]").findElement(window), caption);
 
         //reset existing aggregates
         List<WebElement> deleteButtons = Locator.xpath("//*[contains(@src, 'delete')]").findElements(window);
@@ -786,50 +772,21 @@ public class CustomizeView extends Component
 
                 WebElement comboCell = row.append(Locator.xpath("/td[1]")).findElement(window);
                 comboCell.click();
-                _test._ext4Helper.selectComboBoxItem(Locator.id(grid.getAttribute("id")), aggregate.get("type"));
+                _driver._ext4Helper.selectComboBoxItem(Locator.id(grid.getAttribute("id")), aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
                     WebElement labelCell = row.append(Locator.xpath("/td[2]/div")).findElement(window);
                     labelCell.click();
 
                     WebElement fieldPath = Locator.xpath("//input[@name='label']").findElement(window);
-                    _test.setFormElement(fieldPath, aggregate.get("label"));
+                    _driver.setFormElement(fieldPath, aggregate.get("label"));
                 }
-                _test.fireEvent(_test.getDriver().switchTo().activeElement(), WebDriverWrapper.SeleniumEvent.blur);
+                _driver.fireEvent(_driver.getDriver().switchTo().activeElement(), WebDriverWrapper.SeleniumEvent.blur);
             }
         }
         Locator.xpath("//label").findElement(window).click();
         window.clickButton("OK", 0);
         window.waitForClose();
-    }
-
-    /**
-     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
-     *      or at least first element on page)
-     * post-conditions:  grid has R view of name name
-     * @param name name to give new R view
-     */
-    public void createRReport(String name)
-    {
-        createRReport(name, false);
-    }
-
-    /**
-     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
-     *      or at least first element on page)
-     * post-conditions:  grid has R view of name name
-     * @param name name to give new R view
-     * @param shareView should this view be available to all users
-     */
-    public void createRReport(String name, boolean shareView)
-    {
-        _test.waitForText(("Reports"));
-        _test._extHelper.clickMenuButton("Reports", "Create R Report");
-
-        if (shareView)
-            _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
-
-        _reportHelper.saveReport(name);
     }
 
     /** Check that a column is present. */
@@ -949,7 +906,7 @@ public class CustomizeView extends Component
         public Window clickEdit()
         {
             Locator.css("div.labkey-tool-gear").findElement(getComponentElement()).click();
-            return Window.builder().withTitleContaining("Edit column properties for").build(_test.getDriver());
+            return Window.builder().withTitleContaining("Edit column properties for").build(_driver.getDriver());
         }
     }
 
