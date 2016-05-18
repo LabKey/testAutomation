@@ -26,6 +26,7 @@ import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -81,7 +82,8 @@ public class DataViewsTest extends ParticipantListTest
 
     @Override
     protected void doVerifySteps() throws Exception
-    {   
+    {
+        sortDataViewsTest();
         subcategoryTest();
         basicTest();
         datasetStatusTest();
@@ -97,6 +99,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(CATEGORIES[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
+        // maybe can expand on this to test sorting option available on the customize menu
         assertDataDisplayedAlphabetically();
 
         log("Verify dataset category filtering.");
@@ -461,6 +464,40 @@ public class DataViewsTest extends ParticipantListTest
         assertTextPresent(REFRESH_DATE);
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(REFRESH_DATE);
+    }
+
+    @LogMethod
+    public void sortDataViewsTest()
+    {
+        log("Testing ability to sort Data Views");
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
+
+        // check if top category sorts Alphabetical
+        openCustomizePanel(ORIGINAL_WEBPART_TITLE);
+        RadioButton.builder().withLabel("Alphabetical").build(getDriver()).check();
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+        assertTextPresentInThisOrder("ABCDEFGH></% 1äöüÅ", "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
+                "Chart View: Systolic vs Diastolic", "Crosstab: MouseId Counts",
+                "DEM-1: Demographics", "FPX-1: Final Complete Physical Exam", "PRE-1: Pre-Existing Conditions",
+                "R Report: Dataset Column Names", "RCP-1: Reactogenicity-Resolution", "Scatter: Systolic vs Diastolic",
+                "SCL-1: Specimen Collection", "Time Chart: Body Temp + Pulse For Group 2", "Types",
+                "VAC-1: Post-enrollment Vaccination", "verifyAssay");
+
+        // check if bottom category sorts Alphabetical
+        assertTextPresentInThisOrder("QRSTUVWX></% 1äöüÅ", "ENR-1: Enrollment", "EPX-1: Enrollment Abbreviated Physical Exam",
+                "EVC-1: Enrollment Vaccination", "PO-1: Pregnancy Outcome", "PR-1: Pregnancy Report and History",
+                "RCF-1: Reactogenicity-Day 2", "RCH-1: Reactogenicity-Day 1");
+
+        // check if uncategorized sorts Alphabetical
+        assertTextPresentInThisOrder("Uncategorized", "Mouse Report: 2 Dem Vars + 3 Other Vars", "TestReport");
+
+        // check if option to sort By Display Order exist
+        // with By Display Order DB is not being asked for a specific ordering, so ordering may very from run to run.
+        openCustomizePanel(ORIGINAL_WEBPART_TITLE);
+        RadioButton.builder().withLabel("By Display Order").build(getDriver()).check();
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     /**
