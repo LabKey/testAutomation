@@ -39,6 +39,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     public UIPermissionsHelper(BaseWebDriverTest test)
     {
         super(test);
+        _test = test;
     }
 
     public Integer createGlobalPermissionsGroup(String groupName, String... users)
