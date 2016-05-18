@@ -268,7 +268,7 @@
             <path refid="module.test.src.dirs"/>
         </path>
 
-        <antcall target="force_compile"/>
+        <antcall target="force_build_if_different_modules"/>
 
         <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
             <srcfiles dir="${project.root}" includes="${moduleSources}">
@@ -283,7 +283,13 @@
         <antcall target="write_sampledata_path" inheritrefs="true" />
     </target>
 
-    <target name="force_compile">
+    <target name="uptodate_exists">
+        <condition property="uptodate.exists" value="true">
+            <available file="${test.build.uptodate}"/>
+        </condition>
+    </target>
+
+    <target name="force_build_if_different_modules" if="uptodate.exists" depends="uptodate_exists">
         <loadfile property="previous.modulesFile" srcfile="${test.build.uptodate}" failonerror="false"/>
         <if>
             <not>
