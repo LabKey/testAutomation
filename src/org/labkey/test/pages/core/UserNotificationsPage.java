@@ -40,6 +40,15 @@ public class UserNotificationsPage extends LabKeyPage
         return headerText;
     }
 
+    public int getNotificationCount()
+    {
+        int count;
+
+        count = Locators.notificationBody.findElements(getDriver()).size();
+
+        return count;
+    }
+
     public List<NotificationItem> getAllNotifications()
     {
         List<NotificationItem> notifications = new ArrayList<>();
@@ -140,6 +149,8 @@ public class UserNotificationsPage extends LabKeyPage
         public static final Locator.CssLocator headerToggle = notificationGroupPanel.append(" div.x4-tool-after-title");
         public static final Locator.CssLocator panelBody = notificationGroupPanel.append(" div.x4-panel-body");
         public static final Locator.CssLocator notificationBody = panelBody.append(" div.notification-body");
+        public static final Locator.CssLocator markAllAsRead = allNotificationsPanel.append(" a.notification-all-read");
+        public static final Locator.CssLocator deleteAll = allNotificationsPanel.append(" a.notification-all-delete");
     }
 
     public enum NotificationTypes
@@ -222,8 +233,28 @@ public class UserNotificationsPage extends LabKeyPage
 
         public void clickView()
         {
-            _parent.findElement(By.cssSelector("span.notification-link ")).click();
-            waitForPage();
+            _parent.findElements(By.cssSelector("span.notification-link")).get(1).click();
+            try
+            {
+                waitForElementToDisappear(Locator.css("div#" + _parent.getAttribute("id")));
+            }
+            catch(org.openqa.selenium.StaleElementReferenceException sere)
+            {
+                log("Caught a stale element exception in clickView, this can happen if the page has already changed. So we are good to go.");
+            }
+        }
+
+        public void clickDelete()
+        {
+            _parent.findElements(By.cssSelector("span.notification-link")).get(0).click();
+            try
+            {
+                waitForElementToDisappear(Locator.css("div#" + _parent.getAttribute("id")));
+            }
+            catch(org.openqa.selenium.StaleElementReferenceException sere)
+            {
+                log("Caught a stale element exception in clickDismiss, this can happen if the page has already changed. So we are good to go.");
+            }
         }
 
     }
