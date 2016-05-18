@@ -32,6 +32,7 @@ import org.labkey.remoteapi.security.GetGroupPermsCommand;
 import org.labkey.remoteapi.security.GetGroupPermsResponse;
 import org.labkey.remoteapi.security.RemoveAssignmentCommand;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     private List<Map<String, Object>> groupCache;
     private String groupCacheContainer;
 
-    public ApiPermissionsHelper(BaseWebDriverTest test)
+    public ApiPermissionsHelper(WebDriverWrapper test)
     {
         super(test);
     }
@@ -55,7 +56,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void assertNoPermission(String userOrGroupName, String permissionSetting)
     {
-        String container = _test.getCurrentContainerPath();
+        String container = _driver.getCurrentContainerPath();
         List<String> roles = new ArrayList<>();
         if (userOrGroupName.contains("@"))
             roles.addAll(getUserRoles(container, userOrGroupName));
@@ -69,7 +70,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void assertPermissionSetting(String userOrGroupName, String permissionSetting)
     {
-        String container = _test.getCurrentContainerPath();
+        String container = _driver.getCurrentContainerPath();
         String expectedRole = toRole(permissionSetting);
         List<String> roles = new ArrayList<>();
         if (userOrGroupName.contains("@"))
@@ -143,7 +144,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     {
         if (groupCache == null || !container.equals(groupCacheContainer))
         {
-            Connection connection = _test.createDefaultConnection(false);
+            Connection connection = _driver.createDefaultConnection(false);
             GetGroupPermsCommand command = new GetGroupPermsCommand();
             GetGroupPermsResponse response;
             try
@@ -222,7 +223,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     {
         Integer id = getSiteGroupId(groupName);
         if (id == null)
-            id = getProjectGroupId(groupName, _test.getCurrentProject());
+            id = getProjectGroupId(groupName, _driver.getCurrentProject());
         return id;
     }
 
@@ -252,7 +253,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
             }
         }
 
-        Connection connection = _test.createDefaultConnection(false);
+        Connection connection = _driver.createDefaultConnection(false);
         Command command = new Command("security", "getGroupMembers");
         command.setParameters(new HashMap<String, Object>(Maps.of("groupId", groupId)));
 
@@ -288,7 +289,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private CommandResponse getUserPerms(String container, String user) throws CommandException
     {
-        Connection connection = _test.createDefaultConnection(false);
+        Connection connection = _driver.createDefaultConnection(false);
         Command command = new Command("security", "getUserPerms");
         command.setParameters(new HashMap<String, Object>(Maps.of("userEmail", user)));
 
@@ -308,19 +309,19 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void uncheckInheritedPermissions()
     {
-        new UIPermissionsHelper(_test).uncheckInheritedPermissions();
+        new UIPermissionsHelper((BaseWebDriverTest) _driver).uncheckInheritedPermissions();
     }
 
     @Override
     public void checkInheritedPermissions()
     {
-        inheritPermissions(_test.getContainerId());
+        inheritPermissions(_driver.getContainerId());
     }
 
     public void inheritPermissions(String containerId)
     {
         DeletePolicyCommand  command = new DeletePolicyCommand(containerId);
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _driver.createDefaultConnection(true);
 
         try
         {
@@ -335,12 +336,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public boolean isPermissionsInherited()
     {
-        return isPermissionsInherited(_test.getCurrentContainerPath());
+        return isPermissionsInherited(_driver.getCurrentContainerPath());
     }
 
     public boolean isPermissionsInherited(String container)
     {
-        Connection connection = _test.createDefaultConnection(false);
+        Connection connection = _driver.createDefaultConnection(false);
         GetGroupPermsCommand command = new GetGroupPermsCommand();
         GetGroupPermsResponse response;
         try
@@ -358,7 +359,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     protected void removeRoleAssignment(String userOrGroupName, String permissionString, MemberType memberType)
     {
-        String container = _test.getCurrentContainerPath();
+        String container = _driver.getCurrentContainerPath();
         if (memberType == MemberType.user)
             removeUserRoleAssignment(userOrGroupName, permissionString, container);
         else
@@ -371,7 +372,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     public void removeUserRoleAssignment(String userEmail, String permissionString, String container)
     {
         RemoveAssignmentCommand command = new RemoveAssignmentCommand();
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _driver.createDefaultConnection(true);
 
         command.setEmail(userEmail);
         command.setRoleClassName(toRole(permissionString));
@@ -389,7 +390,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
     public void removeRoleAssignment(Integer principalId, String roleClassName, String container)
     {
         RemoveAssignmentCommand command = new RemoveAssignmentCommand();
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _driver.createDefaultConnection(true);
 
         command.setPrincipalId(principalId);
         command.setRoleClassName(roleClassName);
@@ -407,13 +408,13 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType)
     {
-        addMemberToRole(userOrGroupName, permissionString, memberType, _test.getCurrentContainerPath());
+        addMemberToRole(userOrGroupName, permissionString, memberType, _driver.getCurrentContainerPath());
     }
 
     public void addMemberToRole(String userOrGroupName, String permissionString, MemberType memberType, String container)
     {
         AddAssignmentCommand command = new AddAssignmentCommand();
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _driver.createDefaultConnection(true);
 
         Integer principalId = getPrincipalId(userOrGroupName, memberType, container);
         command.setPrincipalId(principalId);
@@ -464,7 +465,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
 
         DeleteGroupCommand command = new DeleteGroupCommand(groupId);
-        Connection connection = _test.createDefaultConnection(true);
+        Connection connection = _driver.createDefaultConnection(true);
         try
         {
             command.execute(connection, "/");
@@ -486,7 +487,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
         try
         {
-            Connection connection = _test.createDefaultConnection(true);
+            Connection connection = _driver.createDefaultConnection(true);
             return command.execute(connection, container).getGroupId().intValue();
         }
         catch (IOException | CommandException e)
@@ -509,7 +510,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
         try
         {
-            Connection connection = _test.createDefaultConnection(true);
+            Connection connection = _driver.createDefaultConnection(true);
             return command.execute(connection, container).getId().intValue();
         }
         catch (IOException | CommandException e)
@@ -531,13 +532,13 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public Integer createPermissionsGroup(String groupName)
     {
-        return  createProjectGroup(groupName, _test.getCurrentProject());
+        return  createProjectGroup(groupName, _driver.getCurrentProject());
     }
 
     @Override
     public Integer createPermissionsGroup(String groupName, String... users)
     {
-        return _createPermissionsGroup(groupName, _test.getCurrentProject(), users);
+        return _createPermissionsGroup(groupName, _driver.getCurrentProject(), users);
     }
 
     private void addMembersToGroup(String project, Integer groupId, String... members)
@@ -550,7 +551,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
         try
         {
-            Connection connection = _test.createDefaultConnection(true);
+            Connection connection = _driver.createDefaultConnection(true);
             command.execute(connection, project);
         }
         catch (IOException | CommandException e)
@@ -620,7 +621,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
         try
         {
-            Connection connection = _test.createDefaultConnection(true);
+            Connection connection = _driver.createDefaultConnection(true);
             command.execute(connection, "/");
         }
         catch (IOException | CommandException e)

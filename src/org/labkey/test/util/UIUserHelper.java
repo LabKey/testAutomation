@@ -16,42 +16,41 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.NoSuchElementException;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class UIUserHelper extends AbstractUserHelper
 {
-    public UIUserHelper(BaseWebDriverTest test)
+    public UIUserHelper(WebDriverWrapper driverWrapper)
     {
-        super(test);
+        super(driverWrapper);
     }
 
     @Override
     public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
     {
-        _test.goToSiteUsers();
-        _test.clickButton("Add Users");
+        _driver.goToSiteUsers();
+        _driver.clickButton("Add Users");
 
-        _test.setFormElement(Locator.name("newUsers"), userName);
-        _test.setCheckbox(Locator.checkboxByName("sendMail").findElement(_test.getDriver()), sendEmail);
+        _driver.setFormElement(Locator.name("newUsers"), userName);
+        _driver.setCheckbox(Locator.checkboxByName("sendMail").findElement(_driver.getDriver()), sendEmail);
         //            if (cloneUserName != null)
 //            {
 //                checkCheckbox("cloneUserCheck");
 //                setFormElement("cloneUser", cloneUserName);
 //            }
-        _test.clickButton("Add Users");
+        _driver.clickButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
+            assertTrue("Failed to add user " + userName, _driver.isTextPresent(userName + " added as a new user to the system"));
 
-        WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(_test.getDriver());
+        WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(_driver.getDriver());
         String message = resultEl.getText();
 
         String email;
@@ -89,5 +88,48 @@ public class UIUserHelper extends AbstractUserHelper
             }
         };
         return fakeResponse;
+    }
+
+    @Override
+    public void deleteUser(String userEmail)
+    {
+        deleteUsers(false, userEmail);
+    }
+
+    @LogMethod
+    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
+    {
+        int checked = 0;
+        List<String> displayNames = new ArrayList<>();
+        _driver.beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
+
+        DataRegionTable usersTable = new DataRegionTable("Users", _driver.getDriver());
+
+        for(String userEmail : userEmails)
+        {
+            int row = usersTable.getRowIndex("Email", userEmail);
+
+            boolean isPresent = row != -1;
+
+            if (failIfNotFound)
+                assertTrue(userEmail + " was not present", isPresent);
+            else if (!isPresent)
+                TestLogger.log("Unable to delete non-existent user: " + userEmail);
+
+            if (isPresent)
+            {
+                usersTable.checkCheckbox(row);
+                checked++;
+                displayNames.add(usersTable.getDataAsText(row, "Display Name"));
+            }
+        }
+
+        if(checked > 0)
+        {
+            _driver.clickButton("Delete");
+            _driver.assertTextPresent(displayNames);
+            _driver.clickButton("Permanently Delete");
+            _driver.assertTextNotPresent(userEmails);
+        }
     }
 }

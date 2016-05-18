@@ -15,23 +15,31 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
 public class APIUserHelper extends AbstractUserHelper
 {
-    public APIUserHelper(BaseWebDriverTest test)
+    public APIUserHelper(WebDriverWrapper driver)
     {
-        super(test);
+        super(driver);
     }
 
     @Override
@@ -39,7 +47,7 @@ public class APIUserHelper extends AbstractUserHelper
     {
         CreateUserCommand command = new CreateUserCommand(userName);
         command.setSendEmail(sendEmail);
-        Connection connection = _test.createDefaultConnection(false);
+        Connection connection = _driver.createDefaultConnection(false);
         try
         {
             CreateUserResponse response = command.execute(connection, "");
@@ -62,7 +70,7 @@ public class APIUserHelper extends AbstractUserHelper
     public GetUsersResponse getUsers()
     {
         GetUsersCommand command = new GetUsersCommand();
-        Connection connection = _test.createDefaultConnection(false);
+        Connection connection = _driver.createDefaultConnection(false);
 
         try
         {
@@ -71,6 +79,57 @@ public class APIUserHelper extends AbstractUserHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Map<String, Integer> getUserIds(List<String> userEmails)
+    {
+        Map<String, Integer> userIds = new HashMap<>();
+        List<GetUsersResponse.UserInfo> usersInfo = getUsers().getUsersInfo();
+        for (GetUsersResponse.UserInfo userInfo : usersInfo)
+        {
+            if (userEmails.contains(userInfo.getEmail()))
+                userIds.put(userInfo.getEmail(), userInfo.getUserId());
+        }
+        return userIds;
+    }
+
+    public Integer getUserId(String userEmail)
+    {
+        return getUserIds(Arrays.asList(userEmail)).get(userEmail);
+    }
+
+    @Override
+    public void deleteUser(String userEmail)
+    {
+        deleteUsers(false, userEmail);
+    }
+
+    private void deleteUser(@NotNull Integer userId)
+    {
+        Connection connection = _driver.createDefaultConnection(false);
+        DeleteUserCommand command = new DeleteUserCommand(userId);
+        try
+        {
+            command.execute(connection, "/");
+        }
+        catch (IOException|CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @LogMethod
+    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
+    {
+        Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails));
+        for (String userEmail : userEmails)
+        {
+            Integer userId = userIds.get(userEmail);
+            if (failIfNotFound)
+                assertTrue(userEmail + " was not present", userId != null);
+            if (userId != null)
+                deleteUser(userId);
         }
     }
 }

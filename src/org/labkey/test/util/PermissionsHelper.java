@@ -24,6 +24,7 @@ import org.labkey.remoteapi.security.GetRolesCommand;
 import org.labkey.remoteapi.security.GetRolesResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
@@ -42,11 +43,11 @@ import static org.junit.Assert.fail;
  */
 public abstract class PermissionsHelper
 {
-    protected BaseWebDriverTest _test;
+    protected WebDriverWrapper _driver;
 
-    public PermissionsHelper(BaseWebDriverTest test)
+    public PermissionsHelper(WebDriverWrapper driver)
     {
-        _test = test;
+        _driver = driver;
     }
 
     public String toRole(final String perm)
@@ -73,7 +74,7 @@ public abstract class PermissionsHelper
         {
             _roles = new HashMap<>();
             GetRolesCommand command = new GetRolesCommand();
-            Connection connection = _test.createDefaultConnection(false);
+            Connection connection = _driver.createDefaultConnection(false);
 
             try
             {
@@ -105,7 +106,7 @@ public abstract class PermissionsHelper
 
     public void assertPermissionsInherited()
     {
-        assertTrue("Permissions not inherited for folder: " + _test.getCurrentContainerPath(), isPermissionsInherited());
+        assertTrue("Permissions not inherited for folder: " + _driver.getCurrentContainerPath(), isPermissionsInherited());
     }
 
     public enum MemberType
@@ -174,14 +175,14 @@ public abstract class PermissionsHelper
 
     public void assertGroupExists(String groupName, String projectName)
     {
-        _test.log("asserting that group " + groupName + " exists in project " + projectName + "...");
+        _driver.log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (!doesGroupExist(groupName, projectName))
             fail("group " + groupName + " does not exist in project " + projectName);
     }
 
     public void assertGroupDoesNotExist(String groupName, String projectName)
     {
-        _test.log("asserting that group " + groupName + " does not exist in project " + projectName + "...");
+        _driver.log("asserting that group " + groupName + " does not exist in project " + projectName + "...");
         if (doesGroupExist(groupName, projectName))
             fail("group " + groupName + " exists in project " + projectName);
     }
@@ -190,14 +191,14 @@ public abstract class PermissionsHelper
 
     public void assertUserInGroup(String member, String groupName, String projectName, PrincipalType principalType)
     {
-        _test.log("asserting that member " + member + " is in group " + projectName + "/" + groupName + "...");
+        _driver.log("asserting that member " + member + " is in group " + projectName + "/" + groupName + "...");
         if (!isUserInGroup(member, groupName, projectName, principalType))
             fail("member " + member + " was not in group " + projectName + "/" + groupName);
     }
 
     public void assertUserNotInGroup(String member, String groupName, String projectName, PrincipalType principalType)
     {
-        _test.log("asserting that member " + member + " is not in group " + projectName + "/" + groupName + "...");
+        _driver.log("asserting that member " + member + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(member, groupName, projectName, principalType))
             fail("member " + member + " was found in group " + projectName + "/" + groupName);
     }

@@ -16,15 +16,17 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
+import org.openqa.selenium.WebDriver;
 
 public abstract class AbstractUserHelper
 {
-    protected BaseWebDriverTest _test;
+    protected WebDriverWrapper _driver;
 
-    public AbstractUserHelper(BaseWebDriverTest test)
+    public AbstractUserHelper(WebDriverWrapper driver)
     {
-        _test = test;
+        _driver = driver;
     }
 
     public CreateUserResponse createUser(String userName, String clonedUserName)
@@ -53,4 +55,7 @@ public abstract class AbstractUserHelper
     }
 
     public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
+
+    public abstract void deleteUser(String userEmail);
+    public abstract void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails);
 }

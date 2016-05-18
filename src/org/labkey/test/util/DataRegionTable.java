@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.CustomizeView;
@@ -28,6 +29,7 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -103,21 +105,34 @@ public class DataRegionTable extends Component
     }
 
     /**
+     * @deprecated Use {@link DataRegionTable(WebElement, WebDriver)}
      * @param test Necessary while DRT methods live in BWDT
      * @param table table element that contains data region
      */
+    @Deprecated
     public DataRegionTable(WebDriverWrapper test, WebElement table)
     {
         this(table, null, test);
     }
 
     /**
+     * @deprecated Use {@link DataRegionTable(String, WebDriver)}
      * @param regionName 'lk-region-name' of the table
      * @param test Necessary while DRT methods live in BWDT
      */
     public DataRegionTable(String regionName, WebDriverWrapper test)
     {
         this(null, regionName, test);
+    }
+
+    public DataRegionTable(WebElement table, WebDriver driver)
+    {
+        this(table, null, new WebDriverWrapperImpl(driver));
+    }
+
+    public DataRegionTable(String regionName, WebDriver driver)
+    {
+        this(null, regionName, new WebDriverWrapperImpl(driver));
     }
 
     @Override
