@@ -151,8 +151,8 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Set the 'File' column on the runs.");
 
-        click(Locator.linkWithText("view runs"));
-        click(Locator.linkWithText("edit"));
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkWithText("edit"));
 
         setFormElement(Locator.name("quf_RunFileField"), PNG01_FILE);
         clickButton("Submit");
@@ -165,12 +165,12 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         mouseOver(Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"));
         shortWait().until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#helpDiv")));
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'downloadFileLink')]").findElement(getDriver()).getAttribute("src");
-        assertEquals("Bad response from run field pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(src));
+        assertEquals("Bad response from run field pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 
         // Not going to try and download the file as part of the automaiton, although that could be added if wanted int he future.
 
         log("View the results grid.");
-        click(Locator.linkWithText("view results"));
+        clickAndWait(Locator.linkWithText("view results"));
 
         log("Verify that the correct number of file fields are populated as expected.");
         assertElementPresent("Did not find the expected number of links for the file " + XLS_FILE.getName(), Locator.xpath("//a[contains(text(), '" + XLS_FILE.getName() + "')]"), 3);
@@ -182,7 +182,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Add the image to one of the result's 'File' column.");
 
         List<WebElement> editLinks = Locator.linkWithText("edit").findElements(getDriver());
-        editLinks.get(2).click();
+        clickAndWait(editLinks.get(2));
 
         setFormElement(Locator.name("quf_DataFileField"), LRG_PNG_FILE);
         clickButton("Submit");
@@ -192,7 +192,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 2);
 
         log("Export the grid to excel.");
-        list = new DataRegionTable("Data", this);
+        list = new DataRegionTable("Data", getDriver());
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
@@ -222,8 +222,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.removeBatchField("BatchFileField");
         assayDesigner.saveAndClose();
-        waitForElement(Locator.linkWithText("view results")); // Make sure page has loaded completely.
-        click(Locator.linkWithText("view results"));
+        waitAndClickAndWait(Locator.linkWithText("view results"));
 
         log("Verify that the file fields from the batch are no longer present.");
         assertElementPresent("Found a link to file " + XLS_FILE.getName() + " in grid, it should not be there.", Locator.xpath("//a[contains(text(), '" + XLS_FILE.getName() + "')]"), 0);
@@ -235,7 +234,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");
-        list = new DataRegionTable("Data", this);
+        list = new DataRegionTable("Data", getDriver());
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
