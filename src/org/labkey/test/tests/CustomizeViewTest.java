@@ -18,18 +18,15 @@ package org.labkey.test.tests;
 import com.google.common.base.Function;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.data.DataRegion;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -292,5 +289,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
     public List<String> getAssociatedModules()
     {
         return null;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
