@@ -24,6 +24,7 @@ import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -87,7 +88,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("Submit");
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         assertEquals(2, table.getDataRowCount());
         assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
         assertEquals(" ", table.getDataAsText(0, "External Id"));
@@ -118,10 +119,10 @@ public class CreateVialsTest extends AbstractViabilityTest
         _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.addCustomizeViewColumn("TargetStudy");
         _customizeViewsHelper.addCustomizeViewColumn(new String[] { "Run", "Batch", "TargetStudy" }, "BatchTargetStudy");
-        _customizeViewsHelper.setColumnProperties("Run/Batch/TargetStudy", "BatchTargetStudy", (List)null);
+        _customizeViewsHelper.setColumnProperties("Run/Batch/TargetStudy", "BatchTargetStudy", Collections.emptyList());
         _customizeViewsHelper.saveCustomView();
 
-        DataRegionTable table = new DataRegionTable("Data", this);
+        DataRegionTable table = new DataRegionTable("Data", getDriver());
         assertEquals(" ", table.getDataAsText(0, "Target Study"));
         assertEquals(" ", table.getDataAsText(0, "BatchTargetStudy"));
 
@@ -132,7 +133,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         // Delete run
         clickAndWait(Locator.linkWithText("view runs"));
-        checkAllOnPage("Runs");
+        new DataRegionTable("Runs", getDriver()).checkAll();
         clickButton("Delete");
         clickButton("Confirm Delete");
 
@@ -149,7 +150,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         });
 
         clickAndWait(Locator.linkContainingText("run2"));
-        table = new DataRegionTable("Data", this);
+        table = new DataRegionTable("Data", getDriver());
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "BatchTargetStudy"));
 
@@ -167,20 +168,18 @@ public class CreateVialsTest extends AbstractViabilityTest
         click(Locator.xpath("//input[@name='defaultLocationField']/../img"));
         waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
-        assertFormElementEquals(Locator.name("defaultLocationField"), "Alice Lab");
+        assertEquals("Alice Lab", getFormElement(Locator.name("defaultLocationField")));
 
         setFormElement(Locator.name("maxCellPerVialField"), "10e6");
         setFormElement(Locator.name("defaultUsedCellsField"), "1e5");
         setFormElement(Locator.name("defaultLocationField"), "Site A");
-        //String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
-        //click(Locator.id(btnId));
         _extHelper.clickExtButton("Create Vials");
         assertTextPresent("Each vial will have no more than 1.00e+07 cells.");
         assertElementNotPresent(Locator.tagWithText("td", "B01"));
 
 
         log("** test changing cell counts updates used/remaining columns and vial count column");
-        table = new DataRegionTable("Data", this);
+        table = new DataRegionTable("Data", getDriver());
         assertEquals("B02", table.getDataAsText(0, "Participant ID"));
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
@@ -224,7 +223,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** checking cell counts and specimen IDs");
-        table = new DataRegionTable("Data", this);
+        table = new DataRegionTable("Data", getDriver());
         assertEquals("B02", table.getDataAsText(1, "Participant ID"));
         assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
         // Viable Cells value doesn't get updated, only Original Cells
@@ -242,7 +241,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** checking new site 'Site A' was added and no duplicate 'Bob's Lab' exist (Issue 12074)");
         pushLocation();
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
-        table = new DataRegionTable("query", this);
+        table = new DataRegionTable("query", getDriver());
         assertEquals(4, table.getDataRowCount());
         assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
         assertEquals("-1", table.getDataAsText(0, "External Id"));
@@ -258,7 +257,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** checking site and cells per vial");
         pushLocation();
         beginAt("/study-samples/" + getProjectName() + "/" + getFolderName() + "/samples.view?showVials=true");
-        table = new DataRegionTable("SpecimenDetail", this);
+        table = new DataRegionTable("SpecimenDetail", getDriver());
         assertEquals("B02_1.0_0", table.getDataAsText(0, "Global Unique Id"));
         assertEquals("6,666,667.0", table.getDataAsText(0, "Volume"));
         assertEquals("Bob's Lab", table.getDataAsText(0, "Site Name"));
