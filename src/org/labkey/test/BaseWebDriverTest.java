@@ -61,6 +61,7 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.search.SearchSideWebPart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -77,7 +78,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -1256,7 +1256,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         String lastPage = _lastPageURL.toString();
                         URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
                         log("Re-invoking last action with _debug parameter set: " + url.toString());
-                        WebTestHelper.getHttpGetResponse(url.toString());
+                        WebTestHelper.getHttpResponse(url.toString()).getResponseCode();
                     }
                     catch (IOException t)
                     {
@@ -2004,8 +2004,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (changed)
         {
             clickButton("Save Changes", 0);
-            waitForElement(Ext4Helper.Locators.window("Success"));
-            clickButton("OK", 0);
+            Window window = Window.builder().withTitle("Success").build(getDriver());
+            window.clickButton("OK", 0);
+            window.waitForClose();
             _ext4Helper.waitForMaskToDisappear();
         }
         else
@@ -2055,7 +2056,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
     public List<String> getPipelineStatusValues()
     {
-        DataRegionTable status = new DataRegionTable("StatusFiles", this);
+        DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
         return status.getColumnDataAsText("Status");
     }
 
@@ -2127,7 +2128,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Deprecated
     public List<List<String>> getColumnValues(String tableName, String... columnNames)
     {
-        DataRegionTable table = new DataRegionTable(tableName, this);
+        DataRegionTable table = new DataRegionTable(tableName, getDriver());
         return table.getFullColumnValues(columnNames);
     }
 
@@ -2175,7 +2176,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Deprecated
     public void checkAllOnPage(String dataRegionName)
     {
-        new DataRegionTable(dataRegionName, this).checkAll();
+        new DataRegionTable(dataRegionName, getDriver()).checkAll();
     }
 
     /**
@@ -2184,7 +2185,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Deprecated
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
-        new DataRegionTable(dataRegionName, this).checkCheckbox(index);
+        new DataRegionTable(dataRegionName, getDriver()).checkCheckbox(index);
     }
 
     @Deprecated
@@ -2211,8 +2212,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 goToSiteUsers();
 
-                DataRegionTable users = new DataRegionTable("Users", this);
-                int userRow = users.getRow("Email", email);
+                DataRegionTable users = new DataRegionTable("Users", getDriver());
+                int userRow = users.getRowIndex("Email", email);
                 assertFalse("No such user: " + email, userRow == -1);
                 clickAndWait(users.detailsLink(userRow));
 
@@ -2308,11 +2309,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         List<String> displayNames = new ArrayList<>();
         beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
 
-        DataRegionTable usersTable = new DataRegionTable("Users", this);
+        DataRegionTable usersTable = new DataRegionTable("Users", getDriver());
 
         for(String userEmail : userEmails)
         {
-            int row = usersTable.getRow("Email", userEmail);
+            int row = usersTable.getRowIndex("Email", userEmail);
 
             boolean isPresent = row != -1;
 
@@ -2373,7 +2374,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        return new DataRegionTable("Cohort", this);
+        return new DataRegionTable("Cohort", getDriver());
     }
 
     /**

@@ -32,6 +32,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -500,7 +501,7 @@ public class CustomizeView extends Component
             lookupParts = allParts.subList(0, allParts.size() - 1);
             for (int i = 0; i < lookupParts.size(); i++)
             {
-                lookupParts.set(i, lookupParts.get(i).toUpperCase());
+                lookupParts.set(i, lookupParts.get(i));//.toUpperCase());
             }
             fieldName = allParts.get(allParts.size() - 1);
             allParts = new ArrayList<>(lookupParts);
@@ -739,7 +740,7 @@ public class CustomizeView extends Component
             msg = msg + " caption to '" + caption + "'";
         if (aggregates != null && aggregates.size() > 0)
             msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
-        _driver.log(msg);
+        TestLogger.log(msg);
 
         changeTab(ViewItemType.Columns);
 
@@ -754,7 +755,7 @@ public class CustomizeView extends Component
         for (WebElement deleteButton : deleteButtons)
         {
             deleteButton.click();
-            WebDriverWrapper.waitFor(() -> ExpectedConditions.stalenessOf(deleteButton).apply(null), 1000);
+            _driver.shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
         }
 
         //then re-add them

@@ -236,7 +236,7 @@ public class ListTest extends BaseWebDriverTest
                 TEST_DATA[1][1],
                 TEST_DATA[3][2]);
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
         assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
         assertEquals(TEST_DATA[2][2], table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
@@ -255,7 +255,7 @@ public class ListTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
 
-        table = new DataRegionTable("query", this);
+        table = new DataRegionTable("query", getDriver());
         assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
         assertEquals("true", table.getDataAsText(table.getRowIndex(TEST_DATA[0][1]), _listCol3.getLabel()));
         assertEquals("false", table.getDataAsText(table.getRowIndex(TEST_DATA[0][2]), _listCol3.getLabel()));
@@ -351,7 +351,7 @@ public class ListTest extends BaseWebDriverTest
                 TEST_DATA[1][3],
                 TEST_DATA[2][3],
                 TEST_DATA[3][3]);
-        table = new DataRegionTable("query", this);
+        table = new DataRegionTable("query", getDriver());
         assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
         assertEquals(3, table.getRowIndex(TEST_DATA[0][3]));
         assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
@@ -445,7 +445,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
 
         log("Test Sort and Filter in Data View");
-        DataRegionTable region = new DataRegionTable("query", this);
+        DataRegionTable region = new DataRegionTable("query", getDriver());
         region.setSort(_listCol1.getName(), SortDirection.ASC);
         assertTextBefore(TEST_DATA[0][0], TEST_DATA[0][1]);
 
@@ -489,7 +489,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test Export");
 
-        File tableFile = new DataRegionExportHelper(new DataRegionTable("query", this)).exportText();
+        File tableFile = new DataRegionExportHelper(new DataRegionTable("query", getDriver())).exportText();
         String tsv = TestFileUtils.getFileContents(tableFile);
         TextSearcher tsvSearcher = new TextSearcher(() -> tsv).setSearchTransformer(t -> t);
 
@@ -500,7 +500,7 @@ public class ListTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
-        (new DataRegionTable("qwp2", this)).setSort(_listCol4.getName(), SortDirection.ASC);
+        new DataRegionTable("qwp2", getDriver()).setSort(_listCol4.getName(), SortDirection.ASC);
         String source = getHtmlSource();
         int index;
         assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
@@ -580,15 +580,15 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(LIST2_KEY4);
 
         log("Test export");
-        DataRegionTable list = new DataRegionTable("query", this);
+        DataRegionTable list = new DataRegionTable("query", getDriver());
         waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(DataRegionExportHelper.TextSeparator.COMMA);
         TextSearcher srch = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
-        assertTextPresent(srch, LIST_KEY_NAME2.toUpperCase() + _listCol1.getName(),
-                LIST_KEY_NAME2.toUpperCase() + _listCol2.getName(),
-                LIST_KEY_NAME2.toUpperCase() + _listCol4.getName(),
+        assertTextPresent(srch, LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
+                LIST_KEY_NAME2.toLowerCase() + _listCol2.getName(),
+                LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
@@ -734,7 +734,7 @@ public class ListTest extends BaseWebDriverTest
         portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
 
         log("Test that the right filters are present for each type");
-        DataRegionTable region = new DataRegionTable("qwp3", this);
+        DataRegionTable region = new DataRegionTable("qwp3", getDriver());
         region.openFilterDialog(_listCol4.getName());
         _extHelper.clickExtTab("Choose Filters");
         click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
@@ -768,7 +768,7 @@ public class ListTest extends BaseWebDriverTest
 
         String encodedName = EscapeUtil.fieldKeyEncodePart(_listCol6.getName());
 
-        DataRegionTable query = new DataRegionTable("query", this);
+        DataRegionTable query = new DataRegionTable("query", getDriver());
 
         //sort  by element and verify it worked
         query.setSort(encodedName, SortDirection.DESC);

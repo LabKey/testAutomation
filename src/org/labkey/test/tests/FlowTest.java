@@ -314,7 +314,7 @@ public class FlowTest extends BaseFlowTest
                 "L:Count"
         );
 
-        DataRegionTable fcsAnalysisTable = new DataRegionTable("query", this);
+        DataRegionTable fcsAnalysisTable = new DataRegionTable("query", getDriver());
         List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
         List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
@@ -426,7 +426,7 @@ public class FlowTest extends BaseFlowTest
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=GraphQuery&query.showGraphs=Inline");
 
         // verify Issue 16304: query over flow.FCSFiles doesn't include URL for Name column
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         String href = table.getHref(0, "Name");
         assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showWell.view"));
         
@@ -499,7 +499,7 @@ public class FlowTest extends BaseFlowTest
 
         assertTextPresent("Matched 0 of 59 samples.");
 
-        DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", this);
+        DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", getDriver());
         Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
                 .findElement(samplesConfirm.getComponentElement())
                 .click();
@@ -513,7 +513,7 @@ public class FlowTest extends BaseFlowTest
         waitForText("Import Analysis: Confirm");
         clickButton("Finish");
         waitForElement(Locators.labkeyError.containing("Ignoring filter/sort"), defaultWaitForPage);
-        DataRegionTable query = new DataRegionTable("query", this);
+        DataRegionTable query = new DataRegionTable("query", getDriver());
         List<String> names = query.getColumnDataAsText("Name");
         assertEquals("Wrong name for data row", Arrays.asList("88436.fcs-050112-8ColorQualitative-ET"), names);
     }
@@ -627,7 +627,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewSort("Name", "Ascending");
         _customizeViewsHelper.saveCustomView();
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         assertEquals(4, table.getDataRowCount());
         assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }
@@ -646,9 +646,9 @@ public class FlowTest extends BaseFlowTest
     private void verifyDeleted(@LoggedParam String reportName)
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
-        DataRegionTable drt = new DataRegionTable("query", this);
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
         String error = Locators.labkeyError.findElement(drt.getComponentElement()).getText();
-        assertEquals("Ignoring filter/sort on column '" + reportName.toUpperCase() + ".Response' because it does not exist.", error);
+        assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
     }
 
     private void clickButtonWithText(String text)
