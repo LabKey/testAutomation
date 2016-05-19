@@ -275,6 +275,10 @@ public class Ext4Helper
         _test.click(l);
     }
 
+    /**
+     * @deprecated Use {@link Window#clickButton(String, int)}
+     */
+    @Deprecated
     public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
     {
         _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
@@ -282,6 +286,10 @@ public class Ext4Helper
         _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, loc, wait);
     }
 
+    /**
+     * @deprecated Use {@link Window#clickButton(String)}
+     */
+    @Deprecated
     public void clickWindowButtonAndWait(String windowTitle, String buttonText)
     {
         _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
