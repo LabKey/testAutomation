@@ -622,7 +622,8 @@ public class DataRegionTable extends Component
 
     public String getDataAsText(int row, int column)
     {
-        _dataCache.putIfAbsent(row, new TreeMap<>());
+        if (_dataCache.get(row) == null)
+            _dataCache.put(row, new TreeMap<>());
         if (_dataCache.get(row).get(column) == null)
             _dataCache.get(row).put(column, findCell(row, column).getText());
 
