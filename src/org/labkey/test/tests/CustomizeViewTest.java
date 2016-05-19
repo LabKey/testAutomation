@@ -16,6 +16,8 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -52,6 +54,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
                     new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
                     new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
             };
+
     static
     {
         LIST_COLUMNS[0].setRequired(true);
@@ -76,47 +79,29 @@ public class CustomizeViewTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Test
-    public void testSteps()
+    @BeforeClass
+    public static void setupProject()
+    {
+        CustomizeViewTest init = (CustomizeViewTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();
+    }
 
-        saveAfterApplyingView(null, "CreatedBy", "Created By");
-        saveAfterApplyingView("New View", "ModifiedBy", "Modified By");
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkContainingText(LIST_NAME));
+    }
 
-        log("** Show only LastName and Age");
-        setColumns(LAST_NAME_COLUMN, "Age");
-        assertTextPresent("Norbertson");
-        assertTextNotPresent("First Name");
-
-        log("test js injection attack (Issue 14103) ");
-        addFilter(FIRST_NAME, "Starts With", "K");
-        removeFilter(FIRST_NAME);
-
-        log("** Add filter: LastName starts with 'J'");
-        addFilter(LAST_NAME_COLUMN, "Starts With", "J");
-        assertTextNotPresent("Norbertson");
-        assertTextPresent("Janeson", "Johnson");
-
-        log("** Add another filter: LastName != 'Johnson'");
-        addFilter(LAST_NAME_COLUMN, "Does Not Equal", "Johnson");
-        assertTextPresent("Janeson");
-        assertElementNotPresent(Locator.tagContainingText("td", "Johnson"));
-
-        log("** Remove filter");
-        removeFilter(LAST_NAME_COLUMN);
-        assertTextPresent("Johnson", "Norbertson");
-
-        log("** Add sort by Age");
-        assertTextBefore("Billson", "Johnson");
-        addSort("Age", "Ascending");
-        assertTextBefore("Johnson", "Billson");
-
-        log("** Remove sort");
-        removeSort("Age");
-        assertTextBefore("Billson", "Johnson");
-
+    @Test
+    public void testAggregates()
+    {
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
 
@@ -168,6 +153,49 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }, null);
     }
 
+    @Test
+    public void testFilteringAndSorting()
+    {
+        log("** Show only LastName and Age");
+        setColumns(LAST_NAME_COLUMN, "Age");
+        assertTextPresent("Norbertson");
+        assertTextNotPresent("First Name");
+
+        log("test js injection attack (Issue 14103) ");
+        addFilter(FIRST_NAME, "Starts With", "K");
+        removeFilter(FIRST_NAME);
+
+        log("** Add filter: LastName starts with 'J'");
+        addFilter(LAST_NAME_COLUMN, "Starts With", "J");
+        assertTextNotPresent("Norbertson");
+        assertTextPresent("Janeson", "Johnson");
+
+        log("** Add another filter: LastName != 'Johnson'");
+        addFilter(LAST_NAME_COLUMN, "Does Not Equal", "Johnson");
+        assertTextPresent("Janeson");
+        assertElementNotPresent(Locator.tagContainingText("td", "Johnson"));
+
+        log("** Remove filter");
+        removeFilter(LAST_NAME_COLUMN);
+        assertTextPresent("Johnson", "Norbertson");
+
+        log("** Add sort by Age");
+        assertTextBefore("Billson", "Johnson");
+        addSort("Age", "Ascending");
+        assertTextBefore("Johnson", "Billson");
+
+        log("** Remove sort");
+        removeSort("Age");
+        assertTextBefore("Billson", "Johnson");
+    }
+
+    @Test
+    public void testSaveAfterApplyingView()
+    {
+        saveAfterApplyingView(null, "CreatedBy", "Created By");
+        saveAfterApplyingView("New View", "ModifiedBy", "Modified By");
+    }
+
     //Issue 13099: Unable to save custom view after applying view
     private void saveAfterApplyingView(String name, String newColumnLabel, String newColumnDisplayName)
     {
@@ -190,7 +218,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
     //Issue 12577: Save link in view/filter bar doesn't work
     //Issue 12103: Report names appear in random order on Views menu
-    private void saveFilterTest()
+    @Test
+    public void saveFilterTest()
     {
         String fieldKey = LAST_NAME_COLUMN;
         String op = "Starts With";
@@ -209,7 +238,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 
-    private void createList()
+    private  void createList()
     {
         _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
 
