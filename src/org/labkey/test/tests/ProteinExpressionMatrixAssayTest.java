@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 package org.labkey.test.tests;
-/**
- * Created by binalpatel on 4/28/15.
- */
 
-import com.google.common.base.Function;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,19 +35,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 @Category({DailyB.class})
-public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
+public class ProteinExpressionMatrixAssayTest extends BaseWebDriverTest
 {
     private static final String ASSAY_NAME = "Test Protein Expression Matrix";
     private static final String FOLDER_TYPE_MS2 = "MS2";
     private static final String FOLDER_NAME = "ProteinExpressionMatrixFolder";
 
-    private static final File FASTA_FILE = new File("/sampledata/xarfiles/ms2pipe/databases/Bovine_mini1.fasta");
-    private static final File TSV_FILE = new File("/ms2/matrix/MatchesFasta.tsv");
-    private static final File EXCEL_FILE = new File("/ms2/matrix/MatchesFasta.xlsx");
-    private static final File TSV_FILE_BAD_DATA = new File("/ms2/matrix/DoesNotMatchFasta.tsv");
-    private static final File EXCEL_FILE_BAD_DATA = new File("/ms2/matrix/DoesNotMatchFasta.xlsx");
-    private static final File TSV_FILE_DUPLICATE = new File("/ms2/matrix/Duplicates.tsv");
-    private static final File EXCEL_FILE_DUPLICATE = new File("/ms2/matrix/Duplicates.xlsx");
+    private static final File FASTA_FILE = TestFileUtils.getSampleData("xarfiles/ms2pipe/databases/Bovine_mini1.fasta");
 
     private static final List<String> SAMPLE_IDS = Arrays.asList("Condition B", "Condition D", "Condition E", "Condition F", "Condition G", "Condition H");
 
@@ -64,7 +54,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         //delete record of the import
         beginAt("ms2/showProteinAdmin.view?"); //go to Protein Database Admin
 
-        final DataRegionTable annotInsertions = new DataRegionTable("AnnotInsertions", this);
+        final DataRegionTable annotInsertions = new DataRegionTable("AnnotInsertions", getDriver());
 
         annotInsertions.setFilter("FileName", "Contains", FASTA_FILE.getName());
         List<String> fileNames = annotInsertions.getColumnDataAsText("FileName");
@@ -82,7 +72,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void setupProject()
     {
-        ProteinExpresssionMatrixAssayTest init = (ProteinExpresssionMatrixAssayTest) getCurrentTest();
+        ProteinExpressionMatrixAssayTest init = (ProteinExpressionMatrixAssayTest) getCurrentTest();
 
         init.doSetup();
     }
@@ -119,37 +109,37 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     @Test
     public void testTSVImport()
     {
-        importProteinExpressionData("testingTSV", TSV_FILE);
+        importProteinExpressionData("testingTSV", TestFileUtils.getSampleData("ms2/matrix/MatchesFasta.tsv"));
     }
 
     @Test
     public void testExcelImport()
     {
-        importProteinExpressionData("testingExcel", EXCEL_FILE);
+        importProteinExpressionData("testingExcel", TestFileUtils.getSampleData("ms2/matrix/MatchesFasta.xlsx"));
     }
 
     @Test
     public void testBadDataInTSV()
     {
-        importProteinExpressionWithBadData(TSV_FILE_BAD_DATA);
+        importProteinExpressionWithBadData(TestFileUtils.getSampleData("ms2/matrix/DoesNotMatchFasta.tsv"));
     }
 
     @Test
     public void testBadDataInExcel()
     {
-        importProteinExpressionWithBadData(EXCEL_FILE_BAD_DATA);
+        importProteinExpressionWithBadData(TestFileUtils.getSampleData("ms2/matrix/DoesNotMatchFasta.xlsx"));
     }
 
     @Test
     public void testDuplicatesInTSV()
     {
-        importProteinExpressionWithDuplicates(TSV_FILE_DUPLICATE);
+        importProteinExpressionWithDuplicates(TestFileUtils.getSampleData("ms2/matrix/Duplicates.tsv"));
     }
 
     @Test
     public void testDuplicatesInExcel()
     {
-        importProteinExpressionWithDuplicates(EXCEL_FILE_DUPLICATE);
+        importProteinExpressionWithDuplicates(TestFileUtils.getSampleData("ms2/matrix/Duplicates.xlsx"));
     }
 
     @Test
@@ -167,8 +157,8 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithSpan("Import Data"));
         setFormElement(Locator.name("name"), assayId);
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprDataFile.getPath()));
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), exprDataFile);
         clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
         testLinks(assayId);
@@ -181,8 +171,8 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithSpan("Import Data"));
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprBadDataFile.getPath()));
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), exprBadDataFile);
         clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
         assertTextPresent("Unable to find protein '30S_ribosomal_pro_NotInFasta' in the selected FASTA file.");
@@ -196,8 +186,8 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithSpan("Import Data"));
-        selectOptionByText(Locator.name("fastaFormatProteinSequences"), TestFileUtils.getLabKeyRoot() + FASTA_FILE.getPath());
-        setFormElement(Locator.name("__primaryFile__"), TestFileUtils.getSampleData(exprDataWithDuplicates.getPath()));
+        selectOptionByText(Locator.name("fastaFormatProteinSequences"), FASTA_FILE.getPath());
+        setFormElement(Locator.name("__primaryFile__"), exprDataWithDuplicates);
         clickAndWait(Locator.linkWithSpan("Save and Finish"));
 
         assertTextPresent("SQLException"); //TODO: Issue 23232: Provide a useful and user readable error message while importing protein expression data with duplicate IDs.
@@ -236,7 +226,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
 
     private void ensureEmptyConditionValuesHandled(String assayId)
     {
-        final DataRegionTable proteinCol = new DataRegionTable("Data", this);
+        final DataRegionTable proteinCol = new DataRegionTable("Data", getDriver());
         proteinCol.setFilter("SeqId", "Contains", "gi|628074|pir||JP0060");
         proteinCol.setSort("SampleId", SortDirection.ASC);
         List<String> columnDataAsText = proteinCol.getColumnDataAsText("Sample Id");
@@ -259,7 +249,7 @@ public class ProteinExpresssionMatrixAssayTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("ms2");
     }
 
 }

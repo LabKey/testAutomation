@@ -573,7 +573,7 @@ src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/ProjectTermsOfUseTest.java -text
-src/org/labkey/test/tests/ProteinExpresssionMatrixAssayTest.java -text
+src/org/labkey/test/tests/ProteinExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/QueryExportTest.java -text
 src/org/labkey/test/tests/RaphaelRendererTest.java -text
 src/org/labkey/test/tests/RemoteConnectionTest.java -text
