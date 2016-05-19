@@ -2322,15 +2322,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             catch (WebDriverException tryAgain)
             {
-                if (tryAgain instanceof ElementNotVisibleException || tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+                if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+                {
+                    sleep(2500);
+                    Actions builder = new Actions(getDriver());
+                    builder.moveToElement(el, 1, 1).click().build().perform();
+                }
+                else
                 {
                     scrollIntoView(el);
                     shortWait().until(ExpectedConditions.elementToBeClickable(el));
                     el.click();
-                }
-                else
-                {
-                    throw tryAgain;
                 }
             }
         }, pageTimeoutMs);
