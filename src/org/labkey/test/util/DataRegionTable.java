@@ -622,10 +622,12 @@ public class DataRegionTable extends Component
 
     public String getDataAsText(int row, int column)
     {
+        WebElement cell = findCell(row, column); // Will clear cache if needed
+
         if (_dataCache.get(row) == null)
             _dataCache.put(row, new TreeMap<>());
         if (_dataCache.get(row).get(column) == null)
-            _dataCache.get(row).put(column, findCell(row, column).getText());
+            _dataCache.get(row).put(column, cell.getText());
 
         return _dataCache.get(row).get(column);
     }
