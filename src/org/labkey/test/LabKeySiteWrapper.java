@@ -113,7 +113,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertSignedInNotImpersonating();
 
-        if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Startup Modules"))||
+        if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Start Modules"))||
                 isElementPresent(Locator.css(".labkey-nav-page-header").withText("Upgrade Modules")))
         {
             waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
@@ -121,12 +121,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         WebTestHelper.setDefaultSession(getDriver());
-    }
-
-    @Deprecated // TODO: Remove after all 16.1.2 feature branches have been merged
-    public void assertSignOutAndMyAccountPresent()
-    {
-        assertSignedInNotImpersonating();
     }
 
     public void assertSignedInNotImpersonating()

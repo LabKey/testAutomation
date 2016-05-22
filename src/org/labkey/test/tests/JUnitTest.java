@@ -122,7 +122,7 @@ public class JUnitTest extends TestSuite
                 Object json = JSONValue.parse(responseBody);
                 if (json == null)
                 {
-                    if (responseBody.contains("<title>Startup Modules</title>"))
+                    if (responseBody.contains("<title>Start Modules</title>"))
                     {
                         // Server still starting up.  We don't need to use the upgradeHelper to sign in.
                         log("Remote JUnitTest: Server modules starting up (attempt " + attempt + ") ...");
