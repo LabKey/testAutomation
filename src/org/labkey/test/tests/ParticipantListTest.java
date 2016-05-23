@@ -97,6 +97,7 @@ public class ParticipantListTest extends StudyBaseTest
         for (int i = 0; i < dsCount; i++)
         {
             Locator.XPathLocator combo = Locator.xpath("//div[contains(@id, '-viewcategory')]//table").withClass("x4-form-item").index(i);
+            scrollIntoView(combo, true);
             _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
         }
 
