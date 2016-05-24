@@ -36,19 +36,26 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class Locator
 {
-    protected String _loc;
-    protected Integer _index;
-    protected String _contains;
-    protected String _text;
+    private final String _loc;
+    protected final Integer _index;
+    protected final String _contains;
+    protected final String _text;
 
     // XPATH fragments
-    public static final String HIDDEN = "ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden')";
+    public static final String HIDDEN = "ancestor-or-self::*[" +
+            "contains(@style,'display: none') or " +
+            "contains(@style,'visibility: hidden') or " +
+            "contains(@class, 'x-hide-display') or " +
+            "contains(@class, 'x4-hide-offsets') or " +
+            "contains(@class, 'x-hide-offsets')] or " +
+            "(@type = 'hidden')";
     public static final String NOT_HIDDEN = "not(" + HIDDEN + ")";
-    public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
+    public static final String DISABLED = "ancestor-or-self::*[contains(@class, 'disabled')]";
+    public static final String ENABLED = "not(" + DISABLED + ")";
 
     protected Locator(String loc)
     {
-        _loc = loc;
+        this(loc, null, null, null);
     }
 
     private Locator(String loc, Integer index, String contains, String text)
@@ -122,9 +129,15 @@ public abstract class Locator
 
     public abstract String toString();
 
-    public String getLocatorString()
+    public String getLoc()
     {
         return _loc;
+    }
+
+    @Deprecated
+    public String getLocatorString()
+    {
+        return getLoc();
     }
 
     public String getLoggableDescription()
@@ -298,7 +311,7 @@ public abstract class Locator
 
     public static XPathLocator tag(String tag)
     {
-        return xpath("//" + tag);
+        return new XPathCSSLocator(tag);
     }
 
     public static XPathLocator tagWithName(String tag, String name)
@@ -313,32 +326,32 @@ public abstract class Locator
 
     public static XPathLocator tagWithAttribute(String tag, String attrName, String attrVal)
     {
-        return Locator.tag(tag).withAttribute(attrName, attrVal);
+        return tag(tag).withAttribute(attrName, attrVal);
     }
 
     public static XPathLocator tagWithClass(String tag, String cssClass)
     {
-        return Locator.tag(tag).withClass(cssClass);
+        return tag(tag).withClass(cssClass);
     }
 
     public static XPathLocator tagWithClassContaining(String tag, String partialCssClass)
     {
-        return Locator.tag(tag).withAttributeContaining("class", partialCssClass);
+        return tag(tag).withAttributeContaining("class", partialCssClass);
     }
 
     public static XPathLocator tagWithText(String tag, String text)
     {
-        return Locator.tag(tag).withText(text);
+        return tag(tag).withText(text);
     }
 
     public static XPathLocator tagContainingText(String tag, String text)
     {
-        return Locator.tag(tag).withPredicate("contains(text(), " + xq(text) + ")");
+        return tag(tag).containing(text);
     }
 
     public static XPathLocator linkWithImage(String image)
     {
-        return xpath("//a/img").withAttributeContaining("src", image);
+        return tag("a").withChild(tag("img").withAttributeContaining("src", image));
     }
 
     public static XPathLocator gwtButton(String text)
@@ -358,17 +371,22 @@ public abstract class Locator
 
     public static XPathLocator lkButton(String text)
     {
-        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')").withText(text);
+        return lkButton().withText(text);
+    }
+
+    public static XPathLocator lkButton()
+    {
+        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')");
     }
 
     public static XPathLocator lkLabel(String text)
     {
-        return tag("td").notHidden().withPredicate("contains(@class, 'labkey-form-label')").withText(text);
+        return tag("td").withClass("labkey-form-label").withText(text).notHidden();
     }
 
     public static XPathLocator navTreeExpander(String nodeText)
     {
-        return Locator.xpath("//tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node").append("/a");
+        return tag("tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node").append("/a");
     }
 
     public static XPathLocator extButton(String text)
@@ -378,27 +396,22 @@ public abstract class Locator
 
     public static XPathLocator extButtonEnabled(String text)
     {
-        return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
+        return tag("table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
     }
 
     public static XPathLocator extButtonContainingText(String text)
     {
-        return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
+        return tag("button").withClass("x-btn-text").containing(text);
     }
 
     public static XPathLocator lkButtonDisabled(String text)
     {
-        return xpath("//a[normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
+        return tag("a").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
     }
 
     public static XPathLocator lkButtonContainingText(String text)
     {
-        return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
-    }
-
-    public static XPathLocator linkWithImage(String image, Integer index)
-    {
-        return xpath("(//a/img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
+        return lkButton().containing(text);
     }
 
     public static XPathLocator linkWithText(String text)
@@ -408,37 +421,37 @@ public abstract class Locator
 
     public static XPathLocator linkContainingText(String text)
     {
-        return xpath("//a").containing(text);
+        return tag("a").containing(text);
     }
 
     public static XPathLocator menuItem(String text)
     {
-        return xpath("//a/span[" + NOT_HIDDEN + " and text() = " + xq(text) + " and contains(@class, 'menu-item-text')]");
+        return tag("a").child(tag("span").withAttributeContaining("class", "menu-item-text").withText(text)).notHidden();
     }
 
     public static XPathLocator menuBarItem(String text)
     {
-        return xpath("//div[@id='menubar']//a[contains(text()," + xq(text) + ")]");
+        return tag("div").withAttribute("id", "menubar").append(tag("a").containing(text));
     }
 
     public static XPathLocator linkWithTitle(String title)
     {
-        return xpath("//a[@title=" + xq(title) + "]");
+        return tag("a").withAttribute("title", title);
     }
 
     public static XPathLocator linkWithHref(String url)
     {
-        return xpath("//a[contains(@href, " + xq(url) + ")]");
+        return tag("a").withAttributeContaining("href", url);
     }
 
     public static XPathLocator linkWithSpan(String text)
     {
-        return xpath("//a//span[contains(text(), " + xq(text) + ")]");
+        return tag("a").append(tag("span").containing(text));
     }
 
     public static XPathLocator bodyLinkWithText(String text)
     {
-        return xpath("//td[@id='bodypanel']//a[contains(text(), " + xq(text) + ")]");
+        return tag("td").withAttribute("id", "bodypanel").append(linkWithText(text));
     }
 
     public static XPathLocator input(String name)
@@ -448,7 +461,7 @@ public abstract class Locator
 
     public static XPathLocator inputByNameContaining(String partialName)
     {
-        return xpath("//input[@type='text' and contains(@name,'" + partialName + "')]");
+        return tag("input").withAttribute("type", "text").withAttributeContaining("name", partialName);
     }
 
     public static XPathLocator inputById(String id)
@@ -463,27 +476,27 @@ public abstract class Locator
 
     public static XPathLocator checkboxByTitle(String title)
     {
-        return xpath("//input[@type='checkbox' and @title=" + xq(title) + "]");
+        return checkbox().withAttribute("title", title);
     }
 
     public static XPathLocator radioButtonByName(String name)
     {
-        return xpath("//input[@type='radio' and @name=" + xq(name) + "]");
+        return radioButton().withAttribute("name", name);
     }
 
     public static XPathLocator checkboxByName(String name)
     {
-        return xpath("//input[@type='checkbox' and @name=" + xq(name) + "]");
+        return checkbox().withAttribute("name", name);
     }
 
     public static XPathLocator radioButtonById(String id)
     {
-        return xpath("//input[@type='radio' and @id=" + xq(id) + "]");
+        return radioButton().withAttribute("id", id);
     }
 
     public static XPathLocator checkboxById(String id)
     {
-        return xpath("//input[@type='checkbox' and @id=" + xq(id) + "]");
+        return checkbox().withAttribute("id", id);
     }
 
     public static CssLocator checkedRadioInGroup(String groupName)
@@ -493,23 +506,33 @@ public abstract class Locator
 
     public static XPathLocator radioButtonByNameAndValue(String name, String value)
     {
-        return xpath("//input[@type='radio' and @name=" + xq(name) + " and @value=" + xq(value) + "]");
+        return radioButtonByName(name).withAttribute("value", value);
     }
 
     public static XPathLocator checkboxByNameAndValue(String name, String value)
     {
-        return xpath("//input[@type='checkbox' and @name=" + xq(name) + " and @value=" + xq(value) + "]");
+        return checkboxByName(name).withAttribute("value", value);
+    }
+
+    public static XPathLocator checkbox()
+    {
+        return tag("input").withAttribute("type", "checkbox");
+    }
+
+    public static XPathLocator radioButton()
+    {
+        return tag("input").withAttribute("type", "radio");
     }
 
     public static XPathLocator imageMapLinkByTitle(String imageMapName, String title)
     {
-        return xpath("//map[@name=" + xq(imageMapName) + "]/area[@title=" + xq(title) + "]");
+        return tag("map").withAttribute("name", imageMapName).child(Locator.tag("area").withAttribute("title", title));
     }
 
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
-        return xpath("//span[contains(@class, 'labkey-link') and contains(text(), " + xq(linkText) + ")]");
+        return tagWithClass("span", "labkey-link").containing(linkText);
     }
 
     public static XPathLocator gwtTextBoxByLabel(String label)
@@ -554,40 +577,18 @@ public abstract class Locator
         return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
     }
 
-    public static XPathLocator queryTreeNode(String queryName)
-    {
-        // NOTE: this may mis-fire (hit the wrong node... watch for this)
-        return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(queryName);
-    }
-
     public static XPathLocator permissionsTreeNode(String folderName)
     {
         return tagWithClass("a", "x-tree-node-anchor").child("span[text()='" + folderName + "' or text()='" + folderName + "*']");
     }
 
+    @Deprecated
     public static XPathLocator currentProject()
     {
         return id("folderBar");
     }
 
-    /**
-     * TODO: Remove in September 2015. Leaving method so as to not break feature branches
-     */
     @Deprecated
-    public static XPathLocator divByIdContaining(String partialId)
-    {
-        return tag("div").withAttributeContaining("id", partialId);
-    }
-
-    /**
-     * TODO: Remove in September 2015. Leaving method so as to not break feature branches
-     */
-    @Deprecated
-    public static XPathLocator divByClassContaining(String partialClass)
-    {
-        return tag("div").withAttributeContaining("class", partialClass);
-    }
-
     public static XPathLocator divByInnerText(String text)
     {
         return xpath("//div[.='" + text + "']");
@@ -681,6 +682,139 @@ public abstract class Locator
         }
     }
 
+    public static String cq(String value)
+    {
+        return "\"" + value.replaceAll("\"", "\\\"") + "\"";
+    }
+
+    private static class XPathCSSLocator extends XPathLocator
+    {
+        private final XPathLocator _xLoc;
+        private final CssLocator _cssLoc;
+
+        public XPathCSSLocator(String tag)
+        {
+            this(new XPathLocator("//" + tag), new CssLocator(tag));
+        }
+
+        private XPathCSSLocator(XPathLocator xLoc, CssLocator cssLoc)
+        {
+            super("");
+            _xLoc = xLoc;
+            _cssLoc = cssLoc;
+        }
+
+        @Override
+        public XPathLocator containing(String contains)
+        {
+            return _xLoc.containing(contains);
+        }
+
+        @Override
+        public XPathLocator withText(String text)
+        {
+            return _xLoc.withText(text);
+        }
+
+        @Override
+        public XPathLocator index(Integer index)
+        {
+            if (index == 0)
+                return this;
+            return _xLoc.index(index);
+        }
+
+        @Override
+        public XPathLocator withClass(String cssClass)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withClass(cssClass),
+                    _cssLoc.append("." + cssClass));
+        }
+
+        @Override
+        public XPathLocator withoutClass(String cssClass)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withClass(cssClass),
+                    _cssLoc.append(":not(." + cssClass + ")"));
+        }
+
+        @Override
+        public XPathLocator withAttribute(String attribute, String text)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withAttribute(attribute, text),
+                    _cssLoc.append("[" + attribute + "=" + cq(text) + "]"));
+        }
+
+        @Override
+        public XPathLocator withAttributeContaining(String attribute, String text)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.withAttributeContaining(attribute, text),
+                    _cssLoc.append("[" + attribute + "*=" + cq(text) + "]"));
+        }
+
+        @Override
+        public XPathLocator attributeStartsWith(String attribute, String text)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.attributeStartsWith(attribute, text),
+                    _cssLoc.append("[" + attribute + "^=" + cq(text) + "]"));
+        }
+
+        @Override
+        public XPathLocator attributeEndsWith(String attribute, String text)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.attributeEndsWith(attribute, text),
+                    _cssLoc.append("[" + attribute + "$=" + cq(text) + "]"));
+        }
+
+        @Override
+        public XPathLocator child(XPathLocator childLocator)
+        {
+            XPathLocator xLoc = this._xLoc.child(childLocator);
+            if (!(childLocator instanceof XPathCSSLocator))
+                return xLoc;
+
+            return new XPathCSSLocator(
+                    xLoc,
+                    _cssLoc.append(" > " + ((XPathCSSLocator)childLocator)._cssLoc.getLoc()));
+        }
+
+        @Override
+        public XPathLocator append(XPathLocator child)
+        {
+            XPathLocator xLoc = _xLoc.append(child);
+            if (!(child instanceof XPathCSSLocator))
+                return xLoc;
+
+            return new XPathCSSLocator(
+                    xLoc,
+                    _cssLoc.append(((XPathCSSLocator)child)._cssLoc));
+        }
+
+        @Override
+        public String getLoc()
+        {
+            return _xLoc.getLoc();
+        }
+
+        @Override
+        public String toString()
+        {
+            return _cssLoc.toString();
+        }
+
+        @Override
+        public By toBy()
+        {
+            return _cssLoc.toBy();
+        }
+    }
+
     public static class XPathLocator extends Locator
     {
         public XPathLocator(String loc)
@@ -728,27 +862,32 @@ public abstract class Locator
             if (0 == index)
                 return this;
             else
-                return new XPathLocator("("+_loc+")["+(index+1)+"]");
+                return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
         public By toBy()
         {
-            return By.xpath(getPath());
+            return By.xpath(getLoc());
         }
 
         public XPathLocator parent()
         {
-            return new XPathLocator("(" + getPath() + ")/..");
+            return new XPathLocator("(" + getLoc() + ")/..");
         }
 
         public XPathLocator child(String str)
         {
-            return new XPathLocator("(" + getPath() + ")/" + str);
+            return new XPathLocator(getLoc() + "/" + str); //TODO; Parens?
         }
 
         public XPathLocator child(XPathLocator childLocator)
         {
-            return this.child(stripLeadingSlashes(childLocator.getPath()));
+            return this.child(stripLeadingSlashes(childLocator.getLoc()));
+        }
+
+        public XPathLocator withChild(XPathLocator childLocator)
+        {
+            return this.withPredicate(stripLeadingSlashes(childLocator.getLoc()));
         }
 
         private String stripLeadingSlashes(String xpath)
@@ -765,17 +904,17 @@ public abstract class Locator
 
         public XPathLocator last()
         {
-            return new XPathLocator("("+_loc+")[last()]");
+            return new XPathLocator("("+getLoc()+")[last()]");
         }
 
         public XPathLocator append(String clause)
         {
-            return new XPathLocator(getPath() + clause);
+            return new XPathLocator(getLoc() + clause);
         }
 
         public XPathLocator append(XPathLocator child)
         {
-            return new XPathLocator(getPath() + child.getPath());
+            return append(child.getLoc());
         }
 
         public XPathLocator hidden()
@@ -795,12 +934,12 @@ public abstract class Locator
 
         public XPathLocator withDescendant(XPathLocator descendant)
         {
-            return this.withPredicate(descendant.getPath());
+            return this.withPredicate(descendant.getLoc());
         }
 
         public XPathLocator withPredicate(XPathLocator descendant)
         {
-            return this.withPredicate(descendant.getPath());
+            return this.withPredicate(descendant.getLoc());
         }
 
         public XPathLocator withPredicate(String predicate)
@@ -840,9 +979,13 @@ public abstract class Locator
             return this.withPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
         }
 
+        /**
+         * @deprecated Use {@link #getLoc()}
+         */
+        @Deprecated
         public String getPath()
         {
-            return _loc;
+            return getLoc();
         }
 
         public String toString()
@@ -852,7 +995,7 @@ public abstract class Locator
 
         public String toXpath()
         {
-            return _loc;
+            return getLoc();
         }
 
         public String getLoggableDescription()
@@ -863,8 +1006,8 @@ public abstract class Locator
         @Override
         public WebElement findElement(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && _loc.startsWith("//"))
-                return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElement(context);
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && getLoc().startsWith("//"))
+                return new XPathLocator(getLoc().replaceFirst("//", "descendant::")).findElement(context);
             else
                 return super.findElement(context);
         }
@@ -872,8 +1015,8 @@ public abstract class Locator
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && _loc.startsWith("//"))
-                return new XPathLocator(_loc.replaceFirst("//", "descendant::")).findElements(context);
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && getLoc().startsWith("//"))
+                return new XPathLocator(getLoc().replaceFirst("//", "descendant::")).findElements(context);
             else
                 return super.findElements(context);
         }
@@ -924,28 +1067,28 @@ public abstract class Locator
 
         public Locator containing(String contains)
         {
-            return new NameLocator(_loc, _index, contains, _text);
+            return new NameLocator(getLocatorString(), _index, contains, _text);
         }
 
         public Locator withText(String text)
         {
-            return new NameLocator(_loc, _index, _contains, text);
+            return new NameLocator(getLoc(), _index, _contains, text);
         }
 
         public Locator index(Integer index)
         {
-            return new NameLocator(_loc, index, _contains, _text);
+            return new NameLocator(getLoc(), index, _contains, _text);
         }
 
         @Override
         public String toString()
         {
-            return "name=" + _loc + (_index != null ? " index=" + _index : "");
+            return "name=" + getLoc() + (_index != null ? " index=" + _index : "");
         }
 
         public By toBy()
         {
-            return By.name(_loc);
+            return By.name(getLoc());
         }
     }
 
@@ -973,11 +1116,11 @@ public abstract class Locator
             }
 
             StringBuilder unionedLocators = new StringBuilder();
-            unionedLocators.append(locators[0]._loc);
+            unionedLocators.append(locators[0].getLoc());
             for (int i = 1; i < locators.length; i++)
             {
                 unionedLocators.append(", ");
-                unionedLocators.append(locators[i]._loc);
+                unionedLocators.append(locators[i].getLoc());
             }
 
             return new CssLocator(unionedLocators.toString()){
@@ -1000,7 +1143,7 @@ public abstract class Locator
             if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
-            return new CssLocator(_loc, _index, contains, _text);
+            return new CssLocator(getLoc(), _index, contains, _text);
         }
 
         public Locator withText(String text)
@@ -1008,7 +1151,7 @@ public abstract class Locator
             if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
                 throw new IllegalStateException("Text content already been specified for this Locator");
 
-            return new CssLocator(_loc, _index, _contains, text);
+            return new CssLocator(getLoc(), _index, _contains, text);
         }
 
         /**
@@ -1021,30 +1164,30 @@ public abstract class Locator
             if (_index != null && _index != 0)
                 throw new IllegalArgumentException("An index has already been specified for this Locator");
 
-            return new CssLocator(_loc, index, _contains, _text);
+            return new CssLocator(getLoc(), index, _contains, _text);
         }
 
         public CssLocator append(String clause)
         {
-            return new CssLocator(_loc + clause);
+            return new CssLocator(getLoc() + clause);
         }
 
         public CssLocator append(CssLocator clause)
         {
-            return append(" " + clause.getLocatorString());
+            return append(" " + clause.getLoc());
         }
 
         @Override
         public String toString()
         {
-            return "css=" + _loc;
+            return "css=" + getLoc();
         }
 
         public By toBy()
         {
-            if (_loc.contains(":contains("))
-                throw new IllegalArgumentException("CSS3 does not support the ':contains' pseudo-class: '" + _loc + "'");
-            return By.cssSelector(_loc);
+            if (getLoc().contains(":contains("))
+                throw new IllegalArgumentException("CSS3 does not support the ':contains' pseudo-class: '" + getLoc() + "'");
+            return By.cssSelector(getLoc());
         }
     }
 

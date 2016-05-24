@@ -123,7 +123,7 @@ public abstract class WebPart extends Component
     public int getWebPartIndex()
     {
         // Each webpart has an adjacent <br>
-        return Locator.xpath(webPart.getPath().replaceFirst("//", "preceding-sibling::")).findElements(getComponentElement()).size();
+        return Locator.xpath(webPart.getLoc().replaceFirst("//", "preceding-sibling::")).findElements(getComponentElement()).size();
     }
 
     public void goToPermissions()

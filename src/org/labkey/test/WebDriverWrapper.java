@@ -2463,12 +2463,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTableCellText(Locator.XPathLocator table, int row, int column)
     {
-        return getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]"));
+        return getText(getSimpleTableCell(table, row, column));
     }
 
     public Locator getSimpleTableCell(Locator.XPathLocator table, int row, int column)
     {
-        return Locator.xpath(table.toXpath() + "/tbody/tr[" + (row + 1) + "]/td[" + (column + 1) + "]");
+        return table.append("/tbody/tr[" + (row + 1) + "]/*[self::td or self::th][" + (column + 1) + "]");
     }
 
     /**
