@@ -15,14 +15,14 @@
  */
 package org.labkey.test.components.search;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.components.SideWebPart;
+import org.openqa.selenium.WebDriver;
 
 public class SearchSideWebPart extends SideWebPart
 {
-    public SearchSideWebPart(BaseWebDriverTest test)
+    public SearchSideWebPart(WebDriver driver)
     {
-        super(test.getDriver(), "Search");
+        super(driver, "Search");
     }
 
     public SearchForm searchForm()
