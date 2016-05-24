@@ -20,13 +20,22 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.Arrays;
+
+import static org.labkey.test.components.WebPart.Locators.webPart;
 
 public abstract class WebPart extends Component
 {
+    @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
+    private final WebDriverWrapper _wDriver;
 
     protected final WebElement _componentElement;
     protected String _title;
@@ -36,10 +45,20 @@ public abstract class WebPart extends Component
         this(new WebDriverWrapperImpl(driver), componentElement);
     }
 
-    public WebPart(WebDriverWrapper test, WebElement componentElement)
+    public WebPart(WebDriverWrapper driverWrapper, WebElement componentElement)
     {
-        _componentElement = componentElement;
-        _test = test;
+        _componentElement = new RefindingWebElement(Locator.id(componentElement.getAttribute("id")), driverWrapper.getDriver())
+                .withRefindListener(e -> clearCache());
+        _test = driverWrapper;
+        _wDriver = driverWrapper;
+
+        driverWrapper.addPageLoadListener(this::clearCache);
+    }
+
+    protected void clearCache()
+    {
+        _elements = null;
+        _title = null;
     }
 
     @Override
@@ -50,29 +69,62 @@ public abstract class WebPart extends Component
 
     public WebDriver getDriver()
     {
-        return _test.getDriver();
+        return getWrapper().getDriver();
+    }
+
+    public WebDriverWrapper getWrapper()
+    {
+        return _wDriver;
     }
 
     protected abstract void waitForReady();
 
-    private void clearCachedTitle()
+    private void waitForStale()
     {
-        _title = null;
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Arrays.asList(getComponentElement())));
+        clearCache();
     }
 
-    public String getCurrentTitle()
+    public String getTitle()
     {
-        clearCachedTitle();
-        return getTitle();
+        if (_title == null)
+            _title = elements().webPartTitle.getAttribute("title");
+        return _title;
     }
 
-    public abstract String getTitle();
+    public void delete()
+    {
+        clickMenuItem(false, "Remove From Page");
+        waitForStale();
+    }
 
-    public abstract void delete();
+    public void moveUp()
+    {
+        moveWebPart(false);
+    }
 
-    public abstract void moveUp();
+    public void moveDown()
+    {
+        moveWebPart(true);
+    }
 
-    public abstract void moveDown();
+
+    @LogMethod(quiet = true)public void moveWebPart(final boolean down)
+    {
+        final int initialIndex = getWebPartIndex();
+        final int expectedIndex = initialIndex + (down ? 1 : -1);
+
+        clickMenuItem(false, down ? "Move Down" : "Move Up");
+
+        getWrapper().waitFor(() -> getWebPartIndex() == expectedIndex,
+                "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public int getWebPartIndex()
+    {
+        // Each webpart has an adjacent <br>
+        return Locator.xpath(webPart.getPath().replaceFirst("//", "preceding-sibling::")).findElements(getComponentElement()).size();
+    }
 
     public void goToPermissions()
     {
@@ -86,12 +138,16 @@ public abstract class WebPart extends Component
 
     public void clickMenuItem(boolean wait, String... items)
     {
-        _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + _title.toLowerCase() + "']"), items);
+        getWrapper()._ext4Helper.clickExt4MenuButton(wait, elements().moreMenu, false, items);
     }
+
+    protected Elements _elements;
 
     protected Elements elements()
     {
-        return new Elements();
+        if (_elements == null)
+            _elements = new Elements();
+        return _elements;
     }
 
     protected class Elements extends ComponentElements
@@ -102,6 +158,13 @@ public abstract class WebPart extends Component
             return getComponentElement();
         }
 
-        public WebElement webPartTitle = new LazyWebElement(Locator.xpath("tbody/tr/th"), this);
+        public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
+        public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
+    }
+
+    protected static class Locators
+    {
+        public static final Locator.XPathLocator leftTitle = Locator.tag("tbody/tr/th");
+        public static final Locator.XPathLocator webPart = Locator.tag("table").withAttribute("name", "webpart");
     }
 }

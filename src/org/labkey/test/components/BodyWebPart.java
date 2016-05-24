@@ -17,9 +17,10 @@ package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.labkey.test.components.WebPart.Locators.*;
 
 public class BodyWebPart extends WebPart
 {
@@ -31,7 +32,7 @@ public class BodyWebPart extends WebPart
 
     public BodyWebPart(WebDriver test, String title, int index)
     {
-        this(test, PortalHelper.Locators.webPart(title).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, locator().withDescendant(leftTitle.withAttribute("title", title)).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
         _title = title;
     }
 
@@ -42,56 +43,26 @@ public class BodyWebPart extends WebPart
 
     public BodyWebPart(WebDriver test, int index)
     {
-        this(test, PortalHelper.Locators.webPart.index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, locator().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
     @Deprecated
     public BodyWebPart(BaseWebDriverTest test, String title, int index)
     {
-        super(test, PortalHelper.Locators.webPart(title).index(index).waitForElement(test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
-        _title = title;
+        this(test.getDriver(), title, index);
     }
 
     @Deprecated
     public BodyWebPart(BaseWebDriverTest test, String title)
     {
-        this(test, title, 0);
+        this(test.getDriver(), title, 0);
     }
 
     @Override
     protected void waitForReady() {}
 
-    @Override
-    public String getTitle()
+    private static Locator.XPathLocator locator()
     {
-        if (_title == null)
-            _title = elements().webPartTitle.getAttribute("title");
-        return _title;
-    }
-
-    @Override
-    public void delete()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.removeWebPart(getTitle());
-    }
-
-    @Override
-    public void moveUp()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.UP);
-    }
-
-    @Override
-    public void moveDown()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.DOWN);
-    }
-
-    public static Locator locator()
-    {
-        return Locator.css(".labkey-side-panel > table[name=webpart]");
+        return Locator.id("bodypanel").child(webPart);
     }
 }

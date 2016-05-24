@@ -21,6 +21,9 @@ import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.labkey.test.components.WebPart.Locators.leftTitle;
+import static org.labkey.test.components.WebPart.Locators.webPart;
+
 public class SideWebPart extends WebPart
 {
     public SideWebPart(WebDriver driver, WebElement webPartElement)
@@ -30,7 +33,7 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(WebDriver test, String title, int index)
     {
-        this(test, PortalHelper.Locators.webPart(title).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, locator().withDescendant(leftTitle.withText(title)).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
         _title = title;
     }
 
@@ -41,43 +44,14 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(WebDriver test, int index)
     {
-        this(test, PortalHelper.Locators.webPart.index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, locator().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
     @Override
     protected void waitForReady() {}
 
-    @Override
-    public String getTitle()
+    private static Locator.XPathLocator locator()
     {
-        if (_title == null)
-            _title = elements().webPartTitle.getAttribute("title");
-        return _title;
-    }
-
-    @Override
-    public void delete()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.removeWebPart(getTitle());
-    }
-
-    @Override
-    public void moveUp()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.UP);
-    }
-
-    @Override
-    public void moveDown()
-    {
-        PortalHelper portalHelper = new PortalHelper(getDriver());
-        portalHelper.moveWebPart(getTitle(), PortalHelper.Direction.DOWN);
-    }
-
-    public static Locator locator()
-    {
-        return Locator.css(".labkey-side-panel > table[name=webpart]");
+        return Locator.tagWithClass("*", "labkey-side-panel").child(webPart);
     }
 }
