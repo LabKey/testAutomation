@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
+import org.openqa.selenium.WebDriver;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,9 +166,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         _extHelper.waitForExtDialog("Create Vials");
 
         // Check for 'Sally Lab' in ComboBox
-        click(Locator.xpath("//input[@name='defaultLocationField']/../img"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
+        _extHelper.selectComboBoxItem("Default Location:", "Alice Lab");
         assertEquals("Alice Lab", getFormElement(Locator.name("defaultLocationField")));
 
         setFormElement(Locator.name("maxCellPerVialField"), "10e6");
@@ -179,7 +178,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** test changing cell counts updates used/remaining columns and vial count column");
-        table = new DataRegionTable("Data", getDriver());
+        table = new CreateVialsDataRegion(getDriver());
         assertEquals("B02", table.getDataAsText(0, "Participant ID"));
         assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
@@ -223,7 +222,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
 
         log("** checking cell counts and specimen IDs");
-        table = new DataRegionTable("Data", getDriver());
+        table = new CreateVialsDataRegion(getDriver());
         assertEquals("B02", table.getDataAsText(1, "Participant ID"));
         assertEquals("B02_1.0_0,B02_1.0_1,B02_1.0_2", table.getDataAsText(1, "Specimen IDs"));
         // Viable Cells value doesn't get updated, only Original Cells
@@ -311,4 +310,17 @@ public class CreateVialsTest extends AbstractViabilityTest
 
     }
 
+    public class CreateVialsDataRegion extends DataRegionTable
+    {
+        public CreateVialsDataRegion(WebDriver driver)
+        {
+            super("Data", driver);
+        }
+
+        @Override
+        public String getDataAsText(int row, int column)
+        {
+            return findCell(row, column).getText(); // Don't use cached text. Vial counts update dynamically
+        }
+    }
 }
