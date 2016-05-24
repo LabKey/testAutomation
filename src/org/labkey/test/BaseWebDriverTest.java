@@ -62,7 +62,7 @@ import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.search.SearchSideWebPart;
+import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
@@ -2624,7 +2624,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
         clickProject(projectName);
-        final SearchResultsPage searchResults = new SearchSideWebPart(this).searchForm().searchFor(searchFor);
+        final SearchResultsPage searchResults = new SearchBodyWebPart(getDriver()).searchForm().searchFor(searchFor);
 
         try
         {
