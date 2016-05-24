@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static org.labkey.test.components.ext4.Checkbox.Checkbox;
+
 public class Ext4Helper
 {
     private static final String DEFAULT_CSS_PREFIX = "x4-";
@@ -386,7 +388,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label)
     {
-        Checkbox.builder().withLabel(label).build(_test.getDriver()).check();
+        Checkbox().withLabel(label).waitFor(_test.getDriver()).check();
     }
 
     /**
@@ -396,7 +398,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label, @LoggedParam int index)
     {
-        Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).check();
+        Checkbox().withLabel(label).index(index).waitFor(_test.getDriver()).check();
     }
 
     /**
@@ -406,7 +408,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label)
     {
-        Checkbox.builder().withLabel(label).build(_test.getDriver()).uncheck();
+        Checkbox().withLabel(label).waitFor(_test.getDriver()).uncheck();
     }
 
     /**
@@ -416,7 +418,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void uncheckCheckbox(@LoggedParam String label, @LoggedParam int index)
     {
-        Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).uncheck();
+        Checkbox().withLabel(label).index(index).waitFor(_test.getDriver()).uncheck();
     }
 
     /**
@@ -425,7 +427,7 @@ public class Ext4Helper
     @Deprecated
     public boolean isChecked(String label)
     {
-        return Checkbox.builder().withLabel(label).build(_test.getDriver()).isChecked();
+        return Checkbox().withLabel(label).waitFor(_test.getDriver()).isChecked();
     }
 
     /**
@@ -434,7 +436,7 @@ public class Ext4Helper
     @Deprecated
     public boolean isChecked(String label, int index)
     {
-        return Checkbox.builder().withLabel(label).index(index).build(_test.getDriver()).isChecked();
+        return Checkbox().withLabel(label).index(index).waitFor(_test.getDriver()).isChecked();
     }
 
     public boolean isChecked(Locator checkboxLoc)

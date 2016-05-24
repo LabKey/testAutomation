@@ -123,6 +123,7 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.isLocalServer;
+import static org.labkey.test.components.ext4.Window.Window;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -2004,7 +2005,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (changed)
         {
             clickButton("Save Changes", 0);
-            Window window = Window.builder().withTitle("Success").build(getDriver());
+            Window window = Window().withTitle("Success").waitFor(getDriver());
             window.clickButton("OK", 0);
             window.waitForClose();
             _ext4Helper.waitForMaskToDisappear();

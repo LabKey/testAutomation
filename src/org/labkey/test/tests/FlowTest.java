@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.labkey.test.components.ext4.Window.Window;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
@@ -171,12 +172,12 @@ public class FlowTest extends BaseFlowTest
 
         selectOptionByText(Locator.name("positiveKeywordName[3]"), "Comp");
         selectOptionByText(Locator.name("positiveKeywordValue[3]"), "FITC CD4");
-        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
+        clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
         assertTextPresent("Missing data");
         selectOptionByText(Locator.name("negativeKeywordName[0]"), "WELL ID");
         selectOptionByText(Locator.name("negativeKeywordValue[0]"), "H01");
         clickButtonWithText("Universal");
-        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
+        clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
         assertTextPresent("compensation calculation may be edited in a number");
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
@@ -185,7 +186,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Create Analysis Script");
         clickAndWait(Locator.linkWithText("View Source"));
         setFormElement(Locator.name("script"), TestFileUtils.getFileContents(QUV_ANALYSIS_SCRIPT));
-        clickAndWait(Locator.tagWithAttribute("input", "type", "Submit"));
+        clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
     }
 
     @LogMethod
@@ -320,7 +321,7 @@ public class FlowTest extends BaseFlowTest
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
         fcsAnalysisTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        Window measurePicker = Window.builder().withTitle("Y Axis").build(getDriver());
+        Window measurePicker = Window().withTitle("Y Axis").waitFor(getDriver());
         Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
         List<String> availableMeasures = new ArrayList<>();
         waitFor(() -> {

@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -46,5 +47,57 @@ public abstract class Component implements SearchContext
     public List<WebElement> findElements(By by)
     {
         return getComponentElement().findElements(by);
+    }
+
+    protected static abstract class ComponentFinder<S extends SearchContext, C extends Component, F extends ComponentFinder<S, C, F>>
+    {
+        private static final int DEFAULT_TIMEOUT = 10000;
+        private int timeout = 0;
+        private int index = 0;
+
+        public F timeout(int timeout)
+        {
+            this.timeout = timeout;
+            return (F)this;
+        }
+
+        public F index(int index)
+        {
+            this.index = index;
+            return (F)this;
+        }
+
+        protected abstract Locator locator();
+        protected abstract C construct(WebElement el);
+
+        protected final Locator buildLocator()
+        {
+            return locator().index(index);
+        }
+
+        private final WebElement findElement(S context)
+        {
+            return buildLocator().findElement(context);
+        }
+
+        private final WebElement waitForElement(S context)
+        {
+            return buildLocator().waitForElement(context, timeout > 0 ? timeout : DEFAULT_TIMEOUT);
+        }
+
+        public C find(S context)
+        {
+            return construct(findElement(context));
+        }
+
+        public C waitFor(S context)
+        {
+            return construct(waitForElement(context));
+        }
+
+        public C findWhenNeeded(S context)
+        {
+            return construct(new LazyWebElement(buildLocator(), context).withTimeout(timeout));
+        }
     }
 }

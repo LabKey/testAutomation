@@ -46,7 +46,7 @@ public class LazyWebElement extends WebElementWrapper
 
     private WebElement findWrappedElement()
     {
-        if (_waitMs != null)
+        if (_waitMs != null && _waitMs > 0)
         {
             FluentWait<SearchContext> wait = new FluentWait<>(getSearchContext());
             wait.withTimeout(_waitMs, TimeUnit.MILLISECONDS);

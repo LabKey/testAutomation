@@ -14,9 +14,9 @@ public class RadioButton extends FormItem
         this._el = radio;
     }
 
-    public static RadioButtonBuilder builder()
+    public static RadioButtonFinder RadioButton()
     {
-        return new RadioButtonBuilder();
+        return new RadioButtonFinder();
     }
 
     @Override
@@ -61,10 +61,12 @@ public class RadioButton extends FormItem
         Assert.assertTrue("Not a radio button: " + _el.toString(), backgroundImage.contains("radio"));
     }
 
-    public static class RadioButtonBuilder extends FormItemBuilder<RadioButton>
+    public static class RadioButtonFinder extends FormItemFinder<RadioButton, RadioButtonFinder>
     {
+        protected RadioButtonFinder() {}
+
         @Override
-        protected RadioButton doBuild(WebElement el)
+        protected RadioButton construct(WebElement el)
         {
             return new RadioButton(el);
         }

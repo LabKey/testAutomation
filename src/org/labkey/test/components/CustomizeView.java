@@ -46,6 +46,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.labkey.test.components.ext4.Checkbox.Checkbox;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
+import static org.labkey.test.components.ext4.Window.Window;
+
 public class CustomizeView extends Component
 {
     protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".customize-grid-panel");
@@ -205,16 +209,16 @@ public class CustomizeView extends Component
 
     public static class SaveWindow extends Window
     {
-        public final Checkbox shareCheckbox = Checkbox.builder().withLabel("Make this grid view available to all users").buildLazy(this);
-        public final Checkbox inheritCheckbox = Checkbox.builder().withLabel("Make this grid view available in child folders").buildLazy(this);
-        public final RadioButton defaultViewRadio = RadioButton.builder().withLabelContaining("Default").buildLazy(this);
-        public final RadioButton namedViewRadio = RadioButton.builder().withLabelContaining("Named").buildLazy(this);
+        public final Checkbox shareCheckbox = Checkbox().withLabel("Make this grid view available to all users").findWhenNeeded(this);
+        public final Checkbox inheritCheckbox = Checkbox().withLabel("Make this grid view available in child folders").findWhenNeeded(this);
+        public final RadioButton defaultViewRadio = RadioButton().withLabelContaining("Default").findWhenNeeded(this);
+        public final RadioButton namedViewRadio = RadioButton().withLabelContaining("Named").findWhenNeeded(this);
         private final WebElement viewNameInput = new LazyWebElement(Locator.xpath("//input[@name='saveCustomView_name']"), this);
         private final WebElement targetContainerInput = new LazyWebElement(Locator.xpath("//input[@name='saveCustomView_targetContainer']"), this);
 
         protected SaveWindow(WebDriver driver)
         {
-            super(Ext4Helper.Locators.windowWithTitleContaining("Save Custom Grid View").waitForElement(driver, 10000), driver);
+            super("Save Custom Grid View", driver);
         }
 
         public void setName(String name)
@@ -907,7 +911,7 @@ public class CustomizeView extends Component
         public Window clickEdit()
         {
             Locator.css("div.labkey-tool-gear").findElement(getComponentElement()).click();
-            return Window.builder().withTitleContaining("Edit column properties for").build(_driver.getDriver());
+            return Window().withTitleContaining("Edit column properties for").find(_driver.getDriver());
         }
     }
 

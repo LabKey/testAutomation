@@ -3,7 +3,6 @@ package org.labkey.test.components.ext4;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 public class Checkbox extends FormItem
@@ -15,9 +14,9 @@ public class Checkbox extends FormItem
         this._el = checkbox;
     }
 
-    public static CheckboxBuilder builder()
+    public static CheckboxFinder Checkbox()
     {
-        return new CheckboxBuilder();
+        return new CheckboxFinder();
     }
 
     @Override
@@ -76,10 +75,10 @@ public class Checkbox extends FormItem
         Assert.assertTrue("Not a checkbox or radio button: " + _el.toString(), backgroundImage.contains("checkbox") || backgroundImage.contains("radio"));
     }
 
-    public static class CheckboxBuilder extends FormItemBuilder<Checkbox>
+    public static class CheckboxFinder extends FormItemFinder<Checkbox, CheckboxFinder>
     {
         @Override
-        protected Checkbox doBuild(WebElement el)
+        protected Checkbox construct(WebElement el)
         {
             return new Checkbox(el);
         }

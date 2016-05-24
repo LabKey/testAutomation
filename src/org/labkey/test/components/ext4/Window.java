@@ -16,12 +16,11 @@
 package org.labkey.test.components.ext4;
 
 import org.jetbrains.annotations.NotNull;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
-import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.SearchContext;
@@ -29,7 +28,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window extends Component
+public class Window extends WebDriverComponent
 {
     WebElement _window;
     WebDriverWrapper _driver;
@@ -37,7 +36,7 @@ public class Window extends Component
 
     public Window(String windowTitle, WebDriver driver)
     {
-        this(Ext4Helper.Locators.window(windowTitle).waitForElement(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT), driver);
+        this(Window().withTitle(windowTitle).find(driver).getComponentElement(), driver);
     }
 
     public Window(WebElement window, WebDriver driver)
@@ -47,9 +46,9 @@ public class Window extends Component
         _elements = new Elements();
     }
 
-    public static WindowBuilder builder()
+    public static WindowFinder Window()
     {
-        return new WindowBuilder();
+        return new WindowFinder();
     }
 
     protected WebDriverWrapper getWrapper()
@@ -130,51 +129,39 @@ public class Window extends Component
         }
     }
 
-    public static class WindowBuilder
+    public static class WindowFinder extends IndependentComponentFinder<Window, WindowFinder>
     {
         private String titleText = "";
         private boolean partialText = true;
-        private int index = 0;
 
-        public WindowBuilder withTitle(@NotNull String text)
+        public WindowFinder withTitle(@NotNull String text)
         {
             this.titleText = text;
             partialText = false;
             return this;
         }
 
-        public WindowBuilder withTitleContaining(@NotNull String text)
+        public WindowFinder withTitleContaining(@NotNull String text)
         {
             this.titleText = text;
             partialText = true;
             return this;
         }
 
-        public WindowBuilder index(int index)
+        @Override
+        protected Window construct(WebElement el, WebDriver driver)
         {
-            this.index = index;
-            return this;
+            return new Window(el, driver);
         }
 
-        public Window build(@NotNull WebDriver driver)
-        {
-            return new Window(buildLocator().waitForElement(driver, 10000), driver);
-        }
-
-        public Window buildLazy(@NotNull WebDriver driver)
-        {
-            return new Window(new LazyWebElement(buildLocator(), driver).withTimeout(10000), driver);
-        }
-
-        protected Locator buildLocator()
+        @Override
+        protected Locator locator()
         {
             Locator.XPathLocator loc = windowLoc;
             if (!partialText)
                 loc = loc.withPredicate(titleLoc.withText(titleText));
             else if (!titleText.isEmpty())
                 loc = loc.withPredicate(titleLoc.containing(titleText));
-            if (index > 0)
-                loc = loc.index(index);
             return loc;
         }
 
@@ -190,12 +177,12 @@ public class Window extends Component
     {
         public static Locator.XPathLocator window()
         {
-            return WindowBuilder.windowLoc;
+            return WindowFinder.windowLoc;
         }
 
         public static Locator.XPathLocator title()
         {
-            return WindowBuilder.titleLoc;
+            return WindowFinder.titleLoc;
         }
     }
 }

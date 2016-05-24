@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.json.JSONString;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
@@ -26,7 +25,6 @@ import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -35,6 +33,7 @@ import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
 @Category({DailyA.class})
 public class DataViewsTest extends ParticipantListTest
@@ -474,7 +473,7 @@ public class DataViewsTest extends ParticipantListTest
 
         // check if top category sorts Alphabetical
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
-        RadioButton.builder().withLabel("Alphabetical").build(getDriver()).check();
+        RadioButton().withLabel("Alphabetical").find(getDriver()).check();
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
         assertTextPresentInThisOrder("ABCDEFGH></% 1äöüÅ", "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
@@ -495,7 +494,7 @@ public class DataViewsTest extends ParticipantListTest
         // check if option to sort By Display Order exist
         // with By Display Order DB is not being asked for a specific ordering, so ordering may very from run to run.
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
-        RadioButton.builder().withLabel("By Display Order").build(getDriver()).check();
+        RadioButton().withLabel("By Display Order").find(getDriver()).check();
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
     }
