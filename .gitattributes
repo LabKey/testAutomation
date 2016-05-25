@@ -478,7 +478,6 @@ src/org/labkey/test/testpicker/CheckRenderer.java -text
 src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
 src/org/labkey/test/tests/AbstractExportTest.java -text
-src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
@@ -507,7 +506,6 @@ src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
 src/org/labkey/test/tests/DatasetExportTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
-src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
 src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
@@ -523,7 +521,6 @@ src/org/labkey/test/tests/FileContentDownloadTest.java -text
 src/org/labkey/test/tests/FileContentUploadTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
 src/org/labkey/test/tests/FlowAnalysisResolverTest.java -text
-src/org/labkey/test/tests/FlowAssaysTest.java -text
 src/org/labkey/test/tests/FlowCBCTest.java -text
 src/org/labkey/test/tests/FlowImportTest.java -text
 src/org/labkey/test/tests/FlowJoQueryTest.java -text
@@ -534,21 +531,17 @@ src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
 src/org/labkey/test/tests/GenericChartsTest.java -text
 src/org/labkey/test/tests/GenericMeasurePickerTest.java -text
-src/org/labkey/test/tests/GenotypeAssaysTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
 src/org/labkey/test/tests/HiddenEmailTest.java -text
-src/org/labkey/test/tests/HormoneAssayTest.java -text
 src/org/labkey/test/tests/InlineImagesAssayTest.java -text
 src/org/labkey/test/tests/InlineImagesListTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
-src/org/labkey/test/tests/JBrowseTest.java -text
 src/org/labkey/test/tests/JUnitDRTTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/KnitrReportTest.java -text
-src/org/labkey/test/tests/LabModulesTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
@@ -594,7 +587,6 @@ src/org/labkey/test/tests/SecurityLDAPTest.java -text
 src/org/labkey/test/tests/SecurityShortTest.java -text
 src/org/labkey/test/tests/SecurityTest.java -text
 src/org/labkey/test/tests/SecurityTestExtended.java -text
-src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SharedReportTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SiteWideTermsOfUseTest.java -text
@@ -623,7 +615,6 @@ src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
 src/org/labkey/test/tests/UserTest.java -text
 src/org/labkey/test/tests/ViabilityTest.java -text
-src/org/labkey/test/tests/ViralLoadAssayTest.java -text
 src/org/labkey/test/tests/WebDavTest.java -text
 src/org/labkey/test/tests/WebpartPermissionsTest.java -text
 src/org/labkey/test/tests/WikiLongTest.java -text
@@ -633,8 +624,6 @@ src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
 src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
-src/org/labkey/test/unsupported/PepDBModuleTest.java -text
-src/org/labkey/test/unsupported/PeptideModuleTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
 src/org/labkey/test/util/APITestHelper.java -text
@@ -676,7 +665,6 @@ src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
 src/org/labkey/test/util/LabKeyExpectedConditions.java -text
-src/org/labkey/test/util/LabModuleHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
