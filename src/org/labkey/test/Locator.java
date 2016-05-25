@@ -452,9 +452,9 @@ public abstract class Locator
         return tag("a").append(tag("span").containing(text));
     }
 
-    public static XPathLocator bodyLinkWithText(String text)
+    public static XPathLocator bodyLinkContainingText(String text)
     {
-        return tag("td").withAttribute("id", "bodypanel").append(linkWithText(text));
+        return tag("td").withAttribute("id", "bodypanel").append(linkContainingText(text));
     }
 
     public static XPathLocator input(String name)

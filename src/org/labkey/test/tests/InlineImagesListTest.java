@@ -145,7 +145,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         Map<String, String> newValues = new HashMap<>();
 
-        click(Locator.bodyLinkWithText(LIST_NAME));
+        click(Locator.bodyLinkContainingText(LIST_NAME));
 
         log("Add a \"large\" png as an attachment.");
         newValues.put(LIST_KEY_NAME, "1");
