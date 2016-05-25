@@ -476,7 +476,7 @@ public class DataViewsTest extends ParticipantListTest
         RadioButton().withLabel("Alphabetical").find(getDriver()).check();
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
-        assertTextPresentInThisOrder("ABCDEFGH></% 1äöüÅ", "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
+        assertTextPresentInThisOrder(CATEGORIES[0], "Abbreviated Demographics", "Alt ID mapping", "APX-1: Abbreviated Physical Exam",
                 "Chart View: Systolic vs Diastolic", "Crosstab: MouseId Counts",
                 "DEM-1: Demographics", "FPX-1: Final Complete Physical Exam", "PRE-1: Pre-Existing Conditions",
                 "R Report: Dataset Column Names", "RCP-1: Reactogenicity-Resolution", "Scatter: Systolic vs Diastolic",
@@ -484,7 +484,7 @@ public class DataViewsTest extends ParticipantListTest
                 "VAC-1: Post-enrollment Vaccination", "verifyAssay");
 
         // check if bottom category sorts Alphabetical
-        assertTextPresentInThisOrder("QRSTUVWX></% 1äöüÅ", "ENR-1: Enrollment", "EPX-1: Enrollment Abbreviated Physical Exam",
+        assertTextPresentInThisOrder(CATEGORIES[4], "ENR-1: Enrollment", "EPX-1: Enrollment Abbreviated Physical Exam",
                 "EVC-1: Enrollment Vaccination", "PO-1: Pregnancy Outcome", "PR-1: Pregnancy Report and History",
                 "RCF-1: Reactogenicity-Day 2", "RCH-1: Reactogenicity-Day 1");
 
