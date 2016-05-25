@@ -27,6 +27,7 @@ import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -45,6 +46,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
@@ -718,6 +720,30 @@ public class DataRegionTable extends Component
         _driver.setSort(_regionName, columnName, direction);
     }
 
+    public void setAggregate(String columnName, String aggregate){
+        clickAggregate(columnName, aggregate, false);
+    }
+
+    public void clearAggregate(String columnName, String aggregate){
+        clickAggregate(columnName, aggregate, true);
+    }
+
+    private void clickAggregate(String columnName, String aggregate, boolean isExpectedToBeChecked)
+    {
+        String clearOrSet = isExpectedToBeChecked?"Clearing": "Setting";
+        TestLogger.log(clearOrSet + " the " + aggregate + " aggregate in " + _regionName + " for " + columnName);
+        final Locator menuLoc = Locators.columnHeader(_regionName, columnName);
+        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
+
+        WebElement menuItem = _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, true /*openOnly*/, "Aggregates", aggregate);
+
+        WebElement menuIcon = menuItem.findElement(By.xpath("../div[contains(@class, 'x4-menu-item-icon')]"));
+        boolean menuItemIsChecked = menuIcon.getAttribute("class").contains("fa-check-square-o");
+        assertEquals(String.format("Menu item %s for column %s is %s checked",aggregate,columnName,!menuItemIsChecked?"not":"already"), isExpectedToBeChecked, menuItemIsChecked);
+
+        _driver.clickAndWait(menuItem);
+    }
+
     public void clearSort(String columnName)
     {
         _driver.clearSort(_regionName, columnName);
@@ -734,8 +760,8 @@ public class DataRegionTable extends Component
 
         _driver.waitFor(() -> _driver.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
                         _driver.isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
-                "Filter Dialog", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _driver._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Filter Dialog", WAIT_FOR_JAVASCRIPT);
+        _driver._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     public void setFilter(String columnName, String filterType)
@@ -786,7 +812,7 @@ public class DataRegionTable extends Component
         {
             TestLogger.log("Switching to advanced filter UI");
             _driver._extHelper.clickExtTab("Choose Filters");
-            _driver.waitForElement(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text()='Filter Type:']"), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            _driver.waitForElement(Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
 
         //Select combo box item

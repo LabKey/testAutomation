@@ -137,7 +137,6 @@ public class CustomizeViewTest extends BaseWebDriverTest
         _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);
 
         // TODO: pin, unpin, move columns/filters/sort, remove single filter clause
-        saveFilterTest();
 
         log("** Test HTML/JavaScript escaping");
         Crawler.tryInject(this, new Function<Void, Void>()
@@ -153,6 +152,36 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }, null);
     }
 
+
+    @Test
+    public void testAggregatesViaColumnHeader()
+    {
+        log("** Set column title and SUM aggregate");
+        assertTextNotPresent("Oldness Factor");
+
+        final String defaultSumLabel = "Sum:";
+        final String aggregateColumn = "Age";
+        DataRegionTable drt = new DataRegionTable("query", this.getWrappedDriver());
+
+        drt.setAggregate(aggregateColumn, "Sum");
+
+        assertTrue("Aggregate row didn't appear", drt.hasAggregateRow());
+
+        String total = drt.getTotal(-1);// -1 rather than 0 to account for selector (checkbox) column
+        assertEquals("Wrong aggregates", defaultSumLabel, total.replaceAll("\\s+", " "));
+        assertEquals("Wrong aggregates", "279", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+
+        drt.setAggregate(aggregateColumn, "Count");
+
+        assertEquals("Wrong aggregates", defaultSumLabel + " 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+
+        drt.setAggregate(FIRST_NAME, "Count");
+        assertEquals("Wrong aggregates", "Count: 7", drt.getTotal(FIRST_NAME).replaceAll("\\s+", " "));
+
+        drt.clearAggregate(FIRST_NAME, "Count");
+        assertEquals("Wrong aggregates", " ", drt.getTotal(FIRST_NAME).replaceAll("\\s+", " "));
+
+    }
     @Test
     public void testFilteringAndSorting()
     {

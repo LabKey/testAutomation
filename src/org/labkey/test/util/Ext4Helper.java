@@ -680,7 +680,7 @@ public class Ext4Helper
     }
 
     @LogMethod(quiet = true)
-    public void clickExt4MenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    public WebElement clickExt4MenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
         waitForOnReady();
         menu.click();
@@ -699,18 +699,19 @@ public class Ext4Helper
         }
         WebElement item = _test.waitForElement(Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
         if (onlyOpen)
-            return;
+            return item;
 
         if (wait)
             _test.clickAndWait(item);
         else
             _test.clickAndWait(item, 0);
+        return null;
     }
 
     @LogMethod(quiet = true)
-    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    public WebElement clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
-        clickExt4MenuButton(wait, menu.waitForElement(_test.shortWait()), onlyOpen, subMenuLabels);
+        return clickExt4MenuButton(wait, menu.waitForElement(_test.shortWait()), onlyOpen, subMenuLabels);
     }
 
     public List<WebElement> getExt4MenuButtonSubMenu(Locator menu)
