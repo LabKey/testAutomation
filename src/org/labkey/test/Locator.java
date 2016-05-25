@@ -739,7 +739,7 @@ public abstract class Locator
         public XPathLocator withoutClass(String cssClass)
         {
             return new XPathCSSLocator(
-                    _xLoc.withClass(cssClass),
+                    _xLoc.withoutClass(cssClass),
                     _cssLoc.append(":not(." + cssClass + ")"));
         }
 
