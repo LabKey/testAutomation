@@ -3182,20 +3182,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void flash(WebElement element)
     {
-        String borderStyle  = element.getCssValue("border");
-        for (int i = 0; i <  3; i++) {
-            changeStyle("2px solid yellow", element);
-            changeStyle(borderStyle, element);
-        }
-    }
-
-    private void changeStyle(String style, WebElement element) {
-        JavascriptExecutor js = ((JavascriptExecutor) getDriver());
-        js.executeScript("arguments[0].style.border='" + style + "'", element);
-
-        try {
-            Thread.sleep(75);
-        }  catch (InterruptedException e) {
-        }
+        DebugUtils.flash(getDriver(), element, 3);
     }
 }
