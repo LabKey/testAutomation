@@ -344,9 +344,12 @@ public abstract class Locator
         return tag(tag).withText(text);
     }
 
+    /**
+     * Non-standard 'contains' implementation, but changing to tag().containing() breaks too much stuff
+     */
     public static XPathLocator tagContainingText(String tag, String text)
     {
-        return tag(tag).containing(text);
+        return tag(tag).withPredicate("contains(text(), " + xq(text) + ")");
     }
 
     public static XPathLocator linkWithImage(String image)
