@@ -687,7 +687,7 @@ public abstract class Locator
 
     public static String cq(String value)
     {
-        return "\"" + value.replaceAll("\"", "\\\"") + "\"";
+        return "\"" + value.replaceAll("\\\"", "\\\\\"") + "\"";
     }
 
     private static class XPathCSSLocator extends XPathLocator
