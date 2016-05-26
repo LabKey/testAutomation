@@ -25,6 +25,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.By;
@@ -720,6 +721,13 @@ public class DataRegionTable extends Component
         _driver.setSort(_regionName, columnName, direction);
     }
 
+    public WebElement getSubMenuItem(String columnName, String menuItem, String subMenuItem)
+    {
+        final Locator menuLoc = Locators.columnHeader(_regionName, columnName);
+        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
+        return _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, true /*openOnly*/, menuItem, subMenuItem);
+    }
+
     public void setAggregate(String columnName, String aggregate){
         clickAggregate(columnName, aggregate, false);
     }
@@ -732,16 +740,34 @@ public class DataRegionTable extends Component
     {
         String clearOrSet = isExpectedToBeChecked?"Clearing": "Setting";
         TestLogger.log(clearOrSet + " the " + aggregate + " aggregate in " + _regionName + " for " + columnName);
-        final Locator menuLoc = Locators.columnHeader(_regionName, columnName);
-        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-
-        WebElement menuItem = _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, true /*openOnly*/, "Aggregates", aggregate);
+        WebElement menuItem = getSubMenuItem(columnName, "Aggregates", aggregate);
 
         WebElement menuIcon = menuItem.findElement(By.xpath("../div[contains(@class, 'x4-menu-item-icon')]"));
         boolean menuItemIsChecked = menuIcon.getAttribute("class").contains("fa-check-square-o");
         assertEquals(String.format("Menu item %s for column %s is %s checked",aggregate,columnName,!menuItemIsChecked?"not":"already"), isExpectedToBeChecked, menuItemIsChecked);
 
         _driver.clickAndWait(menuItem);
+    }
+
+    public void removeColumn(String columnName)
+    {
+        removeColumn(columnName, false);
+    }
+
+    public void removeColumn(String columnName, boolean errorExpected)
+    {
+        TestLogger.log("Removing column " + columnName + " in " + _regionName);
+        final Locator menuLoc = DataRegionTable.Locators.columnHeader(_regionName, columnName);
+        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
+        _driver._ext4Helper.clickExt4MenuButton(!errorExpected, menuLoc, false, "Remove Column");
+
+        if (errorExpected)
+        {
+            Window removeError = new Window("Error", _driver.getDriver());
+            assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
+            removeError.clickButton("OK", 0);
+            removeError.waitForClose();
+        }
     }
 
     public void clearSort(String columnName)

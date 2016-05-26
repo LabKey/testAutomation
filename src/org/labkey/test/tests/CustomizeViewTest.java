@@ -16,6 +16,8 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 
@@ -42,17 +45,17 @@ public class CustomizeViewTest extends BaseWebDriverTest
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
-    private final static String LIST_KEY_NAME = "Key";
-    protected static final String TEST_ASSAY = "TestAssay1";
-    protected static final String TEST_ASSAY_DESC = "Description for assay 1";
-
+    private final static String LIST_KEY_COLUMN = "Key";
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
-    private final static String FIRST_NAME = "FirstName";
+    private final static String FIRST_NAME_COLUMN = "FirstName";
+    private final static String AGE_COLUMN = "Age";
+    private final static String TEST_DATE_COLUMN = "TestDate";
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
-                    new ListHelper.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
+                    new ListHelper.ListColumn(FIRST_NAME_COLUMN, FIRST_NAME_COLUMN + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
                     new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
-                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
+                    new ListHelper.ListColumn(AGE_COLUMN, "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1),
+                    new ListHelper.ListColumn(TEST_DATE_COLUMN, "Test Date", ListHelper.ListColumnType.DateTime, "The test date")
             };
 
     static
@@ -63,13 +66,13 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
     private final static String[][] TEST_DATA =
             {
-                    { "1", "Bill", "Billson", "34" },
-                    { "2", "Jane", "Janeson", "42" },
-                    { "3", "John", "Johnson", "17" },
-                    { "4", "Mandy", "Mandyson", "32" },
-                    { "5", "Norbert", "Norbertson", "28" },
-                    { "6", "Penny", "Pennyson", "38" },
-                    { "7", "Yak", "Yakson", "88" },
+                    { "1", "Bill", "Billson", "34", "2016-05-01" },
+                    { "2", "Jane", "Janeson", "42", "2016-05-02" },
+                    { "3", "John", "Johnson", "17", "2016-05-03" },
+                    { "4", "Mandy", "Mandyson", "32", "2016-05-04" },
+                    { "5", "Norbert", "Norbertson", "28", "2016-05-05" },
+                    { "6", "Penny", "Pennyson", "38", "" },
+                    { "7", "Yak", "Yakson", "88", "" },
             };
 
 
@@ -102,14 +105,17 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @Test
     public void testAggregates()
     {
+        final String defaultSumLabel = "Sum";
+        final String customSumLabel = "Total Age";
+        final String aggregateColumn = AGE_COLUMN;
+        final String customTitle = "Oldness Factor" + INJECT_CHARS_2;
+
+        setColumns(LAST_NAME_COLUMN, aggregateColumn);
+
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
 
-        final String defaultSumLabel = "Sum";
-        final String customSumLabel = "Total Age";
-        final String aggregateColumn = "Age";
-        final String customTitle = "Oldness Factor" + INJECT_CHARS_2;
-        DataRegionTable drt = new DataRegionTable("query", this);
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
 
         List<Map<String, String>> aggregates = new ArrayList<>();
         aggregates.add(Maps.of("type", "SUM"));
@@ -152,47 +158,106 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }, null);
     }
 
-
     @Test
     public void testAggregatesViaColumnHeader()
     {
-        log("** Set column title and SUM aggregate");
-        assertTextNotPresent("Oldness Factor");
+        String aggregateColumn1 = AGE_COLUMN;
+        String aggregateColumn2 = FIRST_NAME_COLUMN;
+        String defaultSumLabel = "Sum:";
+        String defaultCountLabel = "Count:";
 
-        final String defaultSumLabel = "Sum:";
-        final String aggregateColumn = "Age";
-        DataRegionTable drt = new DataRegionTable("query", this.getWrappedDriver());
+        setColumns(aggregateColumn1, aggregateColumn2);
 
-        drt.setAggregate(aggregateColumn, "Sum");
-
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        drt.setAggregate(aggregateColumn1, "Sum");
         assertTrue("Aggregate row didn't appear", drt.hasAggregateRow());
 
         String total = drt.getTotal(-1);// -1 rather than 0 to account for selector (checkbox) column
         assertEquals("Wrong aggregates", defaultSumLabel, total.replaceAll("\\s+", " "));
-        assertEquals("Wrong aggregates", "279", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        assertEquals("Wrong aggregates", "279", drt.getTotal(aggregateColumn1).replaceAll("\\s+", " "));
 
-        drt.setAggregate(aggregateColumn, "Count");
+        drt.setAggregate(aggregateColumn1, "Count");
+        assertEquals("Wrong aggregates", defaultSumLabel + " 279 " + defaultCountLabel + " 7", drt.getTotal(aggregateColumn1).replaceAll("\\s+", " "));
 
-        assertEquals("Wrong aggregates", defaultSumLabel + " 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        drt.setAggregate(aggregateColumn2, "Count");
+        assertEquals("Wrong aggregates", defaultCountLabel + " 7", drt.getTotal(aggregateColumn2).replaceAll("\\s+", " "));
 
-        drt.setAggregate(FIRST_NAME, "Count");
-        assertEquals("Wrong aggregates", "Count: 7", drt.getTotal(FIRST_NAME).replaceAll("\\s+", " "));
-
-        drt.clearAggregate(FIRST_NAME, "Count");
-        assertEquals("Wrong aggregates", " ", drt.getTotal(FIRST_NAME).replaceAll("\\s+", " "));
-
+        drt.clearAggregate(aggregateColumn2, "Count");
+        assertEquals("Wrong aggregates", " ", drt.getTotal(aggregateColumn2).replaceAll("\\s+", " "));
     }
+
+    @Test
+    public void verifyAggregatesByColumnType()
+    {
+        // PK should not have average and sum
+        setColumns(LIST_KEY_COLUMN);
+        verifyAggregatesSubmenu(LIST_KEY_COLUMN, new String[]{"Count", "Minimum", "Maximum"}, new String[]{"Sum", "Average"});
+
+        // String column should only have count
+        setColumns(FIRST_NAME_COLUMN);
+        verifyAggregatesSubmenu(FIRST_NAME_COLUMN, new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+
+        // Numeric column should have all
+        setColumns(AGE_COLUMN);
+        verifyAggregatesSubmenu(AGE_COLUMN, new String[]{"Count", "Sum", "Average", "Minimum", "Maximum"}, null);
+
+        // Date column should not have average and sum
+        setColumns(TEST_DATE_COLUMN);
+        verifyAggregatesSubmenu(TEST_DATE_COLUMN, new String[]{"Count", "Minimum", "Maximum"}, new String[]{"Sum", "Average"});
+
+        // Folder column should only have count
+        setColumns("container");
+        verifyAggregatesSubmenu("container", new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+
+        // Lookup column should only have count
+        setColumns("CreatedBy");
+        verifyAggregatesSubmenu("CreatedBy", new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+    }
+
+    private void verifyAggregatesSubmenu(String columnName, @NotNull String[] expectedAggregates, @Nullable String[] unexpectedAggregates)
+    {
+        Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
+        _ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Aggregates", "Count"); // they all have count so save to use here for submenu
+
+        for (String expectedAggregate : expectedAggregates)
+            assertElementPresent(Ext4Helper.Locators.menuItem(expectedAggregate));
+
+        if (unexpectedAggregates != null && unexpectedAggregates.length > 0)
+        {
+            for (String unexpectedAggregate : unexpectedAggregates)
+                assertElementNotPresent(Ext4Helper.Locators.menuItem(unexpectedAggregate));
+        }
+    }
+
+    @Test
+    public void testRemoveViaColumnHeader()
+    {
+        setColumns(FIRST_NAME_COLUMN, LAST_NAME_COLUMN);
+
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+
+        // remove the first column and verify that it is gone
+        assertTrue(drt.getColumnNames().contains(FIRST_NAME_COLUMN));
+        drt.removeColumn(FIRST_NAME_COLUMN);
+        assertTrue(!drt.getColumnNames().contains(FIRST_NAME_COLUMN));
+
+        // shouldn't be allowed to remove last column
+        assertTrue(drt.getColumnNames().contains(LAST_NAME_COLUMN));
+        drt.removeColumn(LAST_NAME_COLUMN, true);
+        assertTrue(drt.getColumnNames().contains(LAST_NAME_COLUMN));
+    }
+
     @Test
     public void testFilteringAndSorting()
     {
         log("** Show only LastName and Age");
-        setColumns(LAST_NAME_COLUMN, "Age");
+        setColumns(LAST_NAME_COLUMN, AGE_COLUMN);
         assertTextPresent("Norbertson");
         assertTextNotPresent("First Name");
 
         log("test js injection attack (Issue 14103) ");
-        addFilter(FIRST_NAME, "Starts With", "K");
-        removeFilter(FIRST_NAME);
+        addFilter(FIRST_NAME_COLUMN, "Starts With", "K");
+        removeFilter(FIRST_NAME_COLUMN);
 
         log("** Add filter: LastName starts with 'J'");
         addFilter(LAST_NAME_COLUMN, "Starts With", "J");
@@ -210,11 +275,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         log("** Add sort by Age");
         assertTextBefore("Billson", "Johnson");
-        addSort("Age", "Ascending");
+        addSort(AGE_COLUMN, "Ascending");
         assertTextBefore("Johnson", "Billson");
 
         log("** Remove sort");
-        removeSort("Age");
+        removeSort(AGE_COLUMN);
         assertTextBefore("Billson", "Johnson");
     }
 
@@ -242,7 +307,6 @@ public class CustomizeViewTest extends BaseWebDriverTest
         _customizeViewsHelper.saveUnsavedViewGridClosed(name);
         assertTextNotPresent("unsaved");
         assertTextPresent(newColumnDisplayName);
-//        assertTextPresent(PasswordUtil.getUsername(),8);
     }
 
     //Issue 12577: Save link in view/filter bar doesn't work
@@ -255,6 +319,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         String value = "J";
         String[] viewNames = {TRICKY_CHARACTERS + "view", "AAC", "aaa", "aad", "zzz"};
 
+        setColumns(fieldKey);
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
@@ -269,10 +334,10 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
     private  void createList()
     {
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_COLUMN, LIST_COLUMNS);
 
         StringBuilder data = new StringBuilder();
-        data.append(LIST_KEY_NAME).append("\t");
+        data.append(LIST_KEY_COLUMN).append("\t");
         for (int i = 0; i < LIST_COLUMNS.length; i++)
         {
             data.append(LIST_COLUMNS[i].getName());
@@ -302,6 +367,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     void setColumns(String... fieldKeys)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.clearCustomizeViewColumns();
         for (String fieldKey : fieldKeys)
             _customizeViewsHelper.addCustomizeViewColumn(new String[] { fieldKey });
