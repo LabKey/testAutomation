@@ -185,9 +185,9 @@
             <include name="tika-app-1.5.jar"/>
             <include name="log4j-1.2.16.jar"/>
             <include name="xbean.jar" />
-            <include name="jackson-core-2.5.4.jar" />
-            <include name="jackson-annotations-2.5.4.jar" />
-            <include name="jackson-databind-2.5.4.jar" />
+            <include name="jackson-core-2.6.4.jar" />
+            <include name="jackson-annotations-2.6.0.jar" />
+            <include name="jackson-databind-2.6.4.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
             <include name="labkey-client-api-${product.version}.jar"/>
