@@ -63,6 +63,6 @@ public class BodyWebPart extends WebPart
 
     private static Locator.XPathLocator locator()
     {
-        return Locator.id("bodypanel").child(webPart);
+        return Locator.id("bodypanel").append(webPart);
     }
 }
