@@ -90,7 +90,7 @@ public class Ext4GridRef extends Ext4CmpRef
         try
         {
             rowIdx--;
-            String val = (String)getFnEval("return this.store.getAt('" + rowIdx + "').get('" + fieldName + "') ? this.store.getAt('" + rowIdx + "').get('" + fieldName + "').format('c') : null");
+            String val = (String)getFnEval("return this.store.getAt('" + rowIdx + "').get('" + fieldName + "') ? Ext4.Date.format(this.store.getAt('" + rowIdx + "').get('" + fieldName + "', 'c') : null");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
             return val == null ? null : dateFormat.parse(val);
         }
