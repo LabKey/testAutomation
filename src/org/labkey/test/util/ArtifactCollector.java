@@ -20,9 +20,7 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
@@ -33,10 +31,14 @@ import org.openqa.selenium.TakesScreenshot;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -221,7 +223,7 @@ public class ArtifactCollector
 
         File htmlFile = new File(dir, baseName + ".html");
 
-        try (Writer writer = PrintWriters.getPrintWriter(htmlFile))
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(htmlFile), StandardCharsets.UTF_16)))
         {
             writer.write(pageHtml);
             return htmlFile;
