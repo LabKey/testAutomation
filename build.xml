@@ -182,6 +182,7 @@
             <include name="collections-generic-4.01.jar" />
             <include name="json_simple-1.1.jar" />
             <include name="junit-4.12.jar"/>
+            <include name="slf4j-api-1.7.5.jar"/>
             <include name="tika-app-1.5.jar"/>
             <include name="log4j-1.2.16.jar"/>
             <include name="xbean.jar" />
