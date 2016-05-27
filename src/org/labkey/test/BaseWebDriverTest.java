@@ -69,7 +69,6 @@ import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -1693,12 +1692,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName,  @Nullable List<Filter> filters)
     {
-        return executeSelectRowCommand(schemaName, queryName, filters, false);
-    }
-
-    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, @Nullable List<Filter> filters, boolean reuseSession)
-    {
-        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), filters, reuseSession);
+        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), filters);
     }
 
     @LogMethod
@@ -1767,32 +1761,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             writer.write("</build>");
         }
         catch (IOException ignore){}
-    }
-
-    public File saveTsv(File dir, String baseName)
-    {
-        return saveFile(dir, baseName + ".tsv");
-    }
-
-    public File saveFile(File dir, String fileName)
-    {
-        return saveFile(dir, fileName, getBodyText());
-    }
-
-    public File saveFile(File dir, String fileName, String contents)
-    {
-        File tsvFile = new File(dir, fileName);
-
-        try(Writer writer = PrintWriters.getPrintWriter(tsvFile))
-        {
-            writer.write(contents);
-            return tsvFile;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace(System.err);
-            return null;
-        }
     }
 
     public String getBaseURL()

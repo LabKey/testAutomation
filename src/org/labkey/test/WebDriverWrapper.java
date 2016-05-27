@@ -916,30 +916,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return connection;
     }
 
-    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters, boolean reuseSession)
-    {
-        Connection cn = createDefaultConnection(reuseSession);
-        SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
-        selectCmd.setMaxRows(-1);
-        selectCmd.setContainerFilter(containerFilter);
-        selectCmd.setColumns(Arrays.asList("*"));
-        if (filters != null)
-            selectCmd.setFilters(filters);
-
-        SelectRowsResponse selectResp;
-
-        try
-        {
-            selectResp = selectCmd.execute(cn, path);
-        }
-        catch (CommandException | IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-
-        return selectResp;
-    }
-
     public long beginAt(String relativeURL)
     {
         return beginAt(relativeURL, defaultWaitForPage);

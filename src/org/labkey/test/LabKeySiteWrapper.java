@@ -17,12 +17,17 @@ package org.labkey.test;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -33,7 +38,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -450,11 +457,35 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * @deprecated Use {@link #clickButton(String)}
+     * @deprecated Use {@link WebElement#submit()}
      */
     @Deprecated public void submit(Locator formLocator)
     {
         WebElement form = formLocator.findElement(getDriver());
         doAndWaitForPageToLoad(form::submit);
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
+    {
+        Connection cn = createDefaultConnection(false);
+        SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(containerFilter);
+        selectCmd.setColumns(Arrays.asList("*"));
+        if (filters != null)
+            selectCmd.setFilters(filters);
+
+        SelectRowsResponse selectResp;
+
+        try
+        {
+            selectResp = selectCmd.execute(cn, path);
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return selectResp;
     }
 }

@@ -20,11 +20,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.util.FileUtil;
+import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -189,6 +191,22 @@ public abstract class TestFileUtils
         catch (IOException e)
         {
             TestLogger.log("WARNING: Exception deleting directory -- " + e.getMessage());
+        }
+    }
+
+    public static File saveFile(File dir, String fileName, String contents)
+    {
+        File tsvFile = new File(dir, fileName);
+
+        try (Writer writer = PrintWriters.getPrintWriter(tsvFile))
+        {
+            writer.write(contents);
+            return tsvFile;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace(System.err);
+            return null;
         }
     }
 }
