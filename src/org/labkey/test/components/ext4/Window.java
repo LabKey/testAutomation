@@ -36,7 +36,12 @@ public class Window extends WebDriverComponent
 
     public Window(String windowTitle, WebDriver driver)
     {
-        this(Window().withTitle(windowTitle).waitFor(driver).getComponentElement(), driver);
+        this(Window().withTitle(windowTitle), driver);
+    }
+
+    protected Window(WindowFinder finder, WebDriver driver)
+    {
+        this(finder.waitFor(driver).getComponentElement(), driver);
     }
 
     public Window(WebElement window, WebDriver driver)

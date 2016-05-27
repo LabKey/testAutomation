@@ -103,7 +103,13 @@ public class CustomizeView extends Component
         }
     }
 
+    @Deprecated
     public void closeCustomizeViewPanel()
+    {
+        closePanel();
+    }
+
+    public void closePanel()
     {
         if (isPanelExpanded())
         {
@@ -218,7 +224,7 @@ public class CustomizeView extends Component
 
         protected SaveWindow(WebDriver driver)
         {
-            super("Save Custom Grid View", driver);
+            super(Window().withTitleContaining("Save Custom Grid View"), driver);
         }
 
         public void setName(String name)
@@ -299,6 +305,18 @@ public class CustomizeView extends Component
         _driver.clickAndWait(elements().revertButton);
     }
 
+    @Deprecated
+    public void addCustomizeViewColumn(String column_name)
+    {
+        addColumn(column_name);
+    }
+
+    @Deprecated
+    public void addCustomizeViewColumn(String[] fieldKeyParts)
+    {
+        addColumn(fieldKeyParts);
+    }
+
     /**
      * add a column to an already open customize view grid
      *
@@ -307,14 +325,14 @@ public class CustomizeView extends Component
      *          but the name included in the span containing the checkbox.  It will often be the same name,
      *          but with less whitespace
      */
-    public void addCustomizeViewColumn(String column_name)
+    public void addColumn(String column_name)
     {
-        addCustomizeViewColumn(column_name, column_name);
+        addColumn(column_name, column_name);
     }
 
-    public void addCustomizeViewColumn(String[] fieldKeyParts)
+    public void addColumn(String[] fieldKeyParts)
     {
-        addCustomizeViewColumn(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"));
+        addColumn(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"));
     }
 
     public void changeTab(ViewItemType tab)
@@ -366,7 +384,7 @@ public class CustomizeView extends Component
         return _driver.scrollIntoView(tr, false);
     }
 
-    private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
+    private void addItem(String[] fieldKeyParts, String column_name, ViewItemType type)
     {
         // fieldKey is the value contained in @fieldkey
         _driver.log("Adding " + column_name + " " + type.toString());
@@ -379,35 +397,71 @@ public class CustomizeView extends Component
         new Checkbox(checkbox).check();
     }
 
+    @Deprecated
     public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
     {
-        addCustomizeViewItem(fieldKeyParts, label, ViewItemType.Columns);
+        addColumn(fieldKeyParts, label);
     }
 
+    @Deprecated
     public void addCustomizeViewColumn(String fieldKey, String column_name)
+    {
+        addColumn(fieldKey, column_name);
+    }
+
+    @Deprecated
+    public void addCustomizeViewFilter(String fieldKey, String filter_type)
+    {
+        addFilter(fieldKey, filter_type);
+    }
+
+    @Deprecated
+    public void addCustomizeViewFilter(String fieldKey, String filter_type, String filter)
+    {
+        addFilter(fieldKey, filter_type, filter);
+    }
+
+    @Deprecated
+    public void addCustomizeViewFilter(String fieldKey, String column_name, String filter_type, String filter)
+    {
+        addFilter(fieldKey, column_name, filter_type, filter);
+    }
+
+    @Deprecated
+    public void addCustomizeViewFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
+    {
+        addFilter(fieldKeyParts, column_name, filter_type, filter);
+    }
+
+    public void addColumn(String[] fieldKeyParts, String label)
+    {
+        addItem(fieldKeyParts, label, ViewItemType.Columns);
+    }
+
+    public void addColumn(String fieldKey, String column_name)
     {
         // fieldKey is the value contained in @fieldkey
         _driver.log("Adding " + column_name + " column");
 
-        addCustomizeViewItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
+        addItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
     }
 
-    public void addCustomizeViewFilter(String fieldKey, String filter_type)
+    public void addFilter(String fieldKey, String filter_type)
     {
-        addCustomizeViewFilter(fieldKey, fieldKey, filter_type, "");
+        addFilter(fieldKey, fieldKey, filter_type, "");
     }
 
-    public void addCustomizeViewFilter(String fieldKey, String filter_type, String filter)
+    public void addFilter(String fieldKey, String filter_type, String filter)
     {
-        addCustomizeViewFilter(fieldKey, fieldKey, filter_type, filter);
+        addFilter(fieldKey, fieldKey, filter_type, filter);
     }
 
-    public void addCustomizeViewFilter(String fieldKey, String column_name, String filter_type, String filter)
+    public void addFilter(String fieldKey, String column_name, String filter_type, String filter)
     {
-        addCustomizeViewFilter(fieldKey.split("/"), column_name, filter_type, filter);
+        addFilter(fieldKey.split("/"), column_name, filter_type, filter);
     }
 
-    public void addCustomizeViewFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
+    public void addFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
     {
         if (filter.equals(""))
             _driver.log("Adding " + column_name + " filter of " + filter_type);
@@ -420,7 +474,7 @@ public class CustomizeView extends Component
         if (!_driver.isElementPresent(itemXPath))
         {
             // Add filter if it doesn't exist
-            addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Filter);
+            addItem(fieldKeyParts, column_name, ViewItemType.Filter);
             _driver.assertElementPresent(itemXPath);
         }
         else
@@ -474,7 +528,7 @@ public class CustomizeView extends Component
         return Locator.tagWithClass("table", "labkey-customview-" + type.toString().toLowerCase() + "-item");
     }
 
-    private void removeCustomizeViewItem(String fieldKey, ViewItemType type)
+    private void removeItem(String fieldKey, ViewItemType type)
     {
         changeTab(type);
 
@@ -536,80 +590,128 @@ public class CustomizeView extends Component
         BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
-    private void removeCustomizeViewItem(int item_index, ViewItemType type)
+    private void removeItem(int item_index, ViewItemType type)
     {
         changeTab(type);
 
         String fieldKey = itemXPath(type, item_index).findElement(this).getAttribute("fieldkey");
 
-        removeCustomizeViewItem(fieldKey, type); // Need to remove by key to avoid unintentional removals
+        removeItem(fieldKey, type); // Need to remove by key to avoid unintentional removals
     }
 
+    @Deprecated
     public void addCustomizeViewSort(String column_name, String order)
     {
-        addCustomizeViewSort(column_name, column_name, order);
+        addSort(column_name, order);
     }
 
+    @Deprecated
     public void addCustomizeViewSort(String fieldKey, String column_name, String order)
     {
-        addCustomizeViewSort(fieldKey.split("/"), column_name, order);
+        addSort(fieldKey, column_name, order);
     }
 
+    @Deprecated
     public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
+    {
+        addSort(fieldKeyParts, column_name, order);
+    }
+
+    public void addSort(String column_name, String order)
+    {
+        addSort(column_name, column_name, order);
+    }
+
+    public void addSort(String fieldKey, String column_name, String order)
+    {
+        addSort(fieldKey.split("/"), column_name, order);
+    }
+
+    public void addSort(String[] fieldKeyParts, String column_name, String order)
     {
         _driver.log("Adding " + column_name + " sort");
         Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
         _driver.assertElementNotPresent(itemXPath);
-        addCustomizeViewItem(fieldKeyParts, column_name, ViewItemType.Sort);
+        addItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
         _driver._ext4Helper.selectComboBoxItem(itemXPath, order);
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
     }
 
+    @Deprecated
     public void removeCustomizeViewColumn(String fieldKey)
     {
-        _driver.log("Removing " + fieldKey + " column");
-        removeCustomizeViewItem(fieldKey, ViewItemType.Columns);
+        removeColumn(fieldKey);
     }
 
+    @Deprecated
     public void removeCustomizeViewFilter(String fieldKey)
     {
-        _driver.log("Removing " + fieldKey + " filter");
-        removeCustomizeViewItem(fieldKey, ViewItemType.Filter);
+        removeFilter(fieldKey);
     }
 
-    public void removeCustomizeViewFilter(int item_index)
-    {
-        _driver.log("Removing filter at position " + item_index);
-        removeCustomizeViewItem(item_index, ViewItemType.Filter);
-    }
-
+    @Deprecated
     public void removeCustomizeViewSort(String fieldKey)
     {
-        _driver.log("Removing " + fieldKey + " sort");
-        removeCustomizeViewItem(fieldKey, ViewItemType.Sort);
+        removeSort(fieldKey);
     }
 
+    public void removeColumn(String fieldKey)
+    {
+        _driver.log("Removing " + fieldKey + " column");
+        removeItem(fieldKey, ViewItemType.Columns);
+    }
+
+    public void removeFilter(String fieldKey)
+    {
+        _driver.log("Removing " + fieldKey + " filter");
+        removeItem(fieldKey, ViewItemType.Filter);
+    }
+
+    public void removeSort(String fieldKey)
+    {
+        _driver.log("Removing " + fieldKey + " sort");
+        removeItem(fieldKey, ViewItemType.Sort);
+    }
+
+    @Deprecated
     public void clearCustomizeViewColumns()
     {
-        _driver.log("Clear all Customize View columns.");
-        clearAllCustomizeViewItems(ViewItemType.Columns);
+        clearColumns();
     }
 
+    @Deprecated
     public void clearCustomizeViewFilters()
     {
-        _driver.log("Clear all Customize View filters.");
-        clearAllCustomizeViewItems(ViewItemType.Filter);
+        clearFilters();
     }
 
+    @Deprecated
     public void clearCustomizeViewSorts()
     {
-        _driver.log("Clear all Customize View sorts.");
-        clearAllCustomizeViewItems(ViewItemType.Sort);
+        clearSorts();
     }
 
-    private void clearAllCustomizeViewItems(ViewItemType type)
+    public void clearColumns()
+    {
+        _driver.log("Clear all Customize View columns.");
+        clearItems(ViewItemType.Columns);
+    }
+
+    public void clearFilters()
+    {
+        _driver.log("Clear all Customize View filters.");
+        clearItems(ViewItemType.Filter);
+    }
+
+    public void clearSorts()
+    {
+        _driver.log("Clear all Customize View sorts.");
+        clearItems(ViewItemType.Sort);
+    }
+
+    private void clearItems(ViewItemType type)
     {
         changeTab(type);
 
@@ -679,36 +781,36 @@ public class CustomizeView extends Component
         sortRow.unclip();
     }
 
-    public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
+    public void moveColumn(String fieldKey, boolean moveUp)
     {
         _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Columns);
+        moveItem(fieldKey, moveUp, ViewItemType.Columns);
     }
 
-    public void moveCustomizeViewFilter(String fieldKey, boolean moveUp)
+    public void moveFilter(String fieldKey, boolean moveUp)
     {
         _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Filter);
+        moveItem(fieldKey, moveUp, ViewItemType.Filter);
     }
 
-    public void moveCustomizeViewSort(String fieldKey, boolean moveUp)
+    public void moveSort(String fieldKey, boolean moveUp)
     {
         _driver.log("Moving sort, " + fieldKey + " " + (moveUp ? "up." : "down."));
-        moveCustomizeViewItem(fieldKey, moveUp, ViewItemType.Sort);
+        moveItem(fieldKey, moveUp, ViewItemType.Sort);
     }
 
-    private void moveCustomizeViewItem(String fieldKey, boolean moveUp, ViewItemType type)
+    private void moveItem(String fieldKey, boolean moveUp, ViewItemType type)
     {
         changeTab(type);
         final int itemIndex = _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this));
 
-        moveCustomizeViewItem(itemIndex, moveUp, type);
+        moveItem(itemIndex, moveUp, type);
 
         _driver.waitFor(() -> itemIndex != _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this)),
                 "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
+    private void moveItem(int field_index, boolean moveUp, ViewItemType type)
     {
         changeTab(type);
         if (!moveUp) field_index++; // dragAndDrop only moves items up
@@ -717,6 +819,24 @@ public class CustomizeView extends Component
 
         Actions builder = new Actions(_driver.getDriver());
         builder.dragAndDrop(fromItem, toItem).build().perform();
+    }
+
+    @Deprecated
+    public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
+    {
+        moveColumn(fieldKey, moveUp);
+    }
+
+    @Deprecated
+    public void moveCustomizeViewFilter(String fieldKey, boolean moveUp)
+    {
+        moveFilter(fieldKey, moveUp);
+    }
+
+    @Deprecated
+    public void moveCustomizeViewSort(String fieldKey, boolean moveUp)
+    {
+        moveSort(fieldKey, moveUp);
     }
 
     public void removeColumnProperties(String fieldKey)
