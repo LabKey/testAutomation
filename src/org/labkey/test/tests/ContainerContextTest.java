@@ -227,7 +227,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
 
-        log("** Insering row into list");
+        log("** Inserting row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
         DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
