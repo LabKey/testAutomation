@@ -89,13 +89,11 @@ public class APIContainerHelper extends AbstractContainerHelper
         try
         {
             CreateContainerResponse response = command.execute(connection, parentPath);
-//            TODO: Response text is not encoded correctly for 2-byte characters
-//            if (!isWorkbook)
-//            {
-//                assertEquals("Unexpected name for created container", name, response.getName());
-//                String path = String.join("/", parentPath, name).replace("//", "/");
-//                assertEquals("Unexpected path for created container", path, response.getPath());
-//            }
+            if (!isWorkbook)
+            {
+                String path = String.join("/", parentPath, name).replace("//", "/");
+                assertEquals("Unexpected path for created container", path, response.getPath());
+            }
             if (folderType == null || "custom".equals(folderType.toLowerCase()) || "none".equals(folderType))
                 folderType = (isWorkbook ? "Workbook" : "None");
             assertEquals("Wrong folder type for " + response.getPath() + ". Defining module may be missing.", folderType, response.getProperty("folderType"));
