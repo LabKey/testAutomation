@@ -375,7 +375,6 @@ src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/Git.java -text
-src/org/labkey/test/categories/IDRI.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/LabModule.java -text
 src/org/labkey/test/categories/MS2.java -text
