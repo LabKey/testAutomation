@@ -5,7 +5,7 @@ import org.openqa.selenium.WebElement;
 
 public abstract class WebDriverComponent extends Component
 {
-    public static abstract class IndependentComponentFinder<C extends WebDriverComponent, F extends IndependentComponentFinder<C, F>> extends ComponentFinder<WebDriver, C, F>
+    public static abstract class WebDriverComponentFinder<C extends WebDriverComponent, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<WebDriver, C, F>
     {
         WebDriver driver;
 

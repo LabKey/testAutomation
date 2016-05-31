@@ -134,7 +134,7 @@ public class Window extends WebDriverComponent
         }
     }
 
-    public static class WindowFinder extends IndependentComponentFinder<Window, WindowFinder>
+    public static class WindowFinder extends WebDriverComponentFinder<Window, WindowFinder>
     {
         private String titleText = "";
         private boolean partialText = true;
