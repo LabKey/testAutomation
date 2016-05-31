@@ -243,7 +243,7 @@ public class WebTestHelper
 
     public static String buildURL(String controller, String action)
     {
-        return buildURL(controller, null, action, Collections.EMPTY_MAP);
+        return buildURL(controller, null, action, Collections.emptyMap());
     }
 
     public static String buildURL(String controller, String action, @Nullable Map<String, String> params)
@@ -253,7 +253,7 @@ public class WebTestHelper
 
     public static String buildURL(String controller, @Nullable String containerPath, String action)
     {
-        return buildURL(controller, containerPath, action, Collections.EMPTY_MAP);
+        return buildURL(controller, containerPath, action, Collections.emptyMap());
     }
 
     public static String buildURL(String controller, @Nullable String containerPath, String action, Map<String, String> params)
@@ -263,7 +263,7 @@ public class WebTestHelper
 
     public static String buildRelativeUrl(String controller, String action)
     {
-        return buildRelativeUrl(controller, null, action, Collections.EMPTY_MAP);
+        return buildRelativeUrl(controller, null, action, Collections.emptyMap());
     }
 
     public static String buildRelativeUrl(String controller, String action, @Nullable Map<String, String> params)
@@ -273,7 +273,7 @@ public class WebTestHelper
 
     public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action)
     {
-        return buildRelativeUrl(controller, containerPath, action, Collections.EMPTY_MAP);
+        return buildRelativeUrl(controller, containerPath, action, Collections.emptyMap());
     }
 
     public static String buildRelativeUrl(String controller, @Nullable String containerPath, String action, Map<String, String> params)
