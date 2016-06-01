@@ -462,6 +462,13 @@ src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
+src/org/labkey/test/pages/issues/BaseIssuePage.java -text
+src/org/labkey/test/pages/issues/ClosePage.java -text
+src/org/labkey/test/pages/issues/DetailsPage.java -text
+src/org/labkey/test/pages/issues/InsertPage.java -text
+src/org/labkey/test/pages/issues/ReopenPage.java -text
+src/org/labkey/test/pages/issues/ResolvePage.java -text
+src/org/labkey/test/pages/issues/UpdatePage.java -text
 src/org/labkey/test/pages/query/ExecuteQueryParameterized.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
 src/org/labkey/test/pages/study/CreateStudyPage.java -text
