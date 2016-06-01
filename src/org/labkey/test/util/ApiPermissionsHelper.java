@@ -454,7 +454,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
     @Override
     public void deleteGroup(String groupName, boolean failIfNotFound)
     {
-        Integer groupId = getSiteGroupId(groupName);
+        deleteGroup(groupName, "/", failIfNotFound);
+    }
+
+    public void deleteGroup(String groupName, String project, boolean failIfNotFound)
+    {
+        Integer groupId = "/".equals(project) ? getSiteGroupId(groupName) : getProjectGroupId(groupName, project);
 
         if (groupId == null)
         {
@@ -468,7 +473,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
         Connection connection = _driver.createDefaultConnection(true);
         try
         {
-            command.execute(connection, "/");
+            command.execute(connection, project);
         }
         catch (IOException | CommandException e)
         {
