@@ -1048,14 +1048,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertAlert(String msg)
     {
         Alert alert = waitForAlert();
-        assertEquals(msg, alert.getText());
+        assertEquals("Wrong alert text", msg, alert.getText());
         alert.accept();
     }
 
     public void assertAlertContains(String partialMessage)
     {
         Alert alert = waitForAlert();
-        assertTrue(alert.getText().contains(partialMessage));
+        String alertText = alert.getText();
+        assertTrue("Wrong alert text: " + alertText + ", expected: " + partialMessage, alertText.contains(partialMessage));
         alert.accept();
     }
 
