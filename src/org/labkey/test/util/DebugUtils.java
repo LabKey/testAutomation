@@ -10,16 +10,20 @@ public abstract class DebugUtils
 {
     public static void flash(WebDriver driver, WebElement element, int count)
     {
-        String borderStyle  = element.getCssValue("border");
+        String originalStyle = element.getCssValue("style");
         for (int i = 0; i < count; i++) {
-            changeBorder((JavascriptExecutor) driver, "2px solid yellow", element);
+            setBorderStyle((JavascriptExecutor) driver, "2px solid yellow", element);
             sleep(75);
-            changeBorder((JavascriptExecutor) driver, borderStyle, element);
+            setStyle((JavascriptExecutor) driver, originalStyle, element);
             if (i < count - 1) sleep(75);
         }
     }
 
-    private static void changeBorder(JavascriptExecutor executor, String style, WebElement element) {
-        executor.executeScript("arguments[0].style.border='" + style + "'", element);
+    private static void setBorderStyle(JavascriptExecutor executor, String borderStyle, WebElement element) {
+        executor.executeScript("arguments[0].style.border='" + borderStyle + "'", element);
+    }
+
+    private static void setStyle(JavascriptExecutor executor, String style, WebElement element) {
+        executor.executeScript("arguments[0].style='" + style + "'", element);
     }
 }
