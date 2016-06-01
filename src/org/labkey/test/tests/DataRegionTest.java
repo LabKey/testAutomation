@@ -31,6 +31,7 @@ import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,13 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;
+
+    private static final String[] QWP_TABS = {"Show default view for query", "Filter by Tag equals blue",
+            "Sort by Tag", "Hide buttons", "Hide Edit and Details columns",
+            "Set Paging to 3 with config", "Set Paging to 2 with API"
+    };
+
+    private static final String QWP_SCHEMA_LISTING = "List out all queries in schema";
 
     static
     {
@@ -117,6 +125,52 @@ public class DataRegionTest extends BaseWebDriverTest
         dataRegionTest(url, INJECT_CHARS_1);
         dataRegionTest(url, INJECT_CHARS_2);
         exportLoggingTest();
+
+        testQWPDemoPage();
+    }
+
+    private void testQWPDemoPage()
+    {
+        log("Begin testing QWPDemo page");
+        beginAt("/query/home/QWPDemo.view");
+        clickButton("Drop schema and clear test data");
+
+        log("Testing " + QWP_SCHEMA_LISTING);
+        click(Locator.linkWithText(QWP_SCHEMA_LISTING));
+
+        if (pageHasAlert(WAIT_FOR_JAVASCRIPT)) {
+            dismissAllAlerts();
+            fail(QWP_SCHEMA_LISTING + " failed");
+        }
+        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING));
+
+        List<String> tabs = Arrays.asList(QWP_TABS);
+        tabs.stream().forEach((tab) ->  {
+            testQWPTab(tab);
+        });
+    }
+
+    private boolean pageHasAlert(long wait) {
+        long t= System.currentTimeMillis();
+        long end = t + wait;
+        while(System.currentTimeMillis() < end) {
+            if (isAlertPresent()) {
+                return true;
+            }
+            sleep(1000);
+        }
+        return false;
+    }
+
+    public void testQWPTab(String title)
+    {
+        log("Testing " + title);
+        click(Locator.linkWithText(title));
+        if (pageHasAlert(5000)){
+            dismissAllAlerts();
+            fail(title + " failed");
+        }
+        waitForElement(Locator.css(".labkey-data-region"));
     }
 
     private void exportLoggingTest()
