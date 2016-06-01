@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ComponentElements;
-import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.FloatingComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.SearchContext;
@@ -28,7 +28,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window extends WebDriverComponent
+public class Window extends FloatingComponent
 {
     WebElement _window;
     WebDriverWrapper _driver;

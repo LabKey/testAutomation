@@ -1,37 +1,41 @@
 package org.labkey.test.components;
 
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
+ */
 public abstract class WebDriverComponent extends Component
 {
-    public static abstract class WebDriverComponentFinder<C extends WebDriverComponent, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<WebDriver, C, F>
+    protected abstract WebDriver getDriver();
+
+    public static abstract class WebDriverComponentFinder<C extends WebDriverComponent, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
     {
         WebDriver driver;
-
-        @Override
-        public C find(WebDriver context)
+        public WebDriverComponentFinder(WebDriver driver)
         {
-            driver = context;
-            return super.find(context);
+            this.driver = driver;
+        }
+
+        public C findWhenNeeded()
+        {
+            return super.findWhenNeeded(driver);
+        }
+
+        public C find()
+        {
+            return super.find(driver);
+        }
+
+        public C waitFor()
+        {
+            return super.waitFor(driver);
         }
 
         @Override
-        public C waitFor(WebDriver context)
-        {
-            driver = context;
-            return super.waitFor(context);
-        }
-
-        @Override
-        public C findWhenNeeded(WebDriver context)
-        {
-            driver = context;
-            return super.findWhenNeeded(context);
-        }
-
-        @Override
-        protected C construct(WebElement el)
+        protected final C construct(WebElement el)
         {
             return construct(el, driver);
         }
