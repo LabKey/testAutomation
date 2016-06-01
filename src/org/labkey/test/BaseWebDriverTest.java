@@ -1644,7 +1644,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     protected void checkJsErrors()
     {
-        if (isScriptCheckEnabled() && getDriver() != null && getJsErrorChecker() != null)
+        if (isScriptCheckEnabled() && getJsErrorChecker() != null)
         {
             List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
 
