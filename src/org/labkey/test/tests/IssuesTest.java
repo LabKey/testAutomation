@@ -99,7 +99,7 @@ public class IssuesTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1, USER2);
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Before
@@ -112,7 +112,7 @@ public class IssuesTest extends BaseWebDriverTest
 
     public void readyState()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
 
         // clear region selection and filters
         issuesTable.uncheckAll();
@@ -161,7 +161,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickProject("IssuesVerifyProject");
         _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
-        createUser(USER2, null, false);
+        _userHelper.createUser(USER2, false);
     }
 
     private void createIssues()
@@ -183,7 +183,8 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String issueTitle = "A general issue";
 
-        assertButtonPresent("New Issue");
+        Locator newIssueButton = Locator.lkButton("New Issue");
+        assertElementPresent(newIssueButton);
 
         // quick security test
         // TODO push lots of locations as we go and move this test to end
@@ -191,11 +192,11 @@ public class IssuesTest extends BaseWebDriverTest
         pushLocation();
         signOut();
         popLocation();                          // try open issues as guest
-        assertButtonNotPresent("New Issue");
+        assertElementNotPresent(newIssueButton);
         assertElementPresent(Locator.tagWithName("form", "login"));
         signIn();
         popLocation();                          // and logged in again
-        assertButtonPresent("New Issue");
+        assertElementPresent(newIssueButton);
 
         // AdminAction
         clickButton("Admin");
@@ -387,7 +388,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE);
         clickButton("Save");
         assertTextNotPresent("Invalid template");
-        assertFormElementEquals(Locator.name("emailSubject"), subject);
+        assertEquals(subject, getFormElement(Locator.name("emailSubject")));
     }
 
     @Test
@@ -459,8 +460,8 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("entryPluralName"), "Tickets");
         clickButton("Update");
 
-        assertFormElementEquals(Locator.name("entrySingularName"), "Ticket");
-        assertFormElementEquals(Locator.name("entryPluralName"), "Tickets");
+        assertEquals("Ticket", getFormElement(Locator.name("entrySingularName")));
+        assertEquals("Tickets", getFormElement(Locator.name("entryPluralName")));
 
         assertTextPresent("Tickets Admin Page");
         clickAndWait(Locator.linkWithText("Back to Tickets"));
@@ -558,7 +559,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void viewSelectedDetailsTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
 
         issuesTable.setFilter("Status", "Has Any Value", null);
         issuesTable.checkAll();
@@ -573,7 +574,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void lastFilterTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
 
         // assert both issues are present
         issuesTable.clearAllFilters("IssueId");
@@ -764,9 +765,9 @@ public class IssuesTest extends BaseWebDriverTest
 
         goToModule("Issues");
 
-        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
-        issuesTable.checkCheckbox(issueIdA);
-        issuesTable.checkCheckbox(issueIdB);
+        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
+        issuesTable.checkCheckboxByPrimaryKey(issueIdA);
+        issuesTable.checkCheckboxByPrimaryKey(issueIdB);
         click(Locator.linkWithText("move"));
 
         // handle move dialog (copy pasta)
@@ -1032,13 +1033,13 @@ public class IssuesTest extends BaseWebDriverTest
         });
 
         //Test that no changes were made to the current folder since we Cancelled to inherit.
-        assertFormElementEquals(Locator.name("type"), "Probs");
-        assertFormElementEquals(Locator.name("string1"), "Folder_B_Str1");
+        assertEquals("Probs", getFormElement(Locator.name("type")));
+        assertEquals("Folder_B_Str1", getFormElement(Locator.name("string1")));
         assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
-        assertFormElementEquals(Locator.name("string2"), "Folder_B_Str2");
+        assertEquals("Folder_B_Str2", getFormElement(Locator.name("string2")));
         assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string2"));
 
-        assertOptionEquals(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[13]/td[3]/select"), "Admin");
+        assertEquals("Admin", getSelectedOptionText(Locator.tagWithName("select", "permissions").index(1)));
 
         /** inherit from Folder_A - test for 'OK' to inherit **/
 
@@ -1053,23 +1054,23 @@ public class IssuesTest extends BaseWebDriverTest
         });
 
         //check if all the inherited fields are populated and are disabled.
-        assertFormElementEquals(Locator.name("type"), "Bugs");
+        assertEquals("Bugs", getFormElement(Locator.name("type")));
         WebElement inputType = Locator.input("type").findElement(getDriver());
         assertFalse(inputType.getText() + " should be disabled.", inputType.isEnabled());
 
-        assertFormElementEquals(Locator.name("area"), "Dev Area");
+        assertEquals("Dev Area", getFormElement(Locator.name("area")));
         WebElement inputArea = Locator.input("type").findElement(getDriver());
         assertFalse(inputArea.getText() + " should be disabled.", inputArea.isEnabled());
 
-        assertFormElementEquals(Locator.name("priority"), "Prioritah");
+        assertEquals("Prioritah", getFormElement(Locator.name("priority")));
         WebElement inputPri = Locator.input("type").findElement(getDriver());
         assertFalse(inputPri.getText() + " should be disabled.", inputPri.isEnabled());
 
-        assertFormElementEquals(Locator.name("int1"), "Contract Number");
+        assertEquals("Contract Number", getFormElement(Locator.name("int1")));
         WebElement inputInt1 = Locator.input("type").findElement(getDriver());
         assertFalse(inputInt1.getText() + " should be disabled.", inputInt1.isEnabled());
 
-        assertFormElementEquals(Locator.name("string1"), "Development Sprint");
+        assertEquals("Development Sprint", getFormElement(Locator.name("string1")));
         WebElement inputString1 = Locator.input("type").findElement(getDriver());
         assertFalse(inputString1.getText() + " should be disabled.", inputString1.isEnabled());
 
@@ -1087,7 +1088,7 @@ public class IssuesTest extends BaseWebDriverTest
 //        addKeyword("string1", "Development Sprint", "15.5");//TODO: should check for if it's disabled ("option/keyword" fields are not disabled in the current implementation)
 
         //Check if non-inherited field still exists.
-        assertFormElementEquals(Locator.name("string2"), "Folder_B_Str2");
+        assertEquals("Folder_B_Str2", getFormElement(Locator.name("string2")));
         WebElement inputString2 = Locator.input("string2").findElement(getDriver());
         assertTrue(inputString2.getText() + " is not enabled.", inputString2.isEnabled());
 
@@ -1119,7 +1120,7 @@ public class IssuesTest extends BaseWebDriverTest
         goToModule("Issues");
         clickButton("Admin");
 
-        assertFormElementEquals(Locator.name("milestone"), "milestone_A");
+        assertEquals("milestone_A", getFormElement(Locator.name("milestone")));
         WebElement inputMilestone = Locator.input("milestone").findElement(getDriver());
         assertFalse(inputMilestone.getText() + " should be disabled.", inputMilestone.isEnabled());
 

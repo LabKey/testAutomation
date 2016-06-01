@@ -119,7 +119,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, user);
-        deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
+        _containerHelper.deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
         modifyTemplate(false);
         goToHome();
 
@@ -294,7 +294,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MSG2_TITLE));
         clickButton("Respond");
         selectOptionByText(Locator.name("status"), "Closed");
-        assertFormElementEquals(Locator.name("assignedTo"), "");
+        assertEquals("", getFormElement(Locator.name("assignedTo")));
         clickButton("Submit", longWaitForPage);
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");
@@ -385,7 +385,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         final String messageColumn = "Message Settings";
 
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
-        new DataRegionTable(usersDataRegion, this).checkCheckbox(messageUserId);
+        new DataRegionTable(usersDataRegion, getDriver()).checkCheckboxByPrimaryKey(messageUserId);
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
         click(Locator.lkButton(USERS_UPDATE_BUTTON));
         waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
@@ -394,7 +394,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         waitForText("Are you sure");
         clickButton("Yes");
 
-        DataRegionTable dr = new DataRegionTable(usersDataRegion, this);
+        DataRegionTable dr = new DataRegionTable(usersDataRegion, getDriver());
         assertEquals(dr.getDataAsText(messageUserId, messageColumn), userSettingNew);
      }
 
@@ -541,10 +541,10 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void basicMessageTests()
     {
         log("Add search to project");
-        addWebPart("Search");
+        portalHelper.addWebPart("Search");
 
 
-        messageUserId = createUser(user, null).getUserId().toString();
+        messageUserId = _userHelper.createUser(user).getUserId().toString();
         goToHome();
         goToProjectHome();
         _permissionsHelper.createPermissionsGroup(group);
@@ -630,7 +630,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("test filtering of messages grid");
         clickAndWait(Locator.linkWithText("view list"));
-        DataRegionTable region = new DataRegionTable("Announcements", this);
+        DataRegionTable region = new DataRegionTable("Announcements", getDriver());
         region.setFilter("Title", "Equals", "foo", WAIT_FOR_PAGE);
 
         assertTextNotPresent(RESP1_TITLE);

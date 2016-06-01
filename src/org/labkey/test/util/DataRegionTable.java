@@ -962,12 +962,19 @@ public class DataRegionTable extends Component
             _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL);
     }
 
-    // NOTE: this method would be better named checkCheckboxByPrimaryKey --> while it does take a string, this string will often be a string value
-    public void checkCheckbox(String value)
+    public void checkCheckboxByPrimaryKey(Object value)
     {
-        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(value) + "]")
+        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(String.valueOf(value)) + "]")
                 .findElement(getComponentElement());
         if (!checkbox.isSelected())
+            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
+    }
+
+    public void uncheckCheckboxByPrimaryKey(Object value)
+    {
+        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(String.valueOf(value)) + "]")
+                .findElement(getComponentElement());
+        if (checkbox.isSelected())
             _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
     }
 
