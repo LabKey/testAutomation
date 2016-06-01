@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -150,6 +151,11 @@ public abstract class Locator
 
     public abstract By toBy();
 
+    public LazyWebElement findWhenNeeded(SearchContext context)
+    {
+        return new LazyWebElement(this, context);
+    }
+
     public WebElement findElement(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
@@ -181,7 +187,7 @@ public abstract class Locator
                 }
             }
         }
-        if (_contains != null && !_contains.equals(""))
+        if (_contains != null && !_contains.isEmpty())
         {
             Iterator<WebElement> it = elements.iterator();
             WebElement el;
@@ -529,7 +535,7 @@ public abstract class Locator
 
     public static XPathLocator imageMapLinkByTitle(String imageMapName, String title)
     {
-        return tag("map").withAttribute("name", imageMapName).child(Locator.tag("area").withAttribute("title", title));
+        return tag("map").withAttribute("name", imageMapName).child(tag("area").withAttribute("title", title));
     }
 
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
@@ -540,22 +546,22 @@ public abstract class Locator
 
     public static XPathLocator gwtTextBoxByLabel(String label)
     {
-        return Locator.tagWithClass("input", "gwt-TextBox").withPredicate(Locator.xpath("../preceding-sibling::td").withText(label));
+        return tagWithClass("input", "gwt-TextBox").withPredicate(xpath("../preceding-sibling::td").withText(label));
     }
 
     public static XPathLocator gwtListBoxByLabel(String label)
     {
-        return Locator.tagWithClass("select", "gwt-ListBox").withPredicate(Locator.xpath("../preceding-sibling::td/table/tbody/tr/td/div").withText(label));
+        return tagWithClass("select", "gwt-ListBox").withPredicate(xpath("../preceding-sibling::td/table/tbody/tr/td/div").withText(label));
     }
 
     public static XPathLocator gwtCheckBoxOnImportGridByColLabel(String label)
     {
-        return Locator.tagWithAttribute("input", "type", "checkbox").withPredicate(Locator.xpath("../../following-sibling::td/span").containing(label));
+        return tagWithAttribute("input", "type", "checkbox").withPredicate(xpath("../../following-sibling::td/span").containing(label));
     }
 
     public static XPathLocator gwtNextButtonOnImportGridByColLabel(String label)
     {
-        return Locator.tagWithClass("div", "x-tbar-page-next").withPredicate(Locator.xpath("../preceding-sibling::td/span").containing(label));
+        return tagWithClass("div", "x-tbar-page-next").withPredicate(xpath("../preceding-sibling::td/span").containing(label));
     }
 
     public static Locator permissionRendered()
@@ -566,18 +572,18 @@ public abstract class Locator
     public static XPathLocator permissionButton(String groupName, String role)
     {
         // Supports permission types from a variety of modules.
-        return tag("div").withClass("rolepanel").withDescendant(Locator.tag("h3").withText(role)).append(Locator.tag("a").withClass("x4-btn").withDescendant(Locator.tag("span").startsWith(groupName)));
+        return tag("div").withClass("rolepanel").withDescendant(tag("h3").withText(role)).append(tag("a").withClass("x4-btn").withDescendant(tag("span").startsWith(groupName)));
     }
 
     public static XPathLocator closePermissionButton(String groupName, String role)
     {
         // Supports permission types from a variety of modules.
-        return permissionButton(groupName, role).append(Locator.tag("span").withClass("closeicon"));
+        return permissionButton(groupName, role).append(tag("span").withClass("closeicon"));
     }
 
     public static XPathLocator schemaTreeNode(String schemaName)
     {
-        return Locator.tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
+        return tag("tr").withClass("x4-grid-row").append("/td/div/span").withText(schemaName);
     }
 
     public static XPathLocator permissionsTreeNode(String folderName)
@@ -600,9 +606,9 @@ public abstract class Locator
     public static IdLocator folderTab(String text)
     {
         if ("+".equals(text))
-            return Locator.id("addTab");
+            return id("addTab");
         else
-            return Locator.id(text.replace(" ", "") + "Tab");
+            return id(text.replace(" ", "") + "Tab");
     }
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
@@ -638,12 +644,12 @@ public abstract class Locator
 
     public static XPathLocator paginationText()
     {
-        return Locator.tagWithClass("div", "labkey-pagination");
+        return tagWithClass("div", "labkey-pagination");
     }
 
     public static XPathLocator pageHeader(String headerText)
     {
-        return Locator.id("labkey-nav-trail-current-page").withText(headerText);
+        return id("labkey-nav-trail-current-page").withText(headerText);
     }
 
     /**
@@ -827,7 +833,10 @@ public abstract class Locator
 
         public XPathLocator containing(String contains)
         {
-            return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
+            if (contains != null && !contains.isEmpty())
+                return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
+            else
+                return this;
         }
 
         public XPathLocator withText(String text)
@@ -880,7 +889,12 @@ public abstract class Locator
 
         public XPathLocator child(String str)
         {
-            return new XPathLocator(getLoc() + "/" + str); //TODO; Parens?
+            return new XPathLocator(getLoc() + "/" + str);
+        }
+
+        public XPathLocator childTag(String tag)
+        {
+            return this.child(tag(tag));
         }
 
         public XPathLocator child(XPathLocator childLocator)
@@ -959,7 +973,17 @@ public abstract class Locator
 
         public XPathLocator attributeEndsWith(String attribute, String substring)
         {
-            return this.withPredicate(String.format("substring(@%s, string-length(@%s) - %d) = %s", attribute, attribute, substring.length() - 1, xq(substring))); // XPath 1.0 doesn't support ends-with()
+            return this.endsWith("@" + attribute, substring);
+        }
+
+        public XPathLocator endsWith(String substring)
+        {
+            return this.endsWith("normalize-space()", substring);
+        }
+
+        private XPathLocator endsWith(String expression, String substring)
+        {
+            return this.withPredicate(String.format("substring(%s, string-length(%s) - %d) = %s", expression, expression, substring.length() - 1, xq(substring))); // XPath 1.0 doesn't support ends-with()
         }
 
         public XPathLocator withClass(String cssClass)
