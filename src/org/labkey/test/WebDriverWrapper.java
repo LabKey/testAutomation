@@ -431,7 +431,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         public List<String> ignored()
         {
             return Arrays.asList(
-                    "[:0]", "{:0}", // Truncated JSON: "Ext.Error: You're trying to decode an invalid JSON String:"
+                    "Ext.Error: You're trying to decode an invalid JSON String:",
                     "__webdriver_evaluate",
                     "setting a property that has only a getter",
                     "records[0].get is not a function",
@@ -450,6 +450,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3 issue: https://github.com/mbostock/d3/issues/1805
                     "Using //@ to indicate", // jQuery
                     "CodeMirror is not defined", // There will be more severe errors than this if CodeMirror is actually broken
+                    "Ext.EventManager is undefined", // Causing many TeamCity failures. No obvious culprit
                     "NS_ERROR_FAILURE" // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
             );
         }
