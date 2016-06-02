@@ -85,7 +85,7 @@ public class ProteinExpressionMatrixAssayTest extends BaseWebDriverTest
         beginAt("ms2/showProteinAdmin.view?");
 
         clickButton("Import Data");
-        setFormElement(Locator.id("fname"), TestFileUtils.getLabKeyRoot() + FASTA_FILE);
+        setFormElement(Locator.id("fname"), FASTA_FILE);
         selectOptionByText(Locator.name("fileType"), "fasta");
         clickButton("Load Annotations");
 
