@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -38,7 +37,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
@@ -61,9 +61,11 @@ public class DataRegionTest extends BaseWebDriverTest
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;
 
-    private static final String[] QWP_TABS = {"Show default view for query", "Filter by Tag equals blue",
+    private static final String[] QWP_TABS = {
+            "Show default view for query", "Filter by Tag equals blue",
             "Sort by Tag", "Hide buttons", "Hide Edit and Details columns",
-            "Set Paging to 3 with config", "Set Paging to 2 with API"
+            "Set Paging to 3 with config", "Set Paging to 2 with API",
+            "Regression #25337"
     };
 
     private static final String QWP_SCHEMA_LISTING = "List out all queries in schema";
@@ -145,9 +147,7 @@ public class DataRegionTest extends BaseWebDriverTest
         waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING));
 
         List<String> tabs = Arrays.asList(QWP_TABS);
-        tabs.stream().forEach((tab) ->  {
-            testQWPTab(tab);
-        });
+        tabs.stream().forEach(this::testQWPTab);
     }
 
     private boolean pageHasAlert(long wait) {
@@ -336,7 +336,6 @@ public class DataRegionTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
         assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
         assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-
     }
 
     /**
