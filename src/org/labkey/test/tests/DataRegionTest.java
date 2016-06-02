@@ -134,13 +134,18 @@ public class DataRegionTest extends BaseWebDriverTest
     private void testQWPDemoPage()
     {
         log("Begin testing QWPDemo page");
-        beginAt("/query/home/QWPDemo.view");
+        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
+
+        log("Drop and reload QWPDemo test data");
         clickButton("Drop schema and clear test data");
+        waitForElement(Locator.button("Populate test data"));
+        clickButton("Populate test data");
+        sleep(1000);
 
         log("Testing " + QWP_SCHEMA_LISTING);
         click(Locator.linkWithText(QWP_SCHEMA_LISTING));
 
-        if (pageHasAlert(WAIT_FOR_JAVASCRIPT)) {
+        if (pageHasAlert(3000)) {
             dismissAllAlerts();
             fail(QWP_SCHEMA_LISTING + " failed");
         }
@@ -148,6 +153,10 @@ public class DataRegionTest extends BaseWebDriverTest
 
         List<String> tabs = Arrays.asList(QWP_TABS);
         tabs.stream().forEach(this::testQWPTab);
+
+        log("Drop QWPDemo test data");
+        beginAt("/query/" + getProjectName() + "/QWPDemo.view");
+        clickButton("Drop schema and clear test data"); // drop domain, needed for clean up project
     }
 
     private boolean pageHasAlert(long wait) {
@@ -162,11 +171,11 @@ public class DataRegionTest extends BaseWebDriverTest
         return false;
     }
 
-    public void testQWPTab(String title)
+    private void testQWPTab(String title)
     {
         log("Testing " + title);
         click(Locator.linkWithText(title));
-        if (pageHasAlert(5000)){
+        if (pageHasAlert(3000)){
             dismissAllAlerts();
             fail(title + " failed");
         }
