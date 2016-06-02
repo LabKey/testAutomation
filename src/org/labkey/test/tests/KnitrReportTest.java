@@ -233,13 +233,14 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
-        click(Ext4Helper.Locators.tab("Report"));
-        if (getBrowserType() == BrowserType.CHROME && isScriptCheckEnabled())
+        pauseJsErrorChecker(); // Don't fail due to "$ is not a function"
         {
-            assertAlertContains("$ is not a function");
+            click(Ext4Helper.Locators.tab("Report"));
+            waitForElement(Locator.id("mtcars_table"));
+            assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
         }
-        waitForElement(Locator.id("mtcars_table"));
-        assertElementNotPresent(Locator.id("mtcars_table_wrapper")); // Created by jQuery
+        resumeJsErrorChecker();
+
         _rReportHelper.clickSourceTab();
 
         // now set the dependencies
