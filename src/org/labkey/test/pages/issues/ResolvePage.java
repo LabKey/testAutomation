@@ -43,7 +43,7 @@ public class ResolvePage extends UpdatePage
     {
         protected Elements()
         {
-            resolved = SelectFormItem(getDriver()).withName("resolved").findWhenNeeded();
+            resolution = SelectFormItem(getDriver()).withName("resolution").findWhenNeeded();
             duplicate = SelectFormItem(getDriver()).withName("duplicate").findWhenNeeded();
             status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
         }

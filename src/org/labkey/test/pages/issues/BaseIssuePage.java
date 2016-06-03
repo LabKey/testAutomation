@@ -40,9 +40,9 @@ public abstract class BaseIssuePage extends LabKeyPage
         return elements().related;
     }
 
-    public FormItem<String> resolved()
+    public FormItem<String> resolution()
     {
-        return elements().resolved;
+        return elements().resolution;
     }
 
     public FormItem<String> duplicate()
@@ -75,9 +75,9 @@ public abstract class BaseIssuePage extends LabKeyPage
         return elements().changedDate.getValue();
     }
 
-    public String resolutionDate()
+    public String resolvedDate()
     {
-        return elements().resolutionDate.getValue();
+        return elements().resolvedDate.getValue();
     }
 
     protected Elements elements()
@@ -100,13 +100,13 @@ public abstract class BaseIssuePage extends LabKeyPage
         protected FormItem<String> status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
         protected FormItem<String> assignedTo = ReadOnlyFormItem(getDriver()).withLabel("Assigned To").findWhenNeeded();
         protected FormItem<String> priority = ReadOnlyFormItem(getDriver()).withLabel("Pri").findWhenNeeded();
-        protected FormItem<String> resolved = ReadOnlyFormItem(getDriver()).withLabel("Resolved").findWhenNeeded();
+        protected FormItem<String> resolution = ReadOnlyFormItem(getDriver()).withLabel("Resolution").findWhenNeeded();
         protected FormItem<String> duplicate = ReadOnlyFormItem(getDriver()).withLabel("Duplicate").findWhenNeeded();
         protected FormItem<String> related = ReadOnlyFormItem(getDriver()).withLabel("Related").findWhenNeeded();
         protected FormItem<String> notifyList = ReadOnlyFormItem(getDriver()).withLabel("Notify").findWhenNeeded();
         protected FormItem<String> openedDate = ReadOnlyFormItem(getDriver()).withLabel("Opened").findWhenNeeded();
         protected FormItem<String> changedDate = ReadOnlyFormItem(getDriver()).withLabel("Changed").findWhenNeeded();
-        protected FormItem<String> resolutionDate = ReadOnlyFormItem(getDriver()).withLabel("Resolution").findWhenNeeded();
+        protected FormItem<String> resolvedDate = ReadOnlyFormItem(getDriver()).withLabel("Resolved").findWhenNeeded();
         protected FormItem<String> closedDate = ReadOnlyFormItem(getDriver()).withLabel("Closed").findWhenNeeded();
 
         private Map<String, FormItem> customFormItems = new TreeMap<>();

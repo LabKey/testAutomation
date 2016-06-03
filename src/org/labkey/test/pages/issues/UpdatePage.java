@@ -78,7 +78,6 @@ public class UpdatePage extends BaseIssuePage
     {
         public Elements()
         {
-            status = SelectFormItem(getDriver()).withName("status").findWhenNeeded();
             assignedTo = SelectFormItem(getDriver()).withName("assignedTo").findWhenNeeded();
             priority = SelectFormItem(getDriver()).withName("priority").findWhenNeeded();
             related = TextFormItem.TextFormItem(getDriver()).withName("related").findWhenNeeded();
