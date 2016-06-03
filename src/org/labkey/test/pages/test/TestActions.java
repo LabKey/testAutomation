@@ -1,13 +1,17 @@
 package org.labkey.test.pages.test;
 
+import org.apache.http.HttpStatus;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.SimpleHttpResponse;
 import org.openqa.selenium.WebDriver;
 
 import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestActions extends LabKeyPage
 {
@@ -79,14 +83,28 @@ public class TestActions extends LabKeyPage
     {
         configurationException,
         illegalState,
-        notFound,
+        multiException,
+        notFound(HttpStatus.SC_NOT_FOUND),
         npe,
         npeother,
-        unauthorized;
+        unauthorized(HttpStatus.SC_FORBIDDEN);
+
+        final int response;
+
+        ExceptionActions()
+        {
+            response = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+        }
+
+        ExceptionActions(int response)
+        {
+            this.response = response;
+        }
 
         public void triggerException(String message)
         {
-            WebTestHelper.getHttpResponse(WebTestHelper.buildURL("test", toString(), message == null ? Collections.emptyMap() : Maps.of("message", message)));
+            SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("test", toString(), message == null ? Collections.emptyMap() : Maps.of("message", message)));
+            assertEquals(httpResponse.getResponseMessage(), response, httpResponse.getResponseCode());
         }
 
         public void triggerException()
