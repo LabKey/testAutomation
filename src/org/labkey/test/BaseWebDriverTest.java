@@ -893,10 +893,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void resetErrors()
     {
-        if (isGuestModeTest())
+        if (isGuestModeTest() || !isLocalServer())
             return;
-        if (isLocalServer())
-            beginAt("/admin/resetErrorMark.view");
+
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"));
+        assertEquals("Failed to reset server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
     }
 
     private static final String BEFORE_CLASS = "BeforeClass";
@@ -992,10 +993,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+        resetErrors();
         deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
         reenableMiniProfiler = disableMiniProfiler();
-        resetErrors();
 
         if (isSystemMaintenanceDisabled())
         {
@@ -1104,8 +1105,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         @Override
+        protected void succeeded(Description description)
+        {
+            checkErrors();
+        }
+
+        @Override
         protected void failed(Throwable e, Description description)
         {
+            resetErrors();
             Ext4Helper.resetCssPrefix();
             handleFailure(e, description.getMethodName());
         }
@@ -1467,23 +1475,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (!isLocalServer())
             return;
-        if ( isGuestModeTest() )
+        if (isGuestModeTest())
             return;
-        beginAt("/admin/showErrorsSinceMark.view");
 
-        assertTrue("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.", isPageEmpty());
+        if (!getServerErrors().isEmpty())
+        {
+            beginAt(buildURL("admin", "showErrorsSinceMark"));
+            resetErrors();
+            fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+        }
         log("No new errors found.");
-        goToHome();         // Don't leave on an empty page
     }
 
     @LogMethod
     public void checkExpectedErrors(@LoggedParam int expectedErrors)
     {
-        // Need to remember our location or the next test could start with a blank page
-        pushLocation();
-        beginAt("/admin/showErrorsSinceMark.view");
-
-        String text = getBodyText();
+        String text = getServerErrors();
         Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
         Matcher errorMatcher = errorPattern.matcher(text);
         int count = 0;
@@ -1491,12 +1498,23 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             count++;
         }
-        assertEquals("Expected error count does not match actual count for this run.", expectedErrors, count);
 
-        // Clear the errors to prevent the test from failing.
+        if (expectedErrors != count)
+        {
+            beginAt(buildURL("admin", "showErrorsSinceMark"));
+            resetErrors();
+            assertEquals("Expected error count does not match actual count for this run.", expectedErrors, count);
+        }
+
+        // Clear expected errors to prevent the test from failing.
         resetErrors();
+    }
 
-        popLocation();
+    protected String getServerErrors()
+    {
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"));
+        assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
+        return httpResponse.getResponseBody();
     }
 
     @LogMethod
@@ -1510,7 +1528,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if(!"Query Schema Browser".equals(getDriver().getTitle()))
                 goToSchemaBrowser();
             validateQueries(true);
-//            validateLabAuditTrail();
         }
     }
 
