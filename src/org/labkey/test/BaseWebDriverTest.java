@@ -897,7 +897,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return;
 
         SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"));
-        assertEquals("Failed to reset server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
+        assertEquals("Failed to reset server errors: [" + httpResponse.getResponseBody().split("\n")[0] + "].", HttpStatus.SC_OK, httpResponse.getResponseCode());
     }
 
     private static final String BEFORE_CLASS = "BeforeClass";
@@ -1113,9 +1113,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         protected void failed(Throwable e, Description description)
         {
-            resetErrors();
             Ext4Helper.resetCssPrefix();
             handleFailure(e, description.getMethodName());
+            resetErrors();
         }
 
         @Override
