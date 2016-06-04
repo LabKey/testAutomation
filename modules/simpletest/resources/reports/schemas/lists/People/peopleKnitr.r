@@ -4,6 +4,8 @@
 ##
 ```{r knitr}
 library(knitr)
+
+#TODO: This may cause a break with rmarkdown v2
 opts_chunk$set(cache.path = file.path(labkey.file.root, "cache/testcache", labkey.user.email, ""))
 ```
 
