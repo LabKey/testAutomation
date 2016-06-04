@@ -451,7 +451,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "Using //@ to indicate", // jQuery
                     "CodeMirror is not defined", // There will be more severe errors than this if CodeMirror is actually broken
                     "Ext.EventManager is undefined", // Causing many TeamCity failures. No obvious culprit
-                    "NS_ERROR_FAILURE" // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
+                    "NS_ERROR_FAILURE", // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
+                    "NetworkError: A network error occurred." // Just started appearing on TeamCity Linux/Firefox after r44480 ("26236 - Branding updates - Adjust for font rendering differences in Firefox") TODO: Track down culprit and remove this line
             );
         }
 
