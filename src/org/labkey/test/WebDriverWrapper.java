@@ -1103,6 +1103,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * @deprecated Use {@link #getAlertIfPresent()}
+     */
+    @Deprecated
+    public boolean isAlertPresent()
+    {
+        return null != getAlertIfPresent();
+    }
+
     public String acceptAlert()
     {
         Alert alert = waitForAlert();
