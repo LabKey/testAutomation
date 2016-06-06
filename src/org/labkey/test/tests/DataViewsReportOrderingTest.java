@@ -62,14 +62,11 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
         _portalHelper.clickWebpartMenuItem(ORIGINAL_WEBPART_TITLE, false, "Manage Views");
 
         // bring up the Reorder Reports popup
-        click(Locator.linkContainingText("Reorder Reports And Charts"));
-
-        // confirm popup appears
-        _extHelper.waitForExtDialog("Reorder Reports and Charts");
+        waitAndClick(Locator.linkContainingText("Reorder Reports And Charts"));
 
         // use the ReorderReportsWindow component to reverse the order of the reports in each category
         ReorderReportsWindow reorderReportsWindow = new ReorderReportsWindow(getDriver());
-        HashMap categorReportsOriginalOrder = new HashMap<String, List<String>>();
+        HashMap<String, List<String>> categorReportsOriginalOrder = new HashMap<>();
         List<WebElement> categories = reorderReportsWindow.getCategories();
         for (WebElement category : categories)
         {
@@ -77,7 +74,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
             List<String> reports = reorderReportsWindow.getReportsForCategory(categoryText);
             String[] reportsA = new String[reports.size()];
             reportsA = reports.toArray(reportsA);
-            if (null != reportsA && reportsA.length > 0)
+            if (reportsA.length > 0)
             {
                 assertTextPresentInThisOrder(reportsA);  // confirm reports were in original order on Manage Views page
             }
@@ -91,14 +88,13 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
 
         // when the Done button is clicked the Manage Views page will update to show reversed reports
         reorderReportsWindow.done();
-        reorderReportsWindow.waitForClose();
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that the Manage Views displays the reports in the reverse order from the original
-        for (Object key : categorReportsOriginalOrder.keySet())
+        for (String category : categorReportsOriginalOrder.keySet())
         {
             // determine what the reverse order should be for the reports in each category and verify that it appears on Manage Veiws page
-            String[] reportsBackwards = reverseReports((List<String>)categorReportsOriginalOrder.get(key));
+            String[] reportsBackwards = reverseReports(categorReportsOriginalOrder.get(category));
             if (null != reportsBackwards && reportsBackwards.length > 0)
             {
                 assertTextPresentInThisOrder(reportsBackwards);  // confirm reports in reverse order on Manage Views page
@@ -132,7 +128,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("<module>");
+        return Arrays.asList("study");
     }
 
     public static class ReorderReportsWindow extends Window
@@ -168,6 +164,7 @@ public class DataViewsReportOrderingTest extends BaseWebDriverTest
         public void done()
         {
             clickButton("Done", 0);
+            waitForClose();
         }
 
         public void dragAndDrop(String fromReport, String toReport)
