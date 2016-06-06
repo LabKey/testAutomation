@@ -1546,8 +1546,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         for (String projectName : _containerHelper.getCreatedProjects())
         {
-            clickProject(projectName);
-
+            goToProjectHome(projectName);
             doViewCheck(projectName);
             checked.add(projectName);
         }
@@ -2425,9 +2424,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void goToProjectHome(String projectName)
     {
-        if(!isElementPresent(Locators.projectBar))
-            goToHome();
-        clickProject(projectName);
+        beginAt(buildURL("project", projectName, "begin"));
     }
 
     /**
