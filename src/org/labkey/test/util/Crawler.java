@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
 
@@ -832,13 +833,16 @@ public class Crawler
             if (html.contains(maliciousScript))
                 msg = "page contains injected script";
 
-            while (test.isAlertPresent())
+            Alert alert;
+            while (null != (alert = test.getAlertIfPresent()))
             {
-                if (test.cancelAlert().startsWith(injectedAlert))
+                if (alert.getText().startsWith(injectedAlert))
                     msg = " malicious script executed";
+                alert.dismiss();
             }
+            test.switchToMainWindow();
 
-            // see ConnectionWrapper.java
+            // see StatementWrapper.java
             if (html.contains("SQL injection test failed"))
                 msg = "SQL injection detected";
 

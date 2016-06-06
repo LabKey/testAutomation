@@ -163,7 +163,8 @@ public class DataRegionTest extends BaseWebDriverTest
         long t= System.currentTimeMillis();
         long end = t + wait;
         while(System.currentTimeMillis() < end) {
-            if (isAlertPresent()) {
+            if (null != getAlertIfPresent())
+            {
                 return true;
             }
             sleep(1000);

@@ -1090,16 +1090,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public boolean isAlertPresent()
+    public Alert getAlertIfPresent()
     {
-        try {
-            getDriver().switchTo().alert();
-            switchToMainWindow();
-            return true;
+        try
+        {
+            return getDriver().switchTo().alert();
         }
         catch (NoAlertPresentException ex)
         {
-            return false;
+            return null;
         }
     }
 
@@ -1121,13 +1120,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     private Alert waitForAlert()
     {
-        waitFor(this::isAlertPresent, WAIT_FOR_JAVASCRIPT);
+        waitFor(() -> null != getAlertIfPresent(), WAIT_FOR_JAVASCRIPT);
         return getDriver().switchTo().alert();
     }
 
     public void waitForAlert(String alertText, int wait)
     {
-        waitFor(this::isAlertPresent, "No alert appeared.", wait);
+        waitFor(() -> null != getAlertIfPresent(), "No alert appeared.", wait);
         assertAlert(alertText);
     }
 
