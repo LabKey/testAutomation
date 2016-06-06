@@ -53,7 +53,7 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
  */
-public class DataRegionTable extends Component
+public class DataRegionTable extends Component implements WebDriverWrapper.PageLoadListener
 {
     public static final boolean isNewDataRegion = true; // TODO: Remove flag once conversion is complete
 
@@ -104,7 +104,7 @@ public class DataRegionTable extends Component
         _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
         _floatingHeaders = !Locator.xpath("tbody/tr").withClass("dataregion_column_header_row_spacer").findElements(_tableElement).isEmpty();
 
-        _driver.addPageLoadListener(this::clearCache);
+        _driver.addPageLoadListener(this);
     }
 
     /**
@@ -155,6 +155,11 @@ public class DataRegionTable extends Component
     public WebDriverWrapper getDriver()
     {
         return _driver;
+    }
+
+    public void afterPageLoad()
+    {
+        clearCache();
     }
 
     protected void clearCache()

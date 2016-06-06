@@ -52,7 +52,7 @@ public abstract class Component implements SearchContext
 
     protected abstract class Elements extends ComponentElements implements SearchContext
     {
-        protected SearchContext getContext()
+        protected final SearchContext getContext()
         {
             return getComponentElement();
         }

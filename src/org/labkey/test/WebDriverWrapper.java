@@ -68,6 +68,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -1659,6 +1660,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (msWait > 0)
         {
+            _pageLoadListeners.forEach((listenerRef) -> {
+                PageLoadListener listener = listenerRef.get();
+                if (null != listener)
+                    listener.beforePageLoad();
+            });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
             prepForPageLoad();
         }
@@ -1668,18 +1674,28 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (msWait > 0)
         {
             waitForPageToLoad(msWait);
-            _pageLoadListeners.forEach(Runnable::run);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
+            _pageLoadListeners.forEach((listenerRef) -> {
+                PageLoadListener listener = listenerRef.get();
+                if (null != listener)
+                    listener.afterPageLoad();
+            });
         }
 
         return System.currentTimeMillis() - startTime;
     }
 
-    private List<Runnable> _pageLoadListeners = new ArrayList<>();
+    private List<WeakReference<PageLoadListener>> _pageLoadListeners = new ArrayList<>();
 
-    public void addPageLoadListener(Runnable listener)
+    public void addPageLoadListener(PageLoadListener listener)
     {
-        _pageLoadListeners.add(listener);
+        _pageLoadListeners.add(new WeakReference<>(listener));
+    }
+
+    public interface PageLoadListener
+    {
+        default void beforePageLoad(){}
+        default void afterPageLoad(){}
     }
 
     /**

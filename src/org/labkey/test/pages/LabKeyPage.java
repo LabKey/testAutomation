@@ -18,12 +18,13 @@ package org.labkey.test.pages;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-/**
- * This class should, eventually, contain most basic page interaction functionality
- * {@link org.labkey.test.LabKeySiteWrapper} currently does this
- */
+import java.util.List;
+
 public class LabKeyPage extends WebDriverWrapper
 {
     @Deprecated
@@ -59,5 +60,20 @@ public class LabKeyPage extends WebDriverWrapper
     public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
+    }
+
+    public class ElementCache implements SearchContext
+    {
+        @Override
+        public List<WebElement> findElements(By by)
+        {
+            return getDriver().findElements(by);
+        }
+
+        @Override
+        public WebElement findElement(By by)
+        {
+            return getDriver().findElement(by);
+        }
     }
 }

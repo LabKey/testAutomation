@@ -22,7 +22,6 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,7 +30,7 @@ import java.util.Arrays;
 
 import static org.labkey.test.components.WebPart.Locators.webPart;
 
-public abstract class WebPart extends Component
+public abstract class WebPart extends Component implements WebDriverWrapper.PageLoadListener
 {
     @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
@@ -52,7 +51,13 @@ public abstract class WebPart extends Component
         _test = driverWrapper;
         _wDriver = driverWrapper;
 
-        driverWrapper.addPageLoadListener(this::clearCache);
+        driverWrapper.addPageLoadListener(this);
+    }
+
+    @Override
+    public void afterPageLoad()
+    {
+        clearCache();
     }
 
     protected void clearCache()
@@ -108,7 +113,6 @@ public abstract class WebPart extends Component
         moveWebPart(true);
     }
 
-
     @LogMethod(quiet = true)public void moveWebPart(final boolean down)
     {
         final int initialIndex = getWebPartIndex();
@@ -150,14 +154,8 @@ public abstract class WebPart extends Component
         return _elements;
     }
 
-    protected class Elements extends ComponentElements
+    protected class Elements extends Component.Elements
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
-
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
     }
