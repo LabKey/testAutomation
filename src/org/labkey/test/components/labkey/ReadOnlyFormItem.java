@@ -5,9 +5,18 @@ import org.openqa.selenium.WebElement;
 
 public class ReadOnlyFormItem extends FormItem<String>
 {
+    private String _value;
+    private boolean _isCached;
+
     protected ReadOnlyFormItem(WebElement rowEl, WebDriver driver)
     {
+        this(rowEl, driver, true);
+    }
+
+    protected ReadOnlyFormItem(WebElement rowEl, WebDriver driver, boolean isCached)
+    {
         super(rowEl, driver);
+        _isCached = isCached;
     }
 
     public static ReadOnlyFormItemFinder ReadOnlyFormItem(WebDriver driver)
@@ -17,7 +26,9 @@ public class ReadOnlyFormItem extends FormItem<String>
 
     public String getValue()
     {
-        return elements().itemTd.getText();
+        if (!_isCached || null == _value)
+            _value = elements().itemTd.getText();
+        return _value;
     }
 
     public void setValue(String value)
@@ -27,15 +38,22 @@ public class ReadOnlyFormItem extends FormItem<String>
 
     public static class ReadOnlyFormItemFinder extends FormItemFinder<ReadOnlyFormItem, ReadOnlyFormItemFinder>
     {
+        boolean isCached = true;
+
         public ReadOnlyFormItemFinder(WebDriver driver)
         {
             super(driver);
         }
 
+        public void withoutValueCache()
+        {
+            this.isCached = false;
+        }
+
         @Override
         protected ReadOnlyFormItem construct(WebElement el, WebDriver driver)
         {
-            return new ReadOnlyFormItem(el, driver);
+            return new ReadOnlyFormItem(el, driver, isCached);
         }
     }
 }

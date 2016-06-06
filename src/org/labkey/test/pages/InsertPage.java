@@ -18,22 +18,28 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.WebDriver;
 
-public class InsertPage
+public class InsertPage extends LabKeyPage
 {
-    protected BaseWebDriverTest _test;
     protected String _title;
 
-    public InsertPage(BaseWebDriverTest test, String title)
+    public InsertPage(WebDriver driver, String title)
     {
-        _test = test;
+        super(driver);
         _title = title;
+    }
+
+    @Override
+    protected void waitForPage()
+    {
         waitForReady();
     }
 
     protected void waitForReady()
     {
-        _test.waitForElement(elements().title.withText(_title));
+        waitForElement(elements().title.withText(_title));
     }
 
     protected Elements elements()
