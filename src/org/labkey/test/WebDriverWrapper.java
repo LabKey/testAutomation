@@ -808,7 +808,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void switchToMainWindow()
     {
-        switchToWindow(0);
+        getDriver().switchTo().defaultContent();
     }
 
     public void switchToWindow(int index)
@@ -1056,23 +1056,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public int dismissAllAlerts()
     {
         int alertCount = 0;
-        while (isAlertPresent()){
-            Alert alert = getDriver().switchTo().alert();
-            log("Found unexpected alert: " + getAlertText(alert));
-            alert.dismiss();
-            alertCount++;
+        while (alertCount < 10)
+        {
+            try
+            {
+                Alert alert = getDriver().switchTo().alert();
+                log("Found unexpected alert: " + getAlertText(alert));
+                alert.dismiss();
+                alertCount++;
+            }
+            catch (NoAlertPresentException done)
+            {
+                break;
+            }
         }
-        return alertCount;
-    }
-
-    public int acceptAllAlerts()
-    {
-        int alertCount = 0;
-        while (isAlertPresent()){
-            Alert alert = getDriver().switchTo().alert();
-            log("Found unexpected alert: " + getAlertText(alert));
-            alert.accept();
-            alertCount++;
+        getDriver().switchTo().defaultContent();
+        if (alertCount == 10)
+        {
+            log("Too many alerts. Alert loop in JavaScript?");
         }
         return alertCount;
     }
