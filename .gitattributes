@@ -427,6 +427,7 @@ src/org/labkey/test/components/labkey/TextFormItem.java -text
 src/org/labkey/test/components/search/SearchBodyWebPart.java -text
 src/org/labkey/test/components/search/SearchForm.java -text
 src/org/labkey/test/components/search/SearchSideWebPart.java -text
+src/org/labkey/test/components/study/DatasetFacetPanel.java -text
 src/org/labkey/test/components/study/StudyOverviewWebPart.java -text
 src/org/labkey/test/credentials/ApiKey.java -text
 src/org/labkey/test/credentials/Credentials.java -text

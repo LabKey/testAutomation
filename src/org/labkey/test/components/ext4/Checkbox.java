@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 
 public class Checkbox extends FormItem
 {
-    WebElement _el;
+    private WebElement _el;
 
     public Checkbox(WebElement checkbox)
     {
@@ -51,22 +51,23 @@ public class Checkbox extends FormItem
 
     public void check()
     {
-        if (!isChecked())
-            _el.click();
+        set(true);
     }
 
     public void uncheck()
     {
-        if (isChecked())
-            _el.click();
+        set(false);
     }
 
     public void set(boolean checked)
     {
-        if (checked)
-            check();
-        else
-            uncheck();
+        if (checked != isChecked())
+            toggle();
+    }
+
+    public void toggle()
+    {
+        _el.click();
     }
 
     protected void assertElementType()

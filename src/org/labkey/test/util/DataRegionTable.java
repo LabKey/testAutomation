@@ -26,6 +26,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.By;
@@ -165,6 +166,11 @@ public class DataRegionTable extends Component
         _columnNames.clear();
         _mapRows.clear();
         _dataCache.clear();
+    }
+
+    public void doAndWaitForUpdate(Runnable run)
+    {
+        _driver.doAndWaitForPageSignal(run, DataRegionTable.UPDATE_SIGNAL);
     }
 
     public CustomizeView getCustomizeView()
@@ -1083,16 +1089,15 @@ public class DataRegionTable extends Component
 
     // ======== Side facet panel =========
 
-    public void openSideFilterPanel()
+    public DatasetFacetPanel openSideFilterPanel()
     {
-        _driver.click(Locators.headerButton(_regionName, "Filter"));
-        _driver.waitForElement(Locators.expandedFacetPanel(_regionName));
-        _driver.waitForElement(Locator.css(".lk-filter-panel-label"));
-    }
-
-    public void toggleAllFacetsCheckbox()
-    {
-        _driver.click(Locator.xpath("//div").withClass("lk-filter-panel-label").withText("All"));
+        if (!_driver.isElementPresent(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName)))
+        {
+            _driver.click(Locators.headerButton(_regionName, "Filter"));
+            _driver.waitForElement(Locator.css(".lk-filter-panel-label"));
+        }
+        WebElement panelEl = _driver.waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName));
+        return new DatasetFacetPanel(panelEl, this);
     }
 
     public void clickHeaderButtonByText(String buttonText)
@@ -1148,49 +1153,9 @@ public class DataRegionTable extends Component
             return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button").withText(text));
         }
 
-        private static Locator.XPathLocator facetPanel(String regionName)
-        {
-            return Locator.tagWithAttribute("div", "lk-region-facet-name", regionName);
-        }
-
-        public static Locator.XPathLocator expandedFacetPanel(String regionName)
-        {
-            return facetPanel(regionName).withDescendant(Locator.xpath("div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
-        }
-
-        public static Locator.XPathLocator collapsedFacetPanel(String regionName)
-        {
-            return facetPanel(regionName).withPredicate(Locator.xpath("div/div").withClass("x4-panel-collapsed").withClass("labkey-data-region-facet"));
-        }
-
-        public static Locator.XPathLocator facetRow(String category)
-        {
-            return Locator.xpath("//div").withClass("x4-grid-body").withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(category));
-        }
-
-        public static Locator.XPathLocator facetRow(String category, String group)
-        {
-            return facetRow(category).withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(group));
-        }
-
-        public static Locator.XPathLocator facetRowCheckbox(String category)
-        {
-            return facetRow(category).append(Locator.tag("div").withClass("x4-grid-row-checker"));
-        }
-
-        public static Locator.XPathLocator facetRowCheckbox(String category, String group)
-        {
-            return facetRow(category, group).append(Locator.tag("div").withClass("x4-grid-row-checker"));
-        }
-
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
             return Locator.tagWithAttribute("td", "column-name", regionName + ":" + fieldName);
-        }
-
-        public static Locator.XPathLocator columnHeaderWithLabel(String regionName, String fieldLabel)
-        {
-            return Locator.id(regionName).append(Locator.tagWithClass("td", "labkey-column-header")).withText(fieldLabel);
         }
     }
 

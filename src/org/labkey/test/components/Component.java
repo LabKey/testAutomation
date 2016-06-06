@@ -49,6 +49,15 @@ public abstract class Component implements SearchContext
         return getComponentElement().findElements(by);
     }
 
+
+    protected abstract class Elements extends ComponentElements implements SearchContext
+    {
+        protected SearchContext getContext()
+        {
+            return getComponentElement();
+        }
+    }
+
     protected static abstract class ComponentFinder<S extends SearchContext, C extends Component, F extends ComponentFinder<S, C, F>>
     {
         private static final int DEFAULT_TIMEOUT = 10000;
