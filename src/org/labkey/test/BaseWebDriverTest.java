@@ -1107,6 +1107,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         @Override
         protected void succeeded(Description description)
         {
+            ensureSignedInAsAdmin();
             checkErrors();
         }
 
@@ -1356,8 +1357,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     public void ensureSignedInAsAdmin()
     {
-        signOut();
-        simpleSignIn();
+        if (!onLabKeyPage())
+            goToHome();
+        if (isImpersonating())
+            stopImpersonating();
+        if (!isSignedInAsAdmin())
+            simpleSignIn();
     }
 
     private void cleanup(boolean afterTest) throws TestTimeoutException
