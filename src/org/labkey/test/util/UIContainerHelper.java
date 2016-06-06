@@ -72,7 +72,7 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @Override //TODO :  this will be necessary for full interconversion between UIcontainer and APIContainer,
     //but at the moment it's unnecessary, and complicated because the two don't have the same capabilities.
-    protected void doCreateFolder(String projectName, String folderType, String path)
+    protected void doCreateFolder(String projectName, String path, String folderType)
     {
         throw new UnsupportedOperationException("Use APIContainerHelper to create a sub-folder.");
     }
