@@ -16,9 +16,7 @@
 
 package org.labkey.test.pages;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends LabKeyPage
@@ -29,11 +27,6 @@ public class InsertPage extends LabKeyPage
     {
         super(driver);
         _title = title;
-    }
-
-    @Override
-    protected void waitForPage()
-    {
         waitForReady();
     }
 
