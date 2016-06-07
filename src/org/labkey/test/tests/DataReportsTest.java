@@ -180,7 +180,7 @@ public class DataReportsTest extends ReportTest
 
         clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewFilter("MouseId", "Mouse Id", "Equals One Of", "999320533;999320541;999320529;999320518");
+        _customizeViewsHelper.addFilter("MouseId", "Mouse Id", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
         _customizeViewsHelper.saveCustomView(QUERY_REPORT_VIEW_NAME_2);
 
         goToManageViews();
@@ -326,7 +326,7 @@ public class DataReportsTest extends ReportTest
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
 
         log("Execute and save a script");
-        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
 
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
@@ -336,9 +336,9 @@ public class DataReportsTest extends ReportTest
 
         log("Create view");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn(R_REMCOL);
-        _customizeViewsHelper.addCustomizeViewFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
-        _customizeViewsHelper.addCustomizeViewSort(R_SORT, "2.What is your sex?", "Descending");
+        _customizeViewsHelper.removeColumn(R_REMCOL);
+        _customizeViewsHelper.addFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
+        _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", "Descending");
         _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");
@@ -386,7 +386,7 @@ public class DataReportsTest extends ReportTest
         _extHelper.clickMenuButton("Reports", "Create R Report");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
-        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        assertTrue("Script didn't execute as expected", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         clickSourceTab();
         _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
@@ -541,14 +541,14 @@ public class DataReportsTest extends ReportTest
                 _ext4Helper.checkCheckbox(script);
         }
 
-        if(share)
+        if (share)
         {
             _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
-            if(shareSource)
+            if (shareSource)
                 _rReportHelper.selectOption(RReportHelper.ReportOption.showSourceTab);
         }
-        saveReport(name);
 
+        saveReport(name);
     }
 
     @LogMethod
