@@ -810,7 +810,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void switchToMainWindow()
     {
-        getDriver().switchTo().defaultContent();
+        switchToWindow(0);
     }
 
     public void switchToWindow(int index)
