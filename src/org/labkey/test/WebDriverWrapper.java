@@ -68,7 +68,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -86,7 +85,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Stack;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -1669,8 +1670,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         if (msWait > 0)
         {
-            _pageLoadListeners.forEach((listenerRef) -> {
-                PageLoadListener listener = listenerRef.get();
+            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
                     listener.beforePageLoad();
             });
@@ -1684,8 +1684,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             waitForPageToLoad(msWait);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
-            _pageLoadListeners.forEach((listenerRef) -> {
-                PageLoadListener listener = listenerRef.get();
+            _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
                     listener.afterPageLoad();
             });
@@ -1694,13 +1693,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return System.currentTimeMillis() - startTime;
     }
 
-    private List<WeakReference<PageLoadListener>> _pageLoadListeners = new ArrayList<>();
+    private static final WeakHashMap<WebDriver, Set<PageLoadListener>> _pageLoadListeners = new WeakHashMap<>();
 
     public void addPageLoadListener(PageLoadListener listener)
     {
-        _pageLoadListeners.add(new WeakReference<>(listener));
+        _pageLoadListeners.putIfAbsent(getDriver(), Collections.newSetFromMap(new WeakHashMap<>()));
+        _pageLoadListeners.get(getDriver()).add(listener);
     }
 
+    /**
+     * Interface for classes that want to be notified of page loads (e.g. to clear a cache)
+     * Not guarianteed to work flawlessly. It depends on tests using {@linkplain #doAndWaitForPageToLoad(Runnable)}
+     */
     public interface PageLoadListener
     {
         default void beforePageLoad(){}
