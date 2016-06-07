@@ -406,6 +406,12 @@ public class Crawler
         }
 
         @Override
+        public String toString()
+        {
+            return _controller + "-" + _action;
+        }
+
+        @Override
         public int hashCode()
         {
             return (null==_action?0:_action.hashCode()) ^ (null==_controller?0:_controller.hashCode());
