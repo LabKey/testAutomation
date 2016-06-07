@@ -1158,6 +1158,16 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button").withText(text));
         }
 
+        public static Locator.XPathLocator facetRow(String category)
+        {
+            return Locator.xpath("//div").withClass("x4-grid-body").withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(category));
+        }
+
+        public static Locator.XPathLocator facetRowCheckbox(String category)
+        {
+            return facetRow(category).append(Locator.tag("div").withClass("x4-grid-row-checker"));
+        }
+
         public static Locator.XPathLocator columnHeader(String regionName, String fieldName)
         {
             return Locator.tagWithAttribute("td", "column-name", regionName + ":" + fieldName);
