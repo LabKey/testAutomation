@@ -154,7 +154,7 @@ public abstract class WebPart extends Component implements WebDriverWrapper.Page
         return _elements;
     }
 
-    protected class Elements extends Component.Elements
+    protected class Elements extends ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);

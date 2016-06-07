@@ -21,6 +21,10 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+/**
+ * @deprecated Extend {@link org.labkey.test.components.Component.ElementCache} or {@link org.labkey.test.pages.LabKeyPage.ElementCache}
+ */
+@Deprecated
 public abstract class ComponentElements implements SearchContext
 {
     protected abstract SearchContext getContext();

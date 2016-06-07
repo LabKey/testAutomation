@@ -81,7 +81,7 @@ public class DatasetFacetPanel extends Component
         return _elements;
     }
 
-    protected class Elements extends Component.Elements
+    protected class Elements extends ElementCache
     {
         Map<String, Map<Integer, GroupRow>> groupRows = new HashMap<>();
         Map<String, Map<Integer, CategoryRow>> categoryRows = new HashMap<>();

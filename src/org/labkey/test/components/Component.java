@@ -49,12 +49,18 @@ public abstract class Component implements SearchContext
         return getComponentElement().findElements(by);
     }
 
-
-    protected abstract class Elements extends ComponentElements implements SearchContext
+    protected abstract class ElementCache implements SearchContext
     {
-        protected final SearchContext getContext()
+        @Override
+        public List<WebElement> findElements(By by)
         {
-            return getComponentElement();
+            return getComponentElement().findElements(by);
+        }
+
+        @Override
+        public WebElement findElement(By by)
+        {
+            return getComponentElement().findElement(by);
         }
     }
 
