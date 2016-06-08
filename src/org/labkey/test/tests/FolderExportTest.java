@@ -87,8 +87,8 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String existingGroup = "Existing Group";
 
     private static final String[] testUsers = new String[]{testUser1, testUser2, testUser3, testUser4};
-    private static final String[] importedGroups = new String[]{submitterGroup, superTesterGroup, parentGroup, groupGroup};
-    private static final String[] notImportedGroups = new String[]{emptyGroup};
+    private static final String[] importedGroups = new String[]{submitterGroup, superTesterGroup, parentGroup, groupGroup, emptyGroup};
+    private static final String[] notImportedGroups = new String[]{};
 
     private static final String[] importProjects = new String[]{
             "FolderImportTest 1",
