@@ -180,6 +180,7 @@
             <include name="commons-beanutils-1.7.jar" />
             <include name="commons-lang3-3.4.jar" />
             <include name="collections-generic-4.01.jar" />
+            <include name="commons-collections4-4.1.jar" />
             <include name="json_simple-1.1.jar" />
             <include name="junit-4.12.jar"/>
             <include name="slf4j-api-1.7.5.jar"/>
