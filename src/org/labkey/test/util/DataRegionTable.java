@@ -1042,7 +1042,12 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void setPageSize(int size)
     {
-        clickHeaderButton("Paging", size + " per page");
+        setPageSize(size, false);
+    }
+
+    public void setPageSize(int size, boolean wait)
+    {
+        clickHeaderButton("Paging", wait, size + " per page");
     }
 
     /**
