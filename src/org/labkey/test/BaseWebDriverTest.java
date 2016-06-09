@@ -1362,7 +1362,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isImpersonating())
             stopImpersonating();
         if (!isSignedInAsAdmin())
+        {
+            if (isSignedIn())
+                signOut();
             simpleSignIn();
+        }
     }
 
     private void cleanup(boolean afterTest) throws TestTimeoutException
