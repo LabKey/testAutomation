@@ -9,7 +9,7 @@ This is a minimal example of using **knitr** to produce an _HTML_ page from _Mar
 opts_chunk$set(fig.width=7, fig.height=5)
 ```
 
-Now we write some code chunks in this markdown file:
+Now we ^write^ some code chunks in this markdown file:
 
 ```{r computing}
 x <- 1+1 # a simple calculator

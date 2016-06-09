@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class RReportHelper
@@ -213,6 +214,31 @@ public class RReportHelper
 
         return rVersion;
     }
+
+    public void setPandocEnabled(Boolean enabled)
+    {
+        _test.ensureAdminMode();
+
+        _test.goToAdminConsole();
+        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+
+        _test.log("Check if R already is configured");
+
+        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+
+        String defaultScriptName = "R Scripting Engine";
+        assertTrue("R Engine not setup", scripts.isEnginePresent("R"));
+
+        scripts.editEngine(defaultScriptName);
+
+        if(enabled)
+            _test.checkCheckbox(Locator.id("editEngine_pandocEnabled"));
+        else
+            _test.uncheckCheckbox(Locator.id("editEngine_pandocEnabled"));
+
+        _test.clickButton("Submit", 0);
+    }
+
 
     private File getRExecutable()
     {

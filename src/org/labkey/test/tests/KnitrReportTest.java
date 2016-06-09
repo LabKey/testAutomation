@@ -42,8 +42,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.labkey.test.TestProperties.isScriptCheckEnabled;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends BaseWebDriverTest
@@ -123,6 +124,7 @@ public class KnitrReportTest extends BaseWebDriverTest
                                     plotLocator,
                                     //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
                                     //Locator.css(".MathJax, .mathjax")
+                                    Locator.tag("sup").withText("write^") //should contain the hat markdown v2 closing tag
         };
         String[] reportNotContains = {"```",              // Markdown for R code chunks
                                       "## R code chunks", // Uninterpreted Markdown
@@ -166,6 +168,23 @@ public class KnitrReportTest extends BaseWebDriverTest
         copyLibXml();
 
         verifyAdhocReportDependencies("ClientLib", "knitr");
+    }
+
+    @Test
+    public void testRmarkdownV2Support() throws Exception
+    {
+        Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
+                Locator.css("h2").withText("R code chunks"),
+                Locator.css("code").containing("set.seed(123)"),       // Echoed R code
+                Locator.tag("sup").withText("write") //should not contain the hat markdown v2 closing tag
+        };
+
+        String[] reportNotContains = {"```",              // Markdown for R code chunks
+                "## R code chunks", // Uninterpreted Markdown
+                "{r",               // Markdown for R code chunks
+                "data_means"};      // Non-echoed R code
+
+        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
     }
 
     final Path libXmlSource = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
@@ -269,9 +288,15 @@ public class KnitrReportTest extends BaseWebDriverTest
         return reportSource;
     }
 
-
     private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
+        return createAndVerifyKnitrReport(reportSourcePath, knitrOption, reportContains, reportNotContains, false);
+    }
+
+    private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains, boolean useRmarkdownV2)
+    {
+        _rReportHelper.setPandocEnabled(useRmarkdownV2);
+
         final String reportName = reportSourcePath.getFileName() + " Report";
         String reportSource = createKnitrReport(reportSourcePath, knitrOption);
 

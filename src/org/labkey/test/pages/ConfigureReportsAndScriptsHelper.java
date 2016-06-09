@@ -119,6 +119,7 @@ public class ConfigureReportsAndScriptsHelper
         private File _path;
         private String _command;
         private String _outputFileName;
+        private Boolean _pandocEnabled;
 
         private Map<Locator, String> configMap;
 
@@ -137,6 +138,7 @@ public class ConfigureReportsAndScriptsHelper
             addToConfigMap(Locator.id("editEngine_exePath"), getPath().getAbsolutePath());
             addToConfigMap(Locator.id("editEngine_exeCommand"), getCommand());
             addToConfigMap(Locator.id("editEngine_outputFileName"), getOutputFileName());
+            addToConfigMap(Locator.id("editEngine_pandocEnabled"), isPandocEnabled().toString());
 
             return configMap;
         }
@@ -215,6 +217,16 @@ public class ConfigureReportsAndScriptsHelper
         public void setOutputFileName(String outputFileName)
         {
             _outputFileName = outputFileName;
+        }
+
+        public Boolean isPandocEnabled()
+        {
+            return _pandocEnabled;
+        }
+
+        public void setPandocEnabled(Boolean pandocEnabled)
+        {
+            _pandocEnabled = pandocEnabled;
         }
     }
 
