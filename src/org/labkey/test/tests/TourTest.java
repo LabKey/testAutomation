@@ -180,6 +180,7 @@ public class TourTest extends BaseWebDriverTest
         TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setMode(TourEditor.TourMode.OFF);
         tourEditor.save();
+        waitForText("Saved");
         goToProjectHome();
         sleep(WAIT);
         clickFolder(SUBFOLDER1);
