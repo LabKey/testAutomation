@@ -483,6 +483,11 @@ public abstract class Locator
         return tagWithName("textarea", name);
     }
 
+    public static XPathLocator textAreaByNameContaining(String partialName)
+    {
+        return tag("textarea").withAttributeContaining("name", partialName);
+    }
+
     public static XPathLocator checkboxByTitle(String title)
     {
         return checkbox().withAttribute("title", title);
@@ -526,6 +531,16 @@ public abstract class Locator
     public static XPathLocator checkbox()
     {
         return tag("input").withAttribute("type", "checkbox");
+    }
+
+    public static XPathLocator ehrCheckbox()
+    {
+        return tag("input").withAttribute("type", "button");
+    }
+
+    public static XPathLocator ehrCheckboxIdContaining(String partialId)
+    {
+        return ehrCheckbox().withAttributeContaining("id", partialId);
     }
 
     public static XPathLocator radioButton()
