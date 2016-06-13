@@ -1357,8 +1357,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     public void ensureSignedInAsAdmin()
     {
-        if (!onLabKeyPage())
-            goToHome();
+        goToHome();
         if (isImpersonating())
             stopImpersonating();
         if (!isSignedInAsAdmin())
