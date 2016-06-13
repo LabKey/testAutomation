@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
@@ -333,19 +334,25 @@ public class RReportHelper
         return TestFileUtils.getProcessOutput(getRScriptExecutable(), FileUtil.getAbsoluteCaseSensitiveFile(script).getAbsolutePath());
     }
 
-    public void saveReport(String name)
+    public void saveReport(String name, int wait)
     {
-        _test.clickButton("Save", 0);
-
+        _test.clickButton("Save", wait);
         if (null != name)
         {
             Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            _test.waitForElement(locator);
             if (_test.isElementPresent(locator))
             {
                 _test.setFormElement(locator, name);
-                _test._ext4Helper.clickWindowButton("Save Report", "OK", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, 0);
+                Window window = new Window("Save Report", _test.getWrappedDriver());
+                window.clickButton("OK");
             }
         }
+    }
+
+    public void saveReport(String name)
+    {
+        saveReport(name,0);
     }
 
     public void selectOption(ReportOption option)
