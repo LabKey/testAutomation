@@ -555,6 +555,7 @@ public class DataReportsTest extends ReportTest
     private void saveReport(String name)
     {
         clickSourceTab();
+        waitForElement(Locator.tagWithText("span","Save"));
         _rReportHelper.saveReport(name);
     }
 
