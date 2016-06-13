@@ -195,7 +195,7 @@ public class ETLTest extends ETLBaseTest
         sleep(15000);
         _etlHelper.disableScheduledRun("Error Bad Source Schema");
         clickTab("Portal");
-        Assert.assertTrue(countText("java.lang.IllegalArgumentException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
+        Assert.assertTrue(countText("ConfigurationException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
         //no way of knowing error count due to scheduled job running unknown number of times
         pushLocation();
         resetErrors();
@@ -311,6 +311,7 @@ public class ETLTest extends ETLBaseTest
         {
             assertTrue("Incorrect exception message on bad source: ", e.getMessage().startsWith("Could not find table"));
             assertEquals("ERROR", _diHelper.getTransformStatusByTransformId(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP));
+            _etlHelper.incrementExpectedErrorCount(false);
         }
 
         //Stored proc result set ETL
