@@ -289,8 +289,6 @@ public class PortalHelper extends WebDriverWrapper
 
         if (title != null)
             setFormElement(Locator.name("title"), title);
-        //TODO: remove this once finished troubleshooting argos qwp problem
-        logOptions(_ext4Helper.getComboBoxOptions(Locator.id("schemaName")));
 
         _ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
 
@@ -316,13 +314,6 @@ public class PortalHelper extends WebDriverWrapper
         }
 
         waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
-    }
-
-    private void logOptions(List<String> options)
-    {
-        String schemas = "";
-        for(String option : options){schemas = schemas + option + ",";}
-        log("QueryWebPart returned schemas " + schemas + " in schema combobox.");
     }
 
     public void addReportWebPart(@LoggedParam String reportId)
