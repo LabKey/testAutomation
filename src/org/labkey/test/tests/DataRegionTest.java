@@ -18,10 +18,12 @@ package org.labkey.test.tests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -61,14 +63,19 @@ public class DataRegionTest extends BaseWebDriverTest
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;
 
-    private static final String[] QWP_TABS = {
-            "Show default view for query", "Filter by Tag equals blue",
-            "Sort by Tag", "Hide buttons", "Hide Edit and Details columns",
-            "Set Paging to 3 with config", "Set Paging to 2 with API",
-            "Regression #25337"
-    };
+    private static final List<Pair<String, String>> QWP_TAB_SIGNALS =
+            Arrays.asList(new Pair<>("Show default view for query", "testQueryOnly"),
+                    new Pair<>("Filter by Tag equals blue", "testFilterArray"),
+                    new Pair<>("Sort by Tag", "testSort"),
+                    new Pair<>("Hide buttons", "testHideButtons"),
+                    new Pair<>("Hide Edit and Details columns", "testHideColumns"),
+                    new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
+                    new Pair<>("Set Paging to 2 with API", "testSetPaging"),
+                    new Pair<>("Regression #25337", "test25337"),
+                    new Pair<>("Change Page Offset", "testPageOffset")
+                    );
 
-    private static final String QWP_SCHEMA_LISTING = "List out all queries in schema";
+    private static final Pair<String, String> QWP_SCHEMA_LISTING = new Pair<>("List out all queries in schema", "testSchemaOnly");
 
     static
     {
@@ -142,24 +149,24 @@ public class DataRegionTest extends BaseWebDriverTest
         clickButton("Populate test data");
         sleep(1000);
 
-        log("Testing " + QWP_SCHEMA_LISTING);
-        click(Locator.linkWithText(QWP_SCHEMA_LISTING));
+        log("Testing " + QWP_SCHEMA_LISTING.first);
+        click(Locator.linkWithText(QWP_SCHEMA_LISTING.first));
 
-        if (pageHasAlert(3000)) {
+        if (pageHasAlert(3000, QWP_SCHEMA_LISTING.second)) {
             dismissAllAlerts();
-            fail(QWP_SCHEMA_LISTING + " failed");
+            fail(QWP_SCHEMA_LISTING.first + " failed");
         }
-        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING));
+        waitForElement(Locator.css("span.labkey-wp-title-text").withText(QWP_SCHEMA_LISTING.first));
 
-        List<String> tabs = Arrays.asList(QWP_TABS);
-        tabs.stream().forEach(this::testQWPTab);
+        QWP_TAB_SIGNALS.stream().forEach(this::testQWPTab);
 
         log("Drop QWPDemo test data");
         beginAt("/query/" + getProjectName() + "/QWPDemo.view");
         clickButton("Drop schema and clear test data"); // drop domain, needed for clean up project
     }
 
-    private boolean pageHasAlert(long wait) {
+    // check every 500ms for specified wait amount for either alert or successSignal
+    private boolean pageHasAlert(long wait, String successSignal) {
         long t= System.currentTimeMillis();
         long end = t + wait;
         while(System.currentTimeMillis() < end) {
@@ -167,18 +174,21 @@ public class DataRegionTest extends BaseWebDriverTest
             {
                 return true;
             }
-            sleep(1000);
+            if (isElementPresent(LabKeyPage.Locators.pageSignal(successSignal))) {
+                return false;
+            }
+            sleep(500);
         }
         return false;
     }
 
-    private void testQWPTab(String title)
+    private void testQWPTab(Pair<String, String> titleSignalPair)
     {
-        log("Testing " + title);
-        click(Locator.linkWithText(title));
-        if (pageHasAlert(3000)){
+        log("Testing " + titleSignalPair.first);
+        click(Locator.linkWithText(titleSignalPair.first));
+        if (pageHasAlert(3000, titleSignalPair.second)){
             dismissAllAlerts();
-            fail(title + " failed");
+            fail(titleSignalPair.first + " failed");
         }
         waitForElement(Locator.css(".labkey-data-region"));
     }
