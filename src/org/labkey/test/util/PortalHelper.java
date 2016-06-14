@@ -278,21 +278,28 @@ public class PortalHelper extends WebDriverWrapper
 
     @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
+        addQueryWebPart(title, schemaName, queryName, viewName, WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName, int wait)
+    {
         addWebPart("Query");
 
         waitForElement(Locator.css(".schema-loaded-marker"));
 
         if (title != null)
             setFormElement(Locator.name("title"), title);
+        //TODO: remove this once finished troubleshooting argos qwp problem
+        logOptions(_ext4Helper.getComboBoxOptions(Locator.id("schemaName")));
 
         _ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
 
         if (queryName != null)
         {
             click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
-            waitForElement(Locator.css(".query-loaded-marker"));
+            waitForElement(Locator.css(".query-loaded-marker"), wait);
             _ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
-            waitForElement(Locator.css(".view-loaded-marker"));
+            waitForElement(Locator.css(".view-loaded-marker"), wait);
 
             if (viewName != null)
                 _ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
@@ -309,6 +316,13 @@ public class PortalHelper extends WebDriverWrapper
         }
 
         waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
+    }
+
+    private void logOptions(List<String> options)
+    {
+        String schemas = "";
+        for(String option : options){schemas = schemas + option + ",";}
+        log("QueryWebPart returned schemas " + schemas + " in schema combobox.");
     }
 
     public void addReportWebPart(@LoggedParam String reportId)
