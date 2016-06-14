@@ -246,7 +246,7 @@ public abstract class AbstractContainerHelper
             _test.clickButton("Next", _test.defaultWaitForPage);
         }
 
-        //unless we need addtional tabs, we end here.
+        //unless we need additional tabs, we end here.
         if (null == tabsToAdd || tabsToAdd.length == 0)
             return;
 
