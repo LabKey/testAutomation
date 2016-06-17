@@ -257,8 +257,8 @@ public class ETLHelper
 
     protected void addTransformResult(String transformId, String version, String status, String recordsAffected)
     {
-        addTransformSummary(new String[]{transformId, version, null, status, recordsAffected, null});
-        addTransformHistory(transformId, new String[]{transformId, version, null, status, recordsAffected, null, "Job Details", "Run Details"});
+        addTransformSummary(new String[]{transformId, version, null, status, recordsAffected, null, null});
+        addTransformHistory(transformId, new String[]{transformId, version, null, status, recordsAffected, null, "Job Details", "Run Details", null});
     }
 
     // The summary table should only have one row per transform sorted by transform id so make sure
@@ -731,7 +731,9 @@ public class ETLHelper
                     "Last Run",
                     "Last Status",
                     "Records Processed",
-                    "Execution Time"}, data);
+                    "Execution Time",
+                    "Transform Run Log"
+            }, data);
         }
 
         @Override
@@ -762,7 +764,8 @@ public class ETLHelper
                     "Records Processed",
                     "Execution Time",
                     "Job Info",
-                    "Run Info"
+                    "Run Info",
+                    "Transform Run Log"
             }, data);
 
             _transformId = transformId;

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.etl;
 
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.tests.SimpleModuleTest;
 import org.labkey.test.util.DataIntegrationHelper;
