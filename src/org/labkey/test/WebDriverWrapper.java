@@ -457,7 +457,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "Ext.EventManager is undefined", // Causing many TeamCity failures. No obvious culprit
                     "NS_ERROR_FAILURE", // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
                     "NetworkError: A network error occurred.", // Just started appearing on TeamCity Linux/Firefox after r44480 ("26236 - Branding updates - Adjust for font rendering differences in Firefox") TODO: Track down culprit and remove this line
-                    "TypeError: view.getComputedStyle(...) is null" //only on firefox for argos. TODO: get rid of this once the issue is fixed
+                    "TypeError: view.getComputedStyle(...) is null", //only on firefox for argos. TODO: get rid of this once the issue is fixed
+                    "data-js-id=\"video-modal\""  // Sometimes see this on CDS.
             );
         }
 
