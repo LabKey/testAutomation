@@ -38,6 +38,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
@@ -216,7 +217,8 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"));
         assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "SET");
         clickAndWait(Locator.linkWithText("delete"));
-        assertTextNotPresent("AAA");
+        TextSearcher tsrch= new TextSearcher(() ->getBodyText()).setSearchTransformer(t->t);
+        assertTextNotPresent(tsrch, "AAA");
 
         // Check that non-integer priority results in an error message
         addKeyword("priority", "Priority", "ABC");
