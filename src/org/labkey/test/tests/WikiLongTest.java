@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
@@ -176,7 +175,6 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Test add content to link page");
         WebElement wikiLink = Locator.linkWithText(WIKI_PAGE2_NAME).findElement(getDriver());
         assertEquals("Link to other wiki has bad href", WebTestHelper.buildURL("wiki", getProjectName(), "page", Maps.of("name", WIKI_PAGE2_NAME.replace(" ", "%20"))), wikiLink.getAttribute("href"));
-//        assertFalse("Link to other wiki has 'missing' flag", wikiLink.getAttribute("class").contains("missing"));
         clickAndWait(wikiLink);
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));

@@ -164,6 +164,10 @@ public class WikiTest extends BaseWebDriverTest
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
+
+        // tinyMCE does not decode URLs properly, re-navigate to this page letting the server re-write the URL.
+        // This can be removed once tinyMCE is upgraded to 4.x+ (3.x as of this writing)
+        clickTab("Portal");
         click(Locator.tagWithAttribute("span", "title", "Edit Inline"));
         waitForElement(inlineEditor);
 
@@ -173,7 +177,7 @@ public class WikiTest extends BaseWebDriverTest
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
         assertTextNotPresent(WIKI_CHECK_CONTENT);
-        assertButtonNotPresent("Save");
+        assertElementNotPresent(Locator.lkButton("Save"));
 
         log("** test second edit on inline wiki webpart editor");
         click(Locator.tagWithAttribute("span", "title", "Edit Inline"));
