@@ -529,6 +529,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             try
             {
+                WebTestHelper.getHttpResponse(buildURL("login", "logout"));
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
                 WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
@@ -548,7 +549,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 // ignore timeouts that occur during startup; a poorly timed request
                 // as the webapp is loading may hang forever, causing a timeout.
-                log("Ignoring WebDriver exception: " + e.getMessage());
+                log("Waiting for server: " + e.getMessage());
+            }
+            catch (RuntimeException e)
+            {
+                if (e.getCause() != null && e.getCause() instanceof IOException)
+                    log("Waiting for server: " + e.getCause().getMessage());
+                else
+                    throw e;
             }
             finally
             {
