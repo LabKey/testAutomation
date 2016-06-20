@@ -2922,8 +2922,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
 
+        log(">> Waiting for " + description);
+        TestLogger.increaseIndent();
         waitFor(() -> {
-                    log("Waiting for " + description);
                     List<String> statusValues = getPipelineStatusValues();
                     log("[" + StringUtils.join(statusValues,",") + "]");
                     if (!expectError)
@@ -2940,6 +2941,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 "Pipeline jobs did not complete.", wait);
 
         assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
+        TestLogger.decreaseIndent();
+        log("<< " + description + " complete");
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
