@@ -22,7 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -189,7 +189,7 @@ public class RReportHelper
 
         _test.log("Check if R already is configured");
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         String defaultScriptName = "R Scripting Engine";
         if (scripts.isEnginePresent("R"))
@@ -209,9 +209,9 @@ public class RReportHelper
         _test.log("Try configuring R");
         String rVersion = getRVersion(getRExecutable());
 
-        ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(getRExecutable());
+        ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getRExecutable());
         config.setVersion(rVersion);
-        scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.R, config);
+        scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R, config);
 
         return rVersion;
     }
@@ -225,7 +225,7 @@ public class RReportHelper
 
         _test.log("Check if R already is configured");
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         String defaultScriptName = "R Scripting Engine";
         assertTrue("R Engine not setup", scripts.isEnginePresent("R"));

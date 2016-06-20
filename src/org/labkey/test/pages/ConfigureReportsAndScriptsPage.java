@@ -31,13 +31,13 @@ import java.util.Map;
 /**
  * org.labkey.query.reports.ReportsController.ConfigureReportsAndScriptsAction
  */
-public class ConfigureReportsAndScriptsHelper
+public class ConfigureReportsAndScriptsPage
 {
     private static final String DEFAULT_ENGINE = "Mozilla Rhino";
 
     BaseWebDriverTest _test;
 
-    public ConfigureReportsAndScriptsHelper(BaseWebDriverTest test)
+    public ConfigureReportsAndScriptsPage(BaseWebDriverTest test)
     {
         _test = test;
         waitForEnginesGrid();

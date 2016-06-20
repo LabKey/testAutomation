@@ -20,7 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
-import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -54,7 +54,7 @@ public class PythonHelper
 
         _test.log("Check if Python already is configured");
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         String defaultScriptName = "Python Scripting Engine";
         if (scripts.isEnginePresent("Python"))
@@ -72,11 +72,11 @@ public class PythonHelper
 
         String pythonVersion = getPythonVersion(getPythonExecutable());
 
-        ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(getPythonExecutable());
+        ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getPythonExecutable());
         config.setLanguage("Python");
         config.setExtensions("py");
         config.setVersion(pythonVersion);
-        scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.EXTERNAL, config);
+        scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.EXTERNAL, config);
 
         return pythonVersion;
     }

@@ -18,7 +18,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -41,7 +41,7 @@ public class PerlHelper
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
         _test.log("Check if Perl already is configured");
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         if (scripts.isEnginePresent("Perl"))
             return;
@@ -68,8 +68,8 @@ public class PerlHelper
 
             if (files.length == 1)
             {
-                ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(files[0]);
-                scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.PERL, config);
+                ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(files[0]);
+                scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.PERL, config);
                 return;
             }
             else if (files.length > 1)

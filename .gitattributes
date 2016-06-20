@@ -449,7 +449,7 @@ src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
 src/org/labkey/test/pages/AssayDesignerPage.java -text
 src/org/labkey/test/pages/BaseDesignerPage.java -text
-src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
+src/org/labkey/test/pages/ConfigureReportsAndScriptsPage.java -text
 src/org/labkey/test/pages/DatasetInsertPage.java -text
 src/org/labkey/test/pages/FolderManagementFolderTree.java -text
 src/org/labkey/test/pages/InsertPage.java -text

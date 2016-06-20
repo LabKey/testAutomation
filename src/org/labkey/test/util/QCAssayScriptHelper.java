@@ -19,7 +19,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
 
 import java.io.File;
 
@@ -44,7 +44,7 @@ public class QCAssayScriptHelper
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
         _test.log("setup a java engine");
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         if (!scripts.isEnginePresent(engineLanguage))
         {
@@ -57,7 +57,7 @@ public class QCAssayScriptHelper
                     fail("unable to setup the java engine");
             }
 
-            ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(javaExe);
+            ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(javaExe);
             config.setName(engineName);
             config.setLanguage(engineLanguage);
             config.setExtensions("jar");
@@ -66,7 +66,7 @@ public class QCAssayScriptHelper
             // add -Xdebug and -Xrunjdwp parameters to the engine command in order to attach a debugger to you transform script
             //config.setCommand("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006 -jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
 
-            scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.EXTERNAL, config);
+            scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.EXTERNAL, config);
         }
     }
 
@@ -76,7 +76,7 @@ public class QCAssayScriptHelper
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
 
-        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+        ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         if (scripts.isEnginePresent(engineLanguage))
         {
