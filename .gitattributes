@@ -443,6 +443,7 @@ src/org/labkey/test/etl/ETLRemoteSourceTest.java -text
 src/org/labkey/test/etl/ETLSimpleTransformTest.java -text
 src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
+src/org/labkey/test/io/Grep.java -text
 src/org/labkey/test/module/ModuleTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text

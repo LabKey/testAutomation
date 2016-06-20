@@ -557,6 +557,7 @@
             <sysproperty key="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
+            <sysproperty key="tomcat.home" value="${tomcat.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
             <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
             <sysproperty key="test.credentials.file" value="${test.credentials.file}"/>
@@ -988,6 +989,9 @@
             </and>
         </condition>
 
+        <condition property="tomcat.home" value="${env.CATALINA_HOME}" else="">
+            <isset property="env.CATALINA_HOME"/>
+        </condition>
 
         <echo message="User property overrides:" />
         <echo message="    suite: ${sysprop.suite}"/>
@@ -1003,6 +1007,7 @@
         <echo message="    view check: ${sysprop.viewCheck}"/>
         <echo message="    labkey.port: ${sysprop.labkey.port}"/>
         <echo message="    target server ${sysprop.labkey.server}"/>
+        <echo message="    tomcat home ${tomcat.home}"/>
         <echo message="    labkey.contextpath: ${sysprop.labkey.contextpath}"/>
         <echo message="    database: ${sysprop.databaseType} ${sysprop.databaseVersion}" />
         <echo message="    shuffleTests: ${sysprop.shuffleTests}" />
@@ -1067,6 +1072,7 @@
             <sysproperty key="selenium.reuseWebDriver" value="${selenium.reuseWebDriver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
+            <sysproperty key="tomcat.home" value="${tomcat.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
             <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
             <sysproperty key="test.credentials.file" value="${test.credentials.file}"/>

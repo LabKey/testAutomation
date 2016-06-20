@@ -19,12 +19,20 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.io.Grep;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, DailyB.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
@@ -59,6 +67,25 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Do Database Check"), 120000);
         waitForText(60000, "Database Consistency checker complete");
         assertTextNotPresent("ERROR");
+    }
+
+    @Test
+    public void testTomcatLogs() throws Exception
+    {
+        File tomcatHome = TestProperties.getTomcatHome();
+        assertTrue("Specified tomcat.home does not exist: " + tomcatHome +
+                "\nMake sure CATALINA_HOME is set or specify 'tomcat.home' when running tests",
+                tomcatHome != null && tomcatHome.exists());
+        File logDir = new File(tomcatHome, "logs");
+        File[] logs = logDir.listFiles();
+        Map<File, Integer> contaminatedLogs = Grep.grep(PasswordUtil.getPassword(), logs);
+        Map<String, String> failureFiles = new TreeMap<>();
+        contaminatedLogs.keySet().stream().forEach(
+                file -> failureFiles.put(file.getName(), "line " + contaminatedLogs.get(file)));
+
+        assertTrue(String.format("These tomcat logs (in %s) contained unwanted text [%s]:\n%s",
+                tomcatHome.getAbsolutePath(), PasswordUtil.getPassword(), failureFiles.toString()),
+                failureFiles.isEmpty());
     }
 
     @Override
