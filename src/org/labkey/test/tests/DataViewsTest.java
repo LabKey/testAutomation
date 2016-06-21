@@ -186,9 +186,9 @@ public class DataViewsTest extends ParticipantListTest
         waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
         enableEditMode();
         openEditPanel(REPORT_TO_DELETE);
-        waitForElement(Ext4Helper.Locators.ext4Button("Delete View"));
-        clickButton("Delete View", 0);
-        waitForText("Delete View?");
+        waitForElement(Ext4Helper.Locators.ext4Button("Delete"));
+        clickButton("Delete", 0);
+        waitForText("Delete?");
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.linkContainingText(REPORT_TO_DELETE));
     }

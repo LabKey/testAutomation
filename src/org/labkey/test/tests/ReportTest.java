@@ -39,8 +39,8 @@ public abstract class ReportTest extends StudyBaseTest
 
         click(Locator.linkContainingText("Delete Selected"));
 
-        _extHelper.waitForExtDialog("Delete Views", WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.clickWindowButton("Delete Views", "OK", 0, 0);
+        _extHelper.waitForExtDialog("Delete", WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.clickWindowButton("Delete", "OK", 0, 0);
 
         // make sure the report is deleted
         waitFor(() -> !isElementPresent(report),
