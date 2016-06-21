@@ -64,7 +64,7 @@ public class ElisaAssayTest extends AbstractQCAssayTest
         log("Starting ELISA Assay BVT Test");
 
         //revert to the admin user
-        ensureSignedInAsAdmin();
+        ensureSignedInAsPrimaryTestUser();
 
         log("Testing ELISA Assay Designer");
 

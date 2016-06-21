@@ -219,7 +219,7 @@ public class SecurityTest extends BaseWebDriverTest
         
         userPasswordResetTest(resetUrl);
 
-        ensureSignedInAsAdmin();
+        ensureSignedInAsPrimaryTestUser();
     }
 
     @LogMethod private void dumbsterTest()

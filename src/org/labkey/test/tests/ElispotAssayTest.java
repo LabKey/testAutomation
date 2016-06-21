@@ -278,7 +278,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     protected void setupFolder()
     {
         //revert to the admin user
-        ensureSignedInAsAdmin();
+        ensureSignedInAsPrimaryTestUser();
 
         log("Testing Elispot Assay Designer");
 

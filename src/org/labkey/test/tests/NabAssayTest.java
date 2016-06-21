@@ -201,7 +201,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Starting Assay BVT Test");
         //revert to the admin user
-        ensureSignedInAsAdmin();
+        ensureSignedInAsPrimaryTestUser();
 
         log("Testing NAb Assay Designer");
 

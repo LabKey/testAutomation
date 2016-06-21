@@ -56,7 +56,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         log("Starting Drug Sensitivity Assay BVT Test");
 
         //revert to the admin user
-        ensureSignedInAsAdmin();
+        ensureSignedInAsPrimaryTestUser();
 
         log("Testing Drug Sensitivity Assay Designer");
 
