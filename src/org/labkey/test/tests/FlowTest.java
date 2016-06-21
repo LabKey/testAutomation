@@ -527,16 +527,13 @@ public class FlowTest extends BaseFlowTest
         selectQuery("exp", "Runs");
         waitForText("view data");
         clickAndWait(Locator.linkWithText("view data"));
-        List<WebElement> links = getDriver().findElements(By.xpath("//a[@title='Experiment run graph']"));
-        int linkCount = links.size();
+        int linkCount = Locator.tagWithAttribute("a", "title", "Experiment run graph").findElements(getDriver()).size();
         for (int i = 0; i < linkCount; i++)
         {
             pushLocation();
-            links = getDriver().findElements(By.xpath("//a[@title='Experiment run graph']"));
-            WebElement link = links.get(i);
-            link.click();
-            assertTextNotPresent("Error");
+            clickAndWait(Locator.xpath("//a[@title='Experiment run graph']"));
             assertTextPresent("Click on a node in the graph below for details.");
+            assertTextNotPresent("Error");
             popLocation();
         }
     }
