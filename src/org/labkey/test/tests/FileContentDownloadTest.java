@@ -33,12 +33,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-import com.google.common.base.Function;
 
 import static org.junit.Assert.assertEquals;
 
@@ -90,15 +91,14 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         assertEquals(getZipDownloadFileName(), download.getName());
 
         Set<String> filesInZip = new HashSet<>();
-        try (
-                InputStream is = new FileInputStream(download);
-                ZipInputStream zip = new ZipInputStream(is))
+
+        try (ZipFile zipFile = new ZipFile(download))
         {
-            while (zip.available() != 0)
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements())
             {
-                ZipEntry entry = zip.getNextEntry();
-                if (entry != null)
-                    filesInZip.add(entry.getName());
+                ZipEntry zEntry = entries.nextElement();
+                filesInZip.add(zEntry.getName());
             }
         }
 
