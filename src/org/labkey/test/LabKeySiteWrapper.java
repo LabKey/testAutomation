@@ -47,6 +47,7 @@ import java.util.Stack;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 /**
@@ -128,6 +129,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         WebTestHelper.setDefaultSession(getDriver());
+    }
+
+    /**
+     * Just hit the logout action to sign out or stop impersonating
+     */
+    public void simpleSignOut()
+    {
+        beginAt(buildURL("login", "logout"));
     }
 
     public void assertSignedInNotImpersonating()
@@ -413,16 +422,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
-    protected void ensureNotImpersonating()
-    {
-        if (!onLabKeyPage())
-            goToHome();
-
-        if (!isSignedInAsAdmin())
-            beginAt("/login/logout.view?");
-    }
-
-    protected final HashMap<String, String> usersAndDisplayNames = new HashMap<>();
+    protected final Map<String, String> usersAndDisplayNames = new HashMap<>();
 
     // assumes there are not collisions in the database causing unique numbers to be appended
     // TODO Can be static should be moved to the WebTestHelper test class.

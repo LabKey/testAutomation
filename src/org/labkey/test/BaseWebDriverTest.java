@@ -37,13 +37,9 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
@@ -298,7 +294,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             waitForStartup();
             log("Skipping sign in.  Test runs as guest.");
-            beginAt("/login/logout.view");
+            simpleSignOut();
             return;
         }
 
@@ -313,7 +309,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForStartup();
         log("Signing in");
         //
-        beginAt("/login/logout.view");
+        simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
         ensureAdminMode();
@@ -487,13 +483,19 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void ensureAdminMode()
     {
-        if (!isSignedInAsAdmin())
-            stopImpersonating();
+        if (!isUserSystemAdmin())
+        {
+            if (!onLabKeyPage())
+                goToHome();
+            if (isImpersonating())
+                simpleSignOut();
+        }
         if (!isElementPresent(Locators.projectBar))
         {
             goToHome();
             waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
         }
+        assertTrue("Test user '" + getCurrentUser() + "' is not a site admin", isUserSystemAdmin());
     }
 
     public void goToAdminConsole()
@@ -918,84 +920,103 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static int currentTestNumber;
 
     @ClassRule
-    public static TestWatcher testClassWatcher() {return new TestWatcher()
+    public static RuleChain testClassWatcher()
     {
-        @Override
-        public void starting(Description description)
+        TestWatcher innerClassWatcher = new TestWatcher()
         {
-            testClassStartTime = System.currentTimeMillis();
-            testClass = description.getTestClass();
-            _driver = null;
-            testCount = description.getChildren().size();
-            currentTestNumber = 0;
-            beforeClassSucceeded = false;
-            _anyTestCaseFailed = false;
-
-            TestLogger.resetLogger();
-            TestLogger.log("// BeforeClass - " + description.getTestClass().getSimpleName() + " \\\\");
-            TestLogger.increaseIndent();
-
-            ArtifactCollector.init();
-
-            try
+            @Override
+            public void starting(Description description)
             {
-                currentTest = (BaseWebDriverTest)testClass.newInstance();
-            }
-            catch (InstantiationException | IllegalAccessException e)
-            {
-                throw new RuntimeException(e);
-            }
+                testClassStartTime = System.currentTimeMillis();
+                testClass = description.getTestClass();
+                _driver = null;
+                testCount = description.getChildren().size();
+                currentTestNumber = 0;
+                beforeClassSucceeded = false;
+                _anyTestCaseFailed = false;
 
-            currentTest.setUp();
-        }
+                ArtifactCollector.init();
 
-        @Override
-        protected void failed(Throwable e, Description description)
-        {
-            String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
-
-            if (currentTest != null)
-            {
                 try
                 {
-                    currentTest.handleFailure(e, pseudoTestName);
+                    currentTest = (BaseWebDriverTest) testClass.newInstance();
                 }
-                catch (RuntimeException | Error secondary)
+                catch (InstantiationException | IllegalAccessException e)
                 {
-                    TestLogger.log("Error while collecting failure data");
-                    System.err.println(e.getMessage());
+                    throw new RuntimeException(e);
+                }
+
+                currentTest.setUp();
+
+                if (getDownloadDir().exists())
+                {
+                    try{
+                        FileUtils.deleteDirectory(getDownloadDir());
+                    }
+                    catch (IOException ignore) { }
+                }
+
+                currentTest.getContainerHelper().clearCreatedProjects();
+                currentTest.doPreamble();
+            }
+
+            @Override
+            protected void succeeded(Description description)
+            {
+                if (reenableMiniProfiler)
+                    getCurrentTest().setMiniProfilerEnabled(true);
+
+                if (!_anyTestCaseFailed)
+                    getCurrentTest().doPostamble();
+                else
+                    TestLogger.log("Skipping post-test checks because a test case failed.");
+            }
+        };
+
+        TestWatcher classFailWatcher = new TestWatcher()
+        {
+            @Override
+            protected void failed(Throwable e, Description description)
+            {
+                String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
+
+                if (getCurrentTest() != null)
+                {
+                    getCurrentTest().handleFailure(e, pseudoTestName);
                 }
             }
-        }
 
-        @Override
-        protected void finished(Description description)
+            @Override
+            protected void finished(Description description)
+            {
+                doTearDown();
+            }
+        };
+
+        TestWatcher loggingClassWatcher = new TestWatcher()
         {
-            doTearDown();
+            @Override
+            public void starting(Description description)
+            {
+                TestLogger.resetLogger();
+                TestLogger.log("// BeforeClass - " + description.getTestClass().getSimpleName() + " \\\\");
+                TestLogger.increaseIndent();
+            }
 
-            TestLogger.resetLogger();
-            TestLogger.log("\\\\ AfterClass Complete - " + description.getTestClass().getSimpleName() + " //");
-        }
-    };}
+            @Override
+            protected void finished(Description description)
+            {
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ AfterClass Complete - " + description.getTestClass().getSimpleName() + " //");
+            }
+        };
+
+        return RuleChain.outerRule(loggingClassWatcher).around(classFailWatcher).around(innerClassWatcher);
+    }
 
     public static Class getCurrentTestClass()
     {
         return testClass;
-    }
-
-    @BeforeClass
-    public static void preamble()
-    {
-        if (getDownloadDir().exists())
-        {
-            try{
-                FileUtils.deleteDirectory(getDownloadDir());
-            }
-            catch (IOException ignore) { }
-        }
-
-        currentTest.getContainerHelper().clearCreatedProjects();
-        currentTest.doPreamble();
     }
 
     private void doPreamble()
@@ -1020,31 +1041,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
-    }
-
-    @Before
-    public final void beforeTest() throws Exception
-    {
-        ensureNotImpersonating();
-        simpleSignIn();
-    }
-
-    @After
-    public final void afterTest()
-    {
-        checkJsErrors();
-    }
-
-    @AfterClass
-    public static void postamble() throws Exception
-    {
-        if (beforeClassSucceeded)
-        {
-            if (reenableMiniProfiler)
-                getCurrentTest().setMiniProfilerEnabled(true);
-
-            getCurrentTest().doPostamble();
-        }
     }
 
     private static boolean testClassTimedOut = false;
@@ -1082,132 +1078,139 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Rule
     public Timeout testTimeout = new Timeout(30, TimeUnit.MINUTES);
 
-    private TestWatcher _watcher = new TestWatcher()
+    @Rule
+    public final RuleChain testCaseRules()
     {
-        @Override
-        public Statement apply(Statement base, Description description)
+        TestWatcher _watcher = new TestWatcher()
         {
-            final Statement statement = super.apply(base, description);
-            return new Statement()
+            @Override
+            public Statement apply(Statement base, Description description)
             {
-                @Override
-                public void evaluate() throws Throwable
+                final Statement statement = super.apply(base, description);
+                return new Statement()
                 {
-                    Assume.assumeFalse("Class timed out, skipping remaining tests", testClassTimedOut);
-                    statement.evaluate();
-                }
-            };
-        }
-
-        @Override
-        protected void starting(Description description)
-        {
-            // We know that @BeforeClass methods are done now that we are in a non-static context
-            beforeClassSucceeded = true;
-
-            if (TestProperties.isNewWebDriverForEachTest())
-                doTearDown();
-
-            setUp(); // Instantiate new WebDriver if needed
-            _testFailed = false;
-        }
-
-        @Override
-        protected void succeeded(Description description)
-        {
-            ensureSignedInAsAdmin();
-            checkErrors();
-        }
-
-        @Override
-        protected void failed(Throwable e, Description description)
-        {
-            Ext4Helper.resetCssPrefix();
-            handleFailure(e, description.getMethodName());
-            resetErrors();
-        }
-
-        @Override
-        protected void finished(Description description)
-        {
-            Ext4Helper.resetCssPrefix();
-        }
-    };
-
-    private TestWatcher _logger = new TestWatcher()
-    {
-        private long testCaseStartTimeStamp;
-
-        @Override
-        protected void skipped(AssumptionViolatedException e, Description description)
-        {
-            TestLogger.log(e.getMessage());
-            TestLogger.resetLogger();
-            TestLogger.log("\\\\ Test Case Skipped - " + description.getMethodName() + " //");
-        }
-
-        @Override
-        protected void starting(Description description)
-        {
-            if (currentTestNumber == 0)
-            {
-                TestLogger.resetLogger();
-                TestLogger.log("\\\\ BeforeClass - " + description.getTestClass().getSimpleName() + " Complete //");
+                    @Override
+                    public void evaluate() throws Throwable
+                    {
+                        Assume.assumeFalse("Class timed out, skipping remaining tests", testClassTimedOut);
+                        statement.evaluate();
+                    }
+                };
             }
 
-            currentTestNumber++;
-            testCaseStartTimeStamp = System.currentTimeMillis();
-            String testCaseName = description.getMethodName();
-
-            TestLogger.resetLogger();
-            TestLogger.log("// Begin Test Case - " + testCaseName + " \\\\");
-            TestLogger.increaseIndent();
-        }
-
-        @Override
-        protected void succeeded(Description description)
-        {
-            Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
-            String testCaseName = description.getMethodName();
-
-            TestLogger.resetLogger();
-            TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
-        }
-
-        @Override
-        protected void failed(Throwable e, Description description)
-        {
-            Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
-            String testCaseName = description.getMethodName();
-
-            TestLogger.resetLogger();
-            TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
-        }
-
-        @Override
-        protected void finished(Description description)
-        {
-            if (currentTestNumber == testCount)
+            @Override
+            protected void starting(Description description)
             {
+                // We know that @BeforeClass methods are done now that we are in a non-static context
+                beforeClassSucceeded = true;
+
+                if (TestProperties.isNewWebDriverForEachTest())
+                    doTearDown();
+
+                setUp(); // Instantiate new WebDriver if needed
+                ensureSignedInAsPrimaryTestUser();
+                _testFailed = false;
+            }
+
+            @Override
+            protected void succeeded(Description description)
+            {
+                checkErrors();
+            }
+        };
+
+        // Separate TestWatcher to catch failures
+        TestWatcher _failWatcher = new TestWatcher()
+        {
+            @Override
+            protected void failed(Throwable e, Description description)
+            {
+                handleFailure(e, description.getMethodName());
+                checkJsErrors();
+            }
+
+            @Override
+            protected void finished(Description description)
+            {
+                Ext4Helper.resetCssPrefix();
+                resetErrors();
+            }
+        };
+
+        TestWatcher _logger = new TestWatcher()
+        {
+            private long testCaseStartTimeStamp;
+
+            @Override
+            protected void skipped(AssumptionViolatedException e, Description description)
+            {
+                TestLogger.log(e.getMessage());
                 TestLogger.resetLogger();
-                TestLogger.log("// AfterClass - " + description.getTestClass().getSimpleName() + " \\\\");
+                TestLogger.log("\\\\ Test Case Skipped - " + description.getMethodName() + " //");
+            }
+
+            @Override
+            protected void starting(Description description)
+            {
+                if (currentTestNumber == 0)
+                {
+                    TestLogger.resetLogger();
+                    TestLogger.log("\\\\ BeforeClass - " + description.getTestClass().getSimpleName() + " Complete //");
+                }
+
+                currentTestNumber++;
+                testCaseStartTimeStamp = System.currentTimeMillis();
+                String testCaseName = description.getMethodName();
+
+                TestLogger.resetLogger();
+                TestLogger.log("// Begin Test Case - " + testCaseName + " \\\\");
                 TestLogger.increaseIndent();
             }
 
-        }
+            @Override
+            protected void succeeded(Description description)
+            {
+                Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
+                String testCaseName = description.getMethodName();
 
-        private String getElapsedString(long elapsed)
-        {
-            return String.format("%dm %d.%ds",
-                    TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                    TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                    elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-        }
-    };
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+            }
 
-    @Rule
-    public RuleChain _ruleChain = RuleChain.outerRule(_logger).around(_watcher);
+            @Override
+            protected void failed(Throwable e, Description description)
+            {
+                Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
+                String testCaseName = description.getMethodName();
+
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+            }
+
+            @Override
+            protected void finished(Description description)
+            {
+                if (currentTestNumber == testCount)
+                {
+                    TestLogger.resetLogger();
+                    TestLogger.log("// AfterClass - " + description.getTestClass().getSimpleName() + " \\\\");
+                    TestLogger.increaseIndent();
+                }
+
+            }
+
+            private String getElapsedString(long elapsed)
+            {
+                return String.format("%dm %d.%ds",
+                        TimeUnit.MILLISECONDS.toMinutes(elapsed),
+                        TimeUnit.MILLISECONDS.toSeconds(elapsed) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
+                        elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
+            }
+        };
+
+        return RuleChain.outerRule(_logger).around(_failWatcher).around(_watcher);
+    }
 
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
@@ -1248,7 +1251,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 System.err.println(e.getMessage());
             }
 
-            if (error instanceof UnreachableBrowserException || getDriver() == null)
+            if (error instanceof UnreachableBrowserException)
             {
                 return;
             }
@@ -1315,60 +1318,67 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    @LogMethod
     private void doPostamble()
     {
-        if (!_anyTestCaseFailed)
+        ensureSignedInAsPrimaryTestUser();
+
+        checkQueries();
+
+        checkViews();
+
+        if (!isPerfTest && isTestRunningOnTeamCity())
+            checkActionCoverage();
+
+        checkLinks();
+
+        if (!isTestCleanupSkipped())
         {
-            //make sure you're signed in as admin, because this won't work otherwise
-            ensureSignedInAsAdmin();
+            goToHome();
+            cleanup(true);
 
-            checkQueries();
-
-            checkViews();
-
-            if(!isPerfTest && isTestRunningOnTeamCity())
-                checkActionCoverage();
-
-            checkLinks();
-
-            if (!isTestCleanupSkipped())
+            if (getDownloadDir().exists())
             {
-                goToHome();
-                cleanup(true);
-
-                if (getDownloadDir().exists())
+                try
                 {
-                    try{
-                        FileUtils.deleteDirectory(getDownloadDir());
-                    }
-                    catch (IOException ignore) { }
+                    FileUtils.deleteDirectory(getDownloadDir());
+                }
+                catch (IOException ignore)
+                {
                 }
             }
-            else
-            {
-                log("Skipping test cleanup as requested.");
-            }
-
-            if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
-            {
-                checkLeaksAndErrors();
-            }
-
-            checkJsErrors();
         }
         else
         {
-            log("Skipping post-test checks because a test case failed.");
+            log("Skipping test cleanup as requested.");
         }
+
+        if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
+        {
+            checkLeaksAndErrors();
+        }
+
+        checkJsErrors();
+    }
+
+    /**
+     * Renamed to {@link #ensureSignedInAsPrimaryTestUser()}
+     * TODO: Remove in 16.3
+     */
+    @Deprecated
+    public void ensureSignedInAsAdmin()
+    {
+        ensureSignedInAsPrimaryTestUser();
     }
 
     @LogMethod
-    public void ensureSignedInAsAdmin()
+    public void ensureSignedInAsPrimaryTestUser()
     {
-        goToHome();
+        if (!onLabKeyPage())
+            goToHome();
         if (isImpersonating())
-            stopImpersonating();
-        if (!isSignedInAsAdmin())
+            simpleSignOut();
+        if (!isSignedInAsPrimaryTestUser())
         {
             if (isSignedIn())
                 signOut();
@@ -1494,6 +1504,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isGuestModeTest())
             return;
 
+        ensureSignedInAsPrimaryTestUser();
         if (!getServerErrors().isEmpty())
         {
             beginAt(buildURL("admin", "showErrorsSinceMark"));
@@ -2584,12 +2595,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void signOut(@Nullable String termsText)
     {
         log("Signing out");
-        beginAt("/login/logout.view");
+        simpleSignOut();
 
         acceptTermsOfUse(termsText, true);
 
         if (!isElementPresent(Locators.signInButtonOrLink)) // Sign-out action stopped impersonation
-            beginAt("/login/logout.view");
+            simpleSignOut();
         waitForElement(Locators.signInButtonOrLink);
     }
 
