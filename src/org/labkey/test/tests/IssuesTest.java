@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.collections.CaseInsensitiveHashSet;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
@@ -33,20 +34,25 @@ import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
@@ -107,13 +113,13 @@ public class IssuesTest extends BaseWebDriverTest
     public void returnToProject()
     {
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
         readyState();
     }
 
     public void readyState()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
 
         // clear region selection and filters
         issuesTable.uncheckAll();
@@ -135,10 +141,7 @@ public class IssuesTest extends BaseWebDriverTest
         _containerHelper.enableModule(getProjectName(), "Dumbster");
 
         clickProject(getProjectName());
-
-        portalHelper.addWebPart("Issues Summary");
-        portalHelper.addWebPart("Search");
-        assertTextPresent("Open");
+        _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         enableEmailRecorder();
         checkEmptyToAssignedList();
@@ -168,7 +171,7 @@ public class IssuesTest extends BaseWebDriverTest
     private void createIssues()
     {
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
         _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2));
@@ -199,59 +202,39 @@ public class IssuesTest extends BaseWebDriverTest
         popLocation();                          // and logged in again
         assertElementPresent(newIssueButton);
 
-        // AdminAction
-        clickButton("Admin");
+        addLookupValues("issues", "area", Arrays.asList("Area51", "Fremont", "Downtown"));
+        addLookupValues("issues", "type", Arrays.asList("UFO", "SPEC", "AAA"));
+        addLookupValues("issues", "milestone", Arrays.asList("2012", "2013"));
 
-        // AddKeywordAction
-        addKeywordsAndVerify("area", "Area", "Area51", "Fremont", "Downtown");
-        addKeywordsAndVerify("type", "Type", "UFO", "SPEC", "TODO", "AAA");
-
-        //SetKeywordDefaultAction
-        clickAndWait(Locator.linkWithText("set"));
-        // check that AAA is bold and [clear] link is on that row
-        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"), "AAA");
-        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "CLEAR");
-        //SetKeywordDefaultAction
-        clickAndWait(Locator.linkWithText("clear"));
-        // check that AAA is not bold and [set] link is now on that row
-        assertElementNotPresent(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"));
-        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "SET");
-        clickAndWait(Locator.linkWithText("delete"));
-        TextSearcher tsrch= new TextSearcher(() ->getBodyText()).setSearchTransformer(t->t);
-        assertTextNotPresent(tsrch, "AAA");
-
-        // Check that non-integer priority results in an error message
-        addKeyword("priority", "Priority", "ABC");
-        assertElementPresent(Locator.css(".labkey-error").withText("Priority must be an integer"));
-        assertElementNotPresent(Locator.css("#formPriority td").withText("ABC"));
-        addKeyword("priority", "Priority", "1.2");
-        assertElementPresent(Locator.css(".labkey-error").withText("Priority must be an integer"));
-        assertElementNotPresent(Locator.css("#formPriority td").withText("1.2"));
+        // create lookups for new custom fields
+        createLookupList("issues", "MyFirstString", Arrays.asList("North", "South"));
+        createLookupList("issues", "MyFifthString", Arrays.asList("Cadmium", "Polonium"));
 
         // SetCustomColumnConfigurationAction
-        setFormElement(Locator.name("int1"), "MyInteger");
-        setFormElement(Locator.name("int2"), "MySecondInteger");
-        setFormElement(Locator.name("string1"), "MyFirstString");
-        // Omit string2 to test using it in email template.
-        setFormElement(Locator.name("string3"), "MyThirdString");
-        setFormElement(Locator.name("string4"), "MyFourthString");
-        setFormElement(Locator.name("string5"), "MyFifthString");
-        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
-        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string5"));
-        clickButton("Update");
+        List<ListHelper.ListColumn> fields = new ArrayList<>();
 
-        // AddKeywordAction
-        addKeywordsAndVerify("milestone", "Milestone", "2012", "2013");
-        addKeywordsAndVerify("string1", "MyFirstString", "North", "South");
-        addKeywordsAndVerify("string5", "MyFifthString", "Cadmium", "Polonium");
+        fields.add(new ListHelper.ListColumn("MyInteger", "MyInteger", ListHelper.ListColumnType.Integer, ""));
+        fields.add(new ListHelper.ListColumn("MySecondInteger", "MySecondInteger", ListHelper.ListColumnType.Integer, ""));
+        fields.add(new ListHelper.ListColumn("MyFirstString", "MyFirstString", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "MyFirstString"))));
+        fields.add(new ListHelper.ListColumn("MyThirdString", "MyThirdString", ListHelper.ListColumnType.String, ""));
+        fields.add(new ListHelper.ListColumn("MyFourthString", "MyFourthString", ListHelper.ListColumnType.String, ""));
+        fields.add(new ListHelper.ListColumn("MyFifthString", "MyFifthString", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "MyFifthString"))));
 
-        // ListAction (empty)
-        clickButton("Back to Issues");
+        clickProject(getProjectName());
+        clickAndWait(Locator.linkWithText("Issue Summary"));
+        goToIssuesAdmin();
+
+        for (ListHelper.ListColumn col : fields)
+        {
+            _listHelper.addField(col);
+        }
+        clickButton("Save");
+
+        clickProject(getProjectName());
+        clickAndWait(Locator.linkWithText("Issue Summary"));
 
         // InsertAction
         clickButton("New Issue");
-        String customStringText = getText(Locator.name("string5"));
-        assertEquals(customStringText, "Cadmium\nPolonium");
         setFormElement(Locator.name("title"), issueTitle);
         selectOptionByText(Locator.name("type"), "UFO");
         selectOptionByText(Locator.name("area"), "Area51");
@@ -259,8 +242,16 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("comment"), "a bright flash of light");
         selectOptionByText(Locator.name("assignedTo"), getDisplayName());
         selectOptionByText(Locator.name("milestone"), "2012");
-        setFormElement(Locator.name("string4"), "http://www.issues.test");
-        selectOptionByText(Locator.name("string5"), "Polonium");
+
+        Locator fouthStringLocator = Locator.name("myFourthString");
+        if (!isElementPresent(fouthStringLocator))
+            fouthStringLocator = Locator.name("myfourthstring");
+        setFormElement(fouthStringLocator, "http://www.issues.test");
+
+        Locator fifthStringLocator = Locator.name("myFifthString");
+        if (!isElementPresent(fifthStringLocator))
+            fifthStringLocator = Locator.name("myfifthstring");
+        selectOptionByText(fifthStringLocator, "Polonium");
         clickButton("Save");
 
         // find issueId - parse the text from first space to :
@@ -328,34 +319,78 @@ public class IssuesTest extends BaseWebDriverTest
         // RssAction
     }
 
-    private void addKeyword(String fieldName, String caption, String value)
+    private void setDefaultValues(Map<String, String> defaultValues)
     {
-        addKeyword(this, fieldName, caption, value);
+        clickAndWait(Locator.linkWithText("Issue Summary"));
+        goToIssuesAdmin();
+        click(Locator.tag("div").withClass("gwt-Label").withText("Area"));
+        click(Locator.tag("span").withClass("x-tab-strip-text").withText("Advanced"));
+        clickAndWait(Locator.linkWithText("set value"));
+
+        for (Map.Entry<String, String> field : defaultValues.entrySet())
+        {
+            if ("select".equals(Locator.name(field.getKey()).findElement(getDriver()).getTagName()))
+                selectOptionByText(Locator.name(field.getKey()), field.getValue());
+            else
+                setFormElement(Locator.id(field.getKey()), field.getValue());
+        }
+        clickButton("Save Defaults");
     }
 
-    private void addKeywordsAndVerify(String fieldName, String caption, String... values)
-    {
-        addKeywordsAndVerify(this, fieldName, caption, values);
-    }
-
-    // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
-    @LogMethod(quiet = true)
-    private static void addKeyword(BaseWebDriverTest test, @LoggedParam String fieldName, String caption, String value)
-    {
-        test.setFormElement(Locator.xpath("//form[@name='add" + fieldName + "']/input[@name='keyword']"), value);
-        test.clickButton("Add " + caption);
-    }
-
-    // Add new keyword(s) to the given field and verify they were added without error.  Need to be on the issues admin page already.
     @LogMethod
-    public static void addKeywordsAndVerify(BaseWebDriverTest test, @LoggedParam String fieldName, String caption, String... values)
+    private void setRequiredFields(int[] positions, boolean selected)
     {
+        for (int pos : positions)
+        {
+            click(Locator.tag("div").withAttribute("id", "label" + pos));
+            click(Locator.tag("span").withClass("x-tab-strip-text").withText("Validators"));
+
+            if (selected)
+                checkCheckbox(Locator.checkboxByName("required"));
+            else
+                uncheckCheckbox(Locator.checkboxByName("required"));
+        }
+    }
+
+    private static String getLookupTableName(String issueDefName, String field)
+    {
+        return issueDefName + "-" + field.toLowerCase() + "-lookup";
+    }
+
+    private void addLookupValues(String issueDefName, String fieldName, Collection<String> values)
+    {
+        addLookupValues(this, issueDefName, fieldName, values);
+    }
+
+    @LogMethod
+    public static void addLookupValues(BaseWebDriverTest test, String issueDefName, String fieldName, Collection<String> values)
+    {
+        if (!test.isElementPresent(Locator.lkButton("Import Data")))
+        {
+            test.goToSchemaBrowser();
+            test.selectQuery("lists", getLookupTableName(issueDefName, fieldName));
+            test.click(Locator.linkWithText("view data"));
+        }
+        StringBuilder tsv = new StringBuilder();
+        tsv.append("value");
         for (String value : values)
         {
-            addKeyword(test, fieldName, caption, value);
-            test.assertNoLabKeyErrors();
-            test.assertTextPresent(value);
+            tsv.append("\n");
+            tsv.append(value);
         }
+        test._listHelper.uploadData(tsv.toString());
+    }
+
+    private void goToIssuesAdmin()
+    {
+        clickButton("Admin");
+        waitForText("Configure Fields");
+    }
+
+    private void createLookupList(String issueDefName, String fieldName, Collection<String> values)
+    {
+        _listHelper.createList(getProjectName(), getLookupTableName(issueDefName, fieldName), ListHelper.ListColumnType.String, "value");
+        addLookupValues(issueDefName, fieldName, values);
     }
 
     @Test
@@ -386,11 +421,16 @@ public class IssuesTest extends BaseWebDriverTest
         String subject = getFormElement(Locator.name("emailSubject"));
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE_BAD);
         clickButton("Save");
+
+        // no longer relevant, the email template is non-restrictive to allow
+        // custom fields
+/*
         assertTextPresent("Invalid template");
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE);
         clickButton("Save");
         assertTextNotPresent("Invalid template");
         assertEquals(subject, getFormElement(Locator.name("emailSubject")));
+*/
     }
 
     @Test
@@ -408,14 +448,14 @@ public class IssuesTest extends BaseWebDriverTest
 
         impersonate(USER1);
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
         clickButton("Email Preferences");
         uncheckCheckbox(Locator.checkboxByNameAndValue("emailPreference", "2")); // issue assigned to me is modified
         clickButton("Update");
         stopImpersonating();
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
 
         // need to make change that will message current admin
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
@@ -457,16 +497,18 @@ public class IssuesTest extends BaseWebDriverTest
     public void entryTypeNameTest()
     {
         goToModule("Issues");
-        clickButton("Admin");
+        goToIssuesAdmin();
+
         setFormElement(Locator.name("entrySingularName"), "Ticket");
         setFormElement(Locator.name("entryPluralName"), "Tickets");
-        clickButton("Update");
+        clickButton("Save");
 
+        goToIssuesAdmin();
         assertEquals("Ticket", getFormElement(Locator.name("entrySingularName")));
         assertEquals("Tickets", getFormElement(Locator.name("entryPluralName")));
 
         assertTextPresent("Tickets Admin Page");
-        clickAndWait(Locator.linkWithText("Back to Tickets"));
+        clickButton("Cancel");
 
         assertTextPresent("Tickets List");
         assertTextNotPresent("Issues List");
@@ -475,41 +517,39 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent("Ticket ID");
         assertTextNotPresent("Issue ID");
 
-        clickButton("Admin");
+        goToIssuesAdmin();
         setFormElement(Locator.name("entrySingularName"), "Issue");
         setFormElement(Locator.name("entryPluralName"), "Issues");
-        clickButton("Update");
+        clickButton("Save");
     }
 
     @Test
     public void requiredFieldsTest()
     {
         final String subFolder = "Required Fields";
-        final String[] requiredFields = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
-                "NotifyList", "String1", "Int1"};
-        final String[] requiredFieldLabels = {"Title", "AssignedTo", "Type", "Area", "Milestone",
-                "NotifyList", "Customer Name", "Contract Number"};
-        Set<String> expectedErrors = new HashSet<>();
+        final int[] requiredFieldPos = {0,1,2,3,4,5,6,8,9};
+        final String[] requiredFieldLabels = {"title", "assignedto", "type", "area", "milestone",
+                "notifylist", "customername", "contractnumber"};
+        Set<String> expectedErrors = new CaseInsensitiveHashSet();
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
+        _issuesHelper.createNewIssuesList("required-fields", _containerHelper);
 
-        goToModule("Issues");
-        clickButton("Admin");
+        List<ListHelper.ListColumn> fields = new ArrayList<>();
 
-        addKeywordsAndVerify("type", "Type", "Type");
-        addKeywordsAndVerify("area", "Area", "Area");
-        addKeywordsAndVerify("milestone", "Milestone", "Milestone");
+        fields.add(new ListHelper.ListColumn("ContractNumber", "Contract Number", ListHelper.ListColumnType.Integer, ""));
+        fields.add(new ListHelper.ListColumn("CustomerName", "Customer Name", ListHelper.ListColumnType.String, ""));
 
-        setFormElement(Locator.name("int1"), "Contract Number");
-        setFormElement(Locator.name("string1"), "Customer Name");
+        clickFolder(subFolder);
+        clickAndWait(Locator.linkWithText("Issue Summary"));
+        goToIssuesAdmin();
 
-        updateIssue();
-
-        for (String field : requiredFields)
-            checkRequiredField(field, true);
-
-        clickButton("Update");
-        clickButton("Back to Issues");
+        for (ListHelper.ListColumn col : fields)
+        {
+            _listHelper.addField(col);
+        }
+        setRequiredFields(requiredFieldPos, true);
+        clickButton("Save");
         clickButton("New Issue");
         clickButton("Save");
 
@@ -518,50 +558,28 @@ public class IssuesTest extends BaseWebDriverTest
             expectedErrors.add(String.format("Field %s cannot be blank.", label));
         }
 
-        Set<String> errors = new HashSet<>(getTexts(Locators.labkeyError.findElements(getDriver())));
+        Set<String> errors = new CaseInsensitiveHashSet(getTexts(Locators.labkeyError.findElements(getDriver())));
         errors.remove("*"); // From "Fields marked with an asterisk * are required."
         Assert.assertEquals("Wrong errors", expectedErrors, errors);
         clickButton("Cancel");
 
-        clickButton("Admin");
+        goToIssuesAdmin();
+        // clear all required selections except title
+        setRequiredFields(requiredFieldPos, false);
+        setRequiredFields(new int[]{1}, true);
+        clickButton("Save");
 
-        for (String field : requiredFields)
-        {
-            verifyFieldChecked(field);
-            checkRequiredField(field, false);
-        }
-
-        checkRequiredField("Title", true);
-        clickButton("Update");
-        clickButton("Back to Issues");
         clickButton("New Issue");
         clickButton("Save");
 
-        assertTextPresent("Field Title cannot be blank.");
+        assertTextPresentCaseInsensitive("Field title cannot be blank.");
         clickButton("Cancel");
-    }
-
-    @LogMethod
-    private void checkRequiredField(@LoggedParam String name, boolean select)
-    {
-        Locator checkBoxLocator = Locator.checkboxByNameAndValue("requiredFields", name);
-
-        if (select)
-            checkCheckbox(checkBoxLocator);
-        else
-            uncheckCheckbox(checkBoxLocator);
-    }
-
-    @LogMethod
-    private void verifyFieldChecked(@LoggedParam String fieldName)
-    {
-        assertTrue("Checkbox not set for element: " + fieldName, isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)));
     }
 
     @Test
     public void viewSelectedDetailsTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
 
         issuesTable.setFilter("Status", "Has Any Value", null);
         issuesTable.checkAll();
@@ -576,7 +594,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void lastFilterTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
 
         // assert both issues are present
         issuesTable.clearAllFilters("IssueId");
@@ -639,22 +657,12 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[0], "priority", "2", "comment", "a bright flash of light"));
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
-        (new PortalHelper(this)).addWebPart("Issues List");
-
-
-        //Issue 15550: Better tests for view details, admin, and email preferences
-        for (String button : new String[]{"Admin", "Email Preferences"})
-        {
-            Locator l = Locator.xpath("//span/a[span[text()='" + button + "']]");
-            String href = getAttribute(l, "href");
-            String containerPath = getProjectName() + "/" + subFolder;
-            assertTrue("'" + href + "' did not contain '" + containerPath + "'", href.contains(containerPath));
-        }
+        _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[1], "priority", "2", "comment", "We are in a sub-folder"));
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
         // Set the container filter to include subfolders
         _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder and subfolders");
 
@@ -679,7 +687,7 @@ public class IssuesTest extends BaseWebDriverTest
         String issueIdB = getIssueId();
 
         clickAndWait(Locator.linkWithText("Resolve"));
-        selectOptionByText(Locator.id("resolution"), "Duplicate");
+        selectOptionByText(Locator.name("resolution"), "Duplicate");
         setFormElement(Locator.name("duplicate"), issueIdA);
         clickButton("Save");
 
@@ -701,43 +709,13 @@ public class IssuesTest extends BaseWebDriverTest
         final String path = String.format("/%s/%s", getProjectName(), subFolder);
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
+        _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         goToProjectHome();
         goToModule("Issues");
 
         // create a new issue to be moved
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
-
-        // validate that the move button not active without desintation (here we validate details view)
-        assertElementNotPresent(Locator.linkWithText("move"));
-
-        goToModule("Issues");
-        // validate that the move button not active without destination (here we validate list view)
-        assertElementPresent(Locator.tag("a").withClass("labkey-disabled-button").withText("Move"));
-        clickButton("Admin");
-
-        /// attempt a bad destination
-        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
-        setFormElement(Locator.name("moveToContainerSelect"), "/this/is/a/bad/path");
-        updateIssue();
-        assertTextPresent("Container does not exist!");
-        clickAndWait(Locator.linkWithText("back"));
-
-        // this is needed in FF as after going back, the browser does not remember the form state.
-        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
-
-        // attempt an empty destination
-        setFormElement(Locator.name("moveToContainerSelect"), "");
-        updateIssue();
-        assertTextPresent("The move to specific container option was selected with a blank.");
-        clickAndWait(Locator.linkWithText("back"));
-
-        // this is needed in FF as after going back, the browser does not remember the form state.
-        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
-
-        // setup a good destination
-        setFormElement(Locator.name("moveToContainerSelect"), path);
-        updateIssue();
 
         // move the created issue
         goToModule("Issues");
@@ -756,7 +734,6 @@ public class IssuesTest extends BaseWebDriverTest
         returnToProject();
         goToModule("Issues");
 
-
         String issueTitleA = "Multi-Issue Move A";
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
         String issueIdA = getIssueId();
@@ -767,7 +744,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         goToModule("Issues");
 
-        DataRegionTable issuesTable = new DataRegionTable("Issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
         issuesTable.checkCheckboxByPrimaryKey(issueIdA);
         issuesTable.checkCheckboxByPrimaryKey(issueIdB);
         click(Locator.linkWithText("move"));
@@ -824,7 +801,8 @@ public class IssuesTest extends BaseWebDriverTest
     public void defaultAssignedToTest()
     {
         String user = "reader@email.com";
-        Locator.XPathLocator defaultUserSelect = Locator.tagWithName("select", "defaultUser");
+        Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
+        Locator.XPathLocator specificGroupSelect = Locator.tagWithClass("select", "assigned-to-group");
 
         // create reader user (issue 20598)
         _permissionsHelper.createPermissionsGroup("Readers");
@@ -840,64 +818,62 @@ public class IssuesTest extends BaseWebDriverTest
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
+        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
         clickButton("Cancel");
 
         /// check reader cannot be set as default user (issue 20598)
-        clickButton("Admin");
-        assertElementNotPresent(defaultUserSelect.append(Locator.tagWithText("option", user)));
+        goToIssuesAdmin();
+        assertElementNotPresent(specificUserSelect.append(Locator.tagWithText("option", user)));
 
         // set default
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
-        selectOptionByText(defaultUserSelect, user1DisplayName);
-        clickButton("Update");
-        clickButton("Back to Issues");
+
+        click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
+        selectOptionByText(specificUserSelect, user1DisplayName);
+        clickButton("Save");
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), user1DisplayName);
+        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), user1DisplayName);
         clickButton("Cancel");
 
         // set default group and user
-        clickButton("Admin");
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "Group"));
-        selectOptionByText(Locator.name("assignedToGroup"), "Site:Users");
-        selectOptionByText(defaultUserSelect, getDisplayName());
-        clickButton("Update");
-        clickButton("Back to Issues");
+        goToIssuesAdmin();
+        click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
+        selectOptionByText(specificGroupSelect, "Site:Users");
+        selectOptionByText(specificUserSelect, getDisplayName());
+        clickButton("Save");
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), getDisplayName());
+        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), getDisplayName());
         clickButton("Cancel");
 
         // set no default user and return to project users assign list
-        clickButton("Admin");
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "ProjectUsers"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "NoDefaultUser"));
-        clickButton("Update");
-        clickButton("Back to Issues");
+        goToIssuesAdmin();
+        click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
+        click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
+        clickButton("Save");
 
         // check for no default
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
+        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), "");
         clickButton("Cancel");
 
         // issue 20699 - NPE b/c default assign to user deleted!
         String deletedUser = "deleteme@deletronia.com";
         _permissionsHelper.addUserToProjGroup(deletedUser, getProjectName(), TEST_GROUP);
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
-        clickButton("Admin");
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
-        selectOptionByText(defaultUserSelect, displayNameFromEmail(deletedUser));
-        clickButton("Update");
+        clickAndWait(Locator.linkWithText("Issue Summary"));
+        goToIssuesAdmin();
+        click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
+        selectOptionByText(specificUserSelect, displayNameFromEmail(deletedUser));
+        clickButton("Save");
 
         // taking care of some clean-up while here for the test.
         deleteUsers(true, deletedUser, user);
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText("Issue Summary"));
         clickButton("New Issue");
         // NPE
         //clickButton("Cancel");
@@ -906,7 +882,11 @@ public class IssuesTest extends BaseWebDriverTest
         // TODO: compare user dropdown list between admin and new issues page
     }
 
-    @Test
+    /**
+     * Obsolete, legacy inheritance is not supported and is replaced by shared domain plus scoping. Consider deleting this
+     * test and adding an up to date test for the new code.
+     */
+    @Deprecated
     public void testAdminSettingInheritance()
     {
         final String subFolderA = "Folder_A"; //a folder to inherit from
@@ -967,9 +947,9 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Update");
 
         // add keywords
-        addKeywordsAndVerify("type", "Bugs", "Bad", "Not so Bad");
-        addKeywordsAndVerify("area", "Dev Area", "UI", "Server", "Database");
-        addKeywordsAndVerify("string1", "Development Sprint", "15.1", "15.2", "15.3", "15.4");
+        addLookupValues("issues", "type", Collections.singletonList("Not so Bad"));
+        addLookupValues("issues", "area", Arrays.asList("Server", "Database"));
+        addLookupValues("issues", "Development Sprint", Arrays.asList("15.1", "15.2", "15.3", "15.4"));
 
         // set Required Fields
         checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Type"));
@@ -1014,7 +994,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Update");
 
         //Add Options to string2
-        addKeywordsAndVerify("string2", "Folder_B_Str2", "B_1", "B_2", "B_3");
+        addLookupValues("issues", "Folder_B_Str2", Arrays.asList("B_1", "B_2", "B_3"));
         checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String2"));
 
         goToProjectHome(getProjectName());//REmove
@@ -1095,7 +1075,8 @@ public class IssuesTest extends BaseWebDriverTest
         assertTrue(inputString2.getText() + " is not enabled.", inputString2.isEnabled());
 
         //check if non-inherited options are modifiable
-        addKeyword("string2", "Folder_B_Str2", "B_4");
+        //addKeyword("string2", "Folder_B_Str2", "B_4");
+        //addLookupValues();
         WebElement str2Option = Locator.xpath("//*[@id='formstring2']/table/tbody/tr[4]/td[1]").findElement(getDriver());
         assertTrue("Element B_4 not found.", "B_4".equals(str2Option.getText()));
 

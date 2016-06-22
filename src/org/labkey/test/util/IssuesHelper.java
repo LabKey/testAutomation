@@ -36,6 +36,24 @@ public class IssuesHelper
     }
 
     @LogMethod
+    public void createNewIssuesList(String name, AbstractContainerHelper containerHelper)
+    {
+        containerHelper.enableModule("Issues");
+        PortalHelper portalHelper = new PortalHelper(_test);
+
+        portalHelper.addWebPart("Issue Definitions");
+        _test.clickAndWait(Locator.linkWithText("Insert New"));
+        _test.setFormElement(Locator.input("quf_Label"), name);
+        _test.click(Locator.linkWithText("Submit"));
+        _test.clickAndWait(Locator.linkWithText("Yes"));
+
+        portalHelper.addWebPart("Issues Summary");
+        _test.clickAndWait(Locator.linkWithText("Submit"));
+        portalHelper.addWebPart("Search");
+        _test.assertTextPresent("Open");
+    }
+
+    @LogMethod
     public void addIssue(Map<String, String> issue, File... attachments)
     {
         _test.goToModule("Issues");
@@ -43,10 +61,14 @@ public class IssuesHelper
 
         for (Map.Entry<String, String> field : issue.entrySet())
         {
-            if ("select".equals(Locator.id(field.getKey()).findElement(_test.getDriver()).getTagName()))
-                _test.selectOptionByText(Locator.id(field.getKey()), field.getValue());
+            String fieldName = field.getKey();
+            if (!_test.isElementPresent(Locator.name(fieldName)))
+                fieldName = fieldName.toLowerCase();
+
+            if ("select".equals(Locator.name(fieldName).findElement(_test.getDriver()).getTagName()))
+                _test.selectOptionByText(Locator.name(field.getKey()), field.getValue());
             else
-                _test.setFormElement(Locator.id(field.getKey()), field.getValue());
+                _test.setFormElement(Locator.id(fieldName), field.getValue());
         }
 
         for (int i = 0; i < attachments.length; i++)
