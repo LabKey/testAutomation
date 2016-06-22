@@ -349,11 +349,12 @@ public class UserTest extends BaseWebDriverTest
 
         log("Deactivated users shouldn't show up in issues 'Assign To' list");
         goToProjectHome();
-        goToModule("Issues");
         IssuesHelper issuesHelper = new IssuesHelper(this);
+        issuesHelper.createNewIssuesList("issues", getContainerHelper());
+        goToModule("Issues");
         issuesHelper.goToAdmin();
         issuesHelper.setIssueAssignmentList("Site:Users");
-        issuesHelper.backToIssues();
+        clickButton("Save");
         clickAndWait(Locator.linkWithText("New Issue"));
         assertElementNotPresent(createAssignedToOptionLocator(disabledUserId));
         assertTextNotPresent(displayNameFromEmail(DEACTIVATED_USER));
@@ -377,7 +378,7 @@ public class UserTest extends BaseWebDriverTest
 
     private Locator createAssignedToOptionLocator(String username)
     {
-        return Locator.xpath("//select[@id='assignedTo']/option[@value='" + username +  "']");
+        return Locator.xpath("//select[@name='assignedTo']/option[@value='" + username +  "']");
     }
 
     /**

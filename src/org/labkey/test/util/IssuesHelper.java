@@ -93,34 +93,32 @@ public class IssuesHelper
     {
         if (group != null)
         {
-            _test.checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "Group"));
-            _test.selectOptionByText(Locator.name("assignedToGroup"), group);
+            Locator.XPathLocator specificGroupSelect = Locator.tagWithClass("select", "assigned-to-group");
+
+            _test.click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
+            _test.selectOptionByText(specificGroupSelect, group);
         }
         else
-            _test.checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "ProjectUsers"));
+            _test.click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
+    }
 
-        _test.clickButton("Update");
+    @LogMethod
+    public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
+    {
+        if (user != null)
+        {
+            Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
+
+            _test.click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
+            _test.selectOptionByText(specificUserSelect, user);
+        }
+        else
+            _test.click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
     }
 
     public void goToAdmin()
     {
         _test.clickButton("Admin");
-    }
-
-    @LogMethod
-    public void addPickListOption(@LoggedParam String field, @LoggedParam String option)
-    {
-        _test.setFormElement(Locator.css(String.format("form[name=add%s] input[name=keyword]", field.toLowerCase())), option);
-        _test.clickButton("Add " + field);
-
-        if (!option.isEmpty())
-            _test.assertElementPresent(Locator.css("#form" + field.toLowerCase() + " td").withText(option));
-        else
-            _test.assertElementPresent(Locator.css(".labkey-error").withText("Enter a value in the text box before clicking any of the \"Add <Keyword>\" buttons"));
-    }
-
-    public void backToIssues()
-    {
-        _test.clickAndWait(Locator.lkButton("Back to Issues"));
+        _test.waitForText("Configure Fields");
     }
 }

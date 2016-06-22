@@ -280,11 +280,12 @@ public class FilterTest extends BaseWebDriverTest
     private void containerFilterFacetTest()
     {
         IssuesHelper issuesHelper = new IssuesHelper(this);
+        issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
         issuesHelper.setIssueAssignmentList("Site:Administrators");
-        issuesHelper.addPickListOption("Type", "typea");
-        issuesHelper.addPickListOption("Type", "typeb");
+        clickButton("Save");
+        IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();
         projectIssue.put("title", "project issue1");
@@ -303,11 +304,17 @@ public class FilterTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickFolder("subfolder");
 
+        issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
         issuesHelper.goToAdmin();
         issuesHelper.setIssueAssignmentList("Site:Administrators");
-        issuesHelper.addPickListOption("Type", "typed");
-        issuesHelper.addPickListOption("Type", "typee");
+        clickButton("Save");
+
+        clickProject(getProjectName());
+        IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typed", "typee"));
+
+        clickProject(getProjectName());
+        clickFolder("subfolder");
 
         HashMap<String, String> subfolderIssue = new HashMap<>();
         subfolderIssue.put("title", "subfolder issue1");
@@ -336,7 +343,7 @@ public class FilterTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        DataRegionTable region = new DataRegionTable("Issues", this);
+        DataRegionTable region = new DataRegionTable("issues-issues", this);
         verifyFacetOptions(region, "Type",
                 projectIssue.get("type"),
                 projectIssue2.get("type"),

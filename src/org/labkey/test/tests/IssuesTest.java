@@ -222,7 +222,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
@@ -322,7 +322,7 @@ public class IssuesTest extends BaseWebDriverTest
     private void setDefaultValues(Map<String, String> defaultValues)
     {
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
         click(Locator.tag("div").withClass("gwt-Label").withText("Area"));
         click(Locator.tag("span").withClass("x-tab-strip-text").withText("Advanced"));
         clickAndWait(Locator.linkWithText("set value"));
@@ -497,13 +497,13 @@ public class IssuesTest extends BaseWebDriverTest
     public void entryTypeNameTest()
     {
         goToModule("Issues");
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
 
         setFormElement(Locator.name("entrySingularName"), "Ticket");
         setFormElement(Locator.name("entryPluralName"), "Tickets");
         clickButton("Save");
 
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
         assertEquals("Ticket", getFormElement(Locator.name("entrySingularName")));
         assertEquals("Tickets", getFormElement(Locator.name("entryPluralName")));
 
@@ -517,7 +517,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent("Ticket ID");
         assertTextNotPresent("Issue ID");
 
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
         setFormElement(Locator.name("entrySingularName"), "Issue");
         setFormElement(Locator.name("entryPluralName"), "Issues");
         clickButton("Save");
@@ -542,7 +542,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickFolder(subFolder);
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
@@ -563,7 +563,7 @@ public class IssuesTest extends BaseWebDriverTest
         Assert.assertEquals("Wrong errors", expectedErrors, errors);
         clickButton("Cancel");
 
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
         // clear all required selections except title
         setRequiredFields(requiredFieldPos, false);
         setRequiredFields(new int[]{1}, true);
@@ -802,7 +802,6 @@ public class IssuesTest extends BaseWebDriverTest
     {
         String user = "reader@email.com";
         Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
-        Locator.XPathLocator specificGroupSelect = Locator.tagWithClass("select", "assigned-to-group");
 
         // create reader user (issue 20598)
         _permissionsHelper.createPermissionsGroup("Readers");
@@ -822,13 +821,12 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         /// check reader cannot be set as default user (issue 20598)
-        goToIssuesAdmin();
+        _issuesHelper.goToAdmin();
         assertElementNotPresent(specificUserSelect.append(Locator.tagWithText("option", user)));
 
         // set default
 
-        click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
-        selectOptionByText(specificUserSelect, user1DisplayName);
+        _issuesHelper.setIssueAssignmentUser(user1DisplayName);
         clickButton("Save");
 
         // verify
@@ -837,10 +835,9 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         // set default group and user
-        goToIssuesAdmin();
-        click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
-        selectOptionByText(specificGroupSelect, "Site:Users");
-        selectOptionByText(specificUserSelect, getDisplayName());
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentList("Site:Users");
+        _issuesHelper.setIssueAssignmentUser(getDisplayName());
         clickButton("Save");
 
         // verify
@@ -849,9 +846,9 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         // set no default user and return to project users assign list
-        goToIssuesAdmin();
-        click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
-        click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentList(null);
+        _issuesHelper.setIssueAssignmentUser(null);
         clickButton("Save");
 
         // check for no default
@@ -864,9 +861,8 @@ public class IssuesTest extends BaseWebDriverTest
         _permissionsHelper.addUserToProjGroup(deletedUser, getProjectName(), TEST_GROUP);
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        goToIssuesAdmin();
-        click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
-        selectOptionByText(specificUserSelect, displayNameFromEmail(deletedUser));
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentUser(displayNameFromEmail(deletedUser));
         clickButton("Save");
 
         // taking care of some clean-up while here for the test.
