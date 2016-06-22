@@ -89,7 +89,7 @@ public class PasswordUtil
 
     private static String getHost()
     {
-        String host = WebTestHelper.getTargetServer() + ":" + WebTestHelper.getWebPort();
+        String host = WebTestHelper.getTargetServer();
         return host.replaceFirst("https?://", "");
     }
     
