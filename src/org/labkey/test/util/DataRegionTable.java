@@ -23,7 +23,6 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.study.DatasetFacetPanel;
@@ -203,7 +202,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public DataRegionTable closeCustomizeGrid()
     {
-        getCustomizeView().closeCustomizeViewPanel();
+        getCustomizeView().closePanel();
         return this;
     }
 
@@ -225,7 +224,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName, int msTimeout)
     {
         test.waitForElement(Locators.dataRegion(regionName), msTimeout);
-        return new DataRegionTable(regionName, test);
+        return new DataRegionTable(regionName, test.getDriver());
     }
 
     public static DataRegionTable findDataRegion(WebDriverWrapper test)
@@ -246,7 +245,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context, int index)
     {
         Locator dataRegionLoc = Locator.css("table[lk-region-name]").index(index);
-        return new DataRegionTable(test, new RefindingWebElement(dataRegionLoc, context));
+        return new DataRegionTable(new RefindingWebElement(dataRegionLoc, context), test.getDriver());
     }
 
     public static DataRegionTable findDataRegionWithinWebpart(WebDriverWrapper test, String webPartTitle)
@@ -353,7 +352,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
                     getCustomizeView().openCustomizeViewPanel();
                     opened = true;
                 }
-                getCustomizeView().addCustomizeViewColumn(name);
+                getCustomizeView().addColumn(name);
             }
         }
         if (opened)
@@ -362,9 +361,6 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     /**
      * returns index of the row of the first appearance of the specified data, in the specified column
-     * @param data
-     * @param column
-     * @return
      */
     public int getIndexWhereDataAppears(String data, String column)
     {
@@ -1052,7 +1048,6 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     /**
      * Set the current offset by manipulating the url rather than using the pagination buttons.
-     * @param offset
      */
     public void setOffset(int offset)
     {
@@ -1179,14 +1174,8 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         }
     }
 
-    protected class Elements extends ComponentElements
+    protected class Elements extends Component.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
-
         private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
         private List<WebElement> headerButtons;
         private Map<String, WebElement> headerButtonMap;
