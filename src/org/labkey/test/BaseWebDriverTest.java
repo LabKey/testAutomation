@@ -1126,7 +1126,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             protected void failed(Throwable e, Description description)
             {
                 handleFailure(e, description.getMethodName());
-                checkJsErrors();
             }
 
             @Override
