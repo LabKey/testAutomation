@@ -21,7 +21,9 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Test;
 import org.reflections.Reflections;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,11 +50,16 @@ public class SuiteBuilder
 
     private void loadSuites()
     {
-        Reflections reflections = new Reflections("org.labkey.test");
+        String[] testPackages = System.getProperty("test.packages", "org.labkey.test").split("[^0-9A-Za-z\\._]+");
+        Set<Class<?>> tests = new HashSet<>();
 
-        Set<Class<?>> tests = reflections.getTypesAnnotatedWith(Category.class);
+        for (String testPackage : testPackages)
+        {
+            Reflections reflections = new Reflections(testPackage);
+            tests.addAll(reflections.getTypesAnnotatedWith(Category.class));
+        }
 
-        _suites.put(Continue.class.getSimpleName(), new HashSet<Class>()); // Not actually a suite, used to continue interrupted suite
+        _suites.put(Continue.class.getSimpleName(), new HashSet<>()); // Not actually a suite, used to continue interrupted suite
 
         for (Class test : tests)
         {
@@ -69,22 +76,21 @@ public class SuiteBuilder
             }
 
             // parse test package, add module-derived suites. We expect these to follow the pattern
-            //    org.labkey.test.tests.<moduleName>.<testClassName>
-            String[] packageNameParts = test.getPackage().getName().split("\\.");
-            if (packageNameParts != null &&
-                    packageNameParts.length >= 5 &&
-                    packageNameParts[3].equalsIgnoreCase("tests") )
+            //    <testPackage>.tests.<moduleName>.<testClassName>
+            List<String> packageNameParts = Arrays.asList(test.getPackage().getName().split("\\."));
+            int testsPkgIndex = packageNameParts.indexOf("tests");
+            for (int i = testsPkgIndex + 1; testsPkgIndex > -1 && i < packageNameParts.size(); i++)
             {
-                addTestToSuite(test, packageNameParts[4]);
-                addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
+                addTestToSuite(test, packageNameParts.get(i));
             }
+            addTestToSuite(test, Test.class.getSimpleName()); // Make sure test is in the master "Test" suite
         }
     }
 
     private void addTestToSuite(Class test, String suiteName)
     {
         if (!_suites.containsKey(suiteName.toLowerCase()))
-            _suites.put(suiteName, new HashSet<Class>());
+            _suites.put(suiteName, new HashSet<>());
 
         _suites.get(suiteName).add(test);
     }
