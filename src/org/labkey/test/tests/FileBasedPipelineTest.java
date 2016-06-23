@@ -69,7 +69,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     @Before
     public void startTest()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
     }
 
     @Test
