@@ -17,73 +17,113 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.openqa.selenium.WebDriver;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class IssuesHelper
+public class IssuesHelper extends WebDriverWrapper
 {
-    protected WebDriverWrapper _test;
+    protected WebDriver _driver;
 
+    @Deprecated
     public IssuesHelper(WebDriverWrapper test)
     {
-        _test = test;
+        this(test.getDriver());
+    }
+
+    public IssuesHelper(WebDriver driver)
+    {
+        _driver = driver;
+    }
+
+    @Override
+    public WebDriver getWrappedDriver()
+    {
+        return _driver;
     }
 
     @LogMethod
     public void createNewIssuesList(String name, AbstractContainerHelper containerHelper)
     {
         containerHelper.enableModule("Issues");
-        PortalHelper portalHelper = new PortalHelper(_test);
+        PortalHelper portalHelper = new PortalHelper(getDriver());
 
         portalHelper.addWebPart("Issue Definitions");
-        _test.clickAndWait(Locator.linkWithText("Insert New"));
-        _test.setFormElement(Locator.input("quf_Label"), name);
-        _test.click(Locator.linkWithText("Submit"));
-        _test.clickAndWait(Locator.linkWithText("Yes"));
+        clickAndWait(Locator.linkWithText("Insert New"));
+        setFormElement(Locator.input("quf_Label"), name);
+        click(Locator.linkWithText("Submit"));
+        clickAndWait(Locator.linkWithText("Yes"));
 
         portalHelper.addWebPart("Issues Summary");
-        _test.clickAndWait(Locator.linkWithText("Submit"));
+        clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
-        _test.assertTextPresent("Open");
+        assertTextPresent("Open");
+    }
+
+    public int getHighestIssueId(String containerPath, String issuesQuery)
+    {
+        Connection connection = createDefaultConnection(true);
+        SelectRowsCommand command = new SelectRowsCommand("issues", issuesQuery.toLowerCase().replaceAll(" ", ""));
+        command.addSort("IssueId", Sort.Direction.DESCENDING);
+        command.setMaxRows(1);
+        command.setContainerFilter(ContainerFilter.AllFolders);
+        try
+        {
+            SelectRowsResponse response = command.execute(connection, containerPath);
+            if (response.getRows().isEmpty())
+                return 0;
+            return (Integer) response.getRows().get(0).get("IssueId");
+        }
+        catch (IOException |CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @LogMethod
     public void addIssue(Map<String, String> issue, File... attachments)
     {
-        _test.goToModule("Issues");
-        _test.clickButton("New Issue");
+        goToModule("Issues");
+        clickButton("New Issue");
 
         for (Map.Entry<String, String> field : issue.entrySet())
         {
             String fieldName = field.getKey();
-            if (!_test.isElementPresent(Locator.name(fieldName)))
+            if (!isElementPresent(Locator.name(fieldName)))
                 fieldName = fieldName.toLowerCase();
 
-            if ("select".equals(Locator.name(fieldName).findElement(_test.getDriver()).getTagName()))
-                _test.selectOptionByText(Locator.name(field.getKey()), field.getValue());
+            if ("select".equals(Locator.name(fieldName).findElement(getDriver()).getTagName()))
+                selectOptionByText(Locator.name(field.getKey()), field.getValue());
             else
-                _test.setFormElement(Locator.id(fieldName), field.getValue());
+                setFormElement(Locator.id(fieldName), field.getValue());
         }
 
         for (int i = 0; i < attachments.length; i++)
         {
             if (i == 0)
-                _test.click(Locator.linkWithText("Attach a file"));
+                click(Locator.linkWithText("Attach a file"));
             else
-                _test.click(Locator.linkWithText("Attach another file"));
+                click(Locator.linkWithText("Attach another file"));
 
-            _test.setFormElement(Locator.id(String.format("formFile%02d", i + 1)), attachments[i]);
+            setFormElement(Locator.id(String.format("formFile%02d", i + 1)), attachments[i]);
         }
 
-        _test.clickButton("Save");
+        clickButton("Save");
 
-        List<String> errors = _test.getTexts(Locators.labkeyError.findElements(_test.getDriver()));
+        List<String> errors = getTexts(Locators.labkeyError.findElements(getDriver()));
 
         Assert.assertEquals("Unexpected errors", Collections.<String>emptyList(), errors);
     }
@@ -95,11 +135,11 @@ public class IssuesHelper
         {
             Locator.XPathLocator specificGroupSelect = Locator.tagWithClass("select", "assigned-to-group");
 
-            _test.click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
-            _test.selectOptionByText(specificGroupSelect, group);
+            click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
+            selectOptionByText(specificGroupSelect, group);
         }
         else
-            _test.click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
+            click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
     }
 
     @LogMethod
@@ -109,16 +149,16 @@ public class IssuesHelper
         {
             Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
 
-            _test.click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
-            _test.selectOptionByText(specificUserSelect, user);
+            click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
+            selectOptionByText(specificUserSelect, user);
         }
         else
-            _test.click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
+            click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
     }
 
     public void goToAdmin()
     {
-        _test.clickButton("Admin");
-        _test.waitForText("Configure Fields");
+        clickButton("Admin");
+        waitForText("Configure Fields");
     }
 }
