@@ -435,6 +435,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             return Arrays.asList(
                     "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
+                    "this.panel is null", // TODO: Investigate FilContentDownLoadTest.testDoubleClickDownload
                     "Ext.Error: You're trying to decode an invalid JSON String:",
                     "__webdriver_evaluate",
                     "setting a property that has only a getter",
