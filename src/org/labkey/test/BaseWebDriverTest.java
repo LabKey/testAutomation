@@ -142,12 +142,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 {
     private static BaseWebDriverTest currentTest;
     private static WebDriver _driver;
+    private final BrowserType BROWSER_TYPE;
 
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
     protected static boolean _testFailed = false;
-    protected static boolean _anyTestCaseFailed = false;
+    protected static boolean _anyTestFailed = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     private final ArtifactCollector _artifactCollector;
@@ -177,8 +178,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
-
-    private final BrowserType BROWSER_TYPE;
 
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
 
@@ -933,7 +932,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 testCount = description.getChildren().size();
                 currentTestNumber = 0;
                 beforeClassSucceeded = false;
-                _anyTestCaseFailed = false;
+                _anyTestFailed = false;
 
                 ArtifactCollector.init();
 
@@ -966,7 +965,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (reenableMiniProfiler)
                     getCurrentTest().setMiniProfilerEnabled(true);
 
-                if (!_anyTestCaseFailed)
+                if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
                     TestLogger.log("Skipping post-test checks because a test case failed.");
@@ -1043,12 +1042,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         cleanup(false);
     }
 
+    /**
+     * Using Timeout at the class level isn't actually supported by JUnit.
+     * We do some extra magic to make sure subsequent test cases don't keep running
+     */
     private static boolean testClassTimedOut = false;
 
     @ClassRule
-    public static Timeout globalTimeout()
+    public static Timeout classTimeout()
     {
-        return new Timeout(40, TimeUnit.MINUTES){
+        return new Timeout(40, TimeUnit.MINUTES)
+        {
             @Override
             protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
             {
@@ -1066,7 +1070,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         catch (TestTimedOutException t)
                         {
                             testClassTimedOut = true;
-                            _anyTestCaseFailed = true;
+                            _anyTestFailed = true;
                             throw t;
                         }
                     }
@@ -1079,7 +1083,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public Timeout testTimeout = new Timeout(30, TimeUnit.MINUTES);
 
     @Rule
-    public final RuleChain testCaseRules()
+    public final RuleChain testRules()
     {
         TestWatcher _watcher = new TestWatcher()
         {
@@ -1116,10 +1120,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             protected void succeeded(Description description)
             {
                 checkErrors();
+                checkJsErrors(true);
             }
         };
 
-        // Separate TestWatcher to catch failures
+        // Separate TestWatcher to catch failures that happen in the nested succeeded method
         TestWatcher _failWatcher = new TestWatcher()
         {
             @Override
@@ -1138,15 +1143,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         TestWatcher _logger = new TestWatcher()
         {
-            private long testCaseStartTimeStamp;
-
-            @Override
-            protected void skipped(AssumptionViolatedException e, Description description)
-            {
-                TestLogger.log(e.getMessage());
-                TestLogger.resetLogger();
-                TestLogger.log("\\\\ Test Case Skipped - " + description.getMethodName() + " //");
-            }
+            private long testStartTimeStamp;
 
             @Override
             protected void starting(Description description)
@@ -1158,32 +1155,37 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 }
 
                 currentTestNumber++;
-                testCaseStartTimeStamp = System.currentTimeMillis();
-                String testCaseName = description.getMethodName();
+                testStartTimeStamp = System.currentTimeMillis();
 
                 TestLogger.resetLogger();
-                TestLogger.log("// Begin Test Case - " + testCaseName + " \\\\");
+                TestLogger.log("// Begin Test Case - " + description.getMethodName() + " \\\\");
                 TestLogger.increaseIndent();
+            }
+
+            @Override
+            protected void skipped(AssumptionViolatedException e, Description description)
+            {
+                TestLogger.log(e.getMessage());
+                TestLogger.resetLogger();
+                TestLogger.log("\\\\ Test Case Skipped - " + description.getMethodName() + " //");
             }
 
             @Override
             protected void succeeded(Description description)
             {
-                Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
-                String testCaseName = description.getMethodName();
+                Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Test Case Complete - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
             }
 
             @Override
             protected void failed(Throwable e, Description description)
             {
-                Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
-                String testCaseName = description.getMethodName();
+                Long elapsed = System.currentTimeMillis() - testStartTimeStamp;
 
                 TestLogger.resetLogger();
-                TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //");
+                TestLogger.log("\\\\ Failed Test Case - " + description.getMethodName() + " [" + getElapsedString(elapsed) + "] //");
             }
 
             @Override
@@ -1218,7 +1220,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void handleFailure(Throwable error, @LoggedParam String testName)
     {
         _testFailed = true;
-        _anyTestCaseFailed = true;
+        _anyTestFailed = true;
 
         if (testClassTimedOut ||
                 error instanceof TestTimedOutException ||
@@ -1301,7 +1303,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             dismissAllAlerts();
-            checkJsErrors();
+            checkJsErrors(false);
         }
         finally
         {
@@ -1357,7 +1359,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             checkLeaksAndErrors();
         }
 
-        checkJsErrors();
+        checkJsErrors(true);
     }
 
     /**
@@ -1683,8 +1685,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    @LogMethod
     protected void checkJsErrors()
+    {
+        checkJsErrors(true);
+    }
+
+    @LogMethod
+    protected void checkJsErrors(boolean failOnError)
     {
         if (isScriptCheckEnabled() && getJsErrorChecker() != null)
         {
@@ -1721,7 +1728,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 String errorCtStr = "";
                 if (validErrors.size() > 1)
                     errorCtStr = " (1 of " + validErrors.size() + ") ";
-                if (!_testFailed) // Don't clobber existing failures. Just log them.
+                if (failOnError) // Don't clobber existing failures. Just log them.
                     fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
             }
         }
