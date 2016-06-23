@@ -261,7 +261,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickTab("Manage");
         clickButton("Delete Study");
         checkCheckbox(Locator.checkboxByName("confirm"));
-        clickButton("Delete", WAIT_FOR_PAGE);
+        clickButton("Delete", WAIT_FOR_PAGE * 2);
     }
 
     protected void initializePipeline()
