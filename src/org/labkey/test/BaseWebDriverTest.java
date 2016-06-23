@@ -1750,7 +1750,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if ( isGuestModeTest() )
             return;
 
-        pushLocation();
         int rowCount, coveredActions, totalActions;
         Double actionCoveragePercent;
         String actionCoveragePercentString;
@@ -1772,8 +1771,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         actionCoverageFile.delete();
         download.renameTo(actionCoverageFile);
         getArtifactCollector().publishArtifact(actionCoverageFile);
-
-        popLocation();
     }
 
     @LogMethod
