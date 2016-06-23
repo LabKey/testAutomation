@@ -2324,8 +2324,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
             {
                 el.click();
             }
+            catch (TimeoutException timeout)
+            {
+                throw timeout; // No retry for WebDriver timeout
+            }
             catch (WebDriverException tryAgain)
             {
+                log("Retry click: " + tryAgain.getMessage());
                 scrollIntoView(el);
                 if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
                     sleep(2500);
