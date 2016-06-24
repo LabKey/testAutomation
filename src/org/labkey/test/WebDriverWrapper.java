@@ -135,9 +135,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     @NotNull
     public final WebDriver getDriver()
     {
-        if (getWrappedDriver() == null)
+        WebDriver driver = getWrappedDriver();
+        while (driver instanceof WrapsDriver)
+            driver = ((WrapsDriver)driver).getWrappedDriver();
+        if (driver == null)
             throw new NullPointerException("WebDriver has not been initialized yet");
-        return getWrappedDriver();
+        return driver;
     }
 
     protected WebDriver createNewWebDriver(WebDriver oldWebDriver, BrowserType browserType, File downloadDir)

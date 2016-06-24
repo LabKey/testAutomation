@@ -27,6 +27,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.internal.WrapsDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,23 +37,22 @@ import java.util.Map;
 
 public class IssuesHelper extends WebDriverWrapper
 {
-    protected WebDriver _driver;
+    protected WrapsDriver _driverWrapper;
 
-    @Deprecated
-    public IssuesHelper(WebDriverWrapper test)
+    public IssuesHelper(WrapsDriver driverWrapper)
     {
-        this(test.getDriver());
+        _driverWrapper = driverWrapper;
     }
 
     public IssuesHelper(WebDriver driver)
     {
-        _driver = driver;
+        _driverWrapper = () -> driver;
     }
 
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _driver;
+        return _driverWrapper.getWrappedDriver();
     }
 
     @LogMethod

@@ -25,10 +25,10 @@ import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsDriver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.fail;
 
@@ -37,11 +37,11 @@ import static org.junit.Assert.fail;
  */
 public class PortalHelper extends WebDriverWrapper
 {
-    protected Supplier<WebDriver> _driver;
+    protected WrapsDriver _driverWrapper;
 
-    public PortalHelper(Supplier<WebDriver> driver)
+    public PortalHelper(WrapsDriver driverWrapper)
     {
-        _driver = driver;
+        _driverWrapper = driverWrapper;
     }
 
     public PortalHelper(WebDriver driver)
@@ -49,15 +49,10 @@ public class PortalHelper extends WebDriverWrapper
         this(() -> driver);
     }
 
-    public PortalHelper(WebDriverWrapper test)
-    {
-        this(test::getDriver);
-    }
-
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _driver.get();
+        return _driverWrapper.getWrappedDriver();
     }
 
     public void enableTabEditMode()
