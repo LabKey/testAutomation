@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import com.google.common.base.Function;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -156,11 +157,24 @@ public abstract class Locator
         return new LazyWebElement(this, context);
     }
 
+    public RefindingWebElement refindWhenNeeded(SearchContext context)
+    {
+        return new RefindingWebElement(this, context);
+    }
+
     public WebElement findElement(SearchContext context)
+    {
+        WebElement element = findElementOrNull(context);
+        if (null == element)
+            throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
+        return element;
+    }
+
+    public WebElement findElementOrNull(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
         if (elements.size() < 1)
-            throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
+            return null;
         return elements.get(0);
     }
 
@@ -1114,7 +1128,7 @@ public abstract class Locator
 
         public Locator containing(String contains)
         {
-            return new NameLocator(getLocatorString(), _index, contains, _text);
+            return new NameLocator(getLoc(), _index, contains, _text);
         }
 
         public Locator withText(String text)
