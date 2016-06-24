@@ -5,7 +5,7 @@
         <ns:table tableName="testingFromTemplate" tableDbType="NOT_IN_DB">
             <description>Testing a data class template from module.</description>
             <columns>
-                <column columnName="aa">
+                <column columnName="aa" mandatory="true">
                     <datatype>integer</datatype>
                     <columnTitle>Test Column AA</columnTitle>
                     <rangeURI>http://www.w3.org/2001/XMLSchema#int</rangeURI>

@@ -5,9 +5,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <template xsi:type="ListTemplateType">
-        <table tableName="Category" tableDbType="NOT_IN_DB">
+        <table tableName="Category" tableDbType="NOT_IN_DB" hidden="true">
             <dat:columns>
-                <dat:column columnName="category">
+                <dat:column columnName="category" mandatory="true">
                     <dat:datatype>varchar</dat:datatype>
                     <dat:scale>50</dat:scale>
                 </dat:column>
@@ -70,19 +70,19 @@
     <template xsi:type="DataClassTemplateType">
         <table tableName="TodoList" tableDbType="NOT_IN_DB">
             <dat:columns>
-                <dat:column columnName="title">
+                <dat:column columnName="title" mandatory="true">
                     <dat:datatype>varchar</dat:datatype>
                     <dat:scale>50</dat:scale>
                     <dat:nullable>false</dat:nullable>
                 </dat:column>
-                <dat:column columnName="text">
+                <dat:column columnName="text" mandatory="true">
                     <dat:datatype>varchar</dat:datatype>
                     <dat:scale>5000</dat:scale>
                 </dat:column>
                 <dat:column columnName="file">
                     <dat:rangeURI>http://www.labkey.org/exp/xml#attachment</dat:rangeURI>
                 </dat:column>
-                <dat:column columnName="pri">
+                <dat:column columnName="pri" mandatory="true">
                     <dat:nullable>false</dat:nullable>
                     <dat:fk>
                         <dat:fkDbSchema>lists</dat:fkDbSchema>
