@@ -30,7 +30,7 @@ window.addEventListener('error', function(text, url, line)
     }
     text = (typeof(text) != 'string' ? 'Unknown JavaScript error' : text.replace(/^Uncaught /g, ''));
     
-    var error = text + "\n" + url + "\n" + line;
+    var error = text + "\n" + url + ":line" + line;
 
     for (var i = excludedErrors.length - 1; i >= 0; i--) {
         if (error.indexOf(excludedErrors[i]) != -1) {return;}
@@ -38,7 +38,7 @@ window.addEventListener('error', function(text, url, line)
 
     chrome.runtime.sendMessage({command: 'get'}, function(response){
         if (!response.paused)
-            alert(error);
+            confirm(error);
     });
 }, false);
 
