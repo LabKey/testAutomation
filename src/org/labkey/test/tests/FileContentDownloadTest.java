@@ -31,6 +31,7 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -90,18 +91,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
         assertEquals(getZipDownloadFileName(), download.getName());
 
-        Set<String> filesInZip = new HashSet<>();
-
-        try (ZipFile zipFile = new ZipFile(download))
-        {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements())
-            {
-                ZipEntry zEntry = entries.nextElement();
-                filesInZip.add(zEntry.getName());
-            }
-        }
-
+        Set<String> filesInZip = getFilenamesInZip(download);
         assertEquals(expectedFiles, filesInZip);
     }
 
@@ -131,19 +121,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
         assertEquals(getZipDownloadFileName(), download.getName());
 
-        Set<String> filesInZip = new HashSet<>();
-        try (
-                InputStream is = new FileInputStream(download);
-                ZipInputStream zip = new ZipInputStream(is))
-        {
-            while (zip.available() != 0)
-            {
-                ZipEntry entry = zip.getNextEntry();
-                if (entry != null)
-                    filesInZip.add(entry.getName());
-            }
-        }
-
+        Set<String> filesInZip = getFilenamesInZip(download);
         assertEquals(expectedFiles, filesInZip);
     }
 
@@ -253,5 +231,20 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    private Set<String> getFilenamesInZip(File file) throws IOException {
+        Set<String> filesInZip = new HashSet<>();
+
+        try (ZipFile zipFile = new ZipFile(file))
+        {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements())
+            {
+                ZipEntry zEntry = entries.nextElement();
+                filesInZip.add(zEntry.getName());
+            }
+        }
+        return filesInZip;
     }
 }
