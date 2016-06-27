@@ -187,6 +187,7 @@ modules/simpletest/resources/etls/targetBatchedFiles.xml -text
 modules/simpletest/resources/etls/targetBatchedFilesQueueTail.xml -text
 modules/simpletest/resources/etls/targetBatchedFilesWithBatchColumn.xml -text
 modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/targetFileParameterOverride.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/targetFileQueueTail.xml -text
 modules/simpletest/resources/etls/targetFileWithSleep.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/truncate.xml -text

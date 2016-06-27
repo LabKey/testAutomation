@@ -319,10 +319,23 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.assertInTarget2("Sproc Subject 1", "Sproc Subject 2");
     }
 
+    private static final int DEFAULT_OUTPUT_ROWS = 3;
+
     @Test
     public void testPipelineFileAnalysisTask() throws Exception
     {
-        doSingleFilePipelineFileAnalysis("targetFile", null);
+        doSingleFilePipelineFileAnalysis("targetFile", null, DEFAULT_OUTPUT_ROWS);
+    }
+
+    /**
+     * Test setting an override to default pipeline parameter value via ETL setting.
+     * This etl passes -n 2 to the tail command, so the header row should be missing in the output
+     *
+     */
+    @Test
+    public void testPipelineTaskParameterOverride() throws Exception
+    {
+        doSingleFilePipelineFileAnalysis("targetFileParameterOverride", null, 2);
     }
 
     /**
@@ -331,31 +344,32 @@ public class ETLTest extends ETLBaseTest
     @Test
     public void testQueueAnotherEtl() throws Exception
     {
-        doSingleFilePipelineFileAnalysis("targetFileQueueTail", ETL_OUT);
+        doSingleFilePipelineFileAnalysis("targetFileQueueTail", ETL_OUT, DEFAULT_OUTPUT_ROWS);
     }
 
-    private void doSingleFilePipelineFileAnalysis(String etl, @Nullable String outputSubDir) throws Exception
+    private void doSingleFilePipelineFileAnalysis(String etl, @Nullable String outputSubDir, int expectedOutputRows) throws Exception
     {
         insertSingleFileAnalysisSourceData();
         File dir = setupPipelineFileAnalysis(outputSubDir);
         String jobId = _etlHelper.runETL_API(etl).getJobId();
-        validatePipelineFileAnalysis(dir, jobId);
+        validatePipelineFileAnalysis(dir, jobId, expectedOutputRows);
     }
 
-    private void validatePipelineFileAnalysis(File dir, String jobId) throws IOException, CommandException
+    private void validatePipelineFileAnalysis(File dir, String jobId, int expectedOutputRows) throws IOException, CommandException
     {
         Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, null, true);
         String[] expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
                 "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified".split(",")
                 : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified".split(",");
         // Validate the initially written tsv file
-        assertArrayEquals("ETL output file did not contain header", expected, fileRows.first.get(0));
-
+        assertArrayEquals("ETL query output file did not contain header", expected, fileRows.first.get(0));
         validateFileRow(fileRows.first, 1, "Subject 2");
         validateFileRow(fileRows.first, 2, "Subject 3");
+
         // Validate the file output from the pipeline job
-        validateFileRow(fileRows.second, 1, "Subject 2");
-        validateFileRow(fileRows.second, 2, "Subject 3");
+        assertEquals("ETL pipeline output file did not have expected number of rows.", expectedOutputRows, fileRows.second.size());
+        validateFileRow(fileRows.second, expectedOutputRows - 2, "Subject 2");
+        validateFileRow(fileRows.second, expectedOutputRows - 1, "Subject 3");
     }
 
     @NotNull
@@ -485,7 +499,7 @@ public class ETLTest extends ETLBaseTest
         assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "COMPLETE", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
         scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
         String jobId = _diHelper.getTransformRunFieldByTransformId(TARGET_FILE_WITH_SLEEP, "jobId");
-        validatePipelineFileAnalysis(dir, jobId);
+        validatePipelineFileAnalysis(dir, jobId, DEFAULT_OUTPUT_ROWS);
     }
 
     @Test

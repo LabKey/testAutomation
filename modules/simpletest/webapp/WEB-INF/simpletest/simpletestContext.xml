@@ -108,6 +108,11 @@
                 <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
                     <property name="exePath" value="tail"/>
                 </bean>
+                <bean class="org.labkey.api.pipeline.cmd.ValueWithSwitch">
+                    <property name="parameter" value="numberOfLines"/>
+                    <property name="switchName" value="n"/>
+                    <property name="default" value="10"/>
+                </bean>
                 <bean class="org.labkey.api.pipeline.cmd.PathInLine">
                     <property name="key" value="sourceDocs"/>
                 </bean>
