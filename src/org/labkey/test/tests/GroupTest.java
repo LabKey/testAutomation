@@ -76,10 +76,9 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.deleteGroup(SITE_USER_GROUP);
         deleteUsersIfPresent(TEST_USERS_FOR_GROUP);
         deleteUsersIfPresent(SITE_USER_EMAILS);
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(getProject2Name(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProject2Name(), afterTest);
     }
-
 
     @BeforeClass
     public static void setup()
@@ -88,20 +87,13 @@ public class GroupTest extends BaseWebDriverTest
         init._containerHelper.createProject(init.getProjectName(), "Collaboration");
     }
 
-    @LogMethod protected void init()
-    {
-        for (String user : TEST_USERS_FOR_GROUP)
-        {
-            createUser(user, null);
-        }
-
-//        _containerHelper.createProject(getProjectName(), "Collaboration");
-    }
-
     @Test
     public void testSteps()
     {
-        init();
+        for (String user : TEST_USERS_FOR_GROUP)
+        {
+            _userHelper.createUser(user);
+        }
 
         //double check that user can't see the project yet- otherwise our later check will be invalid
 
@@ -155,7 +147,7 @@ public class GroupTest extends BaseWebDriverTest
     private void permissionsReportTest()
     {
         clickAndWait(Locator.linkWithText("view permissions report"));
-        DataRegionTable drt = new DataRegionTable("access", this); // TODO: This faked up region doesn't work as a real region -- see userAccess.jsp
+        DataRegionTable drt = new DataRegionTable("access", getDriver()); // TODO: This faked up region doesn't work as a real region -- see userAccess.jsp
 
         waitForText("Access Modification History For This Folder");
         assertTextPresent("Folder Access Details");
@@ -398,32 +390,32 @@ public class GroupTest extends BaseWebDriverTest
             apiUserHelper.createUser(user);
         }
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
-        apiPermissionsHelper.createProjectGroup(SITE_USER_GROUP, null);
         apiPermissionsHelper.createGlobalPermissionsGroup(SITE_USER_GROUP, SITE_USER_EMAILS[0]);
 
         goToSiteUsers();
-        DataRegionTable table = new DataRegionTable("Users", this);
+        DataRegionTable table = new DataRegionTable("Users", getDriver());
 
         int initialRowCount = table.getDataRowCount();
-        CustomizeView helper = table.getCustomizeView();
-//      TODO uncomment these lines when Issue 23964 is fixed.
-//        helper.openCustomizeViewPanel();
-//        helper.addCustomizeViewFilter("Groups", "Is Not Blank");
-//        helper.applyCustomView();
 
-//        Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
-//        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRow("Display Name", SITE_USER_NOT_IN_GROUP));
-//        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRow("Display Name", SITE_USER_IN_GROUP));
+        /* TODO: Unable to multi-value display column through Customize Grid (See Issue 26100)
+        CustomizeView helper = table.getCustomizeView();
+        helper.openCustomizeViewPanel();
+        helper.addFilter("Groups", "Is Not Blank");
+        helper.applyCustomView();
+
+        Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
+        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_NOT_IN_GROUP));
+        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_IN_GROUP));
 
         // now try the same filtering with a column filter
-//        helper = new CustomizeViewsHelper(table);
-//        helper.revertUnsavedViewGridClosed();
-//        Assert.assertEquals("After removing filters, should have the original number of users", initialRowCount, table.getDataRowCount());
+        helper.revertUnsavedViewGridClosed();
+        Assert.assertEquals("After removing filters, should have the original number of users", initialRowCount, table.getDataRowCount());
+        */
+
         table.setFilter("Groups", "Is Not Blank");
         Assert.assertNotEquals("Filtered number of users should not be the same as the initial count", initialRowCount, table.getDataRowCount());
-        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRow("Display Name", SITE_USER_NOT_IN_GROUP));
-        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRow("Display Name", SITE_USER_IN_GROUP));
-
+        Assert.assertEquals("User not in a group should not be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_NOT_IN_GROUP));
+        Assert.assertNotEquals("User in group should be in filtered list", -1, table.getRowIndex("Display Name", SITE_USER_IN_GROUP));
     }
 
     @Override protected BrowserType bestBrowser()
