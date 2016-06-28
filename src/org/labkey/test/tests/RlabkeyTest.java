@@ -25,14 +25,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.APITestHelper;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.IssuesHelper;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
 public class RlabkeyTest extends BaseWebDriverTest
@@ -46,6 +49,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final String ISSUE_TITLE_0 = "Rlabkey: Issue at the Project level";
     private static final String ISSUE_TITLE_1 = "Rlabkey: Issue in the subfolder";
     private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
+    private static final String USER = "rlabkey_user@rlabkey.test";
 
     @BeforeClass
     public static void setupProject()
@@ -56,9 +60,15 @@ public class RlabkeyTest extends BaseWebDriverTest
 
     public void doInit()
     {
+        _userHelper.createUser(USER);
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         log("Create Projects");
         _containerHelper.createProject(PROJECT_NAME, null);
+        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME, "Users");
+        apiPermissionsHelper.setPermissions("Users", "Editor");
         _containerHelper.createProject(PROJECT_NAME_2, null);
+        apiPermissionsHelper.addUserToProjGroup(USER, PROJECT_NAME_2, "Users");
+        apiPermissionsHelper.setPermissions("Users", "Editor");
         clickProject(PROJECT_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
@@ -72,37 +82,21 @@ public class RlabkeyTest extends BaseWebDriverTest
         _listHelper.importListArchive(PROJECT_NAME, listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
 
-        clickProject(PROJECT_NAME);
-        portalHelper.addWebPart("Issues List");
-        clickButton("Admin");
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
-        clickButton("Update");
-        clickButton("Back to Issues");
-        clickButton("New Issue");
-        setFormElement(Locator.name("title"), ISSUE_TITLE_0);
-        clickButton("Save");
-        String[] tabsToAdd = new String[0];
-        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, tabsToAdd);
+        IssuesHelper issuesHelper = new IssuesHelper(this);
 
-        clickFolder(FOLDER_NAME);
-        portalHelper.addWebPart("Issues List");
-        clickButton("Admin");
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
-        clickButton("Update");
-        clickButton("Back to Issues");
-        clickButton("New Issue");
-        setFormElement(Locator.name("title"), ISSUE_TITLE_1);
-        clickButton("Save");
+        clickProject(PROJECT_NAME);
+        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_0));
+
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
+        apiPermissionsHelper.checkInheritedPermissions();
+
+        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_1));
 
         clickProject(PROJECT_NAME_2);
-        portalHelper.addWebPart("Issues List");
-        clickButton("Admin");
-        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
-        clickButton("Update");
-        clickButton("Back to Issues");
-        clickButton("New Issue");
-        setFormElement(Locator.name("title"), ISSUE_TITLE_2);
-        clickButton("Save");
+        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_2));
         
         _rReportHelper.ensureRConfig();
     }
@@ -150,8 +144,9 @@ public class RlabkeyTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
-        deleteProject(PROJECT_NAME_2, afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(PROJECT_NAME_2, afterTest);
+        _userHelper.deleteUsers(afterTest, USER);
     }
 
     public List<String> getAssociatedModules()
