@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -336,7 +337,9 @@ public class RReportHelper
 
     public void saveReport(String name, int wait)
     {
-        _test.clickButton("Save", wait);
+        WebElement saveButton = Ext4Helper.Locators.ext4Button("Save").findElement(_test.getDriver());
+        _test.scrollIntoView(saveButton, true);
+        _test.clickAndWait(saveButton, wait);
         if (null != name)
         {
             Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
