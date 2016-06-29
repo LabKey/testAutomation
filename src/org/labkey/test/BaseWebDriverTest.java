@@ -21,23 +21,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
@@ -53,9 +39,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.search.SearchBodyWebPart;
@@ -65,7 +49,6 @@ import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
@@ -75,7 +58,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
@@ -103,7 +85,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.labkey.test.TestProperties.isDevModeEnabled;
 import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
@@ -116,7 +97,6 @@ import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
-import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -164,7 +144,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
     private static File _downloadDir;
 
-    private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     public static final int MAX_WAIT_SECONDS = 10 * 60;
 
     public static final double DELTA = 10E-10;
@@ -284,584 +263,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             _driver = null;
         }
-    }
-
-    @LogMethod
-    public void signIn()
-    {
-        if ( isGuestModeTest() )
-        {
-            waitForStartup();
-            log("Skipping sign in.  Test runs as guest.");
-            simpleSignOut();
-            return;
-        }
-
-        try
-        {
-            PasswordUtil.ensureCredentials();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Unable to ensure credentials", e);
-        }
-        waitForStartup();
-        log("Signing in");
-        //
-        simpleSignOut();
-        checkForUpgrade();
-        simpleSignIn();
-        ensureAdminMode();
-    }
-
-    // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
-    public void signIn(String email, String password)
-    {
-        attemptSignIn(email, password);
-        waitForElementToDisappear(Locator.lkButton("Sign In"));
-        Assert.assertEquals("Logged in as wrong user", email, getCurrentUser());
-    }
-
-    public void attemptSignIn(String email, String password)
-    {
-        if (!getDriver().getTitle().equals("Sign In"))
-        {
-            try
-            {
-                clickAndWait(Locator.linkWithText("Sign In"));
-            }
-            catch (NoSuchElementException error)
-            {
-                throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.", error);
-            }
-        }
-
-        assertTitleEquals("Sign In");
-        assertElementPresent(Locator.tagWithName("form", "login"));
-        setFormElement(Locator.id("email"), email);
-        setFormElement(Locator.id("password"), password);
-        clickButton("Sign In", 0);
-    }
-
-    public void signInShouldFail(String email, String password, String... expectedMessages)
-    {
-        attemptSignIn(email, password);
-        String errorText = waitForElement(Locator.id("errors").withText()).getText();
-        assertTitleEquals("Sign In");
-        assertElementPresent(Locator.tagWithName("form", "login"));
-
-        List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
-        assertTrue(String.format("Wrong errors.\nExpected: ['%s']\nActual: '%s'", String.join("',\n'", expectedMessages), errorText), missingErrors.isEmpty());
-    }
-
-    protected void setInitialPassword(String user, String password)
-    {
-        // Get setPassword URL from notification email.
-        beginAt("/dumbster/begin.view?");
-
-        //the name of the installation can vary, so we need to infer the email subject
-        WebElement link = null;
-        String linkPrefix = user + " : Welcome to the ";
-        String linkSuffix = "new user registration";
-        for (WebElement el : getDriver().findElements(By.partialLinkText(linkPrefix)))
-        {
-            String text = el.getText();
-            if (text.startsWith(linkPrefix) && text.endsWith(linkSuffix))
-            {
-                link = el;
-                break;
-            }
-        }
-        assertNotNull("Link for '" + user + "' not found", link);
-
-        String emailSubject = link.getText();
-        link.click();
-
-        // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
-        WebElement resetLink = emailRegion.append("//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]").findElement(this.getDriver());
-        clickAndWait(resetLink, WAIT_FOR_PAGE);
-
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
-
-        clickButton("Set Password");
-    }
-
-    protected String getPasswordResetUrl(String username)
-    {
-        goToHome();
-        goToModule("Dumbster");
-        String emailSubject = "Reset Password Notification";
-
-        // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
-        WebElement email = emailRegion.append("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(this.getDriver());
-        email.click();
-
-        WebElement resetLink = emailRegion.append("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(this.getDriver());
-        shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
-        return resetLink.getText();
-    }
-
-    protected void resetPassword(String resetUrl, String username, String newPassword)
-    {
-        if (PasswordUtil.getUsername().equals(username))
-            throw new IllegalArgumentException("Don't change the primary site admin user's password");
-
-        if(resetUrl!=null)
-            beginAt(resetUrl);
-
-        assertTextPresent(username, "Choose a password you'll use to access this server", "six non-whitespace characters or more, cannot match email address");
-
-        setFormElement(Locator.id("password"), newPassword);
-        setFormElement(Locator.id("password2"), newPassword);
-
-        clickButton("Set Password");
-
-        if(!isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            clickButtonContainingText("Submit", defaultWaitForPage*3);
-            clickButton("Done");
-
-            signOut();
-            signIn(username, newPassword);
-        }
-    }
-
-    @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
-    {
-        if (PasswordUtil.getUsername().equals(getCurrentUser()))
-            throw new IllegalArgumentException("Don't change the primary site admin user's password");
-
-        goToMyAccount();
-        clickButton("Change Password");
-
-        setFormElement(Locator.id("oldPassword"), oldPassword);
-        setFormElement(Locator.id("password"), password);
-        setFormElement(Locator.id("password2"), password);
-
-        clickButton("Set Password");
-    }
-
-    /**
-     * change user's e-mail from userEmail to newUserEmail from admin console
-     */
-    protected void changeUserEmail(String userEmail, String newUserEmail)
-    {
-        log("Attempting to change user email from " + userEmail + " to " + newUserEmail);
-
-
-        goToSiteUsers();
-        clickAndWait(Locator.linkContainingText(displayNameFromEmail(userEmail)));
-
-        clickButton("Change Email");
-
-        setFormElement(Locator.name("requestedEmail"), newUserEmail);
-        setFormElement(Locator.name("requestedEmailConfirmation"), newUserEmail);
-        clickButton("Submit");
-    }
-
-
-    protected void setSystemMaintenance(boolean enable)
-    {
-        // Not available in production mode
-        if (isDevModeEnabled())
-        {
-            goToAdminConsole();
-            clickAndWait(Locator.linkWithText("system maintenance"));
-
-            if (enable)
-                checkCheckbox(Locator.name("enableSystemMaintenance"));
-            else
-                uncheckCheckbox(Locator.name("enableSystemMaintenance"));
-
-            clickButton("Save");
-        }
-    }
-
-    public void ensureAdminMode()
-    {
-        if (!isUserSystemAdmin())
-        {
-            if (!onLabKeyPage())
-                goToHome();
-            if (isImpersonating())
-                simpleSignOut();
-        }
-        if (!isElementPresent(Locators.projectBar))
-        {
-            goToHome();
-            waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
-        }
-        assertTrue("Test user '" + getCurrentUser() + "' is not a site admin", isUserSystemAdmin());
-    }
-
-    public void goToAdminConsole()
-    {
-        ensureAdminMode();
-        clickAdminMenuItem("Site", "Admin Console");
-    }
-
-    public void goToSiteSettings()
-    {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("site settings"));
-    }
-
-    public void goToAuditLog()
-    {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("audit log"));
-    }
-
-    protected void createDefaultStudy()
-    {
-        clickButton("Create Study");
-        clickButton("Create Study");
-    }
-
-    private void waitForStartup()
-    {
-        boolean hitFirstPage = false;
-        log("Verifying that server has started...");
-        long ms = System.currentTimeMillis();
-        while (!hitFirstPage && ((System.currentTimeMillis() - ms)/1000) < MAX_SERVER_STARTUP_WAIT_SECONDS)
-        {
-            try
-            {
-                WebTestHelper.getHttpResponse(buildURL("login", "logout"));
-                getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
-                getDriver().get(buildURL("login", "logout"));
-                WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
-
-                if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
-                {
-                    hitFirstPage = true;
-                }
-                else
-                {
-                    long elapsedMs = System.currentTimeMillis() - ms;
-                    log("Server is not ready.  Waiting " + (MAX_SERVER_STARTUP_WAIT_SECONDS -
-                            (elapsedMs / 1000)) + " more seconds...");
-                }
-            }
-            catch (WebDriverException e)
-            {
-                // ignore timeouts that occur during startup; a poorly timed request
-                // as the webapp is loading may hang forever, causing a timeout.
-                log("Waiting for server: " + e.getMessage());
-            }
-            catch (RuntimeException e)
-            {
-                if (e.getCause() != null && e.getCause() instanceof IOException)
-                    log("Waiting for server: " + e.getCause().getMessage());
-                else
-                    throw e;
-            }
-            finally
-            {
-                if (!hitFirstPage)
-                {
-                    sleep(1000);
-                }
-            }
-
-        }
-        if (!hitFirstPage)
-        {
-            throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
-        }
-        log("Server is running.");
-    }
-
-    @LogMethod
-    private void checkForUpgrade()
-    {
-        boolean bootstrapped = false;
-
-        // check to see if we're the first user:
-        if (isTextPresent("Welcome! We see that this is your first time logging in."))
-        {
-            bootstrapped = true;
-            assertTitleEquals("Account Setup");
-            log("Need to bootstrap");
-            verifyInitialUserRedirects();
-
-            log("Testing bad email addresses");
-            verifyInitialUserError(null, null, null, "Invalid email address:");
-            verifyInitialUserError("bogus@bogus@bogus", null, null, "Invalid email address: bogus@bogus@bogus");
-
-            log("Testing bad passwords");
-            String email = PasswordUtil.getUsername();
-            verifyInitialUserError(email, null, null, "You must enter a password.");
-            verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
-            verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be six non-whitespace characters or more.");
-            verifyInitialUserError(email, email, email, "Your password must not match your email address.");
-            verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
-
-            log("Register the first user");
-            pushLocation();
-            assertTextPresent("Retype Password");
-            verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
-
-            log("Attempting to register another initial user");
-            popLocation();
-            // Make sure we got redirected to the module status page, since we already have a user
-            assertTextNotPresent("Retype Password");
-            assertTextPresent("Please wait, this page will automatically update with progress information");
-            goToHome();
-        }
-
-        if (bootstrapped || isTitleEqual("Sign In"))
-        {
-            // if the logout page takes us to the sign-in page, then we may have a schema update to do:
-            if (isTitleEqual("Sign In"))
-                simpleSignIn();
-
-            String upgradeText = "Please wait, this page will automatically update with progress information.";
-            boolean performingUpgrade = isTextPresent(upgradeText);
-
-            if (performingUpgrade)
-            {
-                try
-                {
-                    verifyRedirectBehavior(upgradeText);
-                }
-                catch (IOException fail)
-                {
-                    throw new RuntimeException(fail);
-                }
-
-                int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
-
-                while (waitMs > 0 && (!(isButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
-                {
-                    try
-                    {
-                        // Pound the server aggressively with requests for the home page to test synchronization
-                        // in the sql script runner.
-                        for (int i = 0; i < 5; i++)
-                        {
-                            goToHome();
-                            sleep(200);
-                            waitMs -= 200;
-                        }
-                        sleep(2000);
-                        waitMs -= 2000;
-                        if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                            throw new RuntimeException("A startup failure occurred.");
-                    }
-                    catch (WebDriverException ignore)
-                    {
-                        // Do nothing -- this page will sometimes auto-navigate out from under selenium
-                    }
-                }
-
-                if (waitMs <= 0)
-                    throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
-
-                if (isButtonPresent("Next"))
-                {
-                    clickButton("Next");
-
-                    // check for any additional upgrade pages inserted after module upgrade
-                    if (isButtonPresent("Next"))
-                        clickButton("Next");
-                }
-
-                if (isElementPresent(Locator.linkContainingText("Go directly to the server's Home page")))
-                {
-                    clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
-                }
-            }
-
-            // Tests hit this page a lot. Make it load as fast as possible
-            PortalHelper portalHelper = new PortalHelper(this);
-            for (BodyWebPart webPart : portalHelper.getBodyWebParts())
-                webPart.delete();
-            for (SideWebPart webPart : portalHelper.getSideWebParts())
-                webPart.delete();
-        }
-    }
-
-
-    private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedText)
-    {
-        if (null != email)
-            setFormElement(Locator.id("email"), email);
-
-        if (null != password1)
-            setFormElement(Locator.id("password"), password1);
-
-        if (null != password2)
-            setFormElement(Locator.id("password2"), password2);
-
-        clickAndWait(Locator.linkWithText("Next"));
-
-        if (null != expectedText)
-            assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(getDriver()).getText());
-    }
-
-
-    private void verifyInitialUserRedirects()
-    {
-        String initialText = "Welcome! We see that this is your first time logging in.";
-
-        // These requests should redirect to the initial user page
-        beginAt("/login/resetPassword.view");
-        assertTextPresent(initialText);
-        beginAt("/admin/maintenance.view");
-        assertTextPresent(initialText);
-    }
-
-    @LogMethod
-    private void verifyRedirectBehavior(String upgradeText) throws IOException
-    {
-        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
-
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = null;
-        HttpUriRequest method;
-        int status;
-
-        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
-        {
-            // These requests should NOT redirect to the upgrade page
-
-            method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
-            response = client.execute(method, context);
-            status = response.getStatusLine().getStatusCode();
-            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
-            EntityUtils.consume(response.getEntity());
-
-            method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
-            response = client.execute(method, context);
-            status = response.getStatusLine().getStatusCode();
-            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
-            EntityUtils.consume(response.getEntity());
-
-
-            // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
-
-            DefaultRedirectStrategy redirectStrategy = new DefaultRedirectStrategy()
-            {
-                @Override
-                public boolean isRedirected(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
-                {
-                    boolean isRedirect = false;
-                    try
-                    {
-                        isRedirect = super.isRedirected(httpRequest, httpResponse, httpContext);
-                    }
-                    catch (ProtocolException ignore)
-                    {
-                    }
-                    if (!isRedirect)
-                    {
-                        int responseCode = httpResponse.getStatusLine().getStatusCode();
-                        if (responseCode == 301 || responseCode == 302)
-                            return true;
-//                        if (WebTestHelper.getHttpResponseBody(httpResponse).contains("http-equiv=\"Refresh\""))
-//                            return true;
-                    }
-                    return isRedirect;
-                }
-
-                //TODO: Generate HttpRequest for 'http-equiv' redirect
-//                @Override
-//                public HttpUriRequest getRedirect(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
-//                {
-//                    HttpUriRequest redirectRequest = null;
-//                    ProtocolException ex = null;
-//                    try
-//                    {
-//                        return super.getRedirect(httpRequest, httpResponse, httpContext);
-//                    }
-//                    catch (ProtocolException e){ex = e;}
-//                    redirectRequest = httpRequest.;
-//
-//                    if (redirectRequest == null)
-//                        throw ex;
-//                    else
-//                        return redirectRequest;
-//                }
-            };
-            try (CloseableHttpClient redirectClient = getHttpClientBuilder().setRedirectStrategy(redirectStrategy).build())
-            {
-                method = new HttpPost(getBaseURL() + "/login/logout.view");
-                List<NameValuePair> args = new ArrayList<>();
-                args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
-                args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
-                ((HttpPost) method).setEntity(new UrlEncodedFormEntity(args));
-                response = redirectClient.execute(method, context);
-                status = response.getStatusLine().getStatusCode();
-                assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-                // TODO: check login, once http-equiv redirect is sorted out
-                assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
-            }
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consumeQuietly(response.getEntity());
-        }
-    }
-
-    @LogMethod
-    public void disableMaintenance()
-    {
-        if ( isGuestModeTest() )
-            return;
-        beginAt("/admin/customizeSite.view");
-        click(Locator.radioButtonByNameAndValue("systemMaintenanceInterval", "never"));
-        clickButton("Save");
-    }
-
-    private static long smStart = 0;
-    private static String smUrl = null;
-
-    public void startSystemMaintenance()
-    {
-        startSystemMaintenance("");
-    }
-
-    public void startSystemMaintenance(String taskName)
-    {
-        Map<String, String> urlParams = new HashMap<>();
-        urlParams.put("test", "true");
-        if (!taskName.isEmpty())
-            urlParams.put("taskName", taskName);
-        String maintenanceTriggerUrl = WebTestHelper.buildURL("admin", "systemMaintenance", urlParams);
-
-        smStart = System.currentTimeMillis();
-        SimpleHttpRequest request = new SimpleHttpRequest(maintenanceTriggerUrl);
-        request.setRequestMethod("POST");
-        request.copySession(getDriver());
-        try
-        {
-            SimpleHttpResponse response = request.getResponse();
-            assertEquals("Failed to start system maintenance", HttpStatus.SC_OK, response.getResponseCode());
-            smUrl = response.getResponseBody();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void waitForSystemMaintenanceCompletion()
-    {
-        assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
-        long elapsed = System.currentTimeMillis() - smStart;
-
-        // Navigate to pipeline details page, then refresh page and check for system maintenance complete, up to 10 minutes from the start of the test
-        beginAt(smUrl);
-        int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
-        waitForTextWithRefresh(timeLeft > 0 ? timeLeft : 0, "System maintenance complete");
     }
 
     private void populateLastPageInfo()
@@ -1362,31 +763,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         checkJsErrors(true);
     }
 
-    /**
-     * Renamed to {@link #ensureSignedInAsPrimaryTestUser()}
-     * TODO: Remove in 16.3
-     */
-    @Deprecated
-    public void ensureSignedInAsAdmin()
-    {
-        ensureSignedInAsPrimaryTestUser();
-    }
-
-    @LogMethod
-    public void ensureSignedInAsPrimaryTestUser()
-    {
-        if (!onLabKeyPage())
-            goToHome();
-        if (isImpersonating())
-            simpleSignOut();
-        if (!isSignedInAsPrimaryTestUser())
-        {
-            if (isSignedIn())
-                signOut();
-            simpleSignIn();
-        }
-    }
-
     private void cleanup(boolean afterTest) throws TestTimeoutException
     {
         if (!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
@@ -1809,6 +1185,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         catch (IOException ignore){}
     }
 
+    /**
+     * @deprecated Inline me: {@link WebTestHelper#getBaseURL()}
+     */
+    @Deprecated
     public String getBaseURL()
     {
         return WebTestHelper.getBaseURL();
@@ -1817,72 +1197,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public String getProjectUrl()
     {
         return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
-    }
-
-    public void openProjectMenu()
-    {
-        waitForHoverNavigationReady();
-        shortWait().until(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(@Nullable WebDriver driver)
-            {
-                click(Locators.projectBar);
-                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")).apply(driver);
-            }
-        });
-    }
-
-    public void clickProject(String project)
-    {
-        clickProject(project, true);
-    }
-
-    public void clickProject(String project, boolean assertDestination)
-    {
-        openProjectMenu();
-        WebElement projectLink = Locator.linkWithText(project).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
-        if (assertDestination)
-        {
-            acceptTermsOfUse(null, true);
-            waitForElement(Locator.id("folderBar").withText(project));
-        }
-    }
-
-    public void openFolderMenu()
-    {
-        waitForElement(Locators.folderMenu.withText());
-        waitForFolderNavigationReady();
-        shortWait().until(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(@Nullable WebDriver driver)
-            {
-                click(Locators.folderMenu);
-                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#folderBar_menu .folder-nav")).apply(driver);
-            }
-        });
-    }
-
-    public void clickFolder(String folder)
-    {
-        openFolderMenu();
-        expandFolderTree(folder);
-        waitAndClickAndWait(Locator.linkWithText(folder));
-    }
-
-    public void waitForFolderNavigationReady()
-    {
-        waitForHoverNavigationReady();
-        waitFor(() -> (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;"),
-                "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void waitForHoverNavigationReady()
-    {
-        waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
-                "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -2147,42 +1461,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return table.getFullColumnValues(columnNames);
     }
 
+    @Deprecated
     public String getPropertyXPath(String propertyHeading)
     {
         return "//td[text() = '" + propertyHeading + "']/../..";
     }
 
+    @Deprecated
     public String getPropertyXPathContains(String propertyHeading)
     {
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
-    }
-
-    /**
-     *
-     * @param feature  the enable link will have an id of the form "labkey-experimental-feature-[feature]
-     */
-    public void enableExperimentalFeature(String feature)
-    {
-        log("Attempting to enable feature: " + feature);
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("experimental features"));
-
-        String xpath = "//div[div[text()='" + feature + "']]/a";
-        if (!isElementPresent(Locator.xpath(xpath)))
-            fail("No such feature found: " + feature);
-        else
-        {
-            Locator link = Locator.xpath(xpath + "[text()='Enable']");
-            if(isElementPresent(link))
-            {
-                click(link);
-                log("Enable link found, enabling " + feature);
-            }
-            else
-            {
-                log("Link not found, presumed enabled: " + feature);
-            }
-        }
     }
 
     /**
@@ -2447,31 +1735,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToProjectHome(getProjectName());
     }
 
-    public void goToProjectHome(String projectName)
-    {
-        beginAt(buildURL("project", projectName, "begin"));
-    }
-
-    /**
-     * go to the project settings page of a project
-     * @param project project name
-     */
-    public void goToProjectSettings(String project)
-    {
-        goToProjectHome(project);
-        goToProjectSettings();
-    }
-
-    public void goToAdmin()
-    {
-        beginAt("/admin/showAdmin.view");
-    }
-
-    public void goToMyAccount()
-    {
-        clickUserMenuItem("My Account");
-    }
-
     protected void startImportStudyFromZip(File studyFile)
     {
         startImportStudyFromZip(studyFile, false);
@@ -2592,42 +1855,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, validateQueries, useAdvancedOptions);
         importPage.clickStartImport();
         waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
-    }
-
-    @LogMethod
-    public void signOut(@Nullable String termsText)
-    {
-        log("Signing out");
-        simpleSignOut();
-
-        acceptTermsOfUse(termsText, true);
-
-        if (!isElementPresent(Locators.signInButtonOrLink)) // Sign-out action stopped impersonation
-            simpleSignOut();
-        waitForElement(Locators.signInButtonOrLink);
-    }
-
-    @LogMethod
-    public void signOut()
-    {
-        signOut(null);
-    }
-
-    public void signOutHTTP()
-    {
-        String logOutUrl = WebTestHelper.buildURL("login", "logout");
-        SimpleHttpRequest logOutRequest = new SimpleHttpRequest(logOutUrl, "POST");
-        logOutRequest.copySession(getDriver());
-
-        try
-        {
-            SimpleHttpResponse response = logOutRequest.getResponse();
-            assertEquals(HttpStatus.SC_OK, response.getResponseCode());
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     /*
