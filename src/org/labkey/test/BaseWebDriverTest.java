@@ -24,17 +24,18 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.RuleChain;
-import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.writer.PrintWriters;
+import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsResponse;
@@ -422,6 +423,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+        Assert.fail();
         resetErrors();
         deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
@@ -481,7 +483,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @Rule
-    public Timeout testTimeout = new Timeout(30, TimeUnit.MINUTES);
+    public Timeout testTimeout()
+    {
+        return new Timeout(30, TimeUnit.MINUTES);
+    }
 
     @Rule
     public final RuleChain testRules()
@@ -525,7 +530,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        // Separate TestWatcher to catch failures that happen in the nested succeeded method
+        // Separate TestWatcher to handle failures that happen in the nested succeeded method
         TestWatcher _failWatcher = new TestWatcher()
         {
             @Override
