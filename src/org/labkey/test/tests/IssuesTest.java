@@ -369,7 +369,7 @@ public class IssuesTest extends BaseWebDriverTest
         {
             test.goToSchemaBrowser();
             test.selectQuery("lists", getLookupTableName(issueDefName, fieldName));
-            test.click(Locator.linkWithText("view data"));
+            test.clickAndWait(Locator.linkWithText("view data"));
         }
         StringBuilder tsv = new StringBuilder();
         tsv.append("value");
@@ -724,7 +724,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // handle move dialog
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
-        _ext4Helper.selectComboBoxItem("Container:", path);
+        _ext4Helper.selectComboBoxItem("Target folder:", path);
         clickAndWait(Ext4Helper.Locators.ext4Button("Move"));
 
         // validate new container
@@ -751,7 +751,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // handle move dialog (copy pasta)
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
-        _ext4Helper.selectComboBoxItem("Container:", path);
+        _ext4Helper.selectComboBoxItem("Target folder:", path);
         clickAndWait(Ext4Helper.Locators.ext4Button("Move"));
 
         // make sure the moved issues are no longer shwoing up
