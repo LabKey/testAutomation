@@ -30,9 +30,7 @@ import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -40,7 +38,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -233,7 +230,8 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    private Set<String> getFilenamesInZip(File file) throws IOException {
+    private Set<String> getFilenamesInZip(File file) throws IOException
+    {
         Set<String> filesInZip = new HashSet<>();
 
         try (ZipFile zipFile = new ZipFile(file))
