@@ -233,12 +233,29 @@
                 <striplinecomments>
                     <comment value="#"/>
                 </striplinecomments>
+                <striplinecomments>
+                    <comment value="-:"/>
+                </striplinecomments>
                 <expandproperties/>
-                <suffixlines suffix="/test,"/>
+                <suffixlines suffix=","/>
                 <striplinebreaks/>
             </filterchain>
         </loadfile>
-        <echo>${moduleDirectories}</echo>
+        <loadfile property="excludedModuleDirectories" srcfile="${modulesFile.fullpath}">
+            <filterchain>
+                <expandproperties/>
+                <linecontainsregexp>
+                    <regexp pattern="^-:"/>
+                </linecontainsregexp>
+                <tokenfilter>
+                    <replaceregex pattern="^-:" replace=""/>
+                </tokenfilter>
+                <suffixlines suffix=","/>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+        <echo>Module Directories: ${moduleDirectories}</echo>
+        <echo>Module Directories: ${excludedModuleDirectories}</echo>
 
         <loadfile property="moduleSources" srcfile="${modulesFile.fullpath}">
             <filterchain>
@@ -269,7 +286,7 @@
 
         <!-- Create a path that includes all individual module test directories -->
         <path id="module.test.src.dirs">
-            <dirset dir="${project.root}" includes="${moduleDirectories}">
+            <dirset dir="${project.root}" includes="${moduleDirectories}" excludes="${excludedModuleDirectories}">
                 <selector refid="test.module.selector"/>
                 <selector refid="skip.module.selector"/>
             </dirset>
@@ -353,7 +370,7 @@
         <path id="sampledata.roots">
             <path location="${project.root}"/>
             <path>
-                <dirset dir="${project.root}" includes="${moduleDirectories}">
+                <dirset dir="${project.root}" includes="${moduleDirectories}" excludes="${excludedModuleDirectories}">
                     <selector refid="sampledata.selector"/>
                     <selector refid="skip.module.selector"/>
                 </dirset>
