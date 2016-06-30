@@ -17,6 +17,7 @@
 package org.labkey.dumbster;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.api.module.CodeOnlyModule;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
@@ -32,16 +33,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class DumbsterModule extends DefaultModule
+public class DumbsterModule extends CodeOnlyModule
 {
     public String getName()
     {
         return "Dumbster";
-    }
-
-    public double getVersion()
-    {
-        return 16.10;
     }
 
     protected void init()
@@ -59,11 +55,6 @@ public class DumbsterModule extends DefaultModule
                     return new MailWebPart();
                 }
             }));
-    }
-
-    public boolean hasScripts()
-    {
-        return false;
     }
 
     public void doStartup(ModuleContext moduleContext)
