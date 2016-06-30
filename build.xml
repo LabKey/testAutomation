@@ -237,7 +237,7 @@
                     <comment value="-:"/>
                 </striplinecomments>
                 <expandproperties/>
-                <suffixlines suffix=","/>
+                <suffixlines suffix="/test,"/>
                 <striplinebreaks/>
             </filterchain>
         </loadfile>
@@ -250,7 +250,7 @@
                 <tokenfilter>
                     <replaceregex pattern="^-:" replace=""/>
                 </tokenfilter>
-                <suffixlines suffix=","/>
+                <suffixlines suffix="/test,"/>
                 <striplinebreaks/>
             </filterchain>
         </loadfile>
