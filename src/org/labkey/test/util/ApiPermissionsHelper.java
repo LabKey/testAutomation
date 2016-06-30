@@ -459,14 +459,23 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     public void deleteGroup(String groupName, String project, boolean failIfNotFound)
     {
-        Integer groupId = "/".equals(project) ? getSiteGroupId(groupName) : getProjectGroupId(groupName, project);
+        boolean isSiteGroup = "/".equals(project) || StringUtils.trimToEmpty(project).isEmpty();
+        Integer groupId = isSiteGroup ? getSiteGroupId(groupName) : getProjectGroupId(groupName, project);
 
         if (groupId == null)
         {
+            String result = isSiteGroup ?
+                    String.format("Site group, '%s', does not exist.", groupName) :
+                    String.format("Group, '%s', does not exist in project '%s'", groupName, project);
             if (failIfNotFound)
-                throw new IllegalStateException("Group does not exist: " + groupName);
+            {
+                throw new IllegalStateException(result);
+            }
             else
+            {
+                TestLogger.log(result);
                 return;
+            }
         }
 
         DeleteGroupCommand command = new DeleteGroupCommand(groupId);
