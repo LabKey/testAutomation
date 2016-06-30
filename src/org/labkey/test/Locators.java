@@ -29,10 +29,10 @@ public abstract class Locators
 
     public static Locator pageSignal(String signalName)
     {
-        return Locator.css("#testSignals > META[name=" + signalName + "]");
+        return Locator.css("#testSignals > div[name=" + signalName + "]");
     }
     public static Locator pageSignal(String signalName, String value)
     {
-        return Locator.css("#testSignals > META[name=" + signalName + "][value=" + value + "]");
+        return Locator.css("#testSignals > div[name=" + signalName + "][value=" + value + "]");
     }
 }
