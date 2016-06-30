@@ -55,6 +55,11 @@
     <property name="test.compile.deprecation" value="false"/>
     <property name="test.compile.optimize" value="true"/>
 
+    <propertyset id="junit.test.properties" dynamic="true">
+        <propertyref prefix="sysprop."/>
+        <mapper type="glob" from="sysprop.*" to="*"/>
+    </propertyset>
+
     <!-- Grab product.version set by TeamCity if it is there -->
     <condition property="product.version" value="${teamcity.product.version}" else="DevBuild" >
         <isset property="teamcity.product.version"/>
@@ -127,7 +132,7 @@
         <echo message="    -Dlabkey.contextpath={contextpath}"/>
         <echo message=""/>
         <echo message="For extra coverage, the harness can crawl all new links after each test, checking for"/>
-        <echo message="404 and 500 errors.  This provides extra safely, but adds time.  To enable link checking:"/>
+        <echo message="404 and 500 errors.  This provides extra coverage, but adds time.  To enable link checking:"/>
         <echo message="    -DlinkCheck=true"/>
         <echo message=""/>
         <echo message="Add javascript injection testing:"/>
@@ -150,6 +155,11 @@
         <echo message=""/>
         <echo message="Randomize test order."/>
         <echo message="    -DshuffleTests=true"/>
+        <echo message=""/>
+        <echo message="Enumerate tests from a specific package or packages (comma-separated). Default = org.labkey.test"/>
+        <echo message="    -Dtest.packages=&quot;org.labkey.test, com.custom.moldule.test&quot;"/>
+        <echo message="Enumerate tests from a specific package or packages (comma-separated), in addition to those in 'test.packages'"/>
+        <echo message="    -Dextra.test.packages=&quot;com.custom.moldule.test&quot;"/>
     </target>
 
     <target name="clean">
@@ -942,6 +952,13 @@
         <!-- Set property testNewModified : true of false (set in TeamCity) -->
         <condition property="sysprop.testNewAndModified" value="true" else="false">
             <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
+        </condition>
+
+        <condition property="sysprop.test.packages" value="${test.packages}">
+            <isset property="test.packages"/>
+        </condition>
+        <condition property="sysprop.extra.test.packages" value="${extra.test.packages}">
+            <isset property="extra.test.packages"/>
         </condition>
 
         <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/amd64/IEDriverServer.exe">

@@ -21,6 +21,7 @@ import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.Test;
 import org.reflections.Reflections;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +51,10 @@ public class SuiteBuilder
 
     private void loadSuites()
     {
-        String[] testPackages = System.getProperty("test.packages", "org.labkey.test").split("[^0-9A-Za-z\\._]+");
+        List<String> testPackages = new ArrayList<>(Arrays.asList(System.getProperty("test.packages", "org.labkey.test").split("[^0-9A-Za-z\\._]+")));
+        List<String> extraTestPackages = Arrays.asList(System.getProperty("extra.test.packages", "").split("[^0-9A-Za-z\\._]+"));
+        testPackages.addAll(extraTestPackages);
+
         Set<Class<?>> tests = new HashSet<>();
 
         for (String testPackage : testPackages)
