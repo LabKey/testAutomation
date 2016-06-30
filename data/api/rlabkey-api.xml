@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.130")
+                print("Latest Rlabkey version: 2.1.131")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.130"
-                [1] "Found Rlabkey version: 2.1.130"
+                [1] "Latest Rlabkey version: 2.1.131"
+                [1] "Found Rlabkey version: 2.1.131"
             ]]>
         </response>
     </test>
@@ -407,16 +407,15 @@
                 library(Rlabkey)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                    schemaName="issues", queryName="Issues", containerFilter="Current")
+                    schemaName="issues", queryName="Issues", containerFilter="Current",
+                    colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                 selectedRow
                 ]]>
             </url>
             <response>
                 <![CDATA[
-                 Type Area Title Assigned To Pri Status
-                1 <NA> <NA> Rlabkey: Issue at the Project level 0 3 open
-                 Milestone
-                1 <NA>
+                 Type Area Title Priority Status Milestone
+                1 <NA> <NA> Rlabkey: Issue at the Project level 3 open <NA>
                 ]]>
             </response>
         </test>
@@ -425,18 +424,16 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndSubfolders", colSort="+IssueId")
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndSubfolders", colSort="+IssueId",
+                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
              </url>
              <response>
                  <![CDATA[
-                  Type Area Title Assigned To Pri Status
-                 1 <NA> <NA> Rlabkey: Issue at the Project level 0 3 open
-                 2 <NA> <NA> Rlabkey: Issue in the subfolder 0 3 open
-                  Milestone
-                 1 <NA>
-                 2 <NA>
+                  Type Area Title Priority Status Milestone
+                 1 <NA> <NA> Rlabkey: Issue at the Project level 3 open <NA>
+                 2 <NA> <NA> Rlabkey: Issue in the subfolder 3 open <NA>
                  ]]>
              </response>
          </test>
@@ -446,16 +443,15 @@
                 library(Rlabkey)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                    schemaName="issues", queryName="Issues", containerFilter="Current")
+                    schemaName="issues", queryName="Issues", containerFilter="Current",
+                    colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                 selectedRow
                 ]]>
             </url>
             <response>
                 <![CDATA[
-                 Type Area Title Assigned To Pri Status
-                1 <NA> <NA> Rlabkey: Issue in the subfolder 0 3 open
-                 Milestone
-                1 <NA>
+                 Type Area Title Priority Status Milestone
+                1 <NA> <NA> Rlabkey: Issue in the subfolder 3 open <NA>
                 ]]>
             </response>
         </test>
@@ -464,18 +460,16 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndParents", colSort="+IssueId")
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndParents", colSort="+IssueId",
+                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
              </url>
              <response>
                  <![CDATA[
-                  Type Area Title Assigned To Pri Status
-                 1 <NA> <NA> Rlabkey: Issue at the Project level 0 3 open
-                 2 <NA> <NA> Rlabkey: Issue in the subfolder 0 3 open
-                  Milestone
-                 1 <NA>
-                 2 <NA>
+                  Type Area Title Priority Status Milestone
+                 1 <NA> <NA> Rlabkey: Issue at the Project level 3 open <NA>
+                 2 <NA> <NA> Rlabkey: Issue in the subfolder 3 open <NA>
                  ]]>
              </response>
          </test>
@@ -484,18 +478,16 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentPlusProject", colSort="+IssueId")
+                     schemaName="issues", queryName="Issues", containerFilter="CurrentPlusProject", colSort="+IssueId",
+                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
              </url>
              <response>
                  <![CDATA[
-                  Type Area Title Assigned To Pri Status
-                 1 <NA> <NA> Rlabkey: Issue at the Project level 0 3 open
-                 2 <NA> <NA> Rlabkey: Issue in the subfolder 0 3 open
-                  Milestone
-                 1 <NA>
-                 2 <NA>
+                  Type Area Title Priority Status Milestone
+                 1 <NA> <NA> Rlabkey: Issue at the Project level 3 open <NA>
+                 2 <NA> <NA> Rlabkey: Issue in the subfolder 3 open <NA>
                  ]]>
              </response>
          </test>
@@ -507,20 +499,17 @@
                      schemaName="issues", queryName="Issues",
                      colFilter=makeFilter(c("Title", "STARTS_WITH", "Rlabkey:")),
                      colSort="Title",
-                     containerFilter="AllFolders")
+                     containerFilter="AllFolders",
+                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
              </url>
              <response>
                  <![CDATA[
-                  Type Area Title Assigned To Pri Status
-                 1 <NA> <NA> Rlabkey: Issue at the Project level 0 3 open
-                 2 <NA> <NA> Rlabkey: Issue in another project 0 3 open
-                 3 <NA> <NA> Rlabkey: Issue in the subfolder 0 3 open
-                  Milestone
-                 1 <NA>
-                 2 <NA>
-                 3 <NA>
+                  Type Area Title Priority Status Milestone
+                 1 <NA> <NA> Rlabkey: Issue at the Project level 3 open <NA>
+                 2 <NA> <NA> Rlabkey: Issue in another project 3 open <NA>
+                 3 <NA> <NA> Rlabkey: Issue in the subfolder 3 open <NA>
                  ]]>
              </response>
          </test>
