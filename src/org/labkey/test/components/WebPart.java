@@ -30,7 +30,10 @@ import java.util.Arrays;
 
 import static org.labkey.test.components.WebPart.Locators.webPart;
 
-public abstract class WebPart extends Component implements WebDriverWrapper.PageLoadListener
+/**
+ * Base class for Portal WebParts (can be moved, added, and removed)
+ */
+public abstract class WebPart extends Component<WebPart.Elements> implements WebDriverWrapper.PageLoadListener
 {
     @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
@@ -62,7 +65,7 @@ public abstract class WebPart extends Component implements WebDriverWrapper.Page
 
     protected void clearCache()
     {
-        _elements = null;
+        super.clearElementCache();
         _title = null;
     }
 
@@ -93,7 +96,7 @@ public abstract class WebPart extends Component implements WebDriverWrapper.Page
     public String getTitle()
     {
         if (_title == null)
-            _title = elements().webPartTitle.getAttribute("title");
+            _title = elementCache().webPartTitle.getAttribute("title");
         return _title;
     }
 
@@ -142,19 +145,15 @@ public abstract class WebPart extends Component implements WebDriverWrapper.Page
 
     public void clickMenuItem(boolean wait, String... items)
     {
-        getWrapper()._ext4Helper.clickExt4MenuButton(wait, elements().moreMenu, false, items);
+        getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
     }
-
-    protected Elements _elements;
 
     protected Elements elements()
     {
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return elementCache();
     }
 
-    protected class Elements extends ElementCache
+    protected class Elements extends Component.ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);

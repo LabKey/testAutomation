@@ -11,17 +11,21 @@ import java.util.Map;
 
 import static org.labkey.test.util.Ext4Helper.getCssPrefix;
 
-public class DatasetFacetPanel extends Component
+public class DatasetFacetPanel extends Component<DatasetFacetPanel.Elements>
 {
     WebElement _panelEl;
     DataRegionTable _dataRegion;
-    Elements _elements;
 
     public DatasetFacetPanel(WebElement panelEl, DataRegionTable dataRegion)
     {
         _panelEl = panelEl;
         _dataRegion = dataRegion;
-        _elements = new Elements();
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _panelEl;
     }
 
     public Checkbox getGroupCheckbox(String label)
@@ -31,7 +35,7 @@ public class DatasetFacetPanel extends Component
 
     public Checkbox getGroupCheckbox(String label, int index)
     {
-        return elements().getGroupRow(label, index).getCheckbox();
+        return elementCache().getGroupRow(label, index).getCheckbox();
     }
 
     public Checkbox getCategoryCheckbox(String label)
@@ -41,7 +45,7 @@ public class DatasetFacetPanel extends Component
 
     public Checkbox getCategoryCheckbox(String label, int index)
     {
-        return elements().getCategoryRow(label, index).getCheckbox();
+        return elementCache().getCategoryRow(label, index).getCheckbox();
     }
 
     public void clickGroupLabel(String label)
@@ -51,37 +55,32 @@ public class DatasetFacetPanel extends Component
 
     public void clickGroupLabel(String label, int index)
     {
-        elements().getGroupRow(label, index).clickLabel();
+        elementCache().getGroupRow(label, index).clickLabel();
     }
 
     public void toggleAll()
     {
-        elements().allRow.getCheckbox().toggle();
+        elementCache().allRow.getCheckbox().toggle();
     }
 
     public void checkAll()
     {
-        elements().allRow.getCheckbox().check();
+        elementCache().allRow.getCheckbox().check();
     }
 
     public void uncheckAll()
     {
-        elements().allRow.getCheckbox().check(); // in case some are checked
-        elements().allRow.getCheckbox().uncheck();
+        elementCache().allRow.getCheckbox().check(); // in case some are checked
+        elementCache().allRow.getCheckbox().uncheck();
     }
 
     @Override
-    public WebElement getComponentElement()
+    protected Elements newElementCache()
     {
-        return _panelEl;
+        return new Elements();
     }
 
-    private Elements elements()
-    {
-        return _elements;
-    }
-
-    protected class Elements extends ElementCache
+    public class Elements extends Component.ElementCache
     {
         Map<String, Map<Integer, GroupRow>> groupRows = new HashMap<>();
         Map<String, Map<Integer, CategoryRow>> categoryRows = new HashMap<>();

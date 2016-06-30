@@ -25,11 +25,12 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class LabKeyPage extends WebDriverWrapper
+public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWrapper
 {
     @Deprecated
     protected BaseWebDriverTest _test;
     private WebDriver _driver;
+    private EC _elementCache;
 
     /**
      * @deprecated Remove usages of {@link #_test} from class and use {@link LabKeyPage(WebDriver)}
@@ -60,6 +61,18 @@ public class LabKeyPage extends WebDriverWrapper
     public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
+    }
+
+    protected EC elementCache()
+    {
+        if (null == _elementCache)
+            _elementCache = newElementCache();
+        return _elementCache;
+    }
+
+    protected EC newElementCache()
+    {
+        return (EC) new ElementCache();
     }
 
     public class ElementCache implements SearchContext

@@ -7,10 +7,8 @@ import org.openqa.selenium.WebDriver;
 
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
-public class ClosePage extends UpdatePage
+public class ClosePage extends UpdatePage<ClosePage.ElementCache>
 {
-    private Elements _elements;
-
     public ClosePage(WebDriver driver)
     {
         super(driver);
@@ -27,20 +25,15 @@ public class ClosePage extends UpdatePage
         return new ClosePage(driver.getDriver());
     }
 
-    protected Elements elements()
-    {
-        return (Elements)super.elements();
-    }
-
     @Override
-    protected Elements newElements()
+    protected ElementCache newElementCache()
     {
-        return new Elements();
+        return new ElementCache();
     }
 
-    protected class Elements extends UpdatePage.Elements
+    protected class ElementCache extends UpdatePage.ElementCache
     {
-        protected Elements()
+        protected ElementCache()
         {
             assignedTo = ReadOnlyFormItem(getDriver()).withLabel("Assigned To").findWhenNeeded();
             status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();

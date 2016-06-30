@@ -23,7 +23,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public abstract class Component implements SearchContext
+public abstract class Component<EC extends Component.ElementCache> implements SearchContext
 {
     public abstract WebElement getComponentElement();
 
@@ -49,7 +49,26 @@ public abstract class Component implements SearchContext
         return getComponentElement().findElements(by);
     }
 
-    protected abstract class ElementCache implements SearchContext
+    private EC _elementCache;
+
+    protected EC elementCache()
+    {
+        if (null == _elementCache)
+            _elementCache = newElementCache();
+        return _elementCache;
+    }
+
+    protected EC newElementCache()
+    {
+        return null;
+    }
+
+    protected void clearElementCache()
+    {
+        _elementCache = null;
+    }
+
+    public abstract class ElementCache implements SearchContext
     {
         @Override
         public List<WebElement> findElements(By by)
@@ -64,7 +83,7 @@ public abstract class Component implements SearchContext
         }
     }
 
-    protected static abstract class ComponentFinder<S extends SearchContext, C extends Component, F extends ComponentFinder<S, C, F>>
+    public static abstract class ComponentFinder<S extends SearchContext, C, F extends ComponentFinder<S, C, F>>
     {
         private static final int DEFAULT_TIMEOUT = 10000;
         private int timeout = 0;
@@ -82,20 +101,32 @@ public abstract class Component implements SearchContext
             return (F)this;
         }
 
+        public SimpleComponentFinder<C> locatedBy(Locator loc)
+        {
+            return new SimpleComponentFinder<C>(loc)
+            {
+                @Override
+                protected C construct(WebElement el)
+                {
+                    return ComponentFinder.this.construct(el);
+                }
+            };
+        }
+
         protected abstract Locator locator();
         protected abstract C construct(WebElement el);
 
-        protected final Locator buildLocator()
+        private Locator buildLocator()
         {
             return locator().index(index);
         }
 
-        private final WebElement findElement(S context)
+        private WebElement findElement(S context)
         {
             return buildLocator().findElement(context);
         }
 
-        private final WebElement waitForElement(S context)
+        private WebElement waitForElement(S context)
         {
             return buildLocator().waitForElement(context, timeout > 0 ? timeout : DEFAULT_TIMEOUT);
         }
@@ -113,6 +144,22 @@ public abstract class Component implements SearchContext
         public C findWhenNeeded(S context)
         {
             return construct(new LazyWebElement(buildLocator(), context).withTimeout(timeout));
+        }
+    }
+
+    public static abstract class SimpleComponentFinder<C> extends ComponentFinder<SearchContext, C, SimpleComponentFinder<C>>
+    {
+        Locator _locator;
+
+        public SimpleComponentFinder(Locator locator)
+        {
+            _locator = locator;
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
         }
     }
 }

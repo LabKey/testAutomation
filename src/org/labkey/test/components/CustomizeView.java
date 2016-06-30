@@ -46,7 +46,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.labkey.test.components.ext4.Checkbox.Checkbox;
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -215,8 +215,8 @@ public class CustomizeView extends Component
 
     public static class SaveWindow extends Window
     {
-        public final Checkbox shareCheckbox = Checkbox().withLabel("Make this grid view available to all users").findWhenNeeded(this);
-        public final Checkbox inheritCheckbox = Checkbox().withLabel("Make this grid view available in child folders").findWhenNeeded(this);
+        public final Checkbox shareCheckbox = Ext4Checkbox().withLabel("Make this grid view available to all users").findWhenNeeded(this);
+        public final Checkbox inheritCheckbox = Ext4Checkbox().withLabel("Make this grid view available in child folders").findWhenNeeded(this);
         public final RadioButton defaultViewRadio = RadioButton().withLabelContaining("Default").findWhenNeeded(this);
         public final RadioButton namedViewRadio = RadioButton().withLabelContaining("Named").findWhenNeeded(this);
         private final WebElement viewNameInput = new LazyWebElement(Locator.xpath("//input[@name='saveCustomView_name']"), this);

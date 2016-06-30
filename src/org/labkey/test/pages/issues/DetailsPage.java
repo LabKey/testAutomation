@@ -5,7 +5,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class DetailsPage extends BaseIssuePage
+public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 {
     public DetailsPage(WebDriver driver)
     {
@@ -14,63 +14,58 @@ public class DetailsPage extends BaseIssuePage
 
     public InsertPage clickNewIssue()
     {
-        clickAndWait(elements().newIssueLink);
+        clickAndWait(elementCache().newIssueLink);
         return new InsertPage(getDriver());
     }
 
     public LabKeyPage clickReturnToGrid()
     {
-        clickAndWait(elements().returnLink);
+        clickAndWait(elementCache().returnLink);
         return new LabKeyPage(getDriver());
     }
 
     public UpdatePage clickUpdate()
     {
-        clickAndWait(elements().updateLink);
+        clickAndWait(elementCache().updateLink);
         return new UpdatePage(getDriver());
     }
 
     public UpdatePage clickResolve()
     {
-        clickAndWait(elements().resolveLink);
+        clickAndWait(elementCache().resolveLink);
         return new UpdatePage(getDriver());
     }
 
     public UpdatePage clickClose()
     {
-        clickAndWait(elements().closeLink);
+        clickAndWait(elementCache().closeLink);
         return new UpdatePage(getDriver());
     }
 
     public UpdatePage clickReOpen()
     {
-        clickAndWait(elements().reopenLink);
+        clickAndWait(elementCache().reopenLink);
         return new UpdatePage(getDriver());
     }
 
     public LabKeyPage clickPrint()
     {
-        clickAndWait(elements().printLink);
+        clickAndWait(elementCache().printLink);
         return new LabKeyPage(getDriver());
     }
 
     public LabKeyPage clickEmailPrefs()
     {
-        clickAndWait(elements().emailPrefsLink);
+        clickAndWait(elementCache().emailPrefsLink);
         return new LabKeyPage(getDriver());
     }
 
-    protected Elements elements()
+    protected ElementCache newElementCache()
     {
-        return (Elements) super.elements();
+        return new ElementCache();
     }
 
-    protected Elements newElements()
-    {
-        return new Elements();
-    }
-
-    protected class Elements extends BaseIssuePage.Elements
+    protected class ElementCache extends BaseIssuePage.ElementCache
     {
         protected WebElement newIssueLink = Locator.linkWithText("new issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this);

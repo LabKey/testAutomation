@@ -9,10 +9,8 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.labkey.SelectFormItem.SelectFormItem;
 
-public class UpdatePage extends BaseIssuePage
+public class UpdatePage<EC extends UpdatePage.ElementCache> extends BaseIssuePage<EC>
 {
-    private Elements _elements;
-
     public UpdatePage(WebDriver driver)
     {
         super(driver);
@@ -20,35 +18,35 @@ public class UpdatePage extends BaseIssuePage
 
     public Input title()
     {
-        return elements().titleInput;
+        return elementCache().titleInput;
     }
 
     public Input comment()
     {
-        return elements().commentInput;
+        return elementCache().commentInput;
     }
 
     public LabKeyPage clickEmailPrefs()
     {
-        clickAndWait(elements().emailPrefsLink);
+        clickAndWait(elementCache().emailPrefsLink);
         return new LabKeyPage(getDriver());
     }
 
     public LabKeyPage save()
     {
-        clickAndWait(elements().saveButton);
+        clickAndWait(elementCache().saveButton);
         return new LabKeyPage(getDriver());
     }
 
     public UpdatePage saveFail()
     {
-        clickAndWait(elements().saveButton);
+        clickAndWait(elementCache().saveButton);
         return new UpdatePage(getDriver());
     }
 
     public LabKeyPage cancel()
     {
-        clickAndWait(elements().cancelButton);
+        clickAndWait(elementCache().cancelButton);
         return new LabKeyPage(getDriver());
     }
 
@@ -56,27 +54,20 @@ public class UpdatePage extends BaseIssuePage
     {
         doAndWaitForPageToLoad(() ->
         {
-            elements().cancelButton.click();
+            elementCache().cancelButton.click();
             assertAlertContains("Confirm Navigation");
         });
         return new LabKeyPage(getDriver());
     }
 
-    protected Elements elements()
+    protected EC newElementCache()
     {
-        if (_elements == null)
-            _elements = newElements();
-        return _elements;
+        return (EC)new ElementCache();
     }
 
-    protected Elements newElements()
+    protected class ElementCache extends BaseIssuePage.ElementCache
     {
-        return new Elements();
-    }
-
-    protected class Elements extends BaseIssuePage.Elements
-    {
-        public Elements()
+        public ElementCache()
         {
             assignedTo = SelectFormItem(getDriver()).withName("assignedTo").findWhenNeeded();
             priority = SelectFormItem(getDriver()).withName("priority").findWhenNeeded();

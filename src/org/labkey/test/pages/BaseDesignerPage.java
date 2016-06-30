@@ -17,13 +17,14 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.PortalHelper;
+import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 // TODO: Tons of missing functionality
 // TODO: Much ListHelper functionality belongs here
 // TODO: Create subclasses for particular designer pages (e.g. Metadata)
-public abstract class BaseDesignerPage extends LabKeyPage
+public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache> extends LabKeyPage<EC>
 {
     protected static final String DESIGNER_DIRTY_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
     private static final String ROW_HIGHLIGHT = "238"; // rgb(238,238,238)
@@ -80,16 +81,18 @@ public abstract class BaseDesignerPage extends LabKeyPage
 
     public void saveAndClose()
     {
-        if (isElementPresent(Locators.pageSignal(DESIGNER_DIRTY_SIGNAL, "true")))
-            save(); // TODO: 26042: Assay designer 'save & close' doesn't always clear dirty flag
         clickButton("Save & Close");
     }
 
-    public static class Locators extends org.labkey.test.Locators
+    @Override
+    protected EC newElementCache()
     {
-        public static Locator.XPathLocator fieldPanel(String panelTitle)
-        {
-            return Locator.tagWithClass("table", "labkey-wp").withPredicate(PortalHelper.Locators.webPartTitle(panelTitle));
-        }
+        return (EC)new ElementCache();
+    }
+
+    public class ElementCache extends LabKeyPage.ElementCache
+    {
+        public WebElement saveButton = new RefindingWebElement(Locator.lkButton("Save"), this);
+        public WebElement cancelButton = new RefindingWebElement(Locator.lkButton("Cancel"), this);
     }
 }

@@ -1,5 +1,6 @@
 package org.labkey.test.components.html;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.WebDriverComponent;
@@ -15,6 +16,18 @@ public class Input extends WebDriverComponent
     {
         _el = el;
         _wDriver = new WebDriverWrapperImpl(driver);
+    }
+
+    public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
+    {
+        return new SimpleComponentFinder<Input>(loc)
+        {
+            @Override
+            protected Input construct(WebElement el)
+            {
+                return new Input(el, driver);
+            }
+        };
     }
 
     @Override

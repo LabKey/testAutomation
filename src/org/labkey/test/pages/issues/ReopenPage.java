@@ -7,10 +7,8 @@ import org.openqa.selenium.WebDriver;
 
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
-public class ReopenPage extends UpdatePage
+public class ReopenPage extends UpdatePage<ReopenPage.ElementCache>
 {
-    private Elements _elements;
-
     public ReopenPage(WebDriver driver)
     {
         super(driver);
@@ -27,20 +25,14 @@ public class ReopenPage extends UpdatePage
         return new ReopenPage(driver.getDriver());
     }
 
-    protected Elements elements()
+    protected ElementCache newElementCache()
     {
-        return (Elements)super.elements();
+        return new ElementCache();
     }
 
-    @Override
-    protected Elements newElements()
+    protected class ElementCache extends UpdatePage.ElementCache
     {
-        return new Elements();
-    }
-
-    protected class Elements extends UpdatePage.Elements
-    {
-        protected Elements()
+        protected ElementCache()
         {
             status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
         }

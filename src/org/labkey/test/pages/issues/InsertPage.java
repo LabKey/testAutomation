@@ -6,7 +6,7 @@ import org.openqa.selenium.WebDriver;
 
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
-public class InsertPage extends UpdatePage
+public class InsertPage extends UpdatePage<InsertPage.ElementCache>
 {
     public InsertPage(WebDriver driver)
     {
@@ -24,20 +24,14 @@ public class InsertPage extends UpdatePage
         return new InsertPage(driver.getDriver());
     }
 
-    protected Elements elements()
+    protected ElementCache newElementCache()
     {
-        return (Elements)super.elements();
+        return new ElementCache();
     }
 
-    @Override
-    protected Elements newElements()
+    protected class ElementCache extends UpdatePage.ElementCache
     {
-        return new Elements();
-    }
-
-    protected class Elements extends UpdatePage.Elements
-    {
-        protected Elements()
+        protected ElementCache()
         {
             status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
         }

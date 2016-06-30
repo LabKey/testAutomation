@@ -11,7 +11,7 @@ public abstract class WebDriverComponent extends Component
 {
     protected abstract WebDriver getDriver();
 
-    public static abstract class WebDriverComponentFinder<C extends WebDriverComponent, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
+    public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
     {
         WebDriver driver;
         public WebDriverComponentFinder(WebDriver driver)

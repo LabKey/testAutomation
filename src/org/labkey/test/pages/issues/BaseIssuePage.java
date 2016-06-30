@@ -17,10 +17,8 @@ import java.util.regex.Pattern;
 
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
-public abstract class BaseIssuePage extends LabKeyPage
+public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> extends LabKeyPage<EC>
 {
-    Elements _elements;
-
     protected BaseIssuePage(WebDriver driver)
     {
         super(driver);
@@ -28,79 +26,72 @@ public abstract class BaseIssuePage extends LabKeyPage
 
     public FormItem<String> status()
     {
-        return elements().status;
+        return elementCache().status;
     }
 
     public FormItem<String> assignedTo()
     {
-        return elements().assignedTo;
+        return elementCache().assignedTo;
     }
 
     public FormItem<String> priority()
     {
-        return elements().priority;
+        return elementCache().priority;
     }
 
     public FormItem<String> related()
     {
-        return elements().related;
+        return elementCache().related;
     }
 
     public FormItem<String> resolution()
     {
-        return elements().resolution;
+        return elementCache().resolution;
     }
 
     public FormItem<String> duplicate()
     {
-        return elements().duplicate;
+        return elementCache().duplicate;
     }
 
     public FormItem<String> notifyList()
     {
-        return elements().notifyList;
+        return elementCache().notifyList;
     }
 
     public FormItem getCustomField(String label)
     {
-        return elements().getCustomFormItem(label);
+        return elementCache().getCustomFormItem(label);
     }
 
     public String openedDate()
     {
-        return elements().openedDate.getValue();
+        return elementCache().openedDate.getValue().toString();
     }
 
     public String closedDate()
     {
-        return elements().closedDate.getValue();
+        return elementCache().closedDate.getValue().toString();
     }
 
     public String changedDate()
     {
-        return elements().changedDate.getValue();
+        return elementCache().changedDate.getValue().toString();
     }
 
     public String resolvedDate()
     {
-        return elements().resolvedDate.getValue();
+        return elementCache().resolvedDate.getValue().toString();
     }
 
     public List<IssueComment> getComments()
     {
-        return elements().getComments();
+        return elementCache().getComments();
     }
 
-    protected Elements elements()
-    {
-        if (_elements == null)
-            _elements = newElements();
-        return _elements;
-    }
+    protected abstract EC newElementCache();
 
-    protected abstract Elements newElements();
-
-    protected class Elements extends ElementCache
+    protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected FormItem<String> status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
         protected FormItem<String> assignedTo = ReadOnlyFormItem(getDriver()).withLabel("Assigned To").findWhenNeeded();

@@ -307,11 +307,17 @@ public class WebTestHelper
             boolean firstParam = true;
             for (Map.Entry param : params.entrySet())
             {
-                url.append(firstParam ? "?" : "&");
-                url.append(param.getKey());
-                url.append("=");
-                url.append(param.getValue());
-                firstParam = false;
+                if (null != param.getKey())
+                {
+                    url.append(firstParam ? "?" : "&");
+                    url.append(param.getKey());
+                    if (null != param.getValue())
+                    {
+                        url.append("=");
+                        url.append(param.getValue());
+                    }
+                    firstParam = false;
+                }
             }
         }
 

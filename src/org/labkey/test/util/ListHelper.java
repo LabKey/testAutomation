@@ -19,12 +19,15 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
@@ -36,69 +39,79 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 
-public class ListHelper
+public class ListHelper extends LabKeySiteWrapper
 {
-    public static final String EDITOR_CHANGE_SIGNAL = "propertiesEditorChange";
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
-    BaseWebDriverTest _test;
+    private WrapsDriver _wrapsDriver;
 
-    public ListHelper(BaseWebDriverTest test)
+    public ListHelper(WrapsDriver wrapsDriver)
     {
-        _test = test;
+        _wrapsDriver = wrapsDriver;
+    }
+
+    public ListHelper(WebDriver driver)
+    {
+        this(() -> driver);
+    }
+
+    @Override
+    public WebDriver getWrappedDriver()
+    {
+        return _wrapsDriver.getWrappedDriver();
     }
 
     public void uploadCSVData(String listData)
     {
         clickImportData();
-        _test.setFormElement(Locator.id("tsv3"), listData);
-        _test._extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
+        setFormElement(Locator.id("tsv3"), listData);
+        _extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
         submitImportTsv_success();
     }
 
     public void uploadData(String listData)
     {
         clickImportData();
-        _test.setFormElement(Locator.id("tsv3"), listData);
+        setFormElement(Locator.id("tsv3"), listData);
         submitImportTsv_success();
     }
 
     public void submitTsvData(String listData)
     {
-        _test.setFormElement(Locator.id("tsv3"), listData);
+        setFormElement(Locator.id("tsv3"), listData);
         submitImportTsv_success();
     }
 
 
     public void submitImportTsv_success()
     {
-        _test.clickButton("Submit");
-        _test.waitForElement(Locator.css(".labkey-data-region"));
+        clickButton("Submit");
+        waitForElement(Locator.css(".labkey-data-region"));
     }
 
     // null means any error
     public void submitImportTsv_error(String error)
     {
-        _test.doAndWaitForPageSignal(() -> _test.clickButton("Submit", 0),
+        doAndWaitForPageSignal(() -> clickButton("Submit", 0),
                 IMPORT_ERROR_SIGNAL);
         if (error != null)
         {
-            String errors = String.join(", ", _test.getTexts(Locators.labkeyError.findElements(_test.getDriver())));
+            String errors = String.join(", ", getTexts(Locators.labkeyError.findElements(getDriver())));
             assertTrue("Didn't find expected error ['" + error + "'] in [" + errors + "]", errors.contains(error));
         }
     }
 
     public void submitImportTsv_errors(List<String> errors)
     {
-        _test.doAndWaitForPageSignal(() -> _test.clickButton("Submit", 0),
+        doAndWaitForPageSignal(() -> clickButton("Submit", 0),
                 IMPORT_ERROR_SIGNAL);
         if (errors == null || errors.isEmpty()){
-            _test.waitForElement(Locator.css(".labkey-error"));
+            waitForElement(Locator.css(".labkey-error"));
         }
         else
         {
             for (String err : errors)
             {
-                _test.waitForElement(Locator.css(".labkey-error").containing(err));
+                waitForElement(Locator.css(".labkey-error").containing(err));
             }
         }
     }
@@ -113,9 +126,9 @@ public class ListHelper
     public void importDataFromFile(@LoggedParam File inputFile, int wait)
     {
         clickImportData();
-        _test.click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
-        _test.setFormElement(Locator.name("file"), inputFile);
-        _test.clickButton("Submit", wait);
+        click(Locator.tagWithClass("span", "labkey-wp-title-text").containing("Upload file"));
+        setFormElement(Locator.name("file"), inputFile);
+        clickButton("Submit", wait);
     }
 
     /**
@@ -131,7 +144,7 @@ public class ListHelper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _extHelper.clickMenuButton(true, "Insert", "Insert New");
         setRowData(data, validateText);
     }
 
@@ -139,22 +152,22 @@ public class ListHelper
     {
         for(String key : data.keySet())
         {
-            WebElement field = Locator.name("quf_" + key).findElement(_test.getDriver());
+            WebElement field = Locator.name("quf_" + key).findElement(getDriver());
             String inputType = field.getAttribute("type");
             switch (inputType)
             {
                 case "file":
-                    _test.setFormElement(field, new File(data.get(key)));
+                    setFormElement(field, new File(data.get(key)));
                     break;
                 default:
-                    _test.setFormElement(field, data.get(key));
+                    setFormElement(field, data.get(key));
             }
         }
-        _test.clickButton("Submit");
+        clickButton("Submit");
 
         if(validateText)
         {
-            _test.assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
+            assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
         }
 
     }
@@ -171,8 +184,8 @@ public class ListHelper
 
     public void updateRow(int id, Map<String, String> data, boolean validateText)
     {
-        DataRegionTable dr = new DataRegionTable("query", _test);
-        _test.clickAndWait(dr.updateLink(id - 1));
+        DataRegionTable dr = new DataRegionTable("query", getDriver());
+        clickAndWait(dr.updateLink(id - 1));
         setRowData(data, validateText);
     }
 
@@ -181,9 +194,9 @@ public class ListHelper
      */
     public void deleteList()
     {
-        String url = _test.getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
-        _test.beginAt(url);
-        _test.clickButton("OK");
+        String url = getCurrentRelativeURL().replace("grid.view", "deleteListDefinition.view");
+        beginAt(url);
+        clickButton("OK");
     }
 
     @LogMethod
@@ -202,19 +215,19 @@ public class ListHelper
 
     private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        _test.selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
-        _test.setFormElement(Locator.id("ff_keyName"), listKeyName);
-        _test.fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
+        selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
+        setFormElement(Locator.id("ff_keyName"), listKeyName);
+        fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
 
-        _test.clickButton("Create List", 0);
-        _test.waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        clickButton("Create List", 0);
+        waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("ff_name0"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.log("Check that list was created correctly");
-        _test.waitForFormElementToEqual(Locator.name("ff_name"), listName);
-        _test.waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
+        log("Check that list was created correctly");
+        waitForFormElementToEqual(Locator.name("ff_name"), listName);
+        waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
 
-        _test.log("Add columns");
+        log("Add columns");
 
         // i==0 is the key column
         for (int i = 1; i <= cols.length; i++)
@@ -228,92 +241,98 @@ public class ListHelper
 
         for (ListColumn col : cols)
         {
-            _test.assertTextPresent(col.getName());
+            assertTextPresent(col.getName());
             if (!StringUtils.isEmpty(col.getLabel()) && !col.getName().equals(col.getLabel()))
-                _test.assertTextPresent(col.getLabel());
+                assertTextPresent(col.getLabel());
         }
     }
 
     public void addField(ListColumn col)
     {
-        _test.waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        int lastFieldIndex = _test.getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
+        waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
         if (lastFieldIndex > 0)
         {
             Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
-            _test.click(lastField);
+            click(lastField);
         }
-        _test.scrollIntoView(Locator.xpath("//a[contains(@class, 'labkey-button')]//span[text()='Add Field']"));
-        _test.clickButton("Add Field", 0);
+        scrollIntoView(Locator.xpath("//a[contains(@class, 'labkey-button')]//span[text()='Add Field']"));
+        clickButton("Add Field", 0);
         lastFieldIndex++;
-        _test.setFormElement(Locator.name("ff_name" + lastFieldIndex),  col.getName());
-        _test.setFormElement(Locator.name("ff_label" + lastFieldIndex), col.getLabel());
+        setFormElement(Locator.name("ff_name" + lastFieldIndex),  col.getName());
+        setFormElement(Locator.name("ff_label" + lastFieldIndex), col.getLabel());
 
         setColumnType(null, col.getLookup(), col.getType(), lastFieldIndex);
 
-        _test._extHelper.clickExtTab("Display");
+        _extHelper.clickExtTab("Display");
         if (col.getDescription() != null)
         {
-            _test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
+            setFormElement(Locator.id("propertyDescription"), col.getDescription());
         }
 
         if (col.getFormat() != null)
         {
-            _test._extHelper.clickExtTab("Format");
-            _test.setFormElement(Locator.id("propertyFormat"), col.getFormat());
+            _extHelper.clickExtTab("Format");
+            setFormElement(Locator.id("propertyFormat"), col.getFormat());
         }
 
         if (null != col.getURL())
         {
-            _test.setFormElement(Locator.id("url"), col.getURL());
+            setFormElement(Locator.id("url"), col.getURL());
         }
 
         if (col.isRequired())
         {
-            _test._extHelper.clickExtTab("Validators");
+            _extHelper.clickExtTab("Validators");
             clickRequired("");
         }
 
         FieldValidator validator = col.getValidator();
         if (validator != null)
         {
-            _test._extHelper.clickExtTab("Validators");
+            _extHelper.clickExtTab("Validators");
             if (validator instanceof RegExValidator)
-                _test.clickButton("Add RegEx Validator", 0);
+                clickButton("Add RegEx Validator", 0);
             else
-                _test.clickButton("Add Range Validator", 0);
-            _test.setFormElement(Locator.name("name"), validator.getName());
-            _test.setFormElement(Locator.name("description"), validator.getDescription());
-            _test.setFormElement(Locator.name("errorMessage"), validator.getMessage());
+                clickButton("Add Range Validator", 0);
+            setFormElement(Locator.name("name"), validator.getName());
+            setFormElement(Locator.name("description"), validator.getDescription());
+            setFormElement(Locator.name("errorMessage"), validator.getMessage());
 
             if (validator instanceof RegExValidator)
             {
-                _test.setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
+                setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
             }
             else if (validator instanceof RangeValidator)
             {
-                _test.setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
+                setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
             }
-            _test.clickButton("OK", 0);
+            clickButton("OK", 0);
         }
 
         if (col.isMvEnabled())
         {
-            _test._extHelper.clickExtTab("Advanced");
+            _extHelper.clickExtTab("Advanced");
             clickMvEnabled("");
         }
 
         if (col.getScale() != null)
         {
-            _test._extHelper.clickExtTab("Advanced");
+            _extHelper.clickExtTab("Advanced");
             setColumnScale(col.getScale());
         }
     }
 
     public void beginCreateListFromTab(String tabName, String listName)
     {
-        _test.clickTab(tabName.replace(" ", ""));
+        clickTab(tabName.replace(" ", ""));
         beginCreateListHelper(listName);
+    }
+
+    public void clickTab(String tabname)
+    {
+        log("Selecting tab " + tabname);
+        clickAndWait(Locator.folderTab(tabname));
     }
 
     // initial "create list" steps common to both manual and import from file scenarios
@@ -321,11 +340,11 @@ public class ListHelper
     {
         try
         {
-            _test.clickFolder(folderName);
+            clickFolder(folderName);
         }
         catch (WebDriverException ex)
         {
-            _test.clickProject(folderName);
+            clickProject(folderName);
         }
 
         beginCreateListHelper(listName);
@@ -333,19 +352,19 @@ public class ListHelper
 
     private void beginCreateListHelper(String listName)
     {
-        if (!_test.isElementPresent(Locator.linkWithText("Lists")))
+        if (!isElementPresent(Locator.linkWithText("Lists")))
         {
-            PortalHelper portalHelper = new PortalHelper(_test);
+            PortalHelper portalHelper = new PortalHelper(getDriver());
             portalHelper.addWebPart("Lists");
         }
 
-        _test.clickAndWait(Locator.linkWithText("manage lists"));
+        clickAndWait(Locator.linkWithText("manage lists"));
 
-        _test.log("Add List");
-        _test.clickButton("Create New List");
-        _test.waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.id("ff_name"), listName);
-        _test.fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
+        log("Add List");
+        clickButton("Create New List");
+        waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.id("ff_name"), listName);
+        fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
     }
 
 
@@ -353,18 +372,18 @@ public class ListHelper
     {
         beginCreateList(folderName, listName);
 
-        _test.click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
+        click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         //test.clickCheckbox("fileImport");
 
-        _test.clickButton("Create List", 0);
+        clickButton("Create List", 0);
 
-        _test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.setFormElement(Locator.name("uploadFormElement"), inputFile);
+        setFormElement(Locator.name("uploadFormElement"), inputFile);
 
-        _test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.clickButton("Import");
+        clickButton("Import");
     }
 
     /**
@@ -379,7 +398,7 @@ public class ListHelper
 
     public void importListArchive(String folderName, File inputFile)
     {
-        _test.clickFolder(folderName);
+        clickFolder(folderName);
         importListArchive(inputFile);
     }
 
@@ -387,66 +406,66 @@ public class ListHelper
     {
         assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
-        if (!_test.isElementPresent(Locator.linkWithText("Lists")))
+        if (!isElementPresent(Locator.linkWithText("Lists")))
         {
-            PortalHelper portalHelper = new PortalHelper(_test);
+            PortalHelper portalHelper = new PortalHelper(getDriver());
             portalHelper.addWebPart("Lists");
         }
 
-        _test.clickAndWait(Locator.linkWithText("manage lists"));
+        clickAndWait(Locator.linkWithText("manage lists"));
 
-        _test.log("Import List Archive");
-        _test.clickButton("Import List Archive");
-        _test.waitForElement(Locator.xpath("//input[@name='listZip']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        log("Import List Archive");
+        clickButton("Import List Archive");
+        waitForElement(Locator.xpath("//input[@name='listZip']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.setFormElement(Locator.name("listZip"), inputFile);
-        _test.clickButton("Import List Archive");
-        _test.assertElementNotPresent(Locator.tagWithClass("div", "labkey-error"));
+        setFormElement(Locator.name("listZip"), inputFile);
+        clickButton("Import List Archive");
+        assertElementNotPresent(Locator.tagWithClass("div", "labkey-error"));
     }
 
 
 
     public void clickImportData()
     {
-        if(_test.isElementPresent(Locator.lkButton("Import Data")))
-            _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        if(isElementPresent(Locator.lkButton("Import Data")))
+            waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
         else
         {
-            _test.log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            _test._extHelper.clickMenuButton(true, "Insert", "Import Data");
+            log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
+            _extHelper.clickMenuButton(true, "Insert", "Import Data");
         }
-        _test.waitForElement(Locator.id("tsv3"));
+        waitForElement(Locator.id("tsv3"));
     }
 
     public void clickEditDesign()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
-        _test.waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
+        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickEditFields()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Fields"), 0);
-        _test.waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Fields"), 0);
+        waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickSave()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
-        _test.waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
+        waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         // TODO: Remove workaround. Project menu is opening after save on TeamCity for some reason
-        _test.mouseOver(Locator.css("body"));
-        _test.waitForElementToDisappear(Locator.id("projectBar_menu").notHidden());
+        mouseOver(Locator.css("body"));
+        waitForElementToDisappear(Locator.id("projectBar_menu").notHidden());
     }
 
     public void clickDeleteList()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clickRow(int index)
@@ -457,7 +476,7 @@ public class ListHelper
     public void clickRow(@Nullable String prefix, int index)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
-        _test.click(l);
+        click(l);
     }
 
     public void setColumnName(int index, String name)
@@ -468,8 +487,8 @@ public class ListHelper
     public void setColumnName(@Nullable String prefix, int index, String name)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
-        _test.setFormElement(l, name);
-        _test.pressTab(l);
+        setFormElement(l, name);
+        pressTab(l);
     }
 
     public void setColumnLabel(int index, String label)
@@ -480,8 +499,8 @@ public class ListHelper
     public void setColumnLabel(@Nullable String prefix, int index, String label)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
-        _test.setFormElement(l, label);
-        _test.pressTab(l);
+        setFormElement(l, label);
+        pressTab(l);
     }
 
     public void setColumnType(int index, ListColumnType type)
@@ -508,31 +527,31 @@ public class ListHelper
     private void setColumnType(@Nullable String prefix, @Nullable LookupInfo lookup, @LoggedParam @Nullable ListColumnType colType, @LoggedParam int i)
     {
         // click the combobox trigger image
-        _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
+        click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
         // click lookup checkbox
-        _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
+        _extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
         if (lookup != null)
         {
-            _test.waitForElement(Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]"));
+            waitForElement(Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]"));
 
             if (lookup.getFolder() != null)
             {
                 selectLookupComboItem("lookupContainer", lookup.getFolder());
             }
 
-            if (!lookup.getSchema().equals(_test.getFormElement(Locator.css("input[name=schema]"))))
+            if (!lookup.getSchema().equals(getFormElement(Locator.css("input[name=schema]"))))
             {
                 selectLookupComboItem("schema", lookup.getSchema());
             }
             else
-                _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
+                waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
 
             selectLookupTableComboItem(lookup.getTable(), lookup.getTableType());
         }
 
-        _test.clickButton("Apply", 0);
-        _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
+        clickButton("Apply", 0);
+        _extHelper.waitForExtDialogToDisappear("Choose Field Type");
     }
 
     private void selectLookupComboItem(String fieldName, String value)
@@ -542,13 +561,13 @@ public class ListHelper
 
     private void selectLookupComboItem(String fieldName, String value, int attempt)
     {
-        _test.log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
-        _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
+        log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
+        click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
         try
         {
-            _test.scrollIntoView(Locator.tag("div").withClass("x-combo-list-item").withText(value), false);
-            _test.waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
-            _test.log(".. selected");
+            scrollIntoView(Locator.tag("div").withClass("x-combo-list-item").withText(value), false);
+            waitAndClick(500 * attempt, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+            log(".. selected");
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
@@ -556,18 +575,18 @@ public class ListHelper
             if (attempt == 4)
                 throw retry;
 
-            _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
+            fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
             selectLookupComboItem(fieldName, value, attempt + 1);
         }
 
         try
         {
-            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
-            _test.log(".. test-marker updated");
+            waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
+            log(".. test-marker updated");
         }
         catch (NoSuchElementException ignore)
         {
-            _test.log(".. failed to update test-marker, soldier on anyway");
+            log(".. failed to update test-marker, soldier on anyway");
         }
     }
 
@@ -582,12 +601,12 @@ public class ListHelper
                 null == tableType || tableType.isEmpty() ?
                         table + " (" :
                         String.format("%s (%s)", table, tableType);
-        _test.log("Select lookup table combo item '" + table + "', attempt=" + attempt);
+        log("Select lookup table combo item '" + table + "', attempt=" + attempt);
         String fieldName = "table";
-        _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
+        click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
         try
         {
-            _test.waitAndClick(500*attempt, Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), 0);
+            waitAndClick(500*attempt, Locator.tagWithClass("div", "x-combo-list-item").startsWith(comboSubstring), 0);
         }
         catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
         {
@@ -595,10 +614,10 @@ public class ListHelper
             if (attempt == 4)
                 throw retry;
 
-            _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
+            fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
             selectLookupTableComboItem(table, tableType, attempt + 1);
         }
-        _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
+        waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
     }
 
     public void selectPropertyTab(String name)
@@ -608,23 +627,23 @@ public class ListHelper
 
     public void selectPropertyTab(@Nullable String prefix, String name)
     {
-        _test.click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
+        click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
     }
 
     public void clickRequired(String prefix)
     {
         selectPropertyTab(prefix, "Validators");
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='required']");
-        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.checkCheckbox(l);
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(l);
     }
 
     public void clickMvEnabled(String prefix)
     {
         selectPropertyTab(prefix, "Advanced");
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='mvEnabled']");
-        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.checkCheckbox(l);
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(l);
     }
 
     /**
@@ -638,17 +657,17 @@ public class ListHelper
 
         selectPropertyTab("Advanced");
         Locator l = DesignerLocators.scaleTextbox;
-        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if (value == Integer.MAX_VALUE)
         {
-            _test.checkCheckbox(DesignerLocators.maxCheckbox);
+            checkCheckbox(DesignerLocators.maxCheckbox);
         }
         else
         {
-            _test.uncheckCheckbox(DesignerLocators.maxCheckbox);
-            l.findElement(_test.getDriver()).clear();
-            _test.setFormElement(l, value.toString());
+            uncheckCheckbox(DesignerLocators.maxCheckbox);
+            l.findElement(getDriver()).clear();
+            setFormElement(l, value.toString());
         }
     }
 
@@ -658,21 +677,21 @@ public class ListHelper
     public Integer getColumnScale()
     {
         selectPropertyTab("Advanced");
-        String value = _test.getFormElement(DesignerLocators.scaleTextbox);
+        String value = getFormElement(DesignerLocators.scaleTextbox);
         return Integer.valueOf(value.replace(",",""));
     }
 
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
-        String prefix = _test.getPropertyXPath(areaTitle);
+        String prefix = getPropertyXPath(areaTitle);
         Locator addField = Locator.xpath(prefix + "//span" + Locator.lkButton("Add Field").getPath());
-        _test.waitForElement(addField);
+        waitForElement(addField);
 
         clickLastFieldIfExists(prefix);
 
         // click the add field button
-        _test.click(addField);
+        click(addField);
         int newFieldIndex = findNewFieldIndex(prefix);
 
         // set the field values
@@ -689,12 +708,12 @@ public class ListHelper
     private void clickLastFieldIfExists(String prefix)
     {
         Locator fieldLoc = Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]");
-        List<WebElement> fieldList = fieldLoc.findElements(_test.getDriver());
+        List<WebElement> fieldList = fieldLoc.findElements(getDriver());
         if (fieldList.size() > 0)
         {
             String lastField = fieldList.get(fieldList.size() -1 ).getAttribute("name");
             Locator lastFieldLoc = Locator.xpath(prefix + "//input[@name='" + lastField + "']");
-            _test.click(lastFieldLoc);
+            click(lastFieldLoc);
         }
     }
 
@@ -706,7 +725,7 @@ public class ListHelper
     {
         int newFieldIndex = 0;
         Locator fieldLoc = Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]");
-        List<WebElement> fieldList = fieldLoc.findElements(_test.getDriver());
+        List<WebElement> fieldList = fieldLoc.findElements(getDriver());
         String lastField = fieldList.get(fieldList.size() -1 ).getAttribute("name");
         // extract the last field index
         Pattern p = Pattern.compile("[0-9]+$");
@@ -720,10 +739,10 @@ public class ListHelper
 
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
     {
-        String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
+        String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.lkButton("Add Field").getPath();
-        _test.click(Locator.xpath(addField));
-        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        click(Locator.xpath(addField));
+        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
         setColumnLabel(prefix, index, label);
         setColumnType(prefix, index, type);
@@ -731,20 +750,20 @@ public class ListHelper
 
     public void deleteField(String areaTitle, int index)
     {
-        String prefix = _test.getPropertyXPathContains(areaTitle);
-        WebElement deleteButton = _test.waitForElement(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
+        String prefix = getPropertyXPathContains(areaTitle);
+        WebElement deleteButton = waitForElement(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
         deleteButton.click();
 
-        _test.waitFor(() ->
+        waitFor(() ->
         {
-            if (ExpectedConditions.stalenessOf(deleteButton).apply(_test.getDriver()))
+            if (ExpectedConditions.stalenessOf(deleteButton).apply(getDriver()))
                 return true;
 
             try
             {
-                WebElement okButton = Locator.lkButton("OK").findElement(_test.getDriver());
+                WebElement okButton = Locator.lkButton("OK").findElement(getDriver());
                 okButton.click();
-                _test.shortWait().until(ExpectedConditions.stalenessOf(okButton));
+                shortWait().until(ExpectedConditions.stalenessOf(okButton));
             }
             catch (NoSuchElementException ignore) {}
             return false;
@@ -1109,4 +1128,13 @@ public class ListHelper
 
     }
 
+    public String getPropertyXPath(String propertyHeading)
+    {
+        return "//td[text() = '" + propertyHeading + "']/../..";
+    }
+
+    public String getPropertyXPathContains(String propertyHeading)
+    {
+        return "//td[contains(text(), '" + propertyHeading + "')]/../..";
+    }
 }

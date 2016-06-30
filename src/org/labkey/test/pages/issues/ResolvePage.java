@@ -8,10 +8,8 @@ import org.openqa.selenium.WebDriver;
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 import static org.labkey.test.components.labkey.SelectFormItem.SelectFormItem;
 
-public class ResolvePage extends UpdatePage
+public class ResolvePage extends UpdatePage<ResolvePage.ElementCache>
 {
-    private Elements _elements;
-
     public ResolvePage(WebDriver driver)
     {
         super(driver);
@@ -28,20 +26,14 @@ public class ResolvePage extends UpdatePage
         return new ResolvePage(driver.getDriver());
     }
 
-    protected Elements elements()
+    protected ElementCache newElementCache()
     {
-        return (Elements)super.elements();
+        return new ElementCache();
     }
 
-    @Override
-    protected Elements newElements()
+    protected class ElementCache extends UpdatePage.ElementCache
     {
-        return new Elements();
-    }
-
-    protected class Elements extends UpdatePage.Elements
-    {
-        protected Elements()
+        protected ElementCache()
         {
             resolution = SelectFormItem(getDriver()).withName("resolution").findWhenNeeded();
             duplicate = SelectFormItem(getDriver()).withName("duplicate").findWhenNeeded();
