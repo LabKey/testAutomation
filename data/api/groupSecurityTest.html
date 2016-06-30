@@ -1,4 +1,4 @@
-<div id="start-test"></div>
+<button class="labkey-button" id="start-test">Start Test</button>
 <div id="log-info"></div>
 <script type="text/javascript">
 
@@ -68,10 +68,10 @@
                 deleteGroup(groups[2], "/", stepIndex+1);
                 break;
             case 17:
-                updateLog("Done!", true);
+                updateLog("<span>Done!</span>", true);
                 break;
             default:
-                updateLog("Error : unknown step number", true);
+                updateLog("Error : unknown step number", true, true);
         }
     }
 
@@ -83,7 +83,7 @@
             success: function(data){
                 if (groups[groupIndex].name != data.name)
                 {
-                    updateLog("...Error : expected group name of " + groups[groupIndex].name, false);
+                    updateLog("...Error : expected group name of " + groups[groupIndex].name, false, true);
                 }
                 else
                 {
@@ -103,7 +103,7 @@
             success: function(data){
                 if (group.id != data.renamed || group.name != data.oldName || group.name + " Renamed" != data.newName)
                 {
-                    updateLog("...Error : unexpected group rename property", false);
+                    updateLog("...Error : unexpected group rename property", false, true);
                 }
                 else
                 {
@@ -123,7 +123,7 @@
             success: function(data){
                 if (group.id != data.deleted)
                 {
-                    updateLog("...Error : expected group id of " + group.id, false);
+                    updateLog("...Error : expected group id of " + group.id, false, true);
                 }
                 else
                 {
@@ -147,7 +147,7 @@
                 {
                     if (data.added.indexOf(membersArr[i]) == -1)
                     {
-                        updateLog("...Error : principal not added to group " + group.name, false);
+                        updateLog("...Error : principal not added to group " + group.name, false, true);
                         success = false;
                         break;
                     }
@@ -167,7 +167,7 @@
                 }
                 else
                 {
-                    updateLog("...Error : " + response.exception, false);
+                    updateLog("...Error : " + response.exception, false, true);
                 }
             }
         });
@@ -185,7 +185,7 @@
                 {
                     if (data.removed.indexOf(membersArr[i]) == -1)
                     {
-                        updateLog("...Error : principal not removed from group " + group.name, false);
+                        updateLog("...Error : principal not removed from group " + group.name, false, true);
                         success = false;
                         break;
                     }
@@ -200,25 +200,20 @@
         });
     }
 
-    function updateLog(newHtml, newLine){
+    function updateLog(newHtml, newLine, error){
+        if (error)
+            newHtml = "<span class='labkey-error'>" + newHtml + "</span>";
         logHtml += (newLine ? "<br/>" : "") + newHtml;
-        Ext4.get('log-info').update(logHtml);
+        document.getElementById("log-info").innerHTML = logHtml;
     }
 
     function init(){
-        var btn = Ext4.create('Ext.Button', {
-            id: 'test-button',
-            renderTo: 'start-test',
-            text: 'Start Test',
-            handler: function(){
-                updateLog("Starting Group Security API Test", true);
-                step(1);
-            }
-        });
+        document.getElementById("start-test").onclick = function()
+        {
+            updateLog("Starting Group Security API Test", true);
+            step(1);
+        };
     }
 
-    LABKEY.requiresExt4Sandbox(function() {
-        Ext4.onReady(init);
-    });
-
+    init();
 </script>

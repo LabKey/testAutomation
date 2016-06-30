@@ -64,7 +64,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         _driver.waitForElement(l, _driver.defaultWaitForPage);
 
         _driver.setFormElement(l, groupName);
-        _driver.clickButton("Create New Group", 0);
+        _driver.pressEnter(l);
         _driver._extHelper.waitForExtDialog(groupName + " Information");
     }
 

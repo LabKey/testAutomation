@@ -53,6 +53,7 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String SITE_USER_NOT_IN_GROUP = "usernotingroup";
     protected static final String SITE_USER_GROUP = "SiteUsersGroup";
     protected static final String[] SITE_USER_EMAILS = {SITE_USER_IN_GROUP + "@group.test", SITE_USER_NOT_IN_GROUP + "@group.test"};
+    protected static final String API_SITE_GROUP = "API Site Group";
     protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
     protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
 
@@ -74,6 +75,7 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.deleteGroup(BAD_GROUP);
         _permissionsHelper.deleteGroup(CHILD_GROUP);
         _permissionsHelper.deleteGroup(SITE_USER_GROUP);
+        _permissionsHelper.deleteGroup(API_SITE_GROUP);
         deleteUsersIfPresent(TEST_USERS_FOR_GROUP);
         deleteUsersIfPresent(SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
@@ -376,8 +378,8 @@ public class GroupTest extends BaseWebDriverTest
         wikiHelper.setSourceFromFile(GROUP_SECURITY_API_FILE, WIKITEST_NAME);
 
         // Run the Test Script
-        clickButton("Start Test", 0);
-        waitForText(defaultWaitForPage, "Done!");
+        click(Locator.button("Start Test"));
+        waitForElement(Locator.tagWithText("span", "Done!"), defaultWaitForPage);
         assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
     }
 
