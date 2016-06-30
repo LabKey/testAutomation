@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-<name>Error Bad Source Schema</name>
+<name>Error Bad Source Query</name>
 <description>source schema does not exist</description>
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">

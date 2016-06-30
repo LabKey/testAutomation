@@ -53,6 +53,7 @@ import static org.junit.Assert.assertTrue;
 public class ETLTest extends ETLBaseTest
 {
     public static final String ETL_OUT = "etlOut";
+    private static final String DATA_INTEGRATION_TAB = "DataIntegration";
 
     @Nullable
     @Override
@@ -156,12 +157,15 @@ public class ETLTest extends ETLBaseTest
     {
         final String TRANSFORM_KEYCONSTRAINT_ERROR = "{simpletest}/SimpleETLCausesKeyConstraintViolation";
         final String TRANSFORM_QUERY_ERROR = "{simpletest}/SimpleETLqueryDoesNotExist";
+        final String TRANSFORM_QUERY_ERROR_NAME = "Error Bad Source Query";
         final String TRANSFORM_NOCOL_ERROR = "{simpletest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
         final String TRANSFORM_BADCAST = "{simpletest}/badCast";
         final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
 
+        final String NO_CHEESEBURGER_TABLE = "Could not find table: vehicle.etl_source_cheeseburger";
+
         goToProjectHome();
-        clickTab("DataIntegration");
+        clickTab(DATA_INTEGRATION_TAB);
         assertTextNotPresent("Should not have loaded invalid transform xml", "Error Missing Source");
         _etlHelper.insertSourceRow("0", "Subject 0", null);
 
@@ -173,8 +177,11 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.runETLandCheckErrors(TRANSFORM_KEYCONSTRAINT_ERROR, true, false, errors);
         errors.clear();
 
-        errors.add("Could not find table: vehicle.etl_source_cheeseburger");
+        errors.add(NO_CHEESEBURGER_TABLE);
         _etlHelper.runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
+        // Verify we're showing error on the DataTransforms webpart
+        clickTab(DATA_INTEGRATION_TAB);
+        assertTextPresent(NO_CHEESEBURGER_TABLE);
 
         _etlHelper.runETLNoNav(TRANSFORM_NOCOL_ERROR, false, true);
         assertTextPresent("Column not found: etl_source.monkeys");
@@ -189,13 +196,13 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
         errors.clear();
 
-        clickTab("DataIntegration");
-        _etlHelper.enableScheduledRun("Error Bad Source Schema");
+        clickTab(DATA_INTEGRATION_TAB);
+        _etlHelper.enableScheduledRun(TRANSFORM_QUERY_ERROR_NAME);
         //schedule for job is 15 seconds
         sleep(15000);
-        _etlHelper.disableScheduledRun("Error Bad Source Schema");
+        _etlHelper.disableScheduledRun(TRANSFORM_QUERY_ERROR_NAME);
         clickTab("Portal");
-        Assert.assertTrue(countText("ConfigurationException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
+        Assert.assertTrue(countText("ConfigurationException: " + NO_CHEESEBURGER_TABLE) > 1);
         //no way of knowing error count due to scheduled job running unknown number of times
         pushLocation();
         resetErrors();
@@ -489,7 +496,7 @@ public class ETLTest extends ETLBaseTest
         clickButton("Cancel");
         // 23829 Validate run status is really CANCELLED
         _etlHelper.waitForStatus(TARGET_FILE_WITH_SLEEP, "CANCELLED", 10000);
-        clickTab("DataIntegration");
+        clickTab(DATA_INTEGRATION_TAB);
         ETLScheduler scheduler = new ETLScheduler(this);
         assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "CANCELLED", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
         scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
