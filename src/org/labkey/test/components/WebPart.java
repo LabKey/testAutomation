@@ -153,6 +153,11 @@ public abstract class WebPart extends Component<WebPart.Elements> implements Web
         return elementCache();
     }
 
+    protected Elements newElementCache()
+    {
+        return new Elements();
+    }
+
     protected class Elements extends Component.ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
