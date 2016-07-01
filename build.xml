@@ -228,8 +228,21 @@
     </path>
 
     <target name="build" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
+        <property name="modulesFile" value="standard.modules" />
+        <loadfile property="raw.modulesFile" srcfile="${modulesFile}"/>
+        <property name="append.modulesFile" value=""/>
+        <tempfile property="temp.modulesFile" deleteonexit="true"/>
+        <echo file="${temp.modulesFile}">
+            ${raw.modulesFile}
+            ${append.modulesFile}
+        </echo>
+
         <loadfile property="moduleDirectories" srcfile="${modulesFile.fullpath}">
             <filterchain>
+                <tokenfilter>
+                    <trim/>
+                    <ignoreblank/>
+                </tokenfilter>
                 <striplinecomments>
                     <comment value="#"/>
                 </striplinecomments>
@@ -243,6 +256,10 @@
         </loadfile>
         <loadfile property="excludedModuleDirectories" srcfile="${modulesFile.fullpath}">
             <filterchain>
+                <tokenfilter>
+                    <trim/>
+                    <ignoreblank/>
+                </tokenfilter>
                 <expandproperties/>
                 <linecontainsregexp>
                     <regexp pattern="^-:"/>
@@ -255,7 +272,7 @@
             </filterchain>
         </loadfile>
         <echo>Module Directories: ${moduleDirectories}</echo>
-        <echo>Module Directories: ${excludedModuleDirectories}</echo>
+        <echo>Excluded Module Directories: ${excludedModuleDirectories}</echo>
 
         <loadfile property="moduleSources" srcfile="${modulesFile.fullpath}">
             <filterchain>
