@@ -229,7 +229,7 @@
 
     <target name="build" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
         <property name="modulesFile" value="standard.modules" />
-        <loadfile property="raw.modulesFile" srcfile="${modulesFile}"/>
+        <loadfile property="raw.modulesFile" srcfile="${modulesFile.fullpath}"/>
         <property name="append.modulesFile" value=""/>
         <tempfile property="temp.modulesFile" deleteonexit="true"/>
         <echo file="${temp.modulesFile}">
