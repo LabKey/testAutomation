@@ -1753,7 +1753,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public String doAndWaitForPageSignal(Runnable func, String signalName, WebDriverWait wait)
     {
-        return doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait).getAttribute("value");
+        String value;
+        try
+        {
+            value = doAndWaitForElementToRefresh(func, Locators.pageSignal(signalName), wait).getAttribute("value");
+        }
+        catch (StaleElementReferenceException multiSignaled)
+        {
+            value = Locators.pageSignal(signalName).findElement(getDriver()).getAttribute("value");
+        }
+        return value;
     }
 
     /**
