@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
  */
-public abstract class WebDriverComponent extends Component
+public abstract class WebDriverComponent<EC extends Component.ElementCache> extends Component<EC>
 {
     protected abstract WebDriver getDriver();
 

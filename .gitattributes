@@ -416,6 +416,7 @@ src/org/labkey/test/components/core/NotificationPanelItem.java -text
 src/org/labkey/test/components/core/UserNotificationsPanel.java -text
 src/org/labkey/test/components/dumbster/EmailRecordTable.java -text
 src/org/labkey/test/components/ext4/Checkbox.java -text
+src/org/labkey/test/components/ext4/ComboBox.java -text
 src/org/labkey/test/components/ext4/FormItemFinder.java -text
 src/org/labkey/test/components/ext4/RadioButton.java -text
 src/org/labkey/test/components/ext4/Window.java -text

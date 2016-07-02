@@ -35,6 +35,6 @@ public abstract class FormItemFinder<C, F extends FormItemFinder<C, F>> extends 
 
     protected Locator.XPathLocator labelLoc()
     {
-        return Locator.xpath("(../label|../../td/label)"); // Slightly different DOM structure across versions of Ext4
+        return Locator.xpath("(../label|../../td/label|../td/label)"); // Slightly different DOM structure across versions of Ext4
     }
 }
