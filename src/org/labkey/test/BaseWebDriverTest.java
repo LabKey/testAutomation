@@ -141,6 +141,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
+    @Deprecated // Use ApiPermissionsHelper unless UI testing is necessary
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
     private static File _downloadDir;
 
@@ -2199,18 +2200,28 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
     @LogMethod
+    public void waitForAllPipelineJobsToFinish()
+    {
+        waitForPipelineJobsToFinish(-1);
+    }
+
+    // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
+    @LogMethod
     protected void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
-        log("Waiting for " + jobsExpected + " pipeline jobs to finish");
+        log("Waiting for pipeline jobs to finish");
         List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (getFinishedCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getFinishedCount(statusValues) < statusValues.size() && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
+        if (jobsExpected < 0)
+            assertEquals("Pipeline jobs did not finish", getFinishedCount(statusValues), statusValues.size());
+        else
+            assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     @LogMethod
