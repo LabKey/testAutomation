@@ -22,6 +22,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.WrapsDriver;
 
 import java.util.List;
 
@@ -29,31 +30,26 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
 {
     @Deprecated
     protected BaseWebDriverTest _test;
-    private WebDriver _driver;
+    private WrapsDriver _wrapsDriver;
     private EC _elementCache;
 
-    /**
-     * @deprecated Remove usages of {@link #_test} from class and use {@link LabKeyPage(WebDriver)}
-     */
-    @Deprecated
-    public LabKeyPage(WebDriverWrapper test)
+    public LabKeyPage(WrapsDriver test)
     {
         if (test instanceof BaseWebDriverTest)
             _test = (BaseWebDriverTest)test;
-        _driver = test.getDriver();
+        _wrapsDriver = test;
         waitForPage();
     }
 
     public LabKeyPage(WebDriver driver)
     {
-        _driver = driver;
-        waitForPage();
+        this(() -> driver);
     }
 
     @Override
     public WebDriver getWrappedDriver()
     {
-        return _driver;
+        return _wrapsDriver.getWrappedDriver();
     }
 
     protected void waitForPage() {}
