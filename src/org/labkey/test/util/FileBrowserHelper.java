@@ -34,6 +34,7 @@ import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 public class FileBrowserHelper
 {
     public static final String IMPORT_SIGNAL_NAME = "import-actions-updated";
+    public static final Locator fileGridCell = Locator.tagWithClass("div", "labkey-filecontent-grid").append(Locator.tagWithClass("div", "x4-grid-cell-inner"));
 
     BaseWebDriverTest _test;
     public FileBrowserHelper(BaseWebDriverTest test)
@@ -200,7 +201,7 @@ public class FileBrowserHelper
         _test.waitForElement(Ext4Helper.Locators.window("Rename"));
         _test.setFormElement(Locator.name("renameText-inputEl"), newName);
         _test.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newName));
+        _test.waitForElement(fileGridCell.withText(newName));
     }
 
     public void moveFile(String fileName, String destinationPath)
@@ -216,9 +217,9 @@ public class FileBrowserHelper
         _test.click(folder);
         _test.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
-        _test.waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
+        _test.waitForElementToDisappear(fileGridCell.withText(fileName));
         selectFileBrowserItem(destinationPath + "/" + fileName);
-        _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
+        _test.waitForElement(fileGridCell.withText(fileName));
     }
 
     public void deleteFile(String fileName)
@@ -227,7 +228,7 @@ public class FileBrowserHelper
         clickFileBrowserButton(BrowserAction.DELETE);
         _test.waitForElement(Ext4Helper.Locators.window("Delete Files"));
         _test.clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        _test.waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
+        _test.waitForElementToDisappear(fileGridCell.withText(fileName));
     }
 
     public void createFolder(String folderName)
@@ -235,7 +236,7 @@ public class FileBrowserHelper
         clickFileBrowserButton(BrowserAction.NEW_FOLDER);
         _test.setFormElement(Locator.name("folderName"), folderName);
         _test.clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(folderName));
+        _test.waitForElement(fileGridCell.withText(folderName));
     }
 
     public void addToolbarButton(String buttonId)
@@ -340,7 +341,7 @@ public class FileBrowserHelper
                 _test.clickButton("Yes", 0);
             }
         };
-        Locator uploadedFile = Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(file.getName());
+        Locator uploadedFile = fileGridCell.withText(file.getName());
         try
         {
             _test.doAndWaitForElementToRefresh(clickUpload, uploadedFile, _test.shortWait());
@@ -351,7 +352,7 @@ public class FileBrowserHelper
         }
 
         if (description != null)
-            _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(description));
+            _test.waitForElement(fileGridCell.withText(description));
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
@@ -368,7 +369,7 @@ public class FileBrowserHelper
             _test._ext4Helper.waitForMaskToDisappear();
 
             for (FileBrowserExtendedProperty prop : fileProperties)
-                _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(prop.getValue()));
+                _test.waitForElement(fileGridCell.withText(prop.getValue()));
         }
 
         // verify that the description field is empty
