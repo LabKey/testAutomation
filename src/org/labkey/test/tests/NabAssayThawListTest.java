@@ -177,7 +177,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         mouseOver(Locator.linkWithText("set default values"));
         waitAndClickAndWait(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
         // If we don't blow up hitting this next link, the fix for 20441 is good.
-        waitAndClick(Locator.linkContainingText("edit default values for this table in"));
+        waitAndClickAndWait(Locator.linkContainingText("edit default values for this table in"));
 
         // As long as we're here, make sure inheritance is still being acknowledged.
         Assert.assertEquals("Default participant visit resolver not inherited from project",
