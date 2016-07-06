@@ -2016,7 +2016,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (inheritable)
         {
             beginAt(queryURL);
-            editQueryProperties("flow", name);
+            editQueryProperties(schemaName, name);
             selectOptionByValue(Locator.name("inheritable"), "true");
             clickButton("Save");
         }
