@@ -19,6 +19,7 @@ package org.labkey.test;
 import com.google.common.base.Function;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -32,6 +33,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -181,8 +183,15 @@ public abstract class Locator
     public List<WebElement> findElements(SearchContext context)
     {
         List<WebElement> elements = context.findElements(this.toBy());
-        if (_text != null)
+        boolean matchText = _text != null;
+        boolean matchContains = _contains != null && !_contains.isEmpty();
+        int index = 0;
+        if (matchText || matchContains)
         {
+            if (elements.size() > 10)
+                TestLogger.log(String.format("WARNING: Consider using XPath to find element(s) with text content to avoid time-consuming calls to WebElement.getText().\n" +
+                        "Found %d WebElements with this Locator:\n%s", elements.size(), getLoggableDescription()));
+
             Iterator<WebElement> it = elements.iterator();
             WebElement el;
             while (it.hasNext())
@@ -192,28 +201,16 @@ public abstract class Locator
                 try
                 {
                     text = el.getText().trim();
-                    if (!text.equals(_text))
+                    if (matchText && !text.equals(_text) || matchContains && !text.contains(_contains))
+                    {
                         it.remove();
-                }
-                catch (StaleElementReferenceException ex)
-                {
-                    it.remove();
-                }
-            }
-        }
-        if (_contains != null && !_contains.isEmpty())
-        {
-            Iterator<WebElement> it = elements.iterator();
-            WebElement el;
-            while (it.hasNext())
-            {
-                el = it.next();
-                String text;
-                try
-                {
-                    text = el.getText();
-                    if (!text.contains(_contains))
-                        it.remove();
+                    }
+                    else
+                    {
+                        if (new Integer(index).equals(_index))
+                            return Collections.singletonList(el); // Return as soon as we find the desired element
+                        index++;
+                    }
                 }
                 catch (StaleElementReferenceException ex)
                 {
@@ -226,10 +223,9 @@ public abstract class Locator
             return elements;
         else
         {
-            List<WebElement> zeroOrOneElement = new ArrayList<>();
             if (elements.size() > _index)
-                zeroOrOneElement.add(elements.get(_index));
-            return zeroOrOneElement;
+                return Collections.singletonList(elements.get(_index));
+            return Collections.emptyList();
         }
     }
 
@@ -1077,9 +1073,9 @@ public abstract class Locator
         public List<WebElement> findElements(SearchContext context)
         {
             if (!(context instanceof WebDriver || context instanceof WrapsDriver) && getLoc().startsWith("//"))
-                return new XPathLocator(getLoc().replaceFirst("//", "descendant::")).findElements(context);
+                return context.findElements(new XPathLocator(getLoc().replaceFirst("//", "descendant::")).toBy());
             else
-                return super.findElements(context);
+                return context.findElements(this.toBy());
         }
     }
 
