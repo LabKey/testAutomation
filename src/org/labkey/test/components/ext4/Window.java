@@ -19,20 +19,18 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
-import org.labkey.test.components.ComponentElements;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.FloatingComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window extends FloatingComponent
+public class Window extends FloatingComponent<Window.Elements>
 {
     WebElement _window;
     WebDriverWrapper _driver;
-    Elements _elements;
 
     public Window(String windowTitle, WebDriver driver)
     {
@@ -48,7 +46,6 @@ public class Window extends FloatingComponent
     {
         _window = window;
         _driver = new WebDriverWrapperImpl(driver);
-        _elements = new Elements();
     }
 
     public static WindowFinder Window()
@@ -75,6 +72,13 @@ public class Window extends FloatingComponent
     public void clickButton(String buttonText, int msWait)
     {
         getWrapper().clickAndWait(elements().findButton(buttonText), msWait);
+    }
+
+    public void clickButton(String buttonText, boolean expectClose)
+    {
+        clickButton(buttonText, 0);
+        if (expectClose)
+            waitForClose();
     }
 
     public String getTitle()
@@ -114,17 +118,16 @@ public class Window extends FloatingComponent
 
     protected Elements elements()
     {
-        return _elements;
+        return super.elementCache();
     }
 
-    protected class Elements extends ComponentElements
+    protected Elements newElementCache()
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return _window;
-        }
+        return new Elements();
+    }
 
+    protected class Elements extends Component.ElementCache
+    {
         WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
         WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
         WebElement closeButton = new LazyWebElement(Locator.css(".x4-window-header .x4-tool-close"), this);
@@ -184,7 +187,6 @@ public class Window extends FloatingComponent
         {
             return WindowFinder.windowLoc;
         }
-
         public static Locator.XPathLocator title()
         {
             return WindowFinder.titleLoc;

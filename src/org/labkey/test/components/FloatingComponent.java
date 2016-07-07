@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Wrapper for components that should be found at global scope (e.g. an Ext dialog)
  */
-public abstract class FloatingComponent extends Component
+public abstract class FloatingComponent<EC extends Component.ElementCache> extends Component<EC>
 {
     public static abstract class WebDriverComponentFinder<C extends FloatingComponent, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<WebDriver, C, F>
     {
