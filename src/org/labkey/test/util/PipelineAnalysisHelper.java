@@ -181,6 +181,6 @@ public class PipelineAnalysisHelper
             _test.clickButton("Analyze");
         }
 
-        _test.waitForElementToDisappear(Locator.linkWithText("IMPORT RESULTS RUNNING"), BaseWebDriverTest.MAX_WAIT_SECONDS * 1000);
+        _test.waitForRunningPipelineJobs(BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 }
