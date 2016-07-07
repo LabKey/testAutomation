@@ -2200,32 +2200,22 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
     @LogMethod
-    public void waitForAllPipelineJobsToFinish()
+    public void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
-        waitForPipelineJobsToFinish(-1);
-    }
-
-    // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
-    @LogMethod
-    protected void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
-    {
-        log("Waiting for pipeline jobs to finish");
+        log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (getFinishedCount(statusValues) < statusValues.size() && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getFinishedCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        if (jobsExpected < 0)
-            assertEquals("Pipeline jobs did not finish", getFinishedCount(statusValues), statusValues.size());
-        else
-            assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
+        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     @LogMethod
-    protected void waitForRunningPipelineJobs(int wait)
+    public void waitForRunningPipelineJobs(int wait)
     {
         log("Waiting for running pipeline jobs list to be empty.");
         List<String> statusValues = getPipelineStatusValues();
@@ -2363,6 +2353,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (IOException e){
                 log("Failed to dump svg: " + svgFile.getName() + "Reason: " + e.getMessage());
             }
+
         }
     }
 
