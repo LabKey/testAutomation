@@ -407,7 +407,7 @@
                 library(Rlabkey)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                    schemaName="issues", queryName="Issues", containerFilter="Current",
+                    schemaName="issues", queryName="rlabkeyissues", containerFilter="Current",
                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                 selectedRow
                 ]]>
@@ -424,7 +424,7 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndSubfolders", colSort="+IssueId",
+                     schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentAndSubfolders", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
@@ -443,7 +443,7 @@
                 library(Rlabkey)
 
                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                    schemaName="issues", queryName="Issues", containerFilter="Current",
+                    schemaName="issues", queryName="rlabkeyissues", containerFilter="Current",
                     colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                 selectedRow
                 ]]>
@@ -460,7 +460,7 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentAndParents", colSort="+IssueId",
+                     schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentAndParents", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
@@ -478,7 +478,7 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject/RlabkeyTest",
-                     schemaName="issues", queryName="Issues", containerFilter="CurrentPlusProject", colSort="+IssueId",
+                     schemaName="issues", queryName="rlabkeyissues", containerFilter="CurrentPlusProject", colSort="+IssueId",
                      colSelect=c("Type","Area","Title","Priority","Status", "Milestone"))
                  selectedRow
                  ]]>
@@ -496,7 +496,7 @@
                  <![CDATA[
                      library(Rlabkey)
                  selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
-                     schemaName="issues", queryName="Issues",
+                     schemaName="issues", queryName="rlabkeyissues",
                      colFilter=makeFilter(c("Title", "STARTS_WITH", "Rlabkey:")),
                      colSort="Title",
                      containerFilter="AllFolders",

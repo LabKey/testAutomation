@@ -50,6 +50,7 @@ public class RlabkeyTest extends BaseWebDriverTest
     private static final String ISSUE_TITLE_1 = "Rlabkey: Issue in the subfolder";
     private static final String ISSUE_TITLE_2 = "Rlabkey: Issue in another project";
     private static final String USER = "rlabkey_user@rlabkey.test";
+    private static final String ISSUE_LIST_NAME = "rlabkeyissues";
 
     @BeforeClass
     public static void setupProject()
@@ -84,18 +85,22 @@ public class RlabkeyTest extends BaseWebDriverTest
 
         IssuesHelper issuesHelper = new IssuesHelper(this);
 
+        // create an site wide issues list
+        clickProject("Shared");
+        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
+
         clickProject(PROJECT_NAME);
-        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_0));
 
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         apiPermissionsHelper.checkInheritedPermissions();
 
-        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_1));
 
         clickProject(PROJECT_NAME_2);
-        issuesHelper.createNewIssuesList("issues", _containerHelper);
+        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_2));
         
         _rReportHelper.ensureRConfig();
@@ -144,6 +149,10 @@ public class RlabkeyTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        // delete the shared issue list definition
+        IssuesHelper issuesHelper = new IssuesHelper(this);
+        issuesHelper.deleteIssueLists("Shared", this);
+
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _containerHelper.deleteProject(PROJECT_NAME_2, afterTest);
         _userHelper.deleteUsers(afterTest, USER);

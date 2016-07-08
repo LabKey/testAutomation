@@ -23,6 +23,7 @@ import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
@@ -71,6 +72,24 @@ public class IssuesHelper extends WebDriverWrapper
         clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
         assertTextPresent("Open");
+    }
+
+    public void deleteIssueLists(String projectName, LabKeySiteWrapper test)
+    {
+        test.clickProject(projectName);
+        if (isElementPresent(PortalHelper.Locators.webPartTitle("Issue Definitions")))
+        {
+            PortalHelper portalHelper = new PortalHelper(getDriver());
+            DataRegionTable table = new DataRegionTable("IssueListDef", getDriver());
+            table.checkAll();
+            clickButton("Delete");
+            clickButton("Delete");
+            test.clickProject(projectName);
+
+            portalHelper.removeWebPart("Issue Definitions");
+            portalHelper.removeWebPart("Issues Summary");
+            portalHelper.removeWebPart("Search");
+        }
     }
 
     public int getHighestIssueId(String containerPath, String issuesQuery)
