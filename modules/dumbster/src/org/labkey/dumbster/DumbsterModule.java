@@ -18,7 +18,6 @@ package org.labkey.dumbster;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.CodeOnlyModule;
-import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.view.BaseWebPartFactory;
@@ -49,12 +48,13 @@ public class DumbsterModule extends CodeOnlyModule
     @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
-        return new ArrayList<WebPartFactory>(Arrays.asList(new BaseWebPartFactory("Mail Record") {
-                public WebPartView getWebPartView(@NotNull ViewContext portalCtx, @NotNull Portal.WebPart webPart)
-                {
-                    return new MailWebPart();
-                }
-            }));
+        return new ArrayList<>(Arrays.asList(new BaseWebPartFactory("Mail Record")
+        {
+            public WebPartView getWebPartView(@NotNull ViewContext portalCtx, @NotNull Portal.WebPart webPart)
+            {
+                return new MailWebPart();
+            }
+        }));
     }
 
     public void doStartup(ModuleContext moduleContext)
