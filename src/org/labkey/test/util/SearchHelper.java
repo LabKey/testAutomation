@@ -20,12 +20,11 @@ import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,22 +57,14 @@ public class SearchHelper
     @LogMethod(quiet = true)
     public static void waitForIndexer()
     {
-        try
-        {
-            // Invoke a special server action that waits until all previous indexer tasks are complete
-            int response = WebTestHelper.getHttpGetResponse(WebTestHelper.buildURL("search", "waitForIndexer"));
-            assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("WaitForIndexer action failed", e);
-        }
+        // Invoke a special server action that waits until all previous indexer tasks are complete
+        int response = WebTestHelper.getHttpResponse(WebTestHelper.buildURL("search", "waitForIndexer")).getResponseCode();
+        assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
     }
 
     @LogMethod
     public void verifySearchResults(@LoggedParam String container, boolean crawlResults)
     {
-
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
@@ -86,10 +77,10 @@ public class SearchHelper
                 break;
 
             if (i == maxTries)
-                assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
+                assertTrue("These items did not return expected search results: " + notFound.keySet(), notFound.isEmpty());
 
             _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.keySet().toString(), i*5));
-            _test.sleep(i*5000);
+            WebDriverWrapper.sleep(i*5000);
         }
     }
 
@@ -162,7 +153,7 @@ public class SearchHelper
     public void assertNoSearchResult(String searchTerm)
     {
         long startTime = System.currentTimeMillis();
-        List<WebElement> results = new ArrayList<>();
+        List<WebElement> results;
 
         do {
             searchFor(searchTerm);
@@ -178,7 +169,6 @@ public class SearchHelper
     /**
      * Add searchTerm and all expected results to list of terms to search for.
      * If searchTerm is already in the list, replaces the expected results.
-     * @param searchTerm
      * @param expectedResults Omit if expecting 0 results for the search
      */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
