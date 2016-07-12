@@ -228,6 +228,19 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
         getDriver().manage().window().setSize(new Dimension(1280, 1024));
+        closeExtraWindows();
+    }
+
+    private void closeExtraWindows()
+    {
+        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
+        for (int i = 1; i < windows.size(); i++)
+        {
+            getDriver().switchTo().window(windows.get(i));
+            executeScript("window.onbeforeunload = null;");
+            getDriver().close();
+        }
+        switchToMainWindow();
     }
 
     public ArtifactCollector getArtifactCollector()
@@ -699,7 +712,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             try
             {
-                getArtifactCollector().dumpPageSnapshot(testName, null);
+                getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
+                Set<String> windowHandles = getDriver().getWindowHandles();
+                windowHandles.remove(getDriver().getWindowHandle()); // All except current window
+                for (String windowHandle : windowHandles)
+                {
+                    getDriver().switchTo().window(windowHandle);
+                    getArtifactCollector().dumpPageSnapshot(testName + "-" + windowHandle, "otherWindows");
+                }
             }
             catch (RuntimeException | Error e)
             {
