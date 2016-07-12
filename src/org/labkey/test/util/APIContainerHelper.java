@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.labkey.api.util.Path;
@@ -129,7 +130,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (CommandException e)
         {
-            if (e.getMessage().contains("Not Found"))
+            if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND || e.getMessage().contains("Not Found"))
             {
                 if (failIfNotFound)
                     fail("Container not found: " + path);
