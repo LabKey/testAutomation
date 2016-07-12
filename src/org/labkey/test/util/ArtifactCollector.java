@@ -221,7 +221,13 @@ public class ArtifactCollector
         if (pageHtml == null)
             return null;
 
-        File htmlFile = new File(dir, baseName + ".html");
+        String docType = (String)_driver.executeScript("" +
+                "if (document.doctype == null)\n" +
+                "  return 'txt';\n" +
+                "else\n" +
+                "  return document.doctype.name;");
+
+        File htmlFile = new File(dir, baseName + "." + docType);
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(htmlFile), StandardCharsets.UTF_16)))
         {
