@@ -16,6 +16,7 @@
 package org.labkey.test.ms1.params;
 
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 
@@ -25,13 +26,6 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-/**
- * InspectTestParams class
-* <p/>
-* Created: Aug 18, 2008
-*
-* @author bmaclean
-*/
 abstract public class AbstractInspectTestParams extends AbstractPipelineTestParams
 {
     private static final String[] _cacheExtensions = new String[] { ".mzXML.inspect", ".mzXML.ms2.tsv" };
@@ -81,7 +75,7 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
         for (String sampleName : getSampleNames())
         {
             for (String ext : _cacheExtensions)
-                delete(new File(cacheDir, sampleName + ext));
+                TestFileUtils.delete(new File(cacheDir, sampleName + ext));
         }
     }
 

@@ -18,6 +18,8 @@ package org.labkey.test.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PasswordUtil;
@@ -33,13 +35,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * MS2TestParams class
-* <p/>
-* Created: Aug 15, 2007
-*
-* @author bmaclean
-*/
 abstract public class AbstractPipelineTestParams implements PipelineTestParams
 {
     protected PipelineWebTestBase _test;
@@ -224,20 +219,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void clean(File rootDir)
     {
-        delete(new File(rootDir, getDataPath() + File.separatorChar + getProtocolType()));
-    }
-
-    protected void delete(File file)
-    {
-        if (file.isDirectory())
-        {
-            for (File child : file.listFiles())
-            {
-                delete(child);
-            }
-        }
-        System.out.println("Deleting " + file.getPath() + "\n");
-        file.delete();
+        TestFileUtils.delete(new File(new File(rootDir, getDataPath()), getProtocolType()));
     }
 
     public void startProcessing()
@@ -252,11 +234,11 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.log("Choose existing protocol " + getProtocolName());
         _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), wait*12); // seems very long
         _test.selectOptionByText(Locator.name("protocol"), getProtocolName());
-        _test.sleep(wait);
+        WebDriverWrapper.sleep(wait);
 
         _test.log("Start data processing");
         clickSubmitButton();
-        _test.sleep(wait);
+        WebDriverWrapper.sleep(wait);
     }
 
     protected abstract void clickSubmitButton();
@@ -336,7 +318,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         if (!notifyOwner && notifyOthers.length == 0)
             return; // No email expected.
 
-        String userEmail = PasswordUtil.getUsername();
+        String ownerEmail = PasswordUtil.getUsername();
         EmailRecordTable emailTable = new EmailRecordTable(_test);
         EmailRecordTable.EmailMessage message = emailTable.getMessage(description);
         assertNotNull("No email message found for " + description, message);
@@ -348,7 +330,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         List<String> recipients = Arrays.asList(message.getTo());
         if (notifyOwner)
         {
-            validateTrue("Message not sent to owner " + userEmail, recipients.contains(userEmail));
+            validateTrue("Message not sent to owner " + ownerEmail, recipients.contains(ownerEmail));
         }
         for (String notify : notifyOthers)
         {
@@ -358,8 +340,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         assertTrue("Could not find link in message with Status: '" + status + "' and Description: '" + description + "'", clickLink(message));
 
         // Make sure we made it to a status page.
-        _test.assertTextPresent("Job Status");
-        _test.assertTextPresent(status);
+        _test.assertTextPresent("Job Status", status);
     }
 
     private boolean clickLink(EmailRecordTable.EmailMessage message)
@@ -386,7 +367,6 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         assertNotNull("Email validation requires mail settings", _mailSettings);
 
-        String userEmail = PasswordUtil.getUsername();
         String escalateEmail = _mailSettings.getEscalateUsers()[0];
         String messageText = "I have no idea why this job failed.  Please help me.";
 
@@ -408,9 +388,5 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);
         assertNotNull("Escalation message not sent", message);
         assertEquals("Escalation not sent to " + escalateEmail, escalateEmail, message.getTo()[0]);
-
-        // Not sure why the angle-brackets are added...
-        String escalateFrom = '<' + userEmail + '>';
-        //assertTrue("Escalation not sent from " + escalateFrom, message.getFrom()[0].contains(escalateFrom));
     }
 }
