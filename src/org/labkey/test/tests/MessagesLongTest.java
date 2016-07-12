@@ -166,10 +166,10 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check message works in Wiki");
         portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        selectOptionByText(Locator.name("rendererType"), "Wiki Page");
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.name("expires"), EXPIRES1);
         setFormElement(Locator.id("body"), "1 <b>first message testing</b>");
-        selectOptionByText(Locator.name("rendererType"), "Wiki Page");
         clickButton("Submit", longWaitForPage);
         assertTextPresent(MSG1_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
@@ -179,19 +179,19 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check that message with unicode character works");
         clickButton("New");
+        selectOptionByText(Locator.name("rendererType"), "Plain Text");
         setFormElement(Locator.name("title"), MSG4_TITLE);
         setFormElement(Locator.id("body"), MSG4_BODY);
-        selectOptionByText(Locator.name("rendererType"), "Plain Text");
         clickButton("Submit");
         assertTextPresent(MSG4_TITLE);
         assertTextPresent(MSG4_BODY);
 
         log("Check that HTML message works");
         clickButton("New");
+        selectOptionByText(Locator.name("rendererType"), "HTML");
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.id("body"), HTML_BODY);
-        selectOptionByText(Locator.name("rendererType"), "HTML");
-        clickButton("Submit", longWaitForPage);
+        clickButton("Submit");
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
         assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
@@ -352,7 +352,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("common.properties"));
 
         log("Validate that the Message Board Daily Digest is sent.");
-        getDriver().navigate().to(getBaseURL() + "/announcements/home/sendDailyDigest.view?");
+        getDriver().navigate().to(WebTestHelper.getBaseURL() + "/announcements/home/sendDailyDigest.view?");
         goToModule("Dumbster");
         assertTextPresent("New posts to /" + PROJECT_NAME, 2);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
@@ -532,9 +532,9 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void createNewMessage(String title, String body)
     {
         clickButton("New");
+        selectOptionByText(Locator.name("rendererType"), "HTML");
         setFormElement(Locator.name("title"), title);
         setFormElement(Locator.id("body"), body);
-        selectOptionByText(Locator.name("rendererType"), "HTML");
         clickButton("Submit");
     }
 
@@ -542,7 +542,6 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         log("Add search to project");
         portalHelper.addWebPart("Search");
-
 
         messageUserId = _userHelper.createUser(user).getUserId().toString();
         goToHome();
