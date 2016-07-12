@@ -177,9 +177,26 @@ public abstract class TestFileUtils
         return new File(buildDir, "testTemp");
     }
 
+    public static void delete(File file)
+    {
+        TestLogger.log("Deleting from filesystem: " + file.toString());
+        checkFileLocation(file);
+
+        if (!file.exists())
+            return;
+
+        FileUtils.deleteQuietly(file);
+
+        if (!file.exists())
+            TestLogger.log("Deletion successful.");
+        else
+            TestLogger.log("Failed to delete : " + file.getAbsolutePath());
+    }
+
     public static void deleteDir(File dir)
     {
         TestLogger.log("Deleting from filesystem: " + dir.toString());
+        checkFileLocation(dir);
         if (!dir.exists())
             return;
 
@@ -192,6 +209,19 @@ public abstract class TestFileUtils
         {
             TestLogger.log("WARNING: Exception deleting directory -- " + e.getMessage());
         }
+    }
+
+    private static void checkFileLocation(File file)
+    {
+        try
+        {
+            if (!FileUtils.directoryContains(new File(getLabKeyRoot()), file))
+            {
+                // TODO: Consider throwing IllegalArgumentException
+                TestLogger.log("DEBUG: Attempting to delete a file outside of test enlistment");
+            }
+        }
+        catch (IOException ignore) { }
     }
 
     public static File saveFile(File dir, String fileName, String contents)
