@@ -30,6 +30,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -44,6 +45,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -688,7 +690,9 @@ public class ClientAPITest extends BaseWebDriverTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
         waitForElement(loc.containing("Test Complete"));
-        assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
+        List<String> errors = getTexts(Locators.labkeyError.findElements(getDriver()));
+        assertTrue(String.join("\n", errors), errors.isEmpty());
+        assertFalse("Unknown webDav API error", loc.findElement(getDriver()).getText().contains("ERROR"));
     }
 
     @Test @Ignore("WebDavFileSystem doesn't fire 'ready' event")
