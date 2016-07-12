@@ -18,6 +18,9 @@ package org.labkey.test.pipeline;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+
+import static org.labkey.test.components.html.Checkbox.Checkbox;
 
 public class PipelineFolder
 {
@@ -146,6 +149,8 @@ public class PipelineFolder
         {
             _test.log("Updating email settings");
             // Assumes the setup page is already active
+            WebElement updateButton = Locator.lkButton("Update").findElement(_test.getDriver());
+            _test.scrollIntoView(updateButton, true); // WORKAROUND: Odd button behavior after switching to Roboto
             check("notifyOnSuccess", _notifyOnSuccess);
             if (_notifyOnSuccess)
             {
@@ -162,15 +167,12 @@ public class PipelineFolder
                 if (_escalateUsers != null)
                     _test.setFormElement(Locator.id("escalationUsers"), StringUtils.join(_escalateUsers, '\n'));
             }
-            _test.clickButton("Update");
+            _test.clickAndWait(updateButton);
         }
 
         private void check(String name, boolean check)
         {
-            if (check)
-                _test.checkCheckbox(Locator.checkboxByName(name));
-            else
-                _test.uncheckCheckbox(Locator.checkboxByName(name));
+            Checkbox(Locator.checkboxByName(name)).find(_test.getDriver()).set(check);
         }
 
         public boolean isNotifyOnSuccess()
