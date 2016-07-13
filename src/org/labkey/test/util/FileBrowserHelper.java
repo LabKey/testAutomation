@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -27,9 +28,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
+import static org.labkey.test.WebDriverWrapper.sleep;
+import static org.labkey.test.WebDriverWrapper.waitFor;
+import static org.labkey.test.components.ext4.Window.Window;
 
 public class FileBrowserHelper
 {
@@ -145,21 +151,6 @@ public class FileBrowserHelper
         }
     }
 
-    @LogMethod
-    public void uncheckFileBrowserFileCheckbox(@LoggedParam String fileName)
-    {
-        scrollToGridRow(fileName);
-
-        if(_test._ext4Helper.isChecked(Locators.gridRowCheckbox(fileName)))
-            _test.doAndWaitForPageSignal(() -> _test._ext4Helper.uncheckCheckbox(Locators.gridRowCheckbox(fileName)), IMPORT_SIGNAL_NAME);
-    }
-
-    public void checkFileBrowserFileCheckboxWithPartialText(String partialFileName)
-    {
-        String firstMatch = _test.getText(Locator.tagWithAttribute("td", "role", "gridcell").append(Locator.tag("span").containing(partialFileName)));
-        checkFileBrowserFileCheckbox(firstMatch);
-    }
-
     public boolean fileIsPresent(String nodeIdEndsWith)
     {
         Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
@@ -198,9 +189,9 @@ public class FileBrowserHelper
     {
         selectFileBrowserItem(currentName);
         clickFileBrowserButton(BrowserAction.RENAME);
-        _test.waitForElement(Ext4Helper.Locators.window("Rename"));
-        _test.setFormElement(Locator.name("renameText-inputEl"), newName);
-        _test.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        Window renameWindow = Window().withTitle("Rename").waitFor(_test.getDriver());
+        _test.setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
+        renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.waitForElement(fileGridCell.withText(newName));
     }
 
@@ -208,14 +199,13 @@ public class FileBrowserHelper
     {
         selectFileBrowserItem(fileName);
         clickFileBrowserButton(BrowserAction.MOVE);
-        _test.waitForElement(Ext4Helper.Locators.window("Choose Destination"));
+        Window moveWindow = Window().withTitle("Choose Destination").waitFor(_test.getDriver());
         //NOTE:  this doesn't yet support nested folders
-        Locator folder = Locator.xpath("//div[contains(@class, 'x4-window')]//div/span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
-        _test.waitForElement(folder);
+        WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
-        _test.sleep(500);
+        sleep(500);
         _test.click(folder);
-        _test.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         _test.waitForElementToDisappear(fileGridCell.withText(fileName));
         selectFileBrowserItem(destinationPath + "/" + fileName);
@@ -226,8 +216,8 @@ public class FileBrowserHelper
     {
         selectFileBrowserItem(fileName);
         clickFileBrowserButton(BrowserAction.DELETE);
-        _test.waitForElement(Ext4Helper.Locators.window("Delete Files"));
-        _test.clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        Window().withTitle("Delete Files").waitFor(_test.getDriver())
+                .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.waitForElementToDisappear(fileGridCell.withText(fileName));
     }
 
@@ -261,7 +251,7 @@ public class FileBrowserHelper
 
     public void goToConfigureButtonsTab()
     {
-        if (!_test.isElementPresent(Ext4Helper.Locators.window("Manage File Browser Configuration")))
+        if (Window().withTitle("Manage File Browser Configuration").findOrNull(_test.getDriver()) == null)
             goToAdminMenu();
 
         _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
@@ -271,21 +261,21 @@ public class FileBrowserHelper
     public void goToAdminMenu()
     {
         clickFileBrowserButton(BrowserAction.ADMIN);
-        _test.waitForElement(Ext4Helper.Locators.window("Manage File Browser Configuration"));
+        Window().withTitle("Manage File Browser Configuration").waitFor(_test.getDriver());
     }
 
     public void selectImportDataAction(@LoggedParam String actionName)
     {
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-        _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
+        Window importWindow = Window().withTitle("Import Data").waitFor(_test.getDriver());
         Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
         long startTime = System.currentTimeMillis();
         while (!_test.isElementPresent(actionRadioButton) && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
         { // Retry until action is present
-            _test._ext4Helper.clickWindowButton("Import Data", "Cancel", 0, 0);
+            importWindow.clickButton("Cancel", true);
             _test._ext4Helper.waitForMaskToDisappear();
             clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-            _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
+            importWindow = Window().withTitle("Import Data").waitFor(_test.getDriver());
         }
         _test.click(actionRadioButton);
         _test.clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
@@ -336,9 +326,9 @@ public class FileBrowserHelper
 
             if (replace)
             {
-                _test.waitForElement(Ext4Helper.Locators.window("File Conflict:"), 500);
-                _test.assertTextPresent("Would you like to replace it?");
-                _test.clickButton("Yes", 0);
+                Window confirmation = Window().withTitle("File Conflict:").waitFor(_test.getDriver());
+                assertTrue("Unexpected confirmation message.", confirmation.getBody().contains("Would you like to replace it?"));
+                confirmation.clickButton("Yes", true);
             }
         };
         Locator uploadedFile = fileGridCell.withText(file.getName());
@@ -356,7 +346,7 @@ public class FileBrowserHelper
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
-            _test.waitForElement(Ext4Helper.Locators.window("Extended File Properties"));
+            Window propWindow = Window().withTitle("Extended File Properties").waitFor(_test.getDriver());
             _test.waitForText("File (1 of ");
             for (FileBrowserExtendedProperty prop : fileProperties)
             {
@@ -365,7 +355,7 @@ public class FileBrowserHelper
                 else
                     _test.setFormElement(Locator.name(prop.getName()), prop.getValue());
             }
-            _test.clickButton("Save", 0);
+            _test.doAndWaitForElementToRefresh(() -> propWindow.clickButton("Save", true), uploadedFile, _test.shortWait());
             _test._ext4Helper.waitForMaskToDisappear();
 
             for (FileBrowserExtendedProperty prop : fileProperties)
@@ -373,7 +363,7 @@ public class FileBrowserHelper
         }
 
         // verify that the description field is empty
-        _test.assertFormElementEquals(Locator.name("description"), "");
+        assertEquals("Description didn't clear after upload", "", _test.getFormElement(Locator.name("description")));
     }
 
     public void importFile(String filePath, String importAction)
@@ -389,7 +379,7 @@ public class FileBrowserHelper
         WebElement button = action.findButton(_test);
         if (button.isDisplayed())
         {
-            _test.waitFor(() -> !button.getAttribute("class").contains("disabled"), WAIT_FOR_JAVASCRIPT);
+            waitFor(() -> !button.getAttribute("class").contains("disabled"), WAIT_FOR_JAVASCRIPT);
             _test.clickAndWait(button, action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
         }
         else
@@ -560,14 +550,6 @@ public class FileBrowserHelper
         public static Locator.XPathLocator gridRowWithNodeId(String nodeIdEndsWith)
         {
             return gridRow().attributeEndsWith("data-recordid", nodeIdEndsWith);
-        }
-
-        public static Locator.XPathLocator treeRow(String nodeIdEndsWith)
-        {
-            return Locator.tag("tr")
-                    .withClass("x4-grid-data-row")
-                    .withPredicate("starts-with(@id, 'treeview')")
-                    .attributeEndsWith("data-recordid", nodeIdEndsWith);
         }
 
         public static Locator.XPathLocator treeRow(Integer recordIndex)
