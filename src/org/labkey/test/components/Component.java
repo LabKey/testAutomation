@@ -145,6 +145,15 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         {
             return construct(new LazyWebElement(buildLocator(), context).withTimeout(timeout));
         }
+
+        public C findOrNull(S context)
+        {
+            WebElement elementOrNull = buildLocator().findElementOrNull(context);
+            if (elementOrNull == null)
+                return null;
+            else
+                return construct(elementOrNull);
+        }
     }
 
     public static abstract class SimpleComponentFinder<C> extends ComponentFinder<SearchContext, C, SimpleComponentFinder<C>>
