@@ -494,7 +494,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         };
     }
 
-    @Rule
     public Timeout testTimeout()
     {
         return new Timeout(30, TimeUnit.MINUTES);
@@ -628,7 +627,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        return RuleChain.outerRule(_logger).around(_failWatcher).around(_watcher);
+        return RuleChain.outerRule(_logger).around(testTimeout()).around(_failWatcher).around(_watcher);
     }
 
     /**
