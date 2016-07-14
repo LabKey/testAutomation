@@ -99,7 +99,7 @@ public class Window extends FloatingComponent<Window.Elements>
 
     public void waitForClose()
     {
-        waitForClose(1000);
+        waitForClose(5000);
     }
 
     public void waitForClose(int msWait)
