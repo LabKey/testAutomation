@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.issues;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +31,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.IssuesHelper;
@@ -78,6 +79,7 @@ public class IssuesTest extends BaseWebDriverTest
             "\n\'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
 
     private IssuesHelper _issuesHelper = new IssuesHelper(this);
+    private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     public List<String> getAssociatedModules()
     {
@@ -131,12 +133,10 @@ public class IssuesTest extends BaseWebDriverTest
 
     public void setupProject()
     {
-        PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(getProjectName(), null);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
-        clickButton("Save and Finish");
 
         _containerHelper.enableModule(getProjectName(), "Dumbster");
 
@@ -144,28 +144,11 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         enableEmailRecorder();
-        checkEmptyToAssignedList();
-        addProjectUsersToGroup();
-        createIssues();
-    }
-
-    private void checkEmptyToAssignedList()
-    {
-        // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
-
-        goToModule("Issues");
-        clickButton("New Issue");
-        String assignedToText = getText(Locator.name("assignedTo"));
-        assertEquals(assignedToText, "");
-    }
-
-    private void addProjectUsersToGroup()
-    {
         // Add to group so user appears
-        clickProject("IssuesVerifyProject");
         _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
         _userHelper.createUser(USER2, false);
+        createIssues();
     }
 
     private void createIssues()
@@ -804,12 +787,9 @@ public class IssuesTest extends BaseWebDriverTest
         Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
 
         // create reader user (issue 20598)
-        _permissionsHelper.createPermissionsGroup("Readers");
+        _permissionsHelper.createPermissionsGroup("Readers", user);
         _permissionsHelper.assertPermissionSetting("Readers", "No Permissions");
         _permissionsHelper.setPermissions("Readers", "Reader");
-        _permissionsHelper.clickManageGroup("Readers");
-        setFormElement(Locator.name("names"), user);
-        clickButton("Update Group Membership");
 
         String user1DisplayName = displayNameFromEmail(USER1);
 
