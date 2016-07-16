@@ -452,7 +452,7 @@
         </java>
     </target>
 
-    <target name="deploy-test-modules">
+    <target name="deploy-test-modules" unless="skip.test.modules">
         <property name="coreTestModules" value="server/test/modules/*"/>
         <loadfile property="testModuleSources" srcfile="${modulesFile.fullpath}">
             <filterchain>
