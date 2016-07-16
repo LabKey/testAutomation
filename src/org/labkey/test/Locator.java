@@ -901,10 +901,7 @@ public abstract class Locator
 
         public XPathLocator index(Integer index)
         {
-            if (0 == index)
-                return this;
-            else
-                return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
+            return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
         public By toBy()
@@ -991,9 +988,7 @@ public abstract class Locator
 
         public XPathLocator withPredicate(String predicate)
         {
-            if (predicate.startsWith("//"))
-                predicate = predicate.replaceFirst("//", "descendant::");
-            return this.append("["+predicate+"]");
+            return this.append("[" + getRelativeXPath(predicate) + "]");
         }
 
         public XPathLocator attributeStartsWith(String attribute, String text)
@@ -1063,19 +1058,34 @@ public abstract class Locator
         @Override
         public WebElement findElement(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && getLoc().startsWith("//"))
-                return new XPathLocator(getLoc().replaceFirst("//", "descendant::")).findElement(context);
-            else
-                return super.findElement(context);
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver))
+            {
+                String relativeXPath = getRelativeXPath();
+                if (!relativeXPath.equals(getLoc()))
+                    return new XPathLocator(relativeXPath).findElement(context);
+            }
+            return super.findElement(context);
         }
 
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver) && getLoc().startsWith("//"))
-                return context.findElements(new XPathLocator(getLoc().replaceFirst("//", "descendant::")).toBy());
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver))
+                return context.findElements(By.xpath(getRelativeXPath()));
             else
                 return context.findElements(this.toBy());
+        }
+
+        private String getRelativeXPath()
+        {
+            return getRelativeXPath(getLoc());
+        }
+
+        private String getRelativeXPath(String xpath)
+        {
+            if (xpath.startsWith("//") || xpath.startsWith("(//"))
+                xpath = xpath.replaceFirst("//", "descendant::");
+            return xpath;
         }
     }
 
