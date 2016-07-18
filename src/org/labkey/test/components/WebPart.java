@@ -31,9 +31,9 @@ import java.util.Arrays;
 import static org.labkey.test.components.WebPart.Locators.webPart;
 
 /**
- * Base class for Portal WebParts (can be moved, added, and removed)
+ * Base class for Portal WebParts (can be moved, renamed, and removed)
  */
-public abstract class WebPart<EC extends WebPart.Elements> extends Component<EC> implements WebDriverWrapper.PageLoadListener
+public abstract class WebPart<EC extends WebPart.Elements> extends WebDriverComponent<EC> implements WebDriverWrapper.PageLoadListener
 {
     @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
@@ -49,7 +49,7 @@ public abstract class WebPart<EC extends WebPart.Elements> extends Component<EC>
 
     public WebPart(WebDriverWrapper driverWrapper, WebElement componentElement)
     {
-        _componentElement = new RefindingWebElement(Locator.id(componentElement.getAttribute("id")), driverWrapper.getDriver())
+        _componentElement = new RefindingWebElement(componentElement, driverWrapper.getDriver())
                 .withRefindListener(e -> clearCache());
         _test = driverWrapper;
         _wDriver = driverWrapper;
@@ -75,12 +75,12 @@ public abstract class WebPart<EC extends WebPart.Elements> extends Component<EC>
         return _componentElement;
     }
 
-    public WebDriver getDriver()
+    protected WebDriver getDriver()
     {
         return getWrapper().getDriver();
     }
 
-    public WebDriverWrapper getWrapper()
+    protected WebDriverWrapper getWrapper()
     {
         return _wDriver;
     }
@@ -154,6 +154,7 @@ public abstract class WebPart<EC extends WebPart.Elements> extends Component<EC>
         return elementCache();
     }
 
+    @SuppressWarnings("unchecked")
     protected EC newElementCache()
     {
         return (EC)new Elements();
