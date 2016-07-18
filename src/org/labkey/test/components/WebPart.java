@@ -33,7 +33,7 @@ import static org.labkey.test.components.WebPart.Locators.webPart;
 /**
  * Base class for Portal WebParts (can be moved, added, and removed)
  */
-public abstract class WebPart extends Component<WebPart.Elements> implements WebDriverWrapper.PageLoadListener
+public abstract class WebPart<EC extends WebPart.Elements> extends Component<EC> implements WebDriverWrapper.PageLoadListener
 {
     @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
@@ -148,17 +148,18 @@ public abstract class WebPart extends Component<WebPart.Elements> implements Web
         getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
     }
 
+    @Deprecated // Use elementCache()
     protected Elements elements()
     {
         return elementCache();
     }
 
-    protected Elements newElementCache()
+    protected EC newElementCache()
     {
-        return new Elements();
+        return (EC)new Elements();
     }
 
-    protected class Elements extends Component.ElementCache
+    public class Elements extends Component.ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
