@@ -162,6 +162,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
+        datasetTable = new DataRegionTable("Dataset-chartdata", this);
         datasetTable.clearFilter("APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);

@@ -59,8 +59,11 @@ public class SuiteBuilder
 
         for (String testPackage : testPackages)
         {
-            Reflections reflections = new Reflections(testPackage);
-            tests.addAll(reflections.getTypesAnnotatedWith(Category.class));
+            if (!testPackage.trim().isEmpty())
+            {
+                Reflections reflections = new Reflections(testPackage);
+                tests.addAll(reflections.getTypesAnnotatedWith(Category.class));
+            }
         }
 
         _suites.put(Continue.class.getSimpleName(), new HashSet<>()); // Not actually a suite, used to continue interrupted suite

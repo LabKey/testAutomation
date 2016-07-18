@@ -135,6 +135,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
+        datasetTable = new DataRegionTable("Dataset-chartdata", this);
         datasetTable.clearFilter("RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);

@@ -601,6 +601,8 @@
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
             <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
             <sysproperty key="test.credentials.file" value="${test.credentials.file}"/>
+            <sysproperty key="test.packages" value="${sysprop.test.packages}"/>
+            <sysproperty key="extra.test.packages" value="${sysprop.extra.test.packages}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -987,10 +989,16 @@
             <contains string="${sysprop.teamcity.tests.runRiskGroupTestsFirst}" substring="newAndModified" />
         </condition>
 
-        <condition property="sysprop.test.packages" value="${test.packages}">
+        <condition property="default.test.packages" else="org.labkey.test">
+            <isset property="default.test.packages"/>
+        </condition>
+        <condition property="default.extra.test.packages" else="">
+            <isset property="default.extra.test.packages"/>
+        </condition>
+        <condition property="sysprop.test.packages" value="${test.packages}" else="${default.test.packages}">
             <isset property="test.packages"/>
         </condition>
-        <condition property="sysprop.extra.test.packages" value="${extra.test.packages}">
+        <condition property="sysprop.extra.test.packages" value="${extra.test.packages}" else="${default.extra.test.packages}">
             <isset property="extra.test.packages"/>
         </condition>
 
@@ -1123,6 +1131,8 @@
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
             <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
             <sysproperty key="test.credentials.file" value="${test.credentials.file}"/>
+            <sysproperty key="test.packages" value="${sysprop.test.packages}"/>
+            <sysproperty key="extra.test.packages" value="${sysprop.extra.test.packages}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
