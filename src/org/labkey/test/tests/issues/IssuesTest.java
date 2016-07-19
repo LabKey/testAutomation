@@ -98,29 +98,48 @@ public class IssuesTest extends BaseWebDriverTest
         return "IssuesVerifyProject";
     }
 
-    @BeforeClass
-    public static void doSetup() throws Exception
-    {
-        IssuesTest initTest = (IssuesTest)getCurrentTest();
-        initTest.setupProject();
-    }
-
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsersIfPresent(USER1, USER2);
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
+    @BeforeClass
+    public static void doSetup() throws Exception
+    {
+        IssuesTest initTest = (IssuesTest)getCurrentTest();
+        initTest.doInit();
+    }
+
+    public void doInit()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
+        _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
+        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
+
+        _issuesHelper.createNewIssuesList("issues", _containerHelper);
+
+        // Add to group so user appears
+        _userHelper.createUser(USER1);
+        _userHelper.createUser(USER2);
+        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
+
+        // Create issues
+        clickProject(getProjectName());
+        clickAndWait(Locator.linkWithText("Issue Summary"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2));
+    }
+
     @Before
     public void returnToProject()
     {
+        enableEmailRecorder();
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        readyState();
-    }
-
-    public void readyState()
-    {
         DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
 
         // clear region selection and filters
@@ -129,35 +148,6 @@ public class IssuesTest extends BaseWebDriverTest
 
         // reset folder filter
         _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder");
-    }
-
-    public void setupProject()
-    {
-        _containerHelper.createProject(getProjectName(), null);
-        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
-        _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
-        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
-
-        _containerHelper.enableModule(getProjectName(), "Dumbster");
-
-        clickProject(getProjectName());
-        _issuesHelper.createNewIssuesList("issues", _containerHelper);
-
-        enableEmailRecorder();
-        // Add to group so user appears
-        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
-        _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
-        _userHelper.createUser(USER2, false);
-        createIssues();
-    }
-
-    private void createIssues()
-    {
-        clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2));
     }
 
     public void validateQueries()
@@ -404,16 +394,6 @@ public class IssuesTest extends BaseWebDriverTest
         String subject = getFormElement(Locator.name("emailSubject"));
         setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE_BAD);
         clickButton("Save");
-
-        // no longer relevant, the email template is non-restrictive to allow
-        // custom fields
-/*
-        assertTextPresent("Invalid template");
-        setFormElement(Locator.name("emailMessage"), TEST_EMAIL_TEMPLATE);
-        clickButton("Save");
-        assertTextNotPresent("Invalid template");
-        assertEquals(subject, getFormElement(Locator.name("emailSubject")));
-*/
     }
 
     @Test
