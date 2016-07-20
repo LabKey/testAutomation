@@ -471,6 +471,7 @@ src/org/labkey/test/pages/PortalBodyPanel.java -text
 src/org/labkey/test/pages/StartImportPage.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
+src/org/labkey/test/pages/assay/AssayImportPage.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/issues/AdminPage.java -text
