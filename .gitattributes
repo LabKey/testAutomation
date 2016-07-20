@@ -426,6 +426,7 @@ src/org/labkey/test/components/ext4/Window.java -text
 src/org/labkey/test/components/html/Checkbox.java -text
 src/org/labkey/test/components/html/Input.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
+src/org/labkey/test/components/html/Select.java -text
 src/org/labkey/test/components/html/Table.java -text
 src/org/labkey/test/components/labkey/CheckboxFormItem.java -text
 src/org/labkey/test/components/labkey/FormItem.java -text
@@ -499,7 +500,6 @@ src/org/labkey/test/qc/build.xml -text
 src/org/labkey/test/selenium/EphemeralWebElement.java -text
 src/org/labkey/test/selenium/LazyWebElement.java -text
 src/org/labkey/test/selenium/RefindingWebElement.java -text
-src/org/labkey/test/selenium/Select.java -text
 src/org/labkey/test/selenium/WebElementWrapper.java -text
 src/org/labkey/test/studysampler/Runner.java -text
 src/org/labkey/test/studysampler/words.txt -text

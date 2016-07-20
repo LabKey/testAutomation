@@ -1,4 +1,4 @@
-package org.labkey.test.selenium;
+package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;

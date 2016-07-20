@@ -5,7 +5,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.list.SetDefaultValuesListPage;
-import org.labkey.test.selenium.Select;
+import org.labkey.test.components.html.Select;
 import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
-import static org.labkey.test.selenium.Select.Select;
+import static org.labkey.test.components.html.Select.Select;
 
 public class PropertiesEditor extends WebPartPanel
 {

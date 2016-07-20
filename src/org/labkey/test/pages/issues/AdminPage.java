@@ -10,14 +10,14 @@ import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.labkey.test.selenium.Select;
+import org.labkey.test.components.html.Select;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.PropertiesEditor.PropertyEditor;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
-import static org.labkey.test.selenium.Select.Select;
+import static org.labkey.test.components.html.Select.Select;
 
 public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
 {
