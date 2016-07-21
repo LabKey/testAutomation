@@ -682,7 +682,6 @@ src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
 src/org/labkey/test/util/DilutionAssayHelper.java -text
 src/org/labkey/test/util/Echo.java -text
-src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text
 src/org/labkey/test/util/ExcelHelper.java -text
 src/org/labkey/test/util/ExperimentRunTable.java -text
