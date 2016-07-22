@@ -18,11 +18,7 @@ package org.labkey.test.etl;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.RunTransformResponse;
-import org.labkey.remoteapi.query.DeleteRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -30,7 +26,6 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
@@ -42,7 +37,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -549,21 +543,10 @@ public class ETLHelper
         deleteAllRows(TRANSFER);
 
     }
+
     protected void deleteAllRows(String tableName) throws Exception
     {
-        Connection cn = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, tableName);
-        SelectRowsResponse resp = cmd.execute(cn, _projectName);
-        if (resp.getRowCount().intValue() > 0)
-        {
-            _test.log("Deleting rows from " + VEHICLE_SCHEMA + "." + tableName);
-            DeleteRowsCommand delete = new DeleteRowsCommand(VEHICLE_SCHEMA, tableName);
-            for (Map<String, Object> row : resp.getRows())
-            {
-                delete.addRow(row);
-            }
-            delete.execute(cn, _projectName);
-        }
+        _test.deleteAllRows(_projectName, VEHICLE_SCHEMA, tableName);
     }
 
     protected void assertInTarget1(String... targets)
