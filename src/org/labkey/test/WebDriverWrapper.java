@@ -437,10 +437,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         public List<String> ignored()
         {
             return Arrays.asList(
-                    "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
+                    // non-fatal File browser errors
                     "this.panel is null", // TODO: Investigate FilContentDownLoadTest.testDoubleClickDownload
                     "PanelUI.panel is undefined", // TODO: Similar to the above. Downloading files sometimes triggers this
                     "NS_ERROR_NOT_AVAILABLE", // TODO: Again, some weird non-fatal JS error in the file browser
+                    "el is null",
+
+                    "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
                     "Ext.Error: You're trying to decode an invalid JSON String:",
                     "__webdriver_evaluate",
                     "setting a property that has only a getter",
