@@ -24,6 +24,7 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.LazyWebElement;
@@ -721,6 +722,60 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         if (col == -1)
             fail("Column '" + columnName + "' not found.");
         return hasHref(row, col);
+    }
+
+    public ColumnChartRegion createBarChart(String columnName)
+    {
+        return createColumnChart(columnName, "Bar Chart");
+    }
+
+    public ColumnChartRegion createPieChart(String columnName)
+    {
+        return createColumnChart(columnName, "Pie Chart");
+    }
+
+    public ColumnChartRegion createBoxAndWhiskerChart(String columnName)
+    {
+        return createColumnChart(columnName, "Box & Whisker");
+    }
+
+    @LogMethod
+    public ColumnChartRegion createColumnChart(String columnName, String chartType)
+    {
+        int initialNumOfPlots, finalNumOfPlots, numberOfTries;
+        final Locator menuLoc = DataRegionTable.Locators.columnHeader(_regionName, columnName);
+        final int MAX_TRIES = 5;
+
+        Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-part-plotanalyticsprovider svg");
+        initialNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
+
+        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
+        _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, false, chartType);
+
+        // Wait just a moment before looking for the plot the first time.
+        WebDriverWrapper.sleep(1000);
+
+        finalNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
+        numberOfTries = 0;
+
+        // Wait for the plot to be drawn.
+        while((finalNumOfPlots == initialNumOfPlots) && (numberOfTries < MAX_TRIES))
+        {
+            _driver.log("Number of column charts has not changed, checking again.");
+            numberOfTries++;
+            WebDriverWrapper.sleep(WAIT_FOR_JAVASCRIPT);
+            finalNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
+        }
+
+        if((numberOfTries == MAX_TRIES) && (finalNumOfPlots == initialNumOfPlots))
+            throw new NoSuchElementException("The number of column plots did not change.");
+
+        return new ColumnChartRegion(_driver, this);
+    }
+
+    public ColumnChartRegion getColumnPlotRegion()
+    {
+        return new ColumnChartRegion(_driver, this);
     }
 
     public void setSort(String columnName, SortDirection direction)

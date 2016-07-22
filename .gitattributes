@@ -401,6 +401,8 @@ src/org/labkey/test/categories/Wiki.java -text
 src/org/labkey/test/categories/Workflow.java -text
 src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/components/BodyWebPart.java -text
+src/org/labkey/test/components/ColumnChartComponent.java -text
+src/org/labkey/test/components/ColumnChartRegion.java -text
 src/org/labkey/test/components/Component.java -text
 src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/CrosstabDataRegion.java -text
@@ -524,6 +526,7 @@ src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
+src/org/labkey/test/tests/ColumnChartTest.java -text
 src/org/labkey/test/tests/ColumnResizeTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
