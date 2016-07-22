@@ -1945,7 +1945,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return true;
     }
 
-    public WebElement waitForAnyElement(final Locator... locators)
+    public WebElement waitForAnyElement(String error, final Locator... locators)
     {
         if (locators.length == 0)
             throw new IllegalArgumentException("Specify at least one Locator");
@@ -1971,8 +1971,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
         catch (TimeoutException notFound)
         {
-            throw new NoSuchElementException("None of the specified elements appeared");
+            throw new NoSuchElementException(error);
         }
+    }
+
+    public WebElement waitForAnyElement(final Locator... locators)
+    {
+        return waitForAnyElement("None of the specified elements appeared", locators);
     }
 
     public List<WebElement> waitForElements(final Locator... locators)
