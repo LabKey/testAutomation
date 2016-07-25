@@ -64,6 +64,16 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
         return new AssayImportPage(BaseWebDriverTest.getCurrentTest());
     }
 
+    public void clickResetDefaults()
+    {
+        doAndWaitForPageToLoad(()-> elementCache().resetDefaultValuesButton.click());
+    }
+
+    public void clickCancel()
+    {
+        doAndWaitForPageToLoad(()-> elementCache().cancelButton.click());
+    }
+
     @Override
     protected Elements newElementCache()
     {
