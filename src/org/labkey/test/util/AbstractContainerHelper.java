@@ -91,9 +91,9 @@ public abstract class AbstractContainerHelper
         deleteProject(projectName, true);
     }
 
-    public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
+    public void deleteProject(String project, boolean failIfNotFound) throws TestTimeoutException
     {
-        deleteProject(project, failIfFail, 120000);
+        deleteProject(project, failIfNotFound, 120000);
     }
 
     @LogMethod
