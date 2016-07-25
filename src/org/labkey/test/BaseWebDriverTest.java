@@ -796,13 +796,19 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doCleanup(afterTest);
     }
 
-    // Standard cleanup: delete the project
+    // Standard cleanup: delete created projects
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         String projectName = getProjectName();
 
         if (null != projectName)
             _containerHelper.deleteProject(projectName, afterTest);
+
+        List<String> createdProjects = _containerHelper.getCreatedProjects();
+        for (String project : createdProjects)
+        {
+            _containerHelper.deleteProject(project, false);
+        }
     }
 
     public void cleanup() throws Exception
@@ -1632,41 +1638,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         deleteUsers(false, userEmails);
     }
 
-    @LogMethod
+    @Deprecated @LogMethod
     public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
     {
-        int checked = 0;
-        List<String> displayNames = new ArrayList<>();
-        beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
-
-        DataRegionTable usersTable = new DataRegionTable("Users", getDriver());
-
-        for(String userEmail : userEmails)
-        {
-            int row = usersTable.getRowIndex("Email", userEmail);
-
-            boolean isPresent = row != -1;
-
-            if (failIfNotFound)
-                assertTrue(userEmail + " was not present", isPresent);
-            else if (!isPresent)
-                log("Unable to delete non-existent user: " + userEmail);
-
-            if (isPresent)
-            {
-                usersTable.checkCheckbox(row);
-                checked++;
-                displayNames.add(usersTable.getDataAsText(row, "Display Name"));
-            }
-        }
-
-        if(checked > 0)
-        {
-            clickButton("Delete");
-            assertTextPresent(displayNames);
-            clickButton("Permanently Delete");
-            assertTextNotPresent(userEmails);
-        }
+        _userHelper.deleteUsers(failIfNotFound, userEmails);
     }
 
     public void assertUserExists(String email)
