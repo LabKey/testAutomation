@@ -3079,6 +3079,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return locator.findElements(getDriver()).size();
     }
 
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated
     public void assertButtonPresent(String buttonText)
     {
         assertTrue("Button '" + buttonText + "' was not present", isButtonPresent(buttonText));
@@ -3086,7 +3090,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     /**
      * @deprecated Use {@link #assertElementNotPresent(Locator)}. This is slow.
-     * @param buttonText
      */
     @Deprecated
     public void assertButtonNotPresent(String buttonText)
