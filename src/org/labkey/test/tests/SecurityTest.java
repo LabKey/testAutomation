@@ -29,6 +29,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
@@ -42,6 +43,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.WebTestHelper.getHttpResponse;
 
 @Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
@@ -403,18 +405,18 @@ public class SecurityTest extends BaseWebDriverTest
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Messages");
-        assertButtonPresent("New");
+        assertElementPresent(Locator.lkButton("New"));
         pushLocation();
         signOut();
         popLocation();
         clickProject(PROJECT_NAME);
-        assertButtonNotPresent("New");
+        assertElementNotPresent(Locator.lkButton("New"));
         signIn();
         clickProject(PROJECT_NAME);
-        assertButtonPresent("New");
+        assertElementPresent(Locator.lkButton("New"));
         impersonate(NORMAL_USER);
         clickProject(PROJECT_NAME);
-        assertButtonPresent("New");
+        assertElementPresent(Locator.lkButton("New"));
         stopImpersonating();
     }
 
@@ -621,7 +623,7 @@ public class SecurityTest extends BaseWebDriverTest
         String siteAdminDisplayName = getDisplayName(); // Use when checking audit log, below
         ensureAdminMode();
         goToAdminConsole();  // Site admin should be able to get to the admin console
-        deleteUsers(true, TO_BE_DELETED_USER);
+        new UIUserHelper(this).deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 
         ensureAdminMode();
@@ -630,7 +632,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
 
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
 
         table.getDataAsText(2, 2);
         String createdBy      = table.getDataAsText(2, "Created By");
@@ -712,14 +714,8 @@ public class SecurityTest extends BaseWebDriverTest
         // prep: ensure that user does not currently exist in labkey and  self register is enabled
         String selfRegUserEmail = "selfreg@test.labkey.local";
         deleteUsersIfPresent(selfRegUserEmail);
-        try
-        {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true");
-            assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
-        }
-        catch (IOException e){
-            throw (new RuntimeException("failed to enable user self register", e));
-        }
+        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true").getResponseCode();
+        assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
         signOut();
 
         // test: attempt login, check if register button appears, click register
@@ -745,14 +741,8 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod public void loginSelfRegistrationDisabledTest()
     {
         // prep: ensure self register is disabled
-        try
-        {
-            int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false");
-            assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
-        }
-        catch (IOException e){
-            throw (new RuntimeException("failed to disable user self register", e));
-        }
+        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false").getResponseCode();
+        assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
         signOut();
 
         // test: attempt login and confirm self register link is not on login screen
