@@ -1042,9 +1042,25 @@ public class ListHelper extends LabKeySiteWrapper
             this(name, label, type, description, null, null, validator, null);
         }
 
+        public ListColumn(String name, String label, ListColumnType type)
+        {
+            this(name, label, type, null, null, null, null, null);
+        }
+
+        public ListColumn(String name, ListColumnType type)
+        {
+            this(name, name, type);
+        }
+
         public String getName()
         {
             return _name;
+        }
+
+        public ListColumn setName(String name)
+        {
+            _name = name;
+            return this;
         }
 
         public String getLabel()
@@ -1052,9 +1068,21 @@ public class ListHelper extends LabKeySiteWrapper
             return _label;
         }
 
+        public ListColumn setLabel(String label)
+        {
+            _label = label;
+            return this;
+        }
+
         public ListColumnType getType()
         {
             return _type;
+        }
+
+        public ListColumn setType(ListColumnType type)
+        {
+            _type = type;
+            return this;
         }
 
         public String getDescription()
@@ -1062,19 +1090,21 @@ public class ListHelper extends LabKeySiteWrapper
             return _description;
         }
 
+        public ListColumn setDescription(String description)
+        {
+            _description = description;
+            return this;
+        }
+
         public String getFormat()
         {
             return _format;
         }
 
-        public LookupInfo getLookup()
+        public ListColumn setFormat(String format)
         {
-            return _lookup;
-        }
-
-        public FieldValidator getValidator()
-        {
-            return _validator;
+            _format = format;
+            return this;
         }
 
         public boolean isMvEnabled()
@@ -1082,9 +1112,10 @@ public class ListHelper extends LabKeySiteWrapper
             return _mvEnabled;
         }
 
-        public void setMvEnabled(boolean mvEnabled)
+        public ListColumn setMvEnabled(boolean mvEnabled)
         {
             _mvEnabled = mvEnabled;
+            return this;
         }
 
         public boolean isRequired()
@@ -1092,14 +1123,32 @@ public class ListHelper extends LabKeySiteWrapper
             return _required;
         }
 
-        public void setRequired(boolean required)
+        public ListColumn setRequired(boolean required)
         {
             _required = required;
+            return this;
         }
 
-        public void setURL(String url)
+        public LookupInfo getLookup()
         {
-            _url = url;
+            return _lookup;
+        }
+
+        public ListColumn setLookup(LookupInfo lookup)
+        {
+            _lookup = lookup;
+            return this;
+        }
+
+        public FieldValidator getValidator()
+        {
+            return _validator;
+        }
+
+        public ListColumn setValidator(FieldValidator validator)
+        {
+            _validator = validator;
+            return this;
         }
 
         public String getURL()
@@ -1107,14 +1156,21 @@ public class ListHelper extends LabKeySiteWrapper
             return _url;
         }
 
-        public void setScale(Integer value)
+        public ListColumn setURL(String url)
         {
-            _scale = value;
+            _url = url;
+            return this;
         }
 
         public Integer getScale()
         {
             return _scale;
+        }
+
+        public ListColumn setScale(Integer scale)
+        {
+            _scale = scale;
+            return this;
         }
     }
 
