@@ -768,7 +768,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.withClass(cssClass),
-                    _cssLoc.append("." + cssClass));
+                    _cssLoc.withClass(cssClass));
         }
 
         @Override
@@ -991,6 +991,11 @@ public abstract class Locator
             return this.append("[" + getRelativeXPath(predicate) + "]");
         }
 
+        public XPathLocator withoutPredicate(String predicate)
+        {
+            return this.append("[not(" + getRelativeXPath(predicate) + ")]");
+        }
+
         public XPathLocator attributeStartsWith(String attribute, String text)
         {
             return this.withPredicate(String.format("starts-with(@%s, "+xq(text)+")", attribute));
@@ -1018,7 +1023,7 @@ public abstract class Locator
 
         public XPathLocator withoutClass(String cssClass)
         {
-            return this.withPredicate("not(contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + "))");
+            return this.withoutPredicate("contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + ")");
         }
 
         public XPathLocator withAttribute(String attrName, String attrVal)
@@ -1029,6 +1034,21 @@ public abstract class Locator
         public XPathLocator withAttributeContaining(String attrName, String partialAttrVal)
         {
             return this.withPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
+        }
+
+        public XPathLocator withoutAttributeContaining(String attrName, String partialAttrVal)
+        {
+            return this.withoutPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
+        }
+
+        public XPathLocator followingSibling(String tag)
+        {
+            return this.append("/following-sibling::" + tag);
+        }
+
+        public XPathLocator position(int pos)
+        {
+            return this.withPredicate(String.valueOf(pos));
         }
 
         /**
@@ -1084,7 +1104,7 @@ public abstract class Locator
         private String getRelativeXPath(String xpath)
         {
             if (xpath.startsWith("//") || xpath.startsWith("(//"))
-                xpath = xpath.replaceFirst("//", "descendant::");
+                xpath = xpath.replaceFirst("//", ".//");
             return xpath;
         }
     }
@@ -1242,6 +1262,11 @@ public abstract class Locator
         public CssLocator append(CssLocator clause)
         {
             return append(" " + clause.getLoc());
+        }
+
+        public CssLocator withClass(String cssClass)
+        {
+            return append("." + cssClass);
         }
 
         @Override
