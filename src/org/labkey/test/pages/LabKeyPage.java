@@ -84,5 +84,9 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         {
             return getDriver().findElement(by);
         }
+
+        public WebElement headerBlock = Locator.css("body > div.labkey-main > header-block").findWhenNeeded(this);
+        public WebElement bodyBlock = Locator.css("body > div.labkey-main > body-block").findWhenNeeded(this);
+        public WebElement footerBlock = Locator.css("body > div.labkey-main > footer-block").findWhenNeeded(this);
     }
 }

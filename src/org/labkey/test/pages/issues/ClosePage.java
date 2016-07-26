@@ -5,9 +5,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 
-import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
-
-public class ClosePage extends UpdatePage<ClosePage.ElementCache>
+public class ClosePage extends BaseUpdatePage<ClosePage.ElementCache>
 {
     public ClosePage(WebDriver driver)
     {
@@ -26,6 +24,13 @@ public class ClosePage extends UpdatePage<ClosePage.ElementCache>
     }
 
     @Override
+    public ListPage save()
+    {
+        clickAndWait(elementCache().saveButton);
+        return new ListPage(getDriver());
+    }
+
+    @Override
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -35,8 +40,9 @@ public class ClosePage extends UpdatePage<ClosePage.ElementCache>
     {
         protected ElementCache()
         {
-            assignedTo = ReadOnlyFormItem(getDriver()).withLabel("Assigned To").findWhenNeeded();
-            status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
+            //TODO: Assigned To should be read only when closing an issue
+            //assignedTo = readOnlyItem("Assigned To");
+            status = readOnlyItem("Status");
         }
     }
 }

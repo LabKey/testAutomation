@@ -2,13 +2,11 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Select;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 
-import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
-import static org.labkey.test.components.labkey.SelectFormItem.SelectFormItem;
-
-public class ResolvePage extends UpdatePage<ResolvePage.ElementCache>
+public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
 {
     public ResolvePage(WebDriver driver)
     {
@@ -26,6 +24,31 @@ public class ResolvePage extends UpdatePage<ResolvePage.ElementCache>
         return new ResolvePage(driver.getDriver());
     }
 
+    @Override
+    public DetailsPage save()
+    {
+        clickAndWait(elementCache().saveButton);
+        return new DetailsPage(getDriver());
+    }
+
+    @Override
+    public Select assignedTo()
+    {
+        return (Select) super.assignedTo();
+    }
+
+    @Override
+    public Select resolution()
+    {
+        return (Select) super.resolution();
+    }
+
+    @Override
+    public Select duplicate()
+    {
+        return (Select) super.duplicate();
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -35,9 +58,8 @@ public class ResolvePage extends UpdatePage<ResolvePage.ElementCache>
     {
         protected ElementCache()
         {
-            resolution = SelectFormItem(getDriver()).withName("resolution").findWhenNeeded();
-            duplicate = SelectFormItem(getDriver()).withName("duplicate").findWhenNeeded();
-            status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
+            resolution = getSelect("resolution");
+            duplicate = getSelect("duplicate");
         }
     }
 }

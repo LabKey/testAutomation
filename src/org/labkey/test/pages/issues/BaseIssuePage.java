@@ -1,8 +1,13 @@
 package org.labkey.test.pages.issues;
 
 import com.google.common.collect.ImmutableList;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.Locator;
-import org.labkey.test.components.labkey.FormItem;
+import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.FormItem;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.Select;
+import org.labkey.test.components.labkey.ReadOnlyFormItem;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,10 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.components.html.Input.Input;
+import static org.labkey.test.components.html.Select.Select;
+import static org.labkey.test.components.labkey.FormItemFinder.FormItem;
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
 public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> extends LabKeyPage<EC>
@@ -61,27 +68,27 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
     public FormItem getCustomField(String label)
     {
-        return elementCache().getCustomFormItem(label);
+        return elementCache().formItemWithLabel(label);
     }
 
     public String openedDate()
     {
-        return elementCache().openedDate.getValue().toString();
+        return (String) elementCache().openedDate.get();
     }
 
     public String closedDate()
     {
-        return elementCache().closedDate.getValue().toString();
+        return (String) elementCache().closedDate.get();
     }
 
     public String changedDate()
     {
-        return elementCache().changedDate.getValue().toString();
+        return (String) elementCache().changedDate.get();
     }
 
     public String resolvedDate()
     {
-        return elementCache().resolvedDate.getValue().toString();
+        return (String) elementCache().resolvedDate.get();
     }
 
     public List<IssueComment> getComments()
@@ -89,28 +96,69 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         return elementCache().getComments();
     }
 
+    public String getIssueId()
+    {
+        return WebTestHelper.parseUrlQuery(getURL()).get("issueId");
+    }
+
     protected abstract EC newElementCache();
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        protected FormItem<String> status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
-        protected FormItem<String> assignedTo = ReadOnlyFormItem(getDriver()).withLabel("Assigned To").findWhenNeeded();
-        protected FormItem<String> priority = ReadOnlyFormItem(getDriver()).withLabel("Pri").findWhenNeeded();
-        protected FormItem<String> resolution = ReadOnlyFormItem(getDriver()).withLabel("Resolution").findWhenNeeded();
-        protected FormItem<String> duplicate = ReadOnlyFormItem(getDriver()).withLabel("Duplicate").findWhenNeeded();
-        protected FormItem<String> related = ReadOnlyFormItem(getDriver()).withLabel("Related").findWhenNeeded();
-        protected FormItem<String> notifyList = ReadOnlyFormItem(getDriver()).withLabel("Notify").findWhenNeeded();
-        protected FormItem<String> openedDate = ReadOnlyFormItem(getDriver()).withLabel("Opened").findWhenNeeded();
-        protected FormItem<String> changedDate = ReadOnlyFormItem(getDriver()).withLabel("Changed").findWhenNeeded();
-        protected FormItem<String> resolvedDate = ReadOnlyFormItem(getDriver()).withLabel("Resolved").findWhenNeeded();
-        protected FormItem<String> closedDate = ReadOnlyFormItem(getDriver()).withLabel("Closed").findWhenNeeded();
+        protected final Map<String, FormItem> formItems = new CaseInsensitiveHashMap<>();
 
-        private Map<String, FormItem> customFormItems = new TreeMap<>();
-        protected FormItem getCustomFormItem(String label)
+        protected FormItem status = formItemWithLabel("Status");
+        protected FormItem assignedTo = formItemWithLabel("Assigned\u00a0To");
+        protected FormItem priority = formItemWithLabel("Pri");
+        protected FormItem resolution = formItemWithLabel("Resolution");
+        protected FormItem duplicate = formItemWithLabel("Duplicate");
+        protected FormItem related = formItemWithLabel("Related");
+        protected FormItem notifyList = formItemWithLabel("Notify");
+        protected FormItem openedDate = formItemWithLabel("Opened");
+        protected FormItem changedDate = formItemWithLabel("Changed");
+        protected FormItem resolvedDate = formItemWithLabel("Resolved");
+        protected FormItem closedDate = formItemWithLabel("Closed");
+
+        private FormItem replaceIfNewer(String nameOrLabel, FormItem candidate)
         {
-            if (!customFormItems.containsKey(label))
-                customFormItems.put(label, ReadOnlyFormItem(getDriver()).withLabel(label).findWhenNeeded());
-            return customFormItems.get(label);
+            String key = nameOrLabel.replaceAll("\\s", "");
+            FormItem formItem = formItems.get(key);
+            if (formItem == null || !(candidate.getClass().isAssignableFrom(formItem.getClass())))
+                formItems.put(key, candidate); // Replace with more specific or different FormItem
+            return formItems.get(key);
+        }
+
+        protected FormItem formItemWithLabel(String label)
+        {
+            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
+        }
+
+        protected FormItem formItemNamed(String name)
+        {
+            return replaceIfNewer(name, FormItem(getDriver()).withName(name).findWhenNeeded(this));
+        }
+
+        protected ReadOnlyFormItem readOnlyItem(String label)
+        {
+            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
+        }
+
+        protected Select getSelect(String name)
+        {
+            FormItem formItem = replaceIfNewer(name, Select(fieldLocator(name)).findWhenNeeded(this));
+            return (Select) formItem;
+        }
+
+        protected Input getInput(String name)
+        {
+            FormItem formItem = replaceIfNewer(name, Input(fieldLocator(name), getDriver()).findWhenNeeded(this));
+            return (Input) formItem;
+        }
+
+        // Compensate for inconsistent name casing
+        private Locator fieldLocator(String name)
+        {
+            return Locator.css(String.format("*[name=%s], *[name=%s]", name, name.toLowerCase()));
         }
 
         private List<IssueComment> issueComments;

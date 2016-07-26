@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
@@ -27,17 +28,27 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.IssueListDefDataRegion;
+import org.labkey.test.pages.issues.AdminPage;
+import org.labkey.test.pages.issues.DetailsPage;
+import org.labkey.test.pages.issues.InsertPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.internal.WrapsDriver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
+import static org.labkey.test.WebTestHelper.buildURL;
 
 public class IssuesHelper extends WebDriverWrapper
 {
+    public static final String ISSUES_SCHEMA = "issues";
+    public static final String ISSUE_LIST_DEF_QUERY = "IssueListDef";
     protected WrapsDriver _driverWrapper;
 
     public IssuesHelper(WrapsDriver driverWrapper)
@@ -56,6 +67,30 @@ public class IssuesHelper extends WebDriverWrapper
         return _driverWrapper.getWrappedDriver();
     }
 
+    public boolean doesIssueListDefExist(String container, String listDefName)
+    {
+        Connection cn = createDefaultConnection(false);
+        SelectRowsCommand selectCmd = new SelectRowsCommand(ISSUES_SCHEMA, ISSUE_LIST_DEF_QUERY);
+        selectCmd.setMaxRows(1);
+        selectCmd.addFilter("name", listDefName, Filter.Operator.EQUAL);
+
+        try
+        {
+            SelectRowsResponse selectResp = selectCmd.execute(cn, container);
+            return !selectResp.getRows().isEmpty();
+        }
+        catch (CommandException | IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public IssueListDefDataRegion goToIssueListDefinitions(String container)
+    {
+        beginAt(buildURL("query", container, "executeQuery", Maps.of("schemaName", ISSUES_SCHEMA, "query.queryName", ISSUE_LIST_DEF_QUERY)));
+        return IssueListDefDataRegion.fromExecuteQuery(getDriver());
+    }
+
     @LogMethod
     public void createNewIssuesList(String name, AbstractContainerHelper containerHelper)
     {
@@ -63,10 +98,7 @@ public class IssuesHelper extends WebDriverWrapper
         PortalHelper portalHelper = new PortalHelper(getDriver());
 
         portalHelper.addWebPart("Issue Definitions");
-        clickAndWait(Locator.linkWithText("Insert New"));
-        setFormElement(Locator.input("quf_Label"), name);
-        click(Locator.linkWithText("Submit"));
-        clickAndWait(Locator.linkWithText("Yes"));
+        IssueListDefDataRegion.fromWebPart(getDriver()).createIssuesListDefinition(name);
 
         portalHelper.addWebPart("Issues Summary");
         clickAndWait(Locator.linkWithText("Submit"));
@@ -112,22 +144,30 @@ public class IssuesHelper extends WebDriverWrapper
         }
     }
 
+    public DetailsPage addIssue(String title, String assignedTo)
+    {
+        return addIssue(title, assignedTo, Collections.emptyMap());
+    }
+
+    public DetailsPage addIssue(String title, String assignedTo, Map<String, String> extraFields, File... attachments)
+    {
+        Map<String, String> fields = new TreeMap<>();
+        fields.put("title", title);
+        fields.put("assignedTo", assignedTo);
+        fields.putAll(extraFields);
+        return addIssue(fields, attachments);
+    }
+
     @LogMethod
-    public void addIssue(Map<String, String> issue, File... attachments)
+    public DetailsPage addIssue(Map<String, String> issue, File... attachments)
     {
         goToModule("Issues");
         clickButton("New Issue");
+        InsertPage insertPage = new InsertPage(getDriver());
 
         for (Map.Entry<String, String> field : issue.entrySet())
         {
-            String fieldName = field.getKey();
-            if (!isElementPresent(Locator.name(fieldName)))
-                fieldName = fieldName.toLowerCase();
-
-            if ("select".equals(Locator.name(fieldName).findElement(getDriver()).getTagName()))
-                selectOptionByText(Locator.name(field.getKey()), field.getValue());
-            else
-                setFormElement(Locator.id(fieldName), field.getValue());
+            insertPage.fieldWithName(field.getKey()).set(field.getValue());
         }
 
         for (int i = 0; i < attachments.length; i++)
@@ -145,39 +185,26 @@ public class IssuesHelper extends WebDriverWrapper
         List<String> errors = getTexts(Locators.labkeyError.findElements(getDriver()));
 
         Assert.assertEquals("Unexpected errors", Collections.<String>emptyList(), errors);
+
+        return new DetailsPage(getDriver());
     }
 
     @LogMethod
     public void setIssueAssignmentList(@Nullable @LoggedParam String group)
     {
-        if (group != null)
-        {
-            Locator.XPathLocator specificGroupSelect = Locator.tagWithClass("select", "assigned-to-group");
-
-            click(Locator.tag("span").withClass("assigned-to-group-specific").withChild(Locator.tag("input")));
-            selectOptionByText(specificGroupSelect, group);
-        }
-        else
-            click(Locator.tag("span").withClass("assigned-to-group-project").withChild(Locator.tag("input")));
+        new AdminPage(getDriver()).setIssueAssignmentList(group);
     }
 
     @LogMethod
     public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
-        if (user != null)
-        {
-            Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
-
-            click(Locator.tag("span").withClass("assigned-to-specific-user").withChild(Locator.tag("input")));
-            selectOptionByText(specificUserSelect, user);
-        }
-        else
-            click(Locator.tag("span").withClass("assigned-to-empty").withChild(Locator.tag("input")));
+        new AdminPage(getDriver()).setIssueAssignmentUser(user);
     }
 
-    public void goToAdmin()
+    public AdminPage goToAdmin()
     {
         clickButton("Admin");
         waitForText("Configure Fields");
+        return new AdminPage(getDriver());
     }
 }

@@ -31,6 +31,12 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
+import org.labkey.test.pages.issues.ClosePage;
+import org.labkey.test.pages.issues.DetailsPage;
+import org.labkey.test.pages.issues.EmailPrefsPage;
+import org.labkey.test.pages.issues.ListPage;
+import org.labkey.test.pages.issues.ResolvePage;
+import org.labkey.test.pages.issues.UpdatePage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -40,19 +46,17 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebElement;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Data.class})
@@ -123,8 +127,10 @@ public class IssuesTest extends BaseWebDriverTest
         // Add to group so user appears
         _userHelper.createUser(USER1);
         _userHelper.createUser(USER2);
+        _userHelper.createUser(USER3);
         _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(USER3, getProjectName(), TEST_GROUP);
 
         // Create issues
         clickProject(getProjectName());
@@ -164,15 +170,13 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementPresent(newIssueButton);
 
         // quick security test
-        // TODO push lots of locations as we go and move this test to end
-        pushLocation();
-        pushLocation();
+        saveLocation();
         signOut();
-        popLocation();                          // try open issues as guest
+        recallLocation();                          // try open issues as guest
         assertElementNotPresent(newIssueButton);
         assertElementPresent(Locator.tagWithName("form", "login"));
         signIn();
-        popLocation();                          // and logged in again
+        recallLocation();                          // and logged in again
         assertElementPresent(newIssueButton);
 
         addLookupValues("issues", "area", Arrays.asList("Area51", "Fremont", "Downtown"));
@@ -399,22 +403,19 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void emailTest()
     {
-        goToModule("Dumbster");
-        assertTextPresent("No email recorded."); // No other test should trigger notification
-
         goToModule("Issues");
 
         // EmailPrefsAction
-        clickButton("Email Preferences");
-        checkCheckbox(Locator.checkboxByNameAndValue("emailPreference", "8")); // self enter/edit an issue
-        clickButton("Update");
+        EmailPrefsPage emailPrefsPage = new ListPage(getDriver()).clickEmailPreferences();
+        emailPrefsPage.notifyOnMyChanges().check();
+        emailPrefsPage.clickUpdate();
 
         impersonate(USER1);
-        clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
-        clickButton("Email Preferences");
-        uncheckCheckbox(Locator.checkboxByNameAndValue("emailPreference", "2")); // issue assigned to me is modified
-        clickButton("Update");
+        {
+            emailPrefsPage = EmailPrefsPage.beginAt(this, getProjectName());
+            emailPrefsPage.notifyOnAssignedIsModified().uncheck();
+            emailPrefsPage.clickUpdate();
+        }
         stopImpersonating();
 
         clickProject(getProjectName());
@@ -767,8 +768,8 @@ public class IssuesTest extends BaseWebDriverTest
         Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
 
         // create reader user (issue 20598)
+        _userHelper.createUser(user);
         _permissionsHelper.createPermissionsGroup("Readers", user);
-        _permissionsHelper.assertPermissionSetting("Readers", "No Permissions");
         _permissionsHelper.setPermissions("Readers", "Reader");
 
         String user1DisplayName = displayNameFromEmail(USER1);
@@ -817,7 +818,8 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         // issue 20699 - NPE b/c default assign to user deleted!
-        String deletedUser = "deleteme@deletronia.com";
+        String deletedUser = "deleteme@issues.test";
+        _userHelper.createUser(deletedUser);
         _permissionsHelper.addUserToProjGroup(deletedUser, getProjectName(), TEST_GROUP);
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
@@ -826,7 +828,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
 
         // taking care of some clean-up while here for the test.
-        deleteUsers(true, deletedUser, user);
+        _userHelper.deleteUsers(true, deletedUser, user);
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
@@ -838,251 +840,41 @@ public class IssuesTest extends BaseWebDriverTest
         // TODO: compare user dropdown list between admin and new issues page
     }
 
-    /**
-     * Obsolete, legacy inheritance is not supported and is replaced by shared domain plus scoping. Consider deleting this
-     * test and adding an up to date test for the new code.
-     */
-    @Deprecated
-    public void testAdminSettingInheritance()
+    @Test
+    public void testAssignedToOnResolveAndClose() throws Exception
     {
-        final String subFolderA = "Folder_A"; //a folder to inherit from
-        final String pathToA = String.format("/%s/%s", getProjectName(), subFolderA);
+        final String title = "assignmentTest";
+        final String openTo = displayNameFromEmail(USER1);
+        final String updateTo = displayNameFromEmail(USER3);
+        final String resolveTo = getDisplayName();
+        final String closeTo = "Guest";
 
-        final String subFolderA1 = "Folder_A1";
-        final String pathToA1 = String.format("/%s/%s", getProjectName(), subFolderA1);
+        DetailsPage detailsPage = _issuesHelper.addIssue(title, openTo);
+        assertEquals("Wrong assignedTo after issue creation.", openTo, detailsPage.assignedTo().get());
 
-        final String subFolderB = "Folder_B"; //folder that will inherit settings from Folder_A
-        final String pathToB = String.format("/%s/%s", getProjectName(), subFolderB);
+        UpdatePage updatePage = detailsPage.clickUpdate();
+        updatePage.assignedTo().set(updateTo);
+        assertEquals("Wrong assignedTo after issue update.", updateTo, updatePage.assignedTo().get());
+        detailsPage = updatePage.save();
+        assertEquals("Wrong assignedTo after issue update.", updateTo, detailsPage.assignedTo().get());
 
-        final String subFolderC = "Folder_C"; //folder that will not have an option to inherit from Folder_B, since Folder_B inherits from Folder_A
-        final String pathToC = String.format("/%s/%s", getProjectName(), subFolderC);
+        ResolvePage resolvePage = detailsPage.clickResolve();
+        assertEquals("Wrong assignedTo after issue resolve.", resolveTo, resolvePage.assignedTo().get());
+        detailsPage = resolvePage.save();
+        assertEquals("Wrong assignedTo after issue resolve.", resolveTo, detailsPage.assignedTo().get());
 
-        _containerHelper.createSubfolder(getProjectName(), subFolderA);
-        _containerHelper.createSubfolder(getProjectName(), subFolderA1); // Folder of related issues list
-        _containerHelper.createSubfolder(getProjectName(), subFolderB);
-        _containerHelper.createSubfolder(getProjectName(), subFolderC);
-
-        /** Start: go to Folder_A, and set admin settings**/
-        goToProjectHome(getProjectName());
-        clickFolder(subFolderA);
-        goToModule("Issues");
-        clickButton("Admin");
-
-        // Singular item name
-        setFormElement(Locator.name("entrySingularName"), "Issue w/Folder_A Admin");
-
-        // Plural items name
-        setFormElement(Locator.name("entryPluralName"), "Issues w/Folder_A Admin");
-
-        // Comment sort direction
-        selectOptionByValue(Locator.name("direction"), "DESC");
-
-        // Populate the assigned to list from:
-        selectOptionByText(Locator.name("assignedToGroup"), "Site:Users");
-
-        // Set default assigned to user:
-        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "NoDefaultUser"));
-
-        // Inherit Admin Setting from folder:
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "DoNotInheritFromContainer"));
-
-        // Set move to folder:
-        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "NoMoveToContainer"));
-
-        // Set folder of related issues list
-        setFormElement(Locator.name("relatedIssuesList"), pathToA1);
-
-        // set Custom Fields
-        setFormElement(Locator.name("type"), "Bugs");
-        setFormElement(Locator.name("area"), "Dev Area");
-        setFormElement(Locator.name("priority"), "Prioritah");
-        setFormElement(Locator.name("int1"), "Contract Number");
-        setFormElement(Locator.name("string1"), "Development Sprint");
-        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
-        selectOptionByValue(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[12]/td[3]/select"), "insert");
-        clickButton("Update");
-
-        // add keywords
-        addLookupValues("issues", "type", Collections.singletonList("Not so Bad"));
-        addLookupValues("issues", "area", Arrays.asList("Server", "Database"));
-        addLookupValues("issues", "Development Sprint", Arrays.asList("15.1", "15.2", "15.3", "15.4"));
-
-        // set Required Fields
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Type"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Area"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Priority"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Int1"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String1"));
-
-        clickButton("Update");
-
-        //store option values, to later compare with inheritor's values
-        List<WebElement> typeOptionsParent = Locator.xpath("//*[@id=\"formtype\"]//td[1]").findElements(getDriver());
-        List<String> typeOptionsParentList = getTexts(typeOptionsParent);
-
-        List<WebElement> string1OptionsParent = Locator.xpath("//*[@id=\"formstring1\"]").findElements(getDriver());
-        List<String> string1OptionsParentList = getTexts(string1OptionsParent);
-
-        /***** End: go to Folder_A, and set admin settings *****/
-
-        /** Start: go to Folder_B, and inherit settings from Folder_A **/
-        goToProjectHome(getProjectName());
-        clickFolder(subFolderB);
-        goToModule("Issues");
-        clickButton("Admin");
-
-        //inheriting from an empty folder
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
-        setFormElement(Locator.name("inheritFromContainerSelect"), "");
-        clickButton("Update");
-
-        assertTextPresent("The Inherit Admin Setting's 'Choose Folder' option was selected with a blank.");
-        clickAndWait(Locator.linkWithText("back"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "DoNotInheritFromContainer"));
-
-        //Add caption to custom field 'Type', 'String1', and 'String2'
-        setFormElement(Locator.name("type"), "Probs");
-        setFormElement(Locator.name("string1"), "Folder_B_Str1");
-        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
-        setFormElement(Locator.name("string2"), "Folder_B_Str2");
-        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string2"));
-        selectOptionByValue(Locator.xpath("//*[@id=\"adminViewOfIssueList\"]/table/tbody/tr[2]/td[2]/table/tbody/tr[13]/td[3]/select"), "admin");
-        clickButton("Update");
-
-        //Add Options to string2
-        addLookupValues("issues", "Folder_B_Str2", Arrays.asList("B_1", "B_2", "B_3"));
-        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String2"));
-
-        goToProjectHome(getProjectName());//REmove
-        clickFolder(subFolderB);
-        goToModule("Issues");
-        clickButton("Admin");
-
-        /** inherit from Folder_A - test for 'Cancel' to inherit **/
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
-        setFormElement(Locator.name("inheritFromContainerSelect"), pathToA);
-
-        //On update, check for a popup message: "Custom Fields of current folder will get overridden".
-
-        doAndWaitForPageToLoad(() ->
-        {
-            click(Locator.linkWithText("Update"));
-            assertEquals("Custom Fields of current folder will get overridden.", cancelAlert());
-        });
-
-        //Test that no changes were made to the current folder since we Cancelled to inherit.
-        assertEquals("Probs", getFormElement(Locator.name("type")));
-        assertEquals("Folder_B_Str1", getFormElement(Locator.name("string1")));
-        assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
-        assertEquals("Folder_B_Str2", getFormElement(Locator.name("string2")));
-        assertChecked(Locator.checkboxByNameAndValue("pickListColumns", "string2"));
-
-        assertEquals("Admin", getSelectedOptionText(Locator.tagWithName("select", "permissions").index(1)));
-
-        /** inherit from Folder_A - test for 'OK' to inherit **/
-
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
-        setFormElement(Locator.name("inheritFromContainerSelect"), pathToA);
-
-
-        doAndWaitForPageToLoad(() ->
-        {
-            click(Locator.linkWithText("Update"));
-            assertAlert("Custom Fields of current folder will get overridden.");
-        });
-
-        //check if all the inherited fields are populated and are disabled.
-        assertEquals("Bugs", getFormElement(Locator.name("type")));
-        WebElement inputType = Locator.input("type").findElement(getDriver());
-        assertFalse(inputType.getText() + " should be disabled.", inputType.isEnabled());
-
-        assertEquals("Dev Area", getFormElement(Locator.name("area")));
-        WebElement inputArea = Locator.input("type").findElement(getDriver());
-        assertFalse(inputArea.getText() + " should be disabled.", inputArea.isEnabled());
-
-        assertEquals("Prioritah", getFormElement(Locator.name("priority")));
-        WebElement inputPri = Locator.input("type").findElement(getDriver());
-        assertFalse(inputPri.getText() + " should be disabled.", inputPri.isEnabled());
-
-        assertEquals("Contract Number", getFormElement(Locator.name("int1")));
-        WebElement inputInt1 = Locator.input("type").findElement(getDriver());
-        assertFalse(inputInt1.getText() + " should be disabled.", inputInt1.isEnabled());
-
-        assertEquals("Development Sprint", getFormElement(Locator.name("string1")));
-        WebElement inputString1 = Locator.input("type").findElement(getDriver());
-        assertFalse(inputString1.getText() + " should be disabled.", inputString1.isEnabled());
-
-        //check if inherited options are the same as the "parent"
-        List<WebElement> typeOptions = Locator.xpath("//*[@id=\"formtype\"]//td[1]").findElements(getDriver());
-        List<String> typeOptionsList = getTexts(typeOptions);
-        assertEquals("Inherited 'type' options does not match the current options.", typeOptionsParentList, typeOptionsList);
-
-        List<WebElement> string1Options = Locator.xpath("//*[@id=\"formstring1\"]").findElements(getDriver());
-        List<String> string1OptionsList = getTexts(string1Options);
-        assertEquals("Inherited 'string1' options does not match the current options.", string1OptionsParentList, string1OptionsList);
-
-        //check if inherited options are not modifiable or are not modified
-//        addKeyword("type", "Bugs", "can wait"); //TODO: should check for if it's disabled ("option/keyword" fields are not disabled in the current implementation)
-//        addKeyword("string1", "Development Sprint", "15.5");//TODO: should check for if it's disabled ("option/keyword" fields are not disabled in the current implementation)
-
-        //Check if non-inherited field still exists.
-        assertEquals("Folder_B_Str2", getFormElement(Locator.name("string2")));
-        WebElement inputString2 = Locator.input("string2").findElement(getDriver());
-        assertTrue(inputString2.getText() + " is not enabled.", inputString2.isEnabled());
-
-        //check if non-inherited options are modifiable
-        //addKeyword("string2", "Folder_B_Str2", "B_4");
-        //addLookupValues();
-        WebElement str2Option = Locator.xpath("//*[@id='formstring2']/table/tbody/tr[4]/td[1]").findElement(getDriver());
-        assertTrue("Element B_4 not found.", "B_4".equals(str2Option.getText()));
-
-        /***** End: go to Folder_B, and inherit settings from Folder_A *****/
-
-        /***** Start: Test for a message effecting inheritors in Folder_A *****/
-
-        //go to Folder_A, Add caption to an empty custom field of Folder_A
-        goToProjectHome(getProjectName());
-        clickFolder("Folder_A");
-        goToModule("Issues");
-        clickButton("Admin");
-        setFormElement(Locator.name("milestone"), "milestone_A");
-
-        doAndWaitForPageToLoad(() ->
-        {
-            click(Locator.linkWithText("Update"));
-            assertAlert("Found one or more folders with settings inherited from the current folder: Adding new Custom Fields will override Custom Fields of inheriting folders.");
-        });
-
-        //check if the inheritor sees the update
-        goToProjectHome(getProjectName());
-        clickFolder("Folder_B");
-        goToModule("Issues");
-        clickButton("Admin");
-
-        assertEquals("milestone_A", getFormElement(Locator.name("milestone")));
-        WebElement inputMilestone = Locator.input("milestone").findElement(getDriver());
-        assertFalse(inputMilestone.getText() + " should be disabled.", inputMilestone.isEnabled());
-
-        /***** End: Test for a message effecting inheritors in Folder_A *****/
-
-        /***** Start: Test for chaining - which is disallowed *****/
-        goToProjectHome(getProjectName());
-        clickFolder("Folder_C");
-        goToModule("Issues");
-        clickButton("Admin");
-
-        //Under Inherit From Container: Choose Folder : Folders that have inherited settings from a different folder shouldn't be listed, in this case, Folder_B.
-        checkRadioButton(Locator.radioButtonByNameAndValue("inheritFromContainer", "InheritFromSpecificContainer"));
-        assertNotEquals(pathToB, getFormElement(Locator.name("inheritFromContainerSelect")));
-
-        /***** End: Test for chaining - which is disallowed *****/
-
+        ClosePage closePage = detailsPage.clickClose();
+        assertEquals("Wrong assignedTo after issue close.", closeTo, closePage.assignedTo().get());
+        ListPage listPage = closePage.save();
+        assertEquals("Wrong assignedTo after issue close.", closeTo, listPage.dataRegion().getDataAsText(0, "Assigned To"));
     }
 
     // NOTE: returning string here to avoid extra casting
     public String getIssueId()
     {
-        String title = getDriver().getTitle();
-        return title.substring(title.indexOf(' '), title.indexOf(':')).trim();
+        URL url = getURL();
+        Map<String, String> urlParameters = WebTestHelper.parseUrlQuery(url);
+        String id = urlParameters.get("issueId");
+        return id;
     }
 }

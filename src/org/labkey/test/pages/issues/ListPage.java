@@ -3,11 +3,15 @@ package org.labkey.test.pages.issues;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.pages.search.SearchResultsPage;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.labkey.test.components.html.Input.Input;
 
 public class ListPage extends LabKeyPage<ListPage.ElementCache>
 {
@@ -32,6 +36,43 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
         return new ListPage(driver.getDriver());
     }
 
+    public DetailsPage jumpToIssue(String issueId)
+    {
+        elementCache().issueJumpInput.set(issueId);
+        clickAndWait(elementCache().issueJumpButton);
+        return new DetailsPage(getDriver());
+    }
+
+    public SearchResultsPage searchIssues(String search)
+    {
+        elementCache().searchInput.set(search);
+        clickAndWait(elementCache().searchButton);
+        return new SearchResultsPage(getDriver());
+    }
+
+    public InsertPage clickNewIssue()
+    {
+        clickAndWait(elementCache().newIssueButton);
+        return new InsertPage(getDriver());
+    }
+
+    public AdminPage clickAdmin()
+    {
+        elementCache().issuesList.clickHeaderButtonByText("Admin");
+        return new AdminPage(getDriver());
+    }
+
+    public EmailPrefsPage clickEmailPreferences()
+    {
+        elementCache().issuesList.clickHeaderButtonByText("Email Preferences");
+        return new EmailPrefsPage(getDriver());
+    }
+
+    public DataRegionTable dataRegion()
+    {
+        return elementCache().issuesList;
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -39,6 +80,11 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement example = new LazyWebElement(Locator.css("button"), this);
+        WebElement newIssueButton = Locator.lkButton("New Issue").findWhenNeeded(this);
+        Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(this);
+        WebElement issueJumpButton = Locator.lkButton("Jump to Issue").findWhenNeeded(this);
+        Input searchInput = Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
+        WebElement searchButton = Locator.lkButton("Search").findWhenNeeded(bodyBlock);
+        DataRegionTable issuesList = DataRegionTable.findDataRegion(ListPage.this);
     }
 }

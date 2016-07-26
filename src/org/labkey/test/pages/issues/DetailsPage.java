@@ -1,7 +1,10 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -12,16 +15,27 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         super(driver);
     }
 
+    public static DetailsPage beginAt(WebDriverWrapper driver, String issueId)
+    {
+        return beginAt(driver, driver.getCurrentContainerPath(), issueId);
+    }
+
+    public static DetailsPage beginAt(WebDriverWrapper driver, String containerPath, String issueId)
+    {
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "details", Maps.of("issueId", issueId)));
+        return new DetailsPage(driver.getDriver());
+    }
+
     public InsertPage clickNewIssue()
     {
         clickAndWait(elementCache().newIssueLink);
         return new InsertPage(getDriver());
     }
 
-    public LabKeyPage clickReturnToGrid()
+    public ListPage clickReturnToGrid()
     {
         clickAndWait(elementCache().returnLink);
-        return new LabKeyPage(getDriver());
+        return new ListPage(getDriver());
     }
 
     public UpdatePage clickUpdate()
@@ -30,22 +44,22 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         return new UpdatePage(getDriver());
     }
 
-    public UpdatePage clickResolve()
+    public ResolvePage clickResolve()
     {
         clickAndWait(elementCache().resolveLink);
-        return new UpdatePage(getDriver());
+        return new ResolvePage(getDriver());
     }
 
-    public UpdatePage clickClose()
+    public ClosePage clickClose()
     {
         clickAndWait(elementCache().closeLink);
-        return new UpdatePage(getDriver());
+        return new ClosePage(getDriver());
     }
 
-    public UpdatePage clickReOpen()
+    public ReopenPage clickReOpen()
     {
         clickAndWait(elementCache().reopenLink);
-        return new UpdatePage(getDriver());
+        return new ReopenPage(getDriver());
     }
 
     public LabKeyPage clickPrint()
@@ -54,10 +68,10 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         return new LabKeyPage(getDriver());
     }
 
-    public LabKeyPage clickEmailPrefs()
+    public EmailPrefsPage clickEmailPrefs()
     {
         clickAndWait(elementCache().emailPrefsLink);
-        return new LabKeyPage(getDriver());
+        return new EmailPrefsPage(getDriver());
     }
 
     protected ElementCache newElementCache()

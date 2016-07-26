@@ -2,11 +2,10 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.Select;
 import org.openqa.selenium.WebDriver;
 
-import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
-
-public class InsertPage extends UpdatePage<InsertPage.ElementCache>
+public class InsertPage extends UpdatePage
 {
     public InsertPage(WebDriver driver)
     {
@@ -22,18 +21,5 @@ public class InsertPage extends UpdatePage<InsertPage.ElementCache>
     {
         driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "insert"));
         return new InsertPage(driver.getDriver());
-    }
-
-    protected ElementCache newElementCache()
-    {
-        return new ElementCache();
-    }
-
-    protected class ElementCache extends UpdatePage.ElementCache
-    {
-        protected ElementCache()
-        {
-            status = ReadOnlyFormItem(getDriver()).withLabel("Status").findWhenNeeded();
-        }
     }
 }

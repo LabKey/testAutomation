@@ -3,7 +3,7 @@ package org.labkey.test.pages.list;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.labkey.FormItem;
+import org.labkey.test.components.html.FormItem;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,7 +11,7 @@ import org.openqa.selenium.WebElement;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.labkey.test.components.labkey.FormItem.FormItem;
+import static org.labkey.test.components.labkey.FormItemFinder.FormItem;
 
 public class SetDefaultValuesListPage extends LabKeyPage<SetDefaultValuesListPage.ElementCache>
 {
@@ -63,7 +63,7 @@ public class SetDefaultValuesListPage extends LabKeyPage<SetDefaultValuesListPag
         protected WebElement clearButton = Locator.lkButton("Clear Defaults").findWhenNeeded(this);
         protected WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
 
-        public FormItem<String> getFormItem(String fieldLabel)
+        public FormItem getFormItem(String fieldLabel)
         {
             if (!formItems.containsKey(fieldLabel))
                 formItems.put(fieldLabel, FormItem(getDriver()).withLabel(fieldLabel).find(this));

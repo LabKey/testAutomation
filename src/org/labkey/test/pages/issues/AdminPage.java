@@ -1,6 +1,7 @@
 package org.labkey.test.pages.issues;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -11,6 +12,8 @@ import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.components.html.Select;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,7 +40,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         return new AdminPage(driver.getDriver());
     }
 
-    public LabKeyPage customizeEmailTemplate()
+    public LabKeyPage clickEmailTemplate()
     {
         clickAndWait(elementCache().customizeEmailButton);
         return new LabKeyPage(getDriver());
@@ -71,6 +74,36 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     public PropertiesEditor configureFields()
     {
         return elementCache().configureFieldsPanel;
+    }
+
+    @LogMethod
+    public void setIssueAssignmentList(@Nullable @LoggedParam String group)
+    {
+        if (group != null)
+            assignToList().set(AssignToListOption.specificGroup(group));
+        else
+            assignToList().set(AssignToListOption.allProjectUsers());
+    }
+
+    @LogMethod
+    public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
+    {
+        if (user != null)
+            defaultAssignedTo().set(DefaultAssignToOption.specificUser(user));
+        else
+            defaultAssignedTo().set(DefaultAssignToOption.noDefault());
+    }
+
+    @Override
+    public void save()
+    {
+        clickButton("Save");
+    }
+
+    @Override
+    public void saveAndClose()
+    {
+        save();
     }
 
     public enum SortDirection implements Select.SelectOption
@@ -112,10 +145,10 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         public Select<SortDirection> commentSortSelect = Select(Locator.name("sortDirection")).findWhenNeeded(this);
         public RadioButton assignedToAllProjectUsersRadio = RadioButton(Locator.css(".assigned-to-group-project > input")).findWhenNeeded(this);
         public RadioButton assignedToSpecificGroupRadio = RadioButton(Locator.css(".assigned-to-group-specific > input")).findWhenNeeded(this);
-        public Select assignedToSpecificGroupSelect = Select(Locator.name("assigned-to-group")).findWhenNeeded(this);
+        public Select assignedToSpecificGroupSelect = Select(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
         public RadioButton noDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-empty > input")).findWhenNeeded(this);
         public RadioButton specificDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-specific-user > input")).findWhenNeeded(this);
-        public Select defaultAssignedToSelect = Select(Locator.name("sortDirection")).findWhenNeeded(this);
+        public Select defaultAssignedToSelect = Select(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
         public PropertiesEditor configureFieldsPanel = PropertyEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
     }
 
@@ -128,14 +161,14 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             this.option = option;
         }
 
-        public static AssignToListOption specificUser(String specificUser)
+        public static AssignToListOption specificGroup(String group)
         {
-            return new AssignToListOption(Select.SelectOption.textOption(specificUser));
+            return new AssignToListOption(Select.SelectOption.textOption(group));
         }
 
-        public static AssignToListOption specificUser(@NotNull Integer specificUserId)
+        public static AssignToListOption specificGroup(@NotNull Integer groupId)
         {
-            return new AssignToListOption(Select.SelectOption.valueOption(specificUserId.toString()));
+            return new AssignToListOption(Select.SelectOption.valueOption(groupId.toString()));
         }
 
         public static AssignToListOption allProjectUsers()
@@ -152,7 +185,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     
     public class AssignToList
     {
-        public void setAssignedToList(AssignToListOption from)
+        public void set(AssignToListOption from)
         {
             if (null == from)
                 elementCache().assignedToAllProjectUsersRadio.check();
@@ -163,12 +196,12 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             }
         }
 
-        public Select.SelectOption getAssignToGroup()
+        public Select.SelectOption get()
         {
             return elementCache().assignedToSpecificGroupSelect.getSelection();
         }
 
-        public AssignedToRadioOption getAssignedToRadioSelection()
+        public AssignedToRadioOption getRadioSelection()
         {
             if (elementCache().assignedToAllProjectUsersRadio.isChecked())
                 return AssignedToRadioOption.AllProjectUsers;
@@ -186,14 +219,14 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             this.option = option;
         }
 
-        public static DefaultAssignToOption specificUser(String specificUser)
+        public static DefaultAssignToOption specificUser(String displayName)
         {
-            return new DefaultAssignToOption(Select.SelectOption.textOption(specificUser));
+            return new DefaultAssignToOption(Select.SelectOption.textOption(displayName));
         }
 
-        public static DefaultAssignToOption specificUser(@NotNull Integer specificUserId)
+        public static DefaultAssignToOption specificUser(@NotNull Integer userId)
         {
-            return new DefaultAssignToOption(Select.SelectOption.valueOption(specificUserId.toString()));
+            return new DefaultAssignToOption(Select.SelectOption.valueOption(userId.toString()));
         }
 
         public static DefaultAssignToOption noDefault()
@@ -210,7 +243,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     
     public class DefaultAssignTo
     {
-        public void setDefaultAssignedTo(DefaultAssignToOption defaultUser)
+        public void set(DefaultAssignToOption defaultUser)
         {
             if (null == defaultUser)
                 elementCache().noDefaultAssignedToRadio.check();
@@ -221,12 +254,12 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             }
         }
 
-        public Select.SelectOption getDefaultAssignToUser()
+        public Select.SelectOption get()
         {
             return elementCache().defaultAssignedToSelect.getSelection();
         }
 
-        public DefaultAssignedToRadioOption getDefaultAssignedToRadioSelection()
+        public DefaultAssignedToRadioOption getRadioSelection()
         {
             if (elementCache().noDefaultAssignedToRadio.isChecked())
                 return DefaultAssignedToRadioOption.NoDefault;

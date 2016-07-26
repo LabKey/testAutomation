@@ -7,7 +7,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Input extends WebDriverComponent
+public class Input extends WebDriverComponent implements FormItem<String>
 {
     protected final WebElement _el;
     protected final WebDriverWrapper _wDriver; // getFormElement requires javascript
@@ -36,12 +36,26 @@ public class Input extends WebDriverComponent
         return _wDriver.getDriver();
     }
 
+    @Deprecated
     public String getValue()
+    {
+        return get();
+    }
+
+    @Deprecated
+    public void setValue(String value)
+    {
+        set(value);
+    }
+
+    @Override
+    public String get()
     {
         return _wDriver.getFormElement(_el);
     }
 
-    public void setValue(String value)
+    @Override
+    public void set(String value)
     {
         _wDriver.setFormElement(_el, value);
     }

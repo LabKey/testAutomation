@@ -7,12 +7,12 @@ import org.openqa.selenium.remote.RemoteWebElement;
 
 import java.util.List;
 
-public class Select<T extends Select.SelectOption> extends org.openqa.selenium.support.ui.Select
+public class Select<T extends Select.SelectOption> extends org.openqa.selenium.support.ui.Select implements FormItem<String>
 {
     private final WebElement wrappedElement;
     private org.openqa.selenium.support.ui.Select wrappedSelect;
 
-    private Select(WebElement element)
+    public Select(WebElement element)
     {
         // Feed dummy Element to Selenium Select to prevent UnexpectedTagNameException
         super(new RemoteWebElement()
@@ -141,6 +141,18 @@ public class Select<T extends Select.SelectOption> extends org.openqa.selenium.s
             selectByValue(option.getValue());
         else
             selectByVisibleText(option.getText());
+    }
+
+    @Override
+    public String get()
+    {
+        return getSelection().getText();
+    }
+
+    @Override
+    public void set(String text)
+    {
+        selectByVisibleText(text);
     }
 
     public interface SelectOption

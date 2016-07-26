@@ -409,6 +409,7 @@ src/org/labkey/test/components/CrosstabDataRegion.java -text
 src/org/labkey/test/components/CustomizeView.java -text
 src/org/labkey/test/components/D3PieChart.java -text
 src/org/labkey/test/components/FloatingComponent.java -text
+src/org/labkey/test/components/IssueListDefDataRegion.java -text
 src/org/labkey/test/components/ListsWebPart.java -text
 src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
@@ -426,16 +427,14 @@ src/org/labkey/test/components/ext4/FormItemFinder.java -text
 src/org/labkey/test/components/ext4/RadioButton.java -text
 src/org/labkey/test/components/ext4/Window.java -text
 src/org/labkey/test/components/html/Checkbox.java -text
+src/org/labkey/test/components/html/FormItem.java -text
 src/org/labkey/test/components/html/Input.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
 src/org/labkey/test/components/html/Select.java -text
 src/org/labkey/test/components/html/Table.java -text
-src/org/labkey/test/components/labkey/CheckboxFormItem.java -text
-src/org/labkey/test/components/labkey/FormItem.java -text
+src/org/labkey/test/components/labkey/FormItemFinder.java -text
 src/org/labkey/test/components/labkey/GenericFormItem.java -text
 src/org/labkey/test/components/labkey/ReadOnlyFormItem.java -text
-src/org/labkey/test/components/labkey/SelectFormItem.java -text
-src/org/labkey/test/components/labkey/TextFormItem.java -text
 src/org/labkey/test/components/search/SearchBodyWebPart.java -text
 src/org/labkey/test/components/search/SearchForm.java -text
 src/org/labkey/test/components/search/SearchSideWebPart.java -text
@@ -478,8 +477,11 @@ src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/issues/AdminPage.java -text
 src/org/labkey/test/pages/issues/BaseIssuePage.java -text
+src/org/labkey/test/pages/issues/BaseUpdatePage.java -text
 src/org/labkey/test/pages/issues/ClosePage.java -text
+src/org/labkey/test/pages/issues/DeleteIssueListPage.java -text
 src/org/labkey/test/pages/issues/DetailsPage.java -text
+src/org/labkey/test/pages/issues/EmailPrefsPage.java -text
 src/org/labkey/test/pages/issues/InsertPage.java -text
 src/org/labkey/test/pages/issues/ListPage.java -text
 src/org/labkey/test/pages/issues/ReopenPage.java -text
@@ -654,6 +656,8 @@ src/org/labkey/test/tests/WebpartPermissionsTest.java -text
 src/org/labkey/test/tests/WikiLongTest.java -text
 src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
+src/org/labkey/test/tests/issues/IssueDomainSharingTest.java -text
+src/org/labkey/test/tests/issues/IssuesAdminTest.java -text
 src/org/labkey/test/tests/issues/IssuesTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text

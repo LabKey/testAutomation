@@ -1,59 +1,49 @@
 package org.labkey.test.components.labkey;
 
-import org.openqa.selenium.WebDriver;
+import org.labkey.test.components.Component;
+import org.labkey.test.components.html.FormItem;
 import org.openqa.selenium.WebElement;
 
-public class ReadOnlyFormItem extends FormItem<String>
+public class ReadOnlyFormItem extends Component implements FormItem<String>
 {
-    private String _value;
-    private boolean _isCached;
+    private WebElement _el;
 
-    protected ReadOnlyFormItem(WebElement rowEl, WebDriver driver)
+    protected ReadOnlyFormItem(WebElement el)
     {
-        this(rowEl, driver, true);
+        _el = el;
     }
 
-    protected ReadOnlyFormItem(WebElement rowEl, WebDriver driver, boolean isCached)
+    public static FormItemFinder<ReadOnlyFormItem> ReadOnlyFormItem()
     {
-        super(rowEl, driver);
-        _isCached = isCached;
-    }
-
-    public static ReadOnlyFormItemFinder ReadOnlyFormItem(WebDriver driver)
-    {
-        return new ReadOnlyFormItemFinder(driver);
-    }
-
-    public String getValue()
-    {
-        if (!_isCached || null == _value)
-            _value = elements().itemTd.getText();
-        return _value;
-    }
-
-    public void setValue(String value)
-    {
-        throw new UnsupportedOperationException(getLabel() + " field is read-only or unknown");
-    }
-
-    public static class ReadOnlyFormItemFinder extends FormItemFinder<ReadOnlyFormItem, ReadOnlyFormItemFinder>
-    {
-        boolean isCached = true;
-
-        public ReadOnlyFormItemFinder(WebDriver driver)
+        return new FormItemFinder<ReadOnlyFormItem>()
         {
-            super(driver);
-        }
+            @Override
+            protected ReadOnlyFormItem construct(WebElement el)
+            {
+                return new ReadOnlyFormItem(el);
+            }
 
-        public void withoutValueCache()
-        {
-            this.isCached = false;
-        }
+            @Override
+            protected String itemTag()
+            {
+                return ".";
+            }
+        };
+    }
 
-        @Override
-        protected ReadOnlyFormItem construct(WebElement el, WebDriver driver)
-        {
-            return new ReadOnlyFormItem(el, driver, isCached);
-        }
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _el;
+    }
+
+    public String get()
+    {
+        return getComponentElement().getText();
+    }
+
+    public void set(String value)
+    {
+        throw new UnsupportedOperationException("Field is read-only or needs special automation");
     }
 }
