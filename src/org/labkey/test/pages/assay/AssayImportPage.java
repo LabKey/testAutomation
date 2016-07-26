@@ -4,6 +4,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.html.Select;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
@@ -18,16 +19,32 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
         super(test);
     }
 
-    public void setNamedFieldText(String name, String text)
+    public AssayImportPage setNamedInputText(String name, String text)
     {
         WebElement input = Locator.input(name).findElement(getDriver());
-        new Input(input, getDriver()).setValue(text);
+        new Input(input, getDriver()).set(text);
+        return this;
     }
 
-    public void setDataText(String text)
+    public AssayImportPage selectNamedFieldOption(String name, String text)
+    {
+        WebElement input = Locator.xpath("//select[@name='" + name +"']").findElement(getDriver());
+        new Select(input).set(text);
+        return this;
+    }
+
+    public AssayImportPage setNamedTextAreaValue(String name, String text)
+    {
+        WebElement input = Locator.xpath("//textarea[@name='" + name +"']").findElement(getDriver());
+        setFormElement(input, text);
+        return this;
+    }
+
+    public AssayImportPage setDataText(String text)
     {
         selectTSVRadioButton();
         setTextInputField(text);
+        return this;
     }
 
     private void selectTSVRadioButton()
