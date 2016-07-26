@@ -67,7 +67,7 @@ public class CustomizeView extends Component
 
     public CustomizeView(DataRegionTable dataRegion)
     {
-        _driver = dataRegion.getDriver();
+        _driver = dataRegion.getWrapper();
         _dataRegion = dataRegion;
         panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _dataRegion.getComponentElement());
     }

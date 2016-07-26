@@ -152,9 +152,14 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         return _elements;
     }
 
-    public WebDriverWrapper getDriver()
+    public WebDriverWrapper getWrapper()
     {
         return _driver;
+    }
+
+    public WebDriver getDriver()
+    {
+        return getWrapper().getDriver();
     }
 
     public void afterPageLoad()
@@ -1233,7 +1238,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     {
         private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
         private List<WebElement> headerButtons;
-        private Map<String, WebElement> headerButtonMap;
+        private List<String> headerButtonLabels;
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
         private List<WebElement> columnHeaders;
         private List<WebElement> rows;
@@ -1297,6 +1302,19 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             if (headerButtons == null)
                 headerButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button").findElements(header));
             return headerButtons;
+        }
+
+        //TODO: in progress - tchad
+        protected WebElement getHeaderButton(String text)
+        {
+            if (headerButtonLabels == null)
+                headerButtonLabels = new ArrayList<>(getHeaderButtons().size());
+
+            if (!headerButtonLabels.contains(text))
+            {
+
+            }
+            return headerButtons.get(headerButtonLabels.indexOf(text));
         }
     }
 }
