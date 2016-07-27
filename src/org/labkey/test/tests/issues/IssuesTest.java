@@ -137,7 +137,6 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Issue Summary"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
         _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2));
     }
 
     @Before
@@ -358,12 +357,6 @@ public class IssuesTest extends BaseWebDriverTest
         test._listHelper.uploadData(tsv.toString());
     }
 
-    private void goToIssuesAdmin()
-    {
-        clickButton("Admin");
-        waitForText("Configure Fields");
-    }
-
     private void createLookupList(String issueDefName, String fieldName, Collection<String> values)
     {
         _listHelper.createList(getProjectName(), getLookupTableName(issueDefName, fieldName), ListHelper.ListColumnType.String, "value");
@@ -383,7 +376,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("notifyList"), badUsername);
         clickButton("Save");
 
-        assertTextPresent(errorMessage);
+        assertElementPresent(Locators.labkeyError.withText(errorMessage));
 
         clickButton("Cancel");
     }
@@ -419,7 +412,8 @@ public class IssuesTest extends BaseWebDriverTest
         stopImpersonating();
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2))
+                .clickReturnToGrid();
 
         // need to make change that will message current admin
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
@@ -455,36 +449,6 @@ public class IssuesTest extends BaseWebDriverTest
     private void updateIssue()
     {
         clickAndWait(Locator.linkWithText("update"));
-    }
-
-    @Test
-    public void entryTypeNameTest()
-    {
-        goToModule("Issues");
-        _issuesHelper.goToAdmin();
-
-        setFormElement(Locator.name("entrySingularName"), "Ticket");
-        setFormElement(Locator.name("entryPluralName"), "Tickets");
-        clickButton("Save");
-
-        _issuesHelper.goToAdmin();
-        assertEquals("Ticket", getFormElement(Locator.name("entrySingularName")));
-        assertEquals("Tickets", getFormElement(Locator.name("entryPluralName")));
-
-        assertTextPresent("Tickets Admin Page");
-        clickButton("Cancel");
-
-        assertTextPresent("Tickets List");
-        assertTextNotPresent("Issues List");
-        assertButtonPresent("New Ticket");
-        assertButtonPresent("Jump to Ticket");
-        assertTextPresent("Ticket ID");
-        assertTextNotPresent("Issue ID");
-
-        _issuesHelper.goToAdmin();
-        setFormElement(Locator.name("entrySingularName"), "Issue");
-        setFormElement(Locator.name("entryPluralName"), "Issues");
-        clickButton("Save");
     }
 
     @Test
