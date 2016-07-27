@@ -1,41 +1,52 @@
 package org.labkey.test.components;
 
-import org.labkey.test.Locator;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.issues.DeleteIssueListPage;
+import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 
-import static org.labkey.test.components.ext4.Window.Window;
-
 public class IssueListDefDataRegion extends DataRegionTable
 {
-    protected IssueListDefDataRegion(String regionName, WebDriver driver)
+    public static final String NAME_IN_WEBPART = "IssueListDef";
+    public static final String NAME_IN_QUERY = "query";
+
+    public IssueListDefDataRegion(String regionName, WebDriver driver)
     {
         super(regionName, driver);
     }
 
     public static IssueListDefDataRegion fromWebPart(WebDriver driver)
     {
-        return new IssueListDefDataRegion("IssueListDef", driver);
+        return new IssueListDefDataRegion(NAME_IN_WEBPART, driver);
     }
 
     public static IssueListDefDataRegion fromExecuteQuery(WebDriver driver)
     {
-        return new IssueListDefDataRegion("query", driver);
+        return new IssueListDefDataRegion(NAME_IN_QUERY, driver);
     }
 
-    public void createIssuesListDefinition(String name)
-    {
-        startCreateIssuesListDefinition(name).clickButton("Yes");
-    }
-
-    public Window startCreateIssuesListDefinition(String name)
+    public InsertIssueDefPage clickInsert()
     {
         clickHeaderButtonByText("Insert New");
-        getWrapper().setFormElement(Locator.input("quf_Label"), name);
-        getWrapper().click(Locator.linkWithText("Submit"));
-        return Window().withTitle("Create Issue List Definition?").waitFor(getDriver());
+        return new InsertIssueDefPage(getDriver(), this);
+    }
+
+    public DeleteIssueListPage clickDelete()
+    {
+        clickHeaderButtonByText("Delete");
+        return new DeleteIssueListPage(getDriver());
+    }
+
+    public IssueListDefDataRegion createIssuesListDefinition(String name)
+    {
+        return startCreateIssuesListDefinition(name).clickYes();
+    }
+
+    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name)
+    {
+        InsertIssueDefPage insertIssueDefPage = clickInsert();
+        insertIssueDefPage.setLabel(name);
+        return insertIssueDefPage.clickSubmit();
     }
 
     public void selectIssues(String... names)
@@ -44,12 +55,6 @@ public class IssueListDefDataRegion extends DataRegionTable
         {
             checkCheckbox(getRowIndex("Label", name));
         }
-    }
-
-    public DeleteIssueListPage clickDelete()
-    {
-        clickHeaderButtonByText("Delete");
-        return new DeleteIssueListPage(getDriver());
     }
 
     public IssueListDefDataRegion deleteListDefs(String... names)
