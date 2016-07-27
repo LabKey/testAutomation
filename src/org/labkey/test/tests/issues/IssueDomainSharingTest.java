@@ -1,6 +1,7 @@
 package org.labkey.test.tests.issues;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -203,10 +204,14 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 getCurrentContainerPath());
     }
 
-    @Test
+    @Test @Ignore //TODO
     public void testDeletingInheritedListDef() throws Exception
     {
+    }
 
+    @Test @Ignore //TODO
+    public void testProtectedFields() throws Exception
+    {
     }
 
     @Override
