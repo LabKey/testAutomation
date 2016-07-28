@@ -15,6 +15,7 @@
  */
 package org.labkey.test.aspects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -28,7 +29,9 @@ import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
@@ -52,30 +55,22 @@ public class MethodLoggingAspect
         methodStack.push(method);
         startTimes.push(System.currentTimeMillis());
 
-        String argsString = "";
-
+        List<Object> loggedParameters = new ArrayList<>();
         Annotation[][] annotations = signature.getMethod().getParameterAnnotations();
         for (int i = 0; i < annotations.length; i++)
         {
             Annotation[] methodAnnotations = annotations[i];
-            Boolean loggedParameter = false;
             for (Annotation annotation : methodAnnotations)
             {
                 if (annotation instanceof LoggedParam)
                 {
-                    loggedParameter = true;
+                    loggedParameters.add(joinPoint.getArgs()[i]);
                     break;
                 }
             }
-            if (loggedParameter)
-            {
-                String argString = getArgString(joinPoint.getArgs()[i]);
-
-                argsString += (argsString.length() > 0 ? ", " : "") + argString;
-            }
         }
 
-        argsString = (argsString.length() > 0 ? "(" + argsString + ")" : "");
+        String argsString = getArgsString(loggedParameters);
 
         if (logMethod.quiet())
         {
@@ -134,15 +129,57 @@ public class MethodLoggingAspect
         }
     }
 
-    private final int MAX_ARG_LENGTH = 30;
-    private String getArgString(Object arg)
+    private static final String T_STR = "\u2026"; // UTF ellipses
+    /**
+     * Generate loggable string representation of LoggedParams
+     */
+    private String getArgsString(List<Object> args)
+    {
+        if (args.isEmpty())
+            return "";
+
+        final int targetLength = 120;
+        String prevArgsString = "";
+        String argsString;
+        int maxArgLength = Math.max(targetLength / args.size(), 30);
+        boolean done = false;
+
+        do
+        {
+            StringBuilder argBuilder = new StringBuilder();
+            for (Object arg : args)
+            {
+                if (argBuilder.length() > 0)
+                    argBuilder.append(", ");
+                argBuilder.append(getArgString(arg, maxArgLength));
+            }
+            argsString = argBuilder.toString();
+            if (argsString.length() >= targetLength || !argsString.contains(T_STR) || argsString.equals(prevArgsString))
+            {
+                done = true;
+            }
+            else
+            {
+                prevArgsString = argsString;
+                int truncatedArgCount = StringUtils.countMatches(argsString, T_STR);
+                int roomToGrow = targetLength - argsString.length();
+                int extraPerArg = roomToGrow / truncatedArgCount;
+                maxArgLength += extraPerArg;
+            }
+        }while (!done);
+
+        argsString = (argsString.length() > 0 ? "(" + argsString + ")" : "");
+        return argsString;
+    }
+
+    private String getArgString(Object arg, int maxArgLength)
     {
         String argString = "";
         if (arg instanceof Object[])
         {
             for (Object nestedArg : (Object[])arg)
             {
-                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg);
+                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
             argString = "[" + argString + "]";
         }
@@ -150,7 +187,7 @@ public class MethodLoggingAspect
         {
             for (Object nestedArg : (Collection)arg)
             {
-                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg);
+                argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg, maxArgLength);
             }
             argString = "[" + argString + "]";
         }
@@ -165,8 +202,8 @@ public class MethodLoggingAspect
                 argString = arg.toString();
                 if (!(arg instanceof Number || arg instanceof Boolean))
                 {
-                    if (argString.length() > MAX_ARG_LENGTH)
-                        argString = argString.substring(0, MAX_ARG_LENGTH - 3) + "...";
+                    if (argString.length() > maxArgLength)
+                        argString = argString.substring(0, maxArgLength - T_STR.length()) + T_STR;
                     argString = "'" + argString + "'";
                 }
             }
