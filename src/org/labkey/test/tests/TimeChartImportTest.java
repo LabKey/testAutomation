@@ -234,13 +234,21 @@ public class TimeChartImportTest extends StudyBaseTest
             return;
 
         // verify that clicking the Export as Script button works
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Export as Script");
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
         _extHelper.waitForExtDialog("Export Script");
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         // verify that there is a PDF export for each plot
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), true, "Export as Script");
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-menu-item-icon') and contains(@style, 'pdf.gif')]"), info.getCountSVGs());
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), true, "PDF");
+        Locator pdfMenuItem = Locator.xpath("//div[contains(@class, 'export-pdf-menu-item')]");
+        waitForElement(pdfMenuItem);
+        assertElementPresent(pdfMenuItem, info.getCountSVGs());
+
+        // verify that there is a PNG export for each plot
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), true, "PNG");
+        Locator pngMenuItem = Locator.xpath("//div[contains(@class, 'export-png-menu-item')]");
+        waitForElement(pngMenuItem);
+        assertElementPresent(pngMenuItem, info.getCountSVGs());
 
         // verify the count of records in the view data grid
         clickButton("View Data", 0);
@@ -264,7 +272,7 @@ public class TimeChartImportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText(info.getName()));
         waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());
 
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Export as Script");
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
         _extHelper.waitForExtDialog("Export Script");
         String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));

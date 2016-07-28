@@ -197,6 +197,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         //The server side svg converter is fairly strict and will fail with bad inputs
         String svgText = (String)executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);");
 
+        // TODO can we add a PNG export check here as well?
         String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method;

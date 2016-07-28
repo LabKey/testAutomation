@@ -699,7 +699,10 @@ public class Ext4Helper
         }
         WebElement item = _test.waitForElement(Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
         if (onlyOpen)
+        {
+            _test.mouseOver(item);
             return item;
+        }
 
         if (wait)
             _test.clickAndWait(item);
