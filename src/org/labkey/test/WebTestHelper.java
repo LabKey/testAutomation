@@ -42,6 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.api.reader.Readers;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.util.InstallCert;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
@@ -548,7 +550,8 @@ public class WebTestHelper
      * @param requestMethod e.g. "GET" or "POST"
      * @param cookies Provided by {@link WebDriver.Options#getCookies()}
      */
-    public static SimpleHttpResponse getHttpResponse(String url, String requestMethod, String username, String password, Set<Cookie> cookies)
+    @LogMethod(quiet = true)
+    public static SimpleHttpResponse getHttpResponse(@LoggedParam String url, String requestMethod, String username, String password, Set<Cookie> cookies)
     {
         if (url.startsWith("/"))
             url = getBaseURL() + url;
