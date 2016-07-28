@@ -162,13 +162,14 @@ public abstract class TestFileUtils
     public static String getProcessOutput(File executable, String... args) throws IOException
     {
         executable = FileUtil.getAbsoluteCaseSensitiveFile(executable);
-        Runtime rt = Runtime.getRuntime();
-        Process p = rt.exec(ArrayUtils.addAll(new String[]{executable.getAbsolutePath()}, args));
+
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command(ArrayUtils.addAll(new String[]{executable.getAbsolutePath()}, args));
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
 
         // Different platforms output version info differently; just combine all std/err output
-        return StringUtils.trim(
-                getStreamContentsAsString(p.getInputStream()) + System.lineSeparator() +
-                getStreamContentsAsString(p.getErrorStream()));
+        return StringUtils.trim(getStreamContentsAsString(p.getInputStream()));
     }
 
     public static File getTestTempDir()
