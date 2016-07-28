@@ -167,6 +167,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected boolean isPerfTest = false;
 
+    static
+    {
+        TestProperties.load();
+    }
+
     public BaseWebDriverTest()
     {
         _artifactCollector = new ArtifactCollector(this);

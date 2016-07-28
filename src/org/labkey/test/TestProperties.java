@@ -43,6 +43,11 @@ public abstract class TestProperties
         }
     }
 
+    public static void load()
+    {
+        /* Force static block to run */
+    }
+
     public static boolean isTestCleanupSkipped()
     {
         return "false".equals(System.getProperty("clean", "false"));
