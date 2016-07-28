@@ -133,7 +133,7 @@ public class KnitrReportTest extends BaseWebDriverTest
                                       "data_means"};      // Non-echoed R code
 
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
-        assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpGetResponse(plotLocator.findElement(getDriver()).getAttribute("src")));
+        assertEquals("Knitr report failed to display plot", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(plotLocator.findElement(getDriver()).getAttribute("src")).getResponseCode());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class KnitrReportTest extends BaseWebDriverTest
                 "{r",               // Markdown for R code chunks
                 "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true);
+        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true, rmdReport.getFileName() + "MarkdownV2");
     }
 
     final Path libXmlSource = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
@@ -290,14 +290,13 @@ public class KnitrReportTest extends BaseWebDriverTest
 
     private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
-        return createAndVerifyKnitrReport(reportSourcePath, knitrOption, reportContains, reportNotContains, false);
+        return createAndVerifyKnitrReport(reportSourcePath, knitrOption, reportContains, reportNotContains, false, reportSourcePath.getFileName() + " Report");
     }
 
-    private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains, boolean useRmarkdownV2)
+    private WebElement createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains, boolean useRmarkdownV2, String reportName)
     {
         _rReportHelper.setPandocEnabled(useRmarkdownV2);
 
-        final String reportName = reportSourcePath.getFileName() + " Report";
         String reportSource = createKnitrReport(reportSourcePath, knitrOption);
 
         // Regression test: Issue #18602
@@ -353,7 +352,7 @@ public class KnitrReportTest extends BaseWebDriverTest
 
     private static String readReport(final Path reportFile)
     {
-        String reportSource = null;
+        String reportSource;
 
         reportSource = TestFileUtils.getFileContents(reportFile);
 
