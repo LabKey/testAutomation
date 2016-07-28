@@ -23,18 +23,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-/**
- * Created by RyanS on 1/25/2016.
- */
 public class VagrantUtil
 {
-    private final String _dirPath;
+    private final File _dirPath;
     private final String _imageName;
+    private int _commandTimeout = 900000;
+    private boolean _outputPassthrough = false;
 
+    public VagrantUtil(File vagrantDir, String imageName)
+    {
+        _dirPath = vagrantDir;
+        _imageName = imageName;
+    }
+
+    @Deprecated
     public VagrantUtil(String vagrantDirPath, String imageName)
     {
-        _dirPath = vagrantDirPath;
-        _imageName = imageName;
+        this(new File(vagrantDirPath), imageName);
+    }
+
+    public void setCommandTimeout(int commandTimeout)
+    {
+        _commandTimeout = commandTimeout;
+    }
+
+    public void setOutputPassthrough(boolean outputPassthrough)
+    {
+        _outputPassthrough = outputPassthrough;
     }
 
     public void vagrantUp() throws IOException, TimeoutException
@@ -57,23 +72,19 @@ public class VagrantUtil
 
     private void command(List<String> cmd) throws IOException, TimeoutException
     {
-        command(cmd, 900000);
+        command(cmd, _commandTimeout);
     }
 
     private void command(List<String> cmd, long timeOut) throws IOException, TimeoutException
     {
-        String reconstructedCommand = "";
-        for (String c : cmd)
-        {
-            reconstructedCommand = reconstructedCommand + c + " ";
-        }
-        TestLogger.log("Running command " + reconstructedCommand + "in directory " + _dirPath);
+        String reconstructedCommand = String.join(" ", cmd);
         long startTime = System.currentTimeMillis();
-        try
+        TestLogger.log("Running command `" + reconstructedCommand + "` in directory " + _dirPath);
+        TestLogger.increaseIndent();
         {
             ProcessBuilder pb = new ProcessBuilder();
             pb.command(cmd);
-            pb.directory(new File(_dirPath));
+            pb.directory(_dirPath);
             pb.redirectErrorStream(true);
             Process p = pb.start();
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -82,41 +93,39 @@ public class VagrantUtil
             String outLine;
             while ((outLine = stdInput.readLine()) != null)
             {
-                long elapsed = System.currentTimeMillis()-startTime;
-                if(elapsed > timeOut) throw new TimeoutException("Timed out executing vagrant command " + reconstructedCommand + " in directory " + _dirPath);
+                long elapsed = System.currentTimeMillis() - startTime;
+                if (_outputPassthrough)
+                    TestLogger.log(outLine);
                 out.add(outLine);
+                if (elapsed > timeOut)
+                {
+                    processOutput(out, null);
+                    throw new TimeoutException("Timed out executing vagrant command `" + reconstructedCommand + "` in directory " + _dirPath);
+                }
             }
             processOutput(out, p.exitValue());
         }
-        catch (IOException | TimeoutException e)
-        {
-            TestLogger.log(e.getMessage());
-            throw e;
-        }
+        TestLogger.decreaseIndent();
         long totalSecs = (System.currentTimeMillis()-startTime)/1000;
-        TestLogger.log("command " + reconstructedCommand + "in directory " + _dirPath + "completed in " + totalSecs + " seconds");
+        TestLogger.log("command `" + reconstructedCommand + "` in directory \"" + _dirPath + "\" : completed in " + totalSecs + " seconds");
     }
 
-    public void consoleCommand(String command, String expected)
+    private void processOutput(List<String> output, Integer returnCode)
     {
-
-    }
-
-    private void processOutput(List<String> output, int returnCode)
-    {
-        if(returnCode != 0)
+        if(!new Integer(0).equals(returnCode))
         {
-            TestLogger.log("unexpected exit code " + returnCode);
+            if (returnCode != null)
+                TestLogger.log("unexpected exit code " + returnCode, System.err);
             for (int i = output.size() - 10; i < output.size(); i++)
             {
-                if(i > 0)
-                TestLogger.log(output.get(i));
+                if(i >= 0)
+                    System.err.println(output.get(i));
             }
         }
-        else
+        else if (!_outputPassthrough)
         {
             if(output.size() > 0)
-            TestLogger.log(output.get(output.size() -1));
+                TestLogger.log(output.get(output.size() -1));
         }
     }
 }

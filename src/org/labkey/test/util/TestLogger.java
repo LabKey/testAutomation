@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -58,10 +59,15 @@ public class TestLogger
 
     public static void log(String str)
     {
+        log(str, System.out);
+    }
+
+    public static void log(String str, PrintStream out)
+    {
         if (!suppressLogging)
         {
             String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
-            System.out.println(d + " " + getIndentString() + str);
+            out.println(d + " " + getIndentString() + str);
         }
     }
 }
