@@ -51,6 +51,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,10 +65,11 @@ public class IssuesTest extends BaseWebDriverTest
 {
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
-    private static final String ISSUE_TITLE_2 = "A not so serious issue";
     private static final String USER1 = "user1_issuetest@issues.test";
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
+    private Map<String, String> ISSUE_0 = Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
+    private Map<String, String> ISSUE_1 = Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
 
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
@@ -135,8 +137,8 @@ public class IssuesTest extends BaseWebDriverTest
         // Create issues
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
+        _issuesHelper.addIssue(ISSUE_0);
+        _issuesHelper.addIssue(ISSUE_1);
     }
 
     @Before
@@ -215,7 +217,7 @@ public class IssuesTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("type"), "UFO");
         selectOptionByText(Locator.name("area"), "Area51");
         selectOptionByText(Locator.name("priority"), "2");
-        setFormElement(Locator.name("comment"), "a bright flash of light");
+        setFormElement(Locator.name("comment"), ISSUE_0.get("comment"));
         selectOptionByText(Locator.name("assignedTo"), getDisplayName());
         selectOptionByText(Locator.name("milestone"), "2012");
 
@@ -396,6 +398,8 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void emailTest()
     {
+        Map<String, String> ISSUE = Maps.of("assignedTo", displayNameFromEmail(USER1), "title", "A not so serious issue", "priority", "4", "comment", "No big whup", "notifyList", USER2);
+
         goToModule("Issues");
 
         // EmailPrefsAction
@@ -412,11 +416,11 @@ public class IssuesTest extends BaseWebDriverTest
         stopImpersonating();
 
         clickProject(getProjectName());
-        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2))
+        _issuesHelper.addIssue(ISSUE)
                 .clickReturnToGrid();
 
         // need to make change that will message current admin
-        clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
+        clickAndWait(Locator.linkWithText(ISSUE.get("title")));
         updateIssue();
         setFormElement(Locator.name("comment"), "Sup with this issue!");
         clickButton("Save");
@@ -424,16 +428,16 @@ public class IssuesTest extends BaseWebDriverTest
 
         //Issue 16238: From close issue screen: "Save" goes back to issue, "cancel" goes to issue list. This is the opposite of what I want
         log("verify cancelling returns to the same issue page");
-        clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
+        clickAndWait(Locator.linkWithText(ISSUE.get("title")));
         updateIssue();
         clickButton("Cancel");
-        assertTitleContains(ISSUE_TITLE_2);
+        assertTitleContains(ISSUE.get("title"));
 
         goToModule("Dumbster");
         pushLocation();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);
-        EmailMessage message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been opened and assigned to " + displayNameFromEmail(USER1));
+        EmailMessage message = emailTable.getMessage(ISSUE.get("title") + ",\" has been opened and assigned to " + displayNameFromEmail(USER1));
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
@@ -441,7 +445,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
         assertFalse(USER2 + " receieved issue notification without container read permission", recipients.contains(USER2));
 
-        assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
+        assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE.get("title")));
 
         assertTextNotPresent("This line shouldn't appear");
     }
@@ -513,9 +517,8 @@ public class IssuesTest extends BaseWebDriverTest
         issuesTable.checkAll();
         clickButton("View Details");
         assertTextPresent(
-                "a bright flash of light",
-                "alien autopsy",
-                "No big whup");
+                ISSUE_0.get("comment"),
+                ISSUE_1.get("comment"));
         clickAndWait(Locator.linkWithText("view grid"));
     }
 
@@ -578,16 +581,18 @@ public class IssuesTest extends BaseWebDriverTest
     // Test issues grid with issues in a sub-folder
     public void subFolderIssuesTest()
     {
-        final String[] issueTitles = {"This is for the subfolder test", "A sub-folder issue"};
+        final Map<String, String> issue0 = new HashMap<>(ISSUE_0);
+        issue0.put("title", "This is for the subfolder test");
+        final Map<String, String> issue1 = Maps.of("assignedTo", getDisplayName(), "title", "A sub-folder issue", "priority", "2", "comment", "We are in a sub-folder");
         final String subFolder = "SubFolder";
 
         // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[0], "priority", "2", "comment", "a bright flash of light"));
+        _issuesHelper.addIssue(issue0);
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[1], "priority", "2", "comment", "We are in a sub-folder"));
+        _issuesHelper.addIssue(issue1);
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
@@ -595,12 +600,12 @@ public class IssuesTest extends BaseWebDriverTest
         _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder and subfolders");
 
         // Verify the URL of issueTitles[0] goes to getProjectName()
-        String href = getAttribute(Locator.linkContainingText(issueTitles[0]), "href");
+        String href = getAttribute(Locator.linkContainingText(issue0.get("title")), "href");
         assertTrue("Expected issue details URL to link to project container",
                 href.contains("/issues/" + getProjectName() + "/details.view") || href.contains("/" + getProjectName() + "/issues-details.view"));
 
         // Verify the URL of issueTitles[1] goes to getProjectName()/SUB_FOLDER_NAME
-        href = getAttribute(Locator.linkContainingText(issueTitles[1]), "href");
+        href = getAttribute(Locator.linkContainingText(issue1.get("title")), "href");
         assertTrue("Expected issue details URL to link to sub-folder container",
                 href.contains("/issues/" + getProjectName() + "/" + subFolder + "/details.view") || href.contains("/" + getProjectName() + "/" + subFolder + "/issues-details.view"));
     }
