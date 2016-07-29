@@ -63,6 +63,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
     @Test
     public void testEmptyAssignedToList() throws Exception
     {
+        goToProjectHome();
         final String group = "AssignedToGroup";
         _permissionsHelper.setUserPermissions(USER, "FolderAdmin");
         _permissionsHelper.createProjectGroup(group, getProjectName());
