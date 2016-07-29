@@ -98,19 +98,14 @@ public abstract class Locator
      * Wait for elements located by any one of the provided Locators
      * @return All elements matching any of the provided Locators
      */
-    public static List<WebElement> waitForAnyElements(FluentWait<? extends SearchContext> wait, final Locator... locators)
+    public static List<WebElement> waitForElements(FluentWait<? extends SearchContext> wait, final Locator... locators)
     {
         return wait.until(new Function<SearchContext, List<WebElement>>()
         {
             @Override
             public List<WebElement> apply(SearchContext context)
             {
-                List<WebElement> els = new ArrayList<>();
-                for (Locator loc : locators)
-                {
-                    els.addAll(loc.findElements(context));
-                }
-
+                List<WebElement> els = findElements(context, locators);
                 if (els.size() > 0)
                     return els;
                 else
@@ -118,6 +113,16 @@ public abstract class Locator
             }
         });
 
+    }
+
+    public static List<WebElement> findElements(SearchContext context, final Locator... locators)
+    {
+        List<WebElement> els = new ArrayList<>();
+        for (Locator loc : locators)
+        {
+            els.addAll(loc.findElements(context));
+        }
+        return els;
     }
 
     public abstract Locator containing(String contains);

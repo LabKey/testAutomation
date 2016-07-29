@@ -21,9 +21,9 @@ public abstract class Locators
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.IdLocator projectBar = Locator.id("projectBar");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
-    public static final Locator.CssLocator labkeyError = Locator.css(".labkey-error");
+    public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
     public static final Locator signInButtonOrLink = Locator.tag("a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
-    public static final Locator.CssLocator folderTab = Locator.css(".labkey-folder-header ul.tab-nav > li");
+    public static final Locator.XPathLocator folderTab = Locator.tagWithClass("*", "labkey-folder-header").append(Locator.tagWithClass("ul", "tab-nav")).childTag("li");
     public static final Locator.CssLocator labkeyHeader = Locator.css(".labkey-main .header-block");
     public static final Locator.CssLocator labkeyBody = Locator.css(".labkey-main .body-block");
 

@@ -1785,10 +1785,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         clickButton("Import Study From Local Zip Archive");
-        if (isElementPresent(Locator.css(".labkey-error")))
+        List<WebElement> errors = Locators.labkeyError.withText().findElements(getDriver());
+        if (!errors.isEmpty())
         {
-            String errorText = Locator.css(".labkey-error").findElement(getDriver()).getText();
-            assertTrue("Error present: " + errorText, errorText.trim().length() == 0);
+            String errorText = String.join("\n", getTexts(errors)).trim();
+            assertTrue("Error(s) present: " + errorText, errorText.isEmpty());
         }
     }
 
@@ -1958,7 +1959,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         selectSchema(schemaName);
         // wait for tool tip to disappear, in case it is covering the element we want to click on
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
-        Locator loc = Locator.css(".labkey-link").withText(queryName);
+        Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName);
         waitAndClick(loc);
         // NOTE: consider abstracting this.
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
