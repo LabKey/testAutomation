@@ -107,7 +107,7 @@ public abstract class GenericChartsTest extends ReportTest
         setFormElement(Locator.name("reportName"), name);
         setFormElement(Locator.name("reportDescription"), description);
         clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save", "Save");
-        _extHelper.waitForExtDialogToDisappear("Saved");
+        sleep(2500); // sleep while the save success message shows
         waitForText(name);
         waitFor(() ->
                 !(Boolean) executeScript("var p = Ext4.getCmp('generic-report-panel-1'); " +
@@ -125,7 +125,7 @@ public abstract class GenericChartsTest extends ReportTest
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
         clickDialogButtonAndWaitForMaskToDisappear("Save", "Save");
-        _extHelper.waitForExtDialogToDisappear("Saved");
+        sleep(2500); // sleep while the save success message shows
     }
 
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)

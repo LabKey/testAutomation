@@ -195,7 +195,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         clickOptionButtonAndWaitForDialog("Options", "Plot Options");
-        _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
+        _ext4Helper.selectComboBoxItem("Plot Type:", "Scatter Plot");
         clickDialogButtonAndWaitForMaskToDisappear("Plot Options", "OK");
 
         assertSVG(SCATTER_PLOT_QC);
