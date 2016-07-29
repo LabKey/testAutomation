@@ -44,7 +44,6 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.net.URL;
@@ -59,6 +58,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.PasswordUtil.getUsername;
 
 @Category({DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
@@ -68,8 +68,9 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER1 = "user1_issuetest@issues.test";
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
-    private Map<String, String> ISSUE_0 = Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
-    private Map<String, String> ISSUE_1 = Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
+    private final String NAME = displayNameFromEmail(getUsername());
+    private final Map<String, String> ISSUE_0 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
+    private final Map<String, String> ISSUE_1 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
 
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
@@ -130,7 +131,7 @@ public class IssuesTest extends BaseWebDriverTest
         _userHelper.createUser(USER1);
         _userHelper.createUser(USER2);
         _userHelper.createUser(USER3);
-        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), getProjectName(), TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(getUsername(), getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER1, getProjectName(), TEST_GROUP);
         _permissionsHelper.addUserToProjGroup(USER3, getProjectName(), TEST_GROUP);
 
@@ -218,7 +219,7 @@ public class IssuesTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("area"), "Area51");
         selectOptionByText(Locator.name("priority"), "2");
         setFormElement(Locator.name("comment"), ISSUE_0.get("comment"));
-        selectOptionByText(Locator.name("assignedTo"), getDisplayName());
+        selectOptionByText(Locator.name("assignedTo"), NAME);
         selectOptionByText(Locator.name("milestone"), "2012");
 
         Locator fouthStringLocator = Locator.name("myFourthString");
@@ -441,7 +442,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
-        assertTrue("User did not receive issue notification", recipients.contains(PasswordUtil.getUsername()));
+        assertTrue("User did not receive issue notification", recipients.contains(getUsername()));
         assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
         assertFalse(USER2 + " receieved issue notification without container read permission", recipients.contains(USER2));
 
@@ -583,7 +584,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final Map<String, String> issue0 = new HashMap<>(ISSUE_0);
         issue0.put("title", "This is for the subfolder test");
-        final Map<String, String> issue1 = Maps.of("assignedTo", getDisplayName(), "title", "A sub-folder issue", "priority", "2", "comment", "We are in a sub-folder");
+        final Map<String, String> issue1 = Maps.of("assignedTo", NAME, "title", "A sub-folder issue", "priority", "2", "comment", "We are in a sub-folder");
         final String subFolder = "SubFolder";
 
         // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
@@ -613,10 +614,10 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void duplicatesTest()
     {
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This Is some Issue -- let's say A"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This Is some Issue -- let's say A"));
         String issueIdA = getIssueId();
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This is another issue -- let's say B"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This is another issue -- let's say B"));
         String issueIdB = getIssueId();
 
         clickAndWait(Locator.linkWithText("Resolve"));
@@ -638,7 +639,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String subFolder = "Move Folder";
         final String issueTitle = "This issue will be moved";
-        final String displayName = getDisplayName();
+        final String displayName = NAME;
         final String path = String.format("/%s/%s", getProjectName(), subFolder);
 
         _containerHelper.createSubfolder(getProjectName(), subFolder);
@@ -696,13 +697,13 @@ public class IssuesTest extends BaseWebDriverTest
     {
         Locator relatedLocator = Locator.name("related");
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "A is for Apple"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "A is for Apple"));
         String issueIdA = getIssueId();
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "B is for Baking"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "B is for Baking"));
         String issueIdB = getIssueId();
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "C is for Cat"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "C is for Cat"));
         String issueIdC = getIssueId();
 
         // related C to A
@@ -767,12 +768,12 @@ public class IssuesTest extends BaseWebDriverTest
         // set default group and user
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList("Site:Users");
-        _issuesHelper.setIssueAssignmentUser(getDisplayName());
+        _issuesHelper.setIssueAssignmentUser(NAME);
         clickButton("Save");
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), getDisplayName());
+        assertEquals(getSelectedOptionText(Locator.name("assignedTo")), NAME);
         clickButton("Cancel");
 
         // set no default user and return to project users assign list
@@ -815,7 +816,7 @@ public class IssuesTest extends BaseWebDriverTest
         final String title = "assignmentTest";
         final String openTo = displayNameFromEmail(USER1);
         final String updateTo = displayNameFromEmail(USER3);
-        final String resolveTo = getDisplayName();
+        final String resolveTo = NAME;
         final String closeTo = "Guest";
 
         DetailsPage detailsPage = _issuesHelper.addIssue(title, openTo);
