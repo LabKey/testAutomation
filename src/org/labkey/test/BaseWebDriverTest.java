@@ -697,18 +697,32 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
                 {
+                    // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
                     try
                     {
-                        // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
-                        String lastPage = _lastPageURL.toString();
-                        URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
-                        log("Re-invoking last action with _debug parameter set: " + url.toString());
-                        WebTestHelper.getHttpResponse(url.toString()).getResponseCode();
+                        URL baseUrl = new URL(_lastPageURL.getProtocol(), _lastPageURL.getHost(), _lastPageURL.getPort(), _lastPageURL.getPath());
+                        String query = _lastPageURL.getQuery();
+                        String ref = _lastPageURL.getRef();
+                        StringBuilder debugUrl = new StringBuilder(baseUrl.toString());
+                        debugUrl.append("?");
+                        if (StringUtils.trimToNull(query) != null)
+                        {
+                            debugUrl.append(query);
+                            debugUrl.append("&");
+                        }
+                        debugUrl.append("_debug=1");
+                        if (StringUtils.trimToNull(ref) != null)
+                        {
+                            debugUrl.append("#");
+                            debugUrl.append(ref);
+                        }
+                        log("Re-invoking last action with _debug parameter set");
+                        WebTestHelper.getHttpResponse(debugUrl.toString()).getResponseCode();
                     }
-                    catch (IOException t)
+                    catch (MalformedURLException e)
                     {
-                        log("Unable to re-invoke last page");
-                        System.err.println(t.getMessage());
+                        log("Unable to construct debug URL");
+                        e.printStackTrace();
                     }
                 }
             }
