@@ -32,6 +32,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -42,9 +43,11 @@ import org.labkey.test.categories.UnitTests;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 @Category({BVT.class, UnitTests.class, External.class})
@@ -61,12 +64,27 @@ public class JUnitTest extends TestSuite
         return JUnitTest._suite((p) -> true, 0, false);
     }
 
+    /**
+     * @deprecated Use {@link #getCategories(Map)}
+     */
+    @Deprecated
     public static String getWhen(Map<String,Object> test)
     {
         Object when = test.get("when");
         if (!(when instanceof String) || StringUtils.isBlank((String)when))
             return "DRT";
         return ((String)when).toUpperCase();
+    }
+
+    public static Set<String> getCategories(Map<String,Object> test)
+    {
+        Set<String> suiteNames = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        suiteNames.add(getWhen(test));
+        Object module = test.get("module");
+        if (module instanceof String && !StringUtils.isBlank((String)module))
+            suiteNames.add((String)module);
+
+        return suiteNames;
     }
 
     // used when writing JUnitTest class name to the remainingTests.txt log file
