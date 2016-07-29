@@ -21,6 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
@@ -34,7 +35,8 @@ import org.openqa.selenium.WebElement;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
@@ -338,7 +340,7 @@ public class DataReportsTest extends ReportTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeColumn(R_REMCOL);
         _customizeViewsHelper.addFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
-        _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", "Descending");
+        _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", SortDirection.DESC);
         _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");

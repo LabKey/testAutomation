@@ -4,7 +4,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
@@ -29,7 +29,7 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
     public AssayImportPage selectNamedFieldOption(String name, String text)
     {
         WebElement input = Locator.xpath("//select[@name='" + name +"']").findElement(getDriver());
-        new Select(input).set(text);
+        new OptionSelect(input).set(text);
         return this;
     }
 

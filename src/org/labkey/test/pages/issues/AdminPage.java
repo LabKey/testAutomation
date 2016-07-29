@@ -6,12 +6,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.html.EnumSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -20,7 +21,7 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.PropertiesEditor.PropertyEditor;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
-import static org.labkey.test.components.html.Select.Select;
+import static org.labkey.test.components.html.OptionSelect.OptionSelect;
 
 public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
 {
@@ -56,7 +57,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         return elementCache().pluralNameInput;
     }
 
-    public Select<SortDirection> commentSortDirection()
+    public EnumSelect<SortDirection> commentSortDirection()
     {
         return elementCache().commentSortSelect;
     }
@@ -106,7 +107,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         save();
     }
 
-    public enum SortDirection implements Select.SelectOption
+    public enum SortDirection implements OptionSelect.SelectOption
     {
         OldestFirst("ASC", "Oldest First"),
         NewestFirst("DESC", "Newest First");
@@ -142,33 +143,33 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         public WebElement customizeEmailButton = new RefindingWebElement(Locator.lkButton("Customize Email Template"), this);
         public Input singularNameInput = new Input(Locator.id("entrySingularName").findWhenNeeded(this), getDriver());
         public Input pluralNameInput = new Input(Locator.id("entryPluralName").findWhenNeeded(this), getDriver());
-        public Select<SortDirection> commentSortSelect = Select(Locator.name("sortDirection")).findWhenNeeded(this);
+        public EnumSelect<SortDirection> commentSortSelect = EnumSelect.EnumSelect(Locator.name("sortDirection"), SortDirection.class).findWhenNeeded(this);
         public RadioButton assignedToAllProjectUsersRadio = RadioButton(Locator.css(".assigned-to-group-project > input")).findWhenNeeded(this);
         public RadioButton assignedToSpecificGroupRadio = RadioButton(Locator.css(".assigned-to-group-specific > input")).findWhenNeeded(this);
-        public Select assignedToSpecificGroupSelect = Select(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
+        public OptionSelect assignedToSpecificGroupSelect = OptionSelect(Locator.css("select.assigned-to-group")).findWhenNeeded(this);
         public RadioButton noDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-empty > input")).findWhenNeeded(this);
         public RadioButton specificDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-specific-user > input")).findWhenNeeded(this);
-        public Select defaultAssignedToSelect = Select(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
+        public OptionSelect defaultAssignedToSelect = OptionSelect(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
         public PropertiesEditor configureFieldsPanel = PropertyEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
     }
 
     public static class AssignToListOption
     {
-        private Select.SelectOption option;
+        private OptionSelect.SelectOption option;
 
-        public AssignToListOption(Select.SelectOption option)
+        public AssignToListOption(OptionSelect.SelectOption option)
         {
             this.option = option;
         }
 
         public static AssignToListOption specificGroup(String group)
         {
-            return new AssignToListOption(Select.SelectOption.textOption(group));
+            return new AssignToListOption(OptionSelect.SelectOption.textOption(group));
         }
 
         public static AssignToListOption specificGroup(@NotNull Integer groupId)
         {
-            return new AssignToListOption(Select.SelectOption.valueOption(groupId.toString()));
+            return new AssignToListOption(OptionSelect.SelectOption.valueOption(groupId.toString()));
         }
 
         public static AssignToListOption allProjectUsers()
@@ -196,7 +197,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             }
         }
 
-        public Select.SelectOption get()
+        public OptionSelect.SelectOption get()
         {
             return elementCache().assignedToSpecificGroupSelect.getSelection();
         }
@@ -212,21 +213,21 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     
     public static class DefaultAssignToOption
     {
-        private Select.SelectOption option;
+        private OptionSelect.SelectOption option;
 
-        private DefaultAssignToOption(Select.SelectOption option)
+        private DefaultAssignToOption(OptionSelect.SelectOption option)
         {
             this.option = option;
         }
 
         public static DefaultAssignToOption specificUser(String displayName)
         {
-            return new DefaultAssignToOption(Select.SelectOption.textOption(displayName));
+            return new DefaultAssignToOption(OptionSelect.SelectOption.textOption(displayName));
         }
 
         public static DefaultAssignToOption specificUser(@NotNull Integer userId)
         {
-            return new DefaultAssignToOption(Select.SelectOption.valueOption(userId.toString()));
+            return new DefaultAssignToOption(OptionSelect.SelectOption.valueOption(userId.toString()));
         }
 
         public static DefaultAssignToOption noDefault()
@@ -254,7 +255,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
             }
         }
 
-        public Select.SelectOption get()
+        public OptionSelect.SelectOption get()
         {
             return elementCache().defaultAssignedToSelect.getSelection();
         }

@@ -2,7 +2,7 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 
@@ -32,21 +32,21 @@ public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
     }
 
     @Override
-    public Select assignedTo()
+    public OptionSelect assignedTo()
     {
-        return (Select) super.assignedTo();
+        return (OptionSelect) super.assignedTo();
     }
 
     @Override
-    public Select resolution()
+    public OptionSelect resolution()
     {
-        return (Select) super.resolution();
+        return (OptionSelect) super.resolution();
     }
 
     @Override
-    public Select duplicate()
+    public OptionSelect duplicate()
     {
-        return (Select) super.duplicate();
+        return (OptionSelect) super.duplicate();
     }
 
     protected ElementCache newElementCache()

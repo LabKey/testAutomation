@@ -15,9 +15,33 @@
  */
 package org.labkey.test;
 
-/**
- */
 public enum SortDirection
 {
-    ASC, DESC
+    ASC("Ascending"),
+    DESC("Descending");
+
+    private String _string;
+
+    SortDirection(String string)
+    {
+        _string = string;
+    }
+
+    @Override
+    public String toString()
+    {
+        return _string;
+    }
+
+    public static SortDirection fromString(String str)
+    {
+        for (SortDirection sort : values())
+        {
+            if (sort.toString().equalsIgnoreCase(str) || sort.name().equalsIgnoreCase(str))
+            {
+                return sort;
+            }
+        }
+        return valueOf(str);
+    }
 }

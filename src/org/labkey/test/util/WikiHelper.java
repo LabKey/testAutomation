@@ -16,10 +16,12 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.pages.wiki.EditPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -114,10 +116,7 @@ public class WikiHelper
     }
 
     /**
-     * Creates a new wiki page, assuming that the [new page] link is available
-     * somewhere on the current page. This link is typically displayed above
-     * the Wiki table of contents, which is shown on collaboration portal pages,
-     * the wiki module home page, as well as any wiki page.
+     * Creates a new wiki page
      * @param format The format for the new page. Allowed values are "RADEOX" (for wiki),
      * "HTML", and "TEXT_WITH_LINKS". Note that these are the string names for the
      * WikiRendererType enum values.
@@ -125,23 +124,12 @@ public class WikiHelper
      */
     public void createNewWikiPage(String format)
     {
-        if(_test.isElementPresent(Locator.linkWithText("new page")))
-            _test.clickAndWait(Locator.linkWithText("new page"));
-        else if(_test.isElementPresent(Locator.linkWithText("Create a new wiki page")))
-            _test.clickAndWait(Locator.linkWithText("Create a new wiki page"));
-        else if(_test.isElementPresent(Locator.linkWithText("add content")))
-            _test.clickAndWait(Locator.linkWithText("add content"));
-        else if(_test.isTextPresent("Pages"))
-        {
-            PortalHelper portalHelper = new PortalHelper(_test);
-            portalHelper.clickWebpartMenuItem("Pages", "New");
-        }
-        else
-            throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
-                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
-                    " before calling this method.");
+        createNewWikiPage(WikiRendererType.valueOf(format));
+    }
 
-        convertWikiFormat(format);
+    public void createNewWikiPage(WikiRendererType format)
+    {
+        EditPage.beginAt(_test).convertWikiFormat(format);
     }
 
     //must already be on wiki page
@@ -162,17 +150,7 @@ public class WikiHelper
      */
     public void convertWikiFormat(String format)
     {
-        String curFormat = (String) _test.executeScript("return LABKEY._wiki.getProps().rendererType;");
-        if (curFormat.equalsIgnoreCase(format))
-            return;
-
-        _test.clickButton("Convert To...", 0);
-        _test.sleep(500); // animation
-        _test.waitForElement(Locator.id("wiki-input-window-change-format-to"));
-        _test.selectOptionByValue(Locator.id("wiki-input-window-change-format-to"), format);
-        _test.clickButton("Convert", 0);
-        WebElement status = _test.waitForElement(Locator.id("status").containing("Converted."));
-        _test.waitFor(() -> !status.isDisplayed(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        new EditPage(_test.getDriver()).convertWikiFormat(WikiRendererType.valueOf(format));
     }
 
     /**

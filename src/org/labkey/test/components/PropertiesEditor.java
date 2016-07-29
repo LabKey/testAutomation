@@ -3,9 +3,10 @@ package org.labkey.test.components;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.EnumSelect;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.list.SetDefaultValuesListPage;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,8 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.labkey.test.components.html.Checkbox.Checkbox;
+import static org.labkey.test.components.html.EnumSelect.EnumSelect;
 import static org.labkey.test.components.html.Input.Input;
-import static org.labkey.test.components.html.Select.Select;
 
 public class PropertiesEditor extends WebPartPanel
 {
@@ -262,7 +263,7 @@ public class PropertiesEditor extends WebPartPanel
             public final Checkbox measure = Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(this);
             public final Checkbox dimension = Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(this);
             public final Checkbox recommendedVariable = Checkbox(Locator.tagWithName("input", "recommendedVariable")).findWhenNeeded(this);
-            public final Select<ScaleType> defaultScale = Select(Locator.tagWithName("select", "gwt-ListBox")).findWhenNeeded(this);
+            public final EnumSelect<ScaleType> defaultScale = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), ScaleType.class).findWhenNeeded(this);
         }
 
         public class AdvancedTabPane extends FieldTabPane
@@ -273,7 +274,7 @@ public class PropertiesEditor extends WebPartPanel
             }
 
             public final Checkbox mvEnabledCheckbox = Checkbox(Locator.tagWithName("input", "mvEnabled")).findWhenNeeded(this);
-            public final Select<DefaultType> defaultTypeSelect = Select(Locator.tagWithName("select", "gwt-ListBox")).findWhenNeeded(this);
+            public final EnumSelect<DefaultType> defaultTypeSelect = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), DefaultType.class).findWhenNeeded(this);
             public SetDefaultValuesListPage clickSelectDefaultValue()
             {
                 new WebDriverWrapperImpl(getDriver()).clickAndWait(Locator.linkWithText("set value"));
@@ -285,23 +286,21 @@ public class PropertiesEditor extends WebPartPanel
         }
     }
 
-    public enum ScaleType implements Select.SelectOption
+    public enum ScaleType
     {
-        linear("LINEAR", "Linear"),
-        log("LOG", "Log");
+        LINEAR("Linear"),
+        LOG("Log");
 
-        String _value;
         String _text;
 
-        ScaleType(String value, String text)
+        ScaleType(String text)
         {
-            _value = value;
             _text = text;
         }
 
         public String getValue()
         {
-            return _value;
+            return name();
         }
 
         public String getText()
@@ -310,24 +309,22 @@ public class PropertiesEditor extends WebPartPanel
         }
     }
 
-    public enum DefaultType implements Select.SelectOption
+    public enum DefaultType
     {
-        FIXED_EDITABLE("FIXED_EDITABLE", "Editable default"),
-        LAST_ENTERED("LAST_ENTERED", "Last entered"),
-        FIXED_NON_EDITABLE("FIXED_NON_EDITABLE", "Fixed value");
+        FIXED_EDITABLE("Editable default"),
+        LAST_ENTERED("Last entered"),
+        FIXED_NON_EDITABLE("Fixed value");
 
-        String _value;
         String _text;
 
-        DefaultType(String value, String text)
+        DefaultType(String text)
         {
-            _value = value;
             _text = text;
         }
 
         public String getValue()
         {
-            return _value;
+            return name();
         }
 
         public String getText()

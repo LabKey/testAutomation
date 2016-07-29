@@ -2,7 +2,7 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 
@@ -32,8 +32,8 @@ public class UpdatePage extends BaseUpdatePage<BaseUpdatePage.ElementCache>
     }
 
     @Override
-    public Select assignedTo()
+    public OptionSelect assignedTo()
     {
-        return (Select) super.assignedTo();
+        return (OptionSelect) super.assignedTo();
     }
 }

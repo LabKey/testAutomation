@@ -22,6 +22,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.RadioButton;
@@ -602,32 +603,32 @@ public class CustomizeView extends Component
     @Deprecated
     public void addCustomizeViewSort(String column_name, String order)
     {
-        addSort(column_name, order);
+        addSort(column_name, SortDirection.fromString(order));
     }
 
     @Deprecated
     public void addCustomizeViewSort(String fieldKey, String column_name, String order)
     {
-        addSort(fieldKey, column_name, order);
+        addSort(fieldKey, column_name, SortDirection.fromString(order));
     }
 
     @Deprecated
     public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
     {
-        addSort(fieldKeyParts, column_name, order);
+        addSort(fieldKeyParts, column_name, SortDirection.fromString(order));
     }
 
-    public void addSort(String column_name, String order)
+    public void addSort(String column_name, SortDirection order)
     {
         addSort(column_name, column_name, order);
     }
 
-    public void addSort(String fieldKey, String column_name, String order)
+    public void addSort(String fieldKey, String column_name, SortDirection order)
     {
         addSort(fieldKey.split("/"), column_name, order);
     }
 
-    public void addSort(String[] fieldKeyParts, String column_name, String order)
+    public void addSort(String[] fieldKeyParts, String column_name, SortDirection order)
     {
         _driver.log("Adding " + column_name + " sort");
         Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
@@ -635,7 +636,7 @@ public class CustomizeView extends Component
         _driver.assertElementNotPresent(itemXPath);
         addItem(fieldKeyParts, column_name, ViewItemType.Sort);
 
-        _driver._ext4Helper.selectComboBoxItem(itemXPath, order);
+        _driver._ext4Helper.selectComboBoxItem(itemXPath, order.toString());
         itemXPath.append("//tr").findElement(this).click(); // Sort direction doesn't stick without this
     }
 

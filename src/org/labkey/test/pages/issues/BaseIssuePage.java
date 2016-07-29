@@ -6,7 +6,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.components.labkey.ReadOnlyFormItem;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.labkey.test.components.html.Input.Input;
-import static org.labkey.test.components.html.Select.Select;
+import static org.labkey.test.components.html.OptionSelect.OptionSelect;
 import static org.labkey.test.components.labkey.FormItemFinder.FormItem;
 import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
 
@@ -143,10 +143,10 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
         }
 
-        protected Select getSelect(String name)
+        protected OptionSelect getSelect(String name)
         {
-            FormItem formItem = replaceIfNewer(name, Select(fieldLocator(name)).findWhenNeeded(this));
-            return (Select) formItem;
+            FormItem formItem = replaceIfNewer(name, OptionSelect(fieldLocator(name)).findWhenNeeded(this));
+            return (OptionSelect) formItem;
         }
 
         protected Input getInput(String name)

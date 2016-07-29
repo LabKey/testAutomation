@@ -2,7 +2,6 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.html.Select;
 import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends UpdatePage

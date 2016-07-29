@@ -4,15 +4,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.List;
 
-public class Select<T extends Select.SelectOption> extends org.openqa.selenium.support.ui.Select implements FormItem<String>
+public class SelectWrapper extends org.openqa.selenium.support.ui.Select
 {
-    private final WebElement wrappedElement;
+    protected final WebElement wrappedElement;
     private org.openqa.selenium.support.ui.Select wrappedSelect;
 
-    public Select(WebElement element)
+    protected SelectWrapper(WebElement element)
     {
         // Feed dummy Element to Selenium Select to prevent UnexpectedTagNameException
         super(new RemoteWebElement()
@@ -32,23 +33,23 @@ public class Select<T extends Select.SelectOption> extends org.openqa.selenium.s
         wrappedElement = element;
     }
 
-    public static <O extends SelectOption> Component.SimpleComponentFinder<Select> Select(Locator loc)
-    {
-        return new Component.SimpleComponentFinder<Select>(loc)
-        {
-            @Override
-            protected Select<O> construct(WebElement el)
-            {
-                return new Select<>(el);
-            }
-        };
-    }
-
     protected org.openqa.selenium.support.ui.Select getWrappedSelect()
     {
         if (null == wrappedSelect)
             wrappedSelect = new org.openqa.selenium.support.ui.Select(wrappedElement);
         return wrappedSelect;
+    }
+
+    public static Component.SimpleComponentFinder<Select> Select(Locator loc)
+    {
+        return new Component.SimpleComponentFinder<Select>(loc)
+        {
+            @Override
+            protected SelectWrapper construct(WebElement el)
+            {
+                return new SelectWrapper(el);
+            }
+        };
     }
 
     @Override
@@ -115,77 +116,5 @@ public class Select<T extends Select.SelectOption> extends org.openqa.selenium.s
     public void deselectByVisibleText(String text)
     {
         getWrappedSelect().deselectByVisibleText(text);
-    }
-
-    public SelectOption getSelection()
-    {
-        return new SelectOption()
-        {
-            @Override
-            public String getText()
-            {
-                return getFirstSelectedOption().getText();
-            }
-
-            @Override
-            public String getValue()
-            {
-                return getFirstSelectedOption().getAttribute("value");
-            }
-        };
-    }
-
-    public void selectOption(T option)
-    {
-        if (null != option.getValue())
-            selectByValue(option.getValue());
-        else
-            selectByVisibleText(option.getText());
-    }
-
-    @Override
-    public String get()
-    {
-        return getSelection().getText();
-    }
-
-    @Override
-    public void set(String text)
-    {
-        selectByVisibleText(text);
-    }
-
-    public interface SelectOption
-    {
-        String getValue();
-        String getText();
-
-        static SelectOption option(String value, String text)
-        {
-            return new SelectOption()
-            {
-                @Override
-                public String getValue()
-                {
-                    return value;
-                }
-
-                @Override
-                public String getText()
-                {
-                    return text;
-                }
-            };
-        }
-
-        static SelectOption textOption(String text)
-        {
-            return option(null, text);
-        }
-
-        static SelectOption valueOption(String value)
-        {
-            return option(value, null);
-        }
     }
 }

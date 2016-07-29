@@ -1,14 +1,12 @@
 package org.labkey.test.components.labkey;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
-import org.labkey.test.components.html.Select;
-import org.openqa.selenium.By;
+import org.labkey.test.components.html.OptionSelect;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -71,7 +69,7 @@ public class GenericFormItem extends WebDriverComponent implements FormItem
         switch (tagName)
         {
             case "select":
-                return new Select(element);
+                return new OptionSelect(element);
             case "input":
             {
                 String type = element.getAttribute("type");

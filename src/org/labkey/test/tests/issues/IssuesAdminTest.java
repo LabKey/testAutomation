@@ -10,7 +10,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.IssueListDefDataRegion;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -68,7 +68,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _permissionsHelper.setUserPermissions(USER, "FolderAdmin");
         _permissionsHelper.createProjectGroup(group, getProjectName());
         goToModule("Issues");
-        Select assignedTo = new ListPage(getDriver())
+        OptionSelect assignedTo = new ListPage(getDriver())
                 .clickNewIssue()
                 .assignedTo();
         assertEquals("", assignedTo.get());

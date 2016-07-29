@@ -3,7 +3,7 @@ package org.labkey.test.pages.issues;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.Select;
+import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -36,21 +36,21 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
     /**
      * Find a named field you know to be a <select>
      */
-    public Select selectWithName(String fieldName)
+    public OptionSelect selectWithName(String fieldName)
     {
         return elementCache().getSelect(fieldName);
     }
 
     @Override
-    public Select related()
+    public OptionSelect related()
     {
-        return (Select) super.related();
+        return (OptionSelect) super.related();
     }
 
     @Override
-    public Select priority()
+    public OptionSelect priority()
     {
-        return (Select) super.priority();
+        return (OptionSelect) super.priority();
     }
 
     public EmailPrefsPage clickEmailPrefs()
