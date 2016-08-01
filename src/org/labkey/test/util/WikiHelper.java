@@ -16,14 +16,10 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.wiki.EditPage;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -221,6 +217,25 @@ public class WikiHelper
                 _test.click(Locator.css("#wiki-tab-visual > a"));
                 _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
             }
+        }
+    }
+
+    public enum WikiRendererType
+    {
+        RADEOX ("Wiki Page"),
+        HTML ("HTML"),
+        TEXT_WITH_LINKS ("Plain Text");
+
+        final String _displayName;
+
+        WikiRendererType(String displayName)
+        {
+            _displayName = displayName;
+        }
+
+        public String getDisplayName()
+        {
+            return _displayName;
         }
     }
 }

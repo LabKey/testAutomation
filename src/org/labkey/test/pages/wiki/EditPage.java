@@ -1,6 +1,5 @@
 package org.labkey.test.pages.wiki;
 
-import org.labkey.api.wiki.WikiRendererType;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -14,6 +13,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Collections;
 
 import static org.labkey.test.components.html.EnumSelect.EnumSelect;
+import static org.labkey.test.util.WikiHelper.WikiRendererType;
 
 /**
  * TODO: Very incomplete
