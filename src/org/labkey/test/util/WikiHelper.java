@@ -120,7 +120,23 @@ public class WikiHelper
      */
     public void createNewWikiPage(String format)
     {
-        createNewWikiPage(WikiRendererType.valueOf(format));
+        if(_test.isElementPresent(Locator.linkWithText("new page")))
+            _test.clickAndWait(Locator.linkWithText("new page"));
+        else if(_test.isElementPresent(Locator.linkWithText("Create a new wiki page")))
+            _test.clickAndWait(Locator.linkWithText("Create a new wiki page"));
+        else if(_test.isElementPresent(Locator.linkWithText("add content")))
+            _test.clickAndWait(Locator.linkWithText("add content"));
+        else if(_test.isTextPresent("Pages"))
+        {
+            PortalHelper portalHelper = new PortalHelper(_test);
+            portalHelper.clickWebpartMenuItem("Pages", "New");
+        }
+        else
+            throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
+                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
+                    " before calling this method.");
+
+        convertWikiFormat(format);
     }
 
     public void createNewWikiPage(WikiRendererType format)
