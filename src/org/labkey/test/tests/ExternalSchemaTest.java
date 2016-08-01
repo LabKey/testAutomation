@@ -364,8 +364,10 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     Row[] selectViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
     {
         log("** Select via api: " + join(",", pks) + "...");
+        Arrays.sort(pks);
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
         cmd.addFilter("RowId", join(";", pks), Filter.Operator.IN);
+        cmd.addSort(new Sort("RowId"));
         SelectRowsResponse resp = cmd.execute(cn, containerPath);
         assertEquals("Expected to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
 
