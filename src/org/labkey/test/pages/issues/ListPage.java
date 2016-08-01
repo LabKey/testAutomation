@@ -32,7 +32,7 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
 
     public static ListPage beginAt(WebDriverWrapper driver, String containerPath, String issueDefName)
     {
-        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "list", Maps.of("issueDefName", issueDefName)));
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "list", Maps.of("issueDefName", issueDefName.toLowerCase())));
         return new ListPage(driver.getDriver());
     }
 

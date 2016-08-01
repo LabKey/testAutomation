@@ -37,7 +37,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
 
     public static AdminPage beginAt(WebDriverWrapper driver, String containerPath, String issueDefName)
     {
-        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "admin", Maps.of("issueDefName", issueDefName)));
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "admin", Maps.of("issueDefName", issueDefName.toLowerCase())));
         return new AdminPage(driver.getDriver());
     }
 
