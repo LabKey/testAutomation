@@ -37,6 +37,7 @@ import org.labkey.api.writer.PrintWriters;
 import org.labkey.junit.rules.TestWatcher;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
@@ -445,6 +446,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+        checkErrors();
+        assertModulesAvailable(getAssociatedModules());
         resetErrors();
         deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
@@ -464,6 +467,19 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
 
         cleanup(false);
+    }
+
+    private void assertModulesAvailable(List<String> modules)
+    {
+        if (modules != null && !modules.isEmpty())
+        {
+            Set<String> allModules = _containerHelper.getAllModules();
+            Set<String> missing = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+            missing.addAll(modules);
+            missing.removeAll(allModules);
+            if (!missing.isEmpty()) // TODO: Make this a fail state so that tests fail quickly if required modules are missing
+                log(String.format("WARNING: Missing associated module%s [%s]. Ensure that you have these modules and that they are actually module, not controllers.", missing.size() > 1 ? "s" : "", String.join(", ", missing)));
+        }
     }
 
     /**

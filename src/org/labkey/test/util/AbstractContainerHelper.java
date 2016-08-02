@@ -17,21 +17,24 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.admin.GetModulesCommand;
+import org.labkey.remoteapi.admin.GetModulesResponse;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.Assert.fail;
 
@@ -114,6 +117,44 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Update Folder");
     }
 
+    public Set<String> getAllModules()
+    {
+        GetModulesResponse modulesResponse = getModules("/");
+        Set<String> modules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        modulesResponse.getModules().stream()
+                .forEach(module -> modules.add(module.getName()));
+        return modules;
+    }
+
+    public Set<String> getActiveModules()
+    {
+        return getActiveModules(_test.getCurrentContainerPath());
+    }
+
+    public Set<String> getActiveModules(String containerPath)
+    {
+        GetModulesResponse modulesResponse = getModules(containerPath);
+        Set<String> modules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        modulesResponse.getModules().stream()
+                .filter(GetModulesResponse.Module::isActive)
+                .forEach(module -> modules.add(module.getName()));
+        return modules;
+    }
+
+    private GetModulesResponse getModules(String containerPath)
+    {
+        Connection connection = _test.createDefaultConnection(true);
+        GetModulesCommand getModulesCommand = new GetModulesCommand();
+        try
+        {
+            return getModulesCommand.execute(connection, containerPath);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void enableModule(String projectName, String moduleName)
     {
         _test.ensureAdminMode();
@@ -128,6 +169,9 @@ public abstract class AbstractContainerHelper
 
     public void enableModules(List<String> moduleNames)
     {
+        if (getActiveModules().containsAll(moduleNames))
+            return;
+
         _test.goToFolderManagement();
         _test.clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
