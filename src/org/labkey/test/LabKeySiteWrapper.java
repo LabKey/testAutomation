@@ -107,7 +107,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return;
         }
 
-        if (!isTitleEqual("Sign In"))
+        if (!"Sign In".equals(getDriver().getTitle()))
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
             beginAt("/login/login.view?");
@@ -120,7 +120,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
 
         // Sign in if browser isn't already signed in.  Otherwise, we'll be on the home page.
-        if (isTitleEqual("Sign In"))
+        if ("Sign In".equals(getDriver().getTitle()))
         {
             waitForElement(Locator.id("email"), defaultWaitForPage);
             assertElementPresent(Locator.tagWithName("form", "login"));
@@ -160,7 +160,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 isElementPresent(Locator.css(".labkey-nav-page-header").withText("Upgrade Modules")))
         {
             waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
-            clickButton("Next");
+            clickAndWait(Locator.lkButton("Next"));
         }
 
         WebTestHelper.setDefaultSession(getDriver());
@@ -610,12 +610,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             assertTextNotPresent("Retype Password");
             assertTextPresent("Please wait, this page will automatically update with progress information");
             goToHome();
+
+            WebTestHelper.setDefaultSession(getDriver());
         }
 
-        if (bootstrapped || isTitleEqual("Sign In"))
+        if (bootstrapped || "Sign In".equals(getDriver().getTitle()))
         {
             // if the logout page takes us to the sign-in page, then we may have a schema update to do:
-            if (isTitleEqual("Sign In"))
+            if ("Sign In".equals(getDriver().getTitle()))
                 simpleSignIn();
 
             String upgradeText = "Please wait, this page will automatically update with progress information.";
@@ -633,8 +635,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
+                long startTime = System.currentTimeMillis();
+                long elapsed = 0;
 
-                while (waitMs > 0 && (!(isButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
+                while (elapsed < waitMs && (!(isButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
                 {
                     try
                     {
@@ -644,10 +648,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         {
                             goToHome();
                             sleep(200);
-                            waitMs -= 200;
                         }
                         sleep(2000);
-                        waitMs -= 2000;
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
                             throw new RuntimeException("A startup failure occurred.");
                     }
@@ -655,18 +657,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     {
                         // Do nothing -- this page will sometimes auto-navigate out from under selenium
                     }
+                    finally
+                    {
+                        elapsed = System.currentTimeMillis() - startTime;
+                    }
                 }
 
-                if (waitMs <= 0)
+                if (elapsed > waitMs)
                     throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
 
-                if (isButtonPresent("Next"))
+                WebElement nextButton;
+                for (int i = 0; i < 2 && (nextButton = Locator.lkButton("Next").findElementOrNull(getDriver())) != null; i++)
                 {
-                    clickButton("Next");
-
-                    // check for any additional upgrade pages inserted after module upgrade
-                    if (isButtonPresent("Next"))
-                        clickButton("Next");
+                    clickAndWait(nextButton);
                 }
 
                 if (isElementPresent(Locator.linkContainingText("Go directly to the server's Home page")))
@@ -675,7 +678,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
             }
 
-            // Tests hit this page a lot. Make it load as fast as possible
+            // Tests hit Home portal a lot. Make it load as fast as possible
             PortalHelper portalHelper = new PortalHelper(this);
             for (BodyWebPart webPart : portalHelper.getBodyWebParts())
                 webPart.delete();

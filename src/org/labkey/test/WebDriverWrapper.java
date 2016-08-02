@@ -1220,11 +1220,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public boolean isTitleEqual(String match)
-    {
-        return match.equals(getDriver().getTitle());
-    }
-
     public void assertTitleEquals(String match)
     {
         assertEquals("Wrong page title", match, getDriver().getTitle());
