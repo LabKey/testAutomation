@@ -71,11 +71,12 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
 
     public class ChangeFormatWindow extends Window
     {
-        private final EnumSelect<WikiRendererType> _formatSelect = EnumSelect(Locator.id("wiki-input-window-change-format-to"), WikiRendererType.class).findWhenNeeded(this);
+        private final EnumSelect<WikiRendererType> _formatSelect;
 
         public ChangeFormatWindow()
         {
             super("Change Format", getDriver());
+            _formatSelect = EnumSelect(Locator.id("wiki-input-window-change-format-to"), WikiRendererType.class).waitFor(this);
         }
 
         public EnumSelect<WikiRendererType> format()
