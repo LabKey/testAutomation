@@ -51,6 +51,12 @@ public class JUnitFooter extends BaseWebDriverTest
         waitForSystemMaintenanceCompletion();
     }
 
+    @Override
+    public void checkErrors()
+    {
+        // Skip. Need a way to ignore expected errors.
+    }
+
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
