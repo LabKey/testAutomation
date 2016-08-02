@@ -94,7 +94,7 @@ public class SurveyTest extends BaseWebDriverTest
 
         log("Create survey disign at the subfolder level");
         _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
-        _containerHelper.enableModule("Survey");
+        clickFolder(folderName);
         portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA");
 
