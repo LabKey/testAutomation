@@ -40,6 +40,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
@@ -112,8 +114,6 @@ public class DataRegionTest extends BaseWebDriverTest
         TOTAL_ROWS = map.size();
     }
 
-    DataRegionTable table;
-
     public List<String> getAssociatedModules()
     {
         return null;
@@ -126,7 +126,7 @@ public class DataRegionTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws Exception
     {
         createList();
 
@@ -195,13 +195,13 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private void exportLoggingTest()
     {
-        DataRegionTable list = new DataRegionTable(INJECT_CHARS_2, this);
+        DataRegionTable list = new DataRegionTable(INJECT_CHARS_2, getDriver());
         DataRegionExportHelper exportHelper = new DataRegionExportHelper(list);
         exportHelper.exportText();
         goToAuditLog();
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "Query export events"));
 
-        DataRegionTable auditTable =  new DataRegionTable("query", this);
+        DataRegionTable auditTable =  new DataRegionTable("query", getDriver());
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", PROJECT_NAME}, {"SchemaName", "lists"},
                 {"QueryName", LIST_NAME}, {"Comment", "Exported to TSV"}};
@@ -226,35 +226,28 @@ public class DataRegionTest extends BaseWebDriverTest
         _listHelper.uploadData(LIST_DATA);
     }
 
-    private void dataRegionTest(URL url, String dataRegionName)
+    private void dataRegionTest(URL url, String dataRegionName) throws MalformedURLException
     {
         log("** Beginning test for dataRegionName: " + dataRegionName);
 
         // Issue 11392: DataRegion name escaping in button menus.  Append evil dataRegionName parameter.
-        try
-        {
-            String encodedName = EscapeUtil.encode(dataRegionName);
-            url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "&dataRegionName=" + encodedName);
-        }
-        catch (MalformedURLException mue)
-        {
-            throw new RuntimeException(mue);
-        }
+        String encodedName = EscapeUtil.encode(dataRegionName);
+        url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "&dataRegionName=" + encodedName);
         beginAt(url.getFile());
 
-        table = new DataRegionTable(dataRegionName, this);
+        DataRegionTable table = new DataRegionTable(dataRegionName, getDriver());
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
-        assertButtonPresent("Paging");
+        assertElementPresent(Locator.lkButton("Paging"));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
         assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
 
         log("Test 3 per page");
         table.setMaxRows(3);
-        table = new DataRegionTable(dataRegionName, this);
-        clickButton("Paging", 0);
+        WebElement menuItem = _ext4Helper.openMenu(Locator.lkButton("Paging"), "3 per page");
+        assertNotNull("'Paging' menu selection doesn't match URL parameter", Locator.xpath("preceding-sibling::div").withClass("fa-check-square-o").findElementOrNull(menuItem));
         assertElementPresent(Locator.linkWithText("3 per page"));
         assertElementPresent(Locator.linkWithText("40 per page"));
         assertElementPresent(Locator.linkWithText("100 per page"));
@@ -268,7 +261,6 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Test 5 per page");
         table.setMaxRows(5);
-        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
@@ -279,7 +271,6 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Next Page");
         table.pageNext();
-        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, 3));
@@ -290,7 +281,6 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Last Page");
         table.pageLast();
-        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(16, 16, 16);
         assertEquals(1, table.getDataRowCount());
         assertEquals("yellow", table.getDataAsText(0, 3));
@@ -301,7 +291,6 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Previous Page");
         table.pagePrev();
-        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(11, 15, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("purple", table.getDataAsText(0, 3));
@@ -312,7 +301,6 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
-        table = new DataRegionTable(dataRegionName, this);
         assertPaginationText(1, 5, 15);
         assertEquals("black", table.getDataAsText(0, 3));
 
@@ -332,7 +320,6 @@ public class DataRegionTest extends BaseWebDriverTest
             fail("Didn't find 'Selected 5 of 15 rows.' message");
         clickButton("Paging", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
-        table = new DataRegionTable(dataRegionName, this);
         assertEquals(5, table.getDataRowCount());
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
@@ -342,7 +329,6 @@ public class DataRegionTest extends BaseWebDriverTest
         log("Show All");
         clickButton("Paging", 0);
         clickAndWait(Locator.linkWithText("Show All"));
-        table = new DataRegionTable(dataRegionName, this);
         assertEquals(15, table.getDataRowCount());
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
@@ -370,7 +356,7 @@ public class DataRegionTest extends BaseWebDriverTest
         String fullPaginationText = Locator.css(".labkey-pagination").findElement(getDriver()).getText();
         Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
         Matcher matcher = pattern.matcher(fullPaginationText);
-        matcher.find();
+        assertTrue("Unable to parse pagination text: " + fullPaginationText, matcher.find());
         String actual = matcher.group(0);
         assertEquals("Wrong pagination text", expected, actual);
     }

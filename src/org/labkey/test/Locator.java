@@ -125,6 +125,18 @@ public abstract class Locator
         return els;
     }
 
+    public static WebElement findAnyElement(String description, SearchContext context, final Locator... locators)
+    {
+        List<WebElement> els;
+        for (Locator loc : locators)
+        {
+            els = loc.findElements(context);
+            if (!els.isEmpty())
+                return els.get(0);
+        }
+        throw new NoSuchElementException(description + " not found");
+    }
+
     public abstract Locator containing(String contains);
 
     public abstract Locator withText(String text);

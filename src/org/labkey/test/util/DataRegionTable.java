@@ -17,14 +17,15 @@ package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
+import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
-import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.LazyWebElement;
@@ -747,33 +748,14 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     @LogMethod
     public ColumnChartRegion createColumnChart(String columnName, String chartType)
     {
-        int initialNumOfPlots, finalNumOfPlots, numberOfTries;
-        final Locator menuLoc = DataRegionTable.Locators.columnHeader(_regionName, columnName);
-        final int MAX_TRIES = 5;
+        final WebElement menu = elements().getColumnHeader(columnName);
 
         Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-part-plotanalyticsprovider svg");
-        initialNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
+        int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
-        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-        _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, false, chartType);
+        _driver._ext4Helper.clickExt4MenuButton(false, menu, false, chartType);
 
-        // Wait just a moment before looking for the plot the first time.
-        WebDriverWrapper.sleep(1000);
-
-        finalNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
-        numberOfTries = 0;
-
-        // Wait for the plot to be drawn.
-        while((finalNumOfPlots == initialNumOfPlots) && (numberOfTries < MAX_TRIES))
-        {
-            _driver.log("Number of column charts has not changed, checking again.");
-            numberOfTries++;
-            WebDriverWrapper.sleep(WAIT_FOR_JAVASCRIPT);
-            finalNumOfPlots = cssPlotLocator.findElements(_driver.getDriver()).size();
-        }
-
-        if((numberOfTries == MAX_TRIES) && (finalNumOfPlots == initialNumOfPlots))
-            throw new NoSuchElementException("The number of column plots did not change.");
+        cssPlotLocator.index(initialNumOfPlots).waitForElement(this, 60000);
 
         return new ColumnChartRegion(_driver, this);
     }
@@ -790,9 +772,8 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public WebElement getSubMenuItem(String columnName, String menuItem, String subMenuItem)
     {
-        final Locator menuLoc = Locators.columnHeader(_regionName, columnName);
-        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-        return _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, true /*openOnly*/, menuItem, subMenuItem);
+        final WebElement menu = elements().getColumnHeader(columnName);
+        return _driver._ext4Helper.clickExt4MenuButton(false, menu, true /*openOnly*/, menuItem, subMenuItem);
     }
 
     public void setAggregate(String columnName, String aggregate){
@@ -824,9 +805,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     public void removeColumn(String columnName, boolean errorExpected)
     {
         TestLogger.log("Removing column " + columnName + " in " + _regionName);
-        final Locator menuLoc = DataRegionTable.Locators.columnHeader(_regionName, columnName);
-        _driver.waitForElement(menuLoc, WAIT_FOR_JAVASCRIPT);
-        _driver._ext4Helper.clickExt4MenuButton(!errorExpected, menuLoc, false, "Remove Column");
+        clickColumnMenu(columnName, !errorExpected, "Remove Column");
 
         if (errorExpected)
         {
@@ -844,9 +823,8 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void openFilterDialog(String columnName)
     {
-        Locator.XPathLocator menuLoc = DataRegionTable.Locators.columnHeader(getTableName(), columnName);
-        String columnLabel = _driver.getText(menuLoc);
-        _driver._ext4Helper.clickExt4MenuButton(false, menuLoc, false, "Filter...");
+        String columnLabel = elements().getColumnHeader(columnName).getText();
+        clickColumnMenu(columnName, false, "Filter...");
 
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         _driver.waitForElement(filterDialog);
@@ -947,7 +925,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         TestLogger.log(log);
 
         openFilterDialog(columnName);
-        String columnLabel = _driver.getText(DataRegionTable.Locators.columnHeader(_regionName, columnName));
+        String columnLabel = elements().getColumnHeader(columnName).getText();
 
         WebDriverWrapper.sleep(500);
 
@@ -983,8 +961,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     {
         TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
 
-        Runnable clickClearFilter = () ->
-                _driver._ext4Helper.clickExt4MenuButton(false, Locators.columnHeader(_regionName, columnName), false, "Clear Filter");
+        Runnable clickClearFilter = () -> clickColumnMenu(columnName, false, "Clear Filter");
 
         if (waitMillis == 0)
             _driver.doAndWaitForPageSignal(clickClearFilter, UPDATE_SIGNAL);
@@ -998,6 +975,12 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
         openFilterDialog(columnName);
         _driver.clickButton("CLEAR ALL FILTERS");
+    }
+
+    private void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
+    {
+        final WebElement menu = elements().getColumnHeader(columnName);
+        _driver._ext4Helper.clickExt4MenuButton(pageLoad, menu, false, menuItems);
     }
 
     public void checkAllOnPage()
@@ -1128,7 +1111,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     @LogMethod
     public void createQuickChart(String columnName)
     {
-        _driver._ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.columnHeader(_regionName, columnName), false, "Quick Chart");
+        clickColumnMenu(columnName, true, "Quick Chart");
         _driver.waitForElement(Locator.css("svg"));
     }
 
@@ -1241,6 +1224,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         private List<String> headerButtonLabels;
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
         private List<WebElement> columnHeaders;
+        private Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
         private WebElement aggregateRow = new LazyWebElement(Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total"), _driver.getDriver());
@@ -1288,6 +1272,17 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             if (aggregateCells == null)
                 aggregateCells = ImmutableList.copyOf(Locator.xpath("td").findElements(aggregateRow));
             return aggregateCells;
+        }
+
+        protected WebElement getColumnHeader(String colName)
+        {
+            if (!columnHeadersByName.containsKey(colName))
+            {
+                columnHeadersByName.put(colName, Locator.findAnyElement("Column header named " + colName, this,
+                        Locators.columnHeader(_regionName, colName),
+                        Locators.columnHeader(_regionName, colName.toLowerCase())));
+            }
+            return columnHeadersByName.get(colName);
         }
 
         protected List<WebElement> getColumnHeaders()

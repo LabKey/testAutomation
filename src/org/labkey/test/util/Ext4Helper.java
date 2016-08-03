@@ -711,6 +711,16 @@ public class Ext4Helper
         return null;
     }
 
+    public WebElement openMenu(Locator menu, String... subMenus)
+    {
+        return clickExt4MenuButton(false, menu, true, subMenus);
+    }
+
+    public WebElement openMenu(WebElement menu, String... subMenus)
+    {
+        return clickExt4MenuButton(false, menu, true, subMenus);
+    }
+
     @LogMethod(quiet = true)
     public WebElement clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
@@ -824,6 +834,11 @@ public class Ext4Helper
         public static Locator.XPathLocator formItemWithInputNamed(String name)
         {
             return formItem().withDescendant(Locator.tag("input").withAttribute("name", name));
+        }
+
+        public static Locator.XPathLocator menu()
+        {
+            return Locator.tagWithClass("div", _cssPrefix + "menu");
         }
 
         public static Locator.XPathLocator menuItem()
