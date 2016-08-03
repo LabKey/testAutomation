@@ -21,6 +21,7 @@ import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
@@ -29,11 +30,20 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.WebPart;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertTrue;
 
 @Category({Base.class, DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
@@ -124,16 +134,37 @@ public class BasicTest extends BaseWebDriverTest
     {
         // Navigate to the credits page and verify that all external components are documented
         beginAt(WebTestHelper.buildURL("admin", "credits"));
-        List<WebElement> creditsWarnings = Locator.css("p.paragraph").containing("WARNING:").findElements(getDriver());
-        if (creditsWarnings.size() > 0)
+        Locator.XPathLocator warningLoc = Locator.tagWithClass("div", "labkey-wiki").containing("WARNING:");
+        List<WebElement> warningWebparts = Locator.tagWithClass("table", "labkey-wp").withDescendant(warningLoc).findElements(getDriver());
+        if (warningWebparts.size() > 0)
         {
-            for (WebElement warning : creditsWarnings)
+            List<String> badModules = new ArrayList<>();
+            for (WebElement wpEl : warningWebparts)
             {
-                log(warning.getText());
+                WebPart webPart = new BodyWebPart(getDriver(), wpEl);
+                String title = webPart.getTitle();
+                Pattern moduleNamePattern = Pattern.compile(".* ([^\\s]+) Module");
+                Matcher matcher = moduleNamePattern.matcher(title);
+                String module;
+                if(matcher.find())
+                    module = matcher.group(1);
+                else
+                    module = "<unknown>";
+                log("Warning for " + module + " Module: " + warningLoc.findElement(wpEl).getText());
+                if (!ignoreCreditsWarnings(module))
+                    badModules.add(module);
             }
-            Assert.fail("Credits page is not up-to-date. See log for more details");
+            assertTrue("Credits page is not up-to-date. See log for more details", badModules.isEmpty());
         }
         assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
+    }
+
+    private boolean ignoreCreditsWarnings(String moduleName)
+    {
+        Set<String> ignoredModules = Collections.newSetFromMap(new CaseInsensitiveHashMap<>());
+        // This set isn't expected to change much, so just hard code it for now
+        ignoredModules.addAll(Arrays.asList("elispot", "pepdb", "peptide", "specimen_tracking"));
+        return ignoredModules.contains(moduleName);
     }
 
     @Test
