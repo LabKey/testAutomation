@@ -399,7 +399,7 @@ public class Runner extends TestSuite
 
                 for (String c : sortedTests)
                     System.err.println("    " + c);
-                System.exit(0);
+                throw new IllegalArgumentException("Couldn't find test '" + testClassName + "' in suite '" + testSet.name() + "'. Check log for details.");
             }
             testClasses.add(testClass);
             if (testMethods != null)
@@ -552,7 +552,7 @@ public class Runner extends TestSuite
                         {
                             System.err.println("    " + ignoredTest);
                         }
-                        System.exit(0);
+                        throw new IllegalArgumentException("Couldn't find test(s) [" + String.join(", ", unfoundTests) + "] in class '" + testClass.getSimpleName() + "'. Check log for details.");
                     }
                 }
             }
@@ -753,10 +753,10 @@ public class Runner extends TestSuite
                 }
                 catch (Exception e)
                 {
-                    System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
+                    System.err.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
                     for (String suite : _suites.getSuites())
-                        System.out.println("   " + suite);
-                    System.exit(0);
+                        System.err.println("   " + suite);
+                    throw new IllegalArgumentException("Couldn't find suite '" + suiteName + "'. Check log for details.");
                 }
             }
             return tests;
