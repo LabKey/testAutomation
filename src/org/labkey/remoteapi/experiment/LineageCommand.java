@@ -129,7 +129,7 @@ public class LineageCommand extends Command<LineageResponse>
         if (null != _expType)
             params.put("expType", _expType);
         if (null != _cpasType)
-            params.put("lsid", _lsid);
+            params.put("cpasType", _cpasType);
 
         return params;
     }
