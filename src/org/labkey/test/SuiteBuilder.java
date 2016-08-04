@@ -67,6 +67,7 @@ public class SuiteBuilder
         }
 
         _suites.put(Continue.class.getSimpleName(), new HashSet<>()); // Not actually a suite, used to continue interrupted suite
+        _suites.put(Test.class.getSimpleName(), new HashSet<>()); // Without this, Runner will crash if 'test.packages' property is misconfigured
 
         for (Class test : tests)
         {
