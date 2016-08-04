@@ -37,6 +37,12 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected String getProjectName()
     {
         return "ReportDatasetNotifyVerifyProject";
@@ -190,7 +196,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Edit");
         waitForElement(Locator.css("svg"));
         clickButton("Options", "Plot Options");
-        _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
+        _ext4Helper.selectComboBoxItem("Plot Type:", "Scatter Plot");
         doAndWaitForElementToRefresh(() -> clickButton("OK", 0), Locator.css("svg"), shortWait());
         _ext4Helper.waitForMaskToDisappear();
         clickButton("Save", 0);

@@ -301,7 +301,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         }
 
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
-        _extHelper.waitForExtDialog("Saved");
+        sleep(2500); // sleep while the save success message shows
     }
 
     @LogMethod
