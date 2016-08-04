@@ -446,9 +446,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
-        checkErrors();
         assertModulesAvailable(getAssociatedModules());
-        resetErrors();
+        if (isTestRunningOnTeamCity())
+            checkErrors();
+        else
+            resetErrors();
         deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
         reenableMiniProfiler = disableMiniProfiler();
