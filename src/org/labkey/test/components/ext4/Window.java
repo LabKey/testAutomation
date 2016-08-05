@@ -173,7 +173,7 @@ public class Window extends FloatingComponent<Window.Elements>
             return loc;
         }
 
-        static final Locator.XPathLocator windowLoc = Locator.tagWithClass("div", Ext4Helper.getCssPrefix() + "window").notHidden();
+        static final Locator.XPathLocator windowLoc = Locator.tagWithClass("div", Ext4Helper.getCssPrefix() + "window").withoutClass(Ext4Helper.getCssPrefix() + "window-ghost").notHidden();
         static final Locator.XPathLocator titleLoc = Locator.tagWithClass("span", Ext4Helper.getCssPrefix() + "window-header-text");
     }
 
