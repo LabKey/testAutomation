@@ -499,7 +499,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.goToAdmin();
         // clear all required selections except title
         setRequiredFields(requiredFieldPos, false);
-        setRequiredFields(new int[]{1}, true);
+        setRequiredFields(new int[]{0}, true);
         clickButton("Save");
 
         clickButton("New Issue");
