@@ -102,7 +102,7 @@ public class ColumnChartTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("<module>");
+        return Arrays.asList("visualization");
     }
 
     @Test
