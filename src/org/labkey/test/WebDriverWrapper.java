@@ -441,6 +441,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "this.panel is null", // TODO: Investigate FilContentDownLoadTest.testDoubleClickDownload
                     "PanelUI.panel is undefined", // TODO: Similar to the above. Downloading files sometimes triggers this
                     "NS_ERROR_NOT_AVAILABLE", // TODO: Again, some weird non-fatal JS error in the file browser
+                    "NS_ERROR_NOT_UNEXPECTED",
                     "el is null",
 
                     "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
