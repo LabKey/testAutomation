@@ -444,6 +444,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     "NS_ERROR_NOT_UNEXPECTED",
                     "el is null",
 
+                    "n is undefined",
                     "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
                     "Ext.Error: You're trying to decode an invalid JSON String:",
                     "__webdriver_evaluate",
