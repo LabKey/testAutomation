@@ -64,7 +64,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to reset DB login config after test failure");
+            log("Failed to reset DB login config after test");
         }
 
         try
@@ -73,7 +73,7 @@ public class TestScrubber extends ExtraSiteWrapper
         }
         catch (RuntimeException e)
         {
-            log("Failed to reset Secondary Authentication after test failure");
+            log("Failed to reset Secondary Authentication after test");
         }
     }
 }
