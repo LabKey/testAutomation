@@ -156,7 +156,10 @@ public class BasicTest extends BaseWebDriverTest
             }
             assertTrue("Credits page is not up-to-date. See log for more details", badModules.isEmpty());
         }
-        assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
+        else
+        {
+            assertTextNotPresent("WARNING:"); // In case the page format changes. Update test if this fails
+        }
     }
 
     private boolean ignoreCreditsWarnings(String moduleName)
