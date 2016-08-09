@@ -85,8 +85,12 @@ public class ArtifactCollector
         {
             currentTestClassName = "UnknownTest";
         }
+        return ensureDumpDir(currentTestClassName);
+    }
 
-        File dumpDir = new File(TestProperties.getDumpDir(), currentTestClassName);
+    public File ensureDumpDir(String testClassName)
+    {
+        File dumpDir = new File(TestProperties.getDumpDir(), testClassName);
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 

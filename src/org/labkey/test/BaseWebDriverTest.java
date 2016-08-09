@@ -31,6 +31,9 @@ import org.junit.Rule;
 import org.junit.rules.RuleChain;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.writer.PrintWriters;
@@ -68,6 +71,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -123,6 +131,8 @@ import static org.labkey.test.components.ext4.Window.Window;
  * before the base test class can perform its final checks -- link check, leak check, etc.
  * The doCleanup method should be overridden for initial and final project cleanup
  */
+@BaseWebDriverTest.ClassTimeout(minutes = 40)
+@RunWith(BaseWebDriverTest.WebTestRunner.class)
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
@@ -178,7 +188,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = DataRegionTable.isNewDataRegion ? new CustomizeView(this) : new CustomizeViewsHelper(this);
-        _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
+        _downloadDir = new File(getArtifactCollector().ensureDumpDir(getClass().getSimpleName()), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
@@ -210,6 +220,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public static BaseWebDriverTest getCurrentTest()
     {
         return currentTest;
+    }
+
+    public static Class getCurrentTestClass()
+    {
+        return getCurrentTest().getClass();
     }
 
     public WebDriver getWrappedDriver()
@@ -274,9 +289,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private static void doTearDown()
     {
+        doTearDown(_testFailed);
+    }
+
+    private static void doTearDown(boolean testFailed)
+    {
         try
         {
-            boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
+            boolean skipTearDown = testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
             if ((!skipTearDown || isTestRunningOnTeamCity()) && _driver != null)
             {
                 _driver.quit();
@@ -339,7 +359,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static boolean beforeClassSucceeded = false;
     private static boolean reenableMiniProfiler = false;
     private static long testClassStartTime;
-    private static Class testClass;
     private static int testCount;
     private static int currentTestNumber;
 
@@ -352,7 +371,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 testClassStartTime = System.currentTimeMillis();
-                testClass = description.getTestClass();
                 _driver = null;
                 testCount = description.getChildren().size();
                 currentTestNumber = 0;
@@ -363,10 +381,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 try
                 {
-                    currentTest = (BaseWebDriverTest) testClass.newInstance();
+                    currentTest = (BaseWebDriverTest) description.getTestClass().newInstance();
                 }
                 catch (InstantiationException | IllegalAccessException e)
                 {
+                    currentTest = null; // Make sure previous instance is cleared
                     throw new RuntimeException(e);
                 }
 
@@ -404,7 +423,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 String pseudoTestName = description.getTestClass().getSimpleName() + (beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
 
-                if (getCurrentTest() != null)
+                if (getCurrentTest() != null && description.getTestClass().equals(getCurrentTestClass()))
                 {
                     getCurrentTest().handleFailure(e, pseudoTestName);
                 }
@@ -413,7 +432,49 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void finished(Description description)
             {
-                doTearDown();
+                // Skip teardown if another test has already started
+                if (description.getTestClass().equals(getCurrentTestClass()))
+                {
+                    if (!isTestCleanupSkipped())
+                    {
+                        try (TestScrubber scrubber = new TestScrubber(getCurrentTest().getBrowserType(), getDownloadDir()))
+                        {
+                            scrubber.cleanSiteSettings();
+                        }
+                    }
+                    doTearDown();
+                }
+            }
+        };
+
+        /**
+         * Using Timeout at the class level isn't actually supported by JUnit.
+         * We do some extra magic to make sure subsequent test methods don't keep running
+         * when the class times out
+         */
+        Timeout classTimeout = new Timeout(WebTestRunner.getClassTimeout(), TimeUnit.MINUTES)
+        {
+            @Override
+            protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
+            {
+                Statement failOnTimeoutStatement = super.createFailOnTimeoutStatement(statement);
+                return new Statement()
+                {
+                    @Override
+                    public void evaluate() throws Throwable
+                    {
+                        try
+                        {
+                            failOnTimeoutStatement.evaluate();
+                        }
+                        catch (TestTimedOutException t)
+                        {
+                            testClassTimedOut = true;
+                            _anyTestFailed = true;
+                            throw t;
+                        }
+                    }
+                };
             }
         };
 
@@ -435,22 +496,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
         };
 
-        return RuleChain.outerRule(loggingClassWatcher).around(classFailWatcher).around(innerClassWatcher);
-    }
-
-    public static Class getCurrentTestClass()
-    {
-        return testClass;
+        return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
     private void doPreamble()
     {
         signIn();
+        resetErrors();
         assertModulesAvailable(getAssociatedModules());
-        if (isTestRunningOnTeamCity())
-            checkErrors();
-        else
-            resetErrors();
         deleteSiteWideTermsOfUsePage();
         enableEmailRecorder();
         reenableMiniProfiler = disableMiniProfiler();
@@ -484,42 +537,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    /**
-     * Using Timeout at the class level isn't actually supported by JUnit.
-     * We do some extra magic to make sure subsequent test cases don't keep running
-     */
     private static boolean testClassTimedOut = false;
-
-    @ClassRule
-    public static Timeout classTimeout()
-    {
-        return new Timeout(40, TimeUnit.MINUTES)
-        {
-            @Override
-            protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
-            {
-                Statement failOnTimeoutStatement = super.createFailOnTimeoutStatement(statement);
-                return new Statement()
-                {
-                    @Override
-                    public void evaluate() throws Throwable
-                    {
-                        testClassTimedOut = false;
-                        try
-                        {
-                            failOnTimeoutStatement.evaluate();
-                        }
-                        catch (TestTimedOutException t)
-                        {
-                            testClassTimedOut = true;
-                            _anyTestFailed = true;
-                            throw t;
-                        }
-                    }
-                };
-            }
-        };
-    }
 
     public Timeout testTimeout()
     {
@@ -540,7 +558,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     @Override
                     public void evaluate() throws Throwable
                     {
-                        Assume.assumeFalse("Class timed out, skipping remaining tests", testClassTimedOut);
+                        Assume.assumeTrue("Class timed out, skipping remaining tests", description.getTestClass().equals(getCurrentTestClass()));
                         statement.evaluate();
                     }
                 };
@@ -580,8 +598,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void finished(Description description)
             {
-                Ext4Helper.resetCssPrefix();
-                resetErrors();
+                if (description.getTestClass().equals(getCurrentTestClass()))
+                {
+                    Ext4Helper.resetCssPrefix();
+                    resetErrors();
+                }
             }
         };
 
@@ -660,14 +681,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
      */
-    @LogMethod
+    @LogMethod // TODO: Make private
     public void handleFailure(Throwable error, @LoggedParam String testName)
     {
         _testFailed = true;
         _anyTestFailed = true;
 
-        if (testClassTimedOut ||
-                error instanceof TestTimedOutException ||
+        if (error instanceof TestTimedOutException ||
                 error instanceof InterruptedException ||
                 error.getCause() != null && error.getCause() instanceof InterruptedException)
         {
@@ -772,14 +792,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         finally
         {
-            if (!isTestCleanupSkipped())
-            {
-                try (TestScrubber scrubber = new TestScrubber(BROWSER_TYPE, getDownloadDir()))
-                {
-                    scrubber.cleanSiteSettings();
-                }
-            }
-
+            resetErrors();
             doTearDown();
         }
     }
@@ -829,7 +842,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private void cleanup(boolean afterTest) throws TestTimeoutException
     {
-        if (!ClassUtils.getAllInterfaces(getCurrentTestClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
+        if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
             doCleanup(afterTest);
     }
 
@@ -1148,7 +1161,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
             for (LogEntry error : jsErrors)
             {
-                if (!getJsErrorChecker().isErrorIgnored(error))
+                if (false) // TODO: Enable when Firefox JS errors are more useful (!getJsErrorChecker().isErrorIgnored(error))
                     validErrors.add(error);
                 else
                     ignoredErrors.add(error);
@@ -2484,5 +2497,34 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);
+    }
+
+    public static class WebTestRunner extends BlockJUnit4ClassRunner
+    {
+        private static final int DEFAULT_CLASS_TIMEOUT = 40;
+        private static int classTimeout;
+
+        public WebTestRunner(Class<?> klass) throws InitializationError
+        {
+            super(klass);
+            ClassTimeout timeout = klass.getAnnotation(ClassTimeout.class);
+            if (timeout != null)
+                classTimeout = timeout.minutes();
+            else
+                classTimeout = DEFAULT_CLASS_TIMEOUT;
+        }
+
+        private static int getClassTimeout()
+        {
+            return classTimeout;
+        }
+    }
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface ClassTimeout
+    {
+        int minutes();
     }
 }
