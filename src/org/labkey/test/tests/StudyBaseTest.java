@@ -179,13 +179,13 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-//        deleteProject(getProjectName(), afterTest);
-//
-//        deleteLogFiles(".");
-//        deleteLogFiles("datasets");
-//        TestFileUtils.deleteDir(new File(getPipelinePath(), "assaydata"));
-//        TestFileUtils.deleteDir(new File(getPipelinePath(), "reports_temp"));
-//        TestFileUtils.deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
+        deleteProject(getProjectName(), afterTest);
+
+        deleteLogFiles(".");
+        deleteLogFiles("datasets");
+        TestFileUtils.deleteDir(new File(getPipelinePath(), "assaydata"));
+        TestFileUtils.deleteDir(new File(getPipelinePath(), "reports_temp"));
+        TestFileUtils.deleteDir(new File(TestFileUtils.getLabKeyRoot(), ARCHIVE_TEMP_DIR));
     }
 
     private void deleteLogFiles(String directoryName)
