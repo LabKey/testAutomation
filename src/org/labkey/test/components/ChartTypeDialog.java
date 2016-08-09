@@ -100,22 +100,54 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
 
     public void setXAxis(String columnName)
     {
-        setAttribute(elements().xAxis, columnName);
+        setXAxis(columnName, false);
+    }
+
+    public void setXAxis(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setAttribute(elements().xAxis, columnName);
+        else
+            setAttribute(elements().xAxisDropText, columnName);
     }
 
     public void setYAxis(String columnName)
     {
-        setAttribute(elements().yAxis, columnName);
+        setYAxis(columnName, false);
+    }
+
+    public void setYAxis(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setAttribute(elements().yAxis, columnName);
+        else
+            setAttribute(elements().yAxisDropText, columnName);
     }
 
     public void setColor(String columnName)
     {
-        setAttribute(elements().color, columnName);
+        setColor(columnName, false);
+    }
+
+    public void setColor(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setAttribute(elements().color, columnName);
+        else
+            setAttribute(elements().colorDropText, columnName);
     }
 
     public void setShape(String columnName)
     {
-        setAttribute(elements().shape, columnName);
+        setShape(columnName, false);
+    }
+
+    public void setShape(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setAttribute(elements().shape, columnName);
+        else
+            setAttribute(elements().shapeDropText, columnName);
     }
 
     private void setAttribute(WebElement attributeElement, String columnName)
@@ -267,12 +299,16 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         public WebElement plotTypePie = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-pie_chart']"),  _test.getDriver());
         public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-scatter_plot']"),  _test.getDriver());
         public WebElement xAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]/following-sibling::div[contains(@class, 'field-area ')]"),  _test.getDriver());
+        public WebElement xAxisDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]/following-sibling::div[contains(@class, 'field-area-drop-text ')]"),  _test.getDriver());
         public WebElement xAxisRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]/following-sibling::div[contains(@class, 'field-area ')]//div[@class='field-selection-display']//div[contains(@class, 'field-selection-remove')]"),  _test.getDriver());
-        public WebElement yAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]/following-sibling::div[contains(@class, 'field-area ')]"),  _test.getDriver());
+        public WebElement yAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]/following-sibling::div[contains(@class, 'field-area')]"),  _test.getDriver());
+        public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]/following-sibling::div[contains(@class, 'field-area-drop-text ')]"),  _test.getDriver());
         public WebElement yAxisRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]/following-sibling::div[contains(@class, 'field-area ')]//div[@class='field-selection-display']//div[contains(@class, 'field-selection-remove')]"),  _test.getDriver());
         public WebElement color = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Color')]/following-sibling::div[contains(@class, 'field-area ')]"),  _test.getDriver());
+        public WebElement colorDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Color')]/following-sibling::div[contains(@class, 'field-area-drop-text ')]"),  _test.getDriver());
         public WebElement colorRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Color')]/following-sibling::div[contains(@class, 'field-area ')]//div[@class='field-selection-display']//div[contains(@class, 'field-selection-remove')]"),  _test.getDriver());
         public WebElement shape = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]/following-sibling::div[contains(@class, 'field-area ')]"),  _test.getDriver());
+        public WebElement shapeDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]/following-sibling::div[contains(@class, 'field-area-drop-text ')]"),  _test.getDriver());
         public WebElement shapeRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]/following-sibling::div[contains(@class, 'field-area ')]//div[@class='field-selection-display']//div[contains(@class, 'field-selection-remove')]"),  _test.getDriver());
         public WebElement columnList = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'mapping-query-col')]"), _test.getDriver());
         public WebElement fieldTitles = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')]"), _test.getDriver());

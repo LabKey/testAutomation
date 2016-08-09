@@ -24,6 +24,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -57,8 +58,8 @@ public class ScatterPlotTest extends GenericChartsTest
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
     }
 
-    private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\n4.Pulse1.Weight";
-    private static final String SCATTER_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n32.0\n40.0\nTestTitle\nTestXAxis\nTestYAxis";
+    private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n32.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod
@@ -66,6 +67,7 @@ public class ScatterPlotTest extends GenericChartsTest
     {
         ChartTypeDialog chartTypeDialog;
         ChartLayoutDialog chartLayoutDialog;
+        SaveChartDialog saveChartDialog;
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -102,7 +104,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.setYAxis("2. Body Temp");
+        chartTypeDialog.setYAxis("2. Body Temp", true);
         chartTypeDialog.clickApply();
 
         log("Set X Axis");
@@ -116,30 +118,31 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
+        chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY, true);
         chartTypeDialog.clickApply();
 
         assertSVG(SCATTER_PLOT_MV_2);
 
         clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save");
+        saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog();
         //Verify name requirement
-        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
+        saveChartDialog.clickSave();
         _extHelper.waitForExtDialog("Error");
         _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        setFormElement(Locator.name("reportName"), "TestReportName");
-        setFormElement(Locator.name("reportDescription"), "TestReportDescription");
-        _ext4Helper.clickWindowButton("Save", "Cancel", 0, 0);
+        saveChartDialog.setReportName("TestReportName");
+        saveChartDialog.setReportDescription("TestReportDescription");
+        saveChartDialog.clickCancel();
         assertTextNotPresent("TestReportName");
 
         savePlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
     }
 
-    private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1:AbbreviatedPhysicalExam\n4.Pulse\n1.Weight";
-    private static final String SCATTER_PLOT_DR_2 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1:AbbreviatedPhysicalExam\n4.Pulse\n1.Weight";
+    private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_DR_2 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
     private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
     /// Test Scatter Plot created from a filtered data region.
@@ -185,7 +188,6 @@ public class ScatterPlotTest extends GenericChartsTest
     private void doQuickChartScatterPlotTest()
     {
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -198,7 +200,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.setXAxis("Integer");
+        chartTypeDialog.setXAxis("Integer", true);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter);
         chartTypeDialog.clickApply();
 
@@ -207,9 +209,9 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
 
-    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1:AbbreviatedPhysicalExam\n4.Pulse\n1.Weight\n0\nNormal\nNot Done";
-    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1:AbbreviatedPhysicalExam\n4.Pulse\n1.Weight\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
-    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1:AbbreviatedPhysicalExam\n4.Pulse\n1.Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight\n0\nNormal\nNot Done";
+    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
     private static final String CIRCLE_PATH_D = "M0,5A5,5 0 1,1 0,-5A5,5 0 1,1 0,5Z";
     private static final String TRIANGLE_PATH_D = "M0,5L5,-5L-5,-5 Z";
     private static final String SQUARE_PATH_D = "M-5,-5L5,-5 5,5 -5,5Z";
@@ -288,7 +290,7 @@ public class ScatterPlotTest extends GenericChartsTest
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
         chartTypeDialog.setColor("7. Neck");
-        chartTypeDialog.setShape("16. Evaluation Summary");
+        // note: shape set to "16. Evaluation Summary" above
         chartTypeDialog.clickApply();
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
@@ -301,7 +303,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertEquals("Point at (60, 48) was not a square.", SQUARE_PATH_D, points.get(25).getAttribute("d"));
         assertEquals("Point at (60, 48) was an unexpected color", "#FC8D62", points.get(25).getAttribute("fill"));
 
-        savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
+        savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored", true);
     }
 
     @LogMethod
@@ -472,7 +474,7 @@ public class ScatterPlotTest extends GenericChartsTest
         String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         chartLayoutDialog.setDeveloperSourceContent(function);
         chartLayoutDialog.clickApply();
-        savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
+        savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn", true);
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc, SeleniumEvent.click));
         waitForText("Query Schema Browser");
         assertTextPresent("APX-1: Abbreviated Physical Exam");

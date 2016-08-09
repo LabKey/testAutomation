@@ -116,7 +116,7 @@ public class ChartLayoutDialog<EC extends Component.ElementCache> extends Compon
     {
         clickDeveloperTab();
         _test.clickButton("Enable", 0);
-        _test.waitForText("// use LABKEY.ActionURL.buildURL to generate a link to a different controller/action within LabKey server");
+        _test.waitForText("// use LABKEY.ActionURL.buildURL to generate a link");
     }
 
     public void clickDeveloperDisable(boolean clickYes)

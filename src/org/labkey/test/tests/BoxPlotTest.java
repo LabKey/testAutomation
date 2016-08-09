@@ -22,6 +22,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -39,8 +40,8 @@ public class BoxPlotTest extends GenericChartsTest
         doQuickChartBoxPlotTest();
    }
 
-    private static final String BOX_PLOT_MV_1 = "RCF-1\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0\n4c.Induration1stmeasure";
-    private static final String BOX_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n37.0\n40.0\nTestTitle\nTestXAxis\nTestYAxis";
+    private static final String BOX_PLOT_MV_1 = "RCF-1\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0\n4c.Induration 1st measure";
+    private static final String BOX_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n37.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
@@ -83,7 +84,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.setYAxis("2.Body temperature");
+        chartTypeDialog.setYAxis("2.Body temperature", true);
         chartTypeDialog.clickApply();
 
         log("Set X Axis");
@@ -101,24 +102,25 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_2);
 
         clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save");
+        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog();
         //Verify name requirement
-        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
+        saveChartDialog.clickSave();
         _extHelper.waitForExtDialog("Error");
         _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        setFormElement(Locator.name("reportName"), "TestReportName");
-        setFormElement(Locator.name("reportDescription"), "TestReportDescription");
-        clickDialogButtonAndWaitForMaskToDisappear("Save", "Cancel");
+        saveChartDialog.setReportName("TestReportName");
+        saveChartDialog.setReportDescription("TestReportDescription");
+        saveChartDialog.clickCancel();
         assertTextNotPresent("TestReportName");
 
         savePlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
     }
 
-    private static final String BOX_PLOT_DR_1 = "RCH-1\n36.6\n36.7\n36.8\n36.9\n37.0\n37.1\n37.2\nRCH-1:Reactogenicity-Day1\n2.Bodytemperature";
-    private static final String BOX_PLOT_DR_2 = "RCH-1\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1:Reactogenicity-Day1\n2.Bodytemperature";
+    private static final String BOX_PLOT_DR_1 = "RCH-1\n36.6\n36.7\n36.8\n36.9\n37.0\n37.1\n37.2\nRCH-1: Reactogenicity-Day 1\n2.Body temperature";
+    private static final String BOX_PLOT_DR_2 = "RCH-1\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0\nRCH-1: Reactogenicity-Day 1\n2.Body temperature";
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
     /// Test Box Plot created from a filtered data region.

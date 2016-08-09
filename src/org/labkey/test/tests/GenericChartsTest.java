@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
@@ -89,24 +90,20 @@ public abstract class GenericChartsTest extends ReportTest
     @LogMethod
     protected void savePlot(String name, String description)
     {
-        boolean saveAs;
-        WebElement saveButton;
-        try
-        {
-            saveButton = findButton("Save As");
-            saveAs = true;
-        }
-        catch (NoSuchElementException wrongButton)
-        {
-            saveButton = findButton("Save");
-            saveAs = false;
-        }
+        savePlot(name, description, false);
+    }
 
+    @LogMethod
+    protected void savePlot(String name, String description, boolean saveAs)
+    {
+        WebElement saveButton = saveAs ? findButton("Save As") : findButton("Save");
         saveButton.click();
-        _extHelper.waitForExtDialog(saveAs ? "Save As" : "Save");
-        setFormElement(Locator.name("reportName"), name);
-        setFormElement(Locator.name("reportDescription"), description);
-        clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save", "Save");
+
+        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog(saveAs);
+        saveChartDialog.setReportName(name);
+        saveChartDialog.setReportDescription(description);
+        saveChartDialog.clickSave();
         sleep(2500); // sleep while the save success message shows
         waitForText(name);
         waitFor(() ->
@@ -123,8 +120,9 @@ public abstract class GenericChartsTest extends ReportTest
     protected void savePlot()
     {
         clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save");
-        clickDialogButtonAndWaitForMaskToDisappear("Save", "Save");
+        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog();
+        saveChartDialog.clickSave();
         sleep(2500); // sleep while the save success message shows
     }
 
