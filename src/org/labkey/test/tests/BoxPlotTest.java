@@ -166,13 +166,13 @@ public class BoxPlotTest extends GenericChartsTest
         List<WebElement> paths = svgPathLoc.findElements(getDriver());
         fireEvent(paths.get(paths.size()-1), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        assertTextPresentInThisOrder("MouseId/Cohort: Group 2", "RCHtempc:");
+        assertTextPresent("RCHtempc:");
         clickButton("OK", 0);
 
         savePlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
 
-    private static final String BOX_PLOT_QC = "Group 1\nGroup 2\n0.0\n20000000.0\n40000000.0\n60000000.0\n80000000.0\n100000000.0\n120000000.0\nTypes\nStudy:Cohort\nDouble";
+    private static final String BOX_PLOT_QC = "Group 1\nGroup 2\n0.0\n20000000.0\n40000000.0\n60000000.0\n80000000.0\n100000000.0\n120000000.0\nTypes\nStudy: Cohort\nDouble";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
     @LogMethod

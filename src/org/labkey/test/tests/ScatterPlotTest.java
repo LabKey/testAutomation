@@ -310,7 +310,6 @@ public class ScatterPlotTest extends GenericChartsTest
     private void doDeleteMeasureTest()
     {
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
 
         log("Remove color and shape measures.");
         clickProject(getProjectName());
@@ -336,19 +335,18 @@ public class ScatterPlotTest extends GenericChartsTest
 
         waitForText("\"7. Neck\", is not available. It may have been deleted or renamed.");
         assertTextPresent("\"16. Evaluation Summary\", is not available. It may have been deleted or renamed.");
-
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.removeColor();
-        chartTypeDialog.removeShape();
+        assertTrue(chartTypeDialog.getColorValue() == null || "".equals(chartTypeDialog.getColorValue()));
+        assertTrue(chartTypeDialog.getShapeValue() == null || "".equals(chartTypeDialog.getShapeValue()));
         chartTypeDialog.clickApply();
 
         log("Set X Axis to categorical measure.");
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.setXAxis("Form Language");
+        chartTypeDialog.setXAxis("Form Language", true);
         chartTypeDialog.clickApply();
 
         savePlot();
