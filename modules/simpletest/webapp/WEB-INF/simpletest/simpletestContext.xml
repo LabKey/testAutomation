@@ -45,7 +45,7 @@
                     <property name="protocolName" value="Dummy NLP invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
-                    <property name="workflowProcessKey" value="documentProcessingWithNLP"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommand"/>
@@ -60,7 +60,7 @@
                     <property name="protocolName" value="Dummy NLP invocation No Results"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocationNoResults"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
-                    <property name="workflowProcessKey" value="documentProcessingWithNLP"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommandNoResults"/>
@@ -75,7 +75,7 @@
                     <property name="protocolName" value="Dummy NLP invocation Cytogenetics"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocationCytogenetics"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
-                    <property name="workflowProcessKey" value="documentProcessingWithNLP"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommandCytogenetics"/>
