@@ -469,8 +469,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                         }
                         catch (TestTimedOutException t)
                         {
-                            testClassTimedOut = true;
-                            _anyTestFailed = true;
+                            _driver = null;
+                            currentTest = null;
                             throw t;
                         }
                     }
@@ -536,8 +536,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log(String.format("WARNING: Missing associated module%s [%s]. Ensure that you have these modules and that they are actually module, not controllers.", missing.size() > 1 ? "s" : "", String.join(", ", missing)));
         }
     }
-
-    private static boolean testClassTimedOut = false;
 
     public Timeout testTimeout()
     {
