@@ -28,12 +28,11 @@ import org.junit.Assume;
 import org.junit.AssumptionViolatedException;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.writer.PrintWriters;
@@ -131,8 +130,7 @@ import static org.labkey.test.components.ext4.Window.Window;
  * before the base test class can perform its final checks -- link check, leak check, etc.
  * The doCleanup method should be overridden for initial and final project cleanup
  */
-@BaseWebDriverTest.ClassTimeout(minutes = 40)
-@RunWith(BaseWebDriverTest.WebTestRunner.class)
+@BaseWebDriverTest.ClassTimeout(minutes = BaseWebDriverTest.DEFAULT_CLASS_TIMEOUT)
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
@@ -161,6 +159,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static File _downloadDir;
 
     public static final int MAX_WAIT_SECONDS = 10 * 60;
+    public static final int DEFAULT_CLASS_TIMEOUT = 40;
 
     public static final double DELTA = 10E-10;
 
@@ -452,29 +451,50 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
          * We do some extra magic to make sure subsequent test methods don't keep running
          * when the class times out
          */
-        Timeout classTimeout = new Timeout(WebTestRunner.getClassTimeout(), TimeUnit.MINUTES)
+        TestRule classTimeout = new TestWatcher()
         {
-            @Override
-            protected Statement createFailOnTimeoutStatement(Statement statement) throws Exception
+            Statement createFailOnTimeoutStatement(Statement statement, Class<?> testClass) throws Exception
             {
-                Statement failOnTimeoutStatement = super.createFailOnTimeoutStatement(statement);
-                return new Statement()
+                long minutes;
+                ClassTimeout timeout = testClass.getAnnotation(ClassTimeout.class);
+                if (timeout != null)
+                    minutes = timeout.minutes();
+                else
+                    minutes = DEFAULT_CLASS_TIMEOUT;
+
+                return FailOnTimeout.builder()
+                        .withTimeout(minutes, TimeUnit.MINUTES)
+                        .withLookingForStuckThread(true)
+                        .build(statement);
+            }
+
+            @Override
+            public Statement apply(Statement base, Description description)
+            {
+                try
                 {
-                    @Override
-                    public void evaluate() throws Throwable
+                    return createFailOnTimeoutStatement(base, description.getTestClass());
+                }
+                catch (final Exception e)
+                {
+                    return new Statement()
                     {
-                        try
+                        @Override public void evaluate() throws Throwable
                         {
-                            failOnTimeoutStatement.evaluate();
+                            throw new RuntimeException("Invalid parameters for Timeout", e);
                         }
-                        catch (TestTimedOutException t)
-                        {
-                            _driver = null;
-                            currentTest = null;
-                            throw t;
-                        }
-                    }
-                };
+                    };
+                }
+            }
+
+            @Override
+            protected void failed(Throwable e, Description description)
+            {
+                if (e instanceof TestTimedOutException)
+                {
+                    _driver = null;
+                    currentTest = null;
+                }
             }
         };
 
@@ -2494,27 +2514,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);
-    }
-
-    public static class WebTestRunner extends BlockJUnit4ClassRunner
-    {
-        private static final int DEFAULT_CLASS_TIMEOUT = 40;
-        private static int classTimeout;
-
-        public WebTestRunner(Class<?> klass) throws InitializationError
-        {
-            super(klass);
-            ClassTimeout timeout = klass.getAnnotation(ClassTimeout.class);
-            if (timeout != null)
-                classTimeout = timeout.minutes();
-            else
-                classTimeout = DEFAULT_CLASS_TIMEOUT;
-        }
-
-        private static int getClassTimeout()
-        {
-            return classTimeout;
-        }
     }
 
     @Target(ElementType.TYPE)
