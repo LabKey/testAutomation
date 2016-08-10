@@ -87,6 +87,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1174,14 +1175,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
 
             List<LogEntry> validErrors = new ArrayList<>();
-            Set<LogEntry> ignoredErrors = new HashSet<>();
+            Map<String, Integer> ignoredErrors = new TreeMap<>();
 
             for (LogEntry error : jsErrors)
             {
                 if (false) // TODO: Enable when Firefox JS errors are more useful (!getJsErrorChecker().isErrorIgnored(error))
                     validErrors.add(error);
                 else
-                    ignoredErrors.add(error);
+                {
+                    String message = error.getMessage();
+                    ignoredErrors.put(message, ignoredErrors.getOrDefault(message, 0) + 1);
+                }
             }
             if (ignoredErrors.size() + validErrors.size() > 0)
             {
@@ -1192,8 +1196,11 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (!ignoredErrors.isEmpty())
                 {
                     log("<<<<<<<<<<<<<<<IGNORED ERRORS>>>>>>>>>>>>>>>>>>");
-                    for (LogEntry error : ignoredErrors)
-                        log("[Ignored] " + error.toString());
+                    for (String error : ignoredErrors.keySet())
+                    {
+                        int count = ignoredErrors.get(error);
+                        log(String.format("[Ignored%s] %s", count > 1 ? " (x" + count + ")" : "", error));
+                    }
                 }
 
                 log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
