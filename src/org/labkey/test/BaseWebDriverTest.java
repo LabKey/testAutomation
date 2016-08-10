@@ -852,8 +852,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (null != projectName)
             _containerHelper.deleteProject(projectName, afterTest);
 
-        List<String> createdProjects = _containerHelper.getCreatedProjects();
-        for (String project : createdProjects)
+        for (String project : _containerHelper.getCreatedProjects())
         {
             _containerHelper.deleteProject(project, false);
         }

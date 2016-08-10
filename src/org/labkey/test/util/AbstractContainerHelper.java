@@ -29,12 +29,12 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.fail;
 
@@ -42,7 +42,7 @@ public abstract class AbstractContainerHelper
 {
     protected BaseWebDriverTest _test;
 
-    private static List<String> _createdProjects = new ArrayList<>();
+    private static Set<String> _createdProjects = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
 
     public AbstractContainerHelper(BaseWebDriverTest test)
@@ -50,7 +50,7 @@ public abstract class AbstractContainerHelper
         _test = test;
     }
 
-    public List<String> getCreatedProjects()
+    public Collection<String> getCreatedProjects()
     {
         return _createdProjects;
     }

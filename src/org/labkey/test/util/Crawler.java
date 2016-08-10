@@ -72,7 +72,7 @@ public class Crawler
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseWebDriverTest _test;
     private boolean _injectionCheckEnabled = false;
-    private List<String> _projects;
+    private Collection<String> _projects;
 
     public Crawler(BaseWebDriverTest test)
     {
@@ -84,7 +84,7 @@ public class Crawler
         this(test, test.getContainerHelper().getCreatedProjects(), crawlTime);
     }
 
-    public Crawler(BaseWebDriverTest test, List<String> projects, int crawlTime)
+    public Crawler(BaseWebDriverTest test, Collection<String> projects, int crawlTime)
     {
         _test = test;
         _projects = projects;
