@@ -25,6 +25,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -308,12 +309,12 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         clickAndWait(Locator.linkWithText(FCS_FILE_1 + " analysis"));
 
-        List<String> expectedMeasures = Arrays.asList(
+        List<String> expectedMeasures = new ArrayList<>(Arrays.asList(
                 "Count",
                 "Singlets:Count",
                 "Singlets:%P",
                 "L:Count"
-        );
+        ));
 
         DataRegionTable fcsAnalysisTable = new DataRegionTable("query", getDriver());
         List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
@@ -321,23 +322,19 @@ public class FlowTest extends BaseFlowTest
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
         fcsAnalysisTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        Window measurePicker = Window().withTitle("Y Axis").waitFor(getDriver());
-        Locator.XPathLocator rowLoc = Locator.tagWithClass("tr", "x4-grid-data-row");
-        List<String> availableMeasures = new ArrayList<>();
-        waitFor(() -> {
-            List<WebElement> pickerRows = rowLoc.findElements(measurePicker);
-            availableMeasures.clear();
-            try
-            {
-                availableMeasures.addAll(getTexts(pickerRows));
-            }
-            catch (StaleElementReferenceException retry)
-            {
-                return false;
-            }
-            return availableMeasures.size() == expectedMeasures.size() && !String.join("", availableMeasures).isEmpty();
-        }, 10000);
+        // The new plot dialog shows all values from the grid that could be used in any aspect of a plot. So need to add these two values.
+        expectedMeasures.add("Compensation Matrix");
+        expectedMeasures.add("Run");
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog.waitForDialog();
+        List<String> availableMeasures =  chartTypeDialog.getColumnList();
         assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(availableMeasures));
+        log("Validate that the values 'Compensation Matrix' and 'Run' cannot be assigned to the Y axis.");
+        chartTypeDialog.clickColumnValue("Compensation Matrix");
+        assertTrue("You should not be able to set 'Compensation Matrix' to the y-axis.", chartTypeDialog.getYAxisValue().trim().length() == 0);
+        chartTypeDialog.clickColumnValue("Run");
+        assertTrue("You should not be able to set 'Run' to the y-axis.", chartTypeDialog.getYAxisValue().trim().length() == 0);
+        chartTypeDialog.clickCancel();
     }
 
     // Test sample set and ICS metadata
