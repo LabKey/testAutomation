@@ -26,11 +26,13 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.pages.BaseDesignerPage;
 import org.labkey.test.util.BoxPlotReportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DatasetDesignerPage;
-import org.labkey.test.util.GenericChartHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -93,6 +95,9 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
     @Test
     public void testRestrictedMeasures()
     {
+        ChartTypeDialog chartTypeDialog;
+        WebElement currentSvg;
+
         enableColumnRestricting();
 
         goToProjectHome();
@@ -102,31 +107,34 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        GenericChartHelper chartHelper = new BoxPlotReportHelper(this, DATASET);
+        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog.waitForDialog();
+        assertFalse("List contains value '" + UNTAGGED_MEASURE + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
+        assertFalse("List contains value '" + UNTAGGED_DIMENSION + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
+        chartTypeDialog.setYAxis(TAGGED_MEASURE);
+        chartTypeDialog.clickApply();
+        currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        chartHelper.selectMeasure(TAGGED_MEASURE);
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_MEASURE));
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(TAGGED_DIMENSION));
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_DIMENSION));
-        chartHelper.confirmSelection();
+        assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
-        assertTrue(chartHelper.getCurrentSvg().getText().contains(TAGGED_MEASURE));
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog.waitForDialog();
+        chartTypeDialog.setXAxis(TAGGED_DIMENSION);
+        chartTypeDialog.clickApply();
+        currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        chartHelper.openXAxisWindow();
-        chartHelper.selectMeasure(TAGGED_DIMENSION);
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_DIMENSION));
-        assertElementPresent(GenericChartHelper.Locators.pickerRow.withText(TAGGED_MEASURE));
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_MEASURE));
-        chartHelper.confirmSelection();
+        assertTrue(currentSvg.getText().contains(TAGGED_DIMENSION));
 
-        assertTrue(chartHelper.getCurrentSvg().getText().contains(TAGGED_DIMENSION));
-
-        chartHelper.saveChart("restricted chart");
+        saveChart("restricted chart");
     }
 
     @Test
     public void testUnrestrictedMeasures()
     {
+        ChartTypeDialog chartTypeDialog;
+        WebElement currentSvg;
+
         disableColumnRestricting();
 
         goToProjectHome();
@@ -136,26 +144,26 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.clickHeaderButton("Charts", "Create Box Plot");
 
-        GenericChartHelper chartHelper = new BoxPlotReportHelper(this, DATASET);
+        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog.waitForDialog();
+        assertTrue("List does not contains value '" + UNTAGGED_MEASURE + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
+        assertTrue("List does not contains value '" + UNTAGGED_DIMENSION + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
+        chartTypeDialog.setYAxis(TAGGED_MEASURE);
+        chartTypeDialog.clickApply();
+        currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        chartHelper.selectMeasure(TAGGED_MEASURE);
-        assertElementPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_MEASURE));
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(TAGGED_DIMENSION));
-        assertElementNotPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_DIMENSION));
-        chartHelper.confirmSelection();
+        assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
-        assertTrue(chartHelper.getCurrentSvg().getText().contains(TAGGED_MEASURE));
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog.waitForDialog();
+        chartTypeDialog.setXAxis(TAGGED_DIMENSION);
+        chartTypeDialog.clickApply();
+        currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        chartHelper.openXAxisWindow();
-        chartHelper.selectMeasure(TAGGED_DIMENSION);
-        assertElementPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_DIMENSION));
-        assertElementPresent(GenericChartHelper.Locators.pickerRow.withText(TAGGED_MEASURE));
-        assertElementPresent(GenericChartHelper.Locators.pickerRow.withText(UNTAGGED_MEASURE));
-        chartHelper.confirmSelection();
+        assertTrue(currentSvg.getText().contains(TAGGED_DIMENSION));
 
-        assertTrue(chartHelper.getCurrentSvg().getText().contains(TAGGED_DIMENSION));
-
-        chartHelper.saveChart("unrestricted chart");
+        saveChart("unrestricted chart");
     }
 
     private void enableColumnRestricting()
@@ -170,6 +178,15 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         goToProjectSettings();
         uncheckCheckbox(Locator.name("restrictedColumnsEnabled"));
         clickButton("Save");
+    }
+
+    private void saveChart(String name)
+    {
+        clickButton("Save", 0);
+        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog();
+        saveChartDialog.setReportName(name);
+        saveChartDialog.clickSave();
     }
 
     @Override
