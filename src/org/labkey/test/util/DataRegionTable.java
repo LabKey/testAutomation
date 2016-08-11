@@ -201,7 +201,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         if (!getCustomizeView().isPanelExpanded())
         {
             _driver.doAndWaitForPageSignal(() ->
-                    clickHeaderButton("Grid Views", false, "Customize Grid"),
+                    clickHeaderMenu("Grid Views", false, "Customize Grid"),
                     DataRegionTable.PANEL_SHOW_SIGNAL);
         }
         return getCustomizeView();
@@ -289,7 +289,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public List<WebElement> getHeaderButtons()
     {
-        return elements().getHeaderButtons();
+        return elements().getAllHeaderButtons();
     }
 
     public int getDataRowCount()
@@ -1076,7 +1076,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void showAll()
     {
-        clickHeaderButton("Paging", "Show All");
+        clickHeaderMenu("Paging", "Show All");
     }
 
     public void setPageSize(int size)
@@ -1086,7 +1086,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void setPageSize(int size, boolean wait)
     {
-        clickHeaderButton("Paging", wait, size + " per page");
+        clickHeaderMenu("Paging", wait, size + " per page");
     }
 
     /**
@@ -1141,42 +1141,55 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     {
         if (!_driver.isElementPresent(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName)))
         {
-            _driver.click(Locators.headerButton(_regionName, "Filter"));
+            clickHeaderButtonByText("Filter");
             _driver.waitForElement(Locator.css(".lk-filter-panel-label"));
         }
         WebElement panelEl = _driver.waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName));
         return new DatasetFacetPanel(panelEl, this);
     }
 
+    // TODO: Rename to 'clickHeaderButton' once deprecated method is safely removed
     public void clickHeaderButtonByText(String buttonText)
     {
-        _driver.waitAndClick(Locator.lkButton(buttonText));
+        elements().getHeaderButton(buttonText).click();
     }
 
+    public void clickHeaderButtonAndWait(String buttonText)
+    {
+        _driver.clickAndWait(elements().getHeaderButton(buttonText));
+    }
+
+    @Deprecated // TODO: Remove after 16.3. Possibly used in unmerged git branches
     public void clickHeaderButton(String buttonText, String ... subMenuLabels)
     {
-        clickHeaderButton(buttonText, true, subMenuLabels);
+        clickHeaderMenu(buttonText, subMenuLabels);
+    }
+
+    @Deprecated // TODO: Remove after 16.3. Possibly used in unmerged git branches
+    public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
+    {
+        clickHeaderMenu(buttonText, wait, subMenuLabels);
     }
 
     public void openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
-        _driver._ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(_regionName, buttonText), true, subMenuLabels);
+        _driver._ext4Helper.clickExt4MenuButton(false, elements().getHeaderMenuButton(buttonText), true, subMenuLabels);
     }
 
-    public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
+    public void clickHeaderMenu(String buttonText, String ... subMenuLabels)
     {
-        _driver._ext4Helper.clickExt4MenuButton(wait, DataRegionTable.Locators.headerMenuButton(_regionName, buttonText), false, subMenuLabels);
+        clickHeaderMenu(buttonText, true, subMenuLabels);
     }
 
-    public List<String> getHeaderButtonSubmenuText(String buttonText)
+    public void clickHeaderMenu(String buttonText, boolean wait, String ... subMenuLabels)
     {
-        List<String> subMenuItems = new ArrayList<>();
-        List<WebElement> buttonElements = _driver._ext4Helper.getExt4MenuButtonSubMenu(DataRegionTable.Locators.headerMenuButton(_regionName, buttonText));
-        for (WebElement buttonElement : buttonElements)
-        {
-            subMenuItems.add(buttonElement.getText());
-        }
-        return subMenuItems;
+        _driver._ext4Helper.clickExt4MenuButton(wait, elements().getHeaderMenuButton(buttonText), false, subMenuLabels);
+    }
+
+    public List<String> getHeaderMenuOptions(String buttonText)
+    {
+        List<WebElement> menuItems = _driver._ext4Helper.getMenuItems(elements().getHeaderMenuButton(buttonText));
+        return getWrapper().getTexts(menuItems);
     }
 
     public static class Locators extends org.labkey.test.Locators
@@ -1191,11 +1204,10 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             return Locator.tagWithAttribute("table", "lk-region-name", regionName);
         }
 
-        public static Locator.XPathLocator headerButton(String regionName, String text)
-        {
-            return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-button").withText(text));
-        }
-
+        /**
+         * @deprecated Access via {@link DataRegionTable} instance
+         */
+        @Deprecated
         public static Locator.XPathLocator headerMenuButton(String regionName, String text)
         {
             return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button").withText(text));
@@ -1220,8 +1232,10 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
     protected class Elements extends Component.ElementCache
     {
         private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
-        private List<WebElement> headerButtons;
-        private List<String> headerButtonLabels;
+        private WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
+        private List<WebElement> allHeaderButtons;
+        private Map<String, WebElement> headerButtons;
+        private Map<String, WebElement> headerMenuButtons;
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
         private List<WebElement> columnHeaders;
         private Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
@@ -1292,24 +1306,35 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             return columnHeaders;
         }
 
-        protected List<WebElement> getHeaderButtons()
+        protected List<WebElement> getAllHeaderButtons()
         {
-            if (headerButtons == null)
-                headerButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button").findElements(header));
-            return headerButtons;
+            if (allHeaderButtons == null)
+                allHeaderButtons = ImmutableList.copyOf(Locator.css("a.labkey-button, a.labkey-menu-button").findElements(buttonBar));
+            return allHeaderButtons;
         }
 
-        //TODO: in progress - tchad
         protected WebElement getHeaderButton(String text)
         {
-            if (headerButtonLabels == null)
-                headerButtonLabels = new ArrayList<>(getHeaderButtons().size());
+            if (headerButtons == null)
+                headerButtons = new TreeMap<>();
 
-            if (!headerButtonLabels.contains(text))
+            if (!headerButtons.containsKey(text))
             {
-
+                headerButtons.put(text, Locator.tagWithClass("a", "labkey-button").withText(text).findElement(buttonBar));
             }
-            return headerButtons.get(headerButtonLabels.indexOf(text));
+            return headerButtons.get(text);
+        }
+
+        protected WebElement getHeaderMenuButton(String text)
+        {
+            if (headerMenuButtons == null)
+                headerMenuButtons = new TreeMap<>();
+
+            if (!headerMenuButtons.containsKey(text))
+            {
+                headerMenuButtons.put(text, Locator.tagWithClass("a", "labkey-menu-button").withText(text).findElement(buttonBar));
+            }
+            return headerMenuButtons.get(text);
         }
     }
 }

@@ -691,7 +691,11 @@ public class Ext4Helper
         catch (NoSuchElementException retry)
         {
             menu.click(); // Sometimes ext4 menus don't open on the first try
+            _test.waitForElement(Locators.menuItem().notHidden(), 1000);
         }
+        if (onlyOpen && subMenuLabels.length == 0)
+            return null;
+
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             WebElement subMenuItem = _test.waitForElement(Locators.menuItem(subMenuLabels[i]).notHidden(), 2000);
@@ -727,10 +731,10 @@ public class Ext4Helper
         return clickExt4MenuButton(wait, menu.waitForElement(_test.shortWait()), onlyOpen, subMenuLabels);
     }
 
-    public List<WebElement> getExt4MenuButtonSubMenu(Locator menu)
+    public List<WebElement> getMenuItems(WebElement menu)
     {
-        _test.waitAndClick(menu);
-        return _test.getDriver().findElements(Locator.tagWithClass("span", _cssPrefix + "menu-item-text").toBy());
+        openMenu(menu);
+        return Locator.tagWithClass("span", _cssPrefix + "menu-item-text").findElements(_test.getDriver());
     }
 
     public void closeExtTab(String tabName)
