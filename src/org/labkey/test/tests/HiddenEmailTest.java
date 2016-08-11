@@ -115,10 +115,10 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -161,12 +161,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickProject(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         stopImpersonating();

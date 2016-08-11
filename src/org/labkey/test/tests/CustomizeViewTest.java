@@ -327,7 +327,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
             _customizeViewsHelper.saveCustomView(name);
         }
 
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "default");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "default");
         DataRegionTable.findDataRegion(this).openHeaderMenu("Grid Views", "default");
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }

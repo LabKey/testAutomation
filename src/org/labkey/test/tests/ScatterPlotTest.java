@@ -156,7 +156,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.clickHeaderButton("Charts", "Create Scatter Plot");
+        datasetTable.clickHeaderMenu("Charts", "Create Scatter Plot");
 
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();

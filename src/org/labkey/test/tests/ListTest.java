@@ -600,7 +600,7 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "default");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");

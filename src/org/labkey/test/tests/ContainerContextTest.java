@@ -32,7 +32,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-import org.labkey.test.components.CustomizeView;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
@@ -162,7 +161,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insert row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(lookupSourceListName));
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
         clickButton("Submit");
@@ -230,11 +229,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Inserting row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
 
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
         clickButton("Submit");
 
@@ -290,13 +289,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", "Create R Report");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", "Create R Report");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(folder + "-BackgroundReport");
         DataRegionTable.waitForDataRegion(this, "query");
 
         log("** Executing background R script");
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", folder + "-BackgroundReport");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", folder + "-BackgroundReport");
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
@@ -329,7 +328,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _customizeViewsHelper.addCustomizeViewSort("Created", "Ascending");
         _customizeViewsHelper.saveCustomView("CreatedOnly");
 
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Grid Views", "Folder Filter", "Current folder and subfolders");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "Folder Filter", "Current folder and subfolders");
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(2, table.getDataRowCount());
 

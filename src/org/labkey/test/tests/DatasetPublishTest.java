@@ -26,7 +26,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -89,7 +88,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        DataRegionTable.findDataRegion(this).clickHeaderButton("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
         waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
         setFormElement(Locator.name("quf_date"), "1/1/2001");

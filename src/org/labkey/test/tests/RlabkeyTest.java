@@ -119,7 +119,7 @@ public class RlabkeyTest extends BaseWebDriverTest
             {
                 clickProject(PROJECT_NAME);
                 clickAndWait(Locator.linkWithText(LIST_NAME));
-                DataRegionTable.findDataRegion(this).clickHeaderButton("Reports", "Create R Report");
+                DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", "Create R Report");
 
                 // we want to load the Rlabkey package from the override location
                 File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");

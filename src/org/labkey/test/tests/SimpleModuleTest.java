@@ -412,7 +412,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.cancel();
 
-        dr.clickHeaderButton("Grid Views", "EditableFileBasedView");
+        dr.clickHeaderMenu("Grid Views", "EditableFileBasedView");
 
         log("** Try to edit overridable file-based view");
         _customizeViewsHelper.openCustomizeViewPanel();

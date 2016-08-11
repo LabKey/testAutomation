@@ -408,7 +408,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         // re-establish the reference to the dataregion table.
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
 
-        dataRegionTable.clickHeaderButton("Grid Views", SAVED_VIEW);
+        dataRegionTable.clickHeaderMenu("Grid Views", SAVED_VIEW);
 
         log("Validate that the plots are there as expected.");
 
