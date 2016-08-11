@@ -46,6 +46,7 @@ public class IssueListDefDataRegion extends DataRegionTable
     {
         InsertIssueDefPage insertIssueDefPage = clickInsert();
         insertIssueDefPage.setLabel(name);
+        insertIssueDefPage.selectKind("General Issue Tracker");
         return insertIssueDefPage.clickSubmit();
     }
 
