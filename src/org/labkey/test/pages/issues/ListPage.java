@@ -58,13 +58,13 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
 
     public AdminPage clickAdmin()
     {
-        elementCache().issuesList.clickHeaderButtonByText("Admin");
+        elementCache().issuesList.clickHeaderButtonAndWait("Admin");
         return new AdminPage(getDriver());
     }
 
     public EmailPrefsPage clickEmailPreferences()
     {
-        elementCache().issuesList.clickHeaderButtonByText("Email Preferences");
+        elementCache().issuesList.clickHeaderButtonAndWait("Email Preferences");
         return new EmailPrefsPage(getDriver());
     }
 
