@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpException;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -26,6 +25,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
@@ -33,7 +33,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -283,24 +282,19 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void toggleThumbnailType(String chart, boolean custom)
+    protected void toggleThumbnailType(String chart, boolean useAutoThumbnail)
     {
         clickAndWait(Locator.linkWithText(chart));
         waitForElement(Locator.css("svg"));
         clickButton("Edit");
         waitForElement(Locator.css("svg"));
-        waitForTextToDisappear("loading data...");
+        waitForTextToDisappear("Loading Data...");
         clickButton("Save", 0);
-        if(!custom)
-        {
-            waitAndClick(Locator.xpath("//input[@type='button' and ../label[text()='None']]"));
-        }
-        else
-        {
-            waitAndClick(Locator.xpath("//input[@type='button' and ../label[text()='Auto-generate']]"));
-        }
 
-        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
+        SaveChartDialog saveChartDialog = new SaveChartDialog(this);
+        saveChartDialog.waitForDialog();
+        saveChartDialog.setThumbnailType(useAutoThumbnail);
+        saveChartDialog.clickSave();
         sleep(2500); // sleep while the save success message shows
     }
 

@@ -50,6 +50,14 @@ public class SaveChartDialog<EC extends Component.ElementCache> extends Componen
         _test.setFormElement(elements().reportDescription, description);
     }
 
+    public void setThumbnailType(boolean auto)
+    {
+        if (auto)
+            elements().autoThumbnail.click();
+        else
+            elements().noThumbnail.click();
+    }
+
     public void clickCancel()
     {
         Window w = new Window(elements().dialog, _test.getDriver());
@@ -77,5 +85,7 @@ public class SaveChartDialog<EC extends Component.ElementCache> extends Componen
         public WebElement dialog = new LazyWebElement(Locator.xpath(DIALOG_XPATH), _test.getDriver());
         public WebElement reportName = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//td//label[text()='Report Name:']/parent::td/following-sibling::td//input"), _test.getDriver());
         public WebElement reportDescription = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//td//label[text()='Report Description:']/parent::td/following-sibling::td//textarea"), _test.getDriver());
+        public WebElement noThumbnail = new LazyWebElement(Locator.xpath("//input[@type='button' and ../label[text()='None']]"), _test.getDriver());
+        public WebElement autoThumbnail = new LazyWebElement(Locator.xpath("//input[@type='button' and ../label[text()='Auto-generate']]"), _test.getDriver());
     }
 }
