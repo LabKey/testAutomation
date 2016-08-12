@@ -73,7 +73,7 @@ public class DumbsterController extends SpringActionController
 
         public NavTree appendNavTrail(NavTree root)
         {
-            return root;
+            return root.addChild("Mail Record");
         }
     }
 
