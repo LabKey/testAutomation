@@ -1173,7 +1173,7 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
-        _driver._ext4Helper.clickExt4MenuButton(false, elements().getHeaderMenuButton(buttonText), true, subMenuLabels);
+        _driver._ext4Helper.clickExt4MenuButton(false, elements().getHeaderButton(buttonText), true, subMenuLabels);
     }
 
     public void clickHeaderMenu(String buttonText, String ... subMenuLabels)
@@ -1183,12 +1183,12 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public void clickHeaderMenu(String buttonText, boolean wait, String ... subMenuLabels)
     {
-        _driver._ext4Helper.clickExt4MenuButton(wait, elements().getHeaderMenuButton(buttonText), false, subMenuLabels);
+        _driver._ext4Helper.clickExt4MenuButton(wait, elements().getHeaderButton(buttonText), false, subMenuLabels);
     }
 
     public List<String> getHeaderMenuOptions(String buttonText)
     {
-        List<WebElement> menuItems = _driver._ext4Helper.getMenuItems(elements().getHeaderMenuButton(buttonText));
+        List<WebElement> menuItems = _driver._ext4Helper.getMenuItems(elements().getHeaderButton(buttonText));
         return getWrapper().getTexts(menuItems);
     }
 
@@ -1235,7 +1235,6 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         private WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private List<WebElement> allHeaderButtons;
         private Map<String, WebElement> headerButtons;
-        private Map<String, WebElement> headerMenuButtons;
         private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
         private List<WebElement> columnHeaders;
         private Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
@@ -1320,21 +1319,9 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
             if (!headerButtons.containsKey(text))
             {
-                headerButtons.put(text, Locator.tagWithClass("a", "labkey-button").withText(text).findElement(buttonBar));
+                headerButtons.put(text, Locator.lkButton(text).findElement(buttonBar));
             }
             return headerButtons.get(text);
-        }
-
-        protected WebElement getHeaderMenuButton(String text)
-        {
-            if (headerMenuButtons == null)
-                headerMenuButtons = new TreeMap<>();
-
-            if (!headerMenuButtons.containsKey(text))
-            {
-                headerMenuButtons.put(text, Locator.tagWithClass("a", "labkey-menu-button").withText(text).findElement(buttonBar));
-            }
-            return headerMenuButtons.get(text);
         }
     }
 }
