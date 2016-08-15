@@ -566,6 +566,7 @@ src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
+src/org/labkey/test/tests/FileAttachmentColumnTest.java -text
 src/org/labkey/test/tests/FileBasedPipelineTest.java -text
 src/org/labkey/test/tests/FileBrowserIconsTest.java -text
 src/org/labkey/test/tests/FileContentActionButtonsTest.java -text
