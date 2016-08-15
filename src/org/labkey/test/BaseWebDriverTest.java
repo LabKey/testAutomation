@@ -885,6 +885,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             log("========= Cleaning up " + getClass().getSimpleName() + " =========");
 
+            setUp();
             // explicitly go back to the site, just in case we're on a 404 or crash page:
             beginAt("");
             signIn();
