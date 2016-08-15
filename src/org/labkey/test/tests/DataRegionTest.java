@@ -74,7 +74,8 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
                     new Pair<>("Set Paging to 2 with API", "testSetPaging"),
                     new Pair<>("Regression #25337", "test25337"),
-                    new Pair<>("Change Page Offset", "testPageOffset")
+                    new Pair<>("Change Page Offset", "testPageOffset"),
+                    new Pair<>("Keep Removable Filters", "testRemovableFilters")
                     );
 
     private static final Pair<String, String> QWP_SCHEMA_LISTING = new Pair<>("List out all queries in schema", "testSchemaOnly");
