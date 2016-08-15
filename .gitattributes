@@ -404,6 +404,7 @@ src/org/labkey/test/categories/Workflow.java -text
 src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/components/BodyWebPart.java -text
 src/org/labkey/test/components/ChartLayoutDialog.java -text
+src/org/labkey/test/components/ChartQueryDialog.java -text
 src/org/labkey/test/components/ChartTypeDialog.java -text
 src/org/labkey/test/components/ColumnChartComponent.java -text
 src/org/labkey/test/components/ColumnChartRegion.java -text

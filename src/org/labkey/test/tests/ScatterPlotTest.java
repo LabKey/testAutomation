@@ -23,6 +23,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
+import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
@@ -74,12 +75,10 @@ public class ScatterPlotTest extends GenericChartsTest
         goToManageViews();
         clickAddChart("Scatter Plot");
 
-        _extHelper.waitForExtDialog("Select Query");
-        //TODO: weird timing with these combo scatteres.
-        _ext4Helper.selectComboBoxItem("Query", "APX-1 (APX-1: Abbreviated Physical Exam)");
-        // Todo: put better wait here
-        sleep(5000);
-        _ext4Helper.clickWindowButton("Select Query", "Ok", 0, 0);
+        ChartQueryDialog queryDialog = new ChartQueryDialog(this);
+        queryDialog.waitForDialog();
+        queryDialog.selectQuery("APX-1 (APX-1: Abbreviated Physical Exam)");
+        queryDialog.clickOk();
 
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();

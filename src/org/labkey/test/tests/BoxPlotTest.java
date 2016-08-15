@@ -21,6 +21,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
+import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
@@ -55,17 +56,13 @@ public class BoxPlotTest extends GenericChartsTest
         goToManageViews();
         clickAddChart("Box Plot");
 
-        //TODO: weird timing with these combo boxes.
-        _ext4Helper.selectComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
-
-        // Todo: put better wait here
-        sleep(5000);
-        _ext4Helper.clickWindowButton("Select Query", "Ok", 0, 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "4c.Induration 1st measure");
+        ChartQueryDialog queryDialog = new ChartQueryDialog(this);
+        queryDialog.waitForDialog();
+        queryDialog.selectQuery("RCF-1 (RCF-1: Reactogenicity-Day 2)");
+        queryDialog.clickOk();
 
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-
         chartTypeDialog.setYAxis("4c.Induration 1st measure");
         chartTypeDialog.clickApply();
 
