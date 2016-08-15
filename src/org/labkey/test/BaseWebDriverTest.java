@@ -193,7 +193,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
         {
-            if (isTestRunningOnTeamCity() || (bestBrowser() == BrowserType.CHROME))
+            if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
             else
                 BROWSER_TYPE = bestBrowser();
