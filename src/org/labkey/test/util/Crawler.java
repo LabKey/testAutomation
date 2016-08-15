@@ -154,6 +154,7 @@ public class Crawler
             new ControllerActionId("reports", "downloadInputData"),
             new ControllerActionId("reports", "streamFile"),
             new ControllerActionId("reports", "download"),
+            new ControllerActionId("search", "search"), // Tests need to wait for indexer manually
             new ControllerActionId("security", "resetPassword"),
             new ControllerActionId("study", "confirmDeleteVisit"),
             new ControllerActionId("study", "template"),
