@@ -1885,22 +1885,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     final File[] files = downloadDir.listFiles(newFileFilter);
                     return files != null && files.length >= expectedFileCount;
                 },
-                "File(s) did not appear in download dir", WAIT_FOR_PAGE);
+                "File(s) did not appear in download dir: " + downloadDir.toString(), WAIT_FOR_PAGE);
 
         waitFor(() -> {
                     final File[] files = downloadDir.listFiles(tempFilesFilter);
                     return files != null && files.length == 0;
                 },
-                "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
+                "Temp files remain after download: " + downloadDir.toString(), WAIT_FOR_JAVASCRIPT);
 
         File[] newFiles = downloadDir.listFiles(newFileFilter);
-        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
 
         log("File(s) downloaded to " + downloadDir);
         for (File newFile : newFiles)
         {
-            log("File downloaded: " + newFile.getName());
+            log("  File downloaded: " + newFile.getName());
         }
+        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
 
         if (getDriver() instanceof FirefoxDriver)
             Locator.css("body").findElement(getDriver()).sendKeys(Keys.ESCAPE); // Dismiss download dialog
