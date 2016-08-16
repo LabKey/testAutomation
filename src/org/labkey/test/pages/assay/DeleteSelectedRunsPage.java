@@ -21,6 +21,11 @@ public class DeleteSelectedRunsPage extends LabKeyPage<DeleteSelectedRunsPage.El
         doAndWaitForPageToLoad(()-> newElementCache().okButton.click());
     }
 
+    public void clickConfirmDelete()
+    {
+        doAndWaitForPageToLoad(()-> newElementCache().confirmDeleteButton.click());
+    }
+
     public void clickCancel()
     {
         doAndWaitForPageToLoad(()-> newElementCache().cancelButton.click());
@@ -35,6 +40,7 @@ public class DeleteSelectedRunsPage extends LabKeyPage<DeleteSelectedRunsPage.El
     public class Elements extends LabKeyPage.ElementCache
     {
         final WebElement okButton = new LazyWebElement(Locator.lkButton("OK"), this);
+        final WebElement confirmDeleteButton = new LazyWebElement(Locator.lkButton("Confirm Delete"), this);
         final WebElement cancelButton = new LazyWebElement(Locator.lkButton("Cancel"), this);
     }
 }
