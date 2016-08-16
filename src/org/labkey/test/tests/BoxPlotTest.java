@@ -25,6 +25,7 @@ import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -70,7 +71,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_1);
 
         log("Set Plot Title");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.setPlotTitle(CHART_TITLE);
@@ -90,7 +91,7 @@ public class BoxPlotTest extends GenericChartsTest
         chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
         chartTypeDialog.clickApply();
 
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.clickXAxisTab();
         chartLayoutDialog.setXAxisLabel("TestXAxis");
@@ -101,11 +102,10 @@ public class BoxPlotTest extends GenericChartsTest
         clickButton("Save", 0);
         SaveChartDialog saveChartDialog = new SaveChartDialog(this);
         saveChartDialog.waitForDialog();
+
         //Verify name requirement
         saveChartDialog.clickSave();
-        _extHelper.waitForExtDialog("Error");
-        _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
-        _extHelper.waitForExtDialogToDisappear("Error");
+        saveChartDialog.waitForInvalid();
 
         //Test cancel button
         saveChartDialog.setReportName("TestReportName");
@@ -151,7 +151,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.clickDeveloperTab();
@@ -188,4 +188,9 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
     }
 
+    private void clickChartLayoutButton()
+    {
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled());
+        clickButton("Chart Layout", 0);
+    }
 }

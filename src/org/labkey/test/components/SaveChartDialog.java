@@ -70,6 +70,11 @@ public class SaveChartDialog<EC extends Component.ElementCache> extends Componen
         w.clickButton("Save", 0);
     }
 
+    public void waitForInvalid()
+    {
+        _test.waitForElement(Locator.xpath(DIALOG_XPATH + "//input[contains(@class, 'x4-form-invalid-field')]"));
+    }
+
     public Elements elements()
     {
         return new Elements();

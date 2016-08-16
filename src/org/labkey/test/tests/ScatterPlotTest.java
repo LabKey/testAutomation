@@ -91,7 +91,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.setPlotTitle(CHART_TITLE);
@@ -107,7 +107,7 @@ public class ScatterPlotTest extends GenericChartsTest
         chartTypeDialog.clickApply();
 
         log("Set X Axis");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.clickXAxisTab();
@@ -125,11 +125,10 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Save", 0);
         saveChartDialog = new SaveChartDialog(this);
         saveChartDialog.waitForDialog();
+
         //Verify name requirement
         saveChartDialog.clickSave();
-        _extHelper.waitForExtDialog("Error");
-        _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
-        _extHelper.waitForExtDialogToDisappear("Error");
+        saveChartDialog.waitForInvalid();
 
         //Test cancel button
         saveChartDialog.setReportName("TestReportName");
@@ -432,7 +431,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.clickDeveloperTab();
@@ -456,7 +455,7 @@ public class ScatterPlotTest extends GenericChartsTest
         click(Ext4Helper.Locators.ext4Button("OK"));
 
         // open developer panel and test JS function validation
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         chartLayoutDialog.clickDeveloperTab();
@@ -489,7 +488,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);
         pushLocation();
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         assertFalse("Found the 'Developer' tab on the the Look and Feel dialog. It should not be there for this user.", chartLayoutDialog.getAvailableTabs().contains("Developer"));
@@ -502,11 +501,17 @@ public class ScatterPlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         popLocation();
         waitForText(CHART_TITLE);
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new ChartLayoutDialog(this);
         chartLayoutDialog.waitForDialog();
         assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", chartLayoutDialog.getAvailableTabs().contains("Developer"));
         chartLayoutDialog.clickCancel();
         stopImpersonating();
+    }
+
+    private void clickChartLayoutButton()
+    {
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled());
+        clickButton("Chart Layout", 0);
     }
 }
