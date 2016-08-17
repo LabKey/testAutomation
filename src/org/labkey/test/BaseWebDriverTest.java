@@ -135,7 +135,7 @@ import static org.labkey.test.components.ext4.Window.Window;
 public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cleanable, WebTest
 {
     private static BaseWebDriverTest currentTest;
-    private static WebDriver _driver;
+    private static final SingletonWebDriver _driver = SingletonWebDriver.getInstance();
     private final BrowserType BROWSER_TYPE;
 
     private String _lastPageTitle = null;
@@ -157,7 +157,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     @Deprecated // Use ApiPermissionsHelper unless UI testing is necessary
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
-    private static File _downloadDir;
 
     public static final int MAX_WAIT_SECONDS = 10 * 60;
     public static final int DEFAULT_CLASS_TIMEOUT = 40;
@@ -188,7 +187,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = DataRegionTable.isNewDataRegion ? new CustomizeView(this) : new CustomizeViewsHelper(this);
-        _downloadDir = new File(getArtifactCollector().ensureDumpDir(getClass().getSimpleName()), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
@@ -229,7 +227,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public WebDriver getWrappedDriver()
     {
-        return _driver;
+        return _driver.getWebDriver();
     }
 
     protected void setIsPerfTest(boolean isPerfTest)
@@ -248,7 +246,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doTearDown();
         }
 
-        _driver = createNewWebDriver(_driver, BROWSER_TYPE, getDownloadDir());
+        _driver.setUp(this);
 
         getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
         getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
@@ -289,24 +287,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private static void doTearDown()
     {
-        doTearDown(_testFailed);
-    }
-
-    private static void doTearDown(boolean testFailed)
-    {
-        try
-        {
-            boolean skipTearDown = testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
-            if ((!skipTearDown || isTestRunningOnTeamCity()) && _driver != null)
-            {
-                _driver.quit();
-            }
-        }
-        catch (UnreachableBrowserException ignore) {}
-        finally
-        {
-            _driver = null;
-        }
+        boolean leaveWindowOpen = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
+        _driver.tearDown(!leaveWindowOpen || isTestRunningOnTeamCity());
     }
 
     private void populateLastPageInfo()
@@ -371,7 +353,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             public void starting(Description description)
             {
                 testClassStartTime = System.currentTimeMillis();
-                _driver = null;
+                _driver.clear();
                 testCount = description.getChildren().size();
                 currentTestNumber = 0;
                 beforeClassSucceeded = false;
@@ -493,7 +475,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 if (e instanceof TestTimedOutException)
                 {
-                    _driver = null;
+                    _driver.clear();
                     currentTest = null;
                 }
             }
@@ -752,7 +734,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             {
                 populateLastPageInfo();
 
-                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
+                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null && _lastPageURL.toString().contains(WebTestHelper.getBaseURL()))
                 {
                     // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
                     try
@@ -825,7 +807,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         checkViews();
 
-        if (!isPerfTest && isTestRunningOnTeamCity())
+        if (!isPerfTest || isTestRunningOnTeamCity())
             checkActionCoverage();
 
         checkLinks();
@@ -901,7 +883,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public static File getDownloadDir()
     {
-        return _downloadDir;
+        return _driver.getDownloadDir();
     }
 
     @LogMethod
@@ -2530,5 +2512,66 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public @interface ClassTimeout
     {
         int minutes();
+    }
+
+    private static final class SingletonWebDriver
+    {
+        private static final SingletonWebDriver INSTANCE = new SingletonWebDriver();
+
+        private WebDriver _webDriver;
+        private File _downloadDir;
+
+        private SingletonWebDriver()
+        {
+            // Just for me
+            if (INSTANCE != null)
+                throw new IllegalStateException("Don't create multiple instances");
+        }
+
+        private static SingletonWebDriver getInstance()
+        {
+            return INSTANCE;
+        }
+
+        private WebDriver getWebDriver()
+        {
+            return _webDriver;
+        }
+
+        private File getDownloadDir()
+        {
+            return _downloadDir;
+        }
+
+        private void setUp(BaseWebDriverTest test)
+        {
+            WebDriver oldWebDriver = _webDriver;
+            File newDownloadDir = new File(test.getArtifactCollector().ensureDumpDir(test.getClass().getSimpleName()), "downloads");
+            _webDriver = test.createNewWebDriver(_webDriver, test.BROWSER_TYPE, newDownloadDir);
+            if (_webDriver != oldWebDriver) // downloadDir only changes when a new WebDriver is started.
+                _downloadDir = newDownloadDir;
+        }
+
+        private void tearDown(boolean closeOldBrowser)
+        {
+            try
+            {
+                if (closeOldBrowser && _webDriver != null)
+                {
+                    _webDriver.quit();
+                }
+            }
+            catch (UnreachableBrowserException ignore) {}
+            finally
+            {
+                clear();
+            }
+        }
+
+        private void clear()
+        {
+            // Don't clear _downloadDir. Cleanup steps might still need it after tearDown
+            _webDriver = null;
+        }
     }
 }
