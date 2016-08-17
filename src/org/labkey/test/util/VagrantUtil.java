@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class VagrantUtil
@@ -99,23 +100,38 @@ public class VagrantUtil
                 out.add(outLine);
                 if (elapsed > timeOut)
                 {
-                    processOutput(out, null);
+                    processOutput(out, p);
                     throw new TimeoutException("Timed out executing vagrant command `" + reconstructedCommand + "` in directory " + _dirPath);
                 }
             }
-            processOutput(out, p.exitValue());
+            processOutput(out, p);
         }
         TestLogger.decreaseIndent();
         long totalSecs = (System.currentTimeMillis()-startTime)/1000;
         TestLogger.log("command `" + reconstructedCommand + "` in directory \"" + _dirPath + "\" : completed in " + totalSecs + " seconds");
     }
 
-    private void processOutput(List<String> output, Integer returnCode)
+    private void processOutput(List<String> output, Process p)
     {
+        Integer returnCode = null;
+        try
+        {
+            if(p.waitFor(30, TimeUnit.SECONDS))
+            {
+                returnCode = p.exitValue();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+
         if(!new Integer(0).equals(returnCode))
         {
             if (returnCode != null)
-                TestLogger.log("unexpected exit code " + returnCode, System.err);
+                TestLogger.log("Unexpected exit code " + returnCode, System.err);
+            else
+                TestLogger.log("Process did not exit after last output", System.err);
             for (int i = output.size() - 10; i < output.size(); i++)
             {
                 if(i >= 0)
