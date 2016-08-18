@@ -31,6 +31,7 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
+import org.labkey.test.components.BodyWebPart;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -44,6 +45,7 @@ public class DataViewsTest extends ParticipantListTest
     private static final String REPORT_TO_DELETE = "Scatter: Systolic vs Diastolic";
     private static final String NEW_CATEGORY = "A New Category";
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
+    private static final int NEW_CUSTOM_HEIGHT = 400;
     private static final String[][] datasets = {
             {"CPS-1: Screening Chemistry Panel", "Unlocked"},
             {"ECI-1: Eligibility Criteria", "Draft"},
@@ -88,6 +90,7 @@ public class DataViewsTest extends ParticipantListTest
         datasetStatusTest();
         refreshDateTest();
         exportImportTest();
+        CustomizePanelHeightTest();
     }
     
     @LogMethod
@@ -497,6 +500,63 @@ public class DataViewsTest extends ParticipantListTest
         RadioButton().withLabel("By Display Order").find(getDriver()).check();
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
+    }
+
+    @LogMethod
+    public void CustomizePanelHeightTest()
+    {
+        log("Testing ability to customize panel height");
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
+
+        // set Data Views panel height to use a Custom height value
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        RadioButton().withLabel("Custom").find(getDriver()).check();
+
+        // specify a custom height
+        setFormElement(Locator.name("height"), String.valueOf(NEW_CUSTOM_HEIGHT));
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+
+        // get actual height of the Data View panel grid portion
+        BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), RENAMED_WEBPART_TITLE);
+        Locator.XPathLocator dataViewGrid = Locator.xpath("//div").withClass("x4-panel x4-border-item x4-box-item x4-panel-default").notHidden();
+        int dataViewHeight = dataViewsWebPart.findElement(dataViewGrid).getSize().getHeight();
+
+        // check if actual height matches custom set height
+        assertEquals("Data View panel height not set to specified custom height", NEW_CUSTOM_HEIGHT, dataViewHeight);
+
+        // set Data Views panel height to use a Default (dynamic) height value
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        RadioButton().withLabel("Default (dynamic)").find(getDriver()).check();
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+
+        // get the number of Data Views that are to be displayed in the Data View panel
+        final Locator displayedDataViewsRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
+        waitForElement(displayedDataViewsRow);
+        int dataViewsInPanel = getElementCount(displayedDataViewsRow);
+
+        // get actual height of the Data View panel grid portion
+        dataViewsWebPart = new BodyWebPart(getDriver(), RENAMED_WEBPART_TITLE);
+        dataViewGrid = Locator.xpath("//div").withClass("x4-panel x4-border-item x4-box-item x4-panel-default").notHidden();
+        dataViewHeight = dataViewsWebPart.findElement(dataViewGrid).getSize().getHeight();
+
+        // calculate expected height of Data View panel given number of Data Views to be displayed
+        // height computing logic replicates that in DataViewsPanel.js
+        int dataViewPanelHeaderSize = 125;
+        int heightPerRecord = 25;
+        int exptectedHeight = dataViewsInPanel * heightPerRecord + dataViewPanelHeaderSize;
+        if (exptectedHeight > 700)
+        {
+            exptectedHeight = 700;
+        }
+        if (exptectedHeight < 200)
+        {
+            exptectedHeight = 200;
+        }
+
+        // check if expected height equals dynamic height
+        assertEquals("Data View panel dynamic height not correct", exptectedHeight , dataViewHeight);
     }
 
     /**
