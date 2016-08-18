@@ -407,7 +407,7 @@ public class ExtHelper
     {
         Locator.XPathLocator comboArrow = parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]");
         _test.click(comboArrow);
-        Locator.XPathLocator comboListItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
+        Locator.XPathLocator comboListItem = Locators.comboListItem().withText(selection);
         _test.waitAndClick(comboListItem);
         if (_test.isElementPresent(comboListItem))
         {
@@ -541,16 +541,18 @@ public class ExtHelper
     {
         /**
          * Locates title bar of an Ext 3 or 4 window
+         *
          * @param title partial text of window title
          * @return Locator for window's title bar
          */
         public static Locator.XPathLocator extDialog(String title)
         {
-            return Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+            return Locator.xpath("//span[" + Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
         }
 
         /**
          * Locates an Ext 3 window
+         *
          * @param title Exact text of window title
          * @return Locator for Ext 3 window
          */
@@ -567,6 +569,11 @@ public class ExtHelper
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
             return Locator.tagWithClass("div", "x-form-item").withPredicate(Locator.xpath("./label").withText(label));
+        }
+
+        public static Locator.XPathLocator comboListItem()
+        {
+            return Locator.tagWithClass("div", "x-combo-list-item").notHidden();
         }
     }
 }
