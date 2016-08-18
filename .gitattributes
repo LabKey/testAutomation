@@ -540,7 +540,6 @@ src/org/labkey/test/tests/BaseTermsOfUseTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
-src/org/labkey/test/tests/CSISampleTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/ColumnChartTest.java -text
