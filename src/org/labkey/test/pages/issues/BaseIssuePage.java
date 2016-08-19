@@ -66,7 +66,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         return elementCache().notifyList;
     }
 
-    public FormItem getCustomField(String label)
+    public FormItem<Object> getCustomField(String label)
     {
         return elementCache().formItemWithLabel(label);
     }
@@ -107,17 +107,17 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
     {
         protected final Map<String, FormItem> formItems = new CaseInsensitiveHashMap<>();
 
-        protected FormItem status = formItemWithLabel("Status");
-        protected FormItem assignedTo = formItemWithLabel("Assigned\u00a0To");
-        protected FormItem priority = formItemWithLabel("Pri");
-        protected FormItem resolution = formItemWithLabel("Resolution");
-        protected FormItem duplicate = formItemWithLabel("Duplicate");
-        protected FormItem related = formItemWithLabel("Related");
-        protected FormItem notifyList = formItemWithLabel("Notify");
-        protected FormItem openedDate = formItemWithLabel("Opened");
-        protected FormItem changedDate = formItemWithLabel("Changed");
-        protected FormItem resolvedDate = formItemWithLabel("Resolved");
-        protected FormItem closedDate = formItemWithLabel("Closed");
+        protected FormItem<String> status = formItemWithLabel("Status");
+        protected FormItem<String> assignedTo = formItemWithLabel("Assigned\u00a0To");
+        protected FormItem<String> priority = formItemWithLabel("Pri");
+        protected FormItem<String> resolution = formItemWithLabel("Resolution");
+        protected FormItem<String> duplicate = formItemWithLabel("Duplicate");
+        protected FormItem<String> related = formItemWithLabel("Related");
+        protected FormItem<String> notifyList = formItemWithLabel("Notify");
+        protected FormItem<String> openedDate = formItemWithLabel("Opened");
+        protected FormItem<String> changedDate = formItemWithLabel("Changed");
+        protected FormItem<String> resolvedDate = formItemWithLabel("Resolved");
+        protected FormItem<String> closedDate = formItemWithLabel("Closed");
 
         private FormItem replaceIfNewer(String nameOrLabel, FormItem candidate)
         {
@@ -128,12 +128,12 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
             return formItems.get(key);
         }
 
-        protected FormItem formItemWithLabel(String label)
+        protected <T> FormItem<T> formItemWithLabel(String label)
         {
             return replaceIfNewer(label, FormItem(getDriver()).withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
         }
 
-        protected FormItem formItemNamed(String name)
+        protected <T> FormItem<T> formItemNamed(String name)
         {
             return replaceIfNewer(name, FormItem(getDriver()).withName(name).findWhenNeeded(this));
         }
