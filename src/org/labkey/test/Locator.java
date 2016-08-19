@@ -1068,6 +1068,21 @@ public abstract class Locator
             return this.withPredicate(String.valueOf(pos));
         }
 
+        //Experimental. Might not work quite right within non-global SearchContext
+        public static XPathLocator union(XPathLocator... locators)
+        {
+            if (locators.length < 1)
+                throw new IllegalArgumentException("Specify at least one locator");
+            if (locators.length == 1)
+                return locators[0];
+            List<String> xpaths = new ArrayList<>(locators.length);
+            for (XPathLocator locator : locators)
+            {
+                xpaths.add(locator.getRelativeXPath());
+            }
+            return new XPathLocator("((" + String.join(")|(", xpaths) + "))");
+        }
+
         /**
          * @deprecated Use {@link #getLoc()}
          */
