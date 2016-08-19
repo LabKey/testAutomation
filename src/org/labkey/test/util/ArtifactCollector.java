@@ -27,6 +27,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -230,6 +231,9 @@ public class ArtifactCollector
                 "  return 'txt';\n" +
                 "else\n" +
                 "  return document.doctype.name;");
+
+        if (_driver.getDriver() instanceof ChromeDriver && docType.equals("txt"))
+            docType = "html"; // Chrome wraps displayed text files in HTML
 
         File htmlFile = new File(dir, baseName + "." + docType);
 
