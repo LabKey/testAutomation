@@ -96,15 +96,16 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     }
 
     @Override
-    public void save()
+    public ListPage save()
     {
         clickButton("Save");
+        return new ListPage(getDriver());
     }
 
     @Override
-    public void saveAndClose()
+    public ListPage saveAndClose()
     {
-        save();
+        return save();
     }
 
     public enum SortDirection implements OptionSelect.SelectOption

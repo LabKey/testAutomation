@@ -73,15 +73,17 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
         waitForElement(Locator.tagWithClass("li", "x-tab-strip-active").withText(tab));
     }
 
-    public void save()
+    public LabKeyPage save()
     {
         doAndExpectClean(() -> clickButton("Save", 0));
         waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
+        return null;
     }
 
-    public void saveAndClose()
+    public LabKeyPage saveAndClose()
     {
         clickButton("Save & Close");
+        return null;
     }
 
     @Override

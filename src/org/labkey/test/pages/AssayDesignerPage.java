@@ -228,10 +228,11 @@ public class AssayDesignerPage extends BaseDesignerPage
     }
 
     @Override
-    public void saveAndClose()
+    public LabKeyPage saveAndClose()
     {
         super.saveAndClose();
         waitForElement(Locator.css("table.labkey-data-region")); // 'Runs' or 'AssayList'
+        return null;
     }
 
     public enum MetadataInputFormat

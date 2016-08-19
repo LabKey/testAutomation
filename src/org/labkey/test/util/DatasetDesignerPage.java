@@ -19,6 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.BaseDesignerPage;
+import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -50,15 +51,17 @@ public class DatasetDesignerPage extends BaseDesignerPage
     }
 
     @Override
-    public void saveAndClose()
+    public LabKeyPage saveAndClose()
     {
         save();
+        return null;
     }
 
     @Override
-    public void save()
+    public LabKeyPage save()
     {
         clickButton("Save");
+        return null;
     }
 
     public void checkDemographicData()
