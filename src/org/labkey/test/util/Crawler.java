@@ -17,6 +17,7 @@
 package org.labkey.test.util;
 
 import com.google.common.base.Function;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
@@ -46,6 +47,7 @@ public class Crawler
 {
     private final List<ControllerActionId> _excludedActions;
     private final List<ControllerActionId> _actionsExcludedFromInjection;
+    private final Collection<String> _adminControllers;
     private final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
@@ -61,7 +63,7 @@ public class Crawler
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
-    private UrlToCheck _urlToCheck;
+    private int _finalDepth = 0;
     private int _crawlTime = 0;
     private int _maxDepth = 3;
     private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<>();
@@ -89,6 +91,7 @@ public class Crawler
         _test = test;
         _projects = projects;
         _maxCrawlTime = crawlTime;
+        _adminControllers = Collections.unmodifiableCollection(getAdminControllers());
         _forbiddenWords = getForbiddenWords();
         _excludedActions = getDefaultExcludedActions();
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
@@ -223,9 +226,11 @@ public class Crawler
         _injectionCheckEnabled = enabled;
     }
 
-    protected List<String> getAdminControllers()
+    protected Collection<String> getAdminControllers()
     {
-        return Arrays.asList("login", "admin", "security", "user");
+        Set<String> adminControllers = Collections.newSetFromMap(new CaseInsensitiveMap<>());
+        adminControllers.addAll(Arrays.asList("login", "admin", "security", "user"));
+        return adminControllers;
     }
 
     protected int getMaxDepth()
@@ -302,12 +307,21 @@ public class Crawler
         return url;
     }
 
+    private static String stripHash(String url)
+    {
+        int paramIdx = url.indexOf('#');
+        if (paramIdx > 0)
+            url = url.substring(0, paramIdx);
+        return url;
+    }
 
     private class UrlToCheck
     {
         // Keep track of urls to check for breadth first crawl
-        private URL _origin;
-        private String _urlText;
+        private final URL _origin;
+        private final String _urlText;
+        private final String _relativeURL;
+        private final ControllerActionId _actionId;
         private int _depth;
 
         public UrlToCheck(URL origin, String urlText, int depth)
@@ -315,6 +329,39 @@ public class Crawler
             _origin = origin;
             _urlText = urlText;
             _depth = depth;
+
+            // Make sure it is a link to inside the page
+            if (urlText.startsWith("http://") ||
+                    urlText.startsWith("https://") ||
+                    urlText.startsWith("javascript:") ||
+                    urlText.startsWith("ftp://"))
+            {
+                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()))
+                {
+                    _relativeURL = null;
+                    _actionId = null;
+                }
+                else
+                {
+                    int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
+                    _relativeURL = urlText.substring(relativeURLStart);
+                    _actionId = new ControllerActionId(_relativeURL);
+                }
+            }
+            else
+            {
+                // Make sure it is correctly formatted
+                if (urlText.startsWith("/"))
+                    _relativeURL = urlText;
+                else if (urlText.startsWith("#"))
+                    _relativeURL = stripHash(origin.toString()) + urlText;
+                else if (urlText.startsWith("?"))
+                    _relativeURL = stripQueryParams(origin.toString()) + urlText;
+                else
+                    _relativeURL = getURLBase(origin) + urlText;
+
+                _actionId = new ControllerActionId(_relativeURL);
+            }
         }
 
         public URL getOrigin()
@@ -331,8 +378,85 @@ public class Crawler
         {
             return _depth;
         }
-    }
 
+        public String getRelativeURL()
+        {
+            return _relativeURL;
+        }
+
+        public ControllerActionId getActionId()
+        {
+            return _actionId;
+        }
+
+        public boolean underCreatedProject()
+        {
+            String folder = StringUtils.strip(getActionId().getFolder(), "/");
+            StringTokenizer st = new StringTokenizer(folder, "/");
+
+            if (!st.hasMoreElements())
+                return false;
+
+            String currentProject = EscapeUtil.decode(st.nextToken());
+            if (StringUtils.isEmpty(currentProject))
+                return false;
+
+            return _projects.contains(currentProject);
+        }
+
+        public boolean isVisitableURL()
+        {
+            if (getRelativeURL() == null)
+                return false;
+
+            String strippedRelativeURL = stripQueryParams(getRelativeURL());
+
+            // never go to the exactly same URL (minus query params) twice:
+            if (_urlsChecked.contains(strippedRelativeURL))
+                return false;
+
+            if (getRelativeURL().contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
+                return false;
+
+            if (getRelativeURL().contains("mailto:")) //Don't crawl mailto: links
+                return false;
+
+            _urlsChecked.add(strippedRelativeURL);
+
+            // after navigating past the first N levels of links, we'll only try "new" actions:
+            if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
+                return false;
+
+            // never visit explicitly excluded actions:
+            if (_excludedActions.contains(getActionId()))
+                return false;
+
+            //skip any _webdav or fake urls
+            if (getActionId().getController().equalsIgnoreCase("_webdav") || getActionId().getController().equalsIgnoreCase("fake"))
+                return false;
+
+            // skip export actions.
+            if (getActionId().getAction().toLowerCase().contains("export"))
+                return false;
+
+            // skip expanding and collapsing paths -- no HTML returned
+            if (getActionId().getAction().equals("expandCollapse"))
+                return false;
+
+            // in addition to test projects, we'll crawl all admin functionality as well
+            // (otherwise this never gets covered).
+            if (_adminControllers.contains(getActionId().getController()) && !"/home".equals(getActionId().getFolder()))
+                return true;
+
+            // always visit all links under projects created by the tests:
+            return underCreatedProject();
+        }
+
+        private boolean isInjectableURL()
+        {
+            return !_actionsExcludedFromInjection.contains(getActionId());
+        }
+    }
 
     public static class ControllerActionId
     {
@@ -382,7 +506,7 @@ public class Crawler
                 /* controller/folders/ */
                 int postControllerSlashIdx = rootRelativeURL.indexOf('/');
                 if (-1 == postControllerSlashIdx)
-                    fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
+                    throw new IllegalArgumentException("Unable to parse folder out of relative URL: \"" + rootRelativeURL + "\"");
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
@@ -548,85 +672,6 @@ public class Crawler
         }
     }
 
-    private boolean isVisitableURL(String rootRelativeURL, int currentDepth)
-    {
-        ControllerActionId actionId = new ControllerActionId(rootRelativeURL);
-        String strippedRelativeURL = stripQueryParams(rootRelativeURL);
-
-        // never go to the exactly same URL (minus query params) twice:
-        if (_urlsChecked.contains(strippedRelativeURL))
-            return false;
-
-        if (rootRelativeURL.contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
-            return false;
-
-        if (rootRelativeURL.contains("mailto:")) //Don't crawl mailto: links
-            return false;
-
-        _urlsChecked.add(strippedRelativeURL);
-
-        // after navigating past the first N levels of links, we'll only try "new" actions:
-        if (currentDepth >= getMaxDepth() && _actionsVisited.contains(actionId))
-            return false;
-
-        // never visit explicitly excluded actions:
-        if (_excludedActions.contains(actionId))
-            return false;
-
-        //skip any _webdav or fake urls
-        if (actionId.getController().equalsIgnoreCase("_webdav") || actionId.getController().equalsIgnoreCase("fake"))
-            return false;
-
-        // skip export actions. 
-        if (actionId.getAction().toLowerCase().contains("export"))
-            return false;
-
-        // skip expanding and collapsing paths -- no HTML returned
-        if (actionId.getAction().equals("expandCollapse"))
-            return false;
-
-        // in addition to test projects, we'll crawl all admin functionality as well
-        // (otherwise this never gets covered).
-        for (String adminController : getAdminControllers())
-        {
-            if (actionId.getController().equalsIgnoreCase(adminController) && !"/home".equals(actionId.getFolder()))
-                return true;
-        }
-
-        // always visit all links under projects created by the tests:
-        return underCreatedProject(rootRelativeURL);
-    }
-
-    private boolean isInjectableURL(String rootRelativeURL)
-    {
-        ControllerActionId actionId = new ControllerActionId(rootRelativeURL);
-
-        return !_actionsExcludedFromInjection.contains(actionId);
-    }
-
-    private boolean underCreatedProject(String relativeURL)
-    {
-        relativeURL = WebTestHelper.stripContextPath(relativeURL);
-        ControllerActionId cid = new ControllerActionId(relativeURL);
-        String folder = StringUtils.strip(cid.getFolder(),"/");
-        StringTokenizer st = new StringTokenizer(folder, "/");
-
-        if (!st.hasMoreElements())
-            return false;
-
-        String currentProject = EscapeUtil.decode(st.nextToken());
-        if (StringUtils.isEmpty(currentProject))
-            return false;
-
-        for (String createdProject : _projects)
-        {
-            if (currentProject.equals(createdProject))
-                return true;
-        }
-        return false;
-    }
-
-
     @LogMethod
     public void crawlAllLinks()
     {
@@ -658,11 +703,10 @@ public class Crawler
 
         // Breadth first search
         int newPages = crawl();
-        saveCrawlStats(_test, _urlToCheck.getDepth(), newPages, _actionsVisited.size(), _crawlTime);
+        saveCrawlStats(_test, _finalDepth, newPages, _actionsVisited.size(), _crawlTime);
 
         TestLogger.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
     }
-
 
     private int crawl()
     {
@@ -673,39 +717,11 @@ public class Crawler
         // Loop through links in list until its empty or time runs out
         while ((!_urlsToCheck.isEmpty()) && (_crawlTime < _maxCrawlTime))
         {
-            _urlToCheck = _urlsToCheck.remove(0);
-            if(_urlToCheck.toString().contains("showMaterialSource"))
-                System.out.println("pay attention");
-            String urlText = _urlToCheck.getUrlText();
-            // Make sure it is a link to inside the page
-            if (urlText.startsWith("http://") ||
-                    urlText.startsWith("https://") ||
-                    urlText.startsWith("javascript:") ||
-                    urlText.startsWith("ftp://"))
-            {
-                if (!urlText.contains(WebTestHelper.getBaseURL()) || urlText.equals(WebTestHelper.getBaseURL()))
-                    continue;
-                else
-                {
-                    int relativeURLStart = urlText.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
-                    urlText = urlText.substring(relativeURLStart);
-                }
-            }
+            UrlToCheck urlToCheck = _urlsToCheck.remove(0);
 
-            // Make sure it is correctly formatted
-            String relativeURL;
-            if (urlText.startsWith("/"))
-                relativeURL = urlText;
-            else if (urlText.startsWith("?"))
-                relativeURL = stripQueryParams(_urlToCheck.getOrigin().toString()) + urlText;
-            else
-                relativeURL = getURLBase(_urlToCheck.getOrigin()) + urlText;
-
-            // Check if it should be visited, if so, visit it
-            int depth = _urlToCheck.getDepth();
-            if (isVisitableURL(relativeURL, depth))
+            if (urlToCheck.isVisitableURL())
             {
-                crawlLink(_urlToCheck, relativeURL, _injectionCheckEnabled && isInjectableURL(relativeURL));
+                crawlLink(urlToCheck);
                 linkCount++;
             }
         }
@@ -714,8 +730,11 @@ public class Crawler
         return linkCount;
     }
 
-    private void crawlLink(UrlToCheck urlToCheck, String relativeURL, boolean testInjection)
+    private void crawlLink(UrlToCheck urlToCheck)
     {
+        _finalDepth = Math.max(urlToCheck.getDepth(), _finalDepth);
+        String relativeURL = urlToCheck.getRelativeURL();
+
         URL origin = null;
         URL currentPageUrl;
         // Helps breadth first crawl
@@ -751,7 +770,6 @@ public class Crawler
                 String[] errorLines = serverError.get(0).split("\n");
                 fail(relativeURL + " produced error: \"" + errorLines[0] + "\".  Originating page: " + origin.toString());
             }
-
         }
         catch (RuntimeException | AssertionError rethrow)
         {
@@ -772,7 +790,7 @@ public class Crawler
             throw rethrow;
         }
 
-        if (testInjection)
+        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
             testInjection(currentPageUrl);
     }
 
@@ -795,7 +813,6 @@ public class Crawler
             }
         }
     }
-
 
     public static final String injectedAlert = "8(";
     public static final String maliciousScript = "<script>alert(\"" + injectedAlert + "\");</script>";
