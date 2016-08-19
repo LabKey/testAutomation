@@ -80,9 +80,11 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement newIssueButton = Locator.lkButton("New Issue").findWhenNeeded(this);
-        Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(this);
-        WebElement issueJumpButton = Locator.lkButton("Jump to Issue").findWhenNeeded(this);
+        WebElement jumpToForm = Locator.tagWithName("form", "jumpToIssue").findWhenNeeded(this);
+        WebElement newIssueButton = Locator.lkButton().startsWith("New ").findWhenNeeded(jumpToForm);
+        Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
+        WebElement issueJumpButton = Locator.lkButton().startsWith("Jump to ").findWhenNeeded(jumpToForm);
+
         Input searchInput = Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
         WebElement searchButton = Locator.lkButton("Search").findWhenNeeded(bodyBlock);
         DataRegionTable issuesList = DataRegionTable.findDataRegion(ListPage.this);
