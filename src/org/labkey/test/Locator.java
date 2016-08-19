@@ -1043,6 +1043,16 @@ public abstract class Locator
             return this.withoutPredicate("contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + ")");
         }
 
+        public XPathLocator withClasses(String... cssClasses)
+        {
+            XPathLocator result = this;
+            for (String cssClass : cssClasses)
+            {
+                result = result.withClass(cssClass);
+            }
+            return result;
+        }
+
         public XPathLocator withAttribute(String attrName, String attrVal)
         {
             return this.withPredicate("@" + attrName + "=" + xq(attrVal));
