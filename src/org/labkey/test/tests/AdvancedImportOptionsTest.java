@@ -54,7 +54,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03, false);
     }
 
-    // This test class has no @Before or @BeforeClass. Each of the test cases, creates it's own project to be used for importing.
+    // This test class has no @Before or @BeforeClass. Each of the test cases, creates its own project to be used for importing.
 
     @Test
     public void testBasicImportFromFile()

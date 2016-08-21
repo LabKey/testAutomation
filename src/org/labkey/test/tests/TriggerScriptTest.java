@@ -671,10 +671,10 @@ public class TriggerScriptTest extends BaseWebDriverTest
     }
 
     /**
-     * Verify error message recieved from api call matches the expected error
+     * Verify error message received from api call matches the expected error
      * @param cmd command to run
      * @param expected error message to check
-     * @param cn connecion object to run against
+     * @param cn connection object to run against
      * @throws IOException
      */
     private void assertAPIErrorMessage(SaveRowsCommand cmd, String expected, Connection cn) throws IOException
