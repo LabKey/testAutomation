@@ -331,8 +331,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
 
-        waitForText("\"7. Neck\", is not available. It may have been deleted or renamed.");
-        assertTextPresent("\"16. Evaluation Summary\", is not available. It may have been deleted or renamed.");
+        waitForText("\"7. Neck\", is not available. It may have been renamed or removed.");
+        assertTextPresent("\"16. Evaluation Summary\", is not available. It may have been renamed or removed.");
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
