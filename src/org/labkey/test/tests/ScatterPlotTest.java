@@ -368,9 +368,10 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // Issue 18186: When not in edit mode, there shouldn't be a pop up message.
-        waitForText("The measure Form Language was not found. It may have been renamed or removed.");
+        String formLanguageError = "The saved x measure, \"Form Language\", is not available. It may have been renamed or removed.";
+        waitForText(formLanguageError);
         clickButton("Edit");
-        waitForText("The measure Form Language was not found. It may have been renamed or removed.");
+        waitForText(formLanguageError);
         clickButton("OK", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
