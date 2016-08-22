@@ -44,10 +44,10 @@ public class InsertIssueDefPage extends LabKeyPage
         new OptionSelect(input).set(kind);
     }
 
-    public CreateListDefConfirmation clickSubmit()
+    public CreateListDefConfirmation clickSubmit(boolean errorExpected)
     {
         click(Locator.lkButton("Submit"));
-        return new CreateListDefConfirmation(getDriver());
+        return new CreateListDefConfirmation(errorExpected ? "Error" : "Create Issue List Definition?", getDriver());
     }
 
     public IssueListDefDataRegion clickCancel()
@@ -58,9 +58,9 @@ public class InsertIssueDefPage extends LabKeyPage
 
     public class CreateListDefConfirmation extends Window
     {
-        private CreateListDefConfirmation(WebDriver driver)
+        private CreateListDefConfirmation(String windowTitle, WebDriver driver)
         {
-            super("Create Issue List Definition?", driver);
+            super(windowTitle, driver);
         }
 
         public IssueListDefDataRegion clickYes()
@@ -78,6 +78,12 @@ public class InsertIssueDefPage extends LabKeyPage
         public InsertIssueDefPage clickNo()
         {
             clickButton("No", true);
+            return InsertIssueDefPage.this;
+        }
+
+        public InsertIssueDefPage clickOkError()
+        {
+            clickButton("OK", true);
             return InsertIssueDefPage.this;
         }
     }

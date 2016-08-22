@@ -39,15 +39,16 @@ public class IssueListDefDataRegion extends DataRegionTable
 
     public IssueListDefDataRegion createIssuesListDefinition(String name)
     {
-        return startCreateIssuesListDefinition(name).clickYes();
+        return startCreateIssuesListDefinition(name, false).clickYes();
     }
 
-    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name)
+    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name, boolean errorExpected)
     {
         InsertIssueDefPage insertIssueDefPage = clickInsert();
         insertIssueDefPage.setLabel(name);
-        insertIssueDefPage.selectKind("General Issue Tracker");
-        return insertIssueDefPage.clickSubmit();
+        if (!errorExpected)
+            insertIssueDefPage.selectKind("General Issue Tracker");
+        return insertIssueDefPage.clickSubmit(errorExpected);
     }
 
     public void selectIssues(String... names)

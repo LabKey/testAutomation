@@ -85,8 +85,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT2, null);
         IssueListDefDataRegion listDefDataRegion = _issuesHelper.goToIssueListDefinitions(PROJECT2);
-        listDefDataRegion.startCreateIssuesListDefinition("noModule").clickYesError();
-        assertElementPresent(Locators.labkeyError.containing("The issue module many not be enabled for this folder."));
+        listDefDataRegion.startCreateIssuesListDefinition("noModule", true).clickOkError();
         listDefDataRegion = _issuesHelper.goToIssueListDefinitions(PROJECT2);
         assertEquals("Issue list definition present with module disabled", 0, listDefDataRegion.getDataRowCount());
     }
