@@ -536,7 +536,7 @@
         </condition>
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,build,deploy-test-modules,set-user-props,set-debug-props,ensurePassword">
+    <target name="runsuite-selenium-tomcat" depends="kill_chrome_teamcity,build,deploy-test-modules,set-user-props,set-debug-props,ensurePassword">
         <fail unless="tomcat.home" />
 
         <!--Can't pass empty values to jvmarg on Linux; use a dummy value instead-->
@@ -620,7 +620,7 @@
             </fileset>
         </copy>
 
-        <antcall target="kill_chromedriver" />
+        <antcall target="kill_chrome_teamcity" />
 
         <antcall target="fail_message"/>
     </target>
@@ -699,6 +699,21 @@
         </exec>
         <exec osfamily="unix" executable="killall">
             <arg line="-HUP chromedriver"/>
+        </exec>
+    </target>
+
+    <target name="kill_chrome_teamcity" description="kill chrome processes">
+        <exec osfamily="windows" executable="taskkill">
+            <arg line="/F /IM chromedriver.exe"/>
+        </exec>
+        <exec osfamily="unix" executable="killall">
+            <arg line="-q -KILL chromedriver"/>
+        </exec>
+        <exec osfamily="unix" executable="killall">
+            <arg line="-q -KILL chrome"/>
+        </exec>
+        <exec osfamily="unix" executable="killall">
+            <arg line="-q -KILL BrowserBlocking"/>
         </exec>
     </target>
 
