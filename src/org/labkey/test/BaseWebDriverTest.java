@@ -37,7 +37,9 @@ import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.junit.rules.TestWatcher;
+import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -841,10 +843,31 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         checkJsErrors(true);
     }
 
+    private void waitForPendingRequests(int msWait)
+    {
+        Connection connection = createDefaultConnection(true);
+        waitFor(() -> {
+            Command getPendingRequestCount = new Command("admin", "getPendingRequestCount");
+            try
+            {
+                CommandResponse response = getPendingRequestCount.execute(connection, null);
+                return (Long)response.getProperty("pendingRequestCount") == 0;
+            }
+            catch (IOException | CommandException e)
+            {
+                return false;
+            }
+        }, msWait);
+    }
+
     private void cleanup(boolean afterTest) throws TestTimeoutException
     {
         if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
+        {
+            if (afterTest)
+                waitForPendingRequests(WAIT_FOR_PAGE);
             doCleanup(afterTest);
+        }
     }
 
     // Standard cleanup: delete created projects
