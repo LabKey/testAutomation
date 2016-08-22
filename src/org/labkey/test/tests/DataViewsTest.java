@@ -642,7 +642,6 @@ public class DataViewsTest extends ParticipantListTest
     private void createDataset(String name)
     {
         _studyHelper.goToManageDatasets();
-        _studyHelper.goToManageDatasets();
         waitForText("Create New Dataset");
         click(Locator.xpath("//a[text()='Create New Dataset']"));
         waitForElement(Locator.xpath("//input[@name='typeName']"));
