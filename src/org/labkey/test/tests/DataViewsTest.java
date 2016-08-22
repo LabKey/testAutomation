@@ -502,6 +502,42 @@ public class DataViewsTest extends ParticipantListTest
         _ext4Helper.waitForMaskToDisappear();
     }
 
+    private void verifyDynamicHeight (String dataViewWebPartName)
+    {
+        // set Data Views panel height to use a Default (dynamic) height value
+        openCustomizePanel(dataViewWebPartName);
+        RadioButton().withLabel("Default (dynamic)").find(getDriver()).check();
+        clickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
+
+        // get the number of Data Views that are to be displayed in the Data View panel
+        final Locator displayedDataViewsRow = Locator.xpath("//tr").withClass("x4-grid-data-row");
+        waitForElement(displayedDataViewsRow, 0, false);
+        int dataViewsInPanel = getElementCount(displayedDataViewsRow);
+
+        // get actual height of the Data View panel grid portion
+        BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), dataViewWebPartName);
+        final Locator.XPathLocator dataViewGrid = Locator.tagWithClass("div", "dvc");
+        int dataViewHeight = dataViewsWebPart.findElement(dataViewGrid).getSize().getHeight();
+
+        // calculate expected height of Data View panel given number of Data Views to be displayed
+        // height computing logic replicates that in DataViewsPanel.js
+        int dataViewPanelHeaderSize = 125;
+        int heightPerRecord = 25;
+        int exptectedHeight = dataViewsInPanel * heightPerRecord + dataViewPanelHeaderSize;
+        if (exptectedHeight > 700)
+        {
+            exptectedHeight = 700;
+        }
+        if (exptectedHeight < 200)
+        {
+            exptectedHeight = 200;
+        }
+
+        // verify the height is appopriate for number of data views
+        assertEquals("Data View panel dynamic height not correct", exptectedHeight , dataViewHeight);
+    }
+
     @LogMethod
     public void CustomizePanelHeightTest()
     {
@@ -519,44 +555,39 @@ public class DataViewsTest extends ParticipantListTest
 
         // get actual height of the Data View panel grid portion
         BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), RENAMED_WEBPART_TITLE);
-        Locator.XPathLocator dataViewGrid = Locator.xpath("//div").withClass("x4-panel x4-border-item x4-box-item x4-panel-default").notHidden();
+        final Locator.XPathLocator dataViewGrid = Locator.tagWithClass("div", "dvc");
         int dataViewHeight = dataViewsWebPart.findElement(dataViewGrid).getSize().getHeight();
 
         // check if actual height matches custom set height
         assertEquals("Data View panel height not set to specified custom height", NEW_CUSTOM_HEIGHT, dataViewHeight);
 
-        // set Data Views panel height to use a Default (dynamic) height value
-        openCustomizePanel(RENAMED_WEBPART_TITLE);
-        RadioButton().withLabel("Default (dynamic)").find(getDriver()).check();
-        clickButton("Save", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        // create new folder with bare bones study
+        String subFolderName = "Dynamic Height Test";
+        goToProjectHome();
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), subFolderName, "Study", null, true);
+        clickButton("Create Study");
+        clickButton("Create Study");
+        goToProjectHome(getProjectName());
+        clickFolder(subFolderName);
 
-        // get the number of Data Views that are to be displayed in the Data View panel
-        final Locator displayedDataViewsRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
-        waitForElement(displayedDataViewsRow);
-        int dataViewsInPanel = getElementCount(displayedDataViewsRow);
+        // create new dataView webpart
+        _portalHelper.addWebPart("Data Views");
 
-        // get actual height of the Data View panel grid portion
-        dataViewsWebPart = new BodyWebPart(getDriver(), RENAMED_WEBPART_TITLE);
-        dataViewGrid = Locator.xpath("//div").withClass("x4-panel x4-border-item x4-box-item x4-panel-default").notHidden();
-        dataViewHeight = dataViewsWebPart.findElement(dataViewGrid).getSize().getHeight();
+        // verify dynamic height works for study that has 0 data views. Less than 4 should show height of 200.
+        verifyDynamicHeight("Data Views");
 
-        // calculate expected height of Data View panel given number of Data Views to be displayed
-        // height computing logic replicates that in DataViewsPanel.js
-        int dataViewPanelHeaderSize = 125;
-        int heightPerRecord = 25;
-        int exptectedHeight = dataViewsInPanel * heightPerRecord + dataViewPanelHeaderSize;
-        if (exptectedHeight > 700)
-        {
-            exptectedHeight = 700;
-        }
-        if (exptectedHeight < 200)
-        {
-            exptectedHeight = 200;
-        }
+        // add 15 data views
+        createDatasets("testDataViewA", 15);
+        clickFolder(subFolderName);
+        // verify dynamic height works for study that has 15 data views. Between 4 and 22 should show height between 200 and 700.
+        verifyDynamicHeight("Data Views");
 
-        // check if expected height equals dynamic height
-        assertEquals("Data View panel dynamic height not correct", exptectedHeight , dataViewHeight);
+        // add 15 more data views
+        createDatasets("testDataViewB", 15);
+        clickFolder(subFolderName);
+        // verify dynamic height works for study that has 30 data views. More than 22 should show height of 700.
+        verifyDynamicHeight("Data Views");
+        _containerHelper.deleteFolder(getProjectName(), subFolderName);
     }
 
     /**
@@ -598,5 +629,28 @@ public class DataViewsTest extends ParticipantListTest
         {
             return Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
         }
+    }
+
+    private void createDatasets(String nameBase, int count)
+    {
+        for (int x = 0; x < count; x++)
+        {
+            createDataset(nameBase+x);
+        }
+    }
+
+    private void createDataset(String name)
+    {
+        _studyHelper.goToManageDatasets();
+        _studyHelper.goToManageDatasets();
+        waitForText("Create New Dataset");
+        click(Locator.xpath("//a[text()='Create New Dataset']"));
+        waitForElement(Locator.xpath("//input[@name='typeName']"));
+        setFormElement(Locator.xpath("//input[@name='typeName']"), name);
+        clickButton("Next");
+        waitForElement(Locator.xpath("//input[@id='name0-input']"));
+        assertTextNotPresent("XTest");
+        setFormElement(Locator.xpath("//input[@id='name0-input']"), "XTest");
+        clickButton("Save");
     }
 }
