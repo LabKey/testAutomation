@@ -255,4 +255,88 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), listName);
         clickButton("Save Defaults");
     }
+
+    @Test
+    public void validateBackgroundImporting()
+    {
+        final String ASSAY_BACKGROUND_IMPORT_PROJECT = "Background Import Assay Data From List Project";
+        final String ASSAY_NAME = "Issue26774Assay";
+        final String LIST_NAME = "DataList";
+        final File STUDY_ZIP = TestFileUtils.getSampleData("AssayBackgroundImport/assayTestList.xls");
+
+        // This test is to cover a testing gap identified in bug 26774 (Issues linking assay runs with sample sets).
+
+        log("Test a General assay background importing data from a list.");
+
+        log("Create a project, delete it if it already exist.");
+        _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
+        _containerHelper.createProject(ASSAY_BACKGROUND_IMPORT_PROJECT, null);
+
+        PortalHelper portalHelper = new PortalHelper(this);
+
+        clickProject(ASSAY_BACKGROUND_IMPORT_PROJECT);
+
+        log("Create new General assay");
+        portalHelper.addWebPart("Assay List");
+
+        portalHelper.clickButton("New Assay Design");
+        portalHelper.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
+        portalHelper.clickButton("Next");
+
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        portalHelper.waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        portalHelper.setFormElement(assayName, ASSAY_NAME);
+
+        portalHelper.setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "Validating fix for issue 26774.");
+
+        portalHelper.checkCheckbox(Locator.checkboxByName("backgroundUpload"));
+        portalHelper.clickButton("Save & Close", "<Select Web Part>");
+
+        log("Create a list with data coming from the test file.");
+
+        portalHelper.addWebPart("Lists");
+        portalHelper.clickAndWait(Locator.linkWithText("Manage Lists"));
+
+        portalHelper.clickButton("Create New List");
+        portalHelper.waitForElement(Locator.inputById("ff_name"));
+        portalHelper.setFormElement(Locator.inputById("ff_name"), LIST_NAME);
+        portalHelper.checkCheckbox(Locator.css("span#fileImport input[type='checkbox']"));
+        portalHelper.clickButton("Create List", "Import from TSV or Excel file.");
+        portalHelper.setFormElement(Locator.xpath("//input[@name='uploadFormElement']"), STUDY_ZIP.getPath());
+
+        portalHelper.waitForElement(Locator.xpath("//span[text()='Import']"));
+        portalHelper.clickButton("Import", "Grid Views");
+
+        log("go back to home.");
+        goToProjectHome(ASSAY_BACKGROUND_IMPORT_PROJECT);
+
+        log("Now import the data from the list into the assay.");
+        portalHelper.clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        portalHelper.clickButton(("Import Data"), "Batch Properties");
+
+        portalHelper.checkRadioButton(Locator.radioButtonById("RadioBtn-Lookup"));
+        portalHelper.waitForText("Use an existing sample list");
+        portalHelper.checkRadioButton(Locator.radioButtonById("RadioBtn-ThawListType-List"));
+        portalHelper.waitForText("Schema:");
+
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
+        waitForElement(Locator.css(".query-loaded-marker"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), LIST_NAME);
+
+        portalHelper.clickButton("Next", "Run Properties");
+
+        portalHelper.checkRadioButton(Locator.radioButtonById("Fileupload"));
+        portalHelper.waitForElement(Locator.xpath("//input[@name='__primaryFile__']"));
+        portalHelper.setFormElement(Locator.xpath("//input[@name='__primaryFile__']"), STUDY_ZIP.getPath());
+
+        portalHelper.clickButton("Save and Finish", "Data Pipeline");
+
+        log("Validate that the pipeline job completed successfuly.");
+        waitForPipelineJobsToComplete(1, "Assay import job", false);
+
+        log("Looks like pipeline job completed. Let's go home and clean up.");
+        goToHome();
+        _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
+    }
+
 }
