@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.UnhandledAlertException;
@@ -778,7 +779,7 @@ public class Crawler
             if (origin != null)
             {
                 TestLogger.log("Crawl failure: collecting origin page info.");
-                try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(BaseWebDriverTest.getCurrentTest().getBrowserType(), BaseWebDriverTest.getDownloadDir()))
+                try (ExtraSiteWrapper originBrowser = new ExtraSiteWrapper(WebDriverWrapper.BrowserType.FIREFOX, BaseWebDriverTest.getDownloadDir()))
                 {
                     originBrowser.simpleSignIn();
                     originBrowser.beginAt(origin.toString());

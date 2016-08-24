@@ -421,7 +421,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 {
                     if (!isTestCleanupSkipped())
                     {
-                        try (TestScrubber scrubber = new TestScrubber(getCurrentTest().getBrowserType(), getDownloadDir()))
+                        try (TestScrubber scrubber = new TestScrubber(BrowserType.FIREFOX, getDownloadDir()))
                         {
                             scrubber.cleanSiteSettings();
                         }
