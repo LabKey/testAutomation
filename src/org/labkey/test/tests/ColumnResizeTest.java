@@ -183,7 +183,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
 
         log("Change column with existing larger data");
         //Check changing size with larger existing data
-        clickButton("View Design");
+        _extHelper.clickMenuButton("Design");
         _listHelper.clickEditDesign();
         _listHelper.clickRow(MAX_ROW);
         _listHelper.setColumnScale(LT_SCALE);

@@ -324,7 +324,6 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Cancel");
-        clickButton(DETAILS_BUTTON_NAME);
 
         log("Test inserting new row");
         _extHelper.clickMenuButton("Insert", "Insert New");
@@ -374,7 +373,6 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
-        clickButton(DETAILS_BUTTON_NAME);
         _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
@@ -394,7 +392,6 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        clickButton(DETAILS_BUTTON_NAME);
         _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
@@ -413,7 +410,6 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickButton("Cancel");
-        clickButton(DETAILS_BUTTON_NAME);
         _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
@@ -432,7 +428,6 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        clickButton(DETAILS_BUTTON_NAME);
         _extHelper.clickMenuButton("Insert", "Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");

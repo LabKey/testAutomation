@@ -115,7 +115,7 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         dataRow.put("Another Test Field", "4");
         listHelper.insertNewRow(dataRow);
 
-        click(Locator.linkWithText("View Design"));
+        _extHelper.clickMenuButton("Design");
         waitForText("Edit Design");
         clickButton("Edit Design", 0);
         waitForText("Import Fields");
@@ -126,8 +126,6 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForText("Edit Design");
         clickButton("Done", 0);
-        waitForElement(Locator.linkWithText("Details"));
-        clickAndWait(Locator.linkWithText("Details"));
         waitForText("No data to show.");
         assertTextPresent(REPLACEMENT_COL);
     }
