@@ -326,7 +326,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         log("Test inserting new row");
-        _extHelper.clickMenuButton("Insert", "Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New Row");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
@@ -373,7 +373,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
-        _extHelper.clickMenuButton("Insert", "Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New Row");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
@@ -392,7 +392,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickMenuButton("Insert", "Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New Row");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
 
@@ -410,7 +410,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickMenuButton("Insert", "Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New Row");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
 
@@ -428,7 +428,7 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickMenuButton("Insert", "Insert New");
+        _extHelper.clickMenuButton("Insert", "Insert New Row");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
     }

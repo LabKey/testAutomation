@@ -115,10 +115,10 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(ADMIN_USER));
         clickButton("Submit");
         _customizeViewsHelper.openCustomizeViewPanel();

@@ -722,7 +722,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
-        _extHelper.clickMenuButton("Insert", "Import Data");
+        _extHelper.clickMenuButton("Insert", "Import Bulk Data");
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");

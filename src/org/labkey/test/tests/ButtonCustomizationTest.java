@@ -100,10 +100,10 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton("Done");
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
         setFormElement(Locator.name("quf_name"), "Seattle");
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New");
+        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
         setFormElement(Locator.name("quf_name"), "Portland");
         clickButton("Submit");
         
