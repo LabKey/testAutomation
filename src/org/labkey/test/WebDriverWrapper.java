@@ -3000,7 +3000,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             el.clear();
         }
-        else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        else if (!el.getTagName().equals("select") && text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             el.clear();
             el.sendKeys(text);
