@@ -144,7 +144,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        _extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         setRowData(data, validateText);
     }
 
@@ -432,7 +432,7 @@ public class ListHelper extends LabKeySiteWrapper
         else
         {
             log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            _extHelper.clickMenuButton(true, "Insert", "Import Data");
+            _extHelper.clickMenuButton(true, "Insert", "Import Bulk Data");
         }
         waitForElement(Locator.id("tsv3"));
     }

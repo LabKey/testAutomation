@@ -67,7 +67,7 @@ public class TourTest extends BaseWebDriverTest
     {
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
-        _extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         waitForText("Tour Builder");
         TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setTitle("Test Tour");
@@ -136,7 +136,7 @@ public class TourTest extends BaseWebDriverTest
         String tourJSON = tourEditor.export();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER2 + "/begin.view");
         waitForText("Tours");
-        _extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         waitForText("Tour Builder");
         tourEditor = new TourEditor(getDriver());
         tourEditor.importTour(tourJSON);

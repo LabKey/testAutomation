@@ -301,7 +301,7 @@ public class ETLHelper
     protected void insertDatasetRow(String id, String name)
     {
         _test.log("inserting dataset row " + name);
-        _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _test._extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         _test.waitForElement(Locator.name("quf_ParticipantId"));
         _test.setFormElement(Locator.name("quf_ParticipantId"), name);
         _test.setFormElement(Locator.name("quf_date"), getDate());
@@ -323,7 +323,7 @@ public class ETLHelper
         else
             _test.clickFolder(subFolder);
         _test.click(new Locator.LinkLocator(StringUtils.capitalize(query)));
-        _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _test._extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         _test.waitForElement(Locator.name("quf_id"));
         _test.setFormElement(Locator.name("quf_id"), id);
         _test.setFormElement(Locator.name("quf_name"), name);
@@ -359,7 +359,7 @@ public class ETLHelper
         _test.log("inserting transfer row rowid " + rowId);
         _test.goToProjectHome();
         _test.click(Locator.xpath("//span[text()='Transfers']"));
-        _test._extHelper.clickMenuButton(true, "Insert", "Insert New");
+        _test._extHelper.clickMenuButton(true, "Insert", "Insert New Row");
         _test.waitForElement(Locator.name("quf_rowid"));
         _test.setFormElement(Locator.name("quf_rowid"), rowId);
         _test.setFormElement(Locator.name("quf_transferstart"), transferStart);
