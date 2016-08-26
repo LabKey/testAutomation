@@ -155,13 +155,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     {
         final int myItemCount = 2;
         int initialCount = visibleItemCount();
-        assertTrue("Initial item count not greater than test value of 'myItemCount'; test will be invalid", initialCount > myItemCount);
+        assertTrue("Initial item count not greater than test value of 'myItemCount'; test would be invalid", initialCount > myItemCount);
         _ext4Helper.checkCheckbox(Locators.mineCheckbox());
         waitForItemCount("Item count incorrect after checking 'Mine' checkbox", myItemCount);
         // collapse section
         click(Locators.expanderForUncategorized());
         // give time for section to collapse
-        sleep(500);
+        waitForItemCount("'Uncategorized' section did not collapse", 0);
         // expand section
         click(Locators.expanderForUncategorized());
         waitForItemCount("'Mine' item count incorrect after collapse and expand", myItemCount);
@@ -183,18 +183,18 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     {
         static Locator.XPathLocator editViewsLink(String dataset)
         {
-            return Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
+            return Locator.tag("tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
         }
 
         static Locator.XPathLocator mineCheckbox()
         {
             // The innerHtml of the label for this checkbox is a span (with a qtip) and text '&nbsp;Mine'
-            return Locator.xpath("//span").endsWith("Mine").parent().followingSibling("input").withClass("x4-form-checkbox");
+            return Locator.tag("span").withText("\u00a0Mine").parent().followingSibling("input").withClass("x4-form-checkbox");
         }
 
         static Locator.XPathLocator expanderForUncategorized()
         {
-            return Locator.xpath("//span").withText("Uncategorized").precedingSibling("img").withClass("x4-tree-expander");
+            return Locator.tag("span").withText("Uncategorized").precedingSibling("img").withClass("x4-tree-expander");
         }
     }
 
