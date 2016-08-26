@@ -829,6 +829,14 @@ public abstract class Locator
         }
 
         @Override
+        public XPathLocator followingSibling(String tag)
+        {
+            return new XPathCSSLocator(
+                    _xLoc.followingSibling(tag),
+                    _cssLoc.append(" ~ " + tag));
+        }
+
+        @Override
         public XPathLocator child(XPathLocator childLocator)
         {
             XPathLocator xLoc = this._xLoc.child(childLocator);
