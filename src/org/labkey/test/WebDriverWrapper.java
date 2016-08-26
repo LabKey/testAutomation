@@ -3028,7 +3028,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void setFormElementJS(WebElement el, String text)
     {
-        executeScript("arguments[0].value = arguments[1]", el, text);
+        if ("select".equals(el.getTagName()))
+        {
+            try
+            {
+                selectOptionByText(el,text);
+            }
+            catch (NoSuchElementException x)
+            {
+                selectOptionByValue(el,text);
+            }
+        }
+        else
+        {
+            executeScript("arguments[0].value = arguments[1]", el, text);
+        }
         fireEvent(el, SeleniumEvent.change);
     }
 
