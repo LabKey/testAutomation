@@ -22,10 +22,18 @@ import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
+import static org.junit.Assert.assertTrue;
+
 @Category({DailyA.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
     private final PortalHelper portalHelper = new PortalHelper(this);
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     protected void doCreateSteps()
     {
@@ -133,6 +141,8 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 5","Save",0,0);
         _ext4Helper.waitForMaskToDisappear();
+
+        verifyMineCheckbox();
     }
 
     private void openEditPanel(String itemName)
@@ -140,13 +150,54 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         waitAndClick(Locators.editViewsLink(itemName));
         waitForElement(Ext4Helper.Locators.window(itemName));
     }
+
+    private void verifyMineCheckbox()
+    {
+        final int myItemCount = 2;
+        int initialCount = visibleItemCount();
+        assertTrue("Initial item count not greater than test value of 'myItemCount'; test will be invalid", initialCount > myItemCount);
+        _ext4Helper.checkCheckbox(Locators.mineCheckbox());
+        waitForItemCount("Item count incorrect after checking 'Mine' checkbox", myItemCount);
+        // collapse section
+        click(Locators.expanderForUncategorized());
+        // give time for section to collapse
+        sleep(500);
+        // expand section
+        click(Locators.expanderForUncategorized());
+        waitForItemCount("'Mine' item count incorrect after collapse and expand", myItemCount);
+        _ext4Helper.uncheckCheckbox(Locators.mineCheckbox());
+        waitForItemCount("Full item count incorrect after unchecking 'Mine' checkbox", initialCount);
+    }
+
+    private void waitForItemCount(String errMsg, int expectedCount)
+    {
+        waitForEquals(errMsg, ()-> expectedCount, this::visibleItemCount, 500);
+    }
+
+    private int visibleItemCount()
+    {
+        return getElementCount(Locator.tagWithClass("a", "x4-tree-node-text").notHidden());
+    }
+
     public static class Locators
     {
-        public static Locator.XPathLocator editViewsLink(String dataset)
+        static Locator.XPathLocator editViewsLink(String dataset)
         {
             return Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
         }
+
+        static Locator.XPathLocator mineCheckbox()
+        {
+            // The innerHtml of the label for this checkbox is a span (with a qtip) and text '&nbsp;Mine'
+            return Locator.xpath("//span").endsWith("Mine").parent().followingSibling("input").withClass("x4-form-checkbox");
+        }
+
+        static Locator.XPathLocator expanderForUncategorized()
+        {
+            return Locator.xpath("//span").withText("Uncategorized").precedingSibling("img").withClass("x4-tree-expander");
+        }
     }
+
     private void createUserInProjectForGroup(String userName, String projectName, String groupName, boolean sendEmail)
     {
         if (isElementPresent(Locator.permissionRendered()))

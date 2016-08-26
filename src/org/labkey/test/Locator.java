@@ -1073,6 +1073,11 @@ public abstract class Locator
             return this.append("/following-sibling::" + tag);
         }
 
+        public XPathLocator precedingSibling(String tag)
+        {
+            return this.append("/preceding-sibling::" + tag);
+        }
+
         public XPathLocator position(int pos)
         {
             return this.withPredicate(String.valueOf(pos));
