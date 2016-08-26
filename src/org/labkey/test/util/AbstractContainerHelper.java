@@ -331,8 +331,13 @@ public abstract class AbstractContainerHelper
         _test.setFormElement(Locator.name("name"), child);
     }
 
-    @LogMethod
     public void deleteFolder(String project, @LoggedParam String folderName)
+    {
+        deleteFolder(project, folderName, _test.WAIT_FOR_PAGE);
+    }
+
+    @LogMethod
+    public void deleteFolder(String project, @LoggedParam String folderName, int waitTime)
     {
         _test.log("Deleting folder " + folderName + " under project " + project);
         _test.clickProject(project);
@@ -340,12 +345,12 @@ public abstract class AbstractContainerHelper
         _test.ensureAdminMode();
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
-        _test.clickButton("Delete");
+        _test.clickButton("Delete", waitTime);
         // confirm delete subfolders if present
         if(_test.isTextPresent("This folder has subfolders."))
-            _test.clickButton("Delete All Folders");
+            _test.clickButton("Delete All Folders", waitTime);
         // confirm delete:
-        _test.clickButton("Delete");
+        _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
         _test.assertElementPresent(Locator.currentProject().withText(project));
         _test.openFolderMenu();

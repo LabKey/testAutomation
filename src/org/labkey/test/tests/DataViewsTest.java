@@ -587,7 +587,7 @@ public class DataViewsTest extends ParticipantListTest
         clickFolder(subFolderName);
         // verify dynamic height works for study that has 30 data views. More than 22 should show height of 700.
         verifyDynamicHeight("Data Views");
-        _containerHelper.deleteFolder(getProjectName(), subFolderName);
+        _containerHelper.deleteFolder(getProjectName(), subFolderName, 2 * WAIT_FOR_PAGE);
     }
 
     /**
