@@ -27,7 +27,7 @@ public class IssueListDefDataRegion extends DataRegionTable
 
     public InsertIssueDefPage clickInsert()
     {
-        clickHeaderButtonByText("Insert New");
+        clickHeaderButtonByText("Insert New Row");
         return new InsertIssueDefPage(getDriver(), this);
     }
 
