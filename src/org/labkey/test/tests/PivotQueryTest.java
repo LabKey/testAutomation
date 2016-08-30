@@ -81,19 +81,19 @@ public class PivotQueryTest extends BaseWebDriverTest
 
         log("** Verifying pivot table contents");
         // First "Participant" data cell
-        Locator Participant_cell = region.append("/tbody/tr[5]/td[2]");
+        Locator Participant_cell = region.append("/tbody/tr[5]/td[1]");
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell
-        Locator ParticipantCount_cell = region.append("/tbody/tr[5]/td[3]");
+        Locator ParticipantCount_cell = region.append("/tbody/tr[5]/td[2]");
         assertElementContains(ParticipantCount_cell, "5");
 
         // First "ConcInRange_MIN" data cell
-        Locator ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[4]");
+        Locator ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[3]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // First "ConcInRange_CONCAT" data cell
-        Locator ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[7]");
+        Locator ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[6]");
         String contents = getText(ConcInRange_CONCAT_cell);
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
