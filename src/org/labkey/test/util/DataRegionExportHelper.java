@@ -245,6 +245,6 @@ public class DataRegionExportHelper extends Component
                 : Locator.css(".x-grouptabs-main").withText("Text"), navTabs);
         public WebElement scriptTab = new LazyWebElement(DataRegionTable.isNewDataRegion ? Locator.linkWithText("Script")
                 : Locator.css(".x-grouptabs-main").withText("Script"), navTabs);
-        public WebElement exportSelectedCheckbox = new EphemeralWebElement(Locator.css("div.tab-pane.active input[value=exportSelected"), this);
+        public WebElement exportSelectedCheckbox = new EphemeralWebElement(Locator.css("div.tab-pane.active input[value=exportSelected]"), this);
     }
 }
