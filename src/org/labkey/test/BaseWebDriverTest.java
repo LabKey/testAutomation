@@ -2027,6 +2027,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
     }
 
+    public void selectQueryInSubfolder(String schemaName,String subfolder, String queryName)
+    {
+        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
+        selectSchema(schemaName);
+        selectSchema(subfolder);
+        // wait for tool tip to disappear, in case it is covering the element we want to click on
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
+        Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName);
+        waitAndClick(loc);
+        // NOTE: consider abstracting this.
+        waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
+        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
+    }
+
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         String queryLabel = schemaName + "." + queryName;
