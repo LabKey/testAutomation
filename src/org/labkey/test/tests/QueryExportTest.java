@@ -70,6 +70,18 @@ public class QueryExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getDataRegionSchemaName()
+    {
+        return "lists";
+    }
+
+    @Override
+    protected String getDataRegionQueryName()
+    {
+        return QUERY_NAME;
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return QUERY_NAME;

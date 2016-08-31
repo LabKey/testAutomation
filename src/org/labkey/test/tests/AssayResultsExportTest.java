@@ -70,6 +70,18 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
+    protected String getDataRegionSchemaName()
+    {
+        return "assay.General." + ASSAY_NAME;
+    }
+
+    @Override
+    protected String getDataRegionQueryName()
+    {
+        return "Data";
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return "[Dd]ata";

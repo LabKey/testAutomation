@@ -63,6 +63,18 @@ public class DatasetExportTest extends AssayResultsExportTest
     }
 
     @Override
+    protected String getDataRegionSchemaName()
+    {
+        return "study";
+    }
+
+    @Override
+    protected String getDataRegionQueryName()
+    {
+        return ASSAY_NAME;
+    }
+
+    @Override
     protected String getExportedFilePrefixRegex()
     {
         return ASSAY_NAME;

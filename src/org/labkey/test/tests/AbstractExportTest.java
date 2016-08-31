@@ -52,6 +52,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected abstract int getTestColumnIndex();
     protected abstract String getExportedTsvTestColumnHeader(); // tsv column headers might be field name, rather than label
     protected abstract String getDataRegionColumnName();
+    protected abstract String getDataRegionSchemaName();
+    protected abstract String getDataRegionQueryName();
     protected abstract String getExportedFilePrefixRegex();
     protected abstract String getDataRegionId();
     protected abstract void goToDataRegionPage();
@@ -172,8 +174,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     public final void testCreatePythonScriptNoFilter()
     {
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountNoFilters = 10;
-        assertPythonScriptContents(pythonScript, expectedLineCountNoFilters, null);
+        assertScriptContentLineCount(pythonScript, 10);
+        assertPythonScriptContents(pythonScript, null);
     }
 
     @Test
@@ -182,8 +184,98 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
         String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        int expectedLineCountWithFilters = 13;
-        assertPythonScriptContents(pythonScript, expectedLineCountWithFilters, testColumn);
+        assertScriptContentLineCount(pythonScript, 13);
+        assertPythonScriptContents(pythonScript, testColumn);
+    }
+
+    @Test
+    public final void testCreateRScriptNoFilter()
+    {
+        String rScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.R);
+        assertScriptContentLineCount(rScript, 20);
+        assertRScriptContents(rScript, null);
+    }
+
+    @Test
+    public final void testCreateRScriptWithFilter()
+    {
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
+        String rScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.R);
+        assertScriptContentLineCount(rScript, 20);
+        assertRScriptContents(rScript, testColumn);
+    }
+
+    @Test
+    public final void testCreateJavaScriptNoFilter()
+    {
+        String javaScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVA);
+        assertScriptContentLineCount(javaScript, 20);
+        assertJavaScriptContents(javaScript, null);
+    }
+
+    @Test
+    public final void testCreateJavaScriptWithFilter()
+    {
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
+        String javaScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVA);
+        assertScriptContentLineCount(javaScript, 21);
+        assertJavaScriptContents(javaScript, testColumn);
+    }
+
+    @Test
+    public final void testCreateJavaScriptScriptNoFilter()
+    {
+        String javaScriptScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT);
+        assertScriptContentLineCount(javaScriptScript, 35);
+        assertJavaScriptScriptContents(javaScriptScript, null);
+    }
+
+    @Test
+    public final void testCreateJavaScriptScriptWithFilter()
+    {
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
+        String javaScriptScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT);
+        assertScriptContentLineCount(javaScriptScript, 35);
+        assertJavaScriptScriptContents(javaScriptScript, testColumn);
+    }
+
+    @Test
+    public final void testCreateSASScriptNoFilter()
+    {
+        String sasScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.SAS);
+        assertScriptContentLineCount(sasScript, 15);
+        assertSASScriptContents(sasScript, null);
+    }
+
+    @Test
+    public final void testCreateSASScriptWithFilter()
+    {
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
+        String sasScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.SAS);
+        assertScriptContentLineCount(sasScript, 16);
+        assertSASScriptContents(sasScript, testColumn);
+    }
+
+    @Test
+    public final void testCreatePerlScriptNoFilter()
+    {
+        String perlScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PERL);
+        assertScriptContentLineCount(perlScript, 30);
+        assertPerlScriptContents(perlScript, null);
+    }
+
+    @Test
+    public final void testCreatePerlScriptWithFilter()
+    {
+        String testColumn = getDataRegionColumnName();
+        dataRegion.setFilter(testColumn, "Equals", "foo");
+        String perlScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PERL);
+        assertScriptContentLineCount(perlScript, 33);
+        assertPerlScriptContents(perlScript, testColumn);
     }
 
     protected final List<String> checkFirstNRows(int n)
@@ -270,14 +362,68 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         }
     }
 
-    protected final void assertPythonScriptContents(String pythonScript, int expectedLineCount, String testColumn)
+    protected void assertScriptContentLineCount(String script, int expectedLineCount)
     {
-        String[] linesInScript = pythonScript.split("\n");
+        String[] linesInScript = script.split("\n");
         assertTrue("Wrong number of lines in script [" + linesInScript.length + "]. Expected >" + expectedLineCount, expectedLineCount <= linesInScript.length);
-        if (null != testColumn)
+    }
+
+    protected final void assertPythonScriptContents(String pythonScript, String filterColumn)
+    {
+        assertTrue("Script is missing labkey library", pythonScript.contains("import labkey"));
+        assertTrue("Script is missing labkey.query.select_rows call", pythonScript.contains("labkey.query.select_rows("));
+        assertTrue("Script is missing schema_name property", pythonScript.contains("schema_name='" + getDataRegionSchemaName() + "'"));
+        assertTrue("Script is missing query_name property", pythonScript.contains("query_name='" + getDataRegionQueryName() + "'"));
+        if (null != filterColumn)
+            assertTrue("Script is missing filter for column '" + filterColumn + "'", pythonScript.contains(filterColumn));
+    }
+
+    protected final void assertRScriptContents(String rScript, String filterColumn)
+    {
+        assertTrue("Script is missing Rlabkey library", rScript.contains("library(Rlabkey)"));
+        assertTrue("Script is missing labkey.selectRows call", rScript.contains("labkey.selectRows("));
+        assertTrue("Script is missing schemaName property", rScript.contains("schemaName=\"" + getDataRegionSchemaName() + "\""));
+        assertTrue("Script is missing queryName property", rScript.contains("queryName=\"" + getDataRegionQueryName() + "\""));
+        if (null != filterColumn)
+            assertTrue("Script is missing colFilter property", rScript.contains("makeFilter(c(\"" + filterColumn + "\", \"EQUAL\", \"foo\""));
+    }
+
+    protected final void assertJavaScriptContents(String javaScript, String filterColumn)
+    {
+        assertTrue("Script is missing SelectRowsCommand", javaScript.contains("SelectRowsCommand cmd = new SelectRowsCommand(\"" + getDataRegionSchemaName() + "\", \"" + getDataRegionQueryName() + "\");"));
+        if (null != filterColumn)
+            assertTrue("Script is missing addFilter()", javaScript.contains("cmd.addFilter(\"" + filterColumn + "\", \"foo\", Filter.Operator.EQUAL);"));
+    }
+
+    protected final void assertJavaScriptScriptContents(String javaScriptScript, String filterColumn)
+    {
+        assertTrue("Script is missing LABKEY.Query.selectRows call", javaScriptScript.contains("LABKEY.Query.selectRows({"));
+        assertTrue("Script is missing schemaName property", javaScriptScript.contains("schemaName: '" + getDataRegionSchemaName() + "'"));
+        assertTrue("Script is missing queryName property", javaScriptScript.contains("queryName: '" + getDataRegionQueryName() + "'"));
+        if (null != filterColumn)
+            assertTrue("Script is missing filterArray property", javaScriptScript.contains("LABKEY.Filter.create('" + filterColumn + "', 'foo', LABKEY.Filter.Types.EQUAL)"));
+    }
+
+    protected final void assertSASScriptContents(String sasScript, String filterColumn)
+    {
+        assertTrue("Script is missing %labkeySelectRows call", sasScript.contains("%labkeySelectRows("));
+        assertTrue("Script is missing schemaName property", sasScript.contains("schemaName=\"" + getDataRegionSchemaName() + "\""));
+        assertTrue("Script is missing queryName property", sasScript.contains("queryName=\"" + getDataRegionQueryName() + "\""));
+        if (null != filterColumn)
         {
-            assertTrue("Script is missing filter for column '" + testColumn + "'", pythonScript.contains(testColumn));
+            assertTrue("Script is missing filter property", sasScript.contains("filter=%labkeyMakeFilter("));
+            assertTrue("Script is missing filter property", sasScript.contains("\"" + filterColumn + "\",\"EQUAL\",\"foo\""));
         }
+    }
+
+    protected final void assertPerlScriptContents(String perlScript, String filterColumn)
+    {
+        assertTrue("Script is missing labkey library", perlScript.contains("use LabKey::Query;"));
+        assertTrue("Script is missing LabKey::Query::selectRows call", perlScript.contains("LabKey::Query::selectRows("));
+        assertTrue("Script is missing schemaName property", perlScript.contains("-schemaName =&gt; '" + getDataRegionSchemaName() + "'"));
+        assertTrue("Script is missing queryName property", perlScript.contains("-queryName =&gt; '" + getDataRegionQueryName() + "'"));
+        if (null != filterColumn)
+            assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', eq, ''foo'']"));
     }
 
     protected boolean expectSortedExport()
