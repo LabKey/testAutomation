@@ -2,6 +2,7 @@ package org.labkey.test.components;
 
 import org.labkey.test.pages.issues.DeleteIssueListPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
+import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 
@@ -37,7 +38,7 @@ public class IssueListDefDataRegion extends DataRegionTable
         return new DeleteIssueListPage(getDriver());
     }
 
-    public IssueListDefDataRegion createIssuesListDefinition(String name)
+    public ListPage createIssuesListDefinition(String name)
     {
         return startCreateIssuesListDefinition(name, false).clickYes();
     }

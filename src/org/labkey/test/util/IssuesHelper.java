@@ -94,11 +94,12 @@ public class IssuesHelper extends WebDriverWrapper
     @LogMethod
     public void createNewIssuesList(String name, AbstractContainerHelper containerHelper)
     {
+        pushLocation();
         containerHelper.enableModule("Issues");
         PortalHelper portalHelper = new PortalHelper(getDriver());
-
         portalHelper.addWebPart("Issue Definitions");
         IssueListDefDataRegion.fromWebPart(getDriver()).createIssuesListDefinition(name);
+        popLocation();
 
         portalHelper.addWebPart("Issues Summary");
         clickAndWait(Locator.linkWithText("Submit"));

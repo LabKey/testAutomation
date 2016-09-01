@@ -133,6 +133,12 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         }
     }
 
+    public ListPage cancel()
+    {
+        clickButton("Cancel");
+        return new ListPage(getDriver());
+    }
+
     @Override
     protected ElementCache newElementCache()
     {

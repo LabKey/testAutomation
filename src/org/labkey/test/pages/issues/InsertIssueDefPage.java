@@ -63,10 +63,10 @@ public class InsertIssueDefPage extends LabKeyPage
             super(windowTitle, driver);
         }
 
-        public IssueListDefDataRegion clickYes()
+        public ListPage clickYes()
         {
             clickButton("Yes");
-            return new IssueListDefDataRegion(_dataRegionName, getDriver());
+            return new AdminPage(getDriver()).cancel();
         }
 
         public InsertIssueDefPage clickYesError()
