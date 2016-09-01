@@ -204,7 +204,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
         waitForElement(Locator.lkButton(METADATA_OVERRIDE_BUTTON), 10000);
 
-        assertButtonNotPresent("Insert New");
+        assertButtonNotPresent("Insert New Row");
 
         _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);

@@ -78,12 +78,12 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
         clickAndWait(Locator.linkContainingText("Manage Locations"));
-        clickAndWait(Locator.linkContainingText("Insert New"));
+        clickAndWait(Locator.linkContainingText("Insert New Row"));
         setFormElement(Locator.name("quf_LdmsLabCode"), "100");
         setFormElement(Locator.name("quf_Label"), "Alice Lab");
         clickButton("Submit");
 
-        clickAndWait(Locator.linkContainingText("Insert New"));
+        clickAndWait(Locator.linkContainingText("Insert New Row"));
         setFormElement(Locator.name("quf_LdmsLabCode"), "200");
         setFormElement(Locator.name("quf_Label"), "Bob's Lab");
         clickButton("Submit");
