@@ -418,10 +418,14 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
 
     protected final void assertPerlScriptContents(String perlScript, String filterColumn)
     {
+        // some browsers return script with ">" and "<" and some with "&gt;" and "&lt;"
+        perlScript = perlScript.replaceAll("&gt;", ">");
+        perlScript = perlScript.replaceAll("&lt;", "<");
+
         assertTrue("Script is missing labkey library", perlScript.contains("use LabKey::Query;"));
         assertTrue("Script is missing LabKey::Query::selectRows call", perlScript.contains("LabKey::Query::selectRows("));
-        assertTrue("Script is missing schemaName property", perlScript.contains("-schemaName =&gt; '" + getDataRegionSchemaName() + "'"));
-        assertTrue("Script is missing queryName property", perlScript.contains("-queryName =&gt; '" + getDataRegionQueryName() + "'"));
+        assertTrue("Script is missing schemaName property", perlScript.contains("-schemaName => '" + getDataRegionSchemaName() + "'"));
+        assertTrue("Script is missing queryName property", perlScript.contains("-queryName => '" + getDataRegionQueryName() + "'"));
         if (null != filterColumn)
             assertTrue("Script is missing filterArray property", perlScript.contains("['" + filterColumn + "', eq, ''foo'']"));
     }
