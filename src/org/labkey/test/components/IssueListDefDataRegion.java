@@ -27,13 +27,13 @@ public class IssueListDefDataRegion extends DataRegionTable
 
     public InsertIssueDefPage clickInsert()
     {
-        clickInsertNewRowDropdown();
+        clickInsertNewRowButton();
         return new InsertIssueDefPage(getDriver(), this);
     }
 
     public DeleteIssueListPage clickDelete()
     {
-        clickHeaderButtonByText("Delete");
+        clickHeaderButtonAndWait("Delete");
         return new DeleteIssueListPage(getDriver());
     }
 
