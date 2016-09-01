@@ -1230,7 +1230,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             return getDefaultDisplayName(email);
     }
 
-    protected String getDefaultDisplayName(String email)
+    protected static String getDefaultDisplayName(String email)
     {
         String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
         display = display.replace('_', ' ');
