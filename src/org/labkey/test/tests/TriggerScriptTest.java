@@ -706,7 +706,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      */
     private void insertSingleRowViaUI(Map<String,String> record)
     {
-        clickButton("Insert New");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
         record.entrySet().forEach((entry) -> setFormElement( Locator.xpath("//*[@name='quf_"+ entry.getKey() + "']"), entry.getValue()));
         clickButton("Submit");
     }
@@ -817,7 +817,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Setup Data Class
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Data Classes"));
-        clickButton("Insert New");
+        clickButton(DataRegionTable.getInsertNewButtonText());
         setFormElement(Locator.name("name"), DATA_CLASSES_NAME);
         clickButton("Create");
         clickButton("Add Field", 0);

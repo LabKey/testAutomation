@@ -144,7 +144,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
+        _extHelper.clickInsertNewRow(true);
         setRowData(data, validateText);
     }
 

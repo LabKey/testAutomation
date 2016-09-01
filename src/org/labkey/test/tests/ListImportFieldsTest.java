@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
@@ -108,7 +109,7 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         clickButton("Done", 0);
         waitForElement(Locator.linkWithText("Details"));
         clickAndWait(Locator.linkWithText("Details"));
-        waitForText("Insert New");
+        waitForText(DataRegionTable.getInsertNewButtonText());
 
         Map<String, String> dataRow = new HashMap<>();
         dataRow.put("Test Field", "Some Data");

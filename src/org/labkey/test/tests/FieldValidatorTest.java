@@ -76,7 +76,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // ID regex validation
         log("Test inserting new row");
-        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
+        _extHelper.clickInsertNewRow(true);
         setFormElement(Locator.name("quf_id"), "id:123abc:001");
         setFormElement(Locator.name("quf_name"), "Sid");
         setFormElement(Locator.name("quf_sex"), "male");
@@ -92,7 +92,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // age range validation
         log("Test inserting new row");
-        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
+        _extHelper.clickInsertNewRow(true);
         setFormElement(Locator.name("quf_id"), "ID:123abc:001");
         setFormElement(Locator.name("quf_name"), "Mikey");
         setFormElement(Locator.name("quf_sex"), "male");
@@ -105,7 +105,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // sex validation
         log("Test inserting new row");
-        _extHelper.clickMenuButton(true, "Insert", "Insert New Row");
+        _extHelper.clickInsertNewRow(true);
         setFormElement(Locator.name("quf_id"), "ID:123abc:001");
         setFormElement(Locator.name("quf_name"), "Kim");
         setFormElement(Locator.name("quf_sex"), "Female");

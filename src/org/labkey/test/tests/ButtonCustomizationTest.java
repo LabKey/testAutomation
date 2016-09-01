@@ -100,10 +100,10 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton("Done");
         clickAndWait(Locator.linkWithText(LIST_NAME));
         assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
         setFormElement(Locator.name("quf_name"), "Seattle");
         clickButton("Submit");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
         setFormElement(Locator.name("quf_name"), "Portland");
         clickButton("Submit");
         
@@ -204,7 +204,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
         waitForElement(Locator.lkButton(METADATA_OVERRIDE_BUTTON), 10000);
 
-        assertButtonNotPresent("Insert New Row");
+        assertButtonNotPresent(DataRegionTable.getInsertNewButtonText());
 
         _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);

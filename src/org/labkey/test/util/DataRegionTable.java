@@ -1192,6 +1192,36 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         return getWrapper().getTexts(menuItems);
     }
 
+    public void clickInsertNewRowDropdown()
+    {
+        clickHeaderMenu("Insert", "Insert New Row");
+    }
+
+    public void clickImportBulkDataDropdown()
+    {
+        clickHeaderMenu("Insert", "Import Bulk Data");
+    }
+
+    public void clickInsertNewRowButton()
+    {
+        elements().getHeaderButton("Insert New Row").click();
+    }
+
+    public void clickImportBulkDataButton()
+    {
+        elements().getHeaderButton("Import Bulk Data").click();
+    }
+
+    public static String getInsertNewButtonText()
+    {
+        return "Insert New Row";
+    }
+
+    public static String getImportBulkDataText()
+    {
+        return "Import Bulk Data";
+    }
+
     public static class Locators extends org.labkey.test.Locators
     {
         public static Locator.XPathLocator dataRegion()

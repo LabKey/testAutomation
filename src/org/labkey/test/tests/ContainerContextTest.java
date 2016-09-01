@@ -161,8 +161,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insert row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(lookupSourceListName));
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        setFormElement(Locator.name("quf_MyName"), "MyName");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
         clickButton("Submit");
 
@@ -229,12 +228,10 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Inserting row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
 
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
         clickButton("Submit");
 
         log("** Checking URLs go to correct container...");

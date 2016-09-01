@@ -141,7 +141,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickButton("Save");
 
         DataRegionTable samplesTable = new DataRegionTable("Material", getDriver());
-        samplesTable.clickHeaderButton("Insert", "Import Data");
+        samplesTable.clickImportBulkDataDropdown();
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
         for (File file : new File(DATAFILE_DIRECTORY).listFiles())

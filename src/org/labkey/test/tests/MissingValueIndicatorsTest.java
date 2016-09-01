@@ -155,8 +155,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteListData(3);
 
         log("Test inserting a single new row");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        setFormElement(Locator.name("quf_name"), "Sid");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_name"), "Sid");
         setFormElement(Locator.name("quf_sex"), "male");
         selectOptionByValue(Locator.name("quf_ageMVIndicator"), "Z");
         clickButton("Submit");
@@ -166,7 +165,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteListData(1);
 
         log("Test separate MVIndicator column");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Import Bulk Data");
+        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
         assertLabKeyErrorPresent();
@@ -240,7 +239,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
         clickButton("View Data");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Import Bulk Data");
+        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error(null);
@@ -252,8 +251,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(3);
 
         log("Test inserting a single row");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        setFormElement(Locator.name("quf_ParticipantId"), "Sid");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_ParticipantId"), "Sid");
         setFormElement(Locator.name("quf_SequenceNum"), "1");
         selectOptionByValue(Locator.name("quf_AgeMVIndicator"), "Z");
         setFormElement(Locator.name("quf_Sex"), "male");
@@ -264,7 +262,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Import Bulk Data");
+        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
@@ -273,8 +271,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("Dataset", "ParticipantId");
 
         log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
         Assert.assertEquals("There should not be a devault missing value indicator selection", "", getSelectedOptionText(mvSeletor));
         String mvSelection = "Z";
         selectOptionByValue(mvSeletor, mvSelection);

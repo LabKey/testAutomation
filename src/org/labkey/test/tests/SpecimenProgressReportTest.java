@@ -203,7 +203,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         else
             waitForText("No assay configurations");
         int expectedRowIndex = getElementCount(configGridRow);
-        clickButton("Insert New", 0);
+        clickButton(DataRegionTable.getInsertNewButtonText(), 0);
         waitForElement(Locator.name("AssayName"));
         setFormElement(Locator.name("AssayName"), assayName);
         setFormElement(Locator.name("Description"), assayName + " " + tubeType);

@@ -39,6 +39,26 @@ public class ExtHelper
         _test = test;
     }
 
+    public void clickInsertNewRow()
+    {
+        clickMenuButton(true, "Insert", "Insert New Row");
+    }
+
+    public void clickInsertNewRow(boolean wait)
+    {
+        clickMenuButton(wait, "Insert", "Insert New Row");
+    }
+
+    public void clickImportBulkData()
+    {
+        clickMenuButton(true, "Insert", "Insert New Row");
+    }
+
+    public void clickImportBulkData(boolean wait)
+    {
+        clickMenuButton(wait, "Insert", "Insert New Row");
+    }
+
     public void clickMenuButton(String menusLabel, String... subMenuLabels)
     {
         clickMenuButton(true, menusLabel, subMenuLabels);

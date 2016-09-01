@@ -88,8 +88,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Insert", "Insert New Row");
-        waitForElement(Locator.name("quf_ParticipantId"));
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
         setFormElement(Locator.name("quf_date"), "1/1/2001");
         setFormElement(Locator.name("quf_Comments"), "Comment on added participant");
