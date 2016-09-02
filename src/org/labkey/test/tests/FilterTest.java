@@ -280,6 +280,7 @@ public class FilterTest extends BaseWebDriverTest
     @LogMethod
     private void containerFilterFacetTest()
     {
+        goToProjectHome();
         IssuesHelper issuesHelper = new IssuesHelper(this);
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
