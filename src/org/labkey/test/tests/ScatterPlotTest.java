@@ -331,8 +331,8 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
 
-        waitForText("\"7. Neck\", is not available. It may have been renamed or removed.");
-        assertTextPresent("\"16. Evaluation Summary\", is not available. It may have been renamed or removed.");
+        waitForText("The saved color measure, 7. Neck, is not available. It may have been renamed or removed.");
+        assertTextPresent("The saved shape measure, 16. Evaluation Summary, is not available. It may have been renamed or removed.");
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
@@ -368,7 +368,7 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // Issue 18186: When not in edit mode, there shouldn't be a pop up message.
-        String formLanguageError = "The saved x measure, \"Form Language\", is not available. It may have been renamed or removed.";
+        String formLanguageError = "The saved x measure, Form Language, is not available. It may have been renamed or removed.";
         waitForText(formLanguageError);
         clickButton("Edit");
         waitForText(formLanguageError);
