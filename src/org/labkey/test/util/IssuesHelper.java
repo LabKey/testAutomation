@@ -32,12 +32,12 @@ import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
+import org.labkey.test.pages.issues.ListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.internal.WrapsDriver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +89,12 @@ public class IssuesHelper extends WebDriverWrapper
     {
         beginAt(buildURL("query", container, "executeQuery", Maps.of("schemaName", ISSUES_SCHEMA, "query.queryName", ISSUE_LIST_DEF_QUERY)));
         return IssueListDefDataRegion.fromExecuteQuery(getDriver());
+    }
+
+    public ListPage goToIssueList(String container, String name)
+    {
+        beginAt(buildURL("issues", container, "list.view", Maps.of("issueDefName", name)));
+        return new ListPage(getDriver());
     }
 
     @LogMethod

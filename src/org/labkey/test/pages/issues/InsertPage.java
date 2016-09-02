@@ -2,6 +2,7 @@ package org.labkey.test.pages.issues;
 
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends UpdatePage
@@ -19,6 +20,12 @@ public class InsertPage extends UpdatePage
     public static InsertPage beginAt(WebDriverWrapper driver, String containerPath)
     {
         driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "insert"));
+        return new InsertPage(driver.getDriver());
+    }
+
+    public static InsertPage beginAt(WebDriverWrapper driver, String containerPath, String issueDefName)
+    {
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "insert", Maps.of("issueDefName", issueDefName)));
         return new InsertPage(driver.getDriver());
     }
 }

@@ -43,6 +43,12 @@ public class IssueListDefDataRegion extends DataRegionTable
         return startCreateIssuesListDefinition(name, false).clickYes();
     }
 
+    public ListPage goToIssueList(String name)
+    {
+        link(getRowIndex("Label", name), "Label").click();
+        return new ListPage(getDriver());
+    }
+
     public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name, boolean errorExpected)
     {
         InsertIssueDefPage insertIssueDefPage = clickInsert();
@@ -52,7 +58,7 @@ public class IssueListDefDataRegion extends DataRegionTable
         return insertIssueDefPage.clickSubmit(errorExpected);
     }
 
-    public void selectIssues(String... names)
+    public void selectIssueDefs(String... names)
     {
         for (String name : names)
         {
@@ -62,7 +68,7 @@ public class IssueListDefDataRegion extends DataRegionTable
 
     public IssueListDefDataRegion deleteListDefs(String... names)
     {
-        selectIssues(names);
+        selectIssueDefs(names);
         return clickDelete().confirmDelete();
     }
 }
