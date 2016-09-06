@@ -1087,6 +1087,11 @@ public abstract class Locator
             return this.withPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
         }
 
+        public XPathLocator withoutAttribute(String attrName, String attrVal)
+        {
+            return this.withoutPredicate("@" + attrName + "=" + xq(attrVal));
+        }
+
         public XPathLocator withoutAttributeContaining(String attrName, String partialAttrVal)
         {
             return this.withoutPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
