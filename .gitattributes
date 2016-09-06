@@ -465,9 +465,6 @@ src/org/labkey/test/etl/ETLTaskRefTaskTest.java -text
 src/org/labkey/test/etl/ETLTest.java -text
 src/org/labkey/test/io/Grep.java -text
 src/org/labkey/test/module/ModuleTest.java -text
-src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
-src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
-src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
 src/org/labkey/test/pages/AssayDesignerPage.java -text
 src/org/labkey/test/pages/BaseDesignerPage.java -text
 src/org/labkey/test/pages/ConfigureReportsAndScriptsPage.java -text
@@ -508,6 +505,9 @@ src/org/labkey/test/pages/study/ManageParticipantGroupsPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
 src/org/labkey/test/pages/test/TestActions.java -text
 src/org/labkey/test/pages/wiki/EditPage.java -text
+src/org/labkey/test/params/ms1/AbstractInspectTestParams.java -text
+src/org/labkey/test/params/ms1/FeaturesTestParams.java -text
+src/org/labkey/test/params/ms1/PepMatchTestParams.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text

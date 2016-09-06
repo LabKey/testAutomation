@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.ms1.params;
+package org.labkey.test.params.ms1;
 
+import org.labkey.test.params.ms1.AbstractInspectTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 
 import java.io.File;
