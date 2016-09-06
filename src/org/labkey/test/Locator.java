@@ -169,6 +169,11 @@ public abstract class Locator
             (_text == null ? "" : "\nWith Text: " + _text);
     }
 
+    /**
+     * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+     * TODO: Make private and un-deprecate when able
+     */
+    @Deprecated
     public abstract By toBy();
 
     public LazyWebElement findWhenNeeded(SearchContext context)
@@ -872,6 +877,11 @@ public abstract class Locator
             return _cssLoc.toString();
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make private and un-deprecate when able
+         */
+        @Deprecated
         @Override
         public By toBy()
         {
@@ -929,6 +939,12 @@ public abstract class Locator
             return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make protected and un-deprecate when able
+         */
+        @Deprecated
+        @Override
         public By toBy()
         {
             return By.xpath(getLoc());
@@ -1179,6 +1195,12 @@ public abstract class Locator
             return toCssLocator().append(locator);
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make private and un-deprecate when able
+         */
+        @Deprecated
+        @Override
         public By toBy()
         {
             return _id.contains(" ") ? super.toBy() : By.id(_id);
@@ -1228,6 +1250,11 @@ public abstract class Locator
             return "name=" + getLoc() + (_index != null ? " index=" + _index : "");
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make private and un-deprecate when able
+         */
+        @Deprecated
         public By toBy()
         {
             return By.name(getLoc());
@@ -1330,6 +1357,11 @@ public abstract class Locator
             return "css=" + getLoc();
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make private and un-deprecate when able
+         */
+        @Deprecated
         public By toBy()
         {
             if (getLoc().contains(":contains("))
@@ -1364,6 +1396,11 @@ public abstract class Locator
             return "link=" + _linkText;
         }
 
+        /**
+         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
+         * TODO: Make private and un-deprecate when able
+         */
+        @Deprecated
         public By toBy()
         {
             return By.linkText(_linkText);
