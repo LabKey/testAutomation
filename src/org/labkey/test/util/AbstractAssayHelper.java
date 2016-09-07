@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.pages.AssayDesignerPage;
 
 import java.io.File;
@@ -111,7 +112,7 @@ public abstract class AbstractAssayHelper
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next");
 
-        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test);
+        AssayDesignerPage assayDesigner = new AssayDesignerPage(_test.getDriver());
         assayDesigner.setName(name);
         assayDesigner.save();
 
@@ -139,7 +140,7 @@ public abstract class AbstractAssayHelper
         });
         _test.waitForElement(Locator.id("AssayDesignerDescription"));
 
-        return new AssayDesignerPage(_test);
+        return new AssayDesignerPage(_test.getDriver());
     }
 
     public AssayDesignerPage copyAssayDesign()
@@ -156,7 +157,7 @@ public abstract class AbstractAssayHelper
         else
             _test.clickAndWait(Locator.tag("tr").append(Locator.linkWithText(destinationFolder)));
 
-        return new AssayDesignerPage(_test);
+        return new AssayDesignerPage(_test.getDriver());
     }
 
     public void deleteAssayDesign()
@@ -176,7 +177,7 @@ public abstract class AbstractAssayHelper
         _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "set default values", defaults.getMenuText(assayName));
     }
 
-    public static enum AssayDefaultAreas
+    public enum AssayDefaultAreas
     {
         BATCH_FIELDS("Batch Fields"),
         DATA_FIELDS("Data Fields"),
@@ -186,7 +187,7 @@ public abstract class AbstractAssayHelper
 
         private String menuSuffix;
 
-        private AssayDefaultAreas(String menuSuffix)
+        AssayDefaultAreas(String menuSuffix)
         {
             this.menuSuffix = menuSuffix;
         }
