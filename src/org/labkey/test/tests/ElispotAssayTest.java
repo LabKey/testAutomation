@@ -746,12 +746,12 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 //        assertEquals("TNTC", table.getDataAsText());
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("NormalizedSpotCount");
+        _customizeViewsHelper.addColumn("NormalizedSpotCount");
         _customizeViewsHelper.applyCustomView();
 
-        DataRegionTable dataTable = new DataRegionTable("Data", this);
-        List<String> cellWell = dataTable.getColumnDataAsText("CellWell");
-        List<String> spotCount = dataTable.getColumnDataAsText("SpotCount");
+        DataRegionTable dataTable = new DataRegionTable("Data", getDriver());
+        List<String> cellWell = dataTable.getColumnDataAsText("Cells per Well");
+        List<String> spotCount = dataTable.getColumnDataAsText("Spot Count");
         List<String> normalizedSpotCount = dataTable.getColumnDataAsText("NormalizedSpotCount");
         for (int i=0; i < cellWell.size(); i++)
         {
@@ -769,7 +769,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
             }
             else
             {
-                normalizedSpotCount.get(i).equals("");
+                assertEquals("", normalizedSpotCount.get(i).trim());
             }
         }
         _customizeViewsHelper.openCustomizeViewPanel();
