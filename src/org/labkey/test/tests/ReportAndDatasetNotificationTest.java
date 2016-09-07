@@ -328,7 +328,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickAndWait(Ext4Helper.Locators.ext4Button("Save").index(1), expectReload ? WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
-            _extHelper.waitForExtDialog("Success");
+            waitForElement(Locator.tagWithClass("div", "x4-window").containing("Report saved successfully."));
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
         waitFor(() -> isTextPresent("Please select at least one") || // group/participant

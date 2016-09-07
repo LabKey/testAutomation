@@ -253,7 +253,7 @@ public abstract class TimeChartTest extends ReportTest
         clickAndWait(findButton("Save", 1), expectReload ? WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
-            _extHelper.waitForExtDialog("Success");
+            waitForElement(Locator.tagWithClass("div", "x4-window").containing("Report saved successfully."));
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
         waitFor(() -> isTextPresent("Please select at least one") || // group/participant

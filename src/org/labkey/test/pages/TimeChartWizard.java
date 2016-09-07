@@ -136,7 +136,7 @@ public class TimeChartWizard
         _test.clickAndWait(_test.findButton("Save", 1), expectReload ? BaseWebDriverTest.WAIT_FOR_PAGE : 0);
         if (!expectReload)
         {
-            _test._extHelper.waitForExtDialog("Success");
+            _test.waitForElement(Locator.tagWithClass("div", "x4-window").containing("Report saved successfully."));
             _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
         _test.waitFor(() -> _test.isTextPresent("Please select at least one") || // group/participant
