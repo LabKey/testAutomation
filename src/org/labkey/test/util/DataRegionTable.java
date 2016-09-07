@@ -324,7 +324,10 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
     public String getTotal(String columnLabel)
     {
-        return getTotal(getColumnIndex(columnLabel));
+        final int col = getColumnIndex(columnLabel);
+        if (col == -1)
+            fail("Couldn't find column '" + columnLabel + "'");
+        return getTotal(col);
     }
 
     public String getTotal(int columnIndex)
@@ -485,9 +488,10 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
             {
                 columnText.add(getDataAsText(row, col));
             }
+            return columnText;
         }
-
-        return columnText;
+        else
+            return null;
     }
 
     public List<String> getColumnDataAsText(String name)
