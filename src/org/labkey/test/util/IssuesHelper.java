@@ -67,12 +67,12 @@ public class IssuesHelper extends WebDriverWrapper
         return _driverWrapper.getWrappedDriver();
     }
 
-    public boolean doesIssueListDefExist(String container, String listDefName)
+    public boolean doesIssueListDefExist(String container, String listDefLabel)
     {
         Connection cn = createDefaultConnection(false);
         SelectRowsCommand selectCmd = new SelectRowsCommand(ISSUES_SCHEMA, ISSUE_LIST_DEF_QUERY);
         selectCmd.setMaxRows(1);
-        selectCmd.addFilter("name", listDefName, Filter.Operator.EQUAL);
+        selectCmd.addFilter("Label", listDefLabel, Filter.Operator.EQUAL);
 
         try
         {
