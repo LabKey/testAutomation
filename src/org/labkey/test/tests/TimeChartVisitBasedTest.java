@@ -23,6 +23,8 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -35,7 +37,15 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     private static final String VISIT_CHART_TITLE = "APX-1: Abbreviated Physical Exam";
     private static final String QUERY_MEASURE_DATASET = "APX-1 (APX-1: Abbreviated Physical Exam)";
 
-    private static final String[] VISIT_STRINGS = {"1 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "G1: 6wk/G2: 2wk", "6 week Post-V#2", "1 wk Post-V#2/V#3", "6 wk Post-V#2/V#3"};
+    private static final String[] VISIT_STRINGS = {
+        "1 week Post-V#1",
+        "Int. Vis. %{S.1.1} .%{S.2.1}",
+        "Grp1:F/U/Grp2:V#2",
+        "G1: 6wk/G2: 2wk",
+        "6 week Post-V#2",
+        "1 wk Post-V#2/V#3",
+        "6 wk Post-V#2/V#3"
+    };
 
     @Override
     protected BrowserType bestBrowser()
@@ -91,17 +101,16 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertElementNotPresent(Locator.button("Developer"));
 
         DataRegionTable table = DataRegionTable.findDataRegion(this);
-        List displayOrders = table.getColumnDataAsText("Display Order");
-        for (Object str : displayOrders)
+        List<String> displayOrders = table.getColumnDataAsText("Display Order");
+        for (String str : displayOrders)
         {
-            assertEquals("Display order should default to zero.", "0", str.toString());
+            assertEquals("Display order should default to zero.", "0", str);
         }
 
         List<String> visits = table.getColumnDataAsText("Visit Label");
-        for( String str : VISIT_STRINGS )
-        {
-            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
-        }
+        List<String> missingVisits = new ArrayList<>(Arrays.asList(VISIT_STRINGS));
+        missingVisits.removeAll(visits);
+        assertTrue("Not all visits present in data table. Missing: " + missingVisits, missingVisits.isEmpty());
 
         clickButton("View Chart(s)", 0);
         waitForElementToDisappear(Locator.paginationText(19));
@@ -144,7 +153,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         // verify filtered view issue 16498
         log("Filter the default view of the query");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewFilter("sfdt_136", "Contains One Of", "1;2;");
+        _customizeViewsHelper.addFilter("sfdt_136", "Contains One Of", "1;2;");
         _customizeViewsHelper.saveCustomView();
         waitForElement(Locator.paginationText(31));
 
