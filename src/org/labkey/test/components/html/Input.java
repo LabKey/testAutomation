@@ -33,7 +33,12 @@ public class Input extends WebDriverComponent implements FormItem<String>
     @Override
     protected WebDriver getDriver()
     {
-        return _wDriver.getDriver();
+        return getWrapper().getDriver();
+    }
+
+    protected WebDriverWrapper getWrapper()
+    {
+        return _wDriver;
     }
 
     @Deprecated
@@ -51,13 +56,13 @@ public class Input extends WebDriverComponent implements FormItem<String>
     @Override
     public String get()
     {
-        return _wDriver.getFormElement(_el);
+        return getWrapper().getFormElement(_el);
     }
 
     @Override
     public void set(String value)
     {
-        _wDriver.setFormElement(_el, value);
+        getWrapper().setFormElement(_el, value);
     }
 
     @Override
