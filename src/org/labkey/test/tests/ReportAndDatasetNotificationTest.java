@@ -200,7 +200,8 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Chart Type", 0);
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(this);
         chartTypeDialog.waitForDialog();
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter);
+        assertEquals("Scatter", chartTypeDialog.getChartTypeTitle());
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         doAndWaitForElementToRefresh(() -> chartTypeDialog.clickApply(), Locator.css("svg"), shortWait());
         _ext4Helper.waitForMaskToDisappear();
         clickButton("Save", 0);

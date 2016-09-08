@@ -326,7 +326,7 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         public WebElement fieldTitles = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')]"), _test.getDriver());
 
         public WebElement plotTypeBar = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-bar_chart']"),  _test.getDriver());
-        public WebElement plotTypeBox = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-box_chart']"),  _test.getDriver());
+        public WebElement plotTypeBox = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-box_plot']"),  _test.getDriver());
         public WebElement plotTypePie = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-pie_chart']"),  _test.getDriver());
         public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-scatter_plot']"),  _test.getDriver());
 
