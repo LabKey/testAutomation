@@ -604,6 +604,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (description.getTestClass().equals(getCurrentTestClass()))
                 {
                     Ext4Helper.resetCssPrefix();
+                    ensureSignedInAsPrimaryTestUser();
                     resetErrors();
                 }
             }
@@ -795,7 +796,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
         finally
         {
-            resetErrors();
             doTearDown();
         }
     }
