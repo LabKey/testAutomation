@@ -1044,7 +1044,7 @@ public class ListTest extends BaseWebDriverTest
     void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
-        _listHelper.createList(PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
+        _listHelper.createList(PROJECT_VERIFY, name, ListHelper.ListColumnType.fromNew(cols.get(0).getType()), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
         _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)

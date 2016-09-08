@@ -505,6 +505,7 @@ src/org/labkey/test/pages/study/ManageParticipantGroupsPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
 src/org/labkey/test/pages/test/TestActions.java -text
 src/org/labkey/test/pages/wiki/EditPage.java -text
+src/org/labkey/test/params/FieldDefinition.java -text
 src/org/labkey/test/params/ms1/AbstractInspectTestParams.java -text
 src/org/labkey/test/params/ms1/FeaturesTestParams.java -text
 src/org/labkey/test/params/ms1/PepMatchTestParams.java -text

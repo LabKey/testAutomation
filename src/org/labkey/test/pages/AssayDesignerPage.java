@@ -18,15 +18,26 @@ package org.labkey.test.pages;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.html.SelectWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.PropertiesEditor.PropertyEditor;
+import static org.labkey.test.components.html.Checkbox.Checkbox;
+import static org.labkey.test.components.html.Input.Input;
+import static org.labkey.test.components.html.OptionSelect.OptionSelect;
+import static org.labkey.test.components.html.SelectWrapper.Select;
 
-public class AssayDesignerPage extends BaseDesignerPage
+public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.ElementCache>
 {
     public AssayDesignerPage(WebDriver driver)
     {
@@ -43,136 +54,155 @@ public class AssayDesignerPage extends BaseDesignerPage
     public void waitForReady()
     {
         super.waitForReady();
-        waitForElement(Locator.id("AssayDesignerDescription"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        elementCache().descriptionInput.get();
     }
 
-    public void setName(String name)
+    public AssayDesignerPage setName(String name)
     {
-        setFormElement(Locator.id("AssayDesignerName"), name);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change);
+        elementCache().nameInput.set(name);
+        fireEvent(elementCache().nameInput.getComponentElement(), BaseWebDriverTest.SeleniumEvent.change);
+        return this;
     }
 
-    public void setDescription(String description)
+    public AssayDesignerPage setDescription(String description)
     {
-        setFormElement(Locator.id("AssayDesignerDescription"), description);
+        elementCache().descriptionInput.set(description);
+        return this;
     }
 
-    public void setAutoCopyData(boolean set)
+    public AssayDesignerPage setAutoCopyData(boolean checked)
     {
-        if (set)
-            checkCheckbox(Locator.checkboxByName("autoCopy"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("autoCopy"));
+        elementCache().autoCopyCheckbox.set(checked);
+        return this;
     }
 
-    public void setAutoCopyTarget(String containerPath)
+    public AssayDesignerPage setAutoCopyTarget(String containerPath)
     {
-        selectOptionByText(Locator.id("autoCopyTarget"), containerPath);
+        elementCache().autoCopyTargetSelect.selectByVisibleText(containerPath);
+        return this;
     }
 
-    public void addTransformScript(File transformScript)
+    public AssayDesignerPage addTransformScript(File transformScript)
     {
         int index = getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
         click(Locator.lkButton("Add Script"));
 
-        setTransformScript(transformScript, index);
+        return setTransformScript(transformScript, index);
     }
 
-    public void setTransformScript(File transformScript)
+    public AssayDesignerPage setTransformScript(File transformScript)
     {
-        setTransformScript(transformScript, 0);
+        return setTransformScript(transformScript, 0);
     }
 
-    public void setTransformScript(File transformScript, int index)
+    public AssayDesignerPage setTransformScript(File transformScript, int index)
     {
         assertTrue("Unable to locate the transform script: " + transformScript, transformScript.exists());
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
+        return this;
     }
 
-    public void setPlateTemplate(String template)
+    public AssayDesignerPage setPlateTemplate(String template)
     {
-        selectOptionByText(Locator.id("plateTemplate"), template);
+        elementCache().plateTemplateSelect.selectByVisibleText(template);
+        return this;
     }
 
-    public void setDetectionMethod(String method)
+    public AssayDesignerPage setDetectionMethod(String method)
     {
-        selectOptionByText(Locator.id("detectionMethod"), method);
+        elementCache().detectionMethodSelect.selectByVisibleText(method);
+        return this;
     }
 
-    public void setMetaDataInputFormat(MetadataInputFormat format)
+    public AssayDesignerPage setMetaDataInputFormat(MetadataInputFormat format)
     {
-        selectOptionByValue(Locator.id("metadataInputFormat"), format.name());
+        elementCache().metadataInputSelect.selectOption(format);
+        return this;
     }
 
-    public void setSaveScriptData(boolean set)
+    public AssayDesignerPage setSaveScriptData(boolean checked)
     {
-        if (set)
-            checkCheckbox(Locator.checkboxByName("debugScript"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("debugScript"));
+        elementCache().debugScriptCheckbox.set(checked);
+        return this;
     }
 
-    public void setEditableRuns(boolean set)
+    public AssayDesignerPage setEditableRuns(boolean checked)
     {
-        if (set)
-            checkCheckbox(Locator.checkboxByName("editableRunProperties"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("editableRunProperties"));
+        elementCache().editableRunsCheckbox.set(checked);
+        return this;
     }
 
-    public void setEditableResults(boolean set)
+    public AssayDesignerPage setEditableResults(boolean checked)
     {
-        if (set)
-            checkCheckbox(Locator.checkboxByName("editableResultProperties"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("editableResultProperties"));
+        elementCache().editableResultCheckbox.set(checked);
+        return this;
     }
 
-    public void setBackgroundImport(boolean set)
+    public AssayDesignerPage setBackgroundImport(boolean checked)
     {
-        if (set)
-            checkCheckbox(Locator.checkboxByName("backgroundUpload"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("backgroundUpload"));
+        elementCache().backgroundUploadCheckbox.set(checked);
+        return this;
     }
 
+    public PropertiesEditor batchFields()
+    {
+        return elementCache().batchFieldsPanel;
+    }
+
+    public PropertiesEditor runFields()
+    {
+        return elementCache().runFieldsPanel;
+    }
+
+    public PropertiesEditor dataFields()
+    {
+        return elementCache().dataFieldsPanel;
+    }
+
+    @Deprecated
     public void addBatchField(String name, @Nullable String label, @Nullable String type)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         addField(xpathSection, name, label, type);
     }
 
+    @Deprecated
     public void removeBatchField(String name)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         removeField(xpathSection, name);
     }
 
+    @Deprecated
     public void addRunField(String name, @Nullable String label, @Nullable String type)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         addField(xpathSection, name, label, type);
     }
 
+    @Deprecated
     public void removeRunField(String name)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         removeField(xpathSection, name);
     }
 
+    @Deprecated
     public void addDataField(String name, @Nullable String label, @Nullable String type)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         addField(xpathSection, name, label, type);
     }
 
+    @Deprecated
     public void removeDataField(String name)
     {
         final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
         removeField(xpathSection, name);
     }
 
+    @Deprecated
     private void addField(String xpathSection, String name, @Nullable String label, @Nullable String type)
     {
         List<WebElement> inputBoxes;
@@ -197,6 +227,7 @@ public class AssayDesignerPage extends BaseDesignerPage
         }
     }
 
+    @Deprecated
     public void removeField(String xpathSection, String name)
     {
         final String xpathDelete1 = "input[contains(@id, '-input') and starts-with(@id, 'name')][";
@@ -235,9 +266,47 @@ public class AssayDesignerPage extends BaseDesignerPage
         return null;
     }
 
-    public enum MetadataInputFormat
+    public enum MetadataInputFormat implements OptionSelect.SelectOption
     {
         MANUAL,
-        FILE_BASED
+        FILE_BASED;
+
+        @Override
+        public String getValue()
+        {
+            return name();
+        }
+
+        @Override
+        public String getText()
+        {
+            return null;
+        }
+    }
+
+    @Override
+    protected ElementCache newElementCache()
+    {
+        return new ElementCache();
+    }
+
+    public class ElementCache extends BaseDesignerPage.ElementCache
+    {
+        final Input nameInput = Input(Locator.id("AssayDesignerName"), getDriver()).findWhenNeeded(this);
+        final Input descriptionInput = Input(Locator.id("AssayDesignerDescription"), getDriver()).findWhenNeeded(this);
+        final Checkbox autoCopyCheckbox = Checkbox(Locator.checkboxByName("autoCopy")).findWhenNeeded(this);
+        final Select autoCopyTargetSelect = Select(Locator.id("autoCopyTarget")).findWhenNeeded(this);
+        final Select plateTemplateSelect = Select(Locator.id("plateTemplate")).findWhenNeeded(this);
+        final Select detectionMethodSelect = Select(Locator.id("detectionMethod")).findWhenNeeded(this);
+        final OptionSelect<MetadataInputFormat> metadataInputSelect = OptionSelect(Locator.id("metadataInputFormat")).findWhenNeeded(this);
+        final Checkbox debugScriptCheckbox = Checkbox(Locator.checkboxByName("debugScript")).findWhenNeeded(this);
+        final Checkbox editableRunsCheckbox = Checkbox(Locator.checkboxByName("editableRunProperties")).findWhenNeeded(this);
+        final Checkbox editableResultCheckbox = Checkbox(Locator.checkboxByName("editableResultProperties")).findWhenNeeded(this);
+        final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxByName("backgroundUpload")).findWhenNeeded(this);
+
+
+        final PropertiesEditor batchFieldsPanel = PropertyEditor(getDriver()).withTitle("Batch Fields").findWhenNeeded();
+        final PropertiesEditor runFieldsPanel = PropertyEditor(getDriver()).withTitle("Run Fields").findWhenNeeded();
+        final PropertiesEditor dataFieldsPanel = PropertyEditor(getDriver()).withTitle("Data Fields").findWhenNeeded();
     }
 }

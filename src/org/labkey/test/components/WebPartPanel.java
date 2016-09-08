@@ -66,9 +66,14 @@ public class WebPartPanel extends WebDriverComponent
         @Override
         protected Locator locator()
         {
-            Locator.XPathLocator webPartTitle = Locator.xpath("tbody/tr/th/span").withClass("labkey-wp-title-text");
+            Locator.XPathLocator webPartTitle = titleLocator();
             webPartTitle = _partialTitle ? webPartTitle.containing(_title) : webPartTitle.withText(_title);
             return Locator.tagWithClass("table", "labkey-wp").withDescendant(webPartTitle);
+        }
+
+        protected Locator.XPathLocator titleLocator()
+        {
+            return Locator.xpath("tbody/tr/th/span").withClass("labkey-wp-title-text");
         }
     }
 }

@@ -15,9 +15,10 @@ import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
+import org.labkey.test.params.FieldDefinition;
+import org.labkey.test.params.FieldDefinition.ColumnType;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PermissionsHelper;
 
 import java.util.Arrays;
@@ -85,7 +86,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
 
         AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
         String inheritedField = "inheritedfield";
-        adminPage.configureFields().addField(new ListHelper.ListColumn(inheritedField, ListHelper.ListColumnType.String));
+        adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 
         ListPage issueList = ListPage.beginAt(this, FOLDER_PATH, listDef);
@@ -123,7 +124,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         confirmationWindow.clickButton("Yes");
 
         AdminPage adminPage = AdminPage.beginAt(this, "Shared", listDef);
-        adminPage.configureFields().addField(new ListHelper.ListColumn(inheritedField, ListHelper.ListColumnType.String));
+        adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 
         ListPage issueList = ListPage.beginAt(this, getProjectName(), listDef);
@@ -164,7 +165,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
 
         AdminPage adminPage = AdminPage.beginAt(this, PROJECT2, listDef);
         String inheritedField = "uninheritedfield";
-        adminPage.configureFields().addField(new ListHelper.ListColumn(inheritedField, ListHelper.ListColumnType.String));
+        adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 
         ListPage issueList = ListPage.beginAt(this, getProjectName(), listDef);
@@ -193,7 +194,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
 
         AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
         String inheritedField = "uninheritedfield";
-        adminPage.configureFields().addField(new ListHelper.ListColumn(inheritedField, ListHelper.ListColumnType.String));
+        adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 
         ListPage issueList = ListPage.beginAt(this, FOLDER_PATH, listDef);

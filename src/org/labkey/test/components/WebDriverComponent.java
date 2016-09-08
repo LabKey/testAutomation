@@ -1,5 +1,7 @@
 package org.labkey.test.components;
 
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebDriverWrapperImpl;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,6 +11,14 @@ import org.openqa.selenium.WebElement;
  */
 public abstract class WebDriverComponent<EC extends Component.ElementCache> extends Component<EC>
 {
+    private WebDriverWrapper _dWrapper;
+    protected WebDriverWrapper getWrapper()
+    {
+        if (_dWrapper == null)
+            _dWrapper = new WebDriverWrapperImpl(getDriver());
+        return _dWrapper;
+    }
+
     protected abstract WebDriver getDriver();
 
     public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
