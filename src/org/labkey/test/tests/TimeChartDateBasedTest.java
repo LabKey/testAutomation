@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -48,19 +49,16 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @LogMethod protected void doCreateSteps()
     {
         configureStudy();
-        createUser(USER1, null);
-        createUser(USER2, null);
+        _userHelper.createUser(USER1);
+        _userHelper.createUser(USER2);
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.setUserPermissions(USER1, "Reader");
-        _permissionsHelper.setUserPermissions(USER2, "Editor");
-        _securityHelper.setSiteGroupPermissions("Guests", "Reader");
-        clickButton("Save and Finish");
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.setUserPermissions(USER1, "Reader");
+        permissionsHelper.setUserPermissions(USER2, "Editor");
+        permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Views");
         portalHelper.addWebPart("Datasets");
@@ -689,7 +687,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickAndWait(Locator.linkWithText("Physical Exam"));
 
         String ptid = "249318596";
-        DataRegionTable region = new DataRegionTable("Dataset", this);
+        DataRegionTable region = new DataRegionTable("Dataset", getDriver());
         region.setFilter("ParticipantId", "Equals", ptid);
         assertTextPresent(ptid);
 
