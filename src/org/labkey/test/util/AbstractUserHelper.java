@@ -17,8 +17,6 @@ package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
-import org.openqa.selenium.WebDriver;
 
 public abstract class AbstractUserHelper
 {
@@ -27,11 +25,6 @@ public abstract class AbstractUserHelper
     public AbstractUserHelper(WebDriverWrapper driver)
     {
         _driver = driver;
-    }
-
-    public CreateUserResponse createUser(String userName, String clonedUserName)
-    {
-        return createUser(userName);
     }
 
     public CreateUserResponse createUser(String userName)
