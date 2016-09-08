@@ -91,7 +91,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertElementNotPresent(Locator.button("Developer"));
 
         DataRegionTable table = DataRegionTable.findDataRegion(this);
-        List displayOrders = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Display Order");
+        List displayOrders = table.getColumnDataAsText("Display Order");
         for (Object str : displayOrders)
         {
             assertEquals("Display order should default to zero.", "0", str.toString());

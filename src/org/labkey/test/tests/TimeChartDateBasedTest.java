@@ -646,7 +646,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
-        waitForElement(Locator.tag("td").withText("No group selected. Please select at least one group."));
+        waitForElement(Locator.tagWithText("div", "No group selected. Please select at least one group."));
         sleep(5500);// wait for tool tip to disappear, as it is covering what we want to click. it has a timeout of 5 sec
 
         // re-select group 1 and 2
