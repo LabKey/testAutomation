@@ -6,9 +6,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.issues.InsertPage;
@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class})
+@Category({Issues.class, DailyA.class})
 public class IssuesAdminTest extends BaseWebDriverTest
 {
     private static final String USER = "admin_user@issuesadmin.test";

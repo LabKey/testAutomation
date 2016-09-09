@@ -29,6 +29,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.pages.issues.ClosePage;
@@ -60,7 +61,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
-@Category({DailyA.class, Data.class})
+@Category({Issues.class, DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
     private static final String ISSUE_TITLE_0 = "A very serious issue";

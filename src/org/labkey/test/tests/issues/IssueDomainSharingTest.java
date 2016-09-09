@@ -9,6 +9,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.issues.AdminPage;
@@ -26,7 +27,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class})
+@Category({Issues.class, DailyA.class})
 public class IssueDomainSharingTest extends BaseWebDriverTest
 {
     private static final String USER = "project_user@issuessharing.test";
