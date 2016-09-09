@@ -16,7 +16,6 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
-import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -143,7 +142,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
         public C findWhenNeeded(S context)
         {
-            return construct(new LazyWebElement(buildLocator(), context).withTimeout(timeout));
+            return construct(buildLocator().findWhenNeeded(context).withTimeout(timeout));
         }
 
         public C findOrNull(S context)
