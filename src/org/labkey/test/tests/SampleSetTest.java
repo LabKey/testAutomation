@@ -24,7 +24,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -219,7 +218,6 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTextPresent("SampleSetBVTChildA");
 
         fileAttachmentTest();
-        clickAndWait(Locator.linkWithText("FolderChildrenSampleSet"));
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
 
         // Make sure that the parent got wired up
@@ -248,8 +246,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
         // These two regions are used throughout the remaining jumps comparing parent/child sets
-        DataRegionTable childMaterialsRegion = new DataRegionTable("childMaterials", this);
-        DataRegionTable parentMaterialsRegion = new DataRegionTable("parentMaterials", this);
+        DataRegionTable childMaterialsRegion = new DataRegionTable("childMaterials", this.getDriver());
+        DataRegionTable parentMaterialsRegion = new DataRegionTable("parentMaterials", this.getDriver());
 
         // Filter out any child materials, though there shouldn't be any
         childMaterialsRegion.setFilter("Name", "Is Blank");
@@ -319,9 +317,9 @@ public class SampleSetTest extends BaseWebDriverTest
         insertNewWithFileAttachmentTest();
 
         // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
-        exportGridWithAttachment(3, 5, "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx", "experiment-1.xar.xml");
+        exportGridWithAttachment(3, 4, "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx", "experiment-1.xar.xml");
         deleteAttachmentColumn();
-        exportGridWithAttachment(3, 5, "", "", "");
+        exportGridWithAttachment(3, 4, "", "", "");
     }
 
     private void insertNewWithFileAttachmentTest()
@@ -350,7 +348,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_FileAttachment"),  attachment);
         clickButton("Submit");
 
-        DataRegionTable drt = new DataRegionTable("Material", this);
+        DataRegionTable drt = new DataRegionTable("Material", this.getDriver());
 
         String path = drt.getDataAsText(index, "File Attachment");
         assertNotNull("Path shouldn't be null", path);
@@ -368,12 +366,12 @@ public class SampleSetTest extends BaseWebDriverTest
         int row;
 
         log("Export the grid to excel.");
-        list = new DataRegionTable("Material", this);
+        list = new DataRegionTable("Material", this.getDriver());
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
-        try{
-
+        try
+        {
             workbook = ExcelHelper.create(exportedFile);
             sheet = workbook.getSheetAt(0);
 
@@ -382,7 +380,7 @@ public class SampleSetTest extends BaseWebDriverTest
             log("Validate that the value for the attachment columns is as expected.");
             exportedColumn = ExcelHelper.getColumnData(sheet, exportColumn);
             row = 1;
-            for(String filePath : expectedFilePaths)
+            for (String filePath : expectedFilePaths)
             {
                 if (filePath.length() == 0)
                 {
