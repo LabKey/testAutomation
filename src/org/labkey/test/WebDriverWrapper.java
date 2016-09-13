@@ -3056,20 +3056,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         assertTrue("File not found: " + file.toString(), file.exists());
         String cssString = "";
+        String styleString = "";
         if (!el.isDisplayed())
         {
             cssString = el.getAttribute("class");
+            styleString = el.getAttribute("style");
             log("Remove class so that WebDriver can interact with concealed form element");
-            executeScript("arguments[0].setAttribute('class', '');", el);
+            executeScript("arguments[0].setAttribute('class', '');arguments[0].setAttribute('style', '');", el);
         }
 
         el.sendKeys(FileUtil.getAbsoluteCaseSensitiveFile(file).getAbsolutePath());
 
-        if (!cssString.isEmpty())
+        if (!cssString.isEmpty() || !styleString.isEmpty())
         {
             try
             {
-                executeScript("arguments[0].setAttribute('class', arguments[1]);", el, cssString);
+                executeScript("arguments[0].setAttribute('class', arguments[1]);arguments[0].setAttribute('class', arguments[2])", el, cssString, styleString);
             }
             catch (StaleElementReferenceException ignore) {}
         }
