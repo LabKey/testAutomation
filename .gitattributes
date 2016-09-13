@@ -177,6 +177,8 @@ modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#applica
 modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
+modules/simpletest/resources/etls/merge.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/mergeManyColumns.xml -text
 modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
@@ -253,6 +255,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-0.00-14.10.sql
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.10-15.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.20-15.30.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.20-16.21.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1.00.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-13.10.sql -text
@@ -280,6 +283,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-0.00-14.10.sql 
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.20-15.30.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.20-16.21.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
 modules/simpletest/resources/scripts/simpletest/ScriptValidationExports.js -text

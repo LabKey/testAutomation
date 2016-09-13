@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -690,6 +691,51 @@ public class ETLTest extends ETLBaseTest
         goToProjectHome();
         log("Validating modifiedSinceFilterStrategy is containerFilter aware.");
         _etlHelper.assertInTarget1(CHILD_ROW_2);
+    }
 
+    @Test
+    public void testBasicMerge() throws Exception
+    {
+        final String PREFIX = "Subject for merge test";
+        final String MERGE_ETL = "{simpletest}/merge";
+        _etlHelper.insertSourceRow("600", PREFIX + "1", null);
+        _etlHelper.runETL_API(MERGE_ETL);
+        // Check the ETL works at all
+        _etlHelper.assertInTarget1(PREFIX + "1");
+        _etlHelper.insertSourceRow("610", PREFIX + "2", null);
+        final String newNameForRow1 = "newNameForRow1";
+        _etlHelper.editSourceRow(0, null, newNameForRow1, null);
+        _etlHelper.runETL_API(MERGE_ETL);
+
+        // Check insert of new and update to existing
+        _etlHelper.assertInTarget1(PREFIX + "2", newNameForRow1);
+        // Check we really did UPDATE and not insert a new one
+        _etlHelper.assertNotInTarget1(PREFIX + "1");
+    }
+
+    @Test
+    public void testManyColumnMerge() throws Exception
+    {
+        // Mostly identical coverage as the basic case, but with > 100 columns.
+        final String MERGE_ETL = "{simpletest}/mergeManyColumns";
+        final String firstField5 = "55555";
+        final String secondField5 = "66666";
+        final String modifiedField5 = "77777";
+        final String field180val = "180180";
+
+        _etlHelper.do180columnSetup();
+        Map<Integer, String> rowMap = new HashMap<>();
+        rowMap.put(5, firstField5);
+        _etlHelper.insert180columnsRow(rowMap);
+        _etlHelper.runETL_API(MERGE_ETL);
+        _etlHelper.assertIn180columnTarget(firstField5);
+        rowMap.put(5, secondField5);
+        _etlHelper.insert180columnsRow(rowMap);
+        rowMap.put(5, modifiedField5);
+        rowMap.put(180, field180val);
+        _etlHelper.edit180columnsRow(0, rowMap);
+        _etlHelper.runETL_API(MERGE_ETL);
+        _etlHelper.assertIn180columnTarget(secondField5, modifiedField5, field180val);
+        _etlHelper.assertNotInTarget1(firstField5);
     }
 }

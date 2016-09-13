@@ -17,12 +17,14 @@ package org.labkey.test.etl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -37,6 +39,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,12 +47,18 @@ import static org.junit.Assert.assertTrue;
 public class ETLHelper
 {
     static final String VEHICLE_SCHEMA = "vehicle";
-    public static final String ETL_SOURCE = "etl_source";
-    public static final String ETL_TARGET = "etl_target";
-    public static final String ETL_TARGET_2 = "etl_target2";
-    public static final String ETL_DELETE = "etl_delete";
-    public static final String TRANSFER = "transfer";
+    static final String ETL_SOURCE = "etl_source";
+    static final String ETL_TARGET = "etl_target";
+    private static final String ETL_TARGET_2 = "etl_target2";
+    private static final String ETL_DELETE = "etl_delete";
+    private static final String TRANSFER = "transfer";
     public static final String COMPLETE = "COMPLETE";
+    private static final String DATAINTEGRATION_MODULE = "DataIntegration";
+    private static final String DATAINTEGRATION_SCHEMA = "dataintegration";
+    private static final String ETL_180_COLUMN_SOURCE = "etl_180column_source";
+    private static final String ETL_180_COLUMN_TARGET = "etl_180column_target";
+    private static final String TITLE_180_COLUMN_SOURCE = "180ColumnSource";
+    private static final String TITLE_180_COLUMN_TARGET = "180ColumnTarget";
     private BaseWebDriverTest _test;
 
     private int _jobsComplete;
@@ -63,13 +72,13 @@ public class ETLHelper
     // holds expected results for the TransformHistory table.  The transform history table
     // shows all the runs for a specific ETL type
     //
-    HashMap<String, ArrayList<String[]>> _transformHistories = new HashMap<>();
+    private HashMap<String, ArrayList<String[]>> _transformHistories = new HashMap<>();
 
     //
     // holds expected results for the TransformSummary table.  This will show
     // one row for each different ETL type run.
     //
-    ArrayList<String []> _transformSummaries = new ArrayList<>();
+    private ArrayList<String []> _transformSummaries = new ArrayList<>();
 
     public ETLHelper(BaseWebDriverTest test, String projectName)
     {
@@ -92,31 +101,31 @@ public class ETLHelper
      *
      * @param twoErrors true when a given error generates two occurances of the string "ERROR" in the log.
      */
-    protected void incrementExpectedErrorCount(boolean twoErrors)
+    void incrementExpectedErrorCount(boolean twoErrors)
     {
         _expectedErrors++;
         if (twoErrors)
             _expectedErrors++;
     }
 
-    protected void incrementExpectedErrorCount()
+    void incrementExpectedErrorCount()
     {
         // ETL log files usually have two occurances of the string "ERROR" for every error that occurs.
         incrementExpectedErrorCount(true);
     }
 
-    protected int getExpectedErrorCount()
+    int getExpectedErrorCount()
     {
         return _expectedErrors;
     }
 
 
-    protected void incrementJobsCompleteCount()
+    void incrementJobsCompleteCount()
     {
         _jobsComplete++;
     }
 
-    protected void resetCounts()
+    void resetCounts()
     {
         _expectedErrors = 0;
         _jobsComplete = 0;
@@ -125,12 +134,12 @@ public class ETLHelper
     }
 
     //sets 'enabled' checkbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
-    protected void enableScheduledRun(String transformName)
+    void enableScheduledRun(String transformName)
     {
         _test.checkCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Enabled')]"));
     }
 
-    protected void disableScheduledRun(String transformName)
+    void disableScheduledRun(String transformName)
     {
         _test.uncheckCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Enabled')]"));
     }
@@ -141,11 +150,11 @@ public class ETLHelper
         _test.checkCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Verbose')]"));
     }
 
-    protected void doBasicSetup()
+    void doBasicSetup()
     {
         _test.log("running setup");
         _test._containerHelper.createProject(_projectName, null);
-        _test._containerHelper.enableModules(Arrays.asList("DataIntegration", "simpletest"));
+        _test._containerHelper.enableModules(Arrays.asList(DATAINTEGRATION_MODULE, "simpletest"));
     }
 
     protected void doSetup()
@@ -153,7 +162,7 @@ public class ETLHelper
         doExtendedSetup(true);
     }
 
-    protected void doExtendedSetup(boolean addAllWebparts)
+    void doExtendedSetup(boolean addAllWebparts)
     {
         doBasicSetup();
         PortalHelper portalHelper = new PortalHelper(_test);
@@ -171,9 +180,9 @@ public class ETLHelper
         String transformRun =  (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ?
                 "transformrun" : "TransformRun";
 
-        portalHelper.addQueryWebPart("TransformRun", "dataintegration", transformRun, null);
-        portalHelper.addQueryWebPart("TransformHistory", "dataintegration", "TransformHistory", null);
-        portalHelper.addQueryWebPart("TransformSummary", "dataintegration", "TransformSummary", null);
+        portalHelper.addQueryWebPart("TransformRun", DATAINTEGRATION_SCHEMA, transformRun, null);
+        portalHelper.addQueryWebPart("TransformHistory", DATAINTEGRATION_SCHEMA, "TransformHistory", null);
+        portalHelper.addQueryWebPart("TransformSummary", DATAINTEGRATION_SCHEMA, "TransformSummary", null);
         portalHelper.addWebPart("Data Transform Jobs");
         // make sure the webpart has the 'scheduler' button on it
         _test.clickButton("Scheduler");
@@ -181,6 +190,12 @@ public class ETLHelper
         _test.goBack();
     }
 
+    void do180columnSetup()
+    {
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.addQueryWebPart(TITLE_180_COLUMN_SOURCE, VEHICLE_SCHEMA, ETL_180_COLUMN_SOURCE, null);
+        portalHelper.addQueryWebPart(TITLE_180_COLUMN_TARGET, VEHICLE_SCHEMA, ETL_180_COLUMN_TARGET, null);
+    }
 
     //
     // verify the following:
@@ -189,14 +204,14 @@ public class ETLHelper
     // links to file logs work in history and summary UIs
     // links can be traversed from summary -> history -> detail for the given transform id
     //
-    protected void verifyLogFileLink(String status)
+    private void verifyLogFileLink(String status)
     {
         _test.click(Locator.linkContainingText(status));
         _test.waitForElement(Locator.tag("span").withClass("x4-window-header-text").containing(".etl.log"));
         _test.waitAndClick(Ext4Helper.Locators.ext4ButtonContainingText("Close"));
     }
 
-    protected void verifyTransformSummary()
+    void verifyTransformSummary()
     {
         _test.goToProjectHome();
         gotoQueryWebPart("TransformSummary");
@@ -204,7 +219,7 @@ public class ETLHelper
         verifier.verifyResults();
     }
 
-    protected void waitForTransformLink(String linkText, String goBackText, String ... waitForTexts)
+    private void waitForTransformLink(String linkText, String goBackText, String... waitForTexts)
     {
         _test.log("clicking link with text " + linkText + "'");
         _test.click(Locator.linkWithText(linkText));
@@ -217,7 +232,7 @@ public class ETLHelper
         _test.waitForText(goBackText);
     }
 
-    protected void waitForTransformPage(String linkText, String title, String status)
+    private void waitForTransformPage(String linkText, String title, String status)
     {
         _test.log("clicking link with text " + linkText + " and status " + status);
         if(_test.isElementPresent(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']")))
@@ -236,12 +251,12 @@ public class ETLHelper
         _test.waitForText(status);
     }
 
-    protected void verifyTransformHistory(String transformId, String transformDesc)
+    void verifyTransformHistory(String transformId, String transformDesc)
     {
         verifyTransformHistory(transformId, transformDesc, COMPLETE);
     }
 
-    protected void verifyTransformHistory(String transformId, String transformDesc, String status)
+    private void verifyTransformHistory(String transformId, String transformDesc, String status)
     {
         waitForTransformPage(transformId, "Transform History - " + transformDesc, status);
         TransformHistoryVerifier verifier = new TransformHistoryVerifier(transformId, transformDesc,
@@ -249,7 +264,7 @@ public class ETLHelper
         verifier.verifyResults();
     }
 
-    protected void addTransformResult(String transformId, String version, String status, String recordsAffected)
+    void addTransformResult(String transformId, String version, String status, String recordsAffected)
     {
         addTransformSummary(new String[]{transformId, version, null, status, recordsAffected, null, null});
         addTransformHistory(transformId, new String[]{transformId, version, null, status, recordsAffected, null, "Job Details", "Run Details", null});
@@ -257,7 +272,7 @@ public class ETLHelper
 
     // The summary table should only have one row per transform sorted by transform id so make sure
     // our expected results match that
-    protected void addTransformSummary(String[] newSummary)
+    private void addTransformSummary(String[] newSummary)
     {
         String newTransformId = newSummary[0];
         int insertIdx;
@@ -280,7 +295,7 @@ public class ETLHelper
         _transformSummaries.add(insertIdx, newSummary);
     }
 
-    protected void addTransformHistory(String transformName, String[] historyRow)
+    private void addTransformHistory(String transformName, String[] historyRow)
     {
         ArrayList<String[]> rows = null;
 
@@ -298,7 +313,7 @@ public class ETLHelper
         _transformHistories.put(transformName, rows);
     }
 
-    protected void insertDatasetRow(String id, String name)
+    void insertDatasetRow(String id, String name)
     {
         _test.log("inserting dataset row " + name);
         _test._extHelper.clickInsertNewRow(true);
@@ -310,12 +325,12 @@ public class ETLHelper
         _test.clickButton("Submit");
     }
 
-    protected void insertQueryRow(String id, String name, String RunId, String query)
+    private void insertQueryRow(String id, String name, String RunId, String query)
     {
         insertQueryRow(id, name, RunId, query, null);
     }
 
-    protected void insertQueryRow(String id, String name, String RunId, String query, String subFolder)
+    private void insertQueryRow(String id, String name, String RunId, String query, String subFolder)
     {
         _test.log("inserting " + query + " row " + name);
         if (null == subFolder)
@@ -339,22 +354,22 @@ public class ETLHelper
             _test.clickFolder(subFolder);
     }
 
-    protected void insertSourceRow(String id, String name, String RunId, String subFolder)
+    void insertSourceRow(String id, String name, String runId, String subFolder)
     {
-        insertQueryRow(id, name, RunId, "source", subFolder);
+        insertQueryRow(id, name, runId, "source", subFolder);
     }
 
-    protected void insertSourceRow(String id, String name, String RunId)
+    void insertSourceRow(String id, String name, String runId)
     {
-        insertQueryRow(id, name, RunId, "source");
+        insertQueryRow(id, name, runId, "source");
     }
 
-    protected void insertDeleteSourceRow(String id, String name, String RunId)
+    void insertDeleteSourceRow(String id, String name, String runId)
     {
-        insertQueryRow(id, name, RunId, "delete");
+        insertQueryRow(id, name, runId, "delete");
     }
 
-    protected void insertTransferRow(String rowId, String transferStart, String transferComplete,  String description, String log, String status)
+    void insertTransferRow(String rowId, String transferStart, String transferComplete, String description, String log, String status)
     {
         _test.log("inserting transfer row rowid " + rowId);
         _test.goToProjectHome();
@@ -370,6 +385,64 @@ public class ETLHelper
         _test.clickButton("Submit");
         _test.log("returning to project home");
         _test.clickTab("Portal");
+    }
+
+    void editSourceRow(int row, @Nullable String id, @Nullable String name, @Nullable String runId)
+    {
+        _test.log("updating source row " + row);
+        _test.clickTab("Portal");
+        _test.click(new Locator.LinkLocator(StringUtils.capitalize("source")));
+        _test.clickAndWait(Locator.linkWithText("edit").index(row));
+        _test.waitForElement(Locator.name("quf_id"));
+        if (null != id)
+        {
+            _test.setFormElement(Locator.name("quf_id"), id);
+        }
+        if (null != name)
+        {
+            _test.setFormElement(Locator.name("quf_name"), name);
+        }
+        if (null != runId)
+        {
+            _test.setFormElement(Locator.name("quf_transformrun"), runId);
+        }
+        _test.clickButton("Submit");
+        _test.log("returning to project home or folder");
+        _test.clickTab("Portal");
+    }
+
+    void insert180columnsRow(Map<Integer, String> fieldValues)
+    {
+        _test.log("inserting row to 180 column table");
+        _test.clickTab("Portal");
+        _test.click(new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE));
+        _test._extHelper.clickInsertNewRow(true);
+        _test.waitForElement(Locator.name("quf_field180"));
+        fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
+        _test.clickButton("Submit");
+        _test.clickTab("Portal");
+    }
+
+    void edit180columnsRow(int row, Map<Integer, String> fieldValues)
+    {
+        _test.log("updating row " + row + " in 180 column table");
+        _test.clickTab("Portal");
+        _test.click(new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE));
+        _test.clickAndWait(Locator.linkWithText("edit").index(row));
+        _test.waitForElement(Locator.name("quf_field180"));
+        fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
+        _test.clickButton("Submit");
+        _test.clickTab("Portal");
+    }
+
+    void assertIn180columnTarget(String... targets)
+    {
+        assertQueryWebPart(ETL_180_COLUMN_TARGET, TITLE_180_COLUMN_TARGET, true, targets);
+    }
+
+    void assertNotIn180columnTarget(String... targets)
+    {
+        assertQueryWebPart(ETL_180_COLUMN_TARGET, TITLE_180_COLUMN_TARGET, false, targets);
     }
 
     public void runETL(String transformId)
@@ -388,12 +461,12 @@ public class ETLHelper
         _runETL(transformId, true, true, false);
     }
 
-    public void runETL_NoWork(String transformId)
+    void runETL_NoWork(String transformId)
     {
         _runETL(transformId, false, false, false);
     }
 
-    protected void _runETL(String transformId, boolean hasWork, boolean hasCheckerError, boolean expectExecutionError)
+    private void _runETL(String transformId, boolean hasWork, boolean hasCheckerError, boolean expectExecutionError)
     {
         runETLNoNav(transformId, hasWork, hasCheckerError);
 
@@ -407,20 +480,20 @@ public class ETLHelper
         _test.goToProjectHome();
     }
 
-    protected void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError)
+    void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError)
     {
         runETLNoNav(transformId, hasWork, hasCheckerError, true);
     }
 
-    protected void runETLNoNavNoWait(String transformId, boolean hasWork, boolean hasCheckerError)
+    void runETLNoNavNoWait(String transformId, boolean hasWork, boolean hasCheckerError)
     {
         runETLNoNav(transformId, hasWork, hasCheckerError, false);
     }
 
-    protected void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError, boolean wait)
+    private void runETLNoNav(String transformId, boolean hasWork, boolean hasCheckerError, boolean wait)
     {
         _test.log("running " + transformId + " job");
-        _test.goToModule("DataIntegration");
+        _test.goToModule(DATAINTEGRATION_MODULE);
 
         if (hasWork && !hasCheckerError)
         {
@@ -435,11 +508,11 @@ public class ETLHelper
         {
             // pipeline job does not run
             _test.waitAndClick(findRunNowButton(transformId));
-            _test._ext4Helper.clickWindowButton(hasCheckerError ? "Error" : "Success", "OK", 0, 0);
+            new Window(hasCheckerError ? "Error" : "Success", _test.getDriver()).clickButton("OK", 0);
         }
     }
 
-    protected void waitForEtl()
+    void waitForEtl()
     {
         _test.waitFor(() -> {
                     if (_test.isElementPresent(Locator.tag("tr")
@@ -469,12 +542,12 @@ public class ETLHelper
         return findTransformConfigCell(transformId, true).withDescendant(Locator.xpath("span")).withText("run now");
     }
 
-    protected Locator.XPathLocator findLastStatusCell(String transformId, String status, boolean isLink)
+    Locator.XPathLocator findLastStatusCell(String transformId, String status, boolean isLink)
     {
         return findTransformConfigCell(transformId, isLink).withText(status);
     }
 
-    protected RunTransformResponse runETL_API(String transformId, boolean wait) throws Exception
+    RunTransformResponse runETL_API(String transformId, boolean wait) throws Exception
     {
         _test.log("running " + transformId + " job");
         transformId = ensureFullIdString(transformId);
@@ -490,7 +563,7 @@ public class ETLHelper
         return transformId;
     }
 
-    public void waitForStatus(String transformId, @NotNull String status, int msTimeout) throws IOException, CommandException
+    void waitForStatus(String transformId, @NotNull String status, int msTimeout) throws IOException, CommandException
     {
         String currentStatus;
         long startTime = System.currentTimeMillis();
@@ -505,17 +578,17 @@ public class ETLHelper
         throw new TestTimeoutException("Timeout for ETL status. Current status = " + currentStatus + ". Exceeded " + msTimeout + "ms");
     }
 
-    protected RunTransformResponse runETL_API(String transformId) throws Exception
+    RunTransformResponse runETL_API(String transformId) throws Exception
     {
         return runETL_API(transformId, true);
     }
 
-    protected void clickRetryButton()
+    void clickRetryButton()
     {
         _test.clickAndWait(_test.waitForElementWithRefresh(Locator.lkButton("Retry"), BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
-    protected void deleteSourceRow(String... ids)
+    void deleteSourceRow(String... ids)
     {
         _test.goToProjectHome();
         _test.clickAndWait(Locator.xpath("//span[text()='Source']"));
@@ -534,7 +607,7 @@ public class ETLHelper
         _test.clickTab("Portal");
     }
 
-    protected void cleanupTestTables() throws Exception
+    void cleanupTestTables() throws Exception
     {
         deleteAllRows(ETL_SOURCE);
         deleteAllRows(ETL_TARGET);
@@ -544,34 +617,34 @@ public class ETLHelper
 
     }
 
-    protected void deleteAllRows(String tableName) throws Exception
+    void deleteAllRows(String tableName) throws Exception
     {
         _test.deleteAllRows(_projectName, VEHICLE_SCHEMA, tableName);
     }
 
-    protected void assertInTarget1(String... targets)
+    void assertInTarget1(String... targets)
     {
         assertQueryWebPart("etl_target", "Target1", true, targets);
     }
 
-    protected void assertInTarget2(String... targets)
+    void assertInTarget2(String... targets)
     {
         assertQueryWebPart(ETL_TARGET_2, "Target2", true, targets);
     }
 
-    protected void gotoQueryWebPart(String webpartName)
+    private void gotoQueryWebPart(String webpartName)
     {
         gotoQueryWebPart(webpartName, webpartName);
     }
 
-    protected void gotoDataset(String name)
+    void gotoDataset(String name)
     {
         _test.clickTab("Study");
         _test.clickAndWait(Locator.linkContainingText("2 datasets"));
         _test.clickAndWait(Locator.linkContainingText(name));
     }
 
-    protected void assertInDatasetTarget1(String... targets)
+    void assertInDatasetTarget1(String... targets)
     {
         gotoDataset("ETL Target");
         _test.assertTextPresent(targets);
@@ -583,14 +656,14 @@ public class ETLHelper
         _test.assertTextNotPresent(targets);
     }
 
-    protected void gotoQueryWebPart(String webpartName, String queryName)
+    private void gotoQueryWebPart(String webpartName, String queryName)
     {
         _test.clickTab("Portal");
         _test.clickAndWait(Locator.xpath("//span[text()='" + queryName + "']"));
         _test.waitForText(webpartName);
     }
 
-    protected void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
+    private void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String... targets)
     {
         gotoQueryWebPart(webpartName, queryName);
         if (assertTextPresent)
@@ -599,7 +672,7 @@ public class ETLHelper
             _test.assertTextNotPresent(targets);
     }
 
-    protected void assertNotInTarget1(String... targets)
+    void assertNotInTarget1(String... targets)
     {
         assertQueryWebPart("etl_target", "Target1", false, targets);
     }
@@ -609,18 +682,18 @@ public class ETLHelper
         assertQueryWebPart("TransformRun", "TransformRun", true, targets);
     }
 
-    protected void assertInEtlLogFile(String jobId, String... logStrings) throws Exception
+    void assertInEtlLogFile(String jobId, String... logStrings) throws Exception
     {
         // Promoted the guts of this method to DataIntegrationHelper
         _diHelper.assertInEtlLogFile(jobId, logStrings);
     }
 
-    protected void checkRun()
+    void checkRun()
     {
         checkRun(false);
     }
 
-    protected void checkRun(boolean expectError)
+    void checkRun(boolean expectError)
     {
         _test.goToModule("Pipeline");
         _test.waitForPipelineJobsToComplete(_jobsComplete, "ETL Job", expectError);
@@ -640,7 +713,7 @@ public class ETLHelper
         _test.assertTextPresent(errors);
     }
 
-    protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
+    void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
     {
         runETLNoNav(ETLName, hasWork, hasCheckerError);
         if(!hasCheckerError)
@@ -659,8 +732,8 @@ public class ETLHelper
     class BaseTransformVerifier
     {
         // table of results to verify
-        protected String[] _columns;
-        protected ArrayList<String[]> _data;
+        String[] _columns;
+        ArrayList<String[]> _data;
 
         BaseTransformVerifier(String[] columns, ArrayList<String[]> data)
         {
@@ -678,7 +751,7 @@ public class ETLHelper
         //
         void verifyResults()
         {
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
+            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test.getDriver());
             assertEquals(_columns.length, drt.getColumnCount());
             assertEquals(_data.size(), drt.getDataRowCount());
 
@@ -704,7 +777,7 @@ public class ETLHelper
         }
     }
 
-    class TransformSummaryVerifier extends BaseTransformVerifier
+    private class TransformSummaryVerifier extends BaseTransformVerifier
     {
         TransformSummaryVerifier(ArrayList<String[]> data)
         {
@@ -724,7 +797,7 @@ public class ETLHelper
         {
             super.verifyResults();
 
-            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test);
+            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test.getDriver());
 
             // just spot check the file log
             String status = dataRegion.getDataAsText(0, "Last Status");
@@ -732,10 +805,10 @@ public class ETLHelper
         }
     }
 
-    class TransformHistoryVerifier extends BaseTransformVerifier
+    private class TransformHistoryVerifier extends BaseTransformVerifier
     {
-        protected String _transformId;
-        protected String _transformDesc;
+        String _transformId;
+        String _transformDesc;
 
         TransformHistoryVerifier(String transformId, String transformDesc, ArrayList<String[]> data)
         {
@@ -766,7 +839,7 @@ public class ETLHelper
         {
             super.verifyResults();
 
-            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test);
+            DataRegionTable dataRegion = new DataRegionTable(getDataRegionName(), _test.getDriver());
 
             // walk through all the history rows and verify the link to the file log works (just the first one)
             // and the links work for the transform details page, job details, and run details
@@ -793,7 +866,7 @@ public class ETLHelper
             }
         }
 
-        protected void verifyTransformDetails(String run, String status)
+        void verifyTransformDetails(String run, String status)
         {
             waitForTransformPage(run, "Transform Details - " + _transformDesc, status);
             TransformDetailsVerifier verifier = new TransformDetailsVerifier(_transformId);
@@ -803,9 +876,9 @@ public class ETLHelper
     }
 
     // currently this has the same schema as the TransformRuns table
-    class TransformDetailsVerifier extends BaseTransformVerifier
+    private class TransformDetailsVerifier extends BaseTransformVerifier
     {
-        protected String _transformId;
+        String _transformId;
         TransformDetailsVerifier(String transformId)
         {
 
@@ -838,8 +911,8 @@ public class ETLHelper
         @Override
         protected void verifyResults()
         {
-            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test);
-            assertEquals("column mismatch for data region " + drt.getTableName(), Arrays.asList(_columns), drt.getColumnHeaders());
+            DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test.getDriver());
+            assertEquals("column mismatch for data region " + drt.getTableName(), Arrays.asList(_columns), drt.getColumnLabels());
             assertEquals(1, drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));

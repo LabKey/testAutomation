@@ -81,7 +81,6 @@ public class ETLSimpleTransformTest extends ETLBaseTest
         _etlHelper.runETL(APPEND);
         _etlHelper.addTransformResult(TRANSFORM_APPEND, "1", ETLHelper.COMPLETE, "1");
         _etlHelper.assertInTarget1("Subject 0");
-        //checkRun();
         _etlHelper.verifyTransformSummary();
         _etlHelper.verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
@@ -109,19 +108,6 @@ public class ETLSimpleTransformTest extends ETLBaseTest
         // summary should be where it was as well
         _etlHelper.verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
-
-/*
-UNDONE: need to fix the merge case
-
-        // merge into populated target, note that "Subject 2" was inserted above to test ERROR case
-        // for UI
-
-        insertSourceRow("2", "Subject 2", null);
-        runETL("merge");
-        assertInTarget1("Subject 0", "Subject 1", "Subject 2");
-
-        remove insert below when merge case is fixed
-*/
         _etlHelper.insertSourceRow("2", "Subject 2", null);
         //truncate into populated target
         _etlHelper.deleteSourceRow("0", "1");
