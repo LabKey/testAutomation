@@ -411,6 +411,11 @@ public class ETLHelper
         _test.clickTab("Portal");
     }
 
+    /**
+     * Note most of the columns in the source and target table are hidden via the schema xml,
+     * so if you're trying to verify fields in "field10" to "field179", you'll need to unhide.
+     *
+     */
     void insert180columnsRow(Map<Integer, String> fieldValues)
     {
         _test.log("inserting row to 180 column table");
@@ -423,23 +428,40 @@ public class ETLHelper
         _test.clickTab("Portal");
     }
 
+    /**
+     * Note most of the columns in the source and target table are hidden via the schema xml,
+     * so if you're trying to verify fields in "field10" to "field179", you'll need to unhide.
+     *
+     */
     void edit180columnsRow(int row, Map<Integer, String> fieldValues)
     {
         _test.log("updating row " + row + " in 180 column table");
         _test.clickTab("Portal");
         _test.click(new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE));
-        _test.clickAndWait(Locator.linkWithText("edit").index(row));
+        Locator editLink = Locator.linkWithText("edit").index(row);
+        _test.waitForElement(editLink);
+        _test.clickAndWait(editLink);
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
         _test.clickTab("Portal");
     }
 
+    /**
+     * Note most of the columns in the source and target table are hidden via the schema xml,
+     * so if you're trying to verify fields in "field10" to "field179", you'll need to unhide.
+     *
+     */
     void assertIn180columnTarget(String... targets)
     {
         assertQueryWebPart(ETL_180_COLUMN_TARGET, TITLE_180_COLUMN_TARGET, true, targets);
     }
 
+    /**
+     * Note most of the columns in the source and target table are hidden via the schema xml,
+     * so if you're trying to verify fields in "field10" to "field179", you'll need to unhide.
+     *
+     */
     void assertNotIn180columnTarget(String... targets)
     {
         assertQueryWebPart(ETL_180_COLUMN_TARGET, TITLE_180_COLUMN_TARGET, false, targets);
@@ -675,6 +697,11 @@ public class ETLHelper
     void assertNotInTarget1(String... targets)
     {
         assertQueryWebPart("etl_target", "Target1", false, targets);
+    }
+
+    void assertNotInTarget2(String... targets)
+    {
+        assertQueryWebPart("etl_target2", "Target2", false, targets);
     }
 
     protected void assertInLog(String... targets)

@@ -701,16 +701,16 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.insertSourceRow("600", PREFIX + "1", null);
         _etlHelper.runETL_API(MERGE_ETL);
         // Check the ETL works at all
-        _etlHelper.assertInTarget1(PREFIX + "1");
+        _etlHelper.assertInTarget2(PREFIX + "1");
         _etlHelper.insertSourceRow("610", PREFIX + "2", null);
         final String newNameForRow1 = "newNameForRow1";
         _etlHelper.editSourceRow(0, null, newNameForRow1, null);
         _etlHelper.runETL_API(MERGE_ETL);
 
         // Check insert of new and update to existing
-        _etlHelper.assertInTarget1(PREFIX + "2", newNameForRow1);
+        _etlHelper.assertInTarget2(PREFIX + "2", newNameForRow1);
         // Check we really did UPDATE and not insert a new one
-        _etlHelper.assertNotInTarget1(PREFIX + "1");
+        _etlHelper.assertNotInTarget2(PREFIX + "1");
     }
 
     @Test
@@ -736,6 +736,6 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.edit180columnsRow(0, rowMap);
         _etlHelper.runETL_API(MERGE_ETL);
         _etlHelper.assertIn180columnTarget(secondField5, modifiedField5, field180val);
-        _etlHelper.assertNotInTarget1(firstField5);
+        _etlHelper.assertNotIn180columnTarget(firstField5);
     }
 }
