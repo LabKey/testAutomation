@@ -3071,7 +3071,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             try
             {
-                executeScript("arguments[0].setAttribute('class', arguments[1]);arguments[0].setAttribute('class', arguments[2])", el, cssString, styleString);
+                executeScript("arguments[0].setAttribute('class', arguments[1]);arguments[0].setAttribute('style', arguments[2])", el, cssString, styleString);
             }
             catch (StaleElementReferenceException ignore) {}
         }
