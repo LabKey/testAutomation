@@ -174,6 +174,7 @@ modules/simpletest/resources/etls/appendContainerFilter.xml -text svneol=unset#a
 modules/simpletest/resources/etls/appendIdByRun.xml -text
 modules/simpletest/resources/etls/appendMappedColumns.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/appendSelectAllNoTargetTx.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text

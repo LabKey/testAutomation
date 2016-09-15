@@ -192,8 +192,8 @@ public class ETLHelper
 
     void do180columnSetup()
     {
-        _test.clickTab("Portal");
-        if (!_test.isElementPresent(Locators.qwp180columnSource))
+
+        if (!haveDone180ColumnSetup())
         {
             _test.log("Adding query web parts for 180column source and target");
             PortalHelper portalHelper = new PortalHelper(_test);
@@ -204,6 +204,12 @@ public class ETLHelper
         {
             _test.log("Skipping 180column setup as elements are already present.");
         }
+    }
+
+    private boolean haveDone180ColumnSetup()
+    {
+        _test.clickTab("Portal");
+        return _test.isElementPresent(Locators.qwp180columnSource);
     }
 
     //
@@ -645,7 +651,8 @@ public class ETLHelper
         deleteAllRows(ETL_TARGET_2);
         deleteAllRows(ETL_DELETE);
         deleteAllRows(TRANSFER);
-
+        deleteAllRows(ETL_180_COLUMN_SOURCE);
+        deleteAllRows(ETL_180_COLUMN_TARGET);
     }
 
     void deleteAllRows(String tableName) throws Exception
