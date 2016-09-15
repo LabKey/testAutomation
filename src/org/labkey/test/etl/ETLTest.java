@@ -775,32 +775,43 @@ public class ETLTest extends ETLBaseTest
         // This is very difficult/impossible to test on Postgres. On SQL Server we take advantage of intentionally tripping against
         // a unique constraint violation on a multi-row insert. If there is a wrapping transaction that gets rolled back, no rows
         // are written. If there is no wrapping transaction or it gets committed, the non-violating row will still get written.
-        // This will not happen on Postgres, no matter which order the rows are written.
-        if (!System.getProperty("databaseType").startsWith("p")) // Don't bother on postgres, this doesn't prove anything
-        {
-            final String row1Name = "row1Name";
-            final String row2Name = "row2Name";
-            final String selectAllEtl = "appendSelectAll";
-            log("Verify target transaction is rolled back on error");
-            _etlHelper.insertSourceRow("12300", row1Name, "47");
-            _etlHelper.runETL_API(selectAllEtl);
-            _etlHelper.assertInTarget1(row1Name);
-            // Add a second row
-            _etlHelper.insertSourceRow("45600", row2Name, "47");
-            // Run again - since we're selecting all rows, should get a unique constraint violation as we try to write another row with id=1
-            _etlHelper.runETL_JobError(selectAllEtl);
-            _etlHelper.incrementExpectedErrorCount();
-            // if row2 is in the target, the transaction was committed instead of being rolled back
-            _etlHelper.assertNotInTarget1(row2Name);
+        // This will not happen on Postgres, no matter which order the rows are written, so this first test doesn't really
+        // tell us anything.
 
-            // Now test the useTransaction=false setting on the destination in the etl xml
-            // Note, this is a dangerous setting that is only recommended for advanced users,
-            // and this case would never pass on Postgres anyway.
-            log("Verify write to target is not wrapped in transaction when useTransaction=false");
-            _etlHelper.runETL_JobError(selectAllEtl + "NoTargetTx");
-            _etlHelper.incrementExpectedErrorCount();
+        final String row1Name = "row1Name";
+        final String row2Name = "row2Name";
+        final String selectAllEtl = "appendSelectAll";
+        log("Verify target transaction is rolled back on error");
+        _etlHelper.insertSourceRow("12300", row1Name, "47");
+        _etlHelper.runETL_API(selectAllEtl);
+        _etlHelper.assertInTarget1(row1Name);
+        // Add a second row
+        _etlHelper.insertSourceRow("45600", row2Name, "47");
+        // Run again - since we're selecting all rows, should get a unique constraint violation as we try to write another row with id=1
+        _etlHelper.runETL_JobError(selectAllEtl);
+        _etlHelper.incrementExpectedErrorCount();
+        // if row2 is in the target, the transaction was committed instead of being rolled back
+        _etlHelper.assertNotInTarget1(row2Name);
+
+        // Now test the useTransaction=false setting on the destination in the etl xml
+        // Note, this is a dangerous setting that is only recommended for advanced users,
+        // This would never pass on Postgres with our current implementation, so include a test here for the opposite
+        // case. If that ever starts failing, it's indicator our implementation or Postgres driver has changed
+        // and there's other things we need to revisit about PG transactions.
+        log("Verify write to target is not wrapped in transaction when useTransaction=false");
+        _etlHelper.runETL_JobError(selectAllEtl + "NoTargetTx");
+        _etlHelper.incrementExpectedErrorCount();
+
+        if (!System.getProperty("databaseType").startsWith("p")) // The real test, which only works on SQL Server
+        {
             // There would still be the same error, but row2 should also be inserted.
             _etlHelper.assertInTarget1(row2Name);
+        }
+        else
+        {
+            // If this ever starts failing, it's indicator our implementation or Postgres driver has changed
+            // and there's other things we need to revisit about PG transactions.
+            _etlHelper.assertNotInTarget1(row2Name);
         }
     }
 }
