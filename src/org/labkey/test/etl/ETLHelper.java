@@ -192,9 +192,18 @@ public class ETLHelper
 
     void do180columnSetup()
     {
-        PortalHelper portalHelper = new PortalHelper(_test);
-        portalHelper.addQueryWebPart(TITLE_180_COLUMN_SOURCE, VEHICLE_SCHEMA, ETL_180_COLUMN_SOURCE, null);
-        portalHelper.addQueryWebPart(TITLE_180_COLUMN_TARGET, VEHICLE_SCHEMA, ETL_180_COLUMN_TARGET, null);
+        _test.clickTab("Portal");
+        if (!_test.isElementPresent(Locators.qwp180columnSource))
+        {
+            _test.log("Adding query web parts for 180column source and target");
+            PortalHelper portalHelper = new PortalHelper(_test);
+            portalHelper.addQueryWebPart(TITLE_180_COLUMN_SOURCE, VEHICLE_SCHEMA, ETL_180_COLUMN_SOURCE, null);
+            portalHelper.addQueryWebPart(TITLE_180_COLUMN_TARGET, VEHICLE_SCHEMA, ETL_180_COLUMN_TARGET, null);
+        }
+        else
+        {
+            _test.log("Skipping 180column setup as elements are already present.");
+        }
     }
 
     //
@@ -420,7 +429,7 @@ public class ETLHelper
     {
         _test.log("inserting row to 180 column table");
         _test.clickTab("Portal");
-        _test.click(new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE));
+        _test.click(Locators.qwp180columnSource);
         _test._extHelper.clickInsertNewRow(true);
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
@@ -437,7 +446,7 @@ public class ETLHelper
     {
         _test.log("updating row " + row + " in 180 column table");
         _test.clickTab("Portal");
-        _test.click(new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE));
+        _test.click(Locators.qwp180columnSource);
         Locator editLink = Locator.linkWithText("edit").index(row);
         _test.waitForElement(editLink);
         _test.clickAndWait(editLink);
@@ -944,5 +953,10 @@ public class ETLHelper
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));
         }
+    }
+
+    private static class Locators
+    {
+        static Locator qwp180columnSource = new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE);
     }
 }

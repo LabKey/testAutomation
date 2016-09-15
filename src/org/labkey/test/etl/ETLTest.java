@@ -49,6 +49,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.etl.ETLHelper.ETL_SOURCE;
 
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLTest extends ETLBaseTest
@@ -677,7 +678,7 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.insertSourceRow("1", MY_ROW, "1");
         _containerHelper.createSubfolder(getProjectName(), CHILD_FOLDER);
         clickFolder(CHILD_FOLDER);
-        new PortalHelper(this).addQueryWebPart("Source", ETLHelper.VEHICLE_SCHEMA, ETLHelper.ETL_SOURCE, null);
+        new PortalHelper(this).addQueryWebPart("Source", ETLHelper.VEHICLE_SCHEMA, ETL_SOURCE, null);
         final String CHILD_ROW = "child row";
         _etlHelper.insertSourceRow("2", CHILD_ROW, "1", CHILD_FOLDER);
         _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
@@ -737,5 +738,33 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.runETL_API(MERGE_ETL);
         _etlHelper.assertIn180columnTarget(secondField5, modifiedField5, field180val);
         _etlHelper.assertNotIn180columnTarget(firstField5);
+    }
+
+    @Test
+    public void testXmlDefinedConstants() throws Exception
+    {
+        _etlHelper.do180columnSetup();
+
+        log("Verify name field added from xml when not present in source");
+        Map<Integer, String> rowMap = new HashMap<>();
+        rowMap.put(5, "55555");
+        _etlHelper.insert180columnsRow(rowMap);
+        _etlHelper.runETL_API("constantsNoMatchingSourceColumn");
+        _etlHelper.assertInTarget1("addThisName");
+
+        final String sourceName = "nameFromSource";
+
+        log("Verify name from global xml level used instead of name from source");
+        _etlHelper.insertSourceRow("10", sourceName, "47");
+        _etlHelper.runETL_API("constantsGlobalOverride");
+        _etlHelper.assertNotInTarget1(sourceName);
+        _etlHelper.assertInTarget1("useGlobalName");
+
+        _etlHelper.deleteAllRows(ETL_SOURCE);
+        log("Verify name from step xml level is used instead of name from source or global level");
+        _etlHelper.insertSourceRow("20", sourceName + 2, "47");
+        _etlHelper.runETL_API("constantsStepOverride");
+        _etlHelper.assertNotInTarget1(sourceName + 2);
+        _etlHelper.assertInTarget1("useStepName");
     }
 }

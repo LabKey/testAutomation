@@ -177,6 +177,9 @@ modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#applica
 modules/simpletest/resources/etls/appendWithRowversion.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
+modules/simpletest/resources/etls/constantsGlobalOverride.xml -text
+modules/simpletest/resources/etls/constantsNoMatchingSourceColumn.xml -text
+modules/simpletest/resources/etls/constantsStepOverride.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/merge.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/mergeManyColumns.xml -text
 modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
