@@ -40,8 +40,12 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private static final String FOLDER_NAME = "TestingGPATAssay";
     private static final String FOLDER_TYPE_STUDY = "Study" ;
     private static final File SAMPLE_SET = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetData.xlsx");
+    private static final File SAMPLE_SET_SUB_FOLDER = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetDataSubFolder.xlsx");
     private static final String SAMPLE_SET_NAME = "SampleSet";
-    private static final File ASSAY_IMPORT = TestFileUtils.getSampleData("GPAT/SampleIDLookupAssayImportData.xlsx");
+    public static final String SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME = "SampleIDLookupAssayImportData";
+    private static final File ASSAY_IMPORT = TestFileUtils.getSampleData("GPAT/" + SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME + ".xlsx");
+    public static final String SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME = "SampleIDLookupAssayImportDataForSplitSampleSet";
+    private static final File ASSAY_IMPORT_SPLIT = TestFileUtils.getSampleData("GPAT/" + SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME + ".xlsx");
     private static final String SAMPLE_ID_FIELD_NAME = "SampleID";
     private static final String SAMPLE_ID_FIELD_LABEL = "Sample ID";
 
@@ -62,9 +66,6 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, FOLDER_TYPE_STUDY);
-        clickFolder(FOLDER_NAME);
-
         //add Sample Set webpart
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Sample Sets");
@@ -76,6 +77,21 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.name("file"), SAMPLE_SET);
         clickButton("Submit");
+
+        _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, FOLDER_TYPE_STUDY);
+
+        clickFolder(FOLDER_NAME);
+        portalHelper.addWebPart("Sample Sets");
+        portalHelper.addWebPart("Assay List");
+
+
+        //import more to sample set while in subfolder
+        clickAndWait(Locator.linkWithText(SAMPLE_SET_NAME));
+        clickButton("Import More Samples");
+        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
+        setFormElement(Locator.name("file"), SAMPLE_SET_SUB_FOLDER);
+        clickButton("Submit");
     }
 
     @Before
@@ -86,12 +102,85 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     }
 
     @Test
+    public void testSamplesSameContainerIntegerWarning(){
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        String assayName = "LookupAssay_Integer_Same";
+        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+
+        createAssay("General", assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
+        waitForText("SampleID: Could not convert value 'ID_123456' for field 'SampleID'");
+    }
+
+    @Test
+    public void testSamplesSameContainerIntegerSuccess(){
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        String assayName = "LookupAssay_Integer_Same_Success";
+        String sampleSetFolder = "/LookupToSampleIDTest Project";
+
+        createAssay("General", assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT); //import data into assay
+
+        clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME));
+        waitForText("ID_123456");
+        assertTextNotPresent("<ID_123456>");
+    }
+
+    @Test
+    public void testSamplesSameContainer(){
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        String assayName = "LookupAssay_String_Same";
+        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+
+        createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
+        clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
+        waitForText("<ID_123456>");
+        waitForText("ID_123461");
+        assertTextNotPresent("<ID_123461>");
+    }
+
+    @Test
+    public void testSamplesProjectContainer(){
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        String assayName = "LookupAssay_String_Project";
+        String sampleSetFolder = "/LookupToSampleIDTest Project";
+
+        createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
+        clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
+        waitForText("ID_123456");
+        assertTextNotPresent("<ID_123456>");
+        waitForText("<ID_123461>");
+    }
+
+    @Test
+    public void testSamplesDefaultContainer(){
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        String assayName = "LookupAssay_String_Default";
+        String sampleSetFolder = null;//will leave as default or [current project]
+
+        createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
+        clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
+        waitForText("ID_123456");
+        waitForText("ID_123461");
+        assertTextNotPresent("<ID_123461>");
+    }
+
+    @Test
     public void testStringTableLookupValue()
     {
         String assayName = "LookupAssay_String";
+        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
 
-        createAssay("General", assayName, SAMPLE_SET_NAME, "String");
-        importDataInAssay(assayName); //import data into assay
+        createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
+        importDataInAssay(assayName, ASSAY_IMPORT); //import data into assay
         testAssay(assayName); //test links
     }
 
@@ -99,8 +188,9 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     public void testIntegerTableLookupValue()
     {
         String assayName = "LookupAssay_Integer";
+        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
 
-        createAssay("General", assayName, SAMPLE_SET_NAME, "Integer");
+        createAssay("General", assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
         //select rows using SelectRowsCommand
         //get rowids for each sample
 
@@ -108,18 +198,18 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         //        testAssay(assayName); //test links
     }
 
-    private void createAssay(String type, String name, String lookupTableValue, String lookupTableType)
+    private void createAssay(String type, String name, String lookupTableValue, String lookupTableType, String sampleSetFolder)
     {
         AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit(type, name);
 
-        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("/LookupToSampleIDTest Project/TestingGPATAssay", "samples", lookupTableValue);
+        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo(sampleSetFolder, "samples", lookupTableValue);
         lookupInfo.setTableType(lookupTableType);
 
         _listHelper.addLookupField(name + " Data Fields", 4, SAMPLE_ID_FIELD_NAME, SAMPLE_ID_FIELD_LABEL, lookupInfo);
         assayDesigner.saveAndClose();
     }
 
-    private void importDataInAssay(String assayName)
+    private void importDataInAssay(String assayName, File assayImportFile)
     {
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkContainingText(assayName));
@@ -127,7 +217,7 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
         checkRadioButton(Locator.radioButtonById("RadioBtn-SampleInfo"));
         clickButton("Next");
         checkRadioButton(Locator.radioButtonById("Fileupload"));
-        setFormElement(Locator.input("__primaryFile__"), ASSAY_IMPORT);
+        setFormElement(Locator.input("__primaryFile__"), assayImportFile);
 
         clickButton("Save and Finish");
     }
