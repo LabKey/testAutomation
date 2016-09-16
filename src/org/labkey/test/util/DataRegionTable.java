@@ -513,6 +513,16 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         return rowText;
     }
 
+    public List<String> getRowDataAsText(int row, String... columns)
+    {
+        List<String> rowData = new ArrayList<>();
+        for (String column : columns)
+        {
+            rowData.add(getDataAsText(row, column));
+        }
+        return rowData;
+    }
+
     /**
      * Get values for all specified columns for all pages of the table
      * preconditions:  must be on start page of table
