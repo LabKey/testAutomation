@@ -578,6 +578,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 setUp(); // Instantiate new WebDriver if needed
                 ensureSignedInAsPrimaryTestUser();
+                if (_testFailed)
+                    resetErrors(); // Clear errors from a previously failed test
                 _testFailed = false;
             }
 
@@ -604,8 +606,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 if (description.getTestClass().equals(getCurrentTestClass()))
                 {
                     Ext4Helper.resetCssPrefix();
-                    ensureSignedInAsPrimaryTestUser();
-                    resetErrors();
                 }
             }
         };
