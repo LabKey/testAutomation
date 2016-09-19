@@ -107,8 +107,7 @@ public class ListImportFieldsTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForText("Edit Design");
         clickButton("Done", 0);
-        waitForElement(Locator.linkWithText("Details"));
-        clickAndWait(Locator.linkWithText("Details"));
+        waitAndClick(Locator.linkWithText(LIST_NAME));
         waitForText(DataRegionTable.getInsertNewButtonText());
 
         Map<String, String> dataRow = new HashMap<>();
