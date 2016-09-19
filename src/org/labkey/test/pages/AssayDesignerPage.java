@@ -22,7 +22,6 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
-import org.labkey.test.components.html.SelectWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -158,6 +157,17 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
     public PropertiesEditor dataFields()
     {
         return elementCache().dataFieldsPanel;
+    }
+
+    /**
+     * File-based assay domains match the names of the xml generating them
+     * So we need a generalized method for accessing
+     * @param domainTitle text
+     * @return
+     */
+    public PropertiesEditor fields(String domainTitle)
+    {
+        return PropertyEditor(getDriver()).withTitle(domainTitle).findWhenNeeded();
     }
 
     @Deprecated

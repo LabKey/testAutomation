@@ -271,6 +271,8 @@ public class PropertiesEditor extends WebPartPanel
                 window.selectType(type);
             else
                 window.selectLookup(lookupInfo);
+
+            window.clickApply();
         }
 
         private FormItem<String> findNameEl()
