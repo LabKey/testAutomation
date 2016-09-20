@@ -49,6 +49,13 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     private static final String SAMPLE_ID_FIELD_NAME = "SampleID";
     private static final String SAMPLE_ID_FIELD_LABEL = "Sample ID";
 
+    private static final String SAMPLE_SET_ID_PROJECT_LEVEL_FOUND = "ID_123456";
+    private static final String SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND = "<ID_123456>";
+    private static final String SAMPLE_SET_ID_FOLDER_LEVEL_FOUND = "ID_123461";
+    private static final String SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND = "<ID_123461>";
+    private final String _subfolder = "/" + getProjectName() + "/" + FOLDER_NAME;
+    private final String _projectFolder = "/" + getProjectName();
+
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -102,75 +109,71 @@ public class LookupToSampleIDTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSamplesSameContainerIntegerWarning(){
+    public void testSamplesSameContainerIntegerWarning()
+    {
         goToProjectHome();
         clickFolder(FOLDER_NAME);
         String assayName = "LookupAssay_Integer_Same";
-        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+        String sampleSetFolder = _subfolder;
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         waitForText("SampleID: Could not convert value 'ID_123456' for field 'SampleID'");
-    }
 
-    @Test
-    public void testSamplesSameContainerIntegerSuccess(){
         goToProjectHome();
         clickFolder(FOLDER_NAME);
-        String assayName = "LookupAssay_Integer_Same_Success";
-        String sampleSetFolder = "/LookupToSampleIDTest Project";
+        assayName = "LookupAssay_Integer_Same_Success";
+        sampleSetFolder = _projectFolder;
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "Integer", sampleSetFolder);
         importDataInAssay(assayName, ASSAY_IMPORT); //import data into assay
 
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_NAME));
-        waitForText("ID_123456");
-        assertTextNotPresent("<ID_123456>");
+
+        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
+
+        assertTextNotPresent(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
     }
 
     @Test
-    public void testSamplesSameContainer(){
+    public void testSamplesReferencedAcrossMultipleContainers()
+    {
+
         goToProjectHome();
         clickFolder(FOLDER_NAME);
         String assayName = "LookupAssay_String_Same";
-        String sampleSetFolder = "/LookupToSampleIDTest Project/TestingGPATAssay";
+        String sampleSetFolder = _subfolder;
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText("<ID_123456>");
-        waitForText("ID_123461");
-        assertTextNotPresent("<ID_123461>");
-    }
+        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
 
-    @Test
-    public void testSamplesProjectContainer(){
         goToProjectHome();
         clickFolder(FOLDER_NAME);
-        String assayName = "LookupAssay_String_Project";
-        String sampleSetFolder = "/LookupToSampleIDTest Project";
+        assayName = "LookupAssay_String_Project";
+        sampleSetFolder = _projectFolder;
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText("ID_123456");
-        assertTextNotPresent("<ID_123456>");
-        waitForText("<ID_123461>");
-    }
+        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_SET_ID_PROJECT_LEVEL_NOT_FOUND);
+        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
 
-    @Test
-    public void testSamplesDefaultContainer(){
         goToProjectHome();
         clickFolder(FOLDER_NAME);
-        String assayName = "LookupAssay_String_Default";
-        String sampleSetFolder = null;//will leave as default or [current project]
+        assayName = "LookupAssay_String_Default";
+        sampleSetFolder = null;//will leave as default or [current project]
 
         createAssay("General", assayName, SAMPLE_SET_NAME, "String", sampleSetFolder);
         importDataInAssay(assayName, ASSAY_IMPORT_SPLIT); //import data into assay
         clickAndWait(Locator.linkContainingText(SAMPLE_ASSAY_IMPORT_DATA_FILE_SPLIT_NAME));
-        waitForText("ID_123456");
-        waitForText("ID_123461");
-        assertTextNotPresent("<ID_123461>");
+        waitForText(SAMPLE_SET_ID_PROJECT_LEVEL_FOUND);
+        waitForText(SAMPLE_SET_ID_FOLDER_LEVEL_FOUND);
+        assertTextNotPresent(SAMPLE_SET_ID_FOLDER_LEVEL_NOT_FOUND);
     }
 
     @Test
