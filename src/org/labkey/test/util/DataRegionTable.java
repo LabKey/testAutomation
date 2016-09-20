@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
@@ -366,9 +367,30 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return elements().getAllHeaderButtons();
     }
 
+    /**
+     *
+     * @return The count of rows being displayed
+     */
     public int getDataRowCount()
     {
         return elements().getDataRows().size();
+    }
+
+    /**
+     * Assert that a Data Region has expected pagination text (e.g. "1 - 3 of 16")
+     * @param firstRow position in data of first displayed row
+     * @param lastRow position in data of last displayed row
+     * @param totalRows total number of rows in data behind the dataregion
+     */
+    public void assertPaginationText(int firstRow, int lastRow, int totalRows)
+    {
+        String expected = firstRow + " - " + lastRow + " of " + totalRows;
+        String fullPaginationText = Locator.css(".labkey-pagination").findElement(this).getText();
+        Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
+        Matcher matcher = pattern.matcher(fullPaginationText);
+        assertTrue("Unable to parse pagination text: " + fullPaginationText, matcher.find());
+        String actual = matcher.group(0);
+        assertEquals("Wrong pagination text", expected, actual);
     }
 
     /**

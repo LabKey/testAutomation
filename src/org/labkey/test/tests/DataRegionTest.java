@@ -36,12 +36,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
@@ -258,12 +255,12 @@ public class DataRegionTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("Show Selected"));
         assertElementPresent(Locator.linkWithText("Show Unselected"));
         assertElementPresent(Locator.linkWithText("Show All"));
-        assertPaginationText(1, 3, 16);
+        table.assertPaginationText(1, 3, 16);
         assertEquals(3, table.getDataRowCount());
 
         log("Test 5 per page");
         table.setMaxRows(5);
-        assertPaginationText(1, 5, 16);
+        table.assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
@@ -273,7 +270,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Next Page");
         table.pageNext();
-        assertPaginationText(6, 10, 16);
+        table.assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, 3));
         assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
@@ -283,7 +280,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Last Page");
         table.pageLast();
-        assertPaginationText(16, 16, 16);
+        table.assertPaginationText(16, 16, 16);
         assertEquals(1, table.getDataRowCount());
         assertEquals("yellow", table.getDataAsText(0, 3));
         assertElementPresent(Locator.linkWithTitle(FIRST_LINK));
@@ -293,7 +290,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Previous Page");
         table.pagePrev();
-        assertPaginationText(11, 15, 16);
+        table.assertPaginationText(11, 15, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("purple", table.getDataAsText(0, 3));
         assertElementPresent(Locator.linkWithTitle(FIRST_LINK));
@@ -303,7 +300,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
-        assertPaginationText(1, 5, 15);
+        table.assertPaginationText(1, 5, 15);
         assertEquals("black", table.getDataAsText(0, 3));
 
         log("Show Selected");
@@ -344,23 +341,6 @@ public class DataRegionTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
         assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
         assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-    }
-
-    /**
-     * Assert that a Data Region has expected pagination text (e.g. "1 - 3 of 16")
-     * @param firstRow position in data of first displayed row
-     * @param lastRow position in data of last displayed row
-     * @param totalRows total number of rows in data behind the dataregion
-     */
-    private void assertPaginationText(int firstRow, int lastRow, int totalRows)
-    {
-        String expected = firstRow + " - " + lastRow + " of " + totalRows;
-        String fullPaginationText = Locator.css(".labkey-pagination").findElement(getDriver()).getText();
-        Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
-        Matcher matcher = pattern.matcher(fullPaginationText);
-        assertTrue("Unable to parse pagination text: " + fullPaginationText, matcher.find());
-        String actual = matcher.group(0);
-        assertEquals("Wrong pagination text", expected, actual);
     }
 
     @Override
