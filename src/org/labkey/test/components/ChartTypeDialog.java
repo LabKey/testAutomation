@@ -30,6 +30,8 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void waitForDialog()
     {
         _test.waitForElement(Locator.xpath(elements().DIALOG_XPATH + "//div[text()='Create a plot']"));
+        _test.waitForElement(Locator.xpath(elements().DIALOG_XPATH + "//a[contains(@class, 'x4-btn')]//span[text()='Apply']"));
+        _test.sleep(500);
     }
 
     public void setChartType(ChartType chartType)
