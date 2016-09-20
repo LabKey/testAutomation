@@ -16,7 +16,6 @@
 package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +36,7 @@ import static org.junit.Assert.assertTrue;
  * Keeping this as a separate class b/c it only needs a subset of the main setup
  */
 @Category({DailyB.class, Data.class, ETL.class})
-public class ETLTaskRefTaskTest extends ETLBaseTest
+public class ETLTaskRefTaskTest extends ETLAbstractTest
 {
     private static final String PROJECT_NAME = "ETLTaskRefTaskProject";
     private static final String ETL = "{simpletest}/TaskRefTask";
@@ -74,11 +73,10 @@ public class ETLTaskRefTaskTest extends ETLBaseTest
         _etlHelper.resetCounts();
     }
 
-    @After
-    public void postTest()
+    @Override
+    protected boolean isCheckErrorsInPostTest()
     {
-        if (!_testFailed)
-            checkExpectedErrors(_etlHelper.getExpectedErrorCount());
+        return true;
     }
 
     @Test

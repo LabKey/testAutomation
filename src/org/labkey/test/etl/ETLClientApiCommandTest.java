@@ -48,7 +48,7 @@ import static org.junit.Assert.assertTrue;
  * Keep these test cases separate from ETLTest as they only need a subset of the setup
  */
 @Category({DailyB.class, Data.class, ETL.class})
-public class ETLClientApiCommandTest extends ETLBaseTest
+public class ETLClientApiCommandTest extends ETLAbstractTest
 {
     private static final String TRANSFORM_NOTFOUND = "{simpletest}/notfound";
 

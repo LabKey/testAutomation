@@ -40,7 +40,7 @@ import java.util.List;
  *
  */
 @Category({DailyB.class, Data.class, ETL.class})
-public class ETLRemoteSourceTest extends ETLBaseTest
+public class ETLRemoteSourceTest extends ETLAbstractTest
 {
     private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";

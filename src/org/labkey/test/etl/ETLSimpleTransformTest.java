@@ -16,7 +16,6 @@
 package org.labkey.test.etl;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,8 +34,13 @@ import org.labkey.test.categories.ETL;
  * TODO: Fold this back into ETL Test after 23854 & 23855 have been fixed.
  */
 @Category({DailyB.class, Data.class, ETL.class})
-public class ETLSimpleTransformTest extends ETLBaseTest
+public class ETLSimpleTransformTest extends ETLAbstractTest
 {
+    @Override
+    protected boolean isCheckErrorsInPostTest()
+    {
+        return true;
+    }
 
     @Nullable
     @Override
@@ -58,14 +62,6 @@ public class ETLSimpleTransformTest extends ETLBaseTest
     {
         goToProjectHome();
     }
-
-    @After
-    public void postTest()
-    {
-        if (!_testFailed)
-            checkExpectedErrors(_etlHelper.getExpectedErrorCount());
-    }
-
 
     @Test
     public void testSimpleTransforms()

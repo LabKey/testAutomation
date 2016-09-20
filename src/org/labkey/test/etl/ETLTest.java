@@ -15,20 +15,14 @@
  */
 package org.labkey.test.etl;
 
-import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
@@ -36,27 +30,19 @@ import org.labkey.test.categories.ETL;
 import org.labkey.test.pages.dataintegration.ETLScheduler;
 import org.labkey.test.util.PortalHelper;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.etl.ETLHelper.ETL_SOURCE;
 
 @Category({DailyB.class, Data.class, ETL.class})
-public class ETLTest extends ETLBaseTest
+public class ETLTest extends ETLAbstractTest
 {
-    public static final String ETL_OUT = "etlOut";
-    private static final String DATA_INTEGRATION_TAB = "DataIntegration";
-
     @Nullable
     @Override
     protected String getProjectName()
@@ -68,53 +54,19 @@ public class ETLTest extends ETLBaseTest
     public static void setupProject()
     {
         ETLTest init = (ETLTest) getCurrentTest();
-
         init.doSetup();
     }
 
-    @Before
-    public void preTest() throws Exception
+    @Override
+    protected boolean isResetInPreTest()
     {
-        _etlHelper.resetCounts();
-        resetErrors();
-        _etlHelper.cleanupTestTables();
-        goToProjectHome();
+        return true;
     }
 
-    @After
-    public void postTest()
+    @Override
+    protected boolean isCheckErrorsInPostTest()
     {
-        if (!_testFailed)
-            checkExpectedErrors(_etlHelper.getExpectedErrorCount());
-    }
-
-    @Test
-    public void testDeleteRows() throws Exception
-    {
-
-        final String PREFIX = "Subject For Delete Test ";
-        _etlHelper.insertSourceRow("500", PREFIX + "1", null);
-        _etlHelper.insertSourceRow("501", PREFIX + "2", null);
-        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
-        _etlHelper.assertInTarget1(PREFIX + "1", PREFIX + "2");
-        // Add one of them to the deleted rows source query
-        _etlHelper.insertDeleteSourceRow("500", PREFIX + "1", null);
-        // Filter column for the append is a rowversion; for the delete is a datetime
-        _etlHelper.runETL(APPEND_WITH_ROWVERSION);
-        _etlHelper.assertNotInTarget1(PREFIX + "1");
-        _etlHelper.assertInTarget1(PREFIX + "2");
-
-        // Now flip which column is which datatype. Filter column for append is a datetime, delete is a rowversion
-        _etlHelper.cleanupTestTables();
-        _etlHelper.insertSourceRow("502", PREFIX + "3", null);
-        _etlHelper.insertSourceRow("503", PREFIX + "4", null);
-        _etlHelper.runETL(APPEND);
-        _etlHelper.assertInTarget1(PREFIX + "3", PREFIX + "4");
-        // Add one of them to the deleted rows source query
-        _etlHelper.insertDeleteSourceRow("503", PREFIX + "4", null);
-        _etlHelper.runETL(APPEND);
-        _etlHelper.assertNotInTarget1(PREFIX + "4");
-        _etlHelper.assertInTarget1(PREFIX + "3");
+        return true;
     }
 
     @Test
@@ -328,189 +280,6 @@ public class ETLTest extends ETLBaseTest
         _etlHelper.assertInTarget2("Sproc Subject 1", "Sproc Subject 2");
     }
 
-    private static final int DEFAULT_OUTPUT_ROWS = 3;
-
-    @Test
-    public void testPipelineFileAnalysisTask() throws Exception
-    {
-        doSingleFilePipelineFileAnalysis("targetFile", null, DEFAULT_OUTPUT_ROWS);
-    }
-
-    /**
-     * Test setting an override to default pipeline parameter value via ETL setting.
-     * This etl passes -n 2 to the tail command, so the header row should be missing in the output
-     *
-     */
-    @Test
-    public void testPipelineTaskParameterOverride() throws Exception
-    {
-        doSingleFilePipelineFileAnalysis("targetFileParameterOverride", null, 2);
-    }
-
-    /**
-     * Test queueing one etl from another. Uses pipeline file analysis as that's most relevant for sponsoring client.
-     */
-    @Test
-    public void testQueueAnotherEtl() throws Exception
-    {
-        doSingleFilePipelineFileAnalysis("targetFileQueueTail", ETL_OUT, DEFAULT_OUTPUT_ROWS);
-    }
-
-    private void doSingleFilePipelineFileAnalysis(String etl, @Nullable String outputSubDir, int expectedOutputRows) throws Exception
-    {
-        insertSingleFileAnalysisSourceData();
-        File dir = setupPipelineFileAnalysis(outputSubDir);
-        String jobId = _etlHelper.runETL_API(etl).getJobId();
-        validatePipelineFileAnalysis(dir, jobId, expectedOutputRows);
-    }
-
-    private void validatePipelineFileAnalysis(File dir, String jobId, int expectedOutputRows) throws IOException, CommandException
-    {
-        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, null, true);
-        String[] expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
-                "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified".split(",")
-                : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified".split(",");
-        // Validate the initially written tsv file
-        assertArrayEquals("ETL query output file did not contain header", expected, fileRows.first.get(0));
-        validateFileRow(fileRows.first, 1, "Subject 2");
-        validateFileRow(fileRows.first, 2, "Subject 3");
-
-        // Validate the file output from the pipeline job
-        assertEquals("ETL pipeline output file did not have expected number of rows.", expectedOutputRows, fileRows.second.size());
-        validateFileRow(fileRows.second, expectedOutputRows - 2, "Subject 2");
-        validateFileRow(fileRows.second, expectedOutputRows - 1, "Subject 3");
-    }
-
-    @NotNull
-    private File setupPipelineFileAnalysis(String outputSubDir) throws IOException
-    {
-        //file ETL output and external pipeline test
-        File dir = TestFileUtils.getTestTempDir();
-        FileUtils.deleteDirectory(dir);
-        //noinspection ResultOfMethodCallIgnored
-        dir.mkdirs();
-        setPipelineRoot(dir.getAbsolutePath());
-        if (null != outputSubDir)
-        {
-            dir = new File(dir, outputSubDir);
-        }
-        return dir;
-    }
-
-    private void insertSingleFileAnalysisSourceData()
-    {
-        _etlHelper.insertSourceRow("2", "Subject 2", null);
-        _etlHelper.insertSourceRow("3", "Subject 3", null);
-    }
-
-    private Pair<List<String[]>, List<String[]>> readFile(File dir, String jobId, @Nullable Integer batchNum, boolean expectOutFile) throws IOException, CommandException
-    {
-        Pair<List<String[]>, List<String[]>> results = new Pair<>(new ArrayList<>(), new ArrayList<>());
-
-        String baseName = "report-" + _diHelper.getTransformRunFieldByJobId(jobId, "transformRunId");
-        if (null != batchNum && batchNum > 0)
-            baseName = baseName + "-" + batchNum;
-        File etlFile = new File(dir, baseName + ".testIn.tsv");
-        String fileContents = TestFileUtils.getFileContents(etlFile);
-
-        List<String> rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
-        results.first.addAll(rows.stream().map(row -> row.split(",")).collect(Collectors.toList()));
-
-        if (expectOutFile)
-        {
-            //file created by external pipeline
-            File etlFile2 = new File(dir, baseName + ".testOut.tsv");
-            fileContents = TestFileUtils.getFileContents(etlFile2);
-            rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
-            results.second.addAll(rows.stream().map(row -> row.split(",")).collect(Collectors.toList()));
-        }
-        return results;
-    }
-
-    private void validateFileRow(List<String[]> rows, int index, String name)
-    {
-        // The 6th field in the tsv is the name column; verify it's what we expect
-        assertEquals("Row " + index + " was not for name '" + name +"'", name, rows.get(index)[5]);
-    }
-
-    /**
-     * Test that jobs are serialized correctly so they can be requeued. Using "retry" as standin for requeue on server
-     * restart, as it is the same mechanism. For each case, deliberately create an error condition (key violation, etc),
-     * and then retry the job. If the same error occurs, the job requeued successfully. (Check the initial error now appears twice
-     * in log.)
-     */
-    @Test
-    public void testRequeueJobs() throws Exception
-    {
-        String FILTER_ERROR_MESSAGE;
-        String SPROC_ERROR_MESSAGE = "Intentional SQL Exception From Inside Proc";
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            FILTER_ERROR_MESSAGE = "violates unique constraint";
-        }
-        else
-        {
-            FILTER_ERROR_MESSAGE = "Violation of UNIQUE KEY constraint";
-        }
-
-        _etlHelper.insertSourceRow("2", "Subject 2", "1042");
-
-        // SelectAllFilter
-        _etlHelper.runETL_API(APPEND_SELECT_ALL);
-        tryAndRetry(APPEND_SELECT_ALL, FILTER_ERROR_MESSAGE, true);
-        // 23833 Validate that a successful retry gives a status of COMPLETE
-        _etlHelper.deleteAllRows(ETLHelper.ETL_TARGET);
-        _etlHelper.clickRetryButton();
-        assertEquals("Wrong transform status for retried ETL.", ETLHelper.COMPLETE, _diHelper.getTransformStatusByTransformId(_etlHelper.ensureFullIdString(APPEND_SELECT_ALL)));
-        ETLScheduler scheduler = ETLScheduler.beginAt(this);
-        assertEquals("Error status didn't clear on successful retry for " + APPEND_SELECT_ALL, "COMPLETE", scheduler.transform(APPEND_SELECT_ALL).getLastStatus());
-
-        // ModifiedSinceFilter
-        tryAndRetry(APPEND, FILTER_ERROR_MESSAGE, true);
-
-        //RunFilter
-        _etlHelper.insertTransferRow("1042", _etlHelper.getDate(), _etlHelper.getDate(), "new transfer", "added by test automation", "pending");
-        tryAndRetry(TRANSFORM_BYRUNID, FILTER_ERROR_MESSAGE, true);
-
-        //StoredProc
-        tryAndRetry(TRANSFORM_BAD_THROW_ERROR_SP, SPROC_ERROR_MESSAGE, false);
-
-        // Remote Source
-        tryAndRetry("remoteInvalidDestinationSchemaName", "ERROR: Target schema not found: study_buddy", true);
-
-        // TaskRef (serialization failure only occurred when taskref task had not yet started)
-        tryAndRetry("appendAndTaskRefTask", FILTER_ERROR_MESSAGE, true);
-    }
-
-    /**
-     * Test requeuing an etl job with a pipeline task in it. Doing this one a little differently than other requeue tests.
-     * Cancel the job while it's running, and then on retry verify the job ran to completion.
-     *
-     */
-    @Test
-    public void testRetryCancelledPipelineTask() throws IOException, CommandException
-    {
-        final String TARGET_FILE_WITH_SLEEP = _etlHelper.ensureFullIdString("targetFileWithSleep");
-        insertSingleFileAnalysisSourceData();
-        File dir = setupPipelineFileAnalysis(ETL_OUT);
-        _etlHelper.runETLNoNavNoWait(TARGET_FILE_WITH_SLEEP, true, false);
-        refresh();
-        clickButton("Cancel");
-        // 23829 Validate run status is really CANCELLED
-        _etlHelper.waitForStatus(TARGET_FILE_WITH_SLEEP, "CANCELLED", 10000);
-        clickTab(DATA_INTEGRATION_TAB);
-        ETLScheduler scheduler = new ETLScheduler(this);
-        assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "CANCELLED", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
-        scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
-        _etlHelper.clickRetryButton();
-        _etlHelper.waitForEtl();
-        scheduler = ETLScheduler.beginAt(this);
-        assertEquals("Wrong status for " + TARGET_FILE_WITH_SLEEP, "COMPLETE", scheduler.transform(TARGET_FILE_WITH_SLEEP).getLastStatus());
-        scheduler.transform(TARGET_FILE_WITH_SLEEP).clickLastStatus();
-        String jobId = _diHelper.getTransformRunFieldByTransformId(TARGET_FILE_WITH_SLEEP, "jobId");
-        validatePipelineFileAnalysis(dir, jobId, DEFAULT_OUTPUT_ROWS);
-    }
-
     @Test
     public void testColumnMapping()
     {
@@ -571,90 +340,6 @@ public class ETLTest extends ETLBaseTest
                 .confirmYes();
 
         _etlHelper.assertNotInTarget1("trunc111", "trunc222", "Truncate me");
-    }
-
-    private void tryAndRetry(String transformId, String expectedError, boolean normalErrorCount)
-    {
-        _etlHelper.runETLNoNav(transformId, true, false);
-        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
-        refresh();
-        assertTextPresent(expectedError);
-        _etlHelper.clickRetryButton();
-        _etlHelper.incrementExpectedErrorCount(normalErrorCount);
-        refresh();
-        assertTextPresent(expectedError, 2);
-    }
-
-    @Test
-    public void testBatchingToMultipleFiles() throws Exception
-    {
-        final String BATCH_FILES = "targetBatchedFiles";
-        insertMultipleFilesSourceData();
-        File dir = setupPipelineFileAnalysis(ETL_OUT);
-        String jobId = _etlHelper.runETL_API(BATCH_FILES).getJobId();
-
-        log("Validating output file count and content");
-        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, false);
-        validateFileRow(fileRows.first, 1, "row 1");
-        validateFileRow(fileRows.first, 2, "row 2");
-        fileRows = readFile(dir, jobId, 2, false);
-        validateFileRow(fileRows.first, 1, "row 3");
-        validateFileRow(fileRows.first, 2, "row 4");
-        fileRows = readFile(dir, jobId, 3, false);
-        validateFileRow(fileRows.first, 1, "row 5");
-    }
-
-    @Test
-    public void testBatchingMultipleFilesByBatchColumn() throws Exception
-    {
-        final String BATCH_FILES_WITH_BATCH_COLUMN = "targetBatchedFilesWithBatchColumn";
-        insertMultipleFilesSourceData();
-        File dir = setupPipelineFileAnalysis(ETL_OUT);
-        String jobId = _etlHelper.runETL_API(BATCH_FILES_WITH_BATCH_COLUMN).getJobId();
-
-        log("Validating output file count and content");
-        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, false);
-        validateFileRow(fileRows.first, 1, "row 1");
-        validateFileRow(fileRows.first, 2, "row 2");
-        validateFileRow(fileRows.first, 3, "row 3");
-        validateFileRow(fileRows.first, 4, "row 4");
-        fileRows = readFile(dir, jobId, 2, false);
-        validateFileRow(fileRows.first, 1, "row 5");
-    }
-
-    /**
-     * Output to multiple files, and queue a pipeline job (tail the file) for each.
-     * Verifies that we implicitly allowing of multiple queuing of etl's that start
-     * with an external pipeline task as their first step.
-     *
-     */
-    @Test
-    public void testBatchingMultipleFilesQueuingMultipleTails() throws Exception
-    {
-        final String BATCH_FILES_QUEUE_TAIL = "targetBatchedFilesQueueTail";
-        insertMultipleFilesSourceData();
-        File dir = setupPipelineFileAnalysis(ETL_OUT);
-        String jobId = _etlHelper.runETL_API(BATCH_FILES_QUEUE_TAIL).getJobId();
-
-        // Just validate the final output files, the testBatchingMultipleFilesByBatchColumn test case already validated the intermediate files 
-        log("Validating queued pipeline jobs output file count and content");
-        Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, 1, true);
-        validateFileRow(fileRows.second, 1, "row 1");
-        validateFileRow(fileRows.second, 2, "row 2");
-        fileRows = readFile(dir, jobId, 2, true);
-        validateFileRow(fileRows.second, 1, "row 3");
-        validateFileRow(fileRows.second, 2, "row 4");
-        fileRows = readFile(dir, jobId, 3, true);
-        validateFileRow(fileRows.second, 1, "row 5");    
-    }
-    
-    private void insertMultipleFilesSourceData()
-    {
-        _etlHelper.insertSourceRow("1", "row 1", "1");
-        _etlHelper.insertSourceRow("2", "row 2", "1");
-        _etlHelper.insertSourceRow("3", "row 3", "2");
-        _etlHelper.insertSourceRow("4", "row 4", "2");
-        _etlHelper.insertSourceRow("5", "row 5", "3");
     }
 
     @Test
