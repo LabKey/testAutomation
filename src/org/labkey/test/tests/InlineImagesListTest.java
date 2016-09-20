@@ -141,11 +141,11 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         log("Create a list named: " + LIST_NAME);
         _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, _listColDescription, _listColAttachment01);
-        click(Locator.lkButton("Done"));
+        clickAndWait(Locator.lkButton("Done"));
 
         Map<String, String> newValues = new HashMap<>();
 
-        click(Locator.bodyLinkContainingText(LIST_NAME));
+        clickAndWait(Locator.bodyLinkContainingText(LIST_NAME));
 
         log("Add a \"large\" png as an attachment.");
         newValues.put(LIST_KEY_NAME, "1");
@@ -178,7 +178,7 @@ public class InlineImagesListTest extends BaseWebDriverTest
         _listHelper.clickEditDesign();
         _listHelper.addField(_listColAttachment02);
         _listHelper.clickSave();
-        click(Locator.lkButton("Done"));
+        clickAndWait(Locator.lkButton("Done"));
 
         log("Insert images and files into the new attachment rows.");
         newValues = new HashMap<>();
@@ -266,11 +266,11 @@ public class InlineImagesListTest extends BaseWebDriverTest
         }
 
         log("Remove one of the attachment columns and validate that everything still works.");
-        click(Locator.linkWithText("Design"));
+        clickAndWait(Locator.linkWithText("Design"));
         _listHelper.clickEditDesign();
         _listHelper.deleteField("List Fields", 3);
         _listHelper.clickSave();
-        click(Locator.lkButton("Done"));
+        clickAndWait(Locator.lkButton("Done"));
 
         log("Validate that the correct number of images are present.");
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName(), Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
