@@ -109,7 +109,7 @@ public class FileBrowserIconsTest extends BaseWebDriverTest
         pass = validateCount("span.fa-file-word-o", 5) & pass;
 
         log("Validate number of image icons is correct.");
-        pass = validateCount("span.fa-file-image-o", 4) & pass;
+        pass = validateCount("span.fa-file-image-o", 5) & pass;
 
         log("Validate number of archive icons is correct.");
         pass = validateCount("span.fa-file-archive-o", 3) & pass;
