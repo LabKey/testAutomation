@@ -15,26 +15,26 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseWebDriverTest;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import static java.io.File.pathSeparator;
 import static org.labkey.test.TestFileUtils.getLabKeyRoot;
 
 public class PipelineToolsHelper
 {
     private LabKeySiteWrapper _test;
-    private static String _originalToolsDir = null;
-    private static String _currentToolsDir = null;
-    private static String _pathSeparator = File.pathSeparator;
-    private static final String _defaultToolsDirectory = (new File(getLabKeyRoot() + "/build/deploy/bin")).getAbsoluteFile().toString();
+    private static Set<String> _originalToolsDirs = null;
+    private static Set<String> _currentToolsDirs = null;
+    private static final String _defaultToolsDirectory = new File(getLabKeyRoot(), "build/deploy/bin").getAbsoluteFile().toString();
     private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
 
     public PipelineToolsHelper(LabKeySiteWrapper test)
@@ -44,13 +44,30 @@ public class PipelineToolsHelper
 
     private static String getDefaultToolsPath()
     {
-        return (_extraPipelineTools != null && !_extraPipelineTools.isEmpty() ? _extraPipelineTools + _pathSeparator : "") + _defaultToolsDirectory;
+        return (_extraPipelineTools != null && !_extraPipelineTools.isEmpty() ? _extraPipelineTools + pathSeparator : "") + _defaultToolsDirectory;
+    }
+
+    private static Set<String> dirsFromPath(String path)
+    {
+        final LinkedHashSet<String> dirs = new LinkedHashSet<>(Arrays.asList(path.split(pathSeparator)));
+        dirs.remove("");
+        dirs.remove(null);
+        return dirs;
+    }
+
+    private static String pathFromDirs(Collection<String> dirs)
+    {
+        dirs = new LinkedHashSet<>(dirs);
+        dirs.remove("");
+        dirs.remove(null);
+        return String.join(pathSeparator, dirs);
     }
 
     @LogMethod
-    public void setPipelineToolsDirectory(@LoggedParam String path)
+    public void setPipelineToolsDirectory(@LoggedParam @NotNull String path)
     {
-        if (path.equals(_currentToolsDir))
+        final Set<String> dirs = dirsFromPath(path);
+        if (dirs.equals(_currentToolsDirs))
         {
             _test.log("Pipeline tools directory already has desired setting.");
             return;
@@ -59,10 +76,10 @@ public class PipelineToolsHelper
         _test.log("Set tools bin directory to " + path);
         _test.pushLocation();
         goToSiteSettings();
-        if (_originalToolsDir == null)
-            _originalToolsDir = _test.getFormElement(Locator.name("pipelineToolsDirectory"));
+        if (_originalToolsDirs == null)
+            _originalToolsDirs = dirsFromPath(_test.getFormElement(Locator.name("pipelineToolsDirectory")));
         _test.setFormElement(Locators.pipelineToolsDirectoryField(), path);
-        _currentToolsDir = path;
+        _currentToolsDirs = dirs;
         _test.clickButton("Save");
         _test.popLocation();
     }
@@ -70,29 +87,34 @@ public class PipelineToolsHelper
     @LogMethod
     public void addToPipelineToolsPath(@LoggedParam String... directories)
     {
-        List<String> directoriesToAppend= new ArrayList(Arrays.asList(directories));
-        _test.pushLocation();
-        goToSiteSettings();
-        String previousToolsDir = _test.getFormElement(Locator.name("pipelineToolsDirectory"));
-        if (_originalToolsDir == null)
-            _originalToolsDir = previousToolsDir;
-
-        for (String dirInPreviousPath :  previousToolsDir.split(_pathSeparator))
+        Set<String> directoriesToAppend = new LinkedHashSet<>(Arrays.asList(directories));
+        directoriesToAppend.remove("");
+        directoriesToAppend.remove(null);
+        if (directoriesToAppend.isEmpty() || _currentToolsDirs != null && _currentToolsDirs.containsAll(directoriesToAppend))
         {
-            if (directoriesToAppend.contains(dirInPreviousPath))
-                directoriesToAppend.remove(dirInPreviousPath);
+            TestLogger.log("No changes needed");
+            return;
         }
 
-        if (directoriesToAppend.size() > 0)
+        _test.pushLocation();
+        goToSiteSettings();
+
+        Set<String> toolsDirectories = dirsFromPath(_test.getFormElement(Locator.name("pipelineToolsDirectory")));
+        if (_originalToolsDirs == null)
+            _originalToolsDirs = toolsDirectories;
+
+        if (toolsDirectories.addAll(directoriesToAppend))
         {
-            _currentToolsDir = previousToolsDir + _pathSeparator + StringUtils.join(directoriesToAppend, _pathSeparator);
-            _test.log("New pipeline tools config: " + _currentToolsDir);
-            _test.setFormElement(Locators.pipelineToolsDirectoryField(), _currentToolsDir);
+            _currentToolsDirs = toolsDirectories;
+            final String path = pathFromDirs(toolsDirectories);
+            TestLogger.log("New pipeline tools config: " + path);
+            _test.setFormElement(Locators.pipelineToolsDirectoryField(), path);
             _test.clickButton("Save");
         }
         else
         {
-            _test.log("All directories are already present in pipeline tools config");
+            _currentToolsDirs = toolsDirectories;
+            TestLogger.log("All directories are already present in pipeline tools config");
         }
         _test.popLocation();
     }
@@ -103,10 +125,13 @@ public class PipelineToolsHelper
     @LogMethod
     public void resetPipelineToolsDirectory()
     {
-        if (_originalToolsDir != null)
+        if (_originalToolsDirs != null)
         {
-            setPipelineToolsDirectory(_originalToolsDir);
-            _originalToolsDir = null;
+            if (TestProperties.isTestRunningOnTeamCity())
+                setToolsDirToTestDefault();
+            else
+                setPipelineToolsDirectory(pathFromDirs(_originalToolsDirs));
+            _originalToolsDirs = null;
         }
     }
 
@@ -117,6 +142,8 @@ public class PipelineToolsHelper
     public void setToolsDirToTestDefault()
     {
         setPipelineToolsDirectory(getDefaultToolsPath());
+        if (TestProperties.isTestRunningOnTeamCity())
+            _originalToolsDirs = null;
     }
 
     private void goToSiteSettings()
