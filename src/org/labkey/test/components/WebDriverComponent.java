@@ -23,10 +23,15 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
 
     public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
     {
-        WebDriver driver;
+        private final WebDriver driver;
         public WebDriverComponentFinder(WebDriver driver)
         {
             this.driver = driver;
+        }
+
+        protected WebDriver getDriver()
+        {
+            return driver;
         }
 
         public C findWhenNeeded()

@@ -26,6 +26,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.LazyWebElement;
@@ -54,7 +55,7 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
  */
-public class DataRegionTable extends Component implements WebDriverWrapper.PageLoadListener
+public class DataRegionTable extends WebDriverComponent implements WebDriverWrapper.PageLoadListener
 {
     public static final boolean isNewDataRegion = true; // TODO: Remove flag once conversion is complete
 
@@ -88,18 +89,22 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
 
         if (table == null)
         {
-            _tableElement = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver()).
-                    withRefindListener(element ->
-                    {
-                        clearCache();
-                        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
-                    });
+            _tableElement = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
             _regionName = name;
         }
         else
         {
             _tableElement = table;
             _regionName = table.getAttribute("lk-region-name");
+        }
+        if (_tableElement instanceof RefindingWebElement)
+        {
+            ((RefindingWebElement) _tableElement).
+                    withRefindListener(element ->
+                    {
+                        clearCache();
+                        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
+                    });
         }
 
         _selectors = !Locator.css(".labkey-selectors").findElements(_tableElement).isEmpty();
@@ -223,41 +228,110 @@ public class DataRegionTable extends Component implements WebDriverWrapper.PageL
         return hasAggregateRow() ? 1 : 0;
     }
 
+    public static DataRegionFinder DataRegion(WebDriver driver)
+    {
+        return new DataRegionFinder(driver);
+    }
+
+    public static class DataRegionFinder extends WebDriverComponentFinder<DataRegionTable, DataRegionFinder>
+    {
+        private DataRegionFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        public DataRegionFinder withName(String name)
+        {
+            return new NamedDataRegionFinder(getDriver(), name);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return Locators.dataRegion();
+        }
+
+        @Override
+        protected DataRegionTable construct(WebElement el, WebDriver driver)
+        {
+            return new DataRegionTable(el, driver);
+        }
+    }
+
+    private static class NamedDataRegionFinder extends DataRegionFinder
+    {
+        String _name;
+
+        private NamedDataRegionFinder(WebDriver driver, String name)
+        {
+            super(driver);
+            _name = name;
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return Locators.dataRegion(_name);
+        }
+
+        @Override
+        protected DataRegionTable construct(WebElement el, WebDriver driver)
+        {
+            return new DataRegionTable(_name, driver);
+        }
+
+        @Override
+        public DataRegionFinder index(int index)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public SimpleComponentFinder<DataRegionTable> locatedBy(Locator loc)
+        {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Deprecated
     public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName)
     {
-        return waitForDataRegion(test, regionName, DEFAULT_WAIT);
+        return DataRegion(test.getDriver()).withName(regionName).waitFor();
     }
 
+    @Deprecated
     public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName, int msTimeout)
     {
-        test.waitForElement(Locators.dataRegion(regionName), msTimeout);
-        return new DataRegionTable(regionName, test.getDriver());
+        return DataRegion(test.getDriver()).withName(regionName).timeout(msTimeout).waitFor();
     }
 
+    @Deprecated
     public static DataRegionTable findDataRegion(WebDriverWrapper test)
     {
-        return findDataRegion(test, 0);
+        return DataRegion(test.getDriver()).find();
     }
 
+    @Deprecated
     public static DataRegionTable findDataRegion(WebDriverWrapper test, int index)
     {
-        return findDataRegionWithin(test, test.getDriver(), index);
+        return DataRegion(test.getDriver()).index(index).find();
     }
 
+    @Deprecated
     public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context)
     {
-        return findDataRegionWithin(test, context, 0);
+        return DataRegion(test.getDriver()).find(context);
     }
 
+    @Deprecated
     public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context, int index)
     {
-        Locator dataRegionLoc = Locator.css("table[lk-region-name]").index(index);
-        return new DataRegionTable(new RefindingWebElement(dataRegionLoc, context), test.getDriver());
+        return DataRegion(test.getDriver()).index(index).find(context);
     }
 
     public static DataRegionTable findDataRegionWithinWebpart(WebDriverWrapper test, String webPartTitle)
     {
-        return findDataRegionWithin(test, new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
+        return DataRegion(test.getDriver()).find(new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
     }
 
     public String getTableName()
