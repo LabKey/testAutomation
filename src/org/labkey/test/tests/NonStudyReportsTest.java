@@ -21,7 +21,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -31,9 +31,8 @@ import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import java.io.File;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Reports.class})
+@Category({DailyC.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
 {
     protected final PortalHelper portalHelper = new PortalHelper(this);

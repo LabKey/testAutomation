@@ -17,14 +17,14 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
     private final PortalHelper portalHelper = new PortalHelper(this);

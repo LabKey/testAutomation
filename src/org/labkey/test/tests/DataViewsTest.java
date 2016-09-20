@@ -24,19 +24,19 @@ import org.labkey.remoteapi.reports.GetCategoriesResponse;
 import org.labkey.remoteapi.reports.SaveCategoriesCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
-import org.labkey.test.components.BodyWebPart;
 
 import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 
-@Category({DailyA.class})
+@Category({DailyC.class})
 public class DataViewsTest extends ParticipantListTest
 {
     private static final String REPORT_NAME = "TestReport";

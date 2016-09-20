@@ -385,6 +385,7 @@ src/org/labkey/test/categories/DRT.java -text
 src/org/labkey/test/categories/Daily.java -text
 src/org/labkey/test/categories/DailyA.java -text
 src/org/labkey/test/categories/DailyB.java -text
+src/org/labkey/test/categories/DailyC.java -text
 src/org/labkey/test/categories/Data.java -text
 src/org/labkey/test/categories/Disabled.java -text
 src/org/labkey/test/categories/ETL.java -text

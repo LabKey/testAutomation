@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
@@ -31,9 +31,9 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-@Category({DailyB.class, Reports.class})
+@Category({DailyC.class, Reports.class})
 public class ReportAndDatasetNotificationTest extends StudyBaseTest
 {
     private final PortalHelper _portalHelper = new PortalHelper(this);

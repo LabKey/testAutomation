@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -28,9 +28,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-@Category({DailyA.class, Reports.class})
+@Category({DailyC.class, Reports.class})
 public class ParticipantReportTest extends ReportTest
 {
     private static final String PARTICIPANT_REPORT_NAME = "Test Participant Report";

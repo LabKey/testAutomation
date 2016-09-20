@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
@@ -31,7 +31,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-@Category({DailyA.class, Reports.class, Charting.class})
+@Category({DailyC.class, Reports.class, Charting.class})
 public class BoxPlotTest extends GenericChartsTest
 {
     @LogMethod

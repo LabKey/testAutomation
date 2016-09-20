@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Category({DailyB.class, Reports.class, Charting.class})
+@Category({DailyC.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
