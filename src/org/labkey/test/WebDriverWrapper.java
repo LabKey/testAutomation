@@ -26,6 +26,7 @@ import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -113,8 +114,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public final static int WAIT_FOR_PAGE = 30000;
 
-    private static JSErrorChecker _jsErrorChecker = null;
-
     protected boolean _testTimeout = false;
 
     public int defaultWaitForPage = WAIT_FOR_PAGE;
@@ -184,15 +183,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
 
-                    if (isScriptCheckEnabled())
-                    {
-                        File jsErrorCheckerExtension = new File(TestFileUtils.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker");
-                        options.addArguments("load-extension=" + jsErrorCheckerExtension.toString());
-                    }
-
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                    _jsErrorChecker = new ChromeJSErrorChecker();
                     newWebDriver = new ChromeDriver(capabilities);
                 }
                 break;
@@ -238,15 +230,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     profile.setPreference("browser.ssl_override_behavior", 0);
 
-                    if (isScriptCheckEnabled())
-                    {
-                        try
-                        {
-                            // This doesn't collect timestamps
-                            JavaScriptError.addExtension(profile);}
-                        catch(IOException e)
-                        {throw new RuntimeException("Failed to load JS error checker", e);}
-                    }
                     profile.setAcceptUntrustedCertificates(true);
                     profile.setAssumeUntrustedCertificateIssuer(false);
                     profile.setEnableNativeEvents(useNativeEvents());
@@ -254,13 +237,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
                     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-                    if (isScriptCheckEnabled())
-                    {
-                        // This doesn't collect JS source information (file & line number)
-                        LoggingPreferences loggingPreferences = new LoggingPreferences();
-                        loggingPreferences.enable(LogType.BROWSER, Level.SEVERE);
-                        capabilities.setCapability("loggingPrefs", loggingPreferences);
-                    }
 
                     String browserPath = System.getProperty("selenium.browser.path", "");
                     if (browserPath.length() > 0)
@@ -270,7 +246,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     }
                     newWebDriver = new FirefoxDriver(capabilities);
 
-                    _jsErrorChecker = new FirefoxJSErrorChecker();
                 }
                 break;
             }
@@ -308,25 +283,24 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
-    public void pauseJsErrorChecker()
-    {
-        if (_jsErrorChecker != null && isScriptCheckEnabled())
-        {
-            _jsErrorChecker.pause();
-        }
-    }
-
     public void resumeJsErrorChecker()
     {
-        if (_jsErrorChecker != null && isScriptCheckEnabled())
+        // Turn on server side logging of client errors.
+        if (isScriptCheckEnabled())
         {
-            _jsErrorChecker.resume();
+            Connection cn = createDefaultConnection(false);
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", true);
         }
     }
 
-    protected static JSErrorChecker getJsErrorChecker()
+    public void pauseJsErrorChecker()
     {
-        return _jsErrorChecker;
+        // Turn off server side logging of client errors.
+        if (isScriptCheckEnabled())
+        {
+            Connection cn = createDefaultConnection(false);
+            ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
+        }
     }
 
     protected abstract class JSErrorChecker
@@ -944,14 +918,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     relativeURL = "/" + relativeURL;
                 }
             }
-            pauseJsErrorChecker();
 
             final String fullURL = WebTestHelper.getBaseURL() + relativeURL;
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(fullURL), millis);
             logMessage += " [" + elapsedTime + " ms]";
 
-            resumeJsErrorChecker();
 
             return elapsedTime;
         }
@@ -966,12 +938,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         String logMessage = "Navigating to " + url.toString();
         try
         {
-            pauseJsErrorChecker();
 
             long elapsedTime = doAndWaitForPageToLoad(() -> getDriver().navigate().to(url), milliseconds);
             logMessage += " [" + elapsedTime + " ms]";
 
-            resumeJsErrorChecker();
             return elapsedTime;
         }
         finally

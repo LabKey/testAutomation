@@ -140,6 +140,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final SingletonWebDriver _driver = SingletonWebDriver.getInstance();
     private final BrowserType BROWSER_TYPE;
 
+    private static final String CLIENT_SIDE_ERROR = "Client exception detected";
+
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -507,6 +509,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private void doPreamble()
     {
         signIn();
+
+        // Start logging JS errors.
+        resumeJsErrorChecker();
+
         resetErrors();
         assertModulesAvailable(getAssociatedModules());
         deleteSiteWideTermsOfUsePage();
@@ -587,7 +593,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             protected void succeeded(Description description)
             {
                 checkErrors();
-                checkJsErrors(true);
             }
         };
 
@@ -792,7 +797,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
 
             dismissAllAlerts();
-            checkJsErrors(false);
         }
         finally
         {
@@ -840,7 +844,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             checkLeaksAndErrors();
         }
 
-        checkJsErrors(true);
     }
 
     private void waitForPendingRequests(int msWait)
@@ -989,11 +992,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             return;
 
         ensureSignedInAsPrimaryTestUser();
-        if (!getServerErrors().isEmpty())
+        String serverErrors = getServerErrors();
+        if (!serverErrors.isEmpty())
         {
             beginAt(buildURL("admin", "showErrorsSinceMark"));
             resetErrors();
-            fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            if(serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
+                fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            else
+                fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
         }
         log("No new errors found.");
     }
@@ -1165,61 +1172,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             else
                 log("Skipping manually excluded view: " + viewName);
-        }
-    }
-
-    protected void checkJsErrors()
-    {
-        checkJsErrors(true);
-    }
-
-    @LogMethod
-    protected void checkJsErrors(boolean failOnError)
-    {
-        if (isScriptCheckEnabled() && getJsErrorChecker() != null)
-        {
-            List<LogEntry> jsErrors = getJsErrorChecker().getErrors();
-
-            List<LogEntry> validErrors = new ArrayList<>();
-            Map<String, Integer> ignoredErrors = new TreeMap<>();
-
-            for (LogEntry error : jsErrors)
-            {
-                if (false) // TODO: Enable when Firefox JS errors are more useful (!getJsErrorChecker().isErrorIgnored(error))
-                    validErrors.add(error);
-                else
-                {
-                    String message = error.getMessage();
-                    ignoredErrors.put(message, ignoredErrors.getOrDefault(message, 0) + 1);
-                }
-            }
-            if (ignoredErrors.size() + validErrors.size() > 0)
-            {
-                log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
-                for (LogEntry error : validErrors)
-                    log(error.toString());
-
-                if (!ignoredErrors.isEmpty())
-                {
-                    log("<<<<<<<<<<<<<<<IGNORED ERRORS>>>>>>>>>>>>>>>>>>");
-                    for (String error : ignoredErrors.keySet())
-                    {
-                        int count = ignoredErrors.get(error);
-                        log(String.format("[Ignored%s] %s", count > 1 ? " (x" + count + ")" : "", error));
-                    }
-                }
-
-                log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>");
-            }
-
-            if (validErrors.size() > 0)
-            {
-                String errorCtStr = "";
-                if (validErrors.size() > 1)
-                    errorCtStr = " (1 of " + validErrors.size() + ") ";
-                if (failOnError) // Don't clobber existing failures. Just log them.
-                    fail("JavaScript error" + errorCtStr + ": " + validErrors.get(0));
-            }
         }
     }
 
