@@ -1302,6 +1302,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return getWrapper().getTexts(menuItems);
     }
 
+    public boolean columnHasChartOption(String columnName, String chartType)
+    {
+        WebElement menu = elements().getColumnHeader(columnName);
+        List<String> items = getWrapper().getTexts(_driver._ext4Helper.getMenuItems(menu));
+        for (String item : items)
+        {
+            if (item.toLowerCase().contains(chartType.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void clickInsertNewRowDropdown()
     {
         clickHeaderMenu("Insert", "Insert New Row");

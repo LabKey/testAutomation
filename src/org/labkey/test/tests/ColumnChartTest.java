@@ -14,6 +14,7 @@ import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,18 @@ import java.util.List;
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
-    final static String DATA_SOURCE_1 = "Physical Exam";
+    public static final String DATA_SOURCE_1 = "Physical Exam";
+    public static final List<String> DATA_SOURCE_1_COLNAMES = Arrays.asList(
+        "ParticipantId", "date", "Weight_kg", "Temp_C",
+        "SystolicBloodPressure", "DiastolicBloodPressure",
+        "Pulse", "Respirations", "Signature", "Pregnancy", "Language"
+    );
+    public static final List<String> DATA_SOURCE_1_NUMERIC_COLNAMES = Arrays.asList(
+        "Weight_kg", "Temp_C", "SystolicBloodPressure", "DiastolicBloodPressure",
+        "Pulse", "Respirations", "Signature"
+    );
+    public static List<String> DATA_SOURCE_1_DIMENSIONS = new ArrayList<>();
+    public static List<String> DATA_SOURCE_1_MEASURES = new ArrayList<>();
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -41,12 +53,14 @@ public class ColumnChartTest extends BaseWebDriverTest
     {
         final String PREGNANCY_FIELD_ID = "name7-input";
         final String LANGUAGE_FIELD_ID = "name8-input";
+        final String PULSE_FIELD_ID = "name4-input";
         final String RESPIRATIONS_FIELD_ID = "name5-input";
+        final String SIGNATURE_FIELD_ID = "name6-input";
         final String WEIGHT_FIELD_ID = "name0-input";
 
         log("Create a study and import the data from the LabkeyDemoStudy.zip");
         _containerHelper.createProject(getProjectName(), "Study");
-        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"));
+        importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"), true);
 
         log("Go to the schema browser and modify some of the fields.");
         goToSchemaBrowser();
@@ -56,21 +70,50 @@ public class ColumnChartTest extends BaseWebDriverTest
         waitForText("Edit Dataset Definition");
         waitForElement(Locator.inputById(PREGNANCY_FIELD_ID));
 
-        log("Set the 'Pregnancy', 'Language', 'Respirations' and 'Weight_kg' fields to be dimensions.");
+        log("Set the 'Pregnancy', 'Language', 'Respirations', 'Signature', and 'Weight_kg' fields to be dimensions but not measures.");
 
         click(Locator.inputById(PREGNANCY_FIELD_ID));
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
         setCheckbox(Locator.input("dimension"), true);
+        setCheckbox(Locator.input("measure"), false);
+        DATA_SOURCE_1_DIMENSIONS.add("Pregnancy");
 
         // Since the field property dock is already displayed and showing the 'Reporting' tab I do not need to show it again, just set the field.
         click(Locator.inputById(LANGUAGE_FIELD_ID));
         setCheckbox(Locator.input("dimension"), true);
+        setCheckbox(Locator.input("measure"), false);
+        DATA_SOURCE_1_DIMENSIONS.add("Language");
 
+        click(Locator.inputById(SIGNATURE_FIELD_ID));
+        setCheckbox(Locator.input("dimension"), true);
+        setCheckbox(Locator.input("measure"), false);
+        DATA_SOURCE_1_DIMENSIONS.add("Signature");
+
+        log("Set the 'Respirations' and 'Weight_kg' fields to be both dimensions and measures.");
         click(Locator.inputById(RESPIRATIONS_FIELD_ID));
         setCheckbox(Locator.input("dimension"), true);
+        setCheckbox(Locator.input("measure"), true);
+        DATA_SOURCE_1_DIMENSIONS.add("Respirations");
+        DATA_SOURCE_1_MEASURES.add("Respirations");
 
         click(Locator.inputById(WEIGHT_FIELD_ID));
         setCheckbox(Locator.input("dimension"), true);
+        setCheckbox(Locator.input("measure"), true);
+        DATA_SOURCE_1_DIMENSIONS.add("Weight_kg");
+        DATA_SOURCE_1_MEASURES.add("Weight_kg");
+
+        log("Set 'Pulse' to not be a measure or dimensions");
+        click(Locator.inputById(PULSE_FIELD_ID));
+        setCheckbox(Locator.input("dimension"), false);
+        setCheckbox(Locator.input("measure"), false);
+
+        log("Add the default measures to the ArrayList");
+        DATA_SOURCE_1_MEASURES.add("Temp_C");
+        DATA_SOURCE_1_MEASURES.add("SystolicBloodPressure");
+        DATA_SOURCE_1_MEASURES.add("DiastolicBloodPressure");
+
+        log("Add the default dimension to the ArrayList");
+        DATA_SOURCE_1_DIMENSIONS.add("ParticipantId");
 
         doAndWaitForPageToLoad(()->{
             click(Locator.linkWithSpan("Save"));
@@ -213,6 +256,76 @@ public class ColumnChartTest extends BaseWebDriverTest
         plotRegion.revertView();
 
         log("All done, let's go home.");
+    }
+
+    @Test
+    public void validateChartingColumnRestrictions()
+    {
+        log("Go to the '" + DATA_SOURCE_1 + "' grid and verify the presence of column chart restrictions (or lack thereof).");
+        goToProjectHome();
+        clickTab("Clinical and Assay Data");
+        waitAndClick(Locator.linkWithText(DATA_SOURCE_1));
+
+        log("Ensure charting menu items based on column type and measure/dimension setting");
+        DataRegionTable dataRegionTable = new DataRegionTable("Dataset", getDriver());
+        for (String colName : DATA_SOURCE_1_COLNAMES)
+        {
+            boolean isMeasure = DATA_SOURCE_1_MEASURES.contains(colName);
+            boolean isDimension = DATA_SOURCE_1_DIMENSIONS.contains(colName);
+            boolean isNumeric = DATA_SOURCE_1_NUMERIC_COLNAMES.contains(colName);
+
+            if ((isMeasure || isNumeric) && (isDimension || !isNumeric))
+            {
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Bar Chart"));
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Pie Chart"));
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Box & Whisker"));
+            }
+            else if (isMeasure || isNumeric)
+            {
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Bar Chart"));
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Pie Chart"));
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Box & Whisker"));
+            }
+            else //isDimension || !isNumeric
+            {
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Bar Chart"));
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Pie Chart"));
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Box & Whisker"));
+            }
+        }
+
+        log("Enable column measure/dimension restriction settings for this project.");
+        pushLocation();
+        enableColumnRestricting();
+        popLocation();
+
+        log("Ensure only dimension columns can make a pie chart and bar chart.");
+        dataRegionTable = new DataRegionTable("Dataset", getDriver());
+        for (String colName : DATA_SOURCE_1_COLNAMES)
+        {
+            if (DATA_SOURCE_1_DIMENSIONS.contains(colName))
+            {
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Bar Chart"));
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Pie Chart"));
+            }
+            else
+            {
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Bar Chart"));
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Pie Chart"));
+            }
+        }
+
+        log("Ensure only measure columns can make a box & whisker chart.");
+        for (String colName : DATA_SOURCE_1_COLNAMES)
+        {
+            if (DATA_SOURCE_1_MEASURES.contains(colName))
+                Assert.assertTrue(dataRegionTable.columnHasChartOption(colName, "Box & Whisker"));
+            else
+                Assert.assertFalse(dataRegionTable.columnHasChartOption(colName, "Box & Whisker"));
+        }
+
+        log("Disable column measure/dimension restriction settings for this project.");
+        disableColumnRestricting();
     }
 
     @Test
@@ -433,6 +546,20 @@ public class ColumnChartTest extends BaseWebDriverTest
         // Since this is a saved view it can not be reverted.
         log("All done, let's go home.");
 
+    }
+
+    private void enableColumnRestricting()
+    {
+        goToProjectSettings();
+        checkCheckbox(Locator.name("restrictedColumnsEnabled"));
+        clickButton("Save");
+    }
+
+    private void disableColumnRestricting()
+    {
+        goToProjectSettings();
+        uncheckCheckbox(Locator.name("restrictedColumnsEnabled"));
+        clickButton("Save");
     }
 
 }
