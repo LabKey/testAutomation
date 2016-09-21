@@ -45,8 +45,7 @@ import java.util.stream.Collectors;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
-    private List<Map<String, Object>> groupCache;
-    private String groupCacheContainer;
+    private Map<String, List<Map<String, Object>>> groupCache;
 
     public ApiPermissionsHelper(WebDriverWrapper test)
     {
@@ -142,7 +141,12 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private List<Map<String, Object>> getGroups(String container)
     {
-        if (groupCache == null || !container.equals(groupCacheContainer))
+        if (groupCache == null)
+        {
+            groupCache = new HashMap<>();
+        }
+
+        if (!groupCache.containsKey(container))
         {
             Connection connection = _driver.createDefaultConnection(false);
             GetGroupPermsCommand command = new GetGroupPermsCommand();
@@ -156,32 +160,15 @@ public class ApiPermissionsHelper extends PermissionsHelper
                 throw new RuntimeException(e);
             }
 
-            groupCacheContainer = container;
-            groupCache = (List) ((Map) response.getParsedData().get("container")).get("groups");
+            groupCache.put(container, (List) ((Map) response.getParsedData().get("container")).get("groups"));
         }
 
-        return groupCache;
+        return groupCache.get(container);
     }
 
     private List<Map<String, Object>> getProjectGroups(String project)
     {
-        List<Map<String, Object>> groups = new ArrayList<>(groupCache == null ? getGroups(project) : groupCache);
-
-        Iterator<Map<String, Object>> iter = groups.iterator();
-        while (iter.hasNext())
-        {
-            Map<String, Object> group = iter.next();
-            if ((Boolean)group.get("isProjectGroup"))
-            {
-                iter.remove();
-            }
-        }
-        return groups;
-    }
-
-    private List<Map<String, Object>> getSiteGroups()
-    {
-        List<Map<String, Object>> groups = new ArrayList<>(groupCache == null ? getGroups("/") : groupCache);
+        List<Map<String, Object>> groups = new ArrayList<>(getGroups(project));
 
         Iterator<Map<String, Object>> iter = groups.iterator();
         while (iter.hasNext())
@@ -195,9 +182,14 @@ public class ApiPermissionsHelper extends PermissionsHelper
         return groups;
     }
 
+    private List<Map<String, Object>> getSiteGroups()
+    {
+        return getGroups("/");
+    }
+
     private Integer getProjectGroupId(String groupName, String project)
     {
-        for (Map<String, Object> group : getGroups(project))
+        for (Map<String, Object> group : getProjectGroups(project))
         {
             if (groupName.equals(group.get("name")))
             {
@@ -441,7 +433,7 @@ public class ApiPermissionsHelper extends PermissionsHelper
             case siteGroup:
                 return getSiteGroupId(userOrGroupName);
             default:
-                throw new IllegalStateException("Unknown principal type: " + principalType.toString());
+                throw new IllegalArgumentException("Unknown principal type: " + principalType.toString());
         }
     }
 
@@ -572,10 +564,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             throw new RuntimeException(e);
         }
-        finally
-        {
-            groupCache = null;
-        }
     }
 
     private void addMembersToBulkUpdateCommand(BulkUpdateGroupCommand command, String... members)
@@ -641,10 +629,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
-        }
-        finally
-        {
-            groupCache = null;
         }
     }
 }
