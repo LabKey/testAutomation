@@ -60,6 +60,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 {
     public static final boolean isNewDataRegion = true; // TODO: Remove flag once conversion is complete
 
+    @Deprecated // TODO: Make private and scope to a specific DataRegion
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
@@ -83,13 +84,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     private DataRegionTable(WebElement table, String name, WebDriverWrapper driverWrapper)
     {
         _driver = driverWrapper;
-        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
-
         if ((table == null) == (name == null))
             throw new IllegalArgumentException("Specify either a table element or data region name");
 
         if (table == null)
         {
+            _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
             _tableElement = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
             _regionName = name;
         }
@@ -239,6 +239,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private DataRegionFinder(WebDriver driver)
         {
             super(driver);
+            timeout(DEFAULT_WAIT);
         }
 
         public DataRegionFinder withName(String name)
@@ -255,7 +256,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            return new DataRegionTable(el, driver);
+            return new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
         }
     }
 

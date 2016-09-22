@@ -188,9 +188,7 @@ public class FileContentUploadTest extends BaseWebDriverTest
         waitForElement(Ext4Helper.Locators.window("Update User Settings For Files"));
         _ext4Helper.selectComboBoxItem(MessagesLongTest.NEW_SETTING_LABEL, "No Email");
         clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
-        doAndWaitForPageSignal(
-                () -> waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes")),
-                DataRegionTable.UPDATE_SIGNAL);
+        table.doAndWaitForUpdate(() -> waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes")));
         waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
 
         table = new DataRegionTable("Users", this);

@@ -49,6 +49,11 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return super.waitFor(driver);
         }
 
+        public C findOrNull()
+        {
+            return super.findOrNull(driver);
+        }
+
         @Override
         protected final C construct(WebElement el)
         {

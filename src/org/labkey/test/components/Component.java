@@ -87,6 +87,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         private static final int DEFAULT_TIMEOUT = 10000;
         private int timeout = 0;
         private int index = 0;
+        private S _context;
 
         public F timeout(int timeout)
         {
@@ -115,14 +116,22 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
         protected abstract Locator locator();
         protected abstract C construct(WebElement el);
 
-        private Locator buildLocator()
+        protected final Locator buildLocator()
         {
             return locator().index(index);
         }
 
+        protected final S getContext()
+        {
+            return _context;
+        }
+
         private WebElement findElement(S context)
         {
-            return buildLocator().findElement(context);
+            if (timeout > 0)
+                return waitForElement(context);
+            else
+                return buildLocator().findElement(context);
         }
 
         private WebElement waitForElement(S context)
@@ -132,21 +141,25 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
         public C find(S context)
         {
+            _context = context;
             return construct(findElement(context));
         }
 
         public C waitFor(S context)
         {
+            _context = context;
             return construct(waitForElement(context));
         }
 
         public C findWhenNeeded(S context)
         {
+            _context = context;
             return construct(buildLocator().findWhenNeeded(context).withTimeout(timeout));
         }
 
         public C findOrNull(S context)
         {
+            _context = context;
             WebElement elementOrNull = buildLocator().findElementOrNull(context);
             if (elementOrNull == null)
                 return null;

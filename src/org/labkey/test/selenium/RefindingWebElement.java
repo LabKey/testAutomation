@@ -27,6 +27,15 @@ public class RefindingWebElement extends LazyWebElement
         _wrappedElement = element;
     }
 
+    /**
+     * This constructor provides no guarantee that
+     */
+    public RefindingWebElement(WebElement element, Locator locator, SearchContext searchContext)
+    {
+        this(locator, searchContext);
+        _wrappedElement = element;
+    }
+
     private void assertUniqueId(WebElement el)
     {
         String id = el.getAttribute("id");
