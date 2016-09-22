@@ -41,12 +41,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ApiPermissionsHelper extends PermissionsHelper
 {
-    private Map<String, List<Map<String, Object>>> groupCache;
-
     public ApiPermissionsHelper(WebDriverWrapper test)
     {
         super(test);
@@ -141,34 +140,27 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private List<Map<String, Object>> getGroups(String container)
     {
-        if (groupCache == null)
+        Connection connection = _driver.createDefaultConnection(false);
+        GetGroupPermsCommand command = new GetGroupPermsCommand();
+        GetGroupPermsResponse response;
+        try
         {
-            groupCache = new HashMap<>();
+            response = command.execute(connection, container);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
         }
 
-        if (!groupCache.containsKey(container))
-        {
-            Connection connection = _driver.createDefaultConnection(false);
-            GetGroupPermsCommand command = new GetGroupPermsCommand();
-            GetGroupPermsResponse response;
-            try
-            {
-                response = command.execute(connection, container);
-            }
-            catch (IOException | CommandException e)
-            {
-                throw new RuntimeException(e);
-            }
-
-            groupCache.put(container, (List) ((Map) response.getParsedData().get("container")).get("groups"));
-        }
-
-        return groupCache.get(container);
+        return (List) ((Map) response.getParsedData().get("container")).get("groups");
     }
 
     private List<Map<String, Object>> getProjectGroups(String project)
     {
         List<Map<String, Object>> groups = new ArrayList<>(getGroups(project));
+
+        if (project.isEmpty() || project.equals("/"))
+            return groups;
 
         Iterator<Map<String, Object>> iter = groups.iterator();
         while (iter.hasNext())
@@ -480,10 +472,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         {
             throw new RuntimeException(e);
         }
-        finally
-        {
-            groupCache = null;
-        }
     }
 
     @LogMethod (quiet = true)
@@ -499,10 +487,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
-        }
-        finally
-        {
-            groupCache = null;
         }
     }
 
@@ -522,10 +506,6 @@ public class ApiPermissionsHelper extends PermissionsHelper
         catch (IOException | CommandException e)
         {
             throw new RuntimeException(e);
-        }
-        finally
-        {
-            groupCache = null;
         }
     }
 
