@@ -194,6 +194,8 @@ public class ScatterPlotTest extends GenericChartsTest
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.createQuickChart("dbl");
 
+        _ext4Helper.waitForMaskToDisappear();
+
         log("Set X Axis");
         clickButton("Chart Type", 0);
         chartTypeDialog = new ChartTypeDialog(this);
