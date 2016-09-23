@@ -98,7 +98,7 @@ public class Crawler
         _actionsExcludedFromInjection = getExcludedActionsFromInjection();
         for (String project : projects)
         {
-            _urlsToCheck.add(new UrlToCheck(null, "/project/" + EscapeUtil.encode(project) + "/begin.view?", 0));
+            addProject(project);
         }
         _urlsToCheck.add(new UrlToCheck(null, "/project/begin.view?", 0));
     }
@@ -220,6 +220,11 @@ public class Crawler
     public void addExcludedActions(Collection<ControllerActionId> action)
     {
         _excludedActions.addAll(action);
+    }
+
+    public void addProject(String project)
+    {
+        _urlsToCheck.add(new UrlToCheck(null, WebTestHelper.buildRelativeUrl("project", project, "start"), 0));
     }
 
     public void setInjectionCheckEnabled(boolean enabled)

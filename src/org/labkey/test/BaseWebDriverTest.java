@@ -1223,6 +1223,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
             crawler.addExcludedActions(getUncrawlableActions());
             crawler.setInjectionCheckEnabled(isInjectionCheckEnabled());
+            crawler.addProject(getProjectName());
             crawler.crawlAllLinks();
             resumeJsErrorChecker();
         }

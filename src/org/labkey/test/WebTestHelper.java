@@ -290,7 +290,8 @@ public class WebTestHelper
 
         if (containerPath != null)
         {
-            url.append("/");
+            if (!containerPath.startsWith("/"))
+                url.append("/");
             url.append(URIUtil.encodePath(containerPath));
         }
 
