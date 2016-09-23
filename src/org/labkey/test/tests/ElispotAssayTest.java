@@ -92,7 +92,9 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     public static void initProject()
     {
         ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
+        init.pauseJsErrorChecker();
         init.setupFolder();
+        init.resumeJsErrorChecker();
     }
 
     @Before
@@ -160,6 +162,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     @Test
     public void fluorospotTests()
     {
+        pauseJsErrorChecker();
         log("** Initialize Study Folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
         clickButton("Create Study");
@@ -237,6 +240,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickButton("Copy to Study");
         assertTextPresent("All data is marked for copying to study");
         assertTextPresent(STUDY_FOLDER);
+        resumeJsErrorChecker();
 }
 
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
