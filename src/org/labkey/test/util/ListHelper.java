@@ -38,6 +38,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ListHelper extends LabKeySiteWrapper
@@ -527,8 +528,9 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     private void setColumnType(@Nullable String prefix, @Nullable FieldDefinition.LookupInfo lookup, @LoggedParam @Nullable ListColumnType colType, @LoggedParam int i)
     {
+        Locator.XPathLocator typeField = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']");
         // click the combobox trigger image
-        click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
+        click(typeField.append("/../div[contains(@class, 'x-form-trigger-arrow')]"));
         // click lookup checkbox
         _extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
@@ -553,6 +555,20 @@ public class ListHelper extends LabKeySiteWrapper
 
         clickButton("Apply", 0);
         _extHelper.waitForExtDialogToDisappear("Choose Field Type");
+        String actualType = typeField.findElement(getDriver()).getAttribute("value");
+        if (lookup != null)
+        {
+            String expectedType = new StringBuilder()
+                    .append(lookup.getSchema())
+                    .append(".")
+                    .append(lookup.getTable())
+                    .append(" (").toString();
+            assertTrue("Test error: Failed to define lookup column. Expected: " + expectedType + " Actual: " + actualType, actualType.contains(expectedType));
+        }
+        else
+        {
+            assertEquals("Test error: Failed to set column type", colType.toString(), actualType);
+        }
     }
 
     private void selectLookupComboItem(String fieldName, String value)
