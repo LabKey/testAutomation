@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import com.thoughtworks.selenium.webdriven.commands.Click;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -66,6 +67,12 @@ public class SampleSetTest extends BaseWebDriverTest
     private static final String GRANDCHILD_SAMPLE_SET_TSV = "Name\tParent\tOtherProp\n" +
             "SampleSetBVTGrandchildA\tSampleSetBVTChildA,SampleSetBVTChildB\t11.11\n";
 
+    private static final String PROJECT_INVALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV = "Key Col\tParent\n" +
+            "ProjectS1\tSampleSetBVTChildA\n";
+
+    private static final String PROJECT_VALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV = "Key Col\tParent\n" +
+            "ProjectS1\t/SampleSetTestProject/SampleSetTestFolder.FolderChildrenSampleSet.SampleSetBVTChildA\n";
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("experiment");
@@ -93,10 +100,11 @@ public class SampleSetTest extends BaseWebDriverTest
         checkRadioButton(Locator.radioButtonByNameAndValue("uploadType", "file"));
         setFormElement(Locator.tagWithName("input", "file"), TestFileUtils.getSampleData("sampleSet.xlsx").getAbsolutePath());
         waitForFormElementToEqual(Locator.id("idCol1"), "0"); // "KeyCol"
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
-        // TODO: why is the webpart being added multiple times?
         portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
         setFormElement(Locator.id("name"), FOLDER_SAMPLE_SET_NAME);
@@ -304,6 +312,21 @@ public class SampleSetTest extends BaseWebDriverTest
                 "Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
                 "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
                 "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
+
+        // Verify that we can reference samples in other containers by including a folder path
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_SAMPLE_SET_NAME));
+        clickButton("Import More Samples");
+        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
+        setFormElement(Locator.name("data"), PROJECT_INVALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV);
+        clickButton("Submit");
+        assertTextPresent("Could not find parent material with name 'SampleSetBVTChildA'.");
+        setFormElement(Locator.name("data"), PROJECT_VALID_SUBFOLDER_REFERENCE_SAMPLE_SET_TSV);
+        clickButton("Submit");
+        // Verify it got linked up correctly
+        clickAndWait(Locator.linkWithText("ProjectS1"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVTChildA"));
     }
 
     final File experimentFilePath = new File(TestFileUtils.getLabKeyRoot() + PIPELINE_PATH, "experiment.xar.xml");
