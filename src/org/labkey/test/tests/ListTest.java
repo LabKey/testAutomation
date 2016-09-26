@@ -51,6 +51,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 import static org.labkey.test.util.ListHelper.ListColumnType.Boolean;
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
@@ -454,9 +455,9 @@ public class ListTest extends BaseWebDriverTest
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn(_listCol4.getName());
-        _customizeViewsHelper.addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addCustomizeViewSort(_listCol2.getName(), _listCol2.getLabel(), "Ascending");
+        _customizeViewsHelper.removeColumn(_listCol4.getName());
+        _customizeViewsHelper.addFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_listCol2.getName(), _listCol2.getLabel(), SortDirection.ASC);
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check Customize View worked");
@@ -466,11 +467,11 @@ public class ListTest extends BaseWebDriverTest
 
         log("4725: Check Customize View can't remove all fields");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn(LIST_KEY_NAME2);
-        _customizeViewsHelper.removeCustomizeViewColumn(_listCol1.getName());
-        _customizeViewsHelper.removeCustomizeViewColumn(_listCol2.getName());
-        _customizeViewsHelper.removeCustomizeViewColumn(_listCol3.getName());
-        _customizeViewsHelper.removeCustomizeViewColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
+        _customizeViewsHelper.removeColumn(LIST_KEY_NAME2);
+        _customizeViewsHelper.removeColumn(_listCol1.getName());
+        _customizeViewsHelper.removeColumn(_listCol2.getName());
+        _customizeViewsHelper.removeColumn(_listCol3.getName());
+        _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
         _customizeViewsHelper.clickViewGrid();
         if (DataRegionTable.isNewDataRegion)
         {
@@ -480,7 +481,7 @@ public class ListTest extends BaseWebDriverTest
         }
         else
             assertAlert("You must select at least one field to display in the grid.");
-        _customizeViewsHelper.closeCustomizeViewPanel();
+        _customizeViewsHelper.closePanel();
 
         log("Test Export");
 
@@ -553,13 +554,13 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that reference worked");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol1.getName(), _list2Col1.getLabel() + " " + _listCol1.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol2.getName(), _list2Col1.getLabel() + " " + _listCol2.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list2Col1.getName() + "/" + _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
-        _customizeViewsHelper.addCustomizeViewFilter(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
-        _customizeViewsHelper.addCustomizeViewSort(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Ascending");
-        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
-        _customizeViewsHelper.addCustomizeViewColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol1.getName(), _list2Col1.getLabel() + " " + _listCol1.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol2.getName(), _list2Col1.getLabel() + " " + _listCol2.getLabel());
+        _customizeViewsHelper.addColumn(_list2Col1.getName() + "/" + _listCol4.getName(), _list2Col1.getLabel() + " " + _listCol4.getLabel());
+        _customizeViewsHelper.addFilter(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
+        _customizeViewsHelper.addSort(_list2Col1.getName() + "/" + _listCol4.getName(), _listCol4.getLabel(), SortDirection.ASC);
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col1.getName(), _list3Col1.getLabel() + " " + _list3Col1.getLabel());
+        _customizeViewsHelper.addColumn(_list3Col1.getName() + "/" + _list3Col2.getName(), _list3Col1.getLabel() + " " + _list3Col2.getLabel());
         _customizeViewsHelper.saveCustomView(TEST_VIEW);
 
         log("Check adding referenced fields worked");
@@ -595,15 +596,19 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "default");
+        final DataRegionTable dataRegionTable = DataRegion(getDriver()).withName("query").find();
+        dataRegionTable.clickHeaderMenu("Grid Views", "default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
-        checkCheckbox(Locator.checkboxByName(".toggle"));
-        clickButton("Delete", 0);
-        assertAlert("Are you sure you want to delete the selected rows?");
-        waitForTextToDisappear(LIST2_KEY);
-        assertTextNotPresent(LIST2_KEY2, LIST2_KEY3, LIST2_KEY4);
+        dataRegionTable.checkAll();
+        doAndWaitForPageToLoad(() ->
+        {
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete the selected rows?");
+        });
+        assertEquals("Failed to delete all rows", 0, dataRegionTable.getDataRowCount());
+        assertTextNotPresent(LIST2_KEY, LIST2_KEY2, LIST2_KEY3, LIST2_KEY4);
 
         log("Test deleting data (should any list custom views)");
         clickTab("List");
@@ -707,7 +712,7 @@ public class ListTest extends BaseWebDriverTest
         log("verify look column set properly");
         assertTextPresent("one A");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("lookup/Bfk/Cfk/title");
+        _customizeViewsHelper.addColumn("lookup/Bfk/Cfk/title");
         _customizeViewsHelper.saveCustomView();
 
         clickAndWait(Locator.linkContainingText("one C"));
@@ -1103,11 +1108,11 @@ public class ListTest extends BaseWebDriverTest
 
             // show all columns
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addCustomizeViewColumn("Bfk/B", "Bfk B");
-            _customizeViewsHelper.addCustomizeViewColumn("Bfk/title", "Bfk Title");
-            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk", "Bfk Cfk");
-            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk/C", "Bfk Cfk C");
-            _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk/title", "Bfk Cfk Title");
+            _customizeViewsHelper.addColumn("Bfk/B", "Bfk B");
+            _customizeViewsHelper.addColumn("Bfk/title", "Bfk Title");
+            _customizeViewsHelper.addColumn("Bfk/Cfk", "Bfk Cfk");
+            _customizeViewsHelper.addColumn("Bfk/Cfk/C", "Bfk Cfk C");
+            _customizeViewsHelper.addColumn("Bfk/Cfk/title", "Bfk Cfk Title");
             _customizeViewsHelper.saveCustomView("allColumns");
 
             clickAndWait(Locator.linkWithText("one C").index(1));
