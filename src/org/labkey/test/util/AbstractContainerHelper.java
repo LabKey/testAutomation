@@ -331,6 +331,21 @@ public abstract class AbstractContainerHelper
         _test.setFormElement(Locator.name("name"), child);
     }
 
+    public boolean doesFolderExist(String project, String parent, String child)
+    {
+        _test.clickProject(project);
+        if (!parent.equals(project))
+        {
+            _test.clickFolder(parent);
+        }
+        _test.openFolderMenu();
+        if (_test.isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void deleteFolder(String project, @LoggedParam String folderName)
     {
         deleteFolder(project, folderName, _test.WAIT_FOR_PAGE);
