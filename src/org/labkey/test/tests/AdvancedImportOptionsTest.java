@@ -26,6 +26,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     private static final int IMPORT_WAIT_TIME = 60 * 1000;  // This should be a limit of 1 minute.
     private static final boolean EXPECTED_IMPORT_ERRORS = false;
     private static final int EXPECTED_COMPLETED_IMPORT_JOBS = 1;
+    private static final Locator NO_DATA_LOCATOR = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
 
     @Override
     public List<String> getAssociatedModules()
@@ -87,7 +88,10 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        assertTextPresent("Imm001", "immType02", "AdjLabel01");
+        for (String label : new String[]{"Imm001", "Imm003", "Imm002", "AdjLabel01"})
+            waitForElement(Locator.tagWithClassContaining("td", "cell-display").withText(label));
+        for (String label : new String[]{"immType02", "immType01", "immType02"})
+            assertElementPresent(Locator.tagWithClassContaining("td", "cell-display").withText(label));
 
         log("Cleanup and remove the project.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
@@ -132,11 +136,13 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
-        assertTextPresent("No cohort/treatment/timepoint mappings have been defined.");
+        waitForElement(NO_DATA_LOCATOR);
+        assertElementPresent(NO_DATA_LOCATOR, 1);
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        assertTextPresent("No immunogens have been defined.");
+        waitForElement(NO_DATA_LOCATOR);
+        assertElementPresent(NO_DATA_LOCATOR, 2);
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
@@ -196,11 +202,13 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
-        assertTextPresent("No cohort/treatment/timepoint mappings have been defined.");
+        waitForElement(NO_DATA_LOCATOR);
+        assertElementPresent(NO_DATA_LOCATOR, 1);
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        assertTextPresent("No immunogens have been defined.");
+        waitForElement(NO_DATA_LOCATOR);
+        assertElementPresent(NO_DATA_LOCATOR, 2);
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
