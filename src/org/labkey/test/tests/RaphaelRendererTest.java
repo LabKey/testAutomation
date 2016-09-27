@@ -271,6 +271,7 @@ public class RaphaelRendererTest extends BaseWebDriverTest
         clickFolder(GENERIC_CHARTS_FOLDER_NAME);
         waitForText(chartName);
         click(Locator.linkWithText(chartName));
+        _ext4Helper.waitForMaskToDisappear();
         addUrlParameter("useRaphael=true");
         waitForElement(Locator.css("div:not(.thumbnail) > svg"));
         assertSVG(expectedSVG);
