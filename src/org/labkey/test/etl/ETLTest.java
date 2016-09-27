@@ -487,7 +487,7 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.runETL_JobError(selectAllEtl + "NoTargetTx");
         _etlHelper.incrementExpectedErrorCount();
 
-        if (!System.getProperty("databaseType").startsWith("p")) // The real test, which only works on SQL Server
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer) // The real test, which only works on SQL Server
         {
             // There would still be the same error, but row2 should also be inserted.
             _etlHelper.assertInTarget1(row2Name);

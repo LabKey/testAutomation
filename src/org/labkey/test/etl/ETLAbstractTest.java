@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public abstract class ETLAbstractTest extends BaseWebDriverTest
@@ -133,11 +132,13 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
     protected void validatePipelineFileAnalysis(File dir, String jobId, int expectedOutputRows) throws IOException, CommandException
     {
         Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, null, true);
-        String[] expected = WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ?
-                "rowid,container,created,modified,id,name,transformrun,rowversion,diTransformRunId,diModified".split(",")
-                : "rowid,container,created,modified,id,name,transformrun,diTransformRunId,diModified".split(",");
+        List<String> expectedColumns = new ArrayList<>();
+        expectedColumns.addAll(Arrays.asList("rowid", "container", "created", "modified", "id", "name","transformrun"));
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+            expectedColumns.add("rowversion");
+        expectedColumns.addAll(Arrays.asList("diTransformRunId", "diModified", "diModifiedBy", "diCreated", "diCreatedBy"));
         // Validate the initially written tsv file
-        assertArrayEquals("ETL query output file did not contain header", expected, fileRows.first.get(0));
+        assertEquals("ETL query output file did not contain correct header", expectedColumns, Arrays.asList(fileRows.first.get(0)));
         validateFileRow(fileRows.first, 1, "Subject 2");
         validateFileRow(fileRows.first, 2, "Subject 3");
 
