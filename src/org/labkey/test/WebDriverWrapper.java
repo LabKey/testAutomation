@@ -29,6 +29,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
@@ -283,6 +284,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return ((JavascriptExecutor) getDriver()).executeAsyncScript(script, arguments);
     }
 
+    @LogMethod(quiet = true)
     public void resumeJsErrorChecker()
     {
         // Turn on server side logging of client errors.
@@ -293,6 +295,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    @LogMethod(quiet = true)
     public void pauseJsErrorChecker()
     {
         // Turn off server side logging of client errors.
