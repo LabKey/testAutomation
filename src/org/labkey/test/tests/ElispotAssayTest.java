@@ -92,15 +92,18 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     public static void initProject()
     {
         ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
-        init.pauseJsErrorChecker();
         init.setupFolder();
-        init.resumeJsErrorChecker();
     }
 
     @Before
     public void preTest()
     {
+        // There is a jscript error that happens in at this point in the fluorospotTests if it is run immediately after the elispotTests
+        // This error doesn't occur if the test is slowed down, which would imply it is a timing issue.
+        // Because of that flakeyness I'm going to pause the js error checking for now.
+        pauseJsErrorChecker();
         goToProjectHome();
+        resumeJsErrorChecker();
     }
 
     /**
@@ -162,7 +165,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     @Test
     public void fluorospotTests()
     {
-        pauseJsErrorChecker();
         log("** Initialize Study Folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", null);
         clickButton("Create Study");
@@ -240,7 +242,6 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickButton("Copy to Study");
         assertTextPresent("All data is marked for copying to study");
         assertTextPresent(STUDY_FOLDER);
-        resumeJsErrorChecker();
 }
 
     private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
