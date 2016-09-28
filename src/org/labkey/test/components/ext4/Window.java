@@ -27,7 +27,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window extends FloatingComponent<Window.Elements>
+public class Window<EC extends Window.Elements> extends FloatingComponent<EC>
 {
     WebElement _window;
     WebDriverWrapper _driver;
@@ -59,19 +59,19 @@ public class Window extends FloatingComponent<Window.Elements>
     }
 
     @Override
-    public WebElement getComponentElement()
+    public final WebElement getComponentElement()
     {
         return _window;
     }
 
     public void clickButton(String buttonText)
     {
-        getWrapper().clickAndWait(elements().findButton(buttonText));
+        getWrapper().clickAndWait(elementCache().findButton(buttonText));
     }
 
     public void clickButton(String buttonText, int msWait)
     {
-        getWrapper().clickAndWait(elements().findButton(buttonText), msWait);
+        getWrapper().clickAndWait(elementCache().findButton(buttonText), msWait);
     }
 
     public void clickButton(String buttonText, boolean expectClose)
@@ -83,17 +83,17 @@ public class Window extends FloatingComponent<Window.Elements>
 
     public String getTitle()
     {
-        return elements().title.getText();
+        return elementCache().title.getText();
     }
 
     public String getBody()
     {
-        return elements().body.getText();
+        return elementCache().body.getText();
     }
 
     public void close()
     {
-        elements().closeButton.click();
+        elementCache().closeButton.click();
         waitForClose();
     }
 
@@ -116,20 +116,21 @@ public class Window extends FloatingComponent<Window.Elements>
         }, "Window did not close", msWait);
     }
 
+    @Deprecated // Use #elementCache()
     protected Elements elements()
     {
         return super.elementCache();
     }
 
-    protected Elements newElementCache()
+    protected EC newElementCache()
     {
-        return new Elements();
+        return (EC) new Elements();
     }
 
     protected class Elements extends Component.ElementCache
     {
-        WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
-        WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
+        protected WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
+        protected WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
         WebElement closeButton = new LazyWebElement(Locator.css(".x4-window-header .x4-tool-close"), this);
         WebElement findButton(String buttonText)
         {

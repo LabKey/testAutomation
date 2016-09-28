@@ -5,70 +5,57 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ChartQueryDialog<EC extends Component.ElementCache> extends Component<EC>
+public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.ElementCache>
 {
-    private  final String DIALOG_XPATH = "//div[contains(@class, 'chart-wizard-dialog')]//div[contains(@class, 'chart-query-panel')]";
+    public ChartQueryDialog(WebDriver driver)
+    {
+        super("Select a query", driver);
+    }
 
-    protected WebElement _chartQueryDialog;
-    protected BaseWebDriverTest _test;
-
+    @Deprecated
     public ChartQueryDialog(BaseWebDriverTest test)
     {
-        _test = test;
+        this(test.getDriver());
     }
 
-    @Override
-    public WebElement getComponentElement()
-    {
-        return _chartQueryDialog;
-    }
-
-    public boolean isDialogVisible()
-    {
-        return elements().dialog.isDisplayed();
-    }
-
+    @Deprecated // TODO: Remove
     public void waitForDialog()
     {
-        _test.waitForElement(Locator.xpath(DIALOG_XPATH + "//div[text()='Select a query']"));
     }
 
     public void selectSchema(String schemaName)
     {
-        _test._ext4Helper.selectComboBoxItem("Schema:", schemaName);
+        getWrapper()._ext4Helper.selectComboBoxItem("Schema:", schemaName);
     }
 
     public void selectQuery(String queryName)
     {
-        _test._ext4Helper.selectComboBoxItem("Query:", queryName);
+        getWrapper()._ext4Helper.selectComboBoxItem("Query:", queryName);
     }
 
     public void clickCancel()
     {
-        Window w = new Window(elements().dialog, _test.getDriver());
-        w.clickButton("Cancel", 0);
+        clickButton("Cancel", 0);
+        waitForClose();
     }
 
-    public void clickOk()
+    public ChartTypeDialog clickOk()
     {
-        Window w = new Window(elements().dialog, _test.getDriver());
-        w.clickButton("OK", 0);
+        clickButton("OK", 0);
+        waitForClose();
+        return new ChartTypeDialog(getWrapper().getDriver());
     }
 
-    public Elements elements()
+    @Override
+    protected ElementCache newElementCache()
     {
-        return new Elements();
+        return new ElementCache();
     }
 
-    class Elements extends ElementCache
+    class ElementCache extends ChartWizardDialog.ElementCache
     {
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
-
-        public WebElement dialog = new LazyWebElement(Locator.xpath(DIALOG_XPATH), _test.getDriver());
     }
 }

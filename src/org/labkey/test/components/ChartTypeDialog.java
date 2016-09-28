@@ -3,35 +3,33 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ChartTypeDialog<EC extends Component.ElementCache> extends Component<EC>
+public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCache>
 {
+    public ChartTypeDialog(WebDriver driver)
+    {
+        super("Create a plot", driver);
+        Ext4Helper.Locators.ext4Button("Apply").waitForElement(this, 10000);
+    }
 
-    protected WebElement _chartTypeDialog;
-    protected BaseWebDriverTest _test;
-
+    @Deprecated
     public ChartTypeDialog(BaseWebDriverTest test)
     {
-        _test = test;
+        this(test.getDriver());
     }
 
-    public boolean isDialogVisible()
-    {
-        return elements().dialog.isDisplayed();
-    }
-
+    @Deprecated // Does nothing
     public void waitForDialog()
     {
-        _test.waitForElement(Locator.xpath(elements().DIALOG_XPATH + "//div[text()='Create a plot']"));
-        _test.waitForElement(Locator.xpath(elements().DIALOG_XPATH + "//a[contains(@class, 'x4-btn')]//span[text()='Apply']"));
-        _test.sleep(500);
     }
 
     public void setChartType(ChartType chartType)
@@ -39,62 +37,51 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         switch(chartType)
         {
             case Bar:
-                _test.click(elements().plotTypeBar);
+                elementCache().plotTypeBar.click();
                 break;
             case Box:
-                _test.click(elements().plotTypeBox);
+                elementCache().plotTypeBox.click();
                 break;
             case Pie:
-                _test.click(elements().plotTypePie);
+                elementCache().plotTypePie.click();
                 break;
             case Scatter:
-                _test.click(elements().plotTypeScatter);
+                elementCache().plotTypeScatter.click();
                 break;
         }
     }
 
     public boolean isChartTypeEnabled(ChartType chartType)
     {
-        boolean returnValue = false;
         String classValue = "";
 
         switch(chartType)
         {
             case Bar:
-                classValue = elements().plotTypeBar.getAttribute("class");
+                classValue = elementCache().plotTypeBar.getAttribute("class");
                 break;
             case Box:
-                classValue = elements().plotTypeBox.getAttribute("class");
+                classValue = elementCache().plotTypeBox.getAttribute("class");
                 break;
             case Pie:
-                classValue = elements().plotTypePie.getAttribute("class");
+                classValue = elementCache().plotTypePie.getAttribute("class");
                 break;
             case Scatter:
-                classValue = elements().plotTypeScatter.getAttribute("class");
+                classValue = elementCache().plotTypeScatter.getAttribute("class");
                 break;
             default:
                 classValue = "-disabled";
         }
 
         if(classValue.contains("-disabled"))
-            returnValue = false;
+            return false;
         else
-            returnValue = true;
-
-        return returnValue;
+            return true;
     }
 
-    public ArrayList<String> getListOfChartTypes()
+    public List<String> getListOfChartTypes()
     {
-        ArrayList<String> chartTypes = new ArrayList<>();
-        List<WebElement> webElements = Locator.findElements(_test.getDriver(), Locator.xpath(elements().DIALOG_XPATH + "//div[contains(@class, 'types-panel')]//div[contains(@id, 'chart-type')]//div"));
-
-        for(WebElement we : webElements)
-        {
-            chartTypes.add(we.getText());
-        }
-
-        return chartTypes;
+        return getWrapper().getTexts(Locator.xpath("//div[contains(@class, 'types-panel')]//div[contains(@id, 'chart-type')]//div").findElements(this));
     }
 
     public void setXAxis(String columnName)
@@ -105,9 +92,9 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setXAxis(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().xAxis, columnName);
+            setValue(elementCache().xAxis(), columnName);
         else
-            setValue(elements().xAxisDropText, columnName);
+            setValue(elementCache().xAxisDropText, columnName);
     }
 
     public void setYAxis(String columnName)
@@ -118,9 +105,9 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setYAxis(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().yAxis, columnName);
+            setValue(elementCache().yAxis(), columnName);
         else
-            setValue(elements().yAxisDropText, columnName);
+            setValue(elementCache().yAxisDropText, columnName);
     }
 
     public void setCategories(String columnName)
@@ -131,9 +118,9 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setCategories(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().categories, columnName);
+            setValue(elementCache().categories(), columnName);
         else
-            setValue(elements().categoriesDropText, columnName);
+            setValue(elementCache().categoriesDropText, columnName);
     }
 
     public String getCategories()
@@ -142,7 +129,7 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
 
         try
         {
-            return elements().categoriesDisplay.getText();
+            return elementCache().categoriesDisplay().getText();
         }
             catch(org.openqa.selenium.NoSuchElementException nse)
         {
@@ -160,9 +147,9 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setMeasure(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().measure, columnName);
+            setValue(elementCache().measure(), columnName);
         else
-            setValue(elements().measureDropText, columnName);
+            setValue(elementCache().measureDropText, columnName);
     }
 
     public String getMeasure()
@@ -171,7 +158,7 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
 
         try
         {
-            value = elements().measureDisplay.getText();
+            value = elementCache().measureDisplay().getText();
         }
         catch(org.openqa.selenium.NoSuchElementException nse)
         {
@@ -189,9 +176,9 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setColor(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().color, columnName);
+            setValue(elementCache().color(), columnName);
         else
-            setValue(elements().colorDropText, columnName);
+            setValue(elementCache().colorDropText, columnName);
     }
 
     public void setShape(String columnName)
@@ -202,65 +189,68 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public void setShape(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elements().shape, columnName);
+            setValue(elementCache().shape(), columnName);
         else
-            setValue(elements().shapeDropText, columnName);
+            setValue(elementCache().shapeDropText, columnName);
     }
 
-    private void setValue(WebElement element, String columnName)
+    private void setValue(WebElement target, String columnName)
     {
-        _test.click(Locator.xpath("//div[text()='" + columnName + "']"));
-        _test.click(element);
-        _test.waitForFormElementToNotEqual(element.findElement(By.xpath("//div[@class='field-selection-display']")), columnName);
+        elementCache().getColumn(columnName).click();
+        target.click();
+        getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[@class='field-selection-display']")), columnName);
     }
 
     public void removeXAxis()
     {
-        _test.mouseOver(elements().xAxis);
-        removeAttribute(elements().xAxisRemove);
+        getWrapper().mouseOver(elementCache().xAxis());
+        final WebElement remove = elementCache().xAxisRemove();
+        remove.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
     }
 
     public void removeYAxis()
     {
-        _test.mouseOver(elements().yAxis);
-        removeAttribute(elements().yAxisRemove);
+        getWrapper().mouseOver(elementCache().yAxis());
+        final WebElement remove = elementCache().yAxisRemove();
+        remove.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
     }
 
     public void removeColor()
     {
-        _test.mouseOver(elements().color);
-        removeAttribute(elements().colorRemove);
+        getWrapper().mouseOver(elementCache().color());
+        final WebElement remove = elementCache().colorRemove();
+        remove.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
     }
 
     public void removeShape()
     {
-        _test.mouseOver(elements().shape);
-        removeAttribute(elements().shapeRemove);
-    }
-
-    private void removeAttribute(WebElement element)
-    {
-        _test.click(element);
+        getWrapper().mouseOver(elementCache().shape());
+        final WebElement remove = elementCache().shapeRemove();
+        remove.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
     }
 
     public String getXAxisValue()
     {
-        return getFieldValue(elements().xAxis, elements().xAxisDropText);
+        return getFieldValue(elementCache().xAxis(), elementCache().xAxisDropText);
     }
 
     public String getYAxisValue()
     {
-        return getFieldValue(elements().yAxis, elements().yAxisDropText);
+        return getFieldValue(elementCache().yAxis(), elementCache().yAxisDropText);
     }
 
     public String getColorValue()
     {
-        return getFieldValue(elements().color, elements().colorDropText);
+        return getFieldValue(elementCache().color(), elementCache().colorDropText);
     }
 
     public String getShapeValue()
     {
-        return getFieldValue(elements().shape, elements().shapeDropText);
+        return getFieldValue(elementCache().shape(), elementCache().shapeDropText);
     }
 
     // This could be cleaned up to take only one parameter and then try to find the drag and drop element from it.
@@ -292,39 +282,35 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     // change and the mask would not go away.
     public void clickApply(int waitTime)
     {
-        _test.clickButton("Apply", 0);
+        clickButton("Apply", 0);
 
         // If not equal to -1 then the apply should work.
         if(waitTime != -1)
         {
-            _test.sleep(1000);
-            _test._ext4Helper.waitForMaskToDisappear(waitTime);
+            waitForClose();
+            getWrapper().sleep(1000);
+            getWrapper()._ext4Helper.waitForMaskToDisappear(waitTime);
         }
 
-    }
-
-    public void clickCancel()
-    {
-        _test.clickButton("Cancel", 0);
     }
 
     // Should be something like 'Box' or 'Scatter'
     public String getChartTypeTitle()
     {
-        return elements().typeTitle.getText();
+        return elementCache().typeTitle.getText();
     }
 
     // Simply clicks a value int he column list. Can be used to see if the value can be dropped to one of the attributes.
     public void clickColumnValue(String columnValue)
     {
-        _test.click(Locator.xpath("//div[text()='" + columnValue + "']"));
+        elementCache().getColumn(columnValue).click();
     }
 
     public ArrayList<String> getColumnList()
     {
-        String rawText = elements().columnList.getText();
+        String rawText = elementCache().columnList.getText();
         String[] textArray = rawText.split("\n");
-        ArrayList<String> arrayList = new ArrayList<String>(Arrays.asList(textArray));
+        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(textArray));
         arrayList.remove(0); // Remove the first element in the list. This is the title "Columns".
         return arrayList;
     }
@@ -332,7 +318,7 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     public ArrayList<String> getListOfRequiredFields()
     {
         ArrayList<String> requiredFields = new ArrayList<>();
-        List<WebElement> webElements = Locator.findElements(_test.getDriver(), Locator.xpath(elements().DIALOG_XPATH + "//div[contains(@class, 'field-title')]"));
+        List<WebElement> webElements = Locator.xpath("//div[contains(@class, 'field-title')]").findElements(this);
         String temp;
 
         for(WebElement we : webElements)
@@ -351,20 +337,13 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
     }
 
     @Override
-    public WebElement getComponentElement()
+    protected ElementCache newElementCache()
     {
-        return _chartTypeDialog;
+        return new ElementCache();
     }
 
-    public Elements elements()
+    class ElementCache extends ChartWizardDialog.ElementCache
     {
-        return new Elements();
-    }
-
-    class Elements extends ElementCache
-    {
-
-        public final String DIALOG_XPATH = "//div[contains(@class, 'chart-wizard-dialog')]//div[contains(@class, 'chart-type-panel')]";
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
         public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
@@ -377,47 +356,45 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
 
-        protected SearchContext getContext()
+        public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
+
+        public WebElement columnList = new LazyWebElement(Locator.xpath("//div[contains(@class, 'mapping-query-col')]"), this);
+        public WebElement getColumn(String column)
         {
-            return getComponentElement();
+            return Locator.tagWithClass("tr", "x4-grid-data-row").withText(column).waitForElement(columnList, 10000);
         }
+        public WebElement fieldTitles = new LazyWebElement(Locator.xpath("//div[contains(@class, 'field-title')]"), this);
 
-        public WebElement dialog = new LazyWebElement(Locator.xpath(DIALOG_XPATH), _test.getDriver());
-        public WebElement typeTitle = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'type-title')]"), _test.getDriver());
+        public WebElement plotTypeBar = new LazyWebElement(Locator.xpath("//div[@id='chart-type-bar_chart']"),  this);
+        public WebElement plotTypeBox = new LazyWebElement(Locator.xpath("//div[@id='chart-type-box_plot']"),  this);
+        public WebElement plotTypePie = new LazyWebElement(Locator.xpath("//div[@id='chart-type-pie_chart']"),  this);
+        public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath("//div[@id='chart-type-scatter_plot']"),  this);
 
-        public WebElement columnList = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'mapping-query-col')]"), _test.getDriver());
-        public WebElement fieldTitles = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[contains(@class, 'field-title')]"), _test.getDriver());
+        public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xAxisDropText = new LazyWebElement(Locator.xpath(XAXIS_CONTAINER + DROP_TEXT),  this);
+        public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
-        public WebElement plotTypeBar = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-bar_chart']"),  _test.getDriver());
-        public WebElement plotTypeBox = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-box_plot']"),  _test.getDriver());
-        public WebElement plotTypePie = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-pie_chart']"),  _test.getDriver());
-        public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath(DIALOG_XPATH + "//div[@id='chart-type-scatter_plot']"),  _test.getDriver());
+        public WebElement yAxis() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(YAXIS_CONTAINER + DROP_TEXT),  this);
+        public WebElement yAxisRemove() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
-        public WebElement xAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + XAXIS_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement xAxisDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + XAXIS_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement xAxisRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+        public WebElement categories() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement categoriesDisplay() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
+        public WebElement categoriesDropText = new LazyWebElement(Locator.xpath(CATEGORIES_CONTAINER + DROP_TEXT),  this);
+        public WebElement categoriesRemove() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
-        public WebElement yAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement yAxisRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+        public WebElement measure() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement measureDisplay() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
+        public WebElement measureDropText = new LazyWebElement(Locator.xpath(MEASURE_CONTAINER + DROP_TEXT),  this);
+        public WebElement measureRemove() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
-        public WebElement categories = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement categoriesDisplay = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA + FIELD_DISPLAY),  _test.getDriver());
-        public WebElement categoriesDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement categoriesRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+        public WebElement color() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement colorDropText = new LazyWebElement(Locator.xpath(COLOR_CONTAINER + DROP_TEXT),  this);
+        public WebElement colorRemove() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
-        public WebElement measure = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement measureDisplay = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA + FIELD_DISPLAY),  _test.getDriver());
-        public WebElement measureDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement measureRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
-
-        public WebElement color = new LazyWebElement(Locator.xpath(DIALOG_XPATH + COLOR_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement colorDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + COLOR_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement colorRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + COLOR_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
-
-        public WebElement shape = new LazyWebElement(Locator.xpath(DIALOG_XPATH + SHAPE_CONTAINER + FIELD_AREA),  _test.getDriver());
-        public WebElement shapeDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + SHAPE_CONTAINER + DROP_TEXT),  _test.getDriver());
-        public WebElement shapeRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + SHAPE_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+        public WebElement shape() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement shapeDropText = new LazyWebElement(Locator.xpath(SHAPE_CONTAINER + DROP_TEXT),  this);
+        public WebElement shapeRemove() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
     }
 
     public enum ChartType
