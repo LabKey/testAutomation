@@ -280,15 +280,31 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.assertInTarget2("Sproc Subject 1", "Sproc Subject 2");
     }
 
+
+    private final String INSERTED_ID1 = "id1";
+    private final String INSERTED_NAME1 = "name1";
     @Test
     public void testColumnMapping()
     {
-        _etlHelper.insertSourceRow("id1", "name1", null);
-        _etlHelper.runETL("appendMappedColumns");
+        // The id and name fields should be swapped by the mapping in the etl
+        verifyColumnTransform("appendMappedColumns", INSERTED_NAME1, INSERTED_ID1);
+    }
+
+    @Test
+    public void testColumnTransforms()
+    {
+        // A bit more complex. Name field is compound of id, name, and a constant set in the xml. Id field should be blank.
+        String expectedName = INSERTED_ID1 + "_" + INSERTED_NAME1 + "_" + "aConstantValue";
+        verifyColumnTransform("appendTransformedColumn", null, expectedName);
+    }
+
+    private void verifyColumnTransform(String etl, String expectedId, String expectedName)
+    {
+        _etlHelper.insertSourceRow(INSERTED_ID1, INSERTED_NAME1, null);
+        _etlHelper.runETL(etl);
         Map<String, Object> result = executeSelectRowCommand("vehicle", "etl_target").getRows().get(0);
-        // The id and name fields should have been swapped by the mapping in the etl
-        assertEquals("Wrong mapped value for id field", "name1", result.get("id"));
-        assertEquals("Wrong mapped value for name field", "id1", result.get("name"));
+        assertEquals("Wrong transformed value for id field", expectedId, result.get("id"));
+        assertEquals("Wrong transformed value for name field", expectedName, result.get("name"));
     }
 
     @Test
