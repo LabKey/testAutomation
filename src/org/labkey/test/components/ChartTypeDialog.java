@@ -123,6 +123,64 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
             setValue(elements().yAxisDropText, columnName);
     }
 
+    public void setCategories(String columnName)
+    {
+        setCategories(columnName, false);
+    }
+
+    public void setCategories(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setValue(elements().categories, columnName);
+        else
+            setValue(elements().categoriesDropText, columnName);
+    }
+
+    public String getCategories()
+    {
+        String value;
+
+        try
+        {
+            return elements().categoriesDisplay.getText();
+        }
+            catch(org.openqa.selenium.NoSuchElementException nse)
+        {
+            value = "";
+        }
+
+        return value;
+    }
+
+    public void setMeasure(String columnName)
+    {
+        setMeasure(columnName, false);
+    }
+
+    public void setMeasure(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setValue(elements().measure, columnName);
+        else
+            setValue(elements().measureDropText, columnName);
+    }
+
+    public String getMeasure()
+    {
+        String value;
+
+        try
+        {
+            value = elements().measureDisplay.getText();
+        }
+        catch(org.openqa.selenium.NoSuchElementException nse)
+        {
+            value = "";
+        }
+
+        return value;
+    }
+
     public void setColor(String columnName)
     {
         setColor(columnName, false);
@@ -309,12 +367,15 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         public final String DIALOG_XPATH = "//div[contains(@class, 'chart-wizard-dialog')]//div[contains(@class, 'chart-type-panel')]";
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
+        public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
+        public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
         public final String COLOR_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Color')]";
         public final String SHAPE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]";
 
         public final String FIELD_AREA = "/following-sibling::div[contains(@class, 'field-area ')]";
+        public final String FIELD_DISPLAY = "//div[@class='field-selection-display']";
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
-        public final String REMOVE_ICON = "//div[@class='field-selection-display']//div[contains(@class, 'field-selection-remove')]";
+        public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
 
         protected SearchContext getContext()
         {
@@ -339,6 +400,16 @@ public class ChartTypeDialog<EC extends Component.ElementCache> extends Componen
         public WebElement yAxis = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + FIELD_AREA),  _test.getDriver());
         public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + DROP_TEXT),  _test.getDriver());
         public WebElement yAxisRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+
+        public WebElement categories = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA),  _test.getDriver());
+        public WebElement categoriesDisplay = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA + FIELD_DISPLAY),  _test.getDriver());
+        public WebElement categoriesDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + DROP_TEXT),  _test.getDriver());
+        public WebElement categoriesRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + CATEGORIES_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
+
+        public WebElement measure = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA),  _test.getDriver());
+        public WebElement measureDisplay = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA + FIELD_DISPLAY),  _test.getDriver());
+        public WebElement measureDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + DROP_TEXT),  _test.getDriver());
+        public WebElement measureRemove = new LazyWebElement(Locator.xpath(DIALOG_XPATH + MEASURE_CONTAINER + FIELD_AREA + REMOVE_ICON),  _test.getDriver());
 
         public WebElement color = new LazyWebElement(Locator.xpath(DIALOG_XPATH + COLOR_CONTAINER + FIELD_AREA),  _test.getDriver());
         public WebElement colorDropText = new LazyWebElement(Locator.xpath(DIALOG_XPATH + COLOR_CONTAINER + DROP_TEXT),  _test.getDriver());

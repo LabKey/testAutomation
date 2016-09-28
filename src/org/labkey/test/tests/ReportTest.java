@@ -119,8 +119,33 @@ public abstract class ReportTest extends StudyBaseTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
     }
 
+    protected void clickAddChart(ChartTypes chartType)
+    {
+        clickAddChart(chartType.getMenuText());
+    }
+
     protected void clickAddChart(String reportName)
     {
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), reportName);
+    }
+
+    public static enum ChartTypes
+    {
+        BAR("Bar Plot"),
+        BOX("Box Plot"),
+        PIE("Pie Chart"),
+        SCATTER("Scatter Plot"),
+        TIME("Time Chart");
+
+        private String menuTextValue;
+        ChartTypes(String menuText)
+        {
+            menuTextValue = menuText;
+        }
+
+        public String getMenuText()
+        {
+            return menuTextValue;
+        }
     }
 }

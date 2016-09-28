@@ -2421,6 +2421,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    public String getSVGText()
+    {
+        return getSVGText(0);
+    }
+
+    public String getSVGText(final int svgIndex)
+    {
+        final Locator svgLoc = Locator.css("div:not(.thumbnail) > svg").index(svgIndex);
+
+        waitFor(() -> { return isElementPresent(svgLoc);}, WAIT_FOR_JAVASCRIPT);
+
+        return prepareSvgText(getText(svgLoc));
+
+    }
+
     public String waitForWikiDivPopulation(String testDivName, int waitSeconds)
     {
         while (waitSeconds-- > 0)

@@ -627,6 +627,7 @@ src/org/labkey/test/tests/NabMultiVirusPlateTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
 src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
+src/org/labkey/test/tests/PieChartTest.java -text
 src/org/labkey/test/tests/PipelineCancelTest.java -text
 src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
