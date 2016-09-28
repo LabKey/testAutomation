@@ -16,10 +16,11 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.ChartLayoutDialog;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -79,14 +80,6 @@ public abstract class GenericChartsTest extends ReportTest
 
     protected abstract void testPlots();
 
-    protected void clickDialogButtonAndWaitForMaskToDisappear(String dialogTitle, String btnTxt)
-    {
-        _ext4Helper.clickWindowButton(dialogTitle, btnTxt, 0, 0);
-        _extHelper.waitForExtDialogToDisappear(dialogTitle);
-        sleep(500);
-        _ext4Helper.waitForMaskToDisappear();
-    }
-
     @LogMethod
     protected void savePlot(String name, String description)
     {
@@ -126,9 +119,15 @@ public abstract class GenericChartsTest extends ReportTest
         sleep(2500); // sleep while the save success message shows
     }
 
-    protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)
+    protected ChartLayoutDialog clickChartLayoutButton()
     {
-        click(Ext4Helper.Locators.ext4Button(btnTxt));
-        _extHelper.waitForExtDialog(dialogTitle);
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        return new ChartLayoutDialog(getDriver());
+    }
+
+    protected ChartTypeDialog clickChartTypeButton()
+    {
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Type").enabled()).click();
+        return new ChartTypeDialog(getDriver());
     }
 }

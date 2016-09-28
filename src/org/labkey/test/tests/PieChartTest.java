@@ -53,15 +53,12 @@ public class PieChartTest extends GenericChartsTest
         goToManageViews();
         clickAddChart(ChartTypes.PIE);
 
-        queryDialog = new ChartQueryDialog(this);
-        queryDialog.waitForDialog();
+        queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectSchema("study");
         queryDialog.selectQuery(AE_1_QUERY_NAME);
-        queryDialog.clickOk();
+        chartTypeDialog = queryDialog.clickOk();
 
         log("Set the minimal attributes necessary to create a pie chart.");
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
         chartTypeDialog.setCategories(PIE_CHART_CATEGORY);
         chartTypeDialog.clickApply();
 
@@ -78,10 +75,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected ')18%11%5%5%5%5%I'", svgText.contains(")18%11%5%5%5%5%I"));
 
         log("Now add a measure to the pie chart.");
-        clickButton("Chart Type", 0);
-
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setMeasure(PIE_CHART_MEASURE);
         chartTypeDialog.clickApply();
 
@@ -241,10 +235,7 @@ public class PieChartTest extends GenericChartsTest
 
         waitForElement(Locator.css("svg"));
 
-        clickButton("Chart Type", 0);
-
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = clickChartTypeButton();
 
         strTemp = chartTypeDialog.getCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_PIE + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_PIE.toLowerCase()));
@@ -304,7 +295,6 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK + "' ", exportedScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK.toLowerCase()));
 
         clickButton("Close", 0);
-
     }
 
 }

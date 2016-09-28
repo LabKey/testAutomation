@@ -57,13 +57,10 @@ public class BoxPlotTest extends GenericChartsTest
         goToManageViews();
         clickAddChart("Box Plot");
 
-        ChartQueryDialog queryDialog = new ChartQueryDialog(this);
-        queryDialog.waitForDialog();
+        ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectQuery("RCF-1 (RCF-1: Reactogenicity-Day 2)");
-        queryDialog.clickOk();
+        chartTypeDialog = queryDialog.clickOk();
 
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
         chartTypeDialog.setYAxis("4c.Induration 1st measure");
         chartTypeDialog.clickApply();
 
@@ -71,28 +68,23 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_1);
 
         log("Set Plot Title");
-        clickChartLayoutButton();
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = clickChartLayoutButton();
         chartLayoutDialog.setPlotTitle(CHART_TITLE);
         chartLayoutDialog.clickYAxisTab();
         chartLayoutDialog.setScaleType(ChartLayoutDialog.ScaleType.Log);
         chartLayoutDialog.setYAxisLabel("TestYAxis");
         chartLayoutDialog.clickApply();
 
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setYAxis("2.Body temperature", true);
         chartTypeDialog.clickApply();
 
         log("Set X Axis");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(this);
+        chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
         chartTypeDialog.clickApply();
 
-        clickChartLayoutButton();
-        chartLayoutDialog = new ChartLayoutDialog(this);
+        chartLayoutDialog = clickChartLayoutButton();
         chartLayoutDialog.clickXAxisTab();
         chartLayoutDialog.setXAxisLabel("TestXAxis");
         chartLayoutDialog.clickApply();
@@ -134,8 +126,7 @@ public class BoxPlotTest extends GenericChartsTest
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
         datasetTable.clickHeaderMenu("Charts", "Create Box Plot");
 
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setYAxis("2.Body temperature");
         chartTypeDialog.clickApply();
 
@@ -151,9 +142,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
-        clickChartLayoutButton();
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = clickChartLayoutButton();
         chartLayoutDialog.clickDeveloperTab();
         chartLayoutDialog.clickDeveloperEnable();
         chartLayoutDialog.clickApply();
@@ -186,11 +175,5 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_QC);
 
         savePlot(BOX_PLOT_NAME_QC, BOX_PLOT_DESC_QC);
-    }
-
-    private void clickChartLayoutButton()
-    {
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled());
-        clickButton("Chart Layout", 0);
     }
 }
