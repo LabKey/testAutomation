@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ChartLayoutDialog;
@@ -72,7 +73,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
 
         log("Validate that the correct number of % values are shown.");
-        percentCount = org.springframework.util.StringUtils.countOccurrencesOf(svgText, "%");
+        percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 6 '%' in the svg, found " + percentCount, 6, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected ')18%11%5%5%5%5%I'", svgText.contains(")18%11%5%5%5%5%I"));
 
@@ -95,7 +96,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
 
         log("The percentage values displayed should have changed when a measure is applied.");
-        percentCount = org.springframework.util.StringUtils.countOccurrencesOf(svgText, "%");
+        percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 6 '%' in the svg, found " + percentCount, 9, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%5%5%7%5%6%5%5%I'", svgText.contains("d25%9%5%5%7%5%6%5%5%I"));
 
@@ -121,7 +122,7 @@ public class PieChartTest extends GenericChartsTest
         sleep(3000);  // Is there a better trigger?
 
         svgText = getSVGText();
-        percentCount = org.springframework.util.StringUtils.countOccurrencesOf(svgText, "%");
+        percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should be no '%' values in the svg, found " + percentCount, 0, percentCount);
 
         clickButton("Chart Layout", 0);
@@ -149,7 +150,7 @@ public class PieChartTest extends GenericChartsTest
         sleep(3000);  // Is there a better trigger?
 
         svgText = getSVGText();
-        percentCount = org.springframework.util.StringUtils.countOccurrencesOf(svgText, "%");
+        percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 3 '%' in the svg, found " + percentCount, 3, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
 
@@ -173,7 +174,7 @@ public class PieChartTest extends GenericChartsTest
         log("Last scgText: " + svgText);
 
         // There is one extra % because of the TRICKY_CHARACTERS used in the title.
-        percentCount = org.springframework.util.StringUtils.countOccurrencesOf(svgText, "%");
+        percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 4 '%' in the svg, found " + percentCount, 4, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
         Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE.replace(" ", "")));
@@ -185,6 +186,7 @@ public class PieChartTest extends GenericChartsTest
         savePlot(PIE_CHART_SAVE_NAME, PIE_CHART_SAVE_DESC);
 
     }
+
     @LogMethod
     private void doColumnChartClickThrough()
     {
