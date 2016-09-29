@@ -95,6 +95,11 @@ public class Table extends Component
         return getColumnHeaderElements(1);
     }
 
+    public List<WebElement> getColumnHeaderElementsByTag()
+    {
+        return getComponentElement().findElements(By.xpath(".//tr/th"));
+    }
+
     public int getColumnIndex(String headerLabel, int headerIndex)
     {
         //List is zero based, locators that are going to depend on this are 1
