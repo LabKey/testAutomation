@@ -404,6 +404,8 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.runETL_API(MERGE_ETL);
         // Check the ETL works at all
         _etlHelper.assertInTarget2(PREFIX + "1");
+        verifyCreatedMatchesSource();
+
         _etlHelper.insertSourceRow("610", PREFIX + "2", null);
         final String newNameForRow1 = "newNameForRow1";
         _etlHelper.editSourceRow(0, null, newNameForRow1, null);
@@ -413,6 +415,14 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.assertInTarget2(PREFIX + "2", newNameForRow1);
         // Check we really did UPDATE and not insert a new one
         _etlHelper.assertNotInTarget2(PREFIX + "1");
+        verifyCreatedMatchesSource();
+    }
+
+    private void verifyCreatedMatchesSource()
+    {
+        Object target2created = executeSelectRowCommand("vehicle", "etl_target2").getRows().get(0).get("Created");
+        Object sourceCreated = executeSelectRowCommand("vehicle", "etl_source").getRows().get(0).get("Created");
+        assertEquals("Created field in target2 did not match source", sourceCreated, target2created);
     }
 
     @Test
