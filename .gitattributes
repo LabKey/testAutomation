@@ -431,7 +431,9 @@ src/org/labkey/test/components/D3PieChart.java -text
 src/org/labkey/test/components/FloatingComponent.java -text
 src/org/labkey/test/components/IssueListDefDataRegion.java -text
 src/org/labkey/test/components/ListsWebPart.java -text
+src/org/labkey/test/components/LookAndFeelBarPlot.java -text
 src/org/labkey/test/components/LookAndFeelBoxPlot.java -text
+src/org/labkey/test/components/LookAndFeelPieChart.java -text
 src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/PropertiesEditor.java -text

@@ -10,7 +10,7 @@ import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
-import org.labkey.test.components.LookAndFeelBoxPlot;
+import org.labkey.test.components.LookAndFeelBarPlot;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -24,7 +24,7 @@ public class BarPlotTest extends GenericChartsTest
 
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";
     private final String BP_DIASTOLIC = "3. BP diastolic /xxx";
-    private final String BOX_PLOT_SAVE_NAME = "Simple Bar Plot test";
+    private final String BAR_PLOT_SAVE_NAME = "Simple Bar Plot test";
 
     @LogMethod
     protected void testPlots()
@@ -49,7 +49,7 @@ public class BarPlotTest extends GenericChartsTest
 
         ChartQueryDialog queryDialog;
         ChartTypeDialog chartTypeDialog;
-        LookAndFeelBoxPlot lookAndFeelDialog;
+        LookAndFeelBarPlot lookAndFeelDialog;
 
         String strTemp, svgDefaultHeight, svgDefaultWidth;
 
@@ -80,7 +80,7 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Change some of the look and feel settings.");
         clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
         lookAndFeelDialog.setPlotTitle(CHART_TITLE)
                 .setFillColor(COLOR_RED)
                 .setLineColor(COLOR_BLUE)
@@ -120,7 +120,7 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Change some more of the look and feel.");
         clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
         lookAndFeelDialog.setFillColor(COLOR_GREEN)
                 .setLineColor(COLOR_RED)
                 .setPlotWidth("")
@@ -142,7 +142,7 @@ public class BarPlotTest extends GenericChartsTest
         Assert.assertEquals("Stroke-width not as expected.", "5", getAttribute(Locator.css("svg a.bar-individual rect.bar-rect"), "stroke-width"));
 
         log("Save the plot.");
-        savePlot(BOX_PLOT_SAVE_NAME, "This is a box plot from the simple box plot test.");
+        savePlot(BAR_PLOT_SAVE_NAME, "This is a bar plot from the simple bar plot test.");
 
     }
 
@@ -207,7 +207,7 @@ public class BarPlotTest extends GenericChartsTest
         chartTypeDialog.clickCancel();
 
         clickButton("Chart Layout", 0);
-        chartLayoutDialog = new LookAndFeelBoxPlot(getDriver());
+        chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
 
         strTemp = chartLayoutDialog.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
@@ -230,8 +230,8 @@ public class BarPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(BOX_PLOT_SAVE_NAME));
-        clickAndWait(Locator.linkWithText(BOX_PLOT_SAVE_NAME), WAIT_FOR_PAGE);
+        waitForElement(Locator.linkWithText(BAR_PLOT_SAVE_NAME));
+        clickAndWait(Locator.linkWithText(BAR_PLOT_SAVE_NAME), WAIT_FOR_PAGE);
 
         waitForElement(Locator.css("svg"));
 
@@ -300,7 +300,7 @@ public class BarPlotTest extends GenericChartsTest
         chartTypeDialog.clickCancel();
 
         clickButton("Chart Layout", 0);
-        chartLayoutDialog = new LookAndFeelBoxPlot(getDriver());
+        chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
 
         strTemp = chartLayoutDialog.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));

@@ -20,7 +20,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.components.ChartLayoutDialog;
+//import org.labkey.test.components.ChartLayoutDialog;
+import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
@@ -50,7 +51,7 @@ public class BoxPlotTest extends GenericChartsTest
     private void doManageViewsBoxPlotTest()
     {
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelBoxPlot lookAndFeelBoxPlot;
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -68,12 +69,13 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_1);
 
         log("Set Plot Title");
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.setPlotTitle(CHART_TITLE);
-        chartLayoutDialog.clickYAxisTab();
-        chartLayoutDialog.setScaleType(ChartLayoutDialog.ScaleType.Log);
-        chartLayoutDialog.setYAxisLabel("TestYAxis");
-        chartLayoutDialog.clickApply();
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelBoxPlot.setPlotTitle(CHART_TITLE)
+                .clickYAxisTab()
+                .setYAxisScale(LookAndFeelBoxPlot.ScaleType.Log)
+                .setYAxisLabel("TestYAxis")
+                .clickApply();
 
         chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setYAxis("2.Body temperature", true);
@@ -84,10 +86,10 @@ public class BoxPlotTest extends GenericChartsTest
         chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
         chartTypeDialog.clickApply();
 
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickXAxisTab();
-        chartLayoutDialog.setXAxisLabel("TestXAxis");
-        chartLayoutDialog.clickApply();
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelBoxPlot.setXAxisLabel("TestXAxis")
+                .clickApply();
 
         assertSVG(BOX_PLOT_MV_2);
 
@@ -117,7 +119,7 @@ public class BoxPlotTest extends GenericChartsTest
     private void doDataRegionBoxPlotTest()
     {
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelBoxPlot lookAndFeelBoxPlot;
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -142,10 +144,12 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickDeveloperTab();
-        chartLayoutDialog.clickDeveloperEnable();
-        chartLayoutDialog.clickApply();
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
+        lookAndFeelBoxPlot.clickDeveloperTab()
+                .clickDeveloperEnable()
+                .clickApply();
+
         Locator svgPathLoc = Locator.css("svg a path");
 
         // We need to specifically click the last element because those are the outliers.

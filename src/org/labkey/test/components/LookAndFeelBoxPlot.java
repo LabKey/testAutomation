@@ -30,6 +30,47 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
         super.setPlotHeight(height);
         return this;
     }
+    public LookAndFeelBoxPlot clickGeneralTab()
+    {
+        super.clickGeneralTab();
+        return this;
+    }
+
+    public LookAndFeelBoxPlot clickXAxisTab()
+    {
+        super.clickXAxisTab();
+        return this;
+    }
+
+    public LookAndFeelBoxPlot clickYAxisTab()
+    {
+        super.clickYAxisTab();
+        return this;
+    }
+
+    public LookAndFeelBoxPlot setXAxisLabel(String label)
+    {
+        super.setXAxisLabel(label);
+        return this;
+    }
+
+    public LookAndFeelBoxPlot setXAxisScale(ScaleType scaleType)
+    {
+        super.setXAxisScale(scaleType);
+        return this;
+    }
+
+    public LookAndFeelBoxPlot setYAxisLabel(String label)
+    {
+        super.setYAxisLabel(label);
+        return this;
+    }
+
+    public LookAndFeelBoxPlot setYAxisScale(ScaleType scaleType)
+    {
+        super.setYAxisScale(scaleType);
+        return this;
+    }
 
     public LookAndFeelBoxPlot setLineWidth(int lineWidth)
     {
@@ -57,6 +98,45 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
         return getSliderCurrentValue(elementCache().opacitySlider);
     }
 
+    public LookAndFeelBoxPlot setPointSize(int lineWidth)
+    {
+        clickGeneralTab();
+        setSliderValue(elementCache().pointSizeSlider, lineWidth);
+        return this;
+    }
+
+    public int getPointSize()
+    {
+        clickGeneralTab();
+        return getSliderCurrentValue(elementCache().pointSizeSlider);
+    }
+
+    public LookAndFeelBoxPlot clickJitterPoints()
+    {
+        clickGeneralTab();
+        getWrapper().click(elementCache().jitterPointsCheckbox);
+        return this;
+    }
+
+    public boolean jitterPointsChecked()
+    {
+        String classValue;
+
+        classValue = elementCache().jitterPointsCheckboxValue.getAttribute("class");
+
+        if(classValue.toLowerCase().contains("x4-form-cb-checked"))
+            return true;
+        else
+            return false;
+    }
+
+    public LookAndFeelBoxPlot setPointColor(String hexColorValue)
+    {
+        clickGeneralTab();
+        setColor("Point Color:", hexColorValue);
+        return this;
+    }
+
     public LookAndFeelBoxPlot setLineColor(String hexColorValue)
     {
         clickGeneralTab();
@@ -79,7 +159,10 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
     
     class ElementCache extends ChartLayoutDialog.ElementCache
     {
+        public WebElement jitterPointsCheckbox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Jitter Points:']/parent::td/following-sibling::td//input"), this);
+        public WebElement jitterPointsCheckboxValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Jitter Points:']/ancestor::table"), this);
         public WebElement lineWidthSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Line Width:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement opacitySlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Opacity:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
+        public WebElement pointSizeSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Point Size:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
     }
 }

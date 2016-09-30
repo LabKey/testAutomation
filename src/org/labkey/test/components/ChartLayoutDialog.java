@@ -32,24 +32,28 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return getWrapper().getTexts(Locator.xpath("//div[contains(@class, 'navigation-panel')]//div[contains(@class, 'item')]").findElements(this));
     }
 
-    public void clickGeneralTab()
+    public ChartLayoutDialog clickGeneralTab()
     {
         clickTab(elementCache().generalTab);
+        return this;
     }
 
-    public void clickXAxisTab()
+    public ChartLayoutDialog clickXAxisTab()
     {
         clickTab(elementCache().xAxisTab);
+        return this;
     }
 
-    public void clickYAxisTab()
+    public ChartLayoutDialog clickYAxisTab()
     {
         clickTab(elementCache().yAxisTab);
+        return this;
     }
 
-    public void clickDeveloperTab()
+    public ChartLayoutDialog clickDeveloperTab()
     {
         clickTab(elementCache().developerTab);
+        return this;
     }
 
     private void clickTab(WebElement tabElement)
@@ -71,10 +75,18 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         }
     }
 
-    public void setXAxisLabel(String label)
+    public ChartLayoutDialog setXAxisScale(ScaleType scaleType)
+    {
+        clickXAxisTab();
+        setScaleType(scaleType);
+        return this;
+    }
+
+    public ChartLayoutDialog setXAxisLabel(String label)
     {
         clickXAxisTab();
         setLabel(label);
+        return this;
     }
 
     public String getXAxisLabel()
@@ -83,10 +95,18 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return getWrapper().getFormElement(elementCache().visibleLabelTextBox);
     }
 
-    public void setYAxisLabel(String label)
+    public ChartLayoutDialog setYAxisScale(ScaleType scaleType)
+    {
+        clickYAxisTab();
+        setScaleType(scaleType);
+        return this;
+    }
+
+    public ChartLayoutDialog setYAxisLabel(String label)
     {
         clickYAxisTab();
         setLabel(label);
+        return this;
     }
 
     public String getYAxisLabel()
@@ -111,30 +131,6 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     {
         clickGeneralTab();
         return getWrapper().getFormElement(elementCache().plotTitleTextBox);
-    }
-
-    public void setPlotSubTitle(String subTitle)
-    {
-        clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotSubTitleTextBox, subTitle);
-    }
-
-    public String getPlotSubTitle()
-    {
-        clickGeneralTab();
-        return getWrapper().getFormElement(elementCache().plotSubTitleTextBox);
-    }
-
-    public void setPlotFooter(String footer)
-    {
-        clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotFooterTextBox, footer);
-    }
-
-    public String getPlotFooter()
-    {
-        clickGeneralTab();
-        return getWrapper().getFormElement(elementCache().plotFooterTextBox);
     }
 
     public ChartLayoutDialog setPlotWidth(String width)
@@ -163,88 +159,10 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return Integer.parseInt(getWrapper().getFormElement(elementCache().plotHeightTextBox));
     }
 
-    public void setHidePercentageWhen(String width)
-    {
-        clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotHidePercentTextBox, width);
-    }
-
-    public String getHidePercentageWhen()
-    {
-        clickGeneralTab();
-        return getWrapper().getFormElement(elementCache().plotHidePercentTextBox);
-    }
-
-    public void clickShowPercentages()
-    {
-        clickGeneralTab();
-        getWrapper().click(elementCache().showPercentagesCheckbox);
-    }
-
-    public boolean showPercentagesChecked()
-    {
-        String classValue;
-
-        clickGeneralTab();
-
-        classValue = elementCache().showPercentagesCheckboxValue.getAttribute("class");
-
-        if(classValue.toLowerCase().contains("x4-form-cb-checked"))
-            return true;
-        else
-            return false;
-    }
-
-    public void setGradientColor(String hexColorValue)
-    {
-        setColor("Gradient Color:", hexColorValue);
-    }
-
-    public void setPercentagesColor(String hexColorValue)
-    {
-        setColor("Percentages Color:", hexColorValue);
-    }
-
     protected void setColor(String colorLabel, String hexColorValue)
     {
         String tempStr = hexColorValue.replace("#", "").toUpperCase();
         getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = '" + colorLabel + "']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
-    }
-
-    public void setInnerRadiusPercentage(int radiusValue)
-    {
-        clickGeneralTab();
-        setSliderValue(elementCache().innerRadiusSlider, radiusValue);
-    }
-
-    public int getInnerRadiusPercentage()
-    {
-        clickGeneralTab();
-        return getSliderCurrentValue(elementCache().innerRadiusSlider);
-    }
-
-    public void setOuterRadiusPercentage(int radiusValue)
-    {
-        clickGeneralTab();
-        setSliderValue(elementCache().outerRadiusSlider, radiusValue);
-    }
-
-    public int getOuterRadiusPercentage()
-    {
-        clickGeneralTab();
-        return getSliderCurrentValue(elementCache().outerRadiusSlider);
-    }
-
-    public void setGradientPercentage(int radiusValue)
-    {
-        clickGeneralTab();
-        setSliderValue(elementCache().gradientSlider, radiusValue);
-    }
-
-    public int getGradientPercentage()
-    {
-        clickGeneralTab();
-        return getSliderCurrentValue(elementCache().gradientSlider);
     }
 
     protected void setSliderValue(WebElement sliderElement, int newValue)
@@ -286,24 +204,15 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return Integer.parseInt(sliderValue.getAttribute("aria-valuenow"));
     }
 
-    public void setColorPalette(ColorPalette paletteValue)
-    {
-        getWrapper()._ext4Helper.selectComboBoxItem("Color palette:", paletteValue.dropDownText());
-    }
-
-    public String getColorPalette()
-    {
-        return elementCache().colorPalette.getAttribute("value");
-    }
-
-    public void clickDeveloperEnable()
+    public ChartLayoutDialog clickDeveloperEnable()
     {
         clickDeveloperTab();
         getWrapper().clickButton("Enable", 0);
         getWrapper().waitForText("// use LABKEY.ActionURL.buildURL to generate a link");
+        return this;
     }
 
-    public void clickDeveloperDisable(boolean clickYes)
+    public ChartLayoutDialog clickDeveloperDisable(boolean clickYes)
     {
         clickDeveloperTab();
         getWrapper().clickButton("Disable", 0);
@@ -318,12 +227,14 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
             getWrapper().clickButton("No", 0);
         }
 
+        return this;
     }
 
-    public void clickDeveloperSourceTab()
+    public ChartLayoutDialog clickDeveloperSourceTab()
     {
         clickDeveloperTab();
         getWrapper()._ext4Helper.clickTabContainingText("Source");
+        return this;
     }
 
     public String getDeveloperSourceContent()
@@ -332,16 +243,18 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return getWrapper()._extHelper.getCodeMirrorValue("point-click-fn-textarea");
     }
 
-    public void setDeveloperSourceContent(String source)
+    public ChartLayoutDialog setDeveloperSourceContent(String source)
     {
         clickDeveloperSourceTab();
         getWrapper()._extHelper.setCodeMirrorValue("point-click-fn-textarea", source);
+        return this;
     }
 
-    public void clickDeveloperHelpTab()
+    public ChartLayoutDialog clickDeveloperHelpTab()
     {
         clickDeveloperTab();
         getWrapper()._ext4Helper.clickTabContainingText("Help");
+        return this;
     }
 
     public String getDeveloperHelpContent()
@@ -398,17 +311,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement visibleLogScaleRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='log']/preceding-sibling::input[@type='button']"), this);
         public WebElement visibleLabelTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']"), this);
         public WebElement plotTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Title:']/parent::td/following-sibling::td//input"), this);
-        public WebElement plotSubTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='subtitle']"), this);
-        public WebElement plotFooterTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='footer']"), this);
         public WebElement plotWidthTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='width']"), this);
         public WebElement plotHeightTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='height']"), this);
-        public WebElement plotHidePercentTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='pieHideWhenLessThanPercentage']"), this);
-        public WebElement showPercentagesCheckbox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Show Percentages:']/parent::td/following-sibling::td//input"), this);
-        public WebElement showPercentagesCheckboxValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Show Percentages:']/ancestor::table"), this);
-        public WebElement innerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Inner Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
-        public WebElement outerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Outer Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
-        public WebElement gradientSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Gradient %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
-        public WebElement colorPalette = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='colorPaletteScale']"), this);
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
         public WebElement developerDisable = new LazyWebElement(Locator.xpath("//span[text()='Disable']"), this);
     }
@@ -419,21 +323,4 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         Log
     }
 
-    public enum ColorPalette
-    {
-        Light("Light (default)"),
-        Dark("Dark"),
-        Alternate("Alternate");
-
-        private String _dropDownText;
-        ColorPalette(String value)
-        {
-            _dropDownText = value;
-        }
-
-        public String dropDownText()
-        {
-            return _dropDownText;
-        }
-    }
 }

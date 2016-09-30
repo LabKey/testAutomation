@@ -7,10 +7,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
+import org.labkey.test.components.LookAndFeelPieChart;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -46,7 +46,7 @@ public class PieChartTest extends GenericChartsTest
 
         ChartQueryDialog queryDialog;
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelPieChart pieChartLookAndFeel;
         String svgText, strTemp;
         int percentCount;
 
@@ -58,15 +58,15 @@ public class PieChartTest extends GenericChartsTest
         clickAddChart(ChartTypes.PIE);
 
         queryDialog = new ChartQueryDialog(getDriver());
-        queryDialog.selectSchema("study");
-        queryDialog.selectQuery(AE_1_QUERY_NAME);
-        chartTypeDialog = queryDialog.clickOk();
+        chartTypeDialog = queryDialog.selectSchema("study")
+                .selectQuery(AE_1_QUERY_NAME)
+                .clickOk();
 
         log("Set the minimal attributes necessary to create a pie chart.");
         chartTypeDialog.setCategories(PIE_CHART_CATEGORY);
         chartTypeDialog.clickApply();
 
-        sleep(3000);  // Is there a better trigger?
+        sleep(3000);  // TODO Is there a better trigger?
 
         log("Validate that the text values of the pie chart are as expected.");
         svgText = getSVGText();
@@ -80,10 +80,10 @@ public class PieChartTest extends GenericChartsTest
 
         log("Now add a measure to the pie chart.");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setMeasure(PIE_CHART_MEASURE);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setMeasure(PIE_CHART_MEASURE)
+                .clickApply();
 
-        sleep(3000);  // Is there a better trigger?
+        sleep(3000);  // TODO Is there a better trigger?
 
         log("Again validate that the text on the pie chart is as expected.");
         svgText = getSVGText();
@@ -101,22 +101,22 @@ public class PieChartTest extends GenericChartsTest
         log("Now change the chart layout, also validate that the layout dialog is pre-populated as expected.");
         clickButton("Chart Layout", 0);
 
-        chartLayoutDialog = new ChartLayoutDialog(getDriver());
-        strTemp = chartLayoutDialog.getPlotSubTitle();
+        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
+        strTemp = pieChartLookAndFeel.getSubTitle();
         Assert.assertTrue("Value in Subtitle text box not as expected. Expected '" + PIE_CHART_CATEGORY + "'", strTemp.equals(PIE_CHART_CATEGORY));
-        strTemp = chartLayoutDialog.getPlotFooter();
+        strTemp = pieChartLookAndFeel.getFooter();
         Assert.assertTrue("Value in Footer text box not as expected. Expected 'Sum of " + PIE_CHART_MEASURE + "'", strTemp.equals("Sum of " + PIE_CHART_MEASURE));
 
         log("Remove the percentages, and change the gradient.");
-        if(chartLayoutDialog.showPercentagesChecked())
-            chartLayoutDialog.clickShowPercentages();
+        if(pieChartLookAndFeel.showPercentagesChecked())
+            pieChartLookAndFeel.clickShowPercentages();
 
         // Changing gradient just to make sure no errors are generated. Didn't have time to validate that color had change in the pie chart.
-        chartLayoutDialog.setGradientColor(COLOR_RED);
+        pieChartLookAndFeel.setGradientColor(COLOR_RED);
 
-        chartLayoutDialog.clickApply();
+        pieChartLookAndFeel.clickApply();
 
-        sleep(3000);  // Is there a better trigger?
+        sleep(3000);  // TODO Is there a better trigger?
 
         svgText = getSVGText();
         percentCount = StringUtils.countMatches(svgText, "%");
@@ -125,25 +125,26 @@ public class PieChartTest extends GenericChartsTest
         clickButton("Chart Layout", 0);
 
         log("Now add percentages back and change the limit when they are visible.");
-        chartLayoutDialog = new ChartLayoutDialog(getDriver());
+        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
 
-        if(!chartLayoutDialog.showPercentagesChecked())
-            chartLayoutDialog.clickShowPercentages();
+        if(!pieChartLookAndFeel.showPercentagesChecked())
+            pieChartLookAndFeel.clickShowPercentages();
 
-        chartLayoutDialog.setHidePercentageWhen("7");
+        pieChartLookAndFeel.setHidePercentageWhen("7");
 
         // Changing gradient, the radii and colors just to make sure no errors are generated.
         // It would be possible to easily validate the color of the text but validating the radii and gradients would need more work.
-        chartLayoutDialog.setGradientColor(COLOR_WHITE);
-        chartLayoutDialog.setInnerRadiusPercentage(50);
-        chartLayoutDialog.setOuterRadiusPercentage(25);
-        chartLayoutDialog.setGradientColor(COLOR_BLUE);
-        chartLayoutDialog.setGradientPercentage(50);
-        chartLayoutDialog.setPercentagesColor(COLOR_BLACK);
+        pieChartLookAndFeel.setGradientColor(COLOR_WHITE)
+                .setInnerRadiusPercentage(50)
+                .setOuterRadiusPercentage(25)
+                .setGradientColor(COLOR_BLUE)
+                .setGradientPercentage(50)
+                .setPercentagesColor(COLOR_BLACK)
+                .clickApply();
 
-        chartLayoutDialog.clickApply();
+        sleep(3000);  // TODO Is there a better trigger?
 
-        sleep(3000);  // Is there a better trigger?
+        log("Just a quick change.");
 
         svgText = getSVGText();
         percentCount = StringUtils.countMatches(svgText, "%");
@@ -153,15 +154,15 @@ public class PieChartTest extends GenericChartsTest
         log("Ok last bit of changing for the Pie Chart.");
         clickButton("Chart Layout", 0);
 
-        chartLayoutDialog = new ChartLayoutDialog(getDriver());
+        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
 
-        chartLayoutDialog.setPlotTitle(PLOT_TITLE);
-        chartLayoutDialog.setInnerRadiusPercentage(0);
-        chartLayoutDialog.setOuterRadiusPercentage(75);
-        chartLayoutDialog.setPlotWidth("500");
-        chartLayoutDialog.setPlotHeight("500");
-        chartLayoutDialog.setColorPalette(ChartLayoutDialog.ColorPalette.Alternate);
-        chartLayoutDialog.clickApply();
+        pieChartLookAndFeel.setPlotTitle(PLOT_TITLE)
+                .setInnerRadiusPercentage(0)
+                .setOuterRadiusPercentage(75)
+                .setPlotWidth("500")
+                .setPlotHeight("500")
+                .setColorPalette(LookAndFeelPieChart.ColorPalette.Alternate)
+                .clickApply();
 
         sleep(3000);  // Is there a better trigger?
 
@@ -192,7 +193,7 @@ public class PieChartTest extends GenericChartsTest
         ColumnChartRegion plotRegion;
         DataRegionTable dataRegionTable;
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelPieChart pieChartLookAndFeel;
         int expectedPlotCount = 0;
         String strTemp;
 
@@ -238,15 +239,15 @@ public class PieChartTest extends GenericChartsTest
         chartTypeDialog.clickCancel();
 
         clickButton("Chart Layout", 0);
-        chartLayoutDialog = new ChartLayoutDialog(getDriver());
+        pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
 
-        strTemp = chartLayoutDialog.getPlotTitle();
+        strTemp = pieChartLookAndFeel.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
 
-        strTemp = chartLayoutDialog.getPlotSubTitle();
+        strTemp = pieChartLookAndFeel.getSubTitle();
         Assert.assertTrue("Value for plot sub title not as expected. Expected '" + COL_TEXT_PIE + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_PIE.toLowerCase()));
 
-        chartLayoutDialog.clickCancel();
+        pieChartLookAndFeel.clickCancel();
     }
 
     @LogMethod
