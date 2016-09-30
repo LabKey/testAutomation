@@ -431,6 +431,7 @@ src/org/labkey/test/components/D3PieChart.java -text
 src/org/labkey/test/components/FloatingComponent.java -text
 src/org/labkey/test/components/IssueListDefDataRegion.java -text
 src/org/labkey/test/components/ListsWebPart.java -text
+src/org/labkey/test/components/LookAndFeelBoxPlot.java -text
 src/org/labkey/test/components/ParticipantListWebPart.java -text
 src/org/labkey/test/components/PlateSummary.java -text
 src/org/labkey/test/components/PropertiesEditor.java -text
@@ -553,6 +554,7 @@ src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
 src/org/labkey/test/tests/AssayResultsExportTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
+src/org/labkey/test/tests/BarPlotTest.java -text
 src/org/labkey/test/tests/BaseTermsOfUseTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/BoxPlotTest.java -text

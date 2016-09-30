@@ -26,14 +26,16 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
     {
     }
 
-    public void selectSchema(String schemaName)
+    public ChartQueryDialog selectSchema(String schemaName)
     {
         getWrapper()._ext4Helper.selectComboBoxItem("Schema:", schemaName);
+        return this;
     }
 
-    public void selectQuery(String queryName)
+    public ChartQueryDialog selectQuery(String queryName)
     {
         getWrapper()._ext4Helper.selectComboBoxItem("Query:", queryName);
+        return this;
     }
 
     public void clickCancel()

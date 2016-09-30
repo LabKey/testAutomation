@@ -3,12 +3,13 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.ElementCache>
+public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extends ChartWizardDialog<EC>
 {
     public ChartLayoutDialog(WebDriver driver)
     {
@@ -76,10 +77,22 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
         setLabel(label);
     }
 
+    public String getXAxisLabel()
+    {
+        clickXAxisTab();
+        return getWrapper().getFormElement(elementCache().visibleLabelTextBox);
+    }
+
     public void setYAxisLabel(String label)
     {
         clickYAxisTab();
         setLabel(label);
+    }
+
+    public String getYAxisLabel()
+    {
+        clickYAxisTab();
+        return getWrapper().getFormElement(elementCache().visibleLabelTextBox);
     }
 
     private void setLabel(String label)
@@ -87,10 +100,11 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
         getWrapper().setFormElement(elementCache().visibleLabelTextBox, label);
     }
 
-    public void setPlotTitle(String title)
+    public ChartLayoutDialog setPlotTitle(String title)
     {
         clickGeneralTab();
         getWrapper().setFormElement(elementCache().plotTitleTextBox, title);
+        return this;
     }
 
     public String getPlotTitle()
@@ -123,10 +137,11 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
         return getWrapper().getFormElement(elementCache().plotFooterTextBox);
     }
 
-    public void setPlotWidth(int width)
+    public ChartLayoutDialog setPlotWidth(String width)
     {
         clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotWidthTextBox, String.valueOf(width));
+        getWrapper().setFormElement(elementCache().plotWidthTextBox, width);
+        return this;
     }
 
     public int getPlotWidth()
@@ -135,10 +150,11 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
         return Integer.parseInt(getWrapper().getFormElement(elementCache().plotWidthTextBox));
     }
 
-    public void setPlotHeight(int height)
+    public ChartLayoutDialog setPlotHeight(String height)
     {
         clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotHeightTextBox, String.valueOf(height));
+        getWrapper().setFormElement(elementCache().plotHeightTextBox, height);
+        return this;
     }
 
     public int getPlotHeight()
@@ -181,78 +197,91 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
 
     public void setGradientColor(String hexColorValue)
     {
-        String tempStr = hexColorValue.replace("#", "").toUpperCase();
-        getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = 'Gradient Color:']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
+        setColor("Gradient Color:", hexColorValue);
     }
 
     public void setPercentagesColor(String hexColorValue)
     {
+        setColor("Percentages Color:", hexColorValue);
+    }
+
+    protected void setColor(String colorLabel, String hexColorValue)
+    {
         String tempStr = hexColorValue.replace("#", "").toUpperCase();
-        getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = 'Percentages Color:']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
+        getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = '" + colorLabel + "']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
     }
 
     public void setInnerRadiusPercentage(int radiusValue)
     {
-        setSliderValue(elementCache().innerRadiusSlider, elementCache().innerRadiusSliderValue, radiusValue);
+        clickGeneralTab();
+        setSliderValue(elementCache().innerRadiusSlider, radiusValue);
     }
 
     public int getInnerRadiusPercentage()
     {
-        return Integer.parseInt(elementCache().innerRadiusSliderValue.getAttribute("aria-valuenow"));
+        clickGeneralTab();
+        return getSliderCurrentValue(elementCache().innerRadiusSlider);
     }
 
     public void setOuterRadiusPercentage(int radiusValue)
     {
-        setSliderValue(elementCache().outerRadiusSlider, elementCache().outerRadiusSliderValue, radiusValue);
+        clickGeneralTab();
+        setSliderValue(elementCache().outerRadiusSlider, radiusValue);
     }
 
     public int getOuterRadiusPercentage()
     {
-        return Integer.parseInt(elementCache().outerRadiusSliderValue.getAttribute("aria-valuenow"));
+        clickGeneralTab();
+        return getSliderCurrentValue(elementCache().outerRadiusSlider);
     }
 
     public void setGradientPercentage(int radiusValue)
     {
-        setSliderValue(elementCache().gradientSlider, elementCache().gradientSliderValue, radiusValue);
+        clickGeneralTab();
+        setSliderValue(elementCache().gradientSlider, radiusValue);
     }
 
     public int getGradientPercentage()
     {
-        return Integer.parseInt(elementCache().gradientSliderValue.getAttribute("aria-valuenow"));
+        clickGeneralTab();
+        return getSliderCurrentValue(elementCache().gradientSlider);
     }
 
-    private void setSliderValue(WebElement slider, WebElement sliderValue, int percentValue)
+    protected void setSliderValue(WebElement sliderElement, int newValue)
     {
         // An alternative to actually moving the slider might be to have some javascript code that sets the aria-valuenow attribute of the element.
+        int currentValue = getSliderCurrentValue(sliderElement);
+        int xChangeAmount, minAllowedValue, maxAllowedValue;
+        WebElement sliderThumb = sliderElement.findElement(By.className("x4-slider-thumb"));
 
-        if(percentValue > 100)
-            percentValue = 100;
-        if(percentValue < 0)
-            percentValue = 0;
+        minAllowedValue = Integer.parseInt(sliderElement.getAttribute("aria-valuemin"));
+        maxAllowedValue = Integer.parseInt(sliderElement.getAttribute("aria-valuemax"));
 
+        // Protect against bad inputs.
+        if(newValue > maxAllowedValue)
+            newValue = maxAllowedValue;
+        if(newValue < minAllowedValue)
+            newValue = minAllowedValue;
 
-        int currentRadiusValue = getSliderCurrentPercent(sliderValue);
-        int xChangeAmount;
-
-        if(currentRadiusValue == percentValue)
+        if(currentValue == newValue)
             return;
 
-        if(currentRadiusValue > percentValue)
+        if(currentValue > newValue)
         {
             xChangeAmount = -10;
-            while(getSliderCurrentPercent(sliderValue) > percentValue)
-                getWrapper().dragAndDrop(slider, xChangeAmount, 0);
+            while(getSliderCurrentValue(sliderElement) > newValue)
+                getWrapper().dragAndDrop(sliderThumb, xChangeAmount, 0);
         }
         else
         {
             xChangeAmount = 10;
-            while(getSliderCurrentPercent(sliderValue) < percentValue)
-                getWrapper().dragAndDrop(slider, xChangeAmount, 0);
+            while(getSliderCurrentValue(sliderElement) < newValue)
+                getWrapper().dragAndDrop(sliderThumb, xChangeAmount, 0);
         }
 
     }
 
-    private int getSliderCurrentPercent(WebElement sliderValue)
+    protected int getSliderCurrentValue(WebElement sliderValue)
     {
         return Integer.parseInt(sliderValue.getAttribute("aria-valuenow"));
     }
@@ -340,20 +369,25 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
 
     }
 
+    public void clickApplyWithError()
+    {
+        getWrapper().clickButton("Apply", 0);
+    }
+
     public void clickCancel()
     {
         getWrapper().clickButton("Cancel", 0);
     }
 
     @Override
-    protected ElementCache newElementCache()
+    protected EC newElementCache()
     {
-        return new ElementCache();
+        return (EC)new ElementCache();
     }
 
     class ElementCache extends ChartWizardDialog.ElementCache
     {
-        public final String VISIBLE_PANEL_XPATH = "//div[contains(@class, 'center-panel')]//div[contains(@class, 'x4-fit-item')][not(contains(@class, 'x4-item-disabled'))][not(contains(@style, 'display: none;'))]";
+        static public final String VISIBLE_PANEL_XPATH = "//div[contains(@class, 'center-panel')]//div[contains(@class, 'x4-fit-item')][not(contains(@class, 'x4-item-disabled'))][not(contains(@style, 'display: none;'))]";
 
         public WebElement generalTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='General']"), this);
         public WebElement xAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='X-Axis']"), this);
@@ -371,12 +405,9 @@ public class ChartLayoutDialog extends ChartWizardDialog<ChartLayoutDialog.Eleme
         public WebElement plotHidePercentTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='pieHideWhenLessThanPercentage']"), this);
         public WebElement showPercentagesCheckbox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Show Percentages:']/parent::td/following-sibling::td//input"), this);
         public WebElement showPercentagesCheckboxValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Show Percentages:']/ancestor::table"), this);
-        public WebElement innerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Inner Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-thumb')]"), this);
-        public WebElement innerRadiusSliderValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Inner Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
-        public WebElement outerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Outer Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-thumb')]"), this);
-        public WebElement outerRadiusSliderValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Outer Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
-        public WebElement gradientSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Gradient %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-thumb')]"), this);
-        public WebElement gradientSliderValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Gradient %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
+        public WebElement innerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Inner Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
+        public WebElement outerRadiusSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Outer Radius %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
+        public WebElement gradientSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Gradient %:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement colorPalette = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='colorPaletteScale']"), this);
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
         public WebElement developerDisable = new LazyWebElement(Locator.xpath("//span[text()='Disable']"), this);

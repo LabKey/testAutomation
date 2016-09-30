@@ -2,22 +2,27 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Charting;
+import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
-import org.labkey.test.components.ColumnChartComponent;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 
 import java.net.URL;
-import java.util.List;
 
+@Category({DailyC.class, Reports.class, Charting.class})
 public class PieChartTest extends GenericChartsTest
 {
     private final String PIE_CHART_SAVE_NAME = "Simple Pie Chart Test";
-    private final String PIE_CHART_SAVE_DESC = "Pie chart created with the simple test.";
+    private final String PIE_CHART_CATEGORY = "1.Adverse Experience (AE)";
+    private final String PIE_CHART_MEASURE = "9. Visit Code reported";
 
     @LogMethod
     protected void testPlots()
@@ -32,13 +37,12 @@ public class PieChartTest extends GenericChartsTest
     {
 
         final String AE_1_QUERY_NAME = "AE-1 (AE-1:(VTN) AE Log)";
-        final String PIE_CHART_CATEGORY = "1.Adverse Experience (AE)";
-        final String PIE_CHART_MEASURE = "9. Visit Code reported";
         final String PLOT_TITLE = TRICKY_CHARACTERS;
         final String COLOR_WHITE = "FFFFFF";
         final String COLOR_RED = "FF0000";
         final String COLOR_BLUE = "0000FF";
         final String COLOR_BLACK = "000000";
+        final String PIE_CHART_SAVE_DESC = "Pie chart created with the simple test.";
 
         ChartQueryDialog queryDialog;
         ChartTypeDialog chartTypeDialog;
@@ -97,8 +101,7 @@ public class PieChartTest extends GenericChartsTest
         log("Now change the chart layout, also validate that the layout dialog is pre-populated as expected.");
         clickButton("Chart Layout", 0);
 
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = new ChartLayoutDialog(getDriver());
         strTemp = chartLayoutDialog.getPlotSubTitle();
         Assert.assertTrue("Value in Subtitle text box not as expected. Expected '" + PIE_CHART_CATEGORY + "'", strTemp.equals(PIE_CHART_CATEGORY));
         strTemp = chartLayoutDialog.getPlotFooter();
@@ -122,8 +125,7 @@ public class PieChartTest extends GenericChartsTest
         clickButton("Chart Layout", 0);
 
         log("Now add percentages back and change the limit when they are visible.");
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = new ChartLayoutDialog(getDriver());
 
         if(!chartLayoutDialog.showPercentagesChecked())
             chartLayoutDialog.clickShowPercentages();
@@ -151,14 +153,13 @@ public class PieChartTest extends GenericChartsTest
         log("Ok last bit of changing for the Pie Chart.");
         clickButton("Chart Layout", 0);
 
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = new ChartLayoutDialog(getDriver());
 
         chartLayoutDialog.setPlotTitle(PLOT_TITLE);
         chartLayoutDialog.setInnerRadiusPercentage(0);
         chartLayoutDialog.setOuterRadiusPercentage(75);
-        chartLayoutDialog.setPlotWidth(500);
-        chartLayoutDialog.setPlotHeight(500);
+        chartLayoutDialog.setPlotWidth("500");
+        chartLayoutDialog.setPlotHeight("500");
         chartLayoutDialog.setColorPalette(ChartLayoutDialog.ColorPalette.Alternate);
         chartLayoutDialog.clickApply();
 
@@ -172,10 +173,10 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertEquals("There should only be 4 '%' in the svg, found " + percentCount, 4, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
         Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE.replace(" ", "")));
-        int svgWidth = Integer.parseInt(getAttribute(Locator.css("svg"), "width"));
-        int svgHeight= Integer.parseInt(getAttribute(Locator.css("svg"), "height"));
-        Assert.assertEquals("Width of svg not expected.", 500, svgWidth);
-        Assert.assertEquals("Height of svg not expected.", 500, svgHeight);
+        String svgWidth = getAttribute(Locator.css("svg"), "width");
+        String svgHeight= getAttribute(Locator.css("svg"), "height");
+        Assert.assertEquals("Width of svg not expected.", "500", svgWidth);
+        Assert.assertEquals("Height of svg not expected.", "500", svgHeight);
 
         savePlot(PIE_CHART_SAVE_NAME, PIE_CHART_SAVE_DESC);
 
@@ -189,15 +190,13 @@ public class PieChartTest extends GenericChartsTest
         final String COL_TEXT_PIE = "2.What is your sex?";
 
         ColumnChartRegion plotRegion;
-        ColumnChartComponent plotComponent;
         DataRegionTable dataRegionTable;
         ChartTypeDialog chartTypeDialog;
         ChartLayoutDialog chartLayoutDialog;
         int expectedPlotCount = 0;
-        List<String> columnLabels;
-        String plotTitleBar, plotTitleBox1, plotTitleBox2, plotTitlePie, svgText, strTemp;
+        String strTemp;
 
-        log("Go to the '" + DATA_SOURCE_1 + "' grid to start playing with the charts. Make sure each of the chart types can be created and do some other stuff as well.");
+        log("Go to the '" + DATA_SOURCE_1 + "' grid to create a pie chart from a column.");
 
         goToProjectHome();
         clickProject(getProjectName());
@@ -207,16 +206,9 @@ public class PieChartTest extends GenericChartsTest
         click(Locator.linkWithText(DATA_SOURCE_1));
 
         dataRegionTable = new DataRegionTable("Dataset", getDriver());
-        columnLabels = dataRegionTable.getColumnLabels();
-        plotRegion = dataRegionTable.getColumnPlotRegion();
-
-        log("If the plot view is visible, revert it.");
-        if(plotRegion.isRegionVisible())
-            plotRegion.revertView();
 
         log("Create a pie chart.");
         dataRegionTable.createPieChart(COL_NAME_PIE);
-        plotTitlePie = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_PIE));
         expectedPlotCount++;
 
         log("Refresh the reference to the plotRegion object and get a count of the plots.");
@@ -246,8 +238,7 @@ public class PieChartTest extends GenericChartsTest
         chartTypeDialog.clickCancel();
 
         clickButton("Chart Layout", 0);
-        chartLayoutDialog = new ChartLayoutDialog(this);
-        chartLayoutDialog.waitForDialog();
+        chartLayoutDialog = new ChartLayoutDialog(getDriver());
 
         strTemp = chartLayoutDialog.getPlotTitle();
         Assert.assertTrue("Value for plot title not as expected. Expected '" + DATA_SOURCE_1 + "' found '" + strTemp + "'", strTemp.toLowerCase().equals(DATA_SOURCE_1.toLowerCase()));
@@ -261,7 +252,9 @@ public class PieChartTest extends GenericChartsTest
     @LogMethod
     private void doExportOfPieChart()
     {
-        final String EXPORTED_SCRIPT_CHECK = "var chartId = 'exportedChart';";
+        final String EXPORTED_SCRIPT_CHECK_TYPE = "\"renderType\":\"pie_chart\"";
+        final String EXPORTED_SCRIPT_CHECK_XAXIS = PIE_CHART_CATEGORY;
+        final String EXPORTED_SCRIPT_CHECK_YAXIS = "Sum of " + PIE_CHART_MEASURE;
 
         log("Validate that export of the pie chart works.");
         goToProjectHome();
@@ -274,27 +267,24 @@ public class PieChartTest extends GenericChartsTest
         waitForElement(Locator.css("svg"));
 
         log("Export as PDF");
-        clickButton("Export", 0);
-        waitForElement(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='PDF']"));
-        clickAndWaitForDownload(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='PDF']"), 1);
+        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PDF"), 1);
 
         log("Export as PNG");
-        clickButton("Export", 0);
-        waitForElement(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='PNG']"));
-        clickAndWaitForDownload(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='PNG']"), 1);
+        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PNG"), 1);
 
         log("Export to script.");
-        clickButton("Export", 0);
-        waitForElement(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='Script']"));
-        click(Locator.xpath("//a//span[contains(@class, 'x4-menu-item-text')][text()='Script']"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'chart-wizard-dialog')]//div[text()='Export script']"));
+        Locator dlg = Locator.xpath("//div").withClass("chart-wizard-dialog").notHidden().withDescendant(Locator.xpath("//div").withClass("title-panel").withDescendant(Locator.xpath("//div")).withText("Export script"));
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
+        waitFor(() -> isElementPresent(dlg),
+                "Ext Dialog with title '" + "Export script" + "' did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
+        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         log("Validate that the script is as expected.");
-        String exportedScript = getText(Locator.xpath("//div[contains(@class, 'chart-wizard-dialog')]//div[text()='Export script']/ancestor::div[contains(@class, 'chart-wizard-panel')]//div[@class='CodeMirror-code']"));
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_TYPE + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_TYPE.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_XAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_XAXIS.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_YAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_YAXIS.toLowerCase()));
 
-        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK + "' ", exportedScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK.toLowerCase()));
-
-        clickButton("Close", 0);
     }
 
 }

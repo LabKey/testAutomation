@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCache>
+public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends ChartWizardDialog <EC>
 {
     public ChartTypeDialog(WebDriver driver)
     {
@@ -84,43 +84,64 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return getWrapper().getTexts(Locator.xpath("//div[contains(@class, 'types-panel')]//div[contains(@id, 'chart-type')]//div").findElements(this));
     }
 
-    public void setXAxis(String columnName)
+    public ChartTypeDialog setXAxis(String columnName)
     {
         setXAxis(columnName, false);
+        return this;
     }
 
-    public void setXAxis(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setXAxis(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().xAxis(), columnName);
         else
             setValue(elementCache().xAxisDropText, columnName);
+        return this;
     }
 
-    public void setYAxis(String columnName)
+    public ChartTypeDialog setXCategory(String columnName)
+    {
+        setXCategory(columnName, false);
+        return this;
+    }
+
+    public ChartTypeDialog setXCategory(String columnName, boolean replaceExisting)
+    {
+        if (replaceExisting)
+            setValue(elementCache().xCategories(), columnName);
+        else
+            setValue(elementCache().xCategoriesDropText, columnName);
+        return this;
+    }
+
+    public ChartTypeDialog setYAxis(String columnName)
     {
         setYAxis(columnName, false);
+        return this;
     }
 
-    public void setYAxis(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setYAxis(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().yAxis(), columnName);
         else
             setValue(elementCache().yAxisDropText, columnName);
+        return this;
     }
 
-    public void setCategories(String columnName)
+    public ChartTypeDialog setCategories(String columnName)
     {
         setCategories(columnName, false);
+        return this;
     }
 
-    public void setCategories(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setCategories(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().categories(), columnName);
         else
             setValue(elementCache().categoriesDropText, columnName);
+        return this;
     }
 
     public String getCategories()
@@ -139,17 +160,19 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return value;
     }
 
-    public void setMeasure(String columnName)
+    public ChartTypeDialog setMeasure(String columnName)
     {
         setMeasure(columnName, false);
+        return this;
     }
 
-    public void setMeasure(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setMeasure(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().measure(), columnName);
         else
             setValue(elementCache().measureDropText, columnName);
+        return this;
     }
 
     public String getMeasure()
@@ -168,69 +191,78 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         return value;
     }
 
-    public void setColor(String columnName)
+    public ChartTypeDialog setColor(String columnName)
     {
         setColor(columnName, false);
+        return this;
     }
 
-    public void setColor(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setColor(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().color(), columnName);
         else
             setValue(elementCache().colorDropText, columnName);
+        return this;
     }
 
-    public void setShape(String columnName)
+    public ChartTypeDialog setShape(String columnName)
     {
         setShape(columnName, false);
+        return this;
     }
 
-    public void setShape(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setShape(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
             setValue(elementCache().shape(), columnName);
         else
             setValue(elementCache().shapeDropText, columnName);
+        return this;
     }
 
-    private void setValue(WebElement target, String columnName)
+    private ChartTypeDialog setValue(WebElement target, String columnName)
     {
         elementCache().getColumn(columnName).click();
         target.click();
         getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[@class='field-selection-display']")), columnName);
+        return this;
     }
 
-    public void removeXAxis()
+    public ChartTypeDialog removeXAxis()
     {
         getWrapper().mouseOver(elementCache().xAxis());
         final WebElement remove = elementCache().xAxisRemove();
         remove.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
+        return this;
     }
 
-    public void removeYAxis()
+    public ChartTypeDialog removeYAxis()
     {
         getWrapper().mouseOver(elementCache().yAxis());
         final WebElement remove = elementCache().yAxisRemove();
         remove.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
+        return this;
     }
 
-    public void removeColor()
+    public ChartTypeDialog removeColor()
     {
         getWrapper().mouseOver(elementCache().color());
         final WebElement remove = elementCache().colorRemove();
         remove.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
+        return this;
     }
 
-    public void removeShape()
+    public ChartTypeDialog removeShape()
     {
         getWrapper().mouseOver(elementCache().shape());
         final WebElement remove = elementCache().shapeRemove();
         remove.click();
         getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
+        return this;
     }
 
     public String getXAxisValue()
@@ -301,9 +333,10 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     }
 
     // Simply clicks a value int he column list. Can be used to see if the value can be dropped to one of the attributes.
-    public void clickColumnValue(String columnValue)
+    public ChartTypeDialog clickColumnValue(String columnValue)
     {
         elementCache().getColumn(columnValue).click();
+        return this;
     }
 
     public ArrayList<String> getColumnList()
@@ -337,14 +370,15 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
     }
 
     @Override
-    protected ElementCache newElementCache()
+    protected EC newElementCache()
     {
-        return new ElementCache();
+        return (EC) new ElementCache();
     }
 
     class ElementCache extends ChartWizardDialog.ElementCache
     {
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
+        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Categories')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
         public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
         public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
@@ -373,6 +407,10 @@ public class ChartTypeDialog extends ChartWizardDialog<ChartTypeDialog.ElementCa
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement xAxisDropText = new LazyWebElement(Locator.xpath(XAXIS_CONTAINER + DROP_TEXT),  this);
         public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
+
+        public WebElement xCategories() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xCategoriesDropText = new LazyWebElement(Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT),  this);
+        public WebElement xCategoriesRemove() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement yAxis() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(YAXIS_CONTAINER + DROP_TEXT),  this);
