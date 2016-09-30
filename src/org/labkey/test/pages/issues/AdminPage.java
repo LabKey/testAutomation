@@ -19,7 +19,7 @@ import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import static org.labkey.test.components.PropertiesEditor.PropertyEditor;
+import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 import static org.labkey.test.components.html.OptionSelect.OptionSelect;
 
@@ -157,7 +157,7 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         public RadioButton noDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-empty > input")).findWhenNeeded(this);
         public RadioButton specificDefaultAssignedToRadio = RadioButton(Locator.css(".assigned-to-specific-user > input")).findWhenNeeded(this);
         public OptionSelect defaultAssignedToSelect = OptionSelect(Locator.css("select.assigned-to-user")).findWhenNeeded(this);
-        public PropertiesEditor configureFieldsPanel = PropertyEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
+        public PropertiesEditor configureFieldsPanel = PropertiesEditor(getDriver()).withTitle("Configure Fields").findWhenNeeded();
     }
 
     public static class AssignToListOption

@@ -42,9 +42,9 @@ public class PropertiesEditor extends WebPartPanel
         super(element, driver);
     }
 
-    public static PropertyEditorFinder PropertyEditor(WebDriver driver)
+    public static PropertiesEditorFinder PropertiesEditor(WebDriver driver)
     {
-        return new PropertyEditorFinder(driver);
+        return new PropertiesEditorFinder(driver);
     }
 
     public FieldRow selectField(String name)
@@ -206,9 +206,9 @@ public class PropertiesEditor extends WebPartPanel
         private FieldPropertyDock fieldPropertyDock = new FieldPropertyDock();
     }
 
-    public static class PropertyEditorFinder extends WebPartFinder<PropertiesEditor, PropertyEditorFinder>
+    public static class PropertiesEditorFinder extends WebPartFinder<PropertiesEditor, PropertiesEditorFinder>
     {
-        public PropertyEditorFinder(WebDriver driver)
+        public PropertiesEditorFinder(WebDriver driver)
         {
             super(driver);
         }

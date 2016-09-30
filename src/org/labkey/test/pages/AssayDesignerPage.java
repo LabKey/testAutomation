@@ -30,7 +30,7 @@ import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.components.PropertiesEditor.PropertyEditor;
+import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.OptionSelect.OptionSelect;
@@ -167,7 +167,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
      */
     public PropertiesEditor fields(String domainTitle)
     {
-        return PropertyEditor(getDriver()).withTitle(domainTitle).findWhenNeeded();
+        return PropertiesEditor(getDriver()).withTitle(domainTitle).findWhenNeeded();
     }
 
     @Deprecated
@@ -315,8 +315,8 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxByName("backgroundUpload")).findWhenNeeded(this);
 
 
-        final PropertiesEditor batchFieldsPanel = PropertyEditor(getDriver()).withTitle("Batch Fields").findWhenNeeded();
-        final PropertiesEditor runFieldsPanel = PropertyEditor(getDriver()).withTitle("Run Fields").findWhenNeeded();
-        final PropertiesEditor dataFieldsPanel = PropertyEditor(getDriver()).withTitle("Data Fields").findWhenNeeded();
+        final PropertiesEditor batchFieldsPanel = PropertiesEditor(getDriver()).withTitle("Batch Fields").findWhenNeeded();
+        final PropertiesEditor runFieldsPanel = PropertiesEditor(getDriver()).withTitle("Run Fields").findWhenNeeded();
+        final PropertiesEditor dataFieldsPanel = PropertiesEditor(getDriver()).withTitle("Data Fields").findWhenNeeded();
     }
 }
