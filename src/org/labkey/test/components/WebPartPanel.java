@@ -64,7 +64,7 @@ public class WebPartPanel extends WebDriverComponent
         }
 
         @Override
-        protected Locator locator()
+        protected Locator.XPathLocator locator()
         {
             Locator.XPathLocator webPartTitle = titleLocator();
             webPartTitle = _partialTitle ? webPartTitle.containing(_title) : webPartTitle.withText(_title);

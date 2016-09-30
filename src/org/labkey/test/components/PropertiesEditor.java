@@ -220,6 +220,12 @@ public class PropertiesEditor extends WebPartPanel
         }
 
         @Override
+        protected Locator.XPathLocator locator()
+        {
+            return super.locator().withDescendant(Locator.tagWithClass("tr", "editor-field-row"));
+        }
+
+        @Override
         protected Locator.XPathLocator titleLocator()
         {
             return Locator.xpath("tbody/tr/td").withClass("labkey-wp-title-left");
