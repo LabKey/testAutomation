@@ -231,11 +231,8 @@ public class ListHelper extends LabKeySiteWrapper
 
         log("Add columns");
 
-        // i==0 is the key column
-        for (int i = 1; i <= cols.length; i++)
+        for (ListColumn col : cols)
         {
-            ListColumn col = cols[i-1];
-
             addField(col);
         }
 
