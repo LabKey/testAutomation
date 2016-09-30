@@ -387,9 +387,7 @@ public class PropertiesEditor extends WebPartPanel
 
             protected FieldTabPane(String tabLabel)
             {
-                _paneElement = Locator.tagWithClass("div", "x-tab-panel-header")
-                        .append(Locator.tagWithClass("a", "x-tab-right").withText(tabLabel))
-                        .findElement(FieldPropertyDock.this);
+                _paneElement = Locator.name(tabLabel + "Pane").waitForElement(FieldPropertyDock.this, 1000);
             }
 
             @Override
