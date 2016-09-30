@@ -56,6 +56,7 @@ public abstract class Locator
     public static final String NOT_HIDDEN = "not(" + HIDDEN + ")";
     public static final String DISABLED = "ancestor-or-self::*[contains(@class, 'disabled')]";
     public static final String ENABLED = "not(" + DISABLED + ")";
+    public static final String NBSP = "\u00A0";
 
     protected Locator(String loc)
     {
