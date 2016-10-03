@@ -126,10 +126,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable(String, WebDriver)}
      * @param regionName 'lk-region-name' of the table
      * @param test Necessary while DRT methods live in BWDT
      */
+    @Deprecated // Use {@link DataRegionTable(String, WebDriver)}
     public DataRegionTable(String regionName, WebDriverWrapper test)
     {
         this(null, regionName, test);
