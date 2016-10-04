@@ -8,6 +8,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.studydesigner.AssayScheduleWebpart;
+import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
+import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
 
 import java.io.File;
@@ -26,7 +29,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
     private static final int IMPORT_WAIT_TIME = 60 * 1000;  // This should be a limit of 1 minute.
     private static final boolean EXPECTED_IMPORT_ERRORS = false;
     private static final int EXPECTED_COMPLETED_IMPORT_JOBS = 1;
-    private static final Locator NO_DATA_LOCATOR = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
 
     @Override
     public List<String> getAssociatedModules()
@@ -80,18 +82,32 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate that the expected data has been imported.");
         log("Validate assay schedule.");
         clickTab("Assays");
-        assertTextPresent("To change the set of assays and edit the assay schedule, click the edit button below.");
+        AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
+        Assert.assertEquals(1, assayScheduleWebpart.getAssayRowCount());
+        Assert.assertEquals("Name is Assay01", assayScheduleWebpart.getAssayCellDisplayValue("AssayName", 0));
+        Assert.assertEquals("Assay01 Configuration", assayScheduleWebpart.getAssayCellDisplayValue("Description", 0));
+        Assert.assertEquals("This is text in the assay plan (schedule).", assayScheduleWebpart.getAssayPlan());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
-        assertTextPresent("Cohort01", "Treatment01");
+        ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
+        Assert.assertEquals(1, immunizationScheduleWebpart.getCohortRowCount());
+        Assert.assertEquals("Cohort01", immunizationScheduleWebpart.getCohortCellDisplayValue("Label", 0));
+        Assert.assertEquals("5", immunizationScheduleWebpart.getCohortCellDisplayValue("SubjectCount", 0));
+        Assert.assertEquals("Treatment01 ?", immunizationScheduleWebpart.getCohortCellDisplayValue("TimePoint01", 0));
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        for (String label : new String[]{"Imm001", "Imm003", "Imm002", "AdjLabel01"})
-            waitForElement(Locator.tagWithClassContaining("td", "cell-display").withText(label));
-        for (String label : new String[]{"immType02", "immType01", "immType02"})
-            assertElementPresent(Locator.tagWithClassContaining("td", "cell-display").withText(label));
+        VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
+        Assert.assertEquals(3, vaccineDesignWebpart.getImmunogenRowCount());
+        Assert.assertEquals("Imm001", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 0));
+        Assert.assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 0));
+        Assert.assertEquals("Imm003", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 1));
+        Assert.assertEquals("immType01", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 1));
+        Assert.assertEquals("Imm002", vaccineDesignWebpart.getImmunogenCellDisplayValue("Label", 2));
+        Assert.assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 2));
+        Assert.assertEquals(1, vaccineDesignWebpart.getAdjuvantRowCount());
+        Assert.assertEquals("AdjLabel01", vaccineDesignWebpart.getAdjuvantCellDisplayValue("Label", 0));
 
         log("Cleanup and remove the project.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
@@ -132,17 +148,18 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate assay schedule.");
         clickTab("Assays");
-        assertTextPresent("No assays have been scheduled.");
+        AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
+        Assert.assertTrue(assayScheduleWebpart.isEmpty());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
-        waitForElement(NO_DATA_LOCATOR);
-        assertElementPresent(NO_DATA_LOCATOR, 1);
+        ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
+        Assert.assertTrue(immunizationScheduleWebpart.isEmpty());
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        waitForElement(NO_DATA_LOCATOR);
-        assertElementPresent(NO_DATA_LOCATOR, 2);
+        VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
+        Assert.assertTrue(vaccineDesignWebpart.isEmpty());
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
@@ -198,17 +215,18 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Validate assay schedule.");
         clickTab("Assays");
-        assertTextPresent("No assays have been scheduled.");
+        AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
+        Assert.assertTrue(assayScheduleWebpart.isEmpty());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
-        waitForElement(NO_DATA_LOCATOR);
-        assertElementPresent(NO_DATA_LOCATOR, 1);
+        ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
+        Assert.assertTrue(immunizationScheduleWebpart.isEmpty());
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
-        waitForElement(NO_DATA_LOCATOR);
-        assertElementPresent(NO_DATA_LOCATOR, 2);
+        VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
+        Assert.assertTrue(vaccineDesignWebpart.isEmpty());
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");

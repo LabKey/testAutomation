@@ -15,15 +15,22 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.studydesigner.AssayScheduleWebpart;
+import org.labkey.test.components.studydesigner.BaseManageVaccineDesignVisitPage;
+import org.labkey.test.components.studydesigner.ManageAssaySchedulePage;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -34,8 +41,12 @@ import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -134,57 +145,61 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _portalHelper.addQueryWebPart("rho");
         _portalHelper.addQueryWebPart("study");
 
-        // lookup the locationId for the Main site from the study.Locations table
-        goToSchemaBrowser();
-        selectQuery("study", "Location");
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable drt = new DataRegionTable("query", this);
-        _customizeViewsHelper.openCustomizeViewPanel();
-        //TODO: why can't we get the value from the RowId column when it is first in the data region?
-        _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.removeCustomizeViewColumn("RowId");
-        _customizeViewsHelper.addCustomizeViewColumn("RowId");
-        _customizeViewsHelper.applyCustomView();
-        int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
+        // setup the visits and a map to their RowIds
+        List<String> visitLabels = Arrays.asList("PT1", "0", "3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR");
+        Map<String, Integer> visitRowIdMap = new HashMap<>();
+        for (String visitLabel : visitLabels)
+            visitRowIdMap.put(visitLabel, getVisitRowId(visitLabel));
 
-        // add the specimen configurations to the manage page
+        // add the specimen configurations to the manage page and set the visits
         goToModule("rho");
-        addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
-        addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
-        addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
-        sleep(1000); // give the store a second to save the configurations
+        addSpecimenConfiguration("PCR", "R", "Main", "CEF-R Cryovial", 0);
+        setSpecimenConfigurationVisits(visitRowIdMap, Arrays.asList("3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"), true, 0);
+        addSpecimenConfiguration("PCR", "R", "Main", "UPR Micro Tube", 1);
+        setSpecimenConfigurationVisits(visitRowIdMap, Arrays.asList("3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"), false, 1);
+        addSpecimenConfiguration("RNA", "R", "Main", "TGE Cryovial", 2);
+        setSpecimenConfigurationVisits(visitRowIdMap, Arrays.asList("PT1", "0", "6", "20", "SR"), false, 2);
 
-        // lookup the config IDs to use in setting the visits
-        clickFolder(studyFolder);
-        clickAndWait(Locator.linkWithText("AssaySpecimen"));
-        drt = new DataRegionTable("query", this);
-        String pcr1RowId = drt.getDataAsText(drt.getRow("TubeType", "CEF-R Cryovial"), "RowId");
-        String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
-        String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
-        // set the specimen configuration visits (by checking the checkboxes on the manage page
-        goToManageStudy();
-        clickAndWait(Locator.linkWithText("Manage Assay Schedule"));
-        waitForElement(Locator.css("#AssaySpecimenVisitPanel table.x4-grid-table"));
-        setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
-        setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
-        setSpecimenConfigurationVisit(rnaRowId, new String[]{"PT1", "0", "6", "20", "SR"});
-        sleep(1000); // give the store a second to save the configurations
-        // set the assay plan
+        // set the assay plan and save
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
         String assayPlanTxt = "My assay plan " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
-        setFormElement(Locator.name("assayPlan"), assayPlanTxt);
-        clickButton("Save", 1000);
+        managePage.setAssayPlan(assayPlanTxt);
+        managePage.save();
+
+        // verify display of assay schedule webpart
+        AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
+        assertEquals("Unexpected assay plan text", assayPlanTxt, assayScheduleWebpart.getAssayPlan());
+        assertTextPresent("\u2713", 35);
 
         checkRhoQueryRowCount("AssaySpecimenVisit", 35);
         checkRhoQueryRowCount("AssaySpecimenMap", 35);
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
+    }
 
-        // verify display of assay schedule webpart
-        clickAndWait(Locator.linkWithText("Overview"));
-        waitForElement(Locator.tagWithClass("table", "study-vaccine-design"));
-        assertTextPresent(assayPlanTxt);
-        assertTextPresent("\u2713", 35);
+    private Integer getVisitRowId(String visitLabel)
+    {
+        SelectRowsCommand command = new SelectRowsCommand("study", "Visit");
+        if (StringUtils.isNumeric(visitLabel))
+            command.setFilters(Arrays.asList(new Filter("SequenceNumMin", visitLabel)));
+        else
+            command.setFilters(Arrays.asList(new Filter("Label", visitLabel)));
+
+        SelectRowsResponse response;
+        try
+        {
+            response = command.execute(createDefaultConnection(true), getProjectName() + "/" + studyFolder);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        List<Map<String, Object>> rows = response.getRows();
+        if (rows.size() == 1)
+            return Integer.parseInt(rows.get(0).get("RowId").toString());
+
+        return null;
     }
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
@@ -195,30 +210,29 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
     }
 
-    private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType, boolean expectRows)
+    private void addSpecimenConfiguration(String assayName, String source, String location, String tubeType, int newRowIndex)
     {
-        Locator.XPathLocator configGridRow = Locator.xpath("id('AssaySpecimenConfigGrid')//table").withClass("x4-grid-table").append("/tbody/tr");
-        if (expectRows)
-            waitForElement(configGridRow);
-        else
-            waitForText("No assay configurations");
-        int expectedRowIndex = getElementCount(configGridRow);
-        clickButton("Insert New", 0);
-        waitForElement(Locator.name("AssayName"));
-        setFormElement(Locator.name("AssayName"), assayName);
-        setFormElement(Locator.name("Description"), assayName + " " + tubeType);
-        setFormElement(Locator.name("Source"), source);
-        setFormElement(Locator.name("LocationId"), String.valueOf(locationId));
-        setFormElement(Locator.name("TubeType"), tubeType);
-        clickButton("Submit");
-        waitForElement(configGridRow.index(expectedRowIndex));
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
+        assertEquals("Unexpected assay schedule rows", newRowIndex, managePage.getAssayRowCount());
+
+        managePage.addNewAssayRow(assayName, assayName + " " + tubeType, newRowIndex);
+        managePage.setTextFieldValue("Source", source, newRowIndex);
+        managePage.setComboFieldValue("LocationId", location, newRowIndex);
+        managePage.setTextFieldValue("TubeType", tubeType, newRowIndex);
     }
 
-    private void setSpecimenConfigurationVisit(String scRowId, String[] labels)
+    private void setSpecimenConfigurationVisits(Map<String, Integer> visitRowIdMap, List<String> visitLabels, boolean addAllVisits, int rowIndex)
     {
-        for (String label : labels)
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
+
+        if (addAllVisits)
+            managePage.addAllExistingVisitColumns();
+
+        for (String visitLabel : visitLabels)
         {
-            checkCheckbox(Locator.name("sc" + scRowId + "v" + label));
+            BaseManageVaccineDesignVisitPage.Visit visit = new BaseManageVaccineDesignVisitPage.Visit(visitLabel);
+            visit.setRowId(visitRowIdMap.get(visitLabel));
+            managePage.selectVisit(visit, rowIndex);
         }
     }
 

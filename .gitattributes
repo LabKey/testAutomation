@@ -467,6 +467,14 @@ src/org/labkey/test/components/search/SearchForm.java -text
 src/org/labkey/test/components/search/SearchSideWebPart.java -text
 src/org/labkey/test/components/study/DatasetFacetPanel.java -text
 src/org/labkey/test/components/study/StudyOverviewWebPart.java -text
+src/org/labkey/test/components/studydesigner/AssayScheduleWebpart.java -text
+src/org/labkey/test/components/studydesigner/BaseManageVaccineDesignPage.java -text
+src/org/labkey/test/components/studydesigner/BaseManageVaccineDesignVisitPage.java -text
+src/org/labkey/test/components/studydesigner/ImmunizationScheduleWebpart.java -text
+src/org/labkey/test/components/studydesigner/ManageAssaySchedulePage.java -text
+src/org/labkey/test/components/studydesigner/ManageStudyProductsPage.java -text
+src/org/labkey/test/components/studydesigner/ManageTreatmentsPage.java -text
+src/org/labkey/test/components/studydesigner/VaccineDesignWebpart.java -text
 src/org/labkey/test/credentials/ApiKey.java -text
 src/org/labkey/test/credentials/Credentials.java -text
 src/org/labkey/test/credentials/Login.java -text
