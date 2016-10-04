@@ -9,10 +9,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class ListsWebPart extends BodyWebPart
+public class ListsWebPart extends BodyWebPart<ListsWebPart.Elements>
 {
-    private Elements _elements;
-
     public ListsWebPart(WebDriver driver)
     {
         super(driver, "Lists");
@@ -26,13 +24,13 @@ public class ListsWebPart extends BodyWebPart
 
     public LabKeyPage manageLists()
     {
-        _test.clickAndWait(elements().manageLink);
+        getWrapper().clickAndWait(elementCache().manageLink);
         return new LabKeyPage(getDriver());
     }
 
     public List<String> getLists()
     {
-        return _test.getTexts(elements().listLinks());
+        return getWrapper().getTexts(elementCache().listLinks());
     }
 
     public LabKeyPage viewData(String list)
@@ -55,14 +53,13 @@ public class ListsWebPart extends BodyWebPart
         throw new NotImplementedException("Update ListsWebPart.java to add this functionality");
     }
 
-    protected Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
-        if (null == _elements)
-            _elements = new Elements();
-        return _elements;
+        return new Elements();
     }
 
-    protected class Elements extends WebPart.Elements
+    class Elements extends WebPart.Elements
     {
         private List<WebElement> listLinks;
 
