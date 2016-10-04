@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
-//import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.LookAndFeelBoxPlot;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;

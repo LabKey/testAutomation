@@ -59,6 +59,7 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     private void clickTab(WebElement tabElement)
     {
         tabElement.click();
+        getWrapper().sleep(500);
     }
 
     public void setScaleType(ScaleType scaleType)
@@ -66,11 +67,10 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         switch(scaleType)
         {
             case Linear:
-                elementCache().visibleLinearScaleRadioButton.click();
+                getWrapper().click(elementCache().visibleLinearScaleRadioButton);
                 break;
             case Log:
-                getWrapper().log("tag class info: " + elementCache().visibleLogScaleRadioButton.getAttribute("class"));
-                elementCache().visibleLogScaleRadioButton.click();
+                getWrapper().click(elementCache().visibleLogScaleRadioButton);
                 break;
         }
     }
@@ -273,18 +273,12 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         getWrapper().clickButton("Apply", 0);
         getWrapper().sleep(1000);
 
-        //If a wait time of -1 is given use this as a trigger to look for an (expected) error. For example not setting a required field for the plot.
-        // This is needed because if there is an error the mask doesn't disappear so the waitForMaskToDisappear would error out. Too much of a hack?
-        if(waitTime != -1)
-        {
-            getWrapper()._ext4Helper.waitForMaskToDisappear(waitTime);
-        }
-
     }
 
     public void clickApplyWithError()
     {
         getWrapper().clickButton("Apply", 0);
+        getWrapper().sleep(1000);
     }
 
     public void clickCancel()
@@ -307,14 +301,15 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement yAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis']"), this);
         public WebElement developerTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Developer']"), this);
         public WebElement visiblePanel = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH), getWrapper().getWrappedDriver());
-        public WebElement visibleLinearScaleRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='linear']/preceding-sibling::input[@type='button']"), this);
-        public WebElement visibleLogScaleRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='log']/preceding-sibling::input[@type='button']"), this);
-        public WebElement visibleLabelTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']"), this);
         public WebElement plotTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Title:']/parent::td/following-sibling::td//input"), this);
         public WebElement plotWidthTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='width']"), this);
         public WebElement plotHeightTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='height']"), this);
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
         public WebElement developerDisable = new LazyWebElement(Locator.xpath("//span[text()='Disable']"), this);
+        // Making these elements locators because it looks like once a WebElement creates a reference it doesn't re-evaluate the xpath. These three elements are shared on two tabs.
+        public Locator visibleLinearScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='linear']/preceding-sibling::input[@type='button']");
+        public Locator visibleLogScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='log']/preceding-sibling::input[@type='button']");
+        public Locator visibleLabelTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']");
     }
 
     public enum ScaleType

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -25,6 +26,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
 import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.LookAndFeelScatterPlot;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionTable;
@@ -32,6 +34,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -56,6 +59,7 @@ public class ScatterPlotTest extends GenericChartsTest
         doDataRegionScatterPlotTest();
         doQuickChartScatterPlotTest();
         doCustomizeScatterPlotTest(); // Uses scatter plot created by doDataRegionScatterPlotTest()
+        doPlotExport();
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
         doDeleteMeasureTest(); // Uses scatter plot created by doCustomizeScatterPlotTest()
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
@@ -65,11 +69,21 @@ public class ScatterPlotTest extends GenericChartsTest
     private static final String SCATTER_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n32.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
+
+    private static final String MEASURE_1_WEIGHT = "1. Weight";
+    private static final String MEASURE_2_BODY_TEMP = "2. Body Temp";
+    private static final String MEASURE_4_PULSE = "1. Weight";
+    private static final String MEASURE_7_NECK = "7. Neck";
+    private static final String MEASURE_16_EVAL_SUM = "16. Evaluation Summary";
+    private static final String MEASURE_FORM_LANGUAGE = "Form Language";
+
+    private static final String QUERY_APX_1 = "APX-1 (APX-1: Abbreviated Physical Exam)";
+
     @LogMethod
     private void doManageViewsScatterPlotTest()
     {
         ChartTypeDialog chartTypeDialog;
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelScatterPlot lookAndFeelDialog;
         SaveChartDialog saveChartDialog;
 
         clickProject(getProjectName());
@@ -78,38 +92,39 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAddChart("Scatter Plot");
 
         ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
-        queryDialog.selectQuery("APX-1 (APX-1: Abbreviated Physical Exam)");
+        queryDialog.selectQuery(QUERY_APX_1);
         chartTypeDialog = queryDialog.clickOk();
 
-        chartTypeDialog.setYAxis("1. Weight");
-        chartTypeDialog.setXAxis("4. Pulse");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setYAxis(MEASURE_1_WEIGHT)
+                .setXAxis(MEASURE_4_PULSE)
+                .clickApply();
 
         //Verify scatter plot
         // getText(Locator.css("svg"))
         assertSVG(SCATTER_PLOT_MV_1);
 
-        log("Set Plot Title");
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.setPlotTitle(CHART_TITLE);
-        log("Set Y Axis");
-        chartLayoutDialog.clickYAxisTab();
-        chartLayoutDialog.setScaleType(ChartLayoutDialog.ScaleType.Log);
-        chartLayoutDialog.setYAxisLabel("TestYAxis");
-        chartLayoutDialog.clickApply();
+        log("Set Plot Title and the Y-Axis");
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.setPlotTitle(CHART_TITLE)
+                .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
+                .setYAxisLabel("TestYAxis")
+                .clickApply();
+
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setYAxis("2. Body Temp", true);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setYAxis(MEASURE_2_BODY_TEMP, true)
+                .clickApply();
 
         log("Set X Axis");
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickXAxisTab();
-        chartLayoutDialog.setScaleType(ChartLayoutDialog.ScaleType.Log);
-        chartLayoutDialog.setXAxisLabel("TestXAxis");
-        chartLayoutDialog.clickApply();
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.setXAxisScale(ChartLayoutDialog.ScaleType.Log)
+                .setXAxisLabel("TestXAxis")
+                .clickApply();
+
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY, true);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY, true)
+                .clickApply();
 
         assertSVG(SCATTER_PLOT_MV_2);
 
@@ -148,9 +163,9 @@ public class ScatterPlotTest extends GenericChartsTest
         datasetTable.clickHeaderMenu("Charts", "Create Scatter Plot");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("1. Weight");
-        chartTypeDialog.setXAxis("4. Pulse");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setYAxis("1. Weight")
+                .setXAxis("4. Pulse")
+                .clickApply();
 
         //Verify scatter plot
         assertSVG(SCATTER_PLOT_DR_1);
@@ -188,9 +203,9 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Set X Axis");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setXAxis("Integer", true);
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setXAxis("Integer", true)
+                .setChartType(ChartTypeDialog.ChartType.Scatter)
+                .clickApply();
 
         assertSVG(SCATTER_PLOT_QC);
 
@@ -202,13 +217,20 @@ public class ScatterPlotTest extends GenericChartsTest
     private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
     private static final String CIRCLE_PATH_D = "M0,5A5,5 0 1,1 0,-5A5,5 0 1,1 0,5Z";
     private static final String TRIANGLE_PATH_D = "M0,5L5,-5L-5,-5 Z";
+    private static final String LARGE_TRIANGLE_PATH_D = "M0,8L8,-8L-8,-8 Z";
     private static final String SQUARE_PATH_D = "M-5,-5L5,-5 5,5 -5,5Z";
     private static final String DIAMOND_PATH_D = "M0 6.123724356957945 L 6.123724356957945 0 L 0 -6.123724356957945 L -6.123724356957945 0 Z";
+    private static final String COLOR_RED = "#FF0000";
+    private static final String COLOR_POINT_DEFAULT = "#3366FF";
+    private static final String COLOR_POINT_NORMAL = "#FC8D62";
+    private static final String COLOR_POINT_NOT_DONE = "#8DA0CB";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
     {
+
         ChartTypeDialog chartTypeDialog;
+        LookAndFeelScatterPlot lookAndFeelDialog;
         List<WebElement> points;
 
         clickProject(getProjectName());
@@ -231,29 +253,29 @@ public class ScatterPlotTest extends GenericChartsTest
         for (WebElement el : points)
         {
             // All of the points should be blue.
-            assertEquals("The point was not the expected color.", "#3366FF", el.getAttribute("fill"));
+            assertEquals("The point was not the expected color.", COLOR_POINT_DEFAULT, el.getAttribute("fill"));
         }
 
         // Enable Grouping - Colors
         log("Group with colors");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setColor("7. Neck");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setColor(MEASURE_7_NECK)
+                .clickApply();
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
 
         points = Locator.css("svg g a path").findElements(getDriver());
-        assertEquals("Point at (70, 67) was an unexpected color", "#8DA0CB", points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) was an unexpected color", COLOR_POINT_NOT_DONE, points.get(14).getAttribute("fill"));
         assertEquals("Point at (70, 67) was not a circle.", CIRCLE_PATH_D, points.get(14).getAttribute("d"));
-        assertEquals("Point at (92, 89) was an unexpected color", "#FC8D62", points.get(24).getAttribute("fill"));
+        assertEquals("Point at (92, 89) was an unexpected color", COLOR_POINT_NORMAL, points.get(24).getAttribute("fill"));
         assertEquals("Point at (92, 89) was not a circle.", CIRCLE_PATH_D, points.get(24).getAttribute("d"));
 
         // Enable Grouping - Shapes
         log("Group with shapes");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.removeColor();
-        chartTypeDialog.setShape("16. Evaluation Summary");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.removeColor()
+                .setShape(MEASURE_16_EVAL_SUM)
+                .clickApply();
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
         points = Locator.css("svg g a path").findElements(getDriver());
@@ -261,7 +283,7 @@ public class ScatterPlotTest extends GenericChartsTest
         for (WebElement el : points)
         {
             // All of the points should be blue.
-            assertEquals("The point was not the expected color.", "#3366FF", el.getAttribute("fill"));
+            assertEquals("The point was not the expected color.", COLOR_POINT_DEFAULT, el.getAttribute("fill"));
         }
 
         assertEquals("Point at (70, 67) was not a triangle.", TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
@@ -271,27 +293,117 @@ public class ScatterPlotTest extends GenericChartsTest
         // Enable Grouping - Shapes & Colors
         log("Group with both");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setColor("7. Neck");
-        // note: shape set to "16. Evaluation Summary" above
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setColor(MEASURE_7_NECK)
+                .clickApply();
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
         points = Locator.css("svg g a path").findElements(getDriver());
 
         assertEquals("Point at (70, 67) was not a triangle.", TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
-        assertEquals("Point at (70, 67) was an unexpected color", "#8DA0CB", points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) was an unexpected color", COLOR_POINT_NOT_DONE, points.get(14).getAttribute("fill"));
         assertEquals("Point at (92,89) was not a diamond.", DIAMOND_PATH_D, points.get(24).getAttribute("d"));
-        assertEquals("Point at (92,89) was an unexpected color", "#FC8D62", points.get(24).getAttribute("fill"));
+        assertEquals("Point at (92,89) was an unexpected color", COLOR_POINT_NORMAL, points.get(24).getAttribute("fill"));
         assertEquals("Point at (60, 48) was not a square.", SQUARE_PATH_D, points.get(25).getAttribute("d"));
-        assertEquals("Point at (60, 48) was an unexpected color", "#FC8D62", points.get(25).getAttribute("fill"));
+        assertEquals("Point at (60, 48) was an unexpected color", COLOR_POINT_NORMAL, points.get(25).getAttribute("fill"));
+
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        // TODO Add a test to validate that the point color selector is disabled.
+
+        lookAndFeelDialog.setPlotWidth("750")
+                .setPlotHeight("500")
+                .clickJitterPoints()
+                .setOpacity(90)
+                .setPointSize(8)
+                .setXAxisScale(ChartLayoutDialog.ScaleType.Log)
+                .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
+                .clickApply();
+
+        log("Validate that the appropriate valuse have changed for points on the plot.");
+        points = Locator.css("svg g a path").findElements(getDriver());
+        assertEquals("Point at (70, 67) was not a triangle.", LARGE_TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
+        assertEquals("Point at (70, 67) was an unexpected color", COLOR_POINT_NOT_DONE, points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) did not have the expected fill opacity.", "0.9", points.get(14).getAttribute("fill-opacity"));
+
+        log("Svg text: " + getSVGText());
+
+        log("Remove the color variable and set it in the look and feel.");
+        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog.removeColor()
+                .clickApply();
+
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+
+        lookAndFeelDialog.setPlotWidth("")
+                .setPlotHeight("")
+                .setPointColor(COLOR_RED)
+                .clickApply();
+
+        log("Validate that the appropriate valuse have changed for points on the plot.");
+        points = Locator.css("svg g a path").findElements(getDriver());
+        assertEquals("Point at (70, 67) was not a triangle.", LARGE_TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
+        assertEquals("Point at (70, 67) was an unexpected color", COLOR_RED, points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) did not have the expected fill opacity.", "0.9", points.get(14).getAttribute("fill-opacity"));
+
+        log("Add the color variable back because it will be used in a future test..");
+        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog.setColor(MEASURE_7_NECK)
+                .clickApply();
 
         savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored", true);
+
+    }
+
+    @LogMethod
+    private void doPlotExport()
+    {
+        final String EXPORTED_SCRIPT_CHECK_TYPE = "\"renderType\":\"scatter_plot\"";
+        final String EXPORTED_SCRIPT_CHECK_XAXIS = MEASURE_4_PULSE;
+        final String EXPORTED_SCRIPT_CHECK_YAXIS = MEASURE_1_WEIGHT;
+
+        log("Validate that export of the bar plot works.");
+        goToProjectHome();
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        clickTab("Clinical and Assay Data");
+        waitForElement(Locator.linkWithText(SCATTER_PLOT_NAME_DR + " Colored"));
+        clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_DR + " Colored"), WAIT_FOR_PAGE);
+
+        waitForElement(Locator.css("svg"));
+
+        log("Export as PDF");
+        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PDF"), 1);
+
+        log("Export as PNG");
+        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PNG"), 1);
+
+        log("Export to script.");
+
+        Locator dlg = Locator.xpath("//div").withClass("chart-wizard-dialog").notHidden().withDescendant(Locator.xpath("//div").withClass("title-panel").withDescendant(Locator.xpath("//div")).withText("Export script"));
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
+        waitFor(() -> isElementPresent(dlg),
+                "Ext Dialog with title '" + "Export script" + "' did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
+        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
+
+        log("Validate that the script is as expected.");
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_TYPE + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_TYPE.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_XAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_XAXIS.toLowerCase()));
+        Assert.assertTrue("Script did not contain expected text: '" + EXPORTED_SCRIPT_CHECK_YAXIS + "' ", exportScript.toLowerCase().contains(EXPORTED_SCRIPT_CHECK_YAXIS.toLowerCase()));
+
+        goToProjectHome();
+
     }
 
     @LogMethod
     private void doDeleteMeasureTest()
     {
+        final String FIELDS_REGION_TITLE = "Dataset Fields";
+
         ChartTypeDialog chartTypeDialog;
+        List<String> listOfMeasureLabels;
+        int listIndex;
 
         log("Remove color and shape measures.");
         clickProject(getProjectName());
@@ -301,9 +413,16 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Manage", WAIT_FOR_PAGE);
         clickButton("Edit Definition");
 
-        waitForText("Dataset Fields");
-        _listHelper.deleteField("Dataset Fields", 12);
-        _listHelper.deleteField("Dataset Fields", 31);
+        waitForText(FIELDS_REGION_TITLE);
+
+        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
+        log("Remove color measure.");
+        listIndex = listOfMeasureLabels.indexOf(MEASURE_7_NECK);
+        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
+
+        log("Remove shape measure.");
+        listIndex = listOfMeasureLabels.indexOf(MEASURE_16_EVAL_SUM);
+        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
         clickButton("Save");
 
         log("Verify proper error messages for removed measures.");
@@ -315,17 +434,17 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
 
-        waitForText("The saved color measure, 7. Neck, is not available. It may have been renamed or removed.");
-        assertTextPresent("The saved shape measure, 16. Evaluation Summary, is not available. It may have been renamed or removed.");
+        waitForText("The saved color measure, " + MEASURE_7_NECK + ", is not available. It may have been renamed or removed.");
+        assertTextPresent("The saved shape measure, " + MEASURE_16_EVAL_SUM + ", is not available. It may have been renamed or removed.");
         chartTypeDialog = clickChartTypeButton();
         assertTrue(chartTypeDialog.getColorValue() == null || "".equals(chartTypeDialog.getColorValue()));
         assertTrue(chartTypeDialog.getShapeValue() == null || "".equals(chartTypeDialog.getShapeValue()));
         chartTypeDialog.clickApply();
 
-        log("Set X Axis to categorical measure.");
+        log("Set X Axis to categorical measure '" + MEASURE_FORM_LANGUAGE + "");
         chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setXAxis("Form Language", true);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setXAxis(MEASURE_FORM_LANGUAGE, true)
+                .clickApply();
 
         savePlot();
 
@@ -337,8 +456,11 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Manage", WAIT_FOR_PAGE);
         clickButton("Edit Definition");
 
-        waitForText("Dataset Fields");
-        _listHelper.deleteField("Dataset Fields", 35);
+        waitForText(FIELDS_REGION_TITLE);
+        listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);
+        log("Remove x-axis measure.");
+        listIndex = listOfMeasureLabels.indexOf(MEASURE_FORM_LANGUAGE);
+        _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
         clickButton("Save");
 
         log("Verify missing measure error message.");
@@ -348,7 +470,7 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // Issue 18186: When not in edit mode, there shouldn't be a pop up message.
-        String formLanguageError = "The saved x measure, Form Language, is not available. It may have been renamed or removed.";
+        String formLanguageError = "The saved x measure, " + MEASURE_FORM_LANGUAGE + ", is not available. It may have been renamed or removed.";
         waitForText(formLanguageError);
         clickButton("Edit");
         final Window errorWindow = Window().withTitle("Error").waitFor(getDriver());
@@ -356,6 +478,22 @@ public class ScatterPlotTest extends GenericChartsTest
         errorWindow.clickButton("OK", 0);
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.clickCancel();
+    }
+
+    private List<String> getLabels(String areaTitle)
+    {
+        String prefix = _listHelper.getPropertyXPathContains(areaTitle);
+        List<String> labels = new ArrayList<>();
+        List<WebElement> labelsElements;
+
+        labelsElements = Locator.findElements(getDriver(),  Locator.xpath(prefix + "//div[contains(@id, 'label')]//input"));
+
+        for(WebElement we : labelsElements)
+        {
+            labels.add(getFormElement(we));
+        }
+
+        return labels;
     }
 
     @LogMethod
@@ -393,7 +531,7 @@ public class ScatterPlotTest extends GenericChartsTest
     @LogMethod
     private void doPointClickScatterPlotTest()
     {
-        ChartLayoutDialog chartLayoutDialog;
+        LookAndFeelScatterPlot lookAndFeelDialog;
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -412,20 +550,21 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickDeveloperTab();
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.clickDeveloperTab();
         assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
-        chartLayoutDialog.clickDeveloperEnable();
-        chartLayoutDialog.clickDeveloperHelpTab();
+        lookAndFeelDialog.clickDeveloperEnable()
+                .clickDeveloperHelpTab();
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
-        chartLayoutDialog.clickDeveloperSourceTab();
-        String fn = chartLayoutDialog.getDeveloperSourceContent();
+        lookAndFeelDialog.clickDeveloperSourceTab();
+        String fn = lookAndFeelDialog.getDeveloperSourceContent();
         assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, measureInfo, clickEvent) {"));
         // apply the default point click function
-        chartLayoutDialog.clickApply();
+        lookAndFeelDialog.clickApply();
 
         Locator svgCircleLoc = Locator.css("svg a path");
         waitForElement(svgCircleLoc);
@@ -434,21 +573,22 @@ public class ScatterPlotTest extends GenericChartsTest
         click(Ext4Helper.Locators.ext4Button("OK"));
 
         // open developer panel and test JS function validation
-        chartLayoutDialog = clickChartLayoutButton();
-        chartLayoutDialog.clickDeveloperTab();
-        chartLayoutDialog.setDeveloperSourceContent("");
-        chartLayoutDialog.clickApply(-1);
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.clickDeveloperTab()
+                .setDeveloperSourceContent("")
+                .clickApplyWithError();
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        chartLayoutDialog.setDeveloperSourceContent("function(){");
-        chartLayoutDialog.clickApply(-1);
+        lookAndFeelDialog.setDeveloperSourceContent("function(){")
+                .clickApplyWithError();
         assertTextPresent("Error parsing the function:");
-        chartLayoutDialog.clickDeveloperDisable(true);
+        lookAndFeelDialog.clickDeveloperDisable(true);
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
-        chartLayoutDialog.clickDeveloperEnable();
         String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
-        chartLayoutDialog.setDeveloperSourceContent(function);
-        chartLayoutDialog.clickApply();
+        lookAndFeelDialog.clickDeveloperEnable()
+                .setDeveloperSourceContent(function)
+                .clickApply();
         savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn", true);
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc, SeleniumEvent.click));
         waitForText("Query Schema Browser");
@@ -465,9 +605,10 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);
         pushLocation();
-        chartLayoutDialog = clickChartLayoutButton();
-        assertFalse("Found the 'Developer' tab on the the Look and Feel dialog. It should not be there for this user.", chartLayoutDialog.getAvailableTabs().contains("Developer"));
-        chartLayoutDialog.clickCancel();
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        assertFalse("Found the 'Developer' tab on the the Look and Feel dialog. It should not be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
+        lookAndFeelDialog.clickCancel();
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc, SeleniumEvent.click));
         waitForText("APX-1: Abbreviated Physical Exam");
         stopImpersonating();
@@ -476,9 +617,11 @@ public class ScatterPlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         popLocation();
         waitForText(CHART_TITLE);
-        chartLayoutDialog = clickChartLayoutButton();
-        assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", chartLayoutDialog.getAvailableTabs().contains("Developer"));
-        chartLayoutDialog.clickCancel();
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
+        lookAndFeelDialog.clickCancel();
         stopImpersonating();
+
     }
 }

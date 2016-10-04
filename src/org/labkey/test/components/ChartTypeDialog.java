@@ -32,7 +32,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     {
     }
 
-    public void setChartType(ChartType chartType)
+    public ChartTypeDialog setChartType(ChartType chartType)
     {
         switch(chartType)
         {
@@ -49,6 +49,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
                 elementCache().plotTypeScatter.click();
                 break;
         }
+
+        return this;
     }
 
     public boolean isChartTypeEnabled(ChartType chartType)
