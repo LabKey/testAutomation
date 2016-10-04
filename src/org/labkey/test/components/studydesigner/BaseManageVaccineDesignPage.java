@@ -44,7 +44,7 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
     {
         Locator.XPathLocator cellLoc = getOuterCellLoc(table, column, rowIndex);
         setFormElement(cellLoc.append(Locator.tagWithName("textarea", column)), value);
-        sleep(500); // give the store a half second to update
+        removeFocusAndWait();
 
     }
 
@@ -57,7 +57,7 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
     protected void setTextFieldValue(Locator.XPathLocator cellLoc, String column, String value)
     {
         setFormElement(cellLoc.append(Locator.tagWithName("input", column)), value);
-        sleep(500); // give the store a half second to update
+        removeFocusAndWait();
     }
 
     protected void setOuterComboFieldValue(Locator.XPathLocator table, String column, String value, int rowIndex)
@@ -75,7 +75,7 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
     protected void setComboFieldValue(Locator.XPathLocator cellLoc, String value)
     {
         _ext4Helper.selectComboBoxItem(cellLoc, Ext4Helper.TextMatchTechnique.STARTS_WITH, value);
-        sleep(500); // give the store a half second to update
+        removeFocusAndWait();
     }
 
     protected Locator.XPathLocator getOuterCellLoc(Locator.XPathLocator table, String column, int rowIndex)
@@ -95,6 +95,12 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
         Locator.XPathLocator tableLoc = table.append(baseElements().tableRowLoc);
         Locator.XPathLocator cellLoc = tableLoc.append(baseElements().cellDisplayLoc.withAttribute("outer-index", rowIndex+""));
         return cellLoc.append(Locator.tagWithClass("table", "subgrid-" + subgridName));
+    }
+
+    private void removeFocusAndWait()
+    {
+        Locator.tagWithClass("span", "labkey-nav-page-header").findElement(getDriver()).click(); // click outside field to remove focus
+        sleep(500); // give the store a half second to update
     }
 
     public void cancel()
