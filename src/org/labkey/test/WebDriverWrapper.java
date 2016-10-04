@@ -3061,6 +3061,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    /**
+     * @deprecated Use {@link Locator#findElements(SearchContext)}.size()
+     */
+    @Deprecated
     public int getElementCount(Locator locator)
     {
         return locator.findElements(getDriver()).size();
