@@ -3,12 +3,13 @@ package org.labkey.test.components.studydesigner;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.WebPart;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Elements>
+public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.ElementCache>
 {
     public AssayScheduleWebpart(WebDriver driver)
     {
@@ -63,12 +64,12 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
     }
 
     @Override
-    protected Elements newElementCache()
+    protected ElementCache newElementCache()
     {
-        return new Elements();
+        return new ElementCache();
     }
 
-    public class Elements extends BodyWebPart.Elements
+    public class ElementCache extends WebPart.ElementCache
     {
         int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
         Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
