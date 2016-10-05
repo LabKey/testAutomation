@@ -1,6 +1,7 @@
 package org.labkey.test.selenium;
 
 import org.labkey.test.Locator;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -52,8 +53,12 @@ public class RefindingWebElement extends LazyWebElement
         }
         catch (StaleElementReferenceException refind)
         {
-            _wrappedElement = null;
-            callListeners(super.getWrappedElement());
+            try
+            {
+                _wrappedElement = findWrappedElement();
+                callListeners(super.getWrappedElement());
+            }
+            catch (NoSuchElementException ignore) {}
         }
         return super.getWrappedElement();
     }

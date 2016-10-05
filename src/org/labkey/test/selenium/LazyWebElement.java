@@ -44,7 +44,7 @@ public class LazyWebElement extends WebElementWrapper
         return this;
     }
 
-    private WebElement findWrappedElement()
+    protected WebElement findWrappedElement()
     {
         if (_waitMs != null && _waitMs > 0)
         {
