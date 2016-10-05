@@ -25,12 +25,14 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SearchHelper
 {
@@ -77,7 +79,10 @@ public class SearchHelper
                 break;
 
             if (i == maxTries)
-                assertTrue("These items did not return expected search results: " + notFound.keySet(), notFound.isEmpty());
+            {
+                searchFor(new ArrayList<>(notFound.keySet()).get(0), false); // End test on failed search
+                fail("These items did not return expected search results: " + notFound.keySet());
+            }
 
             _test.log(String.format("Bad search results for %s. Waiting %d seconds before trying again...", notFound.keySet().toString(), i*5));
             WebDriverWrapper.sleep(i*5000);
