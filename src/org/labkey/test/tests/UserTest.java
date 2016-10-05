@@ -545,7 +545,8 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
-        assertElementPresent(Locator.css("#" + table.getAttribute("id") + " td.labkey-form-label + td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES), 2);
+        final int count = Locator.tagWithClass("td", "labkey-form-label").followingSibling("td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES).findElements(table).size();
+        assertEquals("Didn't find special characters for user first and last name", 2, count);
     }
 
     @Test
@@ -561,7 +562,8 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
-        assertElementPresent(Locator.css("#" + table.getAttribute("id") + " td.labkey-form-label + td").withText(INJECT_CHARS_1), 2);
+        final int count = Locator.tagWithClass("td", "labkey-form-label").followingSibling("td").withText(INJECT_CHARS_1).findElements(table).size();
+        assertEquals("Didn't find injection string for user first and last name", 2, count);
     }
 
     private static final String PROP_NAME1 = "Institution";

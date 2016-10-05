@@ -620,7 +620,7 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Locator.css(".x4-grid-row-selected"));
-        waitForElement(Locator.css(".x4-grid-row").containing(dataset));
+        waitForElement(Locator.tagWithClass("*", "x4-grid-row").containing(dataset));
     }
 
     public static class Locators

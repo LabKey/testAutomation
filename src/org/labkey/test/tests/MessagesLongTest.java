@@ -40,6 +40,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.Locator.NBSP;
 
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
@@ -224,7 +225,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit", longWaitForPage);
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
+        assertElementPresent(Locator.id("table1").append(Locator.tag("td").withText(NBSP + "(2 responses)")));
 
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
@@ -320,7 +321,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
+        assertElementPresent(Locator.id("table1").append(Locator.tag("td").withText(NBSP + "(2 responses)")));
         clickProject(PROJECT_NAME);
         // We now show closed messages by default
         assertTextPresent(MSG2_TITLE);
@@ -437,7 +438,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
         verifyMemberList();
-        assertElementPresent(Locator.css("table[name=webpart] td").withText("Assigned To: " + displayNameFromEmail(USER3)));
+        assertElementPresent(Locator.tagWithName("table", "webpart").append(Locator.tag("td").withText("Assigned To:" + NBSP + displayNameFromEmail(USER3))));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
 

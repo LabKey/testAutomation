@@ -444,9 +444,8 @@ public class ExtHelper
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));
-
-        _test.waitAndClick(Locator.css(".x-combo-list-item").containing(selection));
+        _test.click(parentLocator.append(Locator.tagWithClass("div", "x-form-trigger-arrow")));
+        _test.waitAndClick(Locator.tagWithClass("*", "x-combo-list-item").containing(selection));
     }
 
     public void closeExtTab(String tabName)

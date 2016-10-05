@@ -108,7 +108,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
-        assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
+        assertElementNotPresent(Locator.tagWithClass("*", "labkey-column-header").withText("Role")); // excluded column
 
         log("Import XLSX GPAT assay");
         clickProject(getProjectName());

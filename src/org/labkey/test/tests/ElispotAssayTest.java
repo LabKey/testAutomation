@@ -495,13 +495,13 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
 
-        Locator.css(".gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.tagWithClass("*", "gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
 
         setFormElement(nameField, PLATE_TEMPLATE_NAME);
         fireEvent(nameField, SeleniumEvent.change);
 
         click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
-        Locator.css(".x-combo-list-item").withText("Background Wells").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.tagWithClass("*", "x-combo-list-item").withText("Background Wells").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 
@@ -517,11 +517,11 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         highlightWells("CONTROL", "Background Wells", "E7", "F9");
         highlightWells("CONTROL", "Background Wells", "G10", "H12");
 
-        Locator groupField = Locator.xpath("//input[../div[contains(@class, 'x-form-trigger-arrow')]]");
+        Locator groupField = Locator.tagWithClass("div", "x-form-trigger-arrow").childTag("input");
         setFormElement(groupField, "other control group");
 
         clickButton("Create", 0);
-        waitForElement(Locator.css("input[type=radio][name=wellGroup] + label").withText("other control group"));
+        waitForElement(Locator.tagWithName("input", "wellGroup").withAttribute("type", "radio").followingSibling("label").withText("other control group"));
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
     }
@@ -581,9 +581,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         _assayHelper.clickEditAssayDesign();
-        Locator.CssLocator locator = Locator.css("div#partdelete_removeTransformScript0 span");
-        waitForElement(locator);
-        click(locator);
+        waitAndClick(Locator.css("div#partdelete_removeTransformScript0 span"));
         clickButton("Save & Close");
         DataRegionTable.waitForDataRegion(this, "Runs");
     }
@@ -722,7 +720,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         }
         else
         {
-            Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
+            Locator.tagWithClass("*", "gwt-Label").withText(type).findElement(getDriver()).click();
             //select no group in order to clear area
         }
         dragAndDrop(start, end);

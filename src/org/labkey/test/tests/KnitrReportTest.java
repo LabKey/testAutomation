@@ -118,9 +118,9 @@ public class KnitrReportTest extends BaseWebDriverTest
     public void testKnitrMarkupFormat() throws Exception
     {
         Locator.CssLocator plotLocator = Locator.css("img[alt='plot of chunk graphics']");
-        Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
-                                    Locator.css("h2").withText("R code chunks"),
-                                    Locator.css("code.r").containing("set.seed(123)"),       // Echoed R code
+        Locator[] reportContains = {Locator.tag("h1").withText("A Minimal Example for Markdown"),
+                                    Locator.tag("h2").withText("R code chunks"),
+                                    Locator.tagWithClass("code", "r").containing("set.seed(123)"),       // Echoed R code
                                     plotLocator,
                                     //Locator.css("p").withText("Inline R code is also supported, e.g. the value of x is 2, and 2 \u00D7 \u03C0 = 6.2832."),
                                     //Locator.css(".MathJax, .mathjax")
@@ -174,8 +174,8 @@ public class KnitrReportTest extends BaseWebDriverTest
     public void testRmarkdownV2Support() throws Exception
     {
         Locator[] reportContains = {Locator.css("h1").withText("A Minimal Example for Markdown"),
-                Locator.css("h2").withText("R code chunks"),
-                Locator.css("code").containing("set.seed(123)"),       // Echoed R code
+                Locator.tag("h2").withText("R code chunks"),
+                Locator.tag("code").containing("set.seed(123)"),       // Echoed R code
                 Locator.tag("sup").withText("write") //should not contain the hat markdown v2 closing tag
         };
 
