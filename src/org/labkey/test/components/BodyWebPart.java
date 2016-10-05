@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.WebPart.Locators.*;
 
-public class BodyWebPart<EC extends WebPart.Elements> extends WebPart<EC>
+public class BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 {
     public BodyWebPart(WebDriver driver, WebElement webPartElement)
     {

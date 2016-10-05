@@ -33,7 +33,7 @@ import static org.labkey.test.components.WebPart.Locators.webPart;
 /**
  * Base class for Portal WebParts (can be moved, renamed, and removed)
  */
-public abstract class WebPart<EC extends WebPart.Elements> extends WebDriverComponent<EC> implements WebDriverWrapper.PageLoadListener
+public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriverComponent<EC> implements WebDriverWrapper.PageLoadListener
 {
     @Deprecated // Use #getWrapper()
     protected final WebDriverWrapper _test;
@@ -149,7 +149,7 @@ public abstract class WebPart<EC extends WebPart.Elements> extends WebDriverComp
     }
 
     @Deprecated // Use elementCache()
-    protected Elements elements()
+    protected ElementCache elements()
     {
         return elementCache();
     }
@@ -157,13 +157,21 @@ public abstract class WebPart<EC extends WebPart.Elements> extends WebDriverComp
     @SuppressWarnings("unchecked")
     protected EC newElementCache()
     {
-        return (EC)new Elements();
+        return (EC)new ElementCache();
     }
 
-    public class Elements extends Component.ElementCache
+    public class ElementCache extends Component.ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
+    }
+
+    /**
+     * @deprecated Renamed to {@link ElementCache} for consistency
+     */
+    @Deprecated
+    public class Elements extends ElementCache
+    {
     }
 
     protected static class Locators
