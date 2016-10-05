@@ -131,7 +131,7 @@ public abstract class ReportTest extends StudyBaseTest
 
     public static enum ChartTypes
     {
-        BAR("Bar Plot"),
+        BAR("Bar Chart"),
         BOX("Box Plot"),
         PIE("Pie Chart"),
         SCATTER("Scatter Plot"),
