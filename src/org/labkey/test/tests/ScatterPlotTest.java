@@ -72,7 +72,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
     private static final String MEASURE_1_WEIGHT = "1. Weight";
     private static final String MEASURE_2_BODY_TEMP = "2. Body Temp";
-    private static final String MEASURE_4_PULSE = "1. Weight";
+    private static final String MEASURE_4_PULSE = "4. Pulse";
     private static final String MEASURE_7_NECK = "7. Neck";
     private static final String MEASURE_16_EVAL_SUM = "16. Evaluation Summary";
     private static final String MEASURE_FORM_LANGUAGE = "Form Language";
