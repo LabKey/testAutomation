@@ -82,6 +82,7 @@ import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
+import static org.labkey.test.WebTestHelper.isLocalServer;
 
 /**
  * TODO: Move non-JUnit related methods from BWDT.
@@ -90,6 +91,7 @@ import static org.labkey.test.WebTestHelper.getHttpResponse;
 public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
+    private static final String CLIENT_SIDE_ERROR = "Client exception detected";
 
     private Stack<String> _impersonationStack = new Stack<>();
 
@@ -676,6 +678,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 {
                     clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
                 }
+
+                checkErrors(); // Check for errors from bootstrap/upgrade
             }
 
             // Tests hit Home portal a lot. Make it load as fast as possible
@@ -686,7 +690,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 webPart.delete();
         }
     }
-
 
     private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedText)
     {
@@ -704,7 +707,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (null != expectedText)
             assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(getDriver()).getText());
     }
-
 
     private void verifyInitialUserRedirects()
     {
@@ -810,6 +812,43 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (null != response)
                 EntityUtils.consumeQuietly(response.getEntity());
         }
+    }
+
+    public void checkErrors()
+    {
+        if (!isLocalServer())
+            return;
+        if (isGuestModeTest())
+            return;
+
+        ensureSignedInAsPrimaryTestUser();
+        String serverErrors = getServerErrors();
+        if (!serverErrors.isEmpty())
+        {
+            beginAt(buildURL("admin", "showErrorsSinceMark"));
+            resetErrors();
+            if(serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
+                fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+            else
+                fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
+        }
+        log("No new errors found.");
+    }
+
+    protected String getServerErrors()
+    {
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"));
+        assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
+        return httpResponse.getResponseBody();
+    }
+
+    public void resetErrors()
+    {
+        if (isGuestModeTest() || !isLocalServer())
+            return;
+
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"));
+        assertEquals("Failed to reset server errors: [" + httpResponse.getResponseBody().split("\n")[0] + "].", HttpStatus.SC_OK, httpResponse.getResponseCode());
     }
 
     @LogMethod

@@ -140,8 +140,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     private static final SingletonWebDriver _driver = SingletonWebDriver.getInstance();
     private final BrowserType BROWSER_TYPE;
 
-    private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -329,15 +327,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             return null;
         }
-    }
-
-    public void resetErrors()
-    {
-        if (isGuestModeTest() || !isLocalServer())
-            return;
-
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"));
-        assertEquals("Failed to reset server errors: [" + httpResponse.getResponseBody().split("\n")[0] + "].", HttpStatus.SC_OK, httpResponse.getResponseCode());
     }
 
     private static final String BEFORE_CLASS = "BeforeClass";
@@ -984,27 +973,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             log("Found " + leakCount + " in-use objects.  This is within the expected number of " + MAX_LEAK_LIMIT + ".");
     }
 
-    public void checkErrors()
-    {
-        if (!isLocalServer())
-            return;
-        if (isGuestModeTest())
-            return;
-
-        ensureSignedInAsPrimaryTestUser();
-        String serverErrors = getServerErrors();
-        if (!serverErrors.isEmpty())
-        {
-            beginAt(buildURL("admin", "showErrorsSinceMark"));
-            resetErrors();
-            if(serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
-                fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
-            else
-                fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
-        }
-        log("No new errors found.");
-    }
-
     @LogMethod
     public void checkExpectedErrors(@LoggedParam int expectedErrors)
     {
@@ -1026,13 +994,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         // Clear expected errors to prevent the test from failing.
         resetErrors();
-    }
-
-    protected String getServerErrors()
-    {
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"));
-        assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
-        return httpResponse.getResponseBody();
     }
 
     @LogMethod
