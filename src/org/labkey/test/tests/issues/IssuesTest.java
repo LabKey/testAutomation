@@ -699,22 +699,13 @@ public class IssuesTest extends BaseWebDriverTest
     {
         Locator relatedLocator = Locator.name("related");
 
-        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "A is for Apple"));
-        String issueIdA = getIssueId();
-
-        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "B is for Baking"));
-        String issueIdB = getIssueId();
-
-        _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "C is for Cat"));
-        String issueIdC = getIssueId();
-
+        String issueIdA = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "A is for Apple", "priority", "0")).getIssueId();
+        String issueIdB = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "B is for Baking", "priority", "0")).getIssueId();
         // related C to A
-        updateIssue();
-        setFormElement(relatedLocator, issueIdA);
-        clickButton("Save");
+        String issueIdC = _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "C is for Cat", "priority", "0", "related", issueIdA)).getIssueId();
 
-        assertElementPresent(Locator.linkWithText(issueIdA));
         clickAndWait(Locator.linkWithText(issueIdA));
+        assertElementPresent(Locator.linkWithText(issueIdC)); // Should link back to related issue
 
         // try to link to non-existent issue
         updateIssue();
