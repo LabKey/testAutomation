@@ -517,7 +517,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         highlightWells("CONTROL", "Background Wells", "E7", "F9");
         highlightWells("CONTROL", "Background Wells", "G10", "H12");
 
-        Locator groupField = Locator.tagWithClass("div", "x-form-trigger-arrow").childTag("input");
+        Locator groupField = Locator.tagWithClass("div", "x-form-trigger-arrow").precedingSibling("input");
         setFormElement(groupField, "other control group");
 
         clickButton("Create", 0);
