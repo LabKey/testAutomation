@@ -28,6 +28,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 public class DataRegionExportHelper extends Component
 {
@@ -102,6 +103,11 @@ public class DataRegionExportHelper extends Component
 
     public String exportScript(ScriptExportType type)
     {
+        return exportAndVerifyScript(type, a -> {});
+    }
+
+    public String exportAndVerifyScript(ScriptExportType type, Consumer<String> verification)
+    {
         expandExportPanel();
         elements().scriptTab.click();
         _driver.checkRadioButton(type.getRadioLocator());
@@ -109,6 +115,7 @@ public class DataRegionExportHelper extends Component
 
         _driver.switchToWindow(1);
         String scriptText = _driver.getDriver().getPageSource();
+        verification.accept(scriptText);
 
         _driver.getDriver().close();
         _driver.switchToMainWindow();

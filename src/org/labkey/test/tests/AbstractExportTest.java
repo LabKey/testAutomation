@@ -173,9 +173,11 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     @Test
     public final void testCreatePythonScriptNoFilter()
     {
-        String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        assertScriptContentLineCount(pythonScript, 10);
-        assertPythonScriptContents(pythonScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.PYTHON, pythonScript ->
+        {
+            assertScriptContentLineCount(pythonScript, 10);
+            assertPythonScriptContents(pythonScript, null);
+        });
     }
 
     @Test
@@ -183,17 +185,21 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String pythonScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PYTHON);
-        assertScriptContentLineCount(pythonScript, 13);
-        assertPythonScriptContents(pythonScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.PYTHON, pythonScript ->
+        {
+            assertScriptContentLineCount(pythonScript, 13);
+            assertPythonScriptContents(pythonScript, testColumn);
+        });
     }
 
     @Test
     public final void testCreateRScriptNoFilter()
     {
-        String rScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.R);
-        assertScriptContentLineCount(rScript, 20);
-        assertRScriptContents(rScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.R, rScript ->
+        {
+            assertScriptContentLineCount(rScript, 20);
+            assertRScriptContents(rScript, null);
+        });
     }
 
     @Test
@@ -201,17 +207,21 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String rScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.R);
-        assertScriptContentLineCount(rScript, 20);
-        assertRScriptContents(rScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.R, rScript ->
+        {
+            assertScriptContentLineCount(rScript, 20);
+            assertRScriptContents(rScript, testColumn);
+        });
     }
 
     @Test
     public final void testCreateJavaScriptNoFilter()
     {
-        String javaScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVA);
-        assertScriptContentLineCount(javaScript, 20);
-        assertJavaScriptContents(javaScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVA, javaScript ->
+        {
+            assertScriptContentLineCount(javaScript, 20);
+            assertJavaScriptContents(javaScript, null);
+        });
     }
 
     @Test
@@ -219,17 +229,21 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String javaScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVA);
-        assertScriptContentLineCount(javaScript, 21);
-        assertJavaScriptContents(javaScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVA, javaScript ->
+        {
+            assertScriptContentLineCount(javaScript, 21);
+            assertJavaScriptContents(javaScript, testColumn);
+        });
     }
 
     @Test
     public final void testCreateJavaScriptScriptNoFilter()
     {
-        String javaScriptScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT);
-        assertScriptContentLineCount(javaScriptScript, 35);
-        assertJavaScriptScriptContents(javaScriptScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
+        {
+            assertScriptContentLineCount(javaScriptScript, 35);
+            assertJavaScriptScriptContents(javaScriptScript, null);
+        });
     }
 
     @Test
@@ -237,17 +251,21 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String javaScriptScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT);
-        assertScriptContentLineCount(javaScriptScript, 35);
-        assertJavaScriptScriptContents(javaScriptScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.JAVASCRIPT, javaScriptScript ->
+        {
+            assertScriptContentLineCount(javaScriptScript, 35);
+            assertJavaScriptScriptContents(javaScriptScript, testColumn);
+        });
     }
 
     @Test
     public final void testCreateSASScriptNoFilter()
     {
-        String sasScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.SAS);
-        assertScriptContentLineCount(sasScript, 15);
-        assertSASScriptContents(sasScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.SAS, sasScript ->
+        {
+            assertScriptContentLineCount(sasScript, 15);
+            assertSASScriptContents(sasScript, null);
+        });
     }
 
     @Test
@@ -255,17 +273,21 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String sasScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.SAS);
-        assertScriptContentLineCount(sasScript, 16);
-        assertSASScriptContents(sasScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.SAS, sasScript ->
+        {
+            assertScriptContentLineCount(sasScript, 16);
+            assertSASScriptContents(sasScript, testColumn);
+        });
     }
 
     @Test
     public final void testCreatePerlScriptNoFilter()
     {
-        String perlScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PERL);
-        assertScriptContentLineCount(perlScript, 30);
-        assertPerlScriptContents(perlScript, null);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.PERL, perlScript ->
+        {
+            assertScriptContentLineCount(perlScript, 30);
+            assertPerlScriptContents(perlScript, null);
+        });
     }
 
     @Test
@@ -273,9 +295,11 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         String testColumn = getDataRegionColumnName();
         dataRegion.setFilter(testColumn, "Equals", "foo");
-        String perlScript = exportHelper.exportScript(DataRegionExportHelper.ScriptExportType.PERL);
-        assertScriptContentLineCount(perlScript, 33);
-        assertPerlScriptContents(perlScript, testColumn);
+        exportHelper.exportAndVerifyScript(DataRegionExportHelper.ScriptExportType.PERL, perlScript ->
+        {
+            assertScriptContentLineCount(perlScript, 33);
+            assertPerlScriptContents(perlScript, testColumn);
+        });
     }
 
     protected final List<String> checkFirstNRows(int n)
