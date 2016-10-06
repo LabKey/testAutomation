@@ -23,8 +23,8 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
     public ManageStudyProductsPage(BaseWebDriverTest test)
     {
         super(test);
-        waitForElements(elements().studyVaccineDesignLoc, 2);
-        waitForElements(elements().outerAddRowIconLoc, 2);
+        waitForElements(elements().studyVaccineDesignLoc, 3);
+        waitForElements(elements().outerAddRowIconLoc, 3);
     }
 
     public void addNewImmunogenRow(String label, String immunogenType, int rowIndex)
