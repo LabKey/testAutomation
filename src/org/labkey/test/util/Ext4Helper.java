@@ -98,7 +98,7 @@ public class Ext4Helper
     public void openComboList(Locator.XPathLocator comboBox)
     {
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
-        _test.click(arrowTrigger);
+        _test.waitAndClick(arrowTrigger);
 
         if (!_test.waitForElement(comboBox.withDescendant(Locator.tag("td").withClass(_cssPrefix + "pickerfield-open")), 1000, false))
             _test.click(arrowTrigger); // try again if combo-box doesn't open

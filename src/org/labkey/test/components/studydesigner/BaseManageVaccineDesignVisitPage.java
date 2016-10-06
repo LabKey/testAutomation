@@ -4,6 +4,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
+import org.openqa.selenium.WebElement;
 
 public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPage
 {
@@ -25,24 +26,29 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
         _ext4Helper.selectComboBoxItem(visitElements().existingVisitLoc, visitLabel);
 
         Window addVisitWindow = new Window("Add Visit", getDriver());
-        addVisitWindow.clickButton("Select", 0);
-        sleep(1000); // give the table a second to refresh
+        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Select", 0), visitElements().addVisitIconLoc, shortWait());
+        removeFocusAndWait();
     }
 
     public void addNewVisitColumn(Locator.XPathLocator table, String label, Integer rangeMin, Integer rangeMax)
     {
         clickOuterAddNewVisit(table);
 
-        waitAndClick(visitElements().newVisitRadioLoc);
-        setFormElement(visitElements().newVisitLabelLoc, label);
+        visitElements().getNewVisitRadio().click();
+        setFormElement(visitElements().getNewVisitLabelField(), label);
         if (rangeMin != null)
-            setFormElement(visitElements().newVisitMinLoc, rangeMin.toString());
+            setFormElement(visitElements().getNewVisitMinField(), rangeMin.toString());
         if (rangeMax != null)
-            setFormElement(visitElements().newVisitMaxLoc, rangeMax.toString());
+            setFormElement(visitElements().getNewVisitMaxField(), rangeMax.toString());
 
         Window addVisitWindow = new Window("Add Visit", getDriver());
-        addVisitWindow.clickButton("Submit", 0);
-        sleep(1000); // give the table a second to refresh
+        doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Submit", 0), visitElements().addVisitIconLoc, shortWait());
+        removeFocusAndWait();
+    }
+
+    protected void clickOuterAddNewVisit(Locator.XPathLocator table)
+    {
+        visitElements().getAddVisitIcon(table).click();
     }
 
     protected BaseVisitElements visitElements()
@@ -52,11 +58,38 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
 
     protected class BaseVisitElements extends BaseElements
     {
+        private Locator.XPathLocator newVisitRadioLoc = Ext4Helper.Locators.radiobutton(_test, "Create a new study visit:");
+        private Locator.XPathLocator newVisitLabelLoc = Locator.tagWithName("input", "newVisitLabel");
+        private Locator.XPathLocator newVisitMinLoc = Locator.tagWithName("input", "newVisitRangeMin");
+        private Locator.XPathLocator newVisitMaxLoc = Locator.tagWithName("input", "newVisitRangeMax");
+
         Locator.XPathLocator existingVisitLoc = Locator.tagWithClass("table", "x4-field").withDescendant(Locator.tagWithName("input", "existingVisit"));
-        Locator.XPathLocator newVisitRadioLoc = Ext4Helper.Locators.radiobutton(_test, "Create a new study visit:");
-        Locator.XPathLocator newVisitLabelLoc = Locator.tagWithName("input", "newVisitLabel");
-        Locator.XPathLocator newVisitMinLoc = Locator.tagWithName("input", "newVisitRangeMin");
-        Locator.XPathLocator newVisitMaxLoc = Locator.tagWithName("input", "newVisitRangeMax");
+        Locator.XPathLocator addVisitIconLoc = Locator.tagWithClass("i", "add-visit-column");
+
+        WebElement getAddVisitIcon(Locator.XPathLocator table)
+        {
+            return table.append(addVisitIconLoc).refindWhenNeeded(getDriver()).withTimeout(wait);
+        }
+
+        WebElement getNewVisitRadio()
+        {
+            return newVisitRadioLoc.findWhenNeeded(getDriver());
+        }
+
+        WebElement getNewVisitLabelField()
+        {
+            return visitElements().newVisitLabelLoc.findWhenNeeded(getDriver());
+        }
+
+        WebElement getNewVisitMinField()
+        {
+            return visitElements().newVisitMinLoc.findWhenNeeded(getDriver());
+        }
+
+        WebElement getNewVisitMaxField()
+        {
+            return visitElements().newVisitMaxLoc.findWhenNeeded(getDriver());
+        }
     }
 
     public static class Visit

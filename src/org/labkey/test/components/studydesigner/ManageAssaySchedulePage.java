@@ -17,6 +17,8 @@ package org.labkey.test.components.studydesigner;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Checkbox;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
     public int getAssayRowCount()
     {
-        return getElementCount(elements().assaysLoc.append(elements().tableRowLoc));
+        return elements().getAssayTableRowCount();
     }
 
     public void addNewAssayRow(String label, String description, int rowIndex)
@@ -73,16 +75,15 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
     public void selectVisit(Visit visit, int rowIndex)
     {
-        Locator.XPathLocator cellLoc = getOuterCellLoc(elements().assaysLoc, "VisitMap", rowIndex);
-        cellLoc = cellLoc.withAttribute("data-filter-value", visit.getRowId().toString());
-        _ext4Helper.checkCheckbox(cellLoc.append(elements().checkbox));
-        sleep(500); // give the store a half second to update
+        Checkbox visitCb = new Checkbox(elements().getVisitCheckbox(visit, rowIndex));
+        visitCb.check();
+
+        removeFocusAndWait();
     }
 
     public void setAssayPlan(String value)
     {
-        setFormElement(elements().assayPlanLoc, value);
-        sleep(500); // give the store a half second to update
+        setFormElement(elements().assayPlan, value);
     }
 
     public void addAllExistingVisitColumns()
@@ -102,7 +103,6 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
     public void save()
     {
-        // TODO handle error case
         doAndWaitForPageToLoad(() -> elements().saveButton.click());
     }
 
@@ -113,8 +113,23 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
     protected class Elements extends BaseElements
     {
+        private Locator.XPathLocator assayPlanLoc = Locator.tagWithName("textarea", "assayPlan");
+        private Locator.XPathLocator checkbox = Locator.tagWithClass("input", "x4-form-checkbox");
+
         Locator.XPathLocator assaysLoc = Locator.tagWithClass("div", "vaccine-design-assays");
-        Locator.XPathLocator assayPlanLoc = Locator.tagWithName("textarea", "assayPlan");
-        Locator.XPathLocator checkbox = Locator.tagWithClass("input", "x4-form-checkbox");
+
+        WebElement assayPlan = assayPlanLoc.findWhenNeeded(getDriver()).withTimeout(wait);
+
+        WebElement getVisitCheckbox(Visit visit, int rowIndex)
+        {
+            Locator.XPathLocator cellLoc = elements().getOuterCellLocator(elements().assaysLoc, "VisitMap", rowIndex);
+            cellLoc = cellLoc.withAttribute("data-filter-value", visit.getRowId().toString());
+            return cellLoc.append(elements().checkbox).findElement(getDriver());
+        }
+
+        int getAssayTableRowCount()
+        {
+            return assaysLoc.append(elements().tableRowLoc).findElements(getDriver()).size();
+        }
     }
 }

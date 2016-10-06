@@ -69,7 +69,7 @@ public class ManageTreatmentsPage extends BaseManageVaccineDesignVisitPage
 
     public void addCohortTreatmentMapping(Visit visit, String treatmentLabel, int rowIndex)
     {
-        Locator.XPathLocator cellLoc = getOuterCellLoc(elements().cohortsLoc, "VisitMap", rowIndex);
+        Locator.XPathLocator cellLoc = elements().getOuterCellLocator(elements().cohortsLoc, "VisitMap", rowIndex);
         cellLoc = cellLoc.withAttribute("data-filter-value", visit.getRowId().toString());
         setComboFieldValue(cellLoc, treatmentLabel);
     }
@@ -91,7 +91,6 @@ public class ManageTreatmentsPage extends BaseManageVaccineDesignVisitPage
 
     public void save()
     {
-        // TODO handle error case
         doAndWaitForPageToLoad(() -> elements().saveButton.click());
     }
 

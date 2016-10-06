@@ -3,12 +3,12 @@ package org.labkey.test.components.studydesigner;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
-import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.components.WebPart;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationScheduleWebpart.Elements>
+public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationScheduleWebpart.ElementCache>
 {
     public ImmunizationScheduleWebpart(WebDriver driver)
     {
@@ -18,30 +18,22 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
     @Override
     protected void waitForReady()
     {
-        getWrapper().waitForElement(elementCache().cohortsLoc.append(elementCache().tableOuterLoc));
+        getWrapper().waitForElement(elementCache().getCohortTableLocator());
     }
 
     public boolean isEmpty()
     {
-        return cohortsHasNoData();
-    }
-
-    public boolean cohortsHasNoData()
-    {
-        elementCache().cohortsTable.findElement(By.xpath(elementCache().tableOuterLoc.getLoc()));
-        return getWrapper().isElementPresent(elementCache().cohortsLoc.append(elementCache().tableOuterLoc).append(elementCache().emptyLoc));
+        return elementCache().isCohortTableEmpty();
     }
 
     public int getCohortRowCount()
     {
-        return getWrapper().getElementCount(elementCache().cohortsLoc.append(elementCache().tableRowLoc));
+        return elementCache().getCohortRowCount();
     }
 
     public String getCohortCellDisplayValue(String column, int rowIndex)
     {
-        Locator.XPathLocator rowLoc = elementCache().cohortsLoc.append(elementCache().tableRowLoc.withAttribute("outer-index", rowIndex+""));
-        Locator.XPathLocator cellLoc = rowLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column));
-        return cellLoc.findElement(getDriver()).getText();
+        return elementCache().getCohortCell(column, rowIndex).getText();
     }
 
     public void manage()
@@ -50,22 +42,45 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
     }
 
     @Override
-    protected Elements newElementCache()
+    protected ElementCache newElementCache()
     {
-        return new Elements();
+        return new ElementCache();
     }
 
-    public class Elements extends BodyWebPart.Elements
+    public class ElementCache extends WebPart.ElementCache
     {
-        int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
-        Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
-        Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
-        Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
-        Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Treatments");
-        Locator.XPathLocator cohortsLoc = Locator.tagWithClass("div", "immunization-schedule-cohorts");
+        private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+        private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
+        private Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
+        private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
+        private Locator.XPathLocator emptyLoc = Locator.tagWithClassContaining("td", "empty").withText("No data to show.");
+        private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Treatments");
+        private Locator.XPathLocator cohortsLoc = Locator.tagWithClass("div", "immunization-schedule-cohorts");
 
-        WebElement cohortsTable = new LazyWebElement(cohortsLoc.append(tableOuterLoc), getComponentElement()).withTimeout(wait);
-        WebElement manageLink = new LazyWebElement(manageLoc, getComponentElement()).withTimeout(wait);
+        Locator.XPathLocator getCohortTableLocator()
+        {
+            return cohortsLoc.append(elementCache().tableOuterLoc);
+        }
+
+        WebElement cohortsTable = cohortsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
+        WebElement manageLink = manageLoc.findWhenNeeded(this).withTimeout(wait);
+
+        WebElement getCohortCell(String column, int rowIndex)
+        {
+            Locator.XPathLocator rowLoc = elementCache().cohortsLoc.append(elementCache().tableRowLoc.withAttribute("outer-index", rowIndex+""));
+            Locator.XPathLocator cellLoc = rowLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column));
+            return cellLoc.findElement(getDriver());
+        }
+
+        int getCohortRowCount()
+        {
+            return cohortsLoc.append(elementCache().tableRowLoc).findElements(getDriver()).size();
+        }
+
+        boolean isCohortTableEmpty()
+        {
+            cohortsTable.findElement(By.xpath(elementCache().tableOuterLoc.getLoc()));
+            return getWrapper().isElementPresent(elementCache().cohortsLoc.append(elementCache().tableOuterLoc).append(elementCache().emptyLoc));
+        }
     }
 }

@@ -79,7 +79,6 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 
     public void save()
     {
-        // TODO handle error case
         doAndWaitForPageToLoad(() -> elements().saveButton.click());
     }
 
