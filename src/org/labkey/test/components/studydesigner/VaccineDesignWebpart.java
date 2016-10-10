@@ -42,9 +42,19 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         return elementCache().getImmunogenAdjuvantRowCount(rowIndex);
     }
 
+    public int getImmunogenDoseAndRouteRowCount(int rowIndex)
+    {
+        return elementCache().getImmunogenDoseAndRouteRowCount(rowIndex);
+    }
+
     public String getImmunogenAntigenRowCellDisplayValue(String column, int outerRowIndex, int subgridRowIndex)
     {
         return elementCache().getImmunogensAntigenCell(column, outerRowIndex, subgridRowIndex).getText();
+    }
+
+    public String getImmunogenDoseAndRouteCellDisplayValue(String column, int outerRowIndex, int subgridRowIndex)
+    {
+        return elementCache().getImmunogensDoseAndRouteCell(column, outerRowIndex, subgridRowIndex).getText();
     }
 
     public String getImmunogenCellDisplayValue(String column, int rowIndex)
@@ -108,6 +118,14 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             return subgridCellLoc.findElement(getDriver());
         }
 
+        WebElement getImmunogensDoseAndRouteCell(String column, int outerRowIndex, int subgridRowIndex)
+        {
+            Locator.XPathLocator cellLoc = elementCache().immunogensLoc.append(elementCache().cellDisplayLoc.withAttribute("outer-index", outerRowIndex+""));
+            Locator.XPathLocator subgridTableLoc = cellLoc.append(Locator.tagWithClass("table", "subgrid-DoseAndRoute"));
+            Locator.XPathLocator subgridCellLoc = subgridTableLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column).withAttribute("subgrid-index", subgridRowIndex+""));
+            return subgridCellLoc.findElement(getDriver());
+        }
+
         WebElement getAdjuvantsCell(String column, int rowIndex)
         {
             Locator.XPathLocator cellLoc = adjuvantsLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
@@ -133,6 +151,17 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             else
                 return subgridTableLoc.append(elementCache().subgridRowLoc).findElements(getDriver()).size();
         }
+
+        int getImmunogenDoseAndRouteRowCount(int rowIndex)
+        {
+            Locator.XPathLocator cellLoc = elementCache().immunogensLoc.append(elementCache().cellDisplayLoc.withAttribute("outer-index", rowIndex+""));
+            Locator.XPathLocator subgridTableLoc = cellLoc.append(Locator.tagWithClass("table", "subgrid-DoseAndRoute"));
+            if (!getWrapper().isElementPresent(subgridTableLoc))
+                return 0;
+            else
+                return subgridTableLoc.append(elementCache().subgridRowLoc).findElements(getDriver()).size();
+        }
+
 
         boolean isImmunogensTableEmpty()
         {
