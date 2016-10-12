@@ -97,7 +97,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().xAxis(), columnName);
         else
-            setValue(elementCache().xAxisDropText, columnName);
+            setValue(elementCache().xAxisDropText(), columnName);
         return this;
     }
 
@@ -112,7 +112,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().xCategories(), columnName);
         else
-            setValue(elementCache().xCategoriesDropText, columnName);
+            setValue(elementCache().xCategoriesDropText(), columnName);
         return this;
     }
 
@@ -127,7 +127,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().yAxis(), columnName);
         else
-            setValue(elementCache().yAxisDropText, columnName);
+            setValue(elementCache().yAxisDropText(), columnName);
         return this;
     }
 
@@ -142,7 +142,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().categories(), columnName);
         else
-            setValue(elementCache().categoriesDropText, columnName);
+            setValue(elementCache().categoriesDropText(), columnName);
         return this;
     }
 
@@ -173,7 +173,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().measure(), columnName);
         else
-            setValue(elementCache().measureDropText, columnName);
+            setValue(elementCache().measureDropText(), columnName);
         return this;
     }
 
@@ -204,7 +204,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().color(), columnName);
         else
-            setValue(elementCache().colorDropText, columnName);
+            setValue(elementCache().colorDropText(), columnName);
         return this;
     }
 
@@ -219,7 +219,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         if (replaceExisting)
             setValue(elementCache().shape(), columnName);
         else
-            setValue(elementCache().shapeDropText, columnName);
+            setValue(elementCache().shapeDropText(), columnName);
         return this;
     }
 
@@ -269,22 +269,22 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
 
     public String getXAxisValue()
     {
-        return getFieldValue(elementCache().xAxis(), elementCache().xAxisDropText);
+        return getFieldValue(elementCache().xAxis(), elementCache().xAxisDropText());
     }
 
     public String getYAxisValue()
     {
-        return getFieldValue(elementCache().yAxis(), elementCache().yAxisDropText);
+        return getFieldValue(elementCache().yAxis(), elementCache().yAxisDropText());
     }
 
     public String getColorValue()
     {
-        return getFieldValue(elementCache().color(), elementCache().colorDropText);
+        return getFieldValue(elementCache().color(), elementCache().colorDropText());
     }
 
     public String getShapeValue()
     {
-        return getFieldValue(elementCache().shape(), elementCache().shapeDropText);
+        return getFieldValue(elementCache().shape(), elementCache().shapeDropText());
     }
 
     // This could be cleaned up to take only one parameter and then try to find the drag and drop element from it.
@@ -407,33 +407,33 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath("//div[@id='chart-type-scatter_plot']"),  this);
 
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
-        public WebElement xAxisDropText = new LazyWebElement(Locator.xpath(XAXIS_CONTAINER + DROP_TEXT),  this);
+        public WebElement xAxisDropText() {return Locator.xpath(XAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement xCategories() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
-        public WebElement xCategoriesDropText = new LazyWebElement(Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT),  this);
+        public WebElement xCategoriesDropText() {return Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xCategoriesRemove() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement yAxis() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA).findElement(this);}
-        public WebElement yAxisDropText = new LazyWebElement(Locator.xpath(YAXIS_CONTAINER + DROP_TEXT),  this);
+        public WebElement yAxisDropText() {return Locator.xpath(YAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement yAxisRemove() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement categories() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement categoriesDisplay() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
-        public WebElement categoriesDropText = new LazyWebElement(Locator.xpath(CATEGORIES_CONTAINER + DROP_TEXT),  this);
+        public WebElement categoriesDropText() {return Locator.xpath(CATEGORIES_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement categoriesRemove() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement measure() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement measureDisplay() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
-        public WebElement measureDropText = new LazyWebElement(Locator.xpath(MEASURE_CONTAINER + DROP_TEXT),  this);
+        public WebElement measureDropText() {return Locator.xpath(MEASURE_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement measureRemove() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement color() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA).findElement(this);}
-        public WebElement colorDropText = new LazyWebElement(Locator.xpath(COLOR_CONTAINER + DROP_TEXT),  this);
+        public WebElement colorDropText() {return Locator.xpath(COLOR_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement colorRemove() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement shape() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA).findElement(this);}
-        public WebElement shapeDropText = new LazyWebElement(Locator.xpath(SHAPE_CONTAINER + DROP_TEXT),  this);
+        public WebElement shapeDropText() {return Locator.xpath(SHAPE_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement shapeRemove() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
     }
 
