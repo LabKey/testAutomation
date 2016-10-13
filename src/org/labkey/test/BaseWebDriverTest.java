@@ -1813,13 +1813,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
-    public void importFolderFromZipUseAdvance(File zipFile, boolean validateQueries, boolean useAdvancedOptions, int completedJobs, boolean expectErrors, int wait)
-    {
-        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, validateQueries, useAdvancedOptions);
-        importPage.clickStartImport();
-        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
-    }
-
     public void importFolderFromPipeline(String folderFile)
     {
         importFolderFromPipeline(folderFile, 1, true);
@@ -1845,13 +1838,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickButton("Start Import");
 
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
-    }
-
-    public void importFolderFromPipelineUseAdvance(File zipFile, boolean validateQueries, boolean useAdvancedOptions, int completedJobs, boolean expectErrors, int wait)
-    {
-        StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, validateQueries, useAdvancedOptions);
-        importPage.clickStartImport();
-        waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }
 
     /*

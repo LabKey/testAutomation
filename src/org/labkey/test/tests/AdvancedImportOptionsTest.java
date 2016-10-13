@@ -69,7 +69,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
-        Assert.assertTrue("The 'Advanced Import Panel' is not visible by default, and it should be in this case.", importPage.isAdvancedImportOptionsVisible());
+        importPage.setSelectSpecificImportOptions(true);
+        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         log("Start the import");
         importPage.clickStartImport();
@@ -124,7 +125,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
-        Assert.assertTrue("The 'Advanced Import Panel' is not visible by default, and it should be in this case.", importPage.isAdvancedImportOptionsVisible());
+        importPage.setSelectSpecificImportOptions(true);
+        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         boolean chkSet = false;
         Map<StartImportPage.AdvancedOptionsCheckBoxes, Boolean> myList = new HashMap<>();
@@ -178,7 +180,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Cleanup and remove the project.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE02);
-
     }
 
     @Test
@@ -191,7 +192,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
-        Assert.assertTrue("The 'Advanced Import Panel' is not visible by default, and it should be in this case.", importPage.isAdvancedImportOptionsVisible());
+        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         boolean chkSet = false;
         Map<StartImportPage.AdvancedOptionsCheckBoxes, Boolean> myList = new HashMap<>();

@@ -19,7 +19,7 @@ public class StartImportPage extends LabKeyPage
         super(test);
     }
 
-    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean useAdvancedOptions)
+    public static StartImportPage startImportFromFile(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean showAdvancedImportOptions)
     {
         StartImportPage sip = new StartImportPage(test.getDriver());
 
@@ -29,15 +29,15 @@ public class StartImportPage extends LabKeyPage
         test.setFormElement(Locator.name("folderZip"), zipFile);
 
         sip.setValidateQueriesCheckBox(validateQueries);
-        sip.setAdvancedImportOptionsCheckBox(useAdvancedOptions);
+        sip.setAdvancedImportOptionsCheckBox(showAdvancedImportOptions);
 
         test.clickButtonContainingText("Import Folder From Local Zip Archive");
-        test.waitForText("Study objects to import");
+        test.waitForText("Select specific objects to import");
 
         return sip;
     }
 
-    public static StartImportPage startImportFromPipeline(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean useAdvancedOptions)
+    public static StartImportPage startImportFromPipeline(BaseWebDriverTest test, File zipFile, boolean validateQueries, boolean selectSpecificImportOptions)
     {
         StartImportPage sip = new StartImportPage(test.getDriver());
         FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(test);
@@ -52,7 +52,7 @@ public class StartImportPage extends LabKeyPage
         test.waitForText("Import Folder from Pipeline");
 
         sip.setValidateQueriesCheckBox(validateQueries);
-        sip.setAdvancedImportOptionsCheckBox(useAdvancedOptions);
+        sip.setSelectSpecificImportOptions(selectSpecificImportOptions);
 
         return sip;
     }
@@ -65,6 +65,11 @@ public class StartImportPage extends LabKeyPage
     public void setAdvancedImportOptionsCheckBox(boolean check)
     {
         setInitialCheckBox(Locator.css("input[name='advancedImportOptions']"), check);
+    }
+
+    public void setSelectSpecificImportOptions(boolean check)
+    {
+        setInitialCheckBox(Locator.css("input[name='specificImportOptions']"), check);
     }
 
     private void setInitialCheckBox(Locator checkBox, boolean check)
@@ -80,9 +85,9 @@ public class StartImportPage extends LabKeyPage
         clickButton("Start Import");
     }
 
-    public boolean isAdvancedImportOptionsVisible()
+    public boolean isSelectSpecificImportOptionsVisible()
     {
-        return isElementVisible(Locator.css("div.import-option-panel"));
+        return isElementVisible(Locator.css("div.advanced-options-panel"));
     }
 
     public void setAdvancedOptionCheckBoxes(AdvancedOptionsCheckBoxes checkBox, boolean check)
@@ -107,7 +112,7 @@ public class StartImportPage extends LabKeyPage
 
     public void setAllAdvancedOptionCheckBoxes(boolean checked)
     {
-        List<WebElement> chkBoxes = Locator.css("div.import-option-panel div.x4-column-layout-ct div.x4-panel-body input").findElements(getDriver());
+        List<WebElement> chkBoxes = Locator.css("div.advanced-options-panel div.x4-column-layout-ct div.x4-panel-body input").findElements(getDriver());
         chkBoxes
                 .stream()
                 .forEach(chkBox -> {
