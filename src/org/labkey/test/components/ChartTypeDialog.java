@@ -5,6 +5,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -226,6 +227,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     private ChartTypeDialog setValue(WebElement target, String columnName)
     {
         elementCache().getColumn(columnName).click();
+        getWrapper().waitFor(() -> {
+            return target.isDisplayed();
+        }, "Target element is not displayed", 5000);
         target.click();
         getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[@class='field-selection-display']")), columnName);
         return this;
