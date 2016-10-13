@@ -196,6 +196,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
         _driver.waitForElement(roleCombo);
+        _driver.scrollIntoView(roleCombo);
         _driver._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _driver.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
         String oldId = _driver.getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");

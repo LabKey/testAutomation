@@ -142,6 +142,7 @@ public class PermissionsEditor
     {
         Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
         _test.waitForElement(roleCombo);
+        _test.scrollIntoView(roleCombo);
         _test._ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         _test.waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
     }
