@@ -68,14 +68,14 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
 
     protected Locator.XPathLocator labelLoc()
     {
-        Locator.XPathLocator loc = Locator.tag("td").withAttributeContaining("class", "labkey-form-label");
-        if (partialText) // Don't match nested elements (e.g. '*' for required fields or '?' for help)
+        Locator.XPathLocator loc = Locator.tag("td").withAttributeContaining("class", "labkey-form-label"); // Includes 'labkey-form-label-nowrap'
+        if (partialText) // Don't match nested elements (e.g. '?' for help)
         {
             if (labelText.isEmpty())
                 return loc;
             return loc.withPredicate("contains(text(), " + xq(labelText) + ")");
         }
         else
-            return loc.withPredicate("text() = " + xq(labelText));
+            return loc.withPredicate("text() = " + xq(labelText) + " or text() = " + xq(labelText + " *"));
     }
 }
