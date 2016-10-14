@@ -40,8 +40,7 @@ public class ClosePage extends BaseUpdatePage<ClosePage.ElementCache>
     {
         protected ElementCache()
         {
-            //TODO: Assigned To should be read only when closing an issue
-            assignedTo = readOnlyItem("Assigned\u00a0To");
+            assignedTo = readOnlyItem("Assigned To");
             status = readOnlyItem("Status");
         }
     }
