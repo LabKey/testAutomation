@@ -130,7 +130,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
         protected <T> FormItem<T> formItemWithLabel(String label)
         {
-            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
+            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label).findWhenNeeded(this));
         }
 
         protected <T> FormItem<T> formItemNamed(String name)
@@ -140,7 +140,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
         protected ReadOnlyFormItem readOnlyItem(String label)
         {
-            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label.replaceAll(" ", "\u00a0")).findWhenNeeded(this));
+            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label).findWhenNeeded(this));
         }
 
         protected OptionSelect getSelect(String name)
