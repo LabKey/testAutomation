@@ -43,7 +43,7 @@ public class WorkbookHelper
     public int createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         _test.clickProject(project);
-        _test.clickButton(DataRegionTable.getInsertNewButtonText());
+        _test.clickButton("Create Workbook");
 
         _test.setFormElement(Locator.id("workbookTitle"), title);
         _test.setFormElement(Locator.id("workbookDescription"), description);
