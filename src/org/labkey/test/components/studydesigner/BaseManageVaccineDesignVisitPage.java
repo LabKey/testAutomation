@@ -30,7 +30,7 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
         removeFocusAndWait();
     }
 
-    public void addNewVisitColumn(Locator.XPathLocator table, String label, Integer rangeMin, Integer rangeMax)
+    public void addNewVisitColumn(Locator.XPathLocator table, String label, Double rangeMin, Double rangeMax)
     {
         clickOuterAddNewVisit(table);
 
@@ -96,15 +96,15 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
     {
         private Integer _rowId;
         private String _label;
-        private Integer _rangeMin;
-        private Integer _rangeMax;
+        private Double _rangeMin;
+        private Double _rangeMax;
 
         public Visit(String visit)
         {
             _label = visit;
         }
 
-        public Visit(String visit, Integer rangeMin, Integer rangeMax)
+        public Visit(String visit, Double rangeMin, Double rangeMax)
         {
             _label = visit;
             _rangeMin = rangeMin;
@@ -126,12 +126,12 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
             return _label;
         }
 
-        public Integer getRangeMin()
+        public Double getRangeMin()
         {
             return _rangeMin;
         }
 
-        public Integer getRangeMax()
+        public Double getRangeMax()
         {
             return _rangeMax;
         }

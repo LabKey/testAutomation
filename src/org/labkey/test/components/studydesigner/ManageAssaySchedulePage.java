@@ -96,7 +96,7 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
         addExistingVisitColumn(elements().assaysLoc, visitLabel);
     }
 
-    public void addNewVisitColumn(String label, Integer rangeMin, Integer rangeMax)
+    public void addNewVisitColumn(String label, Double rangeMin, Double rangeMax)
     {
         addNewVisitColumn(elements().assaysLoc, label, rangeMin, rangeMax);
     }

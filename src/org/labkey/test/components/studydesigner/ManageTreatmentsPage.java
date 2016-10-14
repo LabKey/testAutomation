@@ -84,7 +84,7 @@ public class ManageTreatmentsPage extends BaseManageVaccineDesignVisitPage
         addExistingVisitColumn(elements().cohortsLoc, visitLabel);
     }
 
-    public void addNewVisitColumn(String label, Integer rangeMin, Integer rangeMax)
+    public void addNewVisitColumn(String label, Double rangeMin, Double rangeMax)
     {
         addNewVisitColumn(elements().cohortsLoc, label, rangeMin, rangeMax);
     }
