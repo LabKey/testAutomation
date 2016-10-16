@@ -452,6 +452,30 @@ public class ETLTest extends ETLAbstractTest
     }
 
     @Test
+    public void testMergeWithAlternateKey() throws Exception
+    {
+        final String PREFIX = "Subject for AlternateKey test";
+        final String MERGE_ETL = "{simpletest}/mergeWithAlternateKey";
+        final String ALT_KEY_VAL = "7777";
+        _etlHelper.insertSourceRow(ALT_KEY_VAL, PREFIX + "1", null);
+        _etlHelper.runETL_API(MERGE_ETL);
+        // Check the ETL works at all
+        _etlHelper.assertInTarget2(PREFIX + "1");
+
+        // To verify we're merging matching on the alternate key, delete the row we just inserted, and add
+        // another with the same alternate key value (set in the xml as the "id" column. If the merge works,
+        // we'll update the existing target row instead of creating a new one.
+        _etlHelper.deleteSourceRow(ALT_KEY_VAL);
+        _etlHelper.insertSourceRow(ALT_KEY_VAL, PREFIX + "2", null);
+        _etlHelper.runETL_API(MERGE_ETL);
+
+        // Check update to existing
+        _etlHelper.assertInTarget2(PREFIX + "2");
+        // Check we really did UPDATE and not insert a new one
+        _etlHelper.assertNotInTarget2(PREFIX + "1");
+    }
+
+    @Test
     public void testXmlDefinedConstants() throws Exception
     {
         _etlHelper.do180columnSetup();

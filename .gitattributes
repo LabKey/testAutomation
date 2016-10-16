@@ -184,6 +184,7 @@ modules/simpletest/resources/etls/constantsNoMatchingSourceColumn.xml -text
 modules/simpletest/resources/etls/constantsStepOverride.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/merge.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/mergeManyColumns.xml -text
+modules/simpletest/resources/etls/mergeWithAlternateKey.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
