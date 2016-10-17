@@ -57,6 +57,14 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
         setOuterTextFieldValue(elements().adjuvantsLoc, "Label", label, rowIndex);
     }
 
+    public void addNewChallengeRow(String label, String challengeSubType, int rowIndex)
+    {
+        clickOuterAddNewRow(elements().challengesLoc);
+        setOuterTextFieldValue(elements().challengesLoc, "Label", label, rowIndex);
+        if (challengeSubType != null)
+            setOuterComboFieldValue(elements().challengesLoc, "Type", challengeSubType, rowIndex);
+    }
+
     public void addNewImmunogenDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
         addNewDoseAndRoute(elements().immunogensLoc, dose, route, outerRowIndex, subgridRowIndex);
@@ -65,6 +73,11 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
     public void addNewAdjuvantDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
         addNewDoseAndRoute(elements().adjuvantsLoc, dose, route, outerRowIndex, subgridRowIndex);
+    }
+
+    public void addNewChallengesDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
+    {
+        addNewDoseAndRoute(elements().challengesLoc, dose, route, outerRowIndex, subgridRowIndex);
     }
 
     public void addNewDoseAndRoute(Locator.XPathLocator table, String dose, String route, int outerRowIndex, int subgridRowIndex)
@@ -96,6 +109,7 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
     {
         Locator.XPathLocator immunogensLoc = Locator.tagWithClass("div", "vaccine-design-immunogens");
         Locator.XPathLocator adjuvantsLoc = Locator.tagWithClass("div", "vaccine-design-adjuvants");
+        Locator.XPathLocator challengesLoc = Locator.tagWithClass("div", "vaccine-design-challenges");
     }
 }
 

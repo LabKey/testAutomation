@@ -37,6 +37,11 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         return elementCache().getAdjuvantsRowCount();
     }
 
+    public int getChallengesRowCount()
+    {
+        return elementCache().getChallengesRowCount();
+    }
+
     public int getImmunogenAntigenRowCount(int rowIndex)
     {
         return elementCache().getImmunogenAdjuvantRowCount(rowIndex);
@@ -67,6 +72,11 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         return elementCache().getAdjuvantsCell(column, rowIndex).getText();
     }
 
+    public String getChallengeCellDisplayValue(String column, int rowIndex)
+    {
+        return elementCache().getChallengesCell(column, rowIndex).getText();
+    }
+
     public void manage()
     {
         elementCache().manageLink.click();
@@ -89,6 +99,7 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Study Products");
         private Locator.XPathLocator immunogensLoc = Locator.tagWithClass("div", "vaccine-design-immunogens");
         private Locator.XPathLocator adjuvantsLoc = Locator.tagWithClass("div", "vaccine-design-adjuvants");
+        private Locator.XPathLocator challengesLoc = Locator.tagWithClass("div", "vaccine-design-challenges");
 
         Locator.XPathLocator getImmunogensTableLocator()
         {
@@ -174,5 +185,17 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             adjuvantsTable.findElement(By.xpath(elementCache().tableOuterLoc.getLoc()));
             return getWrapper().isElementPresent(elementCache().adjuvantsLoc.append(elementCache().tableOuterLoc).append(elementCache().emptyLoc));
         }
+
+        int getChallengesRowCount()
+        {
+            return challengesLoc.append(elementCache().tableRowLoc).findElements(getDriver()).size();
+        }
+
+        WebElement getChallengesCell(String column, int rowIndex)
+        {
+            Locator.XPathLocator cellLoc = challengesLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
+            return cellLoc.findElement(getDriver());
+        }
+
     }
 }
