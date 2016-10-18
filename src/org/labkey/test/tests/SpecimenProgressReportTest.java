@@ -161,7 +161,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         setSpecimenConfigurationVisits(visitRowIdMap, Arrays.asList("PT1", "0", "6", "20", "SR"), false, 2);
 
         // set the assay plan and save
-        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this, true);
         String assayPlanTxt = "My assay plan " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
         managePage.setAssayPlan(assayPlanTxt);
         managePage.save();
@@ -212,7 +212,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
     private void addSpecimenConfiguration(String assayName, String source, String location, String tubeType, int newRowIndex)
     {
-        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this, true);
         assertEquals("Unexpected assay schedule rows", newRowIndex, managePage.getAssayRowCount());
 
         managePage.addNewAssayRow(assayName, assayName + " " + tubeType, newRowIndex);
@@ -223,7 +223,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
     private void setSpecimenConfigurationVisits(Map<String, Integer> visitRowIdMap, List<String> visitLabels, boolean addAllVisits, int rowIndex)
     {
-        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this);
+        ManageAssaySchedulePage managePage = new ManageAssaySchedulePage(this, true);
 
         if (addAllVisits)
             managePage.addAllExistingVisitColumns();

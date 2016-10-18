@@ -20,11 +20,17 @@ import org.labkey.test.Locator;
 
 public class ManageTreatmentsPage extends BaseManageVaccineDesignVisitPage
 {
-    public ManageTreatmentsPage(BaseWebDriverTest test)
+    public ManageTreatmentsPage(BaseWebDriverTest test, boolean canInsert)
     {
         super(test);
         waitForElements(elements().studyVaccineDesignLoc, 2);
-        waitForElements(elements().outerAddRowIconLoc, 2);
+        if (canInsert)
+            waitForElements(elements().outerAddRowIconLoc, 2);
+    }
+
+    public boolean canAddNewRow()
+    {
+        return isElementPresent(baseElements().getOutergridAddNewRowLocator(elements().treatmentsLoc));
     }
 
     public void addNewTreatmentRow(String label, String description, int rowIndex)

@@ -24,16 +24,22 @@ import java.util.List;
 
 public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 {
-    public ManageAssaySchedulePage(BaseWebDriverTest test)
+    public ManageAssaySchedulePage(BaseWebDriverTest test, boolean canInsert)
     {
         super(test);
         waitForElements(elements().studyVaccineDesignLoc, 2);
-        waitForElements(elements().outerAddRowIconLoc, 1);
+        if (canInsert)
+            waitForElements(elements().outerAddRowIconLoc, 1);
     }
 
     public int getAssayRowCount()
     {
         return elements().getAssayTableRowCount();
+    }
+
+    public boolean canAddNewRow()
+    {
+        return isElementPresent(baseElements().getOutergridAddNewRowLocator(elements().assaysLoc));
     }
 
     public void addNewAssayRow(String label, String description, int rowIndex)
