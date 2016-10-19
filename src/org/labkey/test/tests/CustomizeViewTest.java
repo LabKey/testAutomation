@@ -50,6 +50,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private final static String FIRST_NAME_COLUMN = "FirstName";
     private final static String AGE_COLUMN = "Age";
     private final static String TEST_DATE_COLUMN = "TestDate";
+    private final static String SUMMARY_STAT_SUM = "Sum";
+    private final static String SUMMARY_STAT_MEAN = "Mean";
+    private final static String SUMMARY_STAT_MIN = "Minimum";
+    private final static String SUMMARY_STAT_MAX = "Maximum";
+    private final static String SUMMARY_STAT_COUNT = "Count (non-blank)";
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
                     new ListHelper.ListColumn(FIRST_NAME_COLUMN, FIRST_NAME_COLUMN + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
@@ -103,40 +108,36 @@ public class CustomizeViewTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAggregates()
+    public void testSummaryStatistics()
     {
-        final String defaultSumLabel = "Sum";
-        final String customSumLabel = "Total Age";
-        final String aggregateColumn = AGE_COLUMN;
+        final String statColumn = AGE_COLUMN;
         final String customTitle = "Oldness Factor" + INJECT_CHARS_2;
 
-        setColumns(LAST_NAME_COLUMN, aggregateColumn);
-
-        log("** Set column title and SUM aggregate");
-        assertTextNotPresent("Oldness Factor");
-
+        setColumns(LAST_NAME_COLUMN, statColumn);
         DataRegionTable drt = new DataRegionTable("query", getDriver());
 
-        List<Map<String, String>> aggregates = new ArrayList<>();
-        aggregates.add(Maps.of("type", "SUM"));
-        aggregates.add(Maps.of("type", "COUNT"));
-        setColumnProperties(aggregateColumn, customTitle, aggregates);
-        assertTrue("Aggregate row didn't appear", drt.hasAggregateRow());
-        assertEquals("Wrong aggregates", defaultSumLabel + ": 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        log("** Set column title");
+        assertTextNotPresent("Oldness Factor");
+        setColumnTitle(statColumn, customTitle);
         assertTextPresent(customTitle);
 
-        log("** Set custom aggregate label");
-        aggregates.set(0, Maps.of(
-                "type", "SUM",
-                "label", customSumLabel));
-        setColumnProperties(aggregateColumn, customTitle, aggregates);
-        assertEquals("Wrong aggregates", customSumLabel + ": 279 Count: 7", drt.getTotal(aggregateColumn).replaceAll("\\s+", " "));
+        log("** Set summary statistics");
+        drt.setSummaryStatistic(statColumn, SUMMARY_STAT_SUM);
+        drt.setSummaryStatistic(statColumn, SUMMARY_STAT_COUNT);
+        assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn).replaceAll("\\s+", " "));
         assertTextPresent(customTitle);
-        assertTextNotPresent(defaultSumLabel + ":");
 
-        log("** Clear column title and SUM aggregate");
-        setColumnProperties(aggregateColumn, null, null);
-        assertFalse("Aggregate row still present", drt.hasAggregateRow());
+        log("** Clear column title");
+        setColumnTitle(statColumn, null);
+        assertTextNotPresent("Oldness Factor");
+
+        log("** Clear summary statistics");
+        drt.clearSummaryStatistic(statColumn, SUMMARY_STAT_SUM);
+        assertTrue("Summary statistic count should still be available", drt.hasSummaryStatisticRow());
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn).replaceAll("\\s+", " "));
+        drt.clearSummaryStatistic(statColumn, SUMMARY_STAT_COUNT);
+        assertFalse("Summary statistic row still present", drt.hasSummaryStatisticRow());
         assertTextNotPresent("Oldness Factor");
 
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -159,73 +160,77 @@ public class CustomizeViewTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testAggregatesViaColumnHeader()
+    public void testSummaryStatisticsViaColumnHeader()
     {
-        String aggregateColumn1 = AGE_COLUMN;
-        String aggregateColumn2 = FIRST_NAME_COLUMN;
-        String defaultSumLabel = "Sum:";
-        String defaultCountLabel = "Count:";
+        String statColumn1 = AGE_COLUMN;
+        String statColumn2 = FIRST_NAME_COLUMN;
 
-        setColumns(aggregateColumn1, aggregateColumn2);
-
+        setColumns(statColumn1, statColumn2);
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        drt.setAggregate(aggregateColumn1, "Sum");
-        assertTrue("Aggregate row didn't appear", drt.hasAggregateRow());
 
-        String total = drt.getTotal(-1);// -1 rather than 0 to account for selector (checkbox) column
-        assertEquals("Wrong aggregates", defaultSumLabel, total.replaceAll("\\s+", " "));
-        assertEquals("Wrong aggregates", "279", drt.getTotal(aggregateColumn1).replaceAll("\\s+", " "));
+        log("** Set summary statistics for " + statColumn1);
+        drt.setSummaryStatistic(statColumn1, SUMMARY_STAT_SUM);
+        assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        drt.setSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_MEAN + ": 39", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
 
-        drt.setAggregate(aggregateColumn1, "Count");
-        assertEquals("Wrong aggregates", defaultSumLabel + " 279 " + defaultCountLabel + " 7", drt.getTotal(aggregateColumn1).replaceAll("\\s+", " "));
+        log("** Set summary statistics for " + statColumn2);
+        assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn2).replaceAll("\\s+", " "));
+        drt.setSummaryStatistic(statColumn2, SUMMARY_STAT_COUNT);
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn2).replaceAll("\\s+", " "));
 
-        drt.setAggregate(aggregateColumn2, "Count");
-        assertEquals("Wrong aggregates", defaultCountLabel + " 7", drt.getTotal(aggregateColumn2).replaceAll("\\s+", " "));
+        log("** Clear summary statistics for " + statColumn1);
+        drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_SUM);
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_MEAN + ": 39", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
+        assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
 
-        drt.clearAggregate(aggregateColumn2, "Count");
-        assertEquals("Wrong aggregates", " ", drt.getTotal(aggregateColumn2).replaceAll("\\s+", " "));
+        log("** Clear summary statistics for " + statColumn2);
+        drt.clearSummaryStatistic(statColumn2, SUMMARY_STAT_COUNT);
+        assertFalse("Summary statistic row shouldn't appear", drt.hasSummaryStatisticRow());
     }
 
     @Test
-    public void verifyAggregatesByColumnType()
+    public void verifySummaryStatisticsByColumnType()
     {
-        // PK should not have average and sum
+        // PK should not have mean and sum
         setColumns(LIST_KEY_COLUMN);
-        verifyAggregatesSubmenu(LIST_KEY_COLUMN, new String[]{"Count", "Minimum", "Maximum"}, new String[]{"Sum", "Average"});
+        verifySummaryStatisticsSubmenu(LIST_KEY_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN});
 
         // String column should only have count
         setColumns(FIRST_NAME_COLUMN);
-        verifyAggregatesSubmenu(FIRST_NAME_COLUMN, new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+        verifySummaryStatisticsSubmenu(FIRST_NAME_COLUMN, new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
 
         // Numeric column should have all
         setColumns(AGE_COLUMN);
-        verifyAggregatesSubmenu(AGE_COLUMN, new String[]{"Count", "Sum", "Average", "Minimum", "Maximum"}, null);
+        verifySummaryStatisticsSubmenu(AGE_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, null);
 
-        // Date column should not have average and sum
+        // Date column should not have mean and sum
         setColumns(TEST_DATE_COLUMN);
-        verifyAggregatesSubmenu(TEST_DATE_COLUMN, new String[]{"Count", "Minimum", "Maximum"}, new String[]{"Sum", "Average"});
+        verifySummaryStatisticsSubmenu(TEST_DATE_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN});
 
         // Folder column should only have count
         setColumns("container");
-        verifyAggregatesSubmenu("container", new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+        verifySummaryStatisticsSubmenu("container", new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
 
         // Lookup column should only have count
         setColumns("CreatedBy");
-        verifyAggregatesSubmenu("CreatedBy", new String[]{"Count"}, new String[]{"Sum", "Average", "Minimum", "Maximum"});
+        verifySummaryStatisticsSubmenu("CreatedBy", new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
     }
 
-    private void verifyAggregatesSubmenu(String columnName, @NotNull String[] expectedAggregates, @Nullable String[] unexpectedAggregates)
+    private void verifySummaryStatisticsSubmenu(String columnName, @NotNull String[] expectedStats, @Nullable String[] unexpectedStats)
     {
         Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
-        _ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Aggregates", "Count"); // they all have count so save to use here for submenu
+        _ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Summary Statistics", SUMMARY_STAT_COUNT); // they all have count so safe to use here for submenu
 
-        for (String expectedAggregate : expectedAggregates)
-            assertElementPresent(Ext4Helper.Locators.menuItem(expectedAggregate));
+        for (String stat : expectedStats)
+            assertElementPresent(Ext4Helper.Locators.menuItem(stat));
 
-        if (unexpectedAggregates != null && unexpectedAggregates.length > 0)
+        if (unexpectedStats != null && unexpectedStats.length > 0)
         {
-            for (String unexpectedAggregate : unexpectedAggregates)
-                assertElementNotPresent(Ext4Helper.Locators.menuItem(unexpectedAggregate));
+            for (String stat : unexpectedStats)
+                assertElementNotPresent(Ext4Helper.Locators.menuItem(stat));
         }
     }
 
@@ -402,10 +407,10 @@ public class CustomizeViewTest extends BaseWebDriverTest
         _customizeViewsHelper.applyCustomView();
     }
 
-    void setColumnProperties(String fieldKey, String columnTitle, List<Map<String, String>> aggregates)
+    void setColumnTitle(String fieldKey, String columnTitle)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.setColumnProperties(fieldKey, columnTitle, aggregates);
+        _customizeViewsHelper.setColumnTitle(fieldKey, columnTitle);
         _customizeViewsHelper.applyCustomView();
     }
 

@@ -840,31 +840,21 @@ public class CustomizeView extends Component
         moveSort(fieldKey, moveUp);
     }
 
-    public void removeColumnProperties(String fieldKey)
+    public void removeColumnTitle(String fieldKey)
     {
-        setColumnProperties(fieldKey, null, new ArrayList<Map<String, String>>());
-    }
-
-    public void setColumnProperties(String fieldKey, String caption, Map<String, String> aggregate)
-    {
-        List<Map<String, String>> aggregates = new ArrayList<>();
-        aggregates.add(aggregate);
-        setColumnProperties(fieldKey, caption, aggregates);
+        setColumnTitle(fieldKey, null);
     }
 
     /**
-     * Sets the column title and aggregate.
+     * Sets the column title.
      * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
      * @param caption The caption value or null to unset the column caption.
-     * @param aggregates An array of the aggregates to apply to the column or null to unset.
      */
-    public void setColumnProperties(String fieldKey, String caption, List<Map<String, String>> aggregates)
+    public void setColumnTitle(String fieldKey, String caption)
     {
         String msg = "Setting column " + fieldKey;
         if (caption != null)
             msg = msg + " caption to '" + caption + "'";
-        if (aggregates != null && aggregates.size() > 0)
-            msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
         TestLogger.log(msg);
 
         changeTab(ViewItemType.Columns);
@@ -873,44 +863,9 @@ public class CustomizeView extends Component
 
         if (caption == null)
             caption = "";
-        _driver.setFormElement(Locator.xpath("//input[contains(@name, 'title')]").findElement(window), caption);
-
-        //reset existing aggregates
-        List<WebElement> deleteButtons = Locator.xpath("//*[contains(@src, 'delete')]").findElements(window);
-        for (WebElement deleteButton : deleteButtons)
-        {
-            deleteButton.click();
-            _driver.shortWait().until(ExpectedConditions.stalenessOf(deleteButton));
-        }
-
-        //then re-add them
-        WebElement grid = Locator.css("div.x4-panel").findElement(window);
-
-        if(aggregates != null)
-        {
-            for(Map<String, String> aggregate : aggregates)
-            {
-                if (aggregate == null || aggregate.get("type") == null)
-                    continue;
-
-                window.clickButton("Add Aggregate", 0);
-                Locator.XPathLocator row = Locator.tagWithClass("tr", "x4-grid-data-row").last();
-
-                WebElement comboCell = row.append(Locator.xpath("/td[1]")).findElement(window);
-                comboCell.click();
-                _driver._ext4Helper.selectComboBoxItem(Locator.id(grid.getAttribute("id")), aggregate.get("type"));
-
-                if(aggregate.get("label") != null){
-                    WebElement labelCell = row.append(Locator.xpath("/td[2]/div")).findElement(window);
-                    labelCell.click();
-
-                    WebElement fieldPath = Locator.xpath("//input[@name='label']").findElement(window);
-                    _driver.setFormElement(fieldPath, aggregate.get("label"));
-                }
-                _driver.fireEvent(_driver.getDriver().switchTo().activeElement(), WebDriverWrapper.SeleniumEvent.blur);
-            }
-        }
+        _driver.setFormElement(Locator.name("title").findElement(window), caption);
         Locator.xpath("//label").findElement(window).click();
+
         window.clickButton("OK", 0);
         window.waitForClose();
     }
@@ -1032,7 +987,7 @@ public class CustomizeView extends Component
         public Window clickEdit()
         {
             Locator.css("div.labkey-tool-gear").findElement(getComponentElement()).click();
-            return Window().withTitleContaining("Edit column properties for").find(_driver.getDriver());
+            return Window().withTitleContaining("Edit title for").find(_driver.getDriver());
         }
     }
 

@@ -226,7 +226,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected int getFooterRowCount()
     {
-        return hasAggregateRow() ? 1 : 0;
+        return hasSummaryStatisticRow() ? 1 : 0;
     }
 
     public static DataRegionFinder DataRegion(WebDriver driver)
@@ -358,7 +358,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _driver.isElementPresent(Locator.tagWithId("table", getTableId() + "-footer"));
     }
 
-    public boolean hasAggregateRow()
+    public boolean hasSummaryStatisticRow()
     {
         return Locator.css("tr.labkey-col-total").findElements(getComponentElement()).size() > 0;
     }
@@ -430,7 +430,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public String getTotal(int columnIndex)
     {
         columnIndex += _selectors ? 1 : 0;
-        return elements().getAggregateCells().get(columnIndex).getText();
+        return elements().getSummaryStatisticCells().get(columnIndex).getText();
     }
 
     /**
@@ -887,23 +887,23 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _driver._ext4Helper.clickExt4MenuButton(false, menu, true /*openOnly*/, menuItem, subMenuItem);
     }
 
-    public void setAggregate(String columnName, String aggregate){
-        clickAggregate(columnName, aggregate, false);
+    public void setSummaryStatistic(String columnName, String stat){
+        clickSummaryStatistic(columnName, stat, false);
     }
 
-    public void clearAggregate(String columnName, String aggregate){
-        clickAggregate(columnName, aggregate, true);
+    public void clearSummaryStatistic(String columnName, String stat){
+        clickSummaryStatistic(columnName, stat, true);
     }
 
-    private void clickAggregate(String columnName, String aggregate, boolean isExpectedToBeChecked)
+    private void clickSummaryStatistic(String columnName, String stat, boolean isExpectedToBeChecked)
     {
         String clearOrSet = isExpectedToBeChecked?"Clearing": "Setting";
-        TestLogger.log(clearOrSet + " the " + aggregate + " aggregate in " + _regionName + " for " + columnName);
-        WebElement menuItem = getSubMenuItem(columnName, "Aggregates", aggregate);
+        TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + _regionName + " for " + columnName);
+        WebElement menuItem = getSubMenuItem(columnName, "Summary Statistics", stat);
 
         WebElement menuIcon = menuItem.findElement(By.xpath("../div[contains(@class, 'x4-menu-item-icon')]"));
         boolean menuItemIsChecked = menuIcon.getAttribute("class").contains("fa-check-square-o");
-        assertEquals(String.format("Menu item %s for column %s is %s checked",aggregate,columnName,!menuItemIsChecked?"not":"already"), isExpectedToBeChecked, menuItemIsChecked);
+        assertEquals(String.format("Menu item %s for column %s is %s checked",stat,columnName,!menuItemIsChecked?"not":"already"), isExpectedToBeChecked, menuItemIsChecked);
 
         _driver.clickAndWait(menuItem);
     }
@@ -1394,8 +1394,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
-        private WebElement aggregateRow = new LazyWebElement(Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total"), _driver.getDriver());
-        private List<WebElement> aggregateCells;
+        private WebElement summaryStatRow = new LazyWebElement(Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total"), _driver.getDriver());
+        private List<WebElement> summaryStatCells;
 
         protected List<WebElement> getDataRows()
         {
@@ -1434,11 +1434,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             return columnCells;
         }
 
-        protected List<WebElement> getAggregateCells()
+        protected List<WebElement> getSummaryStatisticCells()
         {
-            if (aggregateCells == null)
-                aggregateCells = ImmutableList.copyOf(Locator.xpath("td").findElements(aggregateRow));
-            return aggregateCells;
+            if (summaryStatCells == null)
+                summaryStatCells = ImmutableList.copyOf(Locator.xpath("td").findElements(summaryStatRow));
+
+            return summaryStatCells;
         }
 
         protected WebElement getColumnHeader(String colName)

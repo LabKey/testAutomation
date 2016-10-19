@@ -26,7 +26,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -586,29 +585,19 @@ public class CustomizeViewsHelper extends CustomizeView
 
     public void removeColumnProperties(String fieldKey)
     {
-        setColumnProperties(fieldKey, null, new ArrayList<Map<String, String>>());
-    }
-
-    public void setColumnProperties(String fieldKey, String caption, Map<String, String> aggregate)
-    {
-        List<Map<String, String>> aggregates = new ArrayList<>();
-        aggregates.add(aggregate);
-        setColumnProperties(fieldKey, caption, aggregates);
+        setColumnTitle(fieldKey, null);
     }
 
     /**
-     * Sets the column title and aggregate.
+     * Sets the column title.
      * @param fieldKey The field key of the column to change.  Note that the column should already be in the selected column list.
      * @param caption The caption value or null to unset the column caption.
-     * @param aggregates An array of the aggregates to apply to the column or null to unset.
      */
-    public void setColumnProperties(String fieldKey, String caption, List<Map<String, String>> aggregates)
+    public void setColumnTitle(String fieldKey, String caption)
     {
         String msg = "Setting column " + fieldKey;
         if (caption != null)
             msg = msg + " caption to '" + caption + "'";
-        if (aggregates != null && aggregates.size() > 0)
-            msg = msg + " aggregates to '" + StringUtils.join(aggregates, ", ") + "'";
         _driver.log(msg);
 
         changeTab(ViewItemType.Columns);
@@ -622,40 +611,6 @@ public class CustomizeViewsHelper extends CustomizeView
             caption = "";
         _driver.setFormElement(Locator.xpath(parent + "//input[contains(@class, 'x-form-text')]"), caption);
 
-        //reset all aggregates
-        String deleteButtonXPath = "//div[contains(@class, 'x-window')]" + "//*[contains(@class, 'labkey-tool-close')]";
-        while (_driver.isElementPresent(Locator.xpath(deleteButtonXPath)))
-            _driver.click(Locator.xpath(deleteButtonXPath));
-
-        //then re-add them
-        int idx = 1;
-        Locator grid = Locator.xpath(parent + "//div[contains(@class, 'x-grid-panel')]");
-
-        if(aggregates != null)
-        {
-            for(Map<String, String> aggregate : aggregates)
-            {
-                if (aggregate == null || aggregate.get("type") == null)
-                    continue;
-
-                _driver.clickButton("Add Aggregate", 0);
-                Locator row = ExtHelper.locateExt3GridRow(idx, parent);
-
-                Locator comboCell = ExtHelper.locateExt3GridCell(row, 1);
-                _driver.doubleClick(comboCell);
-                _driver._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
-
-                if(aggregate.get("label") != null){
-                    Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
-                    _driver.doubleClick(labelCell);
-
-                    Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
-                    _driver.setFormElement(fieldPath, aggregate.get("label"));
-                }
-
-                idx++;
-            }
-        }
         _driver.clickButton("OK", 0);
     }
 

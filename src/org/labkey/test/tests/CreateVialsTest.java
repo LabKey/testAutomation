@@ -118,9 +118,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         // Add the hidden 'TargetStudy' column on the results table and the actual 'TargetStudy' column from batch
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addCustomizeViewColumn("TargetStudy");
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "Run", "Batch", "TargetStudy" }, "BatchTargetStudy");
-        _customizeViewsHelper.setColumnProperties("Run/Batch/TargetStudy", "BatchTargetStudy", Collections.emptyList());
+        _customizeViewsHelper.addColumn("TargetStudy");
+        _customizeViewsHelper.addColumn(new String[] { "Run", "Batch", "TargetStudy" }, "BatchTargetStudy");
+        _customizeViewsHelper.setColumnTitle("Run/Batch/TargetStudy", "BatchTargetStudy");
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("Data", getDriver());
