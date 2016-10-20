@@ -441,7 +441,13 @@ public class Ext4Helper
 
     public boolean isChecked(Locator checkboxLoc)
     {
-        return new Checkbox(checkboxLoc.findElement(_test.getDriver())).isChecked();
+        return Ext4Checkbox().locatedBy(checkboxLoc).find(_test.getDriver()).isChecked();
+    }
+
+    private Checkbox findGridRowCheckbox(String cellText, int index)
+    {
+        Locator.XPathLocator loc = Locators.getGridRow(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-row-checker"));
+        return Ext4Checkbox().locatedBy(loc).find(_test.getDriver());
     }
 
     /**
@@ -461,17 +467,16 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void checkGridRowCheckbox(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
-        if (!isGridRowChecked(rowLoc))
-            _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-row-checker"));
+        findGridRowCheckbox(cellText, index).check();
     }
 
     @LogMethod(quiet = true)
     public void checkGridRowCheckboxAlt(String cellText, int index, boolean useContainsForCellText)
     {
-        Locator.XPathLocator rowLoc = useContainsForCellText ? Locators.getGridRowContains(cellText, index) : Locators.getGridRow(cellText, index);
-        if (!isGridRowChecked(rowLoc))
-            _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-cell-inner-checkcolumn"));
+        Locator.XPathLocator loc = useContainsForCellText ?
+                Locators.getGridRowContains(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")) :
+                Locators.getGridRow(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn"));
+        Ext4Checkbox().locatedBy(loc).find(_test.getDriver()).check();
     }
 
     /**
@@ -491,9 +496,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
-        if (isGridRowChecked(rowLoc))
-            _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-row-checker')]"));
+        findGridRowCheckbox(cellText, index).uncheck();
     }
 
     /**
@@ -547,29 +550,6 @@ public class Ext4Helper
     public void selectAllParticipantFilter()
     {
         checkGridRowCheckbox("All");
-    }
-
-    /**
-     * Determines if the specified row has a checked checkbox
-     * @param rowLoc Locator provided by {@link Locators#getGridRow(String, int)}
-     * @return true if the specified row has a checked checkbox
-     */
-    private boolean isGridRowChecked(Locator.XPathLocator rowLoc)
-    {
-        _test.assertElementPresent(rowLoc);
-        return _test.isElementPresent(rowLoc.withClass(_cssPrefix + "grid-row-selected"));
-    }
-
-    /**
-     * Determines if the specified row has a checked checkbox
-     * @param cellText Exact text from any cell in the desired row
-     * @param index 0-based index of rows with matching cellText
-     * @return true if the specified row has a checked checkbox
-     */
-    public boolean isGridRowChecked(String cellText, int index)
-    {
-        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
-        return isGridRowChecked(rowLoc);
     }
 
     public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
