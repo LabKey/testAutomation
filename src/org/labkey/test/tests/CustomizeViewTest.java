@@ -173,7 +173,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
         assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
         drt.setSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_MEAN + ": 39", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_MEAN + ": 39.857", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
 
         log("** Set summary statistics for " + statColumn2);
         assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn2).replaceAll("\\s+", " "));
@@ -182,7 +182,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         log("** Clear summary statistics for " + statColumn1);
         drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_SUM);
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_MEAN + ": 39", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        assertEquals("Wrong summary statistics", SUMMARY_STAT_MEAN + ": 39.857", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
         drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
         assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
 
