@@ -27,7 +27,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window<EC extends Window.Elements> extends FloatingComponent<EC>
+public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC>
 {
     WebElement _window;
     WebDriverWrapper _driver;
@@ -117,17 +117,17 @@ public class Window<EC extends Window.Elements> extends FloatingComponent<EC>
     }
 
     @Deprecated // Use #elementCache()
-    protected Elements elements()
+    protected FloatingComponent.ElementCache elements()
     {
         return super.elementCache();
     }
 
     protected EC newElementCache()
     {
-        return (EC) new Elements();
+        return (EC) new ElementCache();
     }
 
-    protected class Elements extends Component.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         protected WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
         protected WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
@@ -136,6 +136,14 @@ public class Window<EC extends Window.Elements> extends FloatingComponent<EC>
         {
             return Ext4Helper.Locators.ext4Button(buttonText).findElement(this);
         }
+    }
+
+    /**
+     * @deprecated Renamed to {@link ElementCache} for consistency
+     */
+    @Deprecated
+    public class Elements extends ElementCache
+    {
     }
 
     public static class WindowFinder extends WebDriverComponentFinder<Window, WindowFinder>
