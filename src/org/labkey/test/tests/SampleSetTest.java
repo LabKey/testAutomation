@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import com.thoughtworks.selenium.webdriven.commands.Click;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
