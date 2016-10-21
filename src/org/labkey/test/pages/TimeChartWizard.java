@@ -90,7 +90,7 @@ public class TimeChartWizard
     public void checkFilterGridRow(String label)
     {
         List<WebElement> svgs = Locator.css("div.x4-container svg").findElements(_test.getDriver());
-        _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
+        _test.waitForElement(Ext4Helper.Locators.getGridRow(label));
         _test._ext4Helper.checkGridRowCheckbox(label);
         if (svgs.size() > 0)
         {
@@ -102,7 +102,7 @@ public class TimeChartWizard
     public void uncheckFilterGridRow(String label)
     {
         List<WebElement> svgs = Locator.css("svg").findElements(_test.getDriver());
-        _test.waitForElement(Ext4Helper.Locators.getGridRow(label, 0));
+        _test.waitForElement(Ext4Helper.Locators.getGridRow(label));
         _test._ext4Helper.uncheckGridRowCheckbox(label);
         if (svgs.size() > 0)
         {

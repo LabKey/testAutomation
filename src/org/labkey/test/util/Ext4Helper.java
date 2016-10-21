@@ -322,7 +322,7 @@ public class Ext4Helper
     }
 
     public boolean isGridRowSelected(String cellText, int index) {
-        WebElement gridRow = Locators.getGridRow(cellText, index).findElement(_test.getDriver());
+        WebElement gridRow = Locators.getGridRow(cellText).index(index).findElement(_test.getDriver());
         if (gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
         {
             return true;
@@ -446,7 +446,7 @@ public class Ext4Helper
 
     private Checkbox findGridRowCheckbox(String cellText, int index)
     {
-        Locator.XPathLocator loc = Locators.getGridRow(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-row-checker"));
+        Locator.XPathLocator loc = Locators.getGridRow(cellText).append(Locator.tagWithClass("div", _cssPrefix + "grid-row-checker")).index(index);
         return Ext4Checkbox().locatedBy(loc).find(_test.getDriver());
     }
 
@@ -474,8 +474,8 @@ public class Ext4Helper
     public void checkGridRowCheckboxAlt(String cellText, int index, boolean useContainsForCellText)
     {
         Locator.XPathLocator loc = useContainsForCellText ?
-                Locators.getGridRowContains(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")) :
-                Locators.getGridRow(cellText, index).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn"));
+                Locators.getGridRowContaining(cellText).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")).index(index) :
+                Locators.getGridRow(cellText).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")).index(index);
         Ext4Checkbox().locatedBy(loc).find(_test.getDriver()).check();
     }
 
@@ -507,7 +507,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void clickGridRowText(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText).index(index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '" + cellText + "']"));
     }
@@ -520,7 +520,7 @@ public class Ext4Helper
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
         _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
-        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locators.getGridRow(cellText).index(index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'group-label')][normalize-space() = '" + cellText + "']"));
     }
@@ -847,7 +847,7 @@ public class Ext4Helper
 
         public static Locator.XPathLocator folderManagementTreeSelectedNode(String nodeText)
         {
-            return Locator.xpath("//tr").withClass(_cssPrefix + "grid-row").withClass(_cssPrefix + "grid-row-selected").append("/td/div").withText(nodeText);
+            return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withClass(_cssPrefix + "grid-row-selected").append("/td/div").withText(nodeText);
         }
 
         public static Locator.XPathLocator tab()
@@ -862,7 +862,7 @@ public class Ext4Helper
 
         public static Locator.XPathLocator ext4Button(String text)
         {
-            return Locator.xpath("//a").notHidden().withClass(_cssPrefix + "btn").withText(text);
+            return Locator.tag("a").notHidden().withClass(_cssPrefix + "btn").withText(text);
         }
 
         public static Locator.XPathLocator ext4ButtonEnabled(String text)
@@ -888,9 +888,9 @@ public class Ext4Helper
          * @deprecated Use {@link Checkbox}
          */
         @Deprecated
-        public static Locator.XPathLocator ext4CheckboxById(String label)
+        public static Locator.XPathLocator ext4CheckboxById(String partialId)
         {
-            return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
+            return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + partialId + "')]");
         }
 
         /**
@@ -904,7 +904,7 @@ public class Ext4Helper
 
         public static Locator getGridRow(String columnVal, String markerCls)
         {
-            return Locator.css("." + markerCls).append(Locator.css("." + _cssPrefix + "grid-data-row")).withText(columnVal);
+            return Locator.tagWithClass("*", markerCls).append(Locator.tagWithClass("*", _cssPrefix + "grid-data-row")).withText(columnVal);
         }
 
         public static Locator.XPathLocator getGridRow()
@@ -919,17 +919,16 @@ public class Ext4Helper
 
         /**
          * @param cellText Exact text from any cell in the desired row
-         * @param index 0-based index of rows with matching cellText
          * @return XPathLocator for the desired row
          */
-        public static Locator.XPathLocator getGridRow(String cellText, int index)
+        public static Locator.XPathLocator getGridRow(String cellText)
         {
-            return getGridRow().withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
+            return getGridRow().withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden();
         }
 
-        private static Locator.XPathLocator getGridRowContains(String cellText, int index)
+        private static Locator.XPathLocator getGridRowContaining(String cellText)
         {
-            return getGridRow().withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
+            return getGridRow().withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden();
         }
 
         public static Locator.XPathLocator invalidField()
