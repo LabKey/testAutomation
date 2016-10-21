@@ -70,6 +70,7 @@ public class DataRegionTest extends BaseWebDriverTest
                     new Pair<>("Hide Edit and Details columns", "testHideColumns"),
                     new Pair<>("Set Paging to 3 with config", "testPagingConfig"),
                     new Pair<>("Set Paging to 2 with API", "testSetPaging"),
+                    new Pair<>("Parameterized Queries", "testParameterizedQueries"),
                     new Pair<>("Regression #25337", "test25337"),
                     new Pair<>("Change Page Offset", "testPageOffset"),
                     new Pair<>("Keep Removable Filters", "testRemovableFilters"),
