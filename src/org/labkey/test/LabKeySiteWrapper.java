@@ -1291,10 +1291,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         doAndWaitForPageToLoad(form::submit);
     }
 
-    /**
-     * @deprecated Use {@link WebElement#submit()}
-     */
-    @Deprecated public void submit(Locator formLocator)
+    public void submit(Locator formLocator)
     {
         WebElement form = formLocator.findElement(getDriver());
         doAndWaitForPageToLoad(form::submit);

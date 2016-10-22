@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -142,7 +143,14 @@ public class DataReportsTest extends ReportTest
         initTest.setDemographicsBit("DEM-1: Demographics", false);
     }
 
-    @Test @Ignore
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        clickFolder(getFolderName());
+    }
+
+    @Test @Ignore // Mask base StudyTest test method
     public void testSteps(){}
 
     @Override
@@ -154,10 +162,6 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doQueryReportTests()
     {
-        log("Create a query report.");
-
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         goToManageViews();
 
         clickAddReport("Query Report");
@@ -236,8 +240,6 @@ public class DataReportsTest extends ReportTest
     {
         String reportName = "TestReport";
 
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         _extHelper.clickMenuButton("Reports", "Create Crosstab Report");
@@ -266,9 +268,6 @@ public class DataReportsTest extends ReportTest
     {
         String viewName = "DRT Eligibility Query";
 
-        // create new grid view report:
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         goToManageViews();
         clickAddReport("Grid View");
         setFormElement(Locator.id("label"), viewName);
@@ -281,39 +280,38 @@ public class DataReportsTest extends ReportTest
     @Test
     public void doAdvancedViewTest()
     {
-        // create new external report
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         _extHelper.clickMenuButton("Reports", "Create Advanced Report");
+
+        log("Verify txt report");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
-        clickButton("Submit");
-        assertTextPresent("Female");
+        submit(Locator.tagWithName("form", "reportDesigner"));
+        assertElementPresent(Locator.tag("pre").containing("Female"));
+
+        log("Verify tsv report");
         setFormElement(Locator.name("program"), java);
         setFormElement(Locator.name("arguments"), "-cp " + TestFileUtils.getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
-        fireEvent(Locator.name("program"), SeleniumEvent.blur); // Try to prevent intermittent submit no-op
-        clickButton("Submit");
-        assertTextPresent("Female");
+        submit(Locator.tagWithName("form", "reportDesigner"));
+        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
+        assertElementPresent(Locator.tag("td").containing("Female"));
+
+        log("Verify saved tsv report");
         setFormElement(Locator.name("label"), "tsv");
         selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
-        fireEvent(Locator.name("label"), SeleniumEvent.blur); // Try to prevent intermittent save no-op
-        clickButton("Save");
+        submit(Locator.tagWithName("form", "saveReport"));
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("tsv"));
-        assertTextPresent("Female");
+        assertElementPresent(Locator.tag("td").withClass("labkey-header").containing("DEMsex"));
+        assertElementPresent(Locator.tag("td").containing("Female"));
     }
 
     @Test
     public void doRReportsTest()
     {
-        log("Create an R Report");
-
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         _extHelper.clickMenuButton("Reports", "Create R Report");
         setCodeEditorValue("script-report-editor", " ");
@@ -482,8 +480,6 @@ public class DataReportsTest extends ReportTest
         final String R_SCRIPT = "write.table(labkey.data, file = \"${tsvout:tsvfile}\", sep = \"\\t\", qmethod = \"double\", col.names=NA)";
         final String DATA_SET_APX1 = "APX-1: Abbreviated Physical Exam";
 
-        goToProjectHome();
-        clickFolder(getFolderName());
         scrollIntoView(Locator.linkWithText(DATA_SET_APX1));
         clickAndWait(Locator.linkWithText(DATA_SET_APX1));
 
