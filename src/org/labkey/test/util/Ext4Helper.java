@@ -904,7 +904,13 @@ public class Ext4Helper
 
         public static Locator getGridRow(String columnVal, String markerCls)
         {
-            return Locator.tagWithClass("*", markerCls).append(Locator.tagWithClass("*", _cssPrefix + "grid-data-row")).withText(columnVal);
+            String[] markerClasses = markerCls.split(" \\.");
+            Locator.XPathLocator loc = Locator.tag("*");
+            for (String cls : markerClasses)
+            {
+                loc = loc.withClass(cls);
+            }
+            return loc.append(Locator.tagWithClass("*", _cssPrefix + "grid-data-row")).withText(columnVal);
         }
 
         public static Locator.XPathLocator getGridRow()
