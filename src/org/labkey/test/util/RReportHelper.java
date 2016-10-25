@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 
 public class RReportHelper
 {
@@ -252,13 +253,9 @@ public class RReportHelper
         {
             _test.log("R_HOME is set to: " + rHome + " searching for the R application");
             File rHomeDir = new File(rHome);
-            FileFilter rFilenameFilter = new FileFilter()
-            {
-                public boolean accept(File file)
-                {
-                    return ("r.exe".equalsIgnoreCase(file.getName()) || "r".equalsIgnoreCase(file.getName())) && file.canExecute();
-                }
-            };
+            FileFilter rFilenameFilter =
+                    file -> ("r.exe".equalsIgnoreCase(file.getName()) || "r".equalsIgnoreCase(file.getName()))
+                            && file.canExecute();
             File[] files = rHomeDir.listFiles(rFilenameFilter);
 
             if (files == null || files.length == 0)
@@ -266,21 +263,18 @@ public class RReportHelper
                 files = new File(rHome, "bin").listFiles(rFilenameFilter);
             }
 
-            if (files != null)
+            if (files != null && files.length > 0)
             {
-                if (files.length == 1)
+                if (files.length > 1)
                 {
-                    rExecutable = files[0];
-                    return rExecutable;
-                }
-                else if (files.length > 1)
-                {
-                    _test.log("Found too many R executables:");
+                    TestLogger.log("WARNING: Found multiple R executables:");
                     for (File file : files)
                     {
                         _test.log("\t" + file.getAbsolutePath());
                     }
                 }
+                rExecutable = files[0];
+                return rExecutable;
             }
         }
 
@@ -376,9 +370,9 @@ public class RReportHelper
             Locator checkbox = Ext4Helper.Locators.checkbox(_test, option._label);
             _test.waitForElement(checkbox);
             if (checked)
-                _test._ext4Helper.checkCheckbox(option._label);
+                Ext4Checkbox().withLabel(option._label).waitFor(_test._ext4Helper._test.getDriver()).check();
             else
-                _test._ext4Helper.uncheckCheckbox(option._label);
+                Ext4Checkbox().withLabel(option._label).waitFor(_test._ext4Helper._test.getDriver()).uncheck();
         }
         else
         {
