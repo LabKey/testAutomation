@@ -51,6 +51,11 @@ public class ManageTreatmentsPage extends BaseManageVaccineDesignVisitPage
         addNewTreatmentProductRow("Adjuvant", productLabel, dose, route, outerRowIndex, subgridRowIndex);
     }
 
+    public void addNewChallengesRow(String productLabel, String dose, String route, int outerRowIndex, int subgridRowIndex)
+    {
+        addNewTreatmentProductRow("Challenge", productLabel, dose, route, outerRowIndex, subgridRowIndex);
+    }
+
     public void addNewTreatmentProductRow(String role, String productLabel, String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
         clickSubgridAddNewRow(elements().treatmentsLoc, role, outerRowIndex);
