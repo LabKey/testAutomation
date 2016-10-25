@@ -291,6 +291,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-14.30-15.10.sql
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.20-15.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.20-16.21.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.20-16.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.21-16.22.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
