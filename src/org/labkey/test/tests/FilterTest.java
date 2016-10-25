@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -105,6 +106,7 @@ public class FilterTest extends BaseWebDriverTest
         facetedFilterTest();
         maskedFacetTest();
         containerFilterFacetTest();
+        searchFilterTest();
     }
 
     @LogMethod
@@ -161,25 +163,6 @@ public class FilterTest extends BaseWebDriverTest
 
         clickButton("Submit", 0);
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
-    }
-
-    /**
-     * Issue 16821:  Create additional tests for behavior of URL filters w/ empty strings
-     * https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=16281
-     * Filters are represented in the page URL.  Because users can save these URLs for reference, it is
-     * important they be consistent.  To that end, this test will hit various URLs directly
-     * and virify the appropriate data is displayed
-     */
-    @LogMethod
-    private void directUrlTest()
-    {
-        List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
-        int count = 0;
-        for(FilterArgs a : args)
-        {
-            log("Loop count: " + count++);
-            validFilterGeneratesCorrectResultsTest(a);
-        }
     }
 
     @LogMethod
@@ -404,9 +387,7 @@ public class FilterTest extends BaseWebDriverTest
     @LogMethod
     private void invalidFiltersGenerateCorrectErrorTest()
     {
-        String[][] testArgs = generateInvalidFilterTestArgs();
-
-        for(String[] argSet : testArgs)
+        for (String[] argSet : generateInvalidFilterTestArgs())
         {
             invalidFiltersGenerateCorrectErrorTest(argSet[0], argSet[1],
                 argSet[2], argSet[3], argSet[4]);
@@ -508,30 +489,6 @@ public class FilterTest extends BaseWebDriverTest
                                               String[] present, String[] notPresent)
     {
         return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, null);
-    }
-
-
-    public static FilterArgs createFilterArgs(String columnName,
-                                              String filter1Type, @Nullable String filter1Value,
-                                              @Nullable String filter2Type, @Nullable String filter2Value,
-                                              String[] present, String[] notPresent, String url)
-    {
-        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, url);
-    }
-
-    private List<FilterArgs> generateValidFilterByUrlArgsAndResponses()
-    {
-            return Arrays.asList(
-                    //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
-                    //Issue 12197
-                    new FilterArgs(_listCol6.getName(), "= ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, listUrl + "&query.Aliased%24CColumn~eq="),
-                    new FilterArgs(_listCol6.getName(), "<> ", "NULL",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~neq="),
-                    new FilterArgs(_listCol6.getName(), "Equals One Of", "BLANK",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, listUrl + "&query.Aliased%24CColumn~in=%3B"),
-                    new FilterArgs(_listCol6.getName(), "IS NOT ANY OF ", "(BLANK)",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~notin=%3B"),
-                    new FilterArgs(_listCol6.getName(), "IS ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0]}, listUrl + "&query.Aliased%24CColumn~isblank"),
-                    new FilterArgs(_listCol4.getName(), "IS NOT ", "NULL",  null, null, new String[] {}, TEST_DATA[1], listUrl + "&query.HiddenColumn~isnonblank"),
-                    createFilterArgs(_listCol4.getName(), "Equals One Of (example usage: a;b;c)", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
-            );
     }
 
     private List<FilterArgs> generateValidFilterArgsAndResponses()
@@ -665,6 +622,47 @@ public class FilterTest extends BaseWebDriverTest
 
         executeScript("LABKEY.DataRegions['" + TABLE_NAME + "'].clearAllFilters();");
         waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod
+    public void searchFilterTest()
+    {
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+
+        final String regionJS = "LABKEY.DataRegions['" + TABLE_NAME + "']";
+
+        // Add search filter for 'ellow' matching Mellow / Yellow
+        executeScript(regionJS + ".addFilter(" + createSearchFilterJS("ellow") + ")");
+
+        DataRegionTable region = new DataRegionTable(TABLE_NAME, this.getDriver());
+        assertEquals("Should have 2 rows present after adding search filter", 2, region.getDataRowCount());
+
+        // Replace search filter 'Robust'
+        executeScript(regionJS + ".replaceFilter(" + createSearchFilterJS("Robust") + ")");
+        assertEquals("Should have 1 row present after replacing search filter", 1, region.getDataRowCount());
+
+        // Replace search filter with INJECT_CHARS_1
+        executeScript(regionJS + ".replaceFilter(" + createSearchFilterJS(INJECT_CHARS_1) + ")");
+        assertEquals("Should have 0 row present after replacing search filter", 0, region.getDataRowCount());
+
+        // Clear all filters
+        executeScript(regionJS + ".clearAllFilters();");
+        assertEquals("Should have 4 rows present after clearing search filters", 4, region.getDataRowCount());
+
+        // Set a filter, then add a case-insensitive "water" search filter to match "Water"
+        executeScript(regionJS + ".addFilter(LABKEY.Filter.create('JewelTone', true))");
+        executeScript(regionJS + ".addFilter(" + createSearchFilterJS("water") + ")");
+        assertEquals("Should have 1 row present after adding case-insensitive search filter", 1, region.getDataRowCount());
+
+        // Remove just the search filter
+        executeScript(regionJS + ".removeFilter(" + createSearchFilterJS("Should not appear") + ")");
+        assertEquals("Should have 2 rows present after removing only search filter", 2, region.getDataRowCount());
+    }
+
+    private String createSearchFilterJS(Object value)
+    {
+        return "LABKEY.Filter.create('*', " + PageFlowUtil.jsString(value.toString()) + ", LABKEY.Filter.Types.Q)";
     }
 
     @LogMethod

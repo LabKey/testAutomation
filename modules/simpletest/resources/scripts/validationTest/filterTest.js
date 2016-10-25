@@ -44,6 +44,8 @@ function doTest()
         errors[errors.length] = new Error("LABKEY.Filter.Types.NOT_MISSING  was undefined");
     if (LABKEY.Filter.Types.STARTS_WITH === undefined)
         errors[errors.length] = new Error("LABKEY.Filter.Types.STARTS_WITH  was undefined");
+    if (LABKEY.Filter.Types.Q === undefined)
+        errors[errors.length] = new Error("LABKEY.Filter.Types.Q  was undefined");
 
     var url = "list/home/grid.view?listId=1&query.Key~startswith=test";
     var desc = LABKEY.Filter.getFilterDescription(url, "query", "Key");

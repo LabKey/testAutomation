@@ -552,8 +552,8 @@ public class ClientAPITest extends BaseWebDriverTest
         {
             log(result);
         }
-        assertFalse(scriptResult.contains("ERROR"));
-        assertEquals("Wrong number of results", 21, testResults.length);
+        assertFalse(scriptResult.contains("FAILURE"));
+        assertEquals("Wrong number of results", 22, testResults.length);
     }
 
     @Test

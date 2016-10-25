@@ -206,6 +206,18 @@ var testFunctions = [
         LABKEY.Query.selectDistinctRows({ schemaName: schemaName, queryName: queryName, column: 'Age', viewName: viewName, success: successHandler, failure: failureHandler });
     },
 
+    function() //testResults[19]
+    {
+        // Filter for Jane Janeson, John Johnson
+        LABKEY.Query.selectRows({
+            schemaName: schemaName,
+            queryName: queryName,
+            filterArray: [ LABKEY.Filter.create('*', 'J', LABKEY.Filter.Types.Q) ],
+            success: successHandler,
+            failure: failureHandler
+        });
+    },
+
     // last function sets the contents of the results div.
     function()
     {
@@ -317,6 +329,11 @@ var testFunctions = [
             html += '18)SUCCESS: SelectDistinctRows returned correct custom view filtered result set<br>';
         else
             html += '18)FAILURE: SelectDistinctRows failed to return expected result of 2 values<br>';
+
+        if (testResults[19].rowCount == 2)
+            html += '19)SUCCESS: SelectRows returned correct expected result when using a search filter<br>';
+        else
+            html += '19)FAILURE: SelectRows failed to return expected result of 2 rows. Result had ' + testResults[19].rowCount + ' rows<br>';
 
         if (html.contains("FAILURE"))
             throw new Error(html);
