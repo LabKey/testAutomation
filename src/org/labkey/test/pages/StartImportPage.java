@@ -2,6 +2,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriver;
@@ -11,6 +12,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class StartImportPage extends LabKeyPage
 {
@@ -72,6 +75,11 @@ public class StartImportPage extends LabKeyPage
         setInitialCheckBox(Locator.css("input[name='specificImportOptions']"), check);
     }
 
+    public void setApplyToMultipleFoldersCheckBox(boolean check)
+    {
+        setInitialCheckBox(Locator.css("input[name='applyToMultipleFolders']"), check);
+    }
+
     private void setInitialCheckBox(Locator checkBox, boolean check)
     {
         if (check)
@@ -83,6 +91,15 @@ public class StartImportPage extends LabKeyPage
     public void clickStartImport()
     {
         clickButton("Start Import");
+    }
+
+    public void clickStartImport(String confirmationText)
+    {
+        clickButton("Start Import", 0);
+
+        Window confirmation = new Window("Confirmation", getDriver());
+        assertEquals("Wrong confirmation message", confirmationText, confirmation.getBody());
+        confirmation.clickButton("Yes");
     }
 
     public boolean isSelectSpecificImportOptionsVisible()
@@ -181,7 +198,5 @@ public class StartImportPage extends LabKeyPage
         {
             return value;
         }
-
     }
-
 }

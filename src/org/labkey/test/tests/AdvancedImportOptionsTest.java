@@ -12,6 +12,9 @@ import org.labkey.test.components.studydesigner.AssayScheduleWebpart;
 import org.labkey.test.components.studydesigner.ImmunizationScheduleWebpart;
 import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.util.Arrays;
@@ -22,13 +25,22 @@ import java.util.Map;
 @Category(DailyB.class)
 public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
+    private static final String LIMITED_USER = "limited@advancedimport.test";
+
     private static final String IMPORT_STUDY_FILE = "/sampledata/AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip";
     private static final String IMPORT_PROJECT_FILE01 = "Advanced Import By File";
     private static final String IMPORT_PROJECT_FILE02 = "Advanced Import By File With Filters";
     private static final String IMPORT_PROJECT_FILE03 = "Advanced Import By Pipeline With Filters";
+
+    private static final String IMPORT_FOLDER_MULTI01 = "Advance Import Folder 01";
+    private static final String IMPORT_FOLDER_MULTI02 = "Advance Import Folder 02";
+    private static final String IMPORT_FOLDER_MULTI03 = "Advance Import Folder 03";
+    private static final String IMPORTED_SUB_FOLDER_NAME = "Advanced Import Subfolder";
+
     private static final int IMPORT_WAIT_TIME = 60 * 1000;  // This should be a limit of 1 minute.
     private static final boolean EXPECTED_IMPORT_ERRORS = false;
     private static final int EXPECTED_COMPLETED_IMPORT_JOBS = 1;
+    private static final int EXPECTED_COMPLETED_MULTI_FOLDER_JOBS = 2;
 
     @Override
     public List<String> getAssociatedModules()
@@ -55,6 +67,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE02, false);
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03, false);
+
+        _userHelper.deleteUser(LIMITED_USER);
     }
 
     // This test class has no @Before or @BeforeClass. Each of the test cases, creates its own project to be used for importing.
@@ -79,7 +93,14 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         waitForPipelineJobsToComplete(EXPECTED_COMPLETED_IMPORT_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME);
 
         goToProjectHome(IMPORT_PROJECT_FILE01);
+        validateFileImportResults();
 
+        log("Cleanup and remove the project.");
+        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
+    }
+
+    private void validateFileImportResults()
+    {
         log("Validate that the expected data has been imported.");
         log("Validate assay schedule.");
         clickTab("Assays");
@@ -109,10 +130,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         Assert.assertEquals("immType02", vaccineDesignWebpart.getImmunogenCellDisplayValue("Type", 2));
         Assert.assertEquals(1, vaccineDesignWebpart.getAdjuvantRowCount());
         Assert.assertEquals("AdjLabel01", vaccineDesignWebpart.getAdjuvantCellDisplayValue("Label", 0));
-
-        log("Cleanup and remove the project.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
-
     }
 
     @Test
@@ -246,5 +263,136 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Cleanup and remove the project.");
         _containerHelper.deleteProject(IMPORT_PROJECT_FILE03);
+    }
+
+    @Test
+    public void testImportToMultipleFolders()
+    {
+        File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
+        _userHelper.createUser(LIMITED_USER);
+
+        log("Create a new project to import the existing data into multiple folders.");
+        _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
+
+        log("Create subfolders and setup permissions.");
+        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI01);
+        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI02);
+        _containerHelper.createSubfolder(IMPORT_PROJECT_FILE01, IMPORT_FOLDER_MULTI03);
+
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+
+        log("Setting up permissions for a limited user");
+        clickFolder(IMPORT_FOLDER_MULTI01);
+        permissionsHelper.addMemberToRole(LIMITED_USER, "Folder Administrator", PermissionsHelper.MemberType.user);
+        clickFolder(IMPORT_FOLDER_MULTI02);
+        permissionsHelper.addMemberToRole(LIMITED_USER, "Reader", PermissionsHelper.MemberType.user);
+        clickFolder(IMPORT_FOLDER_MULTI03);
+        permissionsHelper.addMemberToRole(LIMITED_USER, "Folder Administrator", PermissionsHelper.MemberType.user);
+
+        pushLocation();
+        impersonate(LIMITED_USER);
+        clickFolder(IMPORT_FOLDER_MULTI01);
+        log("Get to the import page and validate that is looks as expected.");
+        StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, false, true);
+        importPage.setSelectSpecificImportOptions(true);
+        importPage.setApplyToMultipleFoldersCheckBox(true);
+
+        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+
+        log("Verify user can import only into folders they have admin access to");
+        waitFor(() -> Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).findElement(getDriver()).isDisplayed(), 5000);
+        assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_PROJECT_FILE01));
+        assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI02));
+
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+
+        stopImpersonating();
+        popLocation();
+
+        clickFolder(IMPORT_FOLDER_MULTI01);
+        log("Import into multiple folders from the same template");
+        importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
+        importPage.setSelectSpecificImportOptions(true);
+        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetData, false);
+        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.DatasetDefinitions, false);
+        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.Specimens, false);
+        importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.SpecimenSettings, false);
+        importPage.setApplyToMultipleFoldersCheckBox(true);
+
+        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        waitFor(() -> Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).findElement(getDriver()).isDisplayed(), 5000);
+
+        log("Select sub folders to import into");
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        sleep(250);
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        sleep(250);
+
+        log("Start the import and verify the confirmation dialog");
+        importPage.clickStartImport("The import archive will be applied to 2 selected target folders. A separate pipeline import job will be created for each. This action cannot be undone.\n\nWould you like to proceed?");
+
+        waitForText("Data Pipeline");
+        log("Verify the container filter has been set to see multiple import jobs");
+
+        // if the container filter has been set correctly we should see all 2 pipeline jobs
+        waitForPipelineJobsToComplete(EXPECTED_COMPLETED_MULTI_FOLDER_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME * EXPECTED_COMPLETED_IMPORT_JOBS);
+
+        log("Validate that the expected data has been imported.");
+        clickFolder(IMPORT_FOLDER_MULTI01);
+        validateMultiFolderImportResults(IMPORT_FOLDER_MULTI01, false, false, false);
+
+        clickFolder(IMPORT_FOLDER_MULTI03);
+        validateMultiFolderImportResults(IMPORT_FOLDER_MULTI03, false, false, false);
+
+        clickFolder(IMPORT_FOLDER_MULTI02);
+        log("Import into a single folder");
+        importPage = StartImportPage.startImportFromPipeline(this, zipFile, false, false);
+        importPage.clickStartImport();
+        waitForText("Data Pipeline");
+
+        // if the container filter has been set correctly we should see all 2 pipeline jobs
+        waitForPipelineJobsToComplete(EXPECTED_COMPLETED_IMPORT_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME);
+
+        log("Validate that the expected data has been imported and the subfolder has been imported.");
+        clickFolder(IMPORT_FOLDER_MULTI02);
+        validateMultiFolderImportResults(IMPORT_FOLDER_MULTI02, true, true, true);
+
+        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
+    }
+
+    public void validateMultiFolderImportResults(String folderName, boolean hasDatasets, boolean hasSpecimens, boolean hasSubfolder)
+    {
+        validateFileImportResults();
+
+        clickTab("Overview");
+        if (hasDatasets)
+        {
+            log("Validate that datasets have been imported");
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "NAbTest"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "FlowTest"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "LuminexTest"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "ELISATest"));
+        }
+        else
+        {
+            log("Validate that no datasets have been imported");
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "5001"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "5002"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "5003"));
+            waitForElement(Locator.tagWithAttribute("div", "data-qtip", "5004"));
+        }
+
+        log("Verify specimen import status");
+        clickTab("Manage");
+        waitForText(hasSpecimens ? "This study uses the advanced specimen repository" : "This study uses the standard specimen repository");
+
+        log("Verify whether a subfolder should be present");
+        openFolderMenu();
+        expandFolderTree(folderName);
+        if (hasSubfolder)
+            assertElementPresent(Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME));
+        else
+            assertElementNotPresent(Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME));
     }
 }
