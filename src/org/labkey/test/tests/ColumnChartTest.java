@@ -22,6 +22,8 @@ import java.util.List;
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
+    // TODO add test case for export/import of custom view with saved column charts
+
     public static final String DATA_SOURCE_1 = "Physical Exam";
     public static final List<String> DATA_SOURCE_1_COLNAMES = Arrays.asList(
         "ParticipantId", "date", "Weight_kg", "Temp_C",
