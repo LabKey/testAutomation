@@ -33,21 +33,29 @@ public class InsertIssueDefPage extends LabKeyPage
         this(driver, originDataRegion.getTableName());
     }
 
-    public void setLabel(String label)
+    public InsertIssueDefPage setLabel(String label)
     {
         _labelInput.set(label);
+        return this;
     }
 
-    public void selectKind(String kind)
+    public InsertIssueDefPage selectKind(String kind)
     {
         WebElement input = Locator.tagWithName("select", "quf_Kind").findElement(getDriver());
         new OptionSelect(input).set(kind);
+        return this;
     }
 
-    public CreateListDefConfirmation clickSubmit(boolean errorExpected)
+    public CreateListDefConfirmation clickSubmit()
     {
         click(Locator.lkButton("Submit"));
-        return new CreateListDefConfirmation(errorExpected ? "Error" : "Create Issue List Definition?", getDriver());
+        return new CreateListDefConfirmation(getDriver());
+    }
+
+    public CreateListDefError clickSubmitError()
+    {
+        click(Locator.lkButton("Submit"));
+        return new CreateListDefError(getDriver());
     }
 
     public IssueListDefDataRegion clickCancel()
@@ -58,15 +66,15 @@ public class InsertIssueDefPage extends LabKeyPage
 
     public class CreateListDefConfirmation extends Window
     {
-        private CreateListDefConfirmation(String windowTitle, WebDriver driver)
+        private CreateListDefConfirmation(WebDriver driver)
         {
-            super(windowTitle, driver);
+            super("Create Issue List Definition?", driver);
         }
 
-        public ListPage clickYes()
+        public AdminPage clickYes()
         {
             clickButton("Yes");
-            return new AdminPage(getDriver()).cancel();
+            return new AdminPage(getDriver());
         }
 
         public InsertIssueDefPage clickYesError()
@@ -80,8 +88,16 @@ public class InsertIssueDefPage extends LabKeyPage
             clickButton("No", true);
             return InsertIssueDefPage.this;
         }
+    }
 
-        public InsertIssueDefPage clickOkError()
+    public class CreateListDefError extends Window
+    {
+        private CreateListDefError(WebDriver driver)
+        {
+            super("Error", driver);
+        }
+
+        public InsertIssueDefPage clickOk()
         {
             clickButton("OK", true);
             return InsertIssueDefPage.this;

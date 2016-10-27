@@ -14,6 +14,7 @@ import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.DetailsPage;
+import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.params.FieldDefinition;
@@ -79,7 +80,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 .createIssuesListDefinition(listDef);
 
         Window confirmationWindow = _issuesHelper.goToIssueListDefinitions(FOLDER_PATH)
-                .startCreateIssuesListDefinition(listDef, false);
+                .startCreateIssuesListDefinition(listDef);
         assertEquals(String.format("An existing Issue Definition was found in this folder: /%s. " +
                 "This existing definition will be shared with your new issue list if created.", getProjectName()),
                 confirmationWindow.getBody());
@@ -118,7 +119,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 .createIssuesListDefinition(listDef);
 
         Window confirmationWindow = _issuesHelper.goToIssueListDefinitions(getProjectName())
-                .startCreateIssuesListDefinition(listDef, false);
+                .startCreateIssuesListDefinition(listDef);
         assertEquals("An existing Issue Definition was found in this folder: /Shared. " +
                 "This existing definition will be shared with your new issue list if created.",
                 confirmationWindow.getBody());
@@ -158,7 +159,7 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 .createIssuesListDefinition(listDef);
 
         Window confirmationWindow = _issuesHelper.goToIssueListDefinitions(getProjectName())
-                .startCreateIssuesListDefinition(listDef, false);
+                .startCreateIssuesListDefinition(listDef);
         assertEquals("Wrong issue definition confirmation",
                 "A new Issue Definition will be generated in this folder: /" + getProjectName(),
                 confirmationWindow.getBody());
@@ -185,15 +186,13 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
         _issuesHelper.goToIssueListDefinitions(FOLDER_PATH)
                 .createIssuesListDefinition(listDef);
 
-        Window confirmationWindow = _issuesHelper.goToIssueListDefinitions(getProjectName())
-                .startCreateIssuesListDefinition(listDef, false);
+        InsertIssueDefPage.CreateListDefConfirmation confirmationWindow = _issuesHelper.goToIssueListDefinitions(getProjectName())
+                .startCreateIssuesListDefinition(listDef);
         assertEquals("Wrong issue definition confirmation",
                 "A new Issue Definition will be generated in this folder: /" + getProjectName(),
                 confirmationWindow.getBody());
 
-        confirmationWindow.clickButton("Yes");
-
-        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
+        AdminPage adminPage = confirmationWindow.clickYes();
         String inheritedField = "uninheritedfield";
         adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();

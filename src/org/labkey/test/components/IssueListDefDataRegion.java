@@ -1,5 +1,6 @@
 package org.labkey.test.components;
 
+import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.DeleteIssueListPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.ListPage;
@@ -38,24 +39,33 @@ public class IssueListDefDataRegion extends DataRegionTable
         return new DeleteIssueListPage(getDriver());
     }
 
-    public ListPage createIssuesListDefinition(String name)
+    public AdminPage createIssuesListDefinition(String name)
     {
-        return startCreateIssuesListDefinition(name, false).clickYes();
+        return startCreateIssuesListDefinition(name).clickYes();
+    }
+
+    public AdminPage createIssuesListDefinition(String name, String kind)
+    {
+        return startCreateIssuesListDefinition(name, kind).clickYes();
     }
 
     public ListPage goToIssueList(String name)
     {
-        link(getRowIndex("Label", name), "Label").click();
+        getWrapper().clickAndWait(link(getRowIndex("Label", name), "Label"));
         return new ListPage(getDriver());
     }
 
-    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name, boolean errorExpected)
+    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name)
+    {
+        return startCreateIssuesListDefinition(name, "General Issue Tracker");
+    }
+
+    public InsertIssueDefPage.CreateListDefConfirmation startCreateIssuesListDefinition(String name, String kind)
     {
         InsertIssueDefPage insertIssueDefPage = clickInsert();
         insertIssueDefPage.setLabel(name);
-        if (!errorExpected)
-            insertIssueDefPage.selectKind("General Issue Tracker");
-        return insertIssueDefPage.clickSubmit(errorExpected);
+        insertIssueDefPage.selectKind(kind);
+        return insertIssueDefPage.clickSubmit();
     }
 
     public void selectIssueDefs(String... names)

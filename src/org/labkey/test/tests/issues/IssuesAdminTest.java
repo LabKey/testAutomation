@@ -11,6 +11,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -84,9 +85,12 @@ public class IssuesAdminTest extends BaseWebDriverTest
     public void testIssueDefinitionRequiresModule() throws Exception
     {
         _containerHelper.createProject(PROJECT2, null);
+        _issuesHelper.goToIssueListDefinitions(PROJECT2)
+                .clickInsert()
+                .setLabel("noModule")
+                .clickSubmitError()
+                .clickOk();
         IssueListDefDataRegion listDefDataRegion = _issuesHelper.goToIssueListDefinitions(PROJECT2);
-        listDefDataRegion.startCreateIssuesListDefinition("noModule", true).clickOkError();
-        listDefDataRegion = _issuesHelper.goToIssueListDefinitions(PROJECT2);
         assertEquals("Issue list definition present with module disabled", 0, listDefDataRegion.getDataRowCount());
     }
 
