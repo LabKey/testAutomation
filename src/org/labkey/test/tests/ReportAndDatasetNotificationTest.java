@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.Locator.NBSP;
 
 @Category({DailyC.class, Reports.class})
 public class ReportAndDatasetNotificationTest extends StudyBaseTest
@@ -76,10 +77,10 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         assertGridPanel(false);
         selectNotificationOption("select");
         assertGridPanel(true);
-        _ext4Helper.checkGridRowCheckboxAlt("Uncategorized", 0, false);
-        _ext4Helper.checkGridRowCheckboxAlt("Cons", 0, false);
-        _ext4Helper.checkGridRowCheckboxAlt("Reports", 0, false);
-        _ext4Helper.checkGridRowCheckboxAlt("Exams", 0, true);
+        _ext4Helper.checkGridCellCheckbox("Uncategorized", 0);
+        _ext4Helper.checkGridCellCheckbox("Cons", 0);
+        _ext4Helper.checkGridCellCheckbox("Reports", 0);
+        _ext4Helper.checkGridCellCheckbox(NBSP + NBSP + NBSP + NBSP + "Exams", 0);
         clickButton("Save");
 
         log("Send notification and check email in dumbster");

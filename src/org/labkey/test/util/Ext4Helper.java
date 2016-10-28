@@ -471,11 +471,9 @@ public class Ext4Helper
     }
 
     @LogMethod(quiet = true)
-    public void checkGridRowCheckboxAlt(String cellText, int index, boolean useContainsForCellText)
+    public void checkGridCellCheckbox(String otherCellText, int index)
     {
-        Locator.XPathLocator loc = useContainsForCellText ?
-                Locators.getGridRowContaining(cellText).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")).index(index) :
-                Locators.getGridRow(cellText).append(Locator.tagWithClass("div", _cssPrefix + "grid-cell-inner-checkcolumn")).index(index);
+        Locator.XPathLocator loc = Locators.getGridRow(otherCellText).append(Locator.tagWithClass("img", _cssPrefix + "grid-checkcolumn")).index(index);
         Ext4Checkbox().locatedBy(loc).find(_test.getDriver()).check();
     }
 
@@ -930,11 +928,6 @@ public class Ext4Helper
         public static Locator.XPathLocator getGridRow(String cellText)
         {
             return getGridRow().withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden();
-        }
-
-        private static Locator.XPathLocator getGridRowContaining(String cellText)
-        {
-            return getGridRow().withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden();
         }
 
         public static Locator.XPathLocator invalidField()
