@@ -1,7 +1,5 @@
-package org.labkey.test.util;
-
 /*
- * Copyright (c) 2014-2015 LabKey Corporation
+ * Copyright (c) 2014-2016 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +13,8 @@ package org.labkey.test.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
