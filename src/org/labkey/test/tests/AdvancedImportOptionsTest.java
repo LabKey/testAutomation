@@ -362,11 +362,11 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         clickFolder(IMPORT_FOLDER_MULTI02);
         log("Import into a single folder");
-        importPage = StartImportPage.startImportFromPipeline(this, zipFile, false, false);
+        importPage = StartImportPage.startImportFromPipeline(this, zipFile, false, true);
+        importPage.setSelectSpecificImportOptions(true);
         importPage.clickStartImport();
         waitForText("Data Pipeline");
 
-        // if the container filter has been set correctly we should see all 2 pipeline jobs
         waitForPipelineJobsToComplete(EXPECTED_COMPLETED_IMPORT_JOBS, "Folder import", EXPECTED_IMPORT_ERRORS, IMPORT_WAIT_TIME);
 
         log("Validate that the expected data has been imported and the subfolder has been imported.");
