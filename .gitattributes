@@ -478,6 +478,8 @@ src/org/labkey/test/components/studydesigner/ImmunizationScheduleWebpart.java -t
 src/org/labkey/test/components/studydesigner/ManageAssaySchedulePage.java -text
 src/org/labkey/test/components/studydesigner/ManageStudyProductsPage.java -text
 src/org/labkey/test/components/studydesigner/ManageTreatmentsPage.java -text
+src/org/labkey/test/components/studydesigner/ManageTreatmentsSingleTablePage.java -text
+src/org/labkey/test/components/studydesigner/TreatmentDialog.java -text
 src/org/labkey/test/components/studydesigner/VaccineDesignWebpart.java -text
 src/org/labkey/test/credentials/ApiKey.java -text
 src/org/labkey/test/credentials/Credentials.java -text
