@@ -908,7 +908,7 @@ public class Ext4Helper
             {
                 loc = loc.append(Locator.tagWithClass("*", cls));
             }
-            return loc.append(Locator.tagWithClass("*", _cssPrefix + "grid-data-row")).withText(columnVal);
+            return loc.append(getGridRow(columnVal).withText(columnVal));
         }
 
         public static Locator.XPathLocator getGridRow()
