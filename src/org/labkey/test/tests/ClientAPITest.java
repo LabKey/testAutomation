@@ -45,7 +45,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -578,6 +577,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String EMAIL_BODY_PLAIN = "This is a test message.";
     private static final String EMAIL_BODY_HTML = "<h2>This is a test message.<\\\\/h2>";
     private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
+
     @Test
     public void emailApiTest()
     {
@@ -766,14 +766,14 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         Command command = new Command(controller, action);
         Map<String, Object> completionValues;
-        String errMsg =  " for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
+        String errMsg = "for controller " + controller + ", displayNameOnly == " + Boolean.toString(displayNameOnly);
         try
         {
             completionValues = command.execute(cn, "/" + getProjectName()).getParsedData();
         }
         catch (IOException | CommandException e)
         {
-            if (e instanceof CommandException && !actionAllowed && e.getMessage().equals("Forbidden"))
+            if (e instanceof CommandException && !actionAllowed && ((CommandException) e).getStatusCode() == 403)
                 return; // This is OK. Properly validated action wasn't allowed
             throw new RuntimeException("Command execution error " + errMsg, e);
         }
