@@ -16,8 +16,6 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,13 +25,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.Maps;
+import org.labkey.test.util.SummaryStatisticsHelper;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -50,11 +45,6 @@ public class CustomizeViewTest extends BaseWebDriverTest
     private final static String FIRST_NAME_COLUMN = "FirstName";
     private final static String AGE_COLUMN = "Age";
     private final static String TEST_DATE_COLUMN = "TestDate";
-    private final static String SUMMARY_STAT_SUM = "Sum";
-    private final static String SUMMARY_STAT_MEAN = "Mean";
-    private final static String SUMMARY_STAT_MIN = "Minimum";
-    private final static String SUMMARY_STAT_MAX = "Maximum";
-    private final static String SUMMARY_STAT_COUNT = "Count (non-blank)";
     private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
                     new ListHelper.ListColumn(FIRST_NAME_COLUMN, FIRST_NAME_COLUMN + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
@@ -80,6 +70,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
                     { "7", "Yak", "Yakson", "88", "" },
             };
 
+    private SummaryStatisticsHelper _summaryStatisticsHelper;
 
     @Override
     protected String getProjectName()
@@ -103,6 +94,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
+        _summaryStatisticsHelper = new SummaryStatisticsHelper(this);
+
         goToProjectHome();
         clickAndWait(Locator.linkContainingText(LIST_NAME));
     }
@@ -122,10 +115,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextPresent(customTitle);
 
         log("** Set summary statistics");
-        drt.setSummaryStatistic(statColumn, SUMMARY_STAT_SUM);
-        drt.setSummaryStatistic(statColumn, SUMMARY_STAT_COUNT);
+        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM);
+        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT);
         assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn).replaceAll("\\s+", " "));
+        String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279 " + SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn));
         assertTextPresent(customTitle);
 
         log("** Clear column title");
@@ -133,10 +127,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextNotPresent("Oldness Factor");
 
         log("** Clear summary statistics");
-        drt.clearSummaryStatistic(statColumn, SUMMARY_STAT_SUM);
+        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM);
         assertTrue("Summary statistic count should still be available", drt.hasSummaryStatisticRow());
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn).replaceAll("\\s+", " "));
-        drt.clearSummaryStatistic(statColumn, SUMMARY_STAT_COUNT);
+        summaryStatStr = SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn));
+        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT);
         assertFalse("Summary statistic row still present", drt.hasSummaryStatisticRow());
         assertTextNotPresent("Oldness Factor");
 
@@ -169,25 +164,29 @@ public class CustomizeViewTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("query", getDriver());
 
         log("** Set summary statistics for " + statColumn1);
-        drt.setSummaryStatistic(statColumn1, SUMMARY_STAT_SUM);
+        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM);
         assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
-        drt.setSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_SUM + ": 279 " + SUMMARY_STAT_MEAN + ": 39.857", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
+        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN);
+        summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279 " + SummaryStatisticsHelper.BASE_STAT_MEAN + ": 39.857";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
 
         log("** Set summary statistics for " + statColumn2);
-        assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn2).replaceAll("\\s+", " "));
-        drt.setSummaryStatistic(statColumn2, SUMMARY_STAT_COUNT);
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_COUNT + ": 7", drt.getTotal(statColumn2).replaceAll("\\s+", " "));
+        assertEquals("Wrong summary statistics", " ", _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn2));
+        drt.setSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT);
+        summaryStatStr = SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn2));
 
         log("** Clear summary statistics for " + statColumn1);
-        drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_SUM);
-        assertEquals("Wrong summary statistics", SUMMARY_STAT_MEAN + ": 39.857", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
-        drt.clearSummaryStatistic(statColumn1, SUMMARY_STAT_MEAN);
-        assertEquals("Wrong summary statistics", " ", drt.getTotal(statColumn1).replaceAll("\\s+", " "));
+        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM);
+        summaryStatStr = SummaryStatisticsHelper.BASE_STAT_MEAN + ": 39.857";
+        assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
+        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN);
+        assertEquals("Wrong summary statistics", " ", _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
 
         log("** Clear summary statistics for " + statColumn2);
-        drt.clearSummaryStatistic(statColumn2, SUMMARY_STAT_COUNT);
+        drt.clearSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT);
         assertFalse("Summary statistic row shouldn't appear", drt.hasSummaryStatisticRow());
     }
 
@@ -196,42 +195,27 @@ public class CustomizeViewTest extends BaseWebDriverTest
     {
         // PK should not have mean and sum
         setColumns(LIST_KEY_COLUMN);
-        verifySummaryStatisticsSubmenu(LIST_KEY_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN});
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(LIST_KEY_COLUMN, "integer", false, true);
 
         // String column should only have count
         setColumns(FIRST_NAME_COLUMN);
-        verifySummaryStatisticsSubmenu(FIRST_NAME_COLUMN, new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(FIRST_NAME_COLUMN, "string");
 
-        // Numeric column should have all
+        // Integer column should have all
         setColumns(AGE_COLUMN);
-        verifySummaryStatisticsSubmenu(AGE_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, null);
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(AGE_COLUMN, "integer");
 
         // Date column should not have mean and sum
         setColumns(TEST_DATE_COLUMN);
-        verifySummaryStatisticsSubmenu(TEST_DATE_COLUMN, new String[]{SUMMARY_STAT_COUNT, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN});
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(TEST_DATE_COLUMN, "date");
 
         // Folder column should only have count
         setColumns("container");
-        verifySummaryStatisticsSubmenu("container", new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu("container", "string");
 
         // Lookup column should only have count
         setColumns("CreatedBy");
-        verifySummaryStatisticsSubmenu("CreatedBy", new String[]{SUMMARY_STAT_COUNT}, new String[]{SUMMARY_STAT_SUM, SUMMARY_STAT_MEAN, SUMMARY_STAT_MIN, SUMMARY_STAT_MAX});
-    }
-
-    private void verifySummaryStatisticsSubmenu(String columnName, @NotNull String[] expectedStats, @Nullable String[] unexpectedStats)
-    {
-        Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
-        _ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Summary Statistics", SUMMARY_STAT_COUNT); // they all have count so safe to use here for submenu
-
-        for (String stat : expectedStats)
-            assertElementPresent(Ext4Helper.Locators.menuItem(stat));
-
-        if (unexpectedStats != null && unexpectedStats.length > 0)
-        {
-            for (String stat : unexpectedStats)
-                assertElementNotPresent(Ext4Helper.Locators.menuItem(stat));
-        }
+        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu("CreatedBy", "integer", true, false);
     }
 
     @Test
