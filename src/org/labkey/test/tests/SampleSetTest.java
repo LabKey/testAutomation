@@ -339,7 +339,7 @@ public class SampleSetTest extends BaseWebDriverTest
         insertNewWithFileAttachmentTest();
 
         // Added these last two test to check for regressions with exporting a grid with a file attachment column and deleting a file attachment column.
-        exportGridWithAttachment(3, 4, "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx", "experiment-1.xar.xml");
+        exportGridWithAttachment(3, 4, "experiment-1.xar.xml", "experiment.xar.xml", "rawandsummary~!@#$%^&()_+-[]{};',..xlsx");
         deleteAttachmentColumn();
         exportGridWithAttachment(3, 4, "", "", "");
     }
