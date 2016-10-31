@@ -2,6 +2,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,21 +28,22 @@ public class SummaryStatisticsHelper
         ALL_STATS.addAll(Arrays.asList(PREMIUM_STAT_COUNT_BLANK, PREMIUM_STAT_COUNT_DISTINCT, PREMIUM_STAT_STDDEV, PREMIUM_STAT_STDERR));
     }
 
-    private BaseWebDriverTest _test;
+    private WebDriverWrapper _wrapper;
+    private boolean _hasPremiumModule;
 
     public SummaryStatisticsHelper(BaseWebDriverTest test)
     {
-        _test = test;
+        _wrapper = test;
+        _hasPremiumModule = test.getContainerHelper().getAllModules().contains("Premium");
     }
 
     public List<String> getExpectedColumnStats(String colType, boolean isLookup, boolean isPK)
     {
         List<String> stats = new ArrayList<>();
-        boolean hasPremiumModule = _test.getContainerHelper().getAllModules().contains("Premium");
         boolean isNumeric = "integer".equalsIgnoreCase(colType) || "double".equalsIgnoreCase(colType);
 
         stats.add(BASE_STAT_COUNT);
-        if (hasPremiumModule)
+        if (_hasPremiumModule)
         {
             stats.add(PREMIUM_STAT_COUNT_BLANK);
             if (!"double".equalsIgnoreCase(colType))
@@ -52,7 +54,7 @@ public class SummaryStatisticsHelper
         {
             stats.add(BASE_STAT_SUM);
             stats.add(BASE_STAT_MEAN);
-            if (hasPremiumModule)
+            if (_hasPremiumModule)
             {
                 stats.add(PREMIUM_STAT_STDDEV);
                 stats.add(PREMIUM_STAT_STDERR);
@@ -91,17 +93,17 @@ public class SummaryStatisticsHelper
 
     public void verifySummaryStatisticsSubmenu(String columnName, String colType, boolean isLookup, boolean isPK)
     {
-        _test.refresh(); // TODO how else can we guarantee that we are only seeing the current column's menu items?
+        _wrapper.refresh(); // refresh to guarantee that we are only seeing the current column's menu items?
 
         // they all have the base count stat so safe to use here for submenu item
         Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
-        _test._ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Summary Statistics", SummaryStatisticsHelper.BASE_STAT_COUNT);
+        _wrapper._ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Summary Statistics", SummaryStatisticsHelper.BASE_STAT_COUNT);
 
         for (String stat : getExpectedColumnStats(colType, isLookup, isPK))
-            _test.assertElementPresent(Ext4Helper.Locators.menuItem(stat));
+            _wrapper.assertElementPresent(Ext4Helper.Locators.menuItem(stat));
 
         for (String stat : getUnexpectedColumnStats(colType, isLookup, isPK))
-            _test.assertElementNotPresent(Ext4Helper.Locators.menuItem(stat));
+            _wrapper.assertElementNotPresent(Ext4Helper.Locators.menuItem(stat));
     }
 
     public String getSummaryStatisticFooterAsString(DataRegionTable drt, String columnName)
