@@ -329,6 +329,29 @@
             ]]>
         </response>
     </test>
+    <test name="table search makeFilter operator" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.selectRows("%baseUrl%"
+                    , folderPath="/RlabkeyVerifyProject"
+                    , schemaName="lists"
+                    , queryName="AllTypes"
+                    , colFilter=makeFilter(c("*", "Q", "empty"))
+                )
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Row 2 Empty Vals
+                row 4 (the n word)
+                Row 5 (na)
+                Row 6 bad chars
+            ]]>
+        </response>
+    </test>
     <test name="delete row" type="post">
         <url>
             <![CDATA[
