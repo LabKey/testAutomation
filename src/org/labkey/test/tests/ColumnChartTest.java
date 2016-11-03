@@ -32,13 +32,13 @@ import org.labkey.test.util.DataRegionTable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
-    // TODO add test case for export/import of custom view with saved column charts
-
     public static final String DATA_SOURCE_1 = "Physical Exam";
     public static final List<String> DATA_SOURCE_1_COLNAMES = Arrays.asList(
         "ParticipantId", "date", "Weight_kg", "Temp_C",
@@ -475,16 +475,11 @@ public class ColumnChartTest extends BaseWebDriverTest
         final String COL_NAME_BOX = "Signature";
         final String COL_NAME_PIE = "Respirations";
 
-        final int UNFILTERED_BAR_COUNT = 28;
-        final int UNFILTERED_PIE_COUNT = 9;
-        final int UNFILTERED_BOX_COUNT = 1;
-
         ColumnChartRegion plotRegion;
-        ColumnChartComponent plotComponent;
         DataRegionTable dataRegionTable;
-        int expectedPlotCount = 0;
+        List<Map<String, String>> columnChartProps = new ArrayList<>();
+        Map<String, String> singleChartProps;
         List<String> columnLabels;
-        String plotTitleBar, plotTitleBox, plotTitlePie;
 
         // Should be at project home (navigated here by the preTest function)
 
@@ -504,65 +499,100 @@ public class ColumnChartTest extends BaseWebDriverTest
 
         log("Create a bar chart.");
         dataRegionTable.createBarChart(COL_NAME_BAR);
-        plotTitleBar = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BAR));
-        expectedPlotCount++;
+        singleChartProps = new HashMap<>();
+        singleChartProps.put("type", ColumnChartComponent.TYPE_BAR);
+        singleChartProps.put("title", columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BAR)));
+        singleChartProps.put("dataPointCount", "28");
+        columnChartProps.add(singleChartProps);
 
         log("Now that a plot has been created, assert that the plot region is visible.");
         Assert.assertTrue("The plot region is not visible after a chart was created. It should be.", plotRegion.isRegionVisible());
 
         log("Create a box and whisker chart.");
         dataRegionTable.createBoxAndWhiskerChart(COL_NAME_BOX);
-        plotTitleBox = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BOX));
-        expectedPlotCount++;
+        singleChartProps = new HashMap<>();
+        singleChartProps.put("type", ColumnChartComponent.TYPE_BOX);
+        singleChartProps.put("title", columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BOX)));
+        singleChartProps.put("dataPointCount", "1");
+        columnChartProps.add(singleChartProps);
 
         log("Create a pie chart.");
         dataRegionTable.createPieChart(COL_NAME_PIE);
-        plotTitlePie = columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_PIE));
-        expectedPlotCount++;
+        singleChartProps = new HashMap<>();
+        singleChartProps.put("type", ColumnChartComponent.TYPE_PIE);
+        singleChartProps.put("title", columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_PIE)));
+        singleChartProps.put("dataPointCount", "9");
+        columnChartProps.add(singleChartProps);
 
-        log("Save the view");
-        plotRegion.saveView(false, SAVED_VIEW, false);
+        log("Validate column charts and save the view");
+        validateSavedViewColumnCharts(columnChartProps);
+        plotRegion.saveView(false, SAVED_VIEW, true);
 
-        log("Now go home (navigate away after saving the view).");
-
+        log("Validate plots display on navigation back to view.");
         goToHome();
-
         goToProjectHome();
+        goToSavedView(DATA_SOURCE_1, SAVED_VIEW);
+        validateSavedViewColumnCharts(columnChartProps);
 
-        log("Go to the '" + DATA_SOURCE_1 + "' grid and bring up the saved view.");
+        log("Validate plots are round tripped on export/import of folder archive.");
+        exportImportFolderViaPipeline("Import Archive");
+        goToSavedView(DATA_SOURCE_1, SAVED_VIEW);
+        validateSavedViewColumnCharts(columnChartProps);
+    }
 
+    private void exportImportFolderViaPipeline(String newFolderName)
+    {
+        // export the project as individual files to the pipeline
+        goToProjectHome();
+        exportFolderAsIndividualFiles(getProjectName(), false, false, false);
+
+        // create a subfolder and set the subfolder pipeline root to match the project
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), newFolderName, "Collaboration", null, true);
+        clickFolder(newFolderName);
+        goToModule("Pipeline");
+        clickButton("Setup");
+        if (isElementPresent(Locator.linkWithText("override")))
+            clickAndWait(Locator.linkWithText("override"));
+        checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));
+        setFormElement(Locator.id("pipeProjectRootPath"), getFormElement(Locator.id("pipeProjectRootPath")).replace("\\"+newFolderName, ""));
+        clickButton("Save");
+
+        // import the folder archive exported from the project to the new subfolder
+        importFolderFromPipeline("/export/folder.xml", 1, false);
+        clickFolder(newFolderName);
+    }
+
+    private void goToSavedView(String dataSource, String viewName)
+    {
+        log("Go to the '" + dataSource + "' grid and bring up the saved view.");
         clickTab("Clinical and Assay Data");
-        waitForElement(Locator.linkWithText(DATA_SOURCE_1));
-        click(Locator.linkWithText(DATA_SOURCE_1));
+        waitForElement(Locator.linkWithText(dataSource));
+        click(Locator.linkWithText(dataSource));
+        DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
+        drt.clickHeaderMenu("Grid Views", viewName);
+    }
 
-        // re-establish the reference to the dataregion table.
-        dataRegionTable = new DataRegionTable("Dataset", getDriver());
+    private void validateSavedViewColumnCharts(List<Map<String, String>> columnChartProps)
+    {
+        DataRegionTable dataRegionTable = new DataRegionTable("Dataset", getDriver());
+        ColumnChartRegion plotRegion = dataRegionTable.getColumnPlotRegion();
 
-        dataRegionTable.clickHeaderMenu("Grid Views", SAVED_VIEW);
+        Assert.assertEquals("Number of plots after opening saved view is not as expected.", columnChartProps.size(), plotRegion.getPlots().size());
 
-        log("Validate that the plots are there as expected.");
+        for (int i = 0; i < columnChartProps.size(); i++)
+        {
+            ColumnChartComponent plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(i));
+            Map<String, String> singleChartProps = columnChartProps.get(i);
 
-        plotRegion = dataRegionTable.getColumnPlotRegion();
-        Assert.assertEquals("Number of plots after openeing saved view is not as expected.", expectedPlotCount, plotRegion.getPlots().size());
+            String msg = "Plot type not as expected. Expected: '" + singleChartProps.get("type") + "'. Found: '" + plotComponent.getPlotType() + "'.";
+            Assert.assertTrue(msg, plotComponent.getPlotType().equals(singleChartProps.get("type")));
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BAR + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BAR.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '"+ plotTitleBar + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBar));
-        Assert.assertEquals("Number of data points for the bar chart (weight) are not as expected.", UNFILTERED_BAR_COUNT, plotComponent.getNumberOfDataPoints());
+            msg = "Plot title not as expected. Expected: '"+ singleChartProps.get("title") + "'. Found: '" + plotComponent.getTitle() + "'.";
+            Assert.assertTrue(msg, plotComponent.getTitle().equals(singleChartProps.get("title")));
 
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(1));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_BOX + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_BOX.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitleBox + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitleBox));
-        Assert.assertEquals("Number of data points for the box chart are not as expected.", UNFILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
-
-        plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(2));
-        Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE.equals(plotComponent.getPlotType()));
-        Assert.assertTrue("Plot title not as expected. Expected: '" + plotTitlePie + "'. Found: '" + plotComponent.getTitle() + "'.", plotComponent.getTitle().equals(plotTitlePie));
-        Assert.assertEquals("Number of data points for the pie chart are not as expected.", UNFILTERED_PIE_COUNT, plotComponent.getNumberOfDataPoints());
-
-        // Since this is a saved view it can not be reverted.
-        log("All done, let's go home.");
-
+            msg = "Number of data points for the chart not as expected.";
+            Assert.assertEquals(msg, singleChartProps.get("dataPointCount"), ""+plotComponent.getNumberOfDataPoints());
+        }
     }
 
     private void enableColumnRestricting()
