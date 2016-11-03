@@ -157,8 +157,8 @@ public class PipelineAnalysisHelper
     public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry)
     {
         // If the given protocol name already exists, select it. If not, define a new one
-        Locator protocolSelect = Locator.id("protocolSelect");
-        _test.assertElementPresent(protocolSelect); // this insures the possible NoSuchElementException below is due to the option not existing
+        Locator.XPathLocator protocolSelect = Locator.id("protocolSelect");
+        _test.waitForElement(protocolSelect.append(Locator.tag("option").withText("<New Protocol>")));
         try
         {
             _test.selectOptionByValue(protocolSelect, protocolName);
