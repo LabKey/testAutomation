@@ -35,7 +35,9 @@ import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.labkey.test.components.ext4.Window.Window;
@@ -61,6 +63,8 @@ public class ScatterPlotTest extends GenericChartsTest
         doCustomizeScatterPlotTest(); // Uses scatter plot created by doDataRegionScatterPlotTest()
         doPlotExport();
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
+        doBinnedScatterPlotTest();
+        doAxisManualRangeScatterPlotTest(); // Uses scatter plot created by doBinnedScatterPlotTest()
         doDeleteMeasureTest(); // Uses scatter plot created by doCustomizeScatterPlotTest()
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
     }
@@ -235,15 +239,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        clickReportGridLink(SCATTER_PLOT_NAME_DR);
-        _ext4Helper.waitForMaskToDisappear();
-
-        // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
-        clickButton("Edit", WAIT_FOR_PAGE);
-        _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+        openSavedPlotInEditMode(SCATTER_PLOT_NAME_DR);
 
         // Verify default styling for point at origin - blue circles
 
@@ -535,18 +531,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-
-        click(Locator.linkContainingText("Clinical and Assay Data"));
-
-        clickReportGridLink(SCATTER_PLOT_NAME_MV);
-        _ext4Helper.waitForMaskToDisappear();
-
-        // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
-        clickButton("Edit", WAIT_FOR_PAGE);
-        _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+        openSavedPlotInEditMode(SCATTER_PLOT_NAME_MV);
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
@@ -622,6 +607,160 @@ public class ScatterPlotTest extends GenericChartsTest
         assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
         lookAndFeelDialog.clickCancel();
         stopImpersonating();
+    }
 
+    private static final String SCATTER_PLOT_CPF_1 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n50\n100\n150\n200\n250\n300\n350\n400\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
+    private static final String SCATTER_PLOT_NAME_BIN = "BinnedScatterPlotTest";
+    private static final String SCATTER_PLOT_DESC_BIN = "This scatter plot was created with the binning threshold set to a number smaller than the data point count.";
+
+    @LogMethod
+    private void doBinnedScatterPlotTest()
+    {
+        Map<String, Integer> expectedBinSizeCounts = new HashMap<>();
+        expectedBinSizeCounts.put("1 point", 5);
+        expectedBinSizeCounts.put("2 points", 1);
+        expectedBinSizeCounts.put("3 points", 1);
+
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
+        DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
+        drt.clickHeaderMenu("Charts", "Create Scatter Plot");
+
+        // create scatter lot with point geom
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setYAxis("1a. ALT (SGPT)").setXAxis("2a. Creatinine").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_1);
+        validateBinWarningMsg(false);
+        validatePointsAndBins(10, 0, 0);
+
+        // change binning threshold to force to hex bin
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.setBinThreshold("13").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_1);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 7, 0);
+        validateBinSizes(expectedBinSizeCounts);
+
+        // change bin shape from hex to square
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setBinShape(ChartLayoutDialog.BinShape.Square).clickApply();
+        assertSVG(SCATTER_PLOT_CPF_1);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 0, 7);
+        validateBinSizes(expectedBinSizeCounts);
+
+        // change threshold to match the number of data points so the binning goes away
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setBinThreshold("14").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_1);
+        validateBinWarningMsg(false);
+        validatePointsAndBins(10, 0, 0);
+
+        // change back to a binned plot and save
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setBinThreshold("13").clickApply();
+        savePlot(SCATTER_PLOT_NAME_BIN, SCATTER_PLOT_DESC_BIN);
+    }
+
+    private static final String SCATTER_PLOT_CPF_2 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n10\n12\n14\n16\n18\n20\n22\n24\n26\n28\n30\n32\n34\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
+    private static final String SCATTER_PLOT_CPF_3 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n0\n10\n20\n30\n40\n50\n60\n70\n80\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
+    private static final String SCATTER_PLOT_CPF_4 = "0.6\n0.6\n0.7\n0.7\n0.8\n0.8\n0.8\n0.9\n0\n10\n20\n30\n40\n50\n60\n70\n80\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
+    private static final String SCATTER_PLOT_NAME_RANGE = "AxisManualRangeScatterPlotTest";
+    private static final String SCATTER_PLOT_DESC_RANGE = "This scatter plot was created with manual min/max ranges set on the x-axis and y-axis.";
+
+    @LogMethod
+    private void doAxisManualRangeScatterPlotTest()
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        openSavedPlotInEditMode(SCATTER_PLOT_NAME_BIN);
+        assertSVG(SCATTER_PLOT_CPF_1);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 0, 7);
+
+        // set y-axis manual range max only, and make sure decimals are allowed
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax(null, "35.5").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_2);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 0, 4);
+
+        // make sure we can use manual range values of zero, in this case for min
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax("0", "80").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_3);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 0, 6);
+
+        // set x-axis manual range
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setXAxisRangeType(ChartLayoutDialog.RangeType.Manual).setXAxisRangeMinMax("0.55", "0.95").clickApply();
+        assertSVG(SCATTER_PLOT_CPF_4);
+        validateBinWarningMsg(true);
+        validatePointsAndBins(0, 0, 1);
+
+        savePlot(SCATTER_PLOT_NAME_RANGE, SCATTER_PLOT_DESC_RANGE, true);
+    }
+
+    private void validateBinWarningMsg(boolean expectMsg)
+    {
+        Locator warningMsg = Locator.tagContainingText("div", "The number of individual points exceeds the limit");
+        if (expectMsg)
+            assertElementPresent(warningMsg);
+        else
+            assertElementNotPresent(warningMsg);
+    }
+
+    private void validatePointsAndBins(int expectedPointCount, int expectedHexBinCount, int expectedSquareBinCount)
+    {
+        Locator pointLoc = Locator.css("svg g.layer a.point");
+        Locator hexBinLoc = Locator.css("svg g.layer a.vis-bin-hexagon");
+        Locator squareBinLoc = Locator.css("svg g.layer a.vis-bin-square");
+
+        assertEquals("Unexpected number of points", expectedPointCount, getVisiblePlotElementCount(pointLoc.findElements(getDriver())));
+        assertEquals("Unexpected number of hex bins", expectedHexBinCount, getVisiblePlotElementCount(hexBinLoc.findElements(getDriver())));
+        assertEquals("Unexpected number of square bins", expectedSquareBinCount, getVisiblePlotElementCount(squareBinLoc.findElements(getDriver())));
+    }
+
+    private int getVisiblePlotElementCount(List<WebElement> elements)
+    {
+        if (elements.isEmpty())
+            return 0;
+
+        int squareBinSize = 10;
+        Locator plotRegionLoc = Locator.css("svg g.axis");
+        WebElement plotRegion = plotRegionLoc.findElement(getDriver());
+        int left = plotRegion.getLocation().getX() - squareBinSize;
+        int right = left + plotRegion.getSize().getWidth() + (2*squareBinSize);
+        int top = plotRegion.getLocation().getY() - squareBinSize;
+        int bottom = top + plotRegion.getSize().getHeight() + (2*squareBinSize);
+        int count = 0;
+
+        for (WebElement element : elements)
+        {
+            int x = element.getLocation().getX();
+            int y = element.getLocation().getY();
+            if (x >= left && x <= right && y >= top && y <= bottom)
+                count++;
+        }
+
+        return count;
+    }
+
+    private void validateBinSizes(Map<String, Integer> expectedBinSizeCounts)
+    {
+        int binCount = 0;
+        Locator binTitleLoc = Locator.css("svg g.layer a.vis-bin title");
+
+        for (Map.Entry<String, Integer> entry : expectedBinSizeCounts.entrySet())
+        {
+            assertTextPresent(entry.getKey(), entry.getValue());
+            binCount += entry.getValue();
+        }
+
+        assertEquals("Unexpected total number of bins", binCount, binTitleLoc.findElements(getDriver()).size());
     }
 }

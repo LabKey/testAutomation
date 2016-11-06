@@ -74,6 +74,18 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
         return this;
     }
 
+    public LookAndFeelScatterPlot setXAxisRangeType(RangeType rangeType)
+    {
+        super.setXAxisRangeType(rangeType);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setXAxisRangeMinMax(String min, String max)
+    {
+        super.setXAxisRangeMinMax(min, max);
+        return this;
+    }
+
     public LookAndFeelScatterPlot clickYAxisTab()
     {
         super.clickYAxisTab();
@@ -89,6 +101,18 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
     public LookAndFeelScatterPlot setYAxisScale(ScaleType scaleType)
     {
         super.setYAxisScale(scaleType);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setYAxisRangeType(RangeType rangeType)
+    {
+        super.setYAxisRangeType(rangeType);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setYAxisRangeMinMax(String min, String max)
+    {
+        super.setYAxisRangeMinMax(min, max);
         return this;
     }
 
@@ -141,6 +165,18 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
     {
         clickGeneralTab();
         setColor("Point Color:", hexColorValue);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setBinThreshold(String threshold)
+    {
+        super.setBinThreshold(threshold);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setBinShape(BinShape shape)
+    {
+        super.setBinShape(shape);
         return this;
     }
 

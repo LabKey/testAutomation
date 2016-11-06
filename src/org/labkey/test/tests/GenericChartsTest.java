@@ -130,4 +130,17 @@ public abstract class GenericChartsTest extends ReportTest
         waitForElement(Ext4Helper.Locators.ext4Button("Chart Type").enabled()).click();
         return new ChartTypeDialog(getDriver());
     }
+
+    protected void openSavedPlotInEditMode(String savedPlotName)
+    {
+        click(Locator.linkContainingText("Clinical and Assay Data"));
+        clickReportGridLink(savedPlotName);
+        _ext4Helper.waitForMaskToDisappear();
+
+        // verify that we originally are in view mode and can switch to edit mode
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
+        clickButton("Edit", WAIT_FOR_PAGE);
+        _ext4Helper.waitForMaskToDisappear();
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+    }
 }

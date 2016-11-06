@@ -26,6 +26,7 @@ import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelBarPlot;
+import org.labkey.test.components.LookAndFeelScatterPlot;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -40,6 +41,13 @@ public class BarPlotTest extends GenericChartsTest
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";
     private final String BP_DIASTOLIC = "3. BP diastolic /xxx";
     private final String BAR_PLOT_SAVE_NAME = "Simple Bar Plot test";
+    private final String BAR_PLOT_SAVE_NAME_2 = "Simple Bar Plot test with manual ranges";
+
+    final String TRICKY_CHART_TITLE = CHART_TITLE + TRICKY_CHARACTERS;
+    private final String SIMPLE_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\n" + PREG_TEST_RESULTS;
+    private final String SECOND_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n" + TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
+    private final String THIRD_BAR_PLOT_SVG_TEXT = "0\nNegative\n-50\n-49\n-48\n-47\n-46\n-45\n-44\n-43\n-42\n-41\n-40\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
+    private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n2600\n2800\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
 
     @LogMethod
     protected void testPlots()
@@ -48,16 +56,13 @@ public class BarPlotTest extends GenericChartsTest
         doColumnPlotClickThrough();
         doExportOfBarPlot();
         doQuickChart();
+        doAxisManualRangeBarPlotTest();
     }
 
     @LogMethod
     private void doBasicBarPlotTest()
     {
-
-        final String CHART_TITLE = TRICKY_CHARACTERS;
         final String APX_1_QUERY = "APX-1 (APX-1: Abbreviated Physical Exam)";
-        final String SIMPLE_BAR_PLOT_SVG_TEXT = "0Negative051015202530354045" + PREG_TEST_RESULTS.replace(" ", "");
-        final String SECOND_BAR_PLOT_SVG_TEXT = "0Negative020040060080010001200140016001800200022002400"+ CHART_TITLE.replace(" ", "")  + PREG_TEST_RESULTS.replace(" ", "") + "Sumof" + BP_DIASTOLIC.replace(" ", "");
         final String COLOR_RED = "FF0000";
         final String COLOR_BLUE = "0000FF";
         final String COLOR_GREEN = "00FF00";
@@ -96,7 +101,7 @@ public class BarPlotTest extends GenericChartsTest
         log("Change some of the look and feel settings.");
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
-        lookAndFeelDialog.setPlotTitle(CHART_TITLE)
+        lookAndFeelDialog.setPlotTitle(TRICKY_CHART_TITLE)
                 .setFillColor(COLOR_RED)
                 .setLineColor(COLOR_BLUE)
                 .setLineWidth(5)
@@ -326,4 +331,25 @@ public class BarPlotTest extends GenericChartsTest
         chartLayoutDialog.clickCancel();
     }
 
+    @LogMethod
+    private void doAxisManualRangeBarPlotTest()
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        openSavedPlotInEditMode(BAR_PLOT_SAVE_NAME);
+        assertSVG(SECOND_BAR_PLOT_SVG_TEXT);
+
+        // set y-axis manual range, make sure we can use negative manual range values
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax("-50", "-40").clickApply();
+        assertSVG(THIRD_BAR_PLOT_SVG_TEXT);
+
+        // set y-axis manual range max only, and make sure decimals are allowed
+        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax(null, "3000.5").clickApply();
+        assertSVG(FOURTH_BAR_PLOT_SVG_TEXT);
+
+        savePlot(BAR_PLOT_SAVE_NAME_2, null, true);
+    }
 }

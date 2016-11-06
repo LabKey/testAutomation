@@ -90,10 +90,38 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         }
     }
 
+    public void setRangeType(RangeType rangeType)
+    {
+        switch(rangeType)
+        {
+            case Automatic:
+                getWrapper().click(elementCache().visibleAutomaticRangeRadioButton);
+                break;
+            case Manual:
+                getWrapper().click(elementCache().visibleManualRangeRadioButton);
+                break;
+        }
+    }
+
     public ChartLayoutDialog setXAxisScale(ScaleType scaleType)
     {
         clickXAxisTab();
         setScaleType(scaleType);
+        return this;
+    }
+
+    public ChartLayoutDialog setXAxisRangeType(RangeType rangeType)
+    {
+        clickXAxisTab();
+        setRangeType(rangeType);
+        return this;
+    }
+
+    public ChartLayoutDialog setXAxisRangeMinMax(String min, String max)
+    {
+        clickXAxisTab();
+        setRangeMin(min);
+        setRangeMax(max);
         return this;
     }
 
@@ -130,9 +158,34 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return getWrapper().getFormElement(elementCache().visibleLabelTextBox);
     }
 
+    public ChartLayoutDialog setYAxisRangeType(RangeType rangeType)
+    {
+        clickYAxisTab();
+        setRangeType(rangeType);
+        return this;
+    }
+
+    public ChartLayoutDialog setYAxisRangeMinMax(String min, String max)
+    {
+        clickYAxisTab();
+        setRangeMin(min);
+        setRangeMax(max);
+        return this;
+    }
+
     private void setLabel(String label)
     {
         getWrapper().setFormElement(elementCache().visibleLabelTextBox, label);
+    }
+
+    private void setRangeMin(String min)
+    {
+        getWrapper().setFormElement(elementCache().visibleRangeMinTextBox, min);
+    }
+
+    private void setRangeMax(String min)
+    {
+        getWrapper().setFormElement(elementCache().visibleRangeMaxTextBox, min);
     }
 
     public ChartLayoutDialog setPlotTitle(String title)
@@ -178,6 +231,28 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     {
         String tempStr = hexColorValue.replace("#", "").toUpperCase();
         getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = '" + colorLabel + "']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
+    }
+
+    public ChartLayoutDialog setBinThreshold(String threshold)
+    {
+        clickGeneralTab();
+        getWrapper().setFormElement(elementCache().plotBinThresholdTextBox, threshold);
+        return this;
+    }
+
+    public ChartLayoutDialog setBinShape(BinShape shape)
+    {
+        clickGeneralTab();
+        switch(shape)
+        {
+            case Hexagon:
+                getWrapper().click(elementCache().hexagonShapeRadioButton);
+                break;
+            case Square:
+                getWrapper().click(elementCache().squareShapeRadioButton);
+                break;
+        }
+        return this;
     }
 
     protected void setSliderValue(WebElement sliderElement, int newValue)
@@ -319,12 +394,19 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement plotTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Title:']/parent::td/following-sibling::td//input"), this);
         public WebElement plotWidthTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='width']"), this);
         public WebElement plotHeightTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='height']"), this);
+        public WebElement plotBinThresholdTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='binThresholdField']"), this);
+        public WebElement hexagonShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Hexagon']/preceding-sibling::input[@type='button']"), this);
+        public WebElement squareShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Square']/preceding-sibling::input[@type='button']"), this);
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
         public WebElement developerDisable = new LazyWebElement(Locator.xpath("//span[text()='Disable']"), this);
-        // Making these elements locators because it looks like once a WebElement creates a reference it doesn't re-evaluate the xpath. These three elements are shared on two tabs.
+        // Making these elements locators because it looks like once a WebElement creates a reference it doesn't re-evaluate the xpath. These three elements are shared on multiple tabs.
         public Locator visibleLinearScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='linear']/preceding-sibling::input[@type='button']");
         public Locator visibleLogScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='log']/preceding-sibling::input[@type='button']");
+        public Locator visibleAutomaticRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Automatic']/preceding-sibling::input[@type='button']");
+        public Locator visibleManualRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Manual']/preceding-sibling::input[@type='button']");
         public Locator visibleLabelTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']");
+        public Locator visibleRangeMinTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='rangeMin']");
+        public Locator visibleRangeMaxTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='rangeMax']");
     }
 
     public enum ScaleType
@@ -333,4 +415,15 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         Log
     }
 
+    public enum RangeType
+    {
+        Automatic,
+        Manual
+    }
+
+    public enum BinShape
+    {
+        Hexagon,
+        Square
+    }
 }
