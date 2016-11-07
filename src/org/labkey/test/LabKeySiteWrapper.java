@@ -1095,10 +1095,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public void openProjectMenu()
+    public WebElement openProjectMenu()
     {
         waitForHoverNavigationReady();
-        shortWait().until(new ExpectedCondition<WebElement>()
+        return shortWait().until(new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(@Nullable WebDriver driver)
@@ -1116,8 +1116,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickProject(String project, boolean assertDestination)
     {
-        openProjectMenu();
-        WebElement projectLink = Locator.linkWithText(project).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        final WebElement projectMenu = openProjectMenu();
+        WebElement projectLink = Locator.linkWithText(project).waitForElement(projectMenu, WAIT_FOR_JAVASCRIPT);
         clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
         if (assertDestination)
         {
@@ -1126,11 +1126,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    public void openFolderMenu()
+    public WebElement openFolderMenu()
     {
         waitForElement(Locators.folderMenu.withText());
         waitForFolderNavigationReady();
-        shortWait().until(new ExpectedCondition<WebElement>()
+        return shortWait().until(new ExpectedCondition<WebElement>()
         {
             @Override
             public WebElement apply(@Nullable WebDriver driver)
@@ -1143,19 +1143,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickFolder(String folder)
     {
-        openFolderMenu();
+        final WebElement folderMenu = openFolderMenu();
         expandFolderTree(folder);
-        waitAndClickAndWait(Locator.linkWithText(folder));
+        clickAndWait(Locator.linkWithText(folder).waitForElement(folderMenu, WAIT_FOR_JAVASCRIPT));
     }
 
-    public void waitForFolderNavigationReady()
+    private void waitForFolderNavigationReady()
     {
         waitForHoverNavigationReady();
         waitFor(() -> (boolean) executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;"),
                 "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
 
-    public void waitForHoverNavigationReady()
+    private void waitForHoverNavigationReady()
     {
         waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
                 "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
