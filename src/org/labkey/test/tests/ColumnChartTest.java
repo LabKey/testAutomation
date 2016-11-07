@@ -554,7 +554,10 @@ public class ColumnChartTest extends BaseWebDriverTest
         if (isElementPresent(Locator.linkWithText("override")))
             clickAndWait(Locator.linkWithText("override"));
         checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));
-        setFormElement(Locator.id("pipeProjectRootPath"), getFormElement(Locator.id("pipeProjectRootPath")).replace("\\"+newFolderName, ""));
+        String pipeRootPath = getFormElement(Locator.id("pipeProjectRootPath"));
+        pipeRootPath = pipeRootPath.replace("\\"+newFolderName, "");
+        pipeRootPath = pipeRootPath.replace("/"+newFolderName, "");
+        setFormElement(Locator.id("pipeProjectRootPath"), pipeRootPath);
         clickButton("Save");
 
         // import the folder archive exported from the project to the new subfolder
