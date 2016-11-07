@@ -42,7 +42,7 @@ public class BoxPlotTest extends GenericChartsTest
         doQuickChartBoxPlotTest();
    }
 
-    private static final String BOX_PLOT_MV_1 = "RCF-1\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0\n4c.Induration 1st measure";
+    private static final String BOX_PLOT_MV_1 = "RCF-1\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0\nRCF-1: Reactogenicity-Day 2\n4c.Induration 1st measure";
     private static final String BOX_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n37.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";

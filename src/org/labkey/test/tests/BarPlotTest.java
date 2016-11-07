@@ -44,7 +44,7 @@ public class BarPlotTest extends GenericChartsTest
     private final String BAR_PLOT_SAVE_NAME_2 = "Simple Bar Plot test with manual ranges";
 
     final String TRICKY_CHART_TITLE = CHART_TITLE + TRICKY_CHARACTERS;
-    private final String SIMPLE_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\n" + PREG_TEST_RESULTS;
+    private final String SIMPLE_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\nAPX-1: Abbreviated Physical Exam\n" + PREG_TEST_RESULTS;
     private final String SECOND_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n" + TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String THIRD_BAR_PLOT_SVG_TEXT = "0\nNegative\n-50\n-49\n-48\n-47\n-46\n-45\n-44\n-43\n-42\n-41\n-40\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n2600\n2800\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;

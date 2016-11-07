@@ -69,7 +69,7 @@ public class ScatterPlotTest extends GenericChartsTest
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
     }
 
-    private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
     private static final String SCATTER_PLOT_MV_2 = "Mice A\nMice B\nMice C\nNot in Mouse Group: Cat Mice Let\n32.0\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
@@ -104,7 +104,6 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
 
         //Verify scatter plot
-        // getText(Locator.css("svg"))
         assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title and the Y-Axis");
