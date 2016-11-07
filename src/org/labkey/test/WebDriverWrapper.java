@@ -16,7 +16,6 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
-import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
