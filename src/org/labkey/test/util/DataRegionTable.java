@@ -28,8 +28,8 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
-import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -127,9 +127,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     /**
      * @param regionName 'lk-region-name' of the table
-     * @param test Necessary while DRT methods live in BWDT
      */
-    @Deprecated // Use {@link DataRegionTable(String, WebDriver)}
     public DataRegionTable(String regionName, WebDriverWrapper test)
     {
         this(null, regionName, test);
@@ -185,9 +183,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         _dataCache.clear();
     }
 
-    public void doAndWaitForUpdate(Runnable run)
+    public String doAndWaitForUpdate(Runnable run)
     {
-        _driver.doAndWaitForPageSignal(run, DataRegionTable.UPDATE_SIGNAL);
+        return _driver.doAndWaitForPageSignal(run, DataRegionTable.UPDATE_SIGNAL);
     }
 
     public CustomizeView getCustomizeView()
@@ -1075,7 +1073,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         Runnable clickClearFilter = () -> clickColumnMenu(columnName, false, "Clear Filter");
 
         if (waitMillis == 0)
-            _driver.doAndWaitForPageSignal(clickClearFilter, UPDATE_SIGNAL);
+            doAndWaitForUpdate(clickClearFilter);
         else
             _driver.doAndWaitForPageToLoad(clickClearFilter, waitMillis);
 
@@ -1104,55 +1102,38 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         uncheckAll();
     }
 
-    private WebElement getToggle()
-    {
-        return Locator.tagWithAttribute("input", "name", ".toggle").findElement(getComponentElement());
-    }
-
     public void checkAll()
     {
-        WebElement toggle = getToggle();
+        WebElement toggle = elements().toggleAll;
         if (!toggle.isSelected())
-            _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL);
+            doAndWaitForUpdate(toggle::click);
     }
 
     public void uncheckAll()
     {
-        WebElement toggle = getToggle();
-        if (null != _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL))
-            _driver.doAndWaitForPageSignal(toggle::click, UPDATE_SIGNAL);
+        WebElement toggle = elements().toggleAll;
+        if (null != doAndWaitForUpdate(toggle::click))
+            doAndWaitForUpdate(toggle::click);
     }
 
     public void checkCheckboxByPrimaryKey(Object value)
     {
-        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(String.valueOf(value)) + "]")
-                .findElement(getComponentElement());
-        if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
+        elements().getRowCheckbox(value).check();
     }
 
     public void uncheckCheckboxByPrimaryKey(Object value)
     {
-        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(String.valueOf(value)) + "]")
-                .findElement(getComponentElement());
-        if (checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
+        elements().getRowCheckbox(value).uncheck();
     }
 
     public void checkCheckbox(int index)
     {
-        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
-                .findElement(getComponentElement());
-        if (!checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
+        elements().getRowCheckbox(index).check();
     }
 
     public void uncheckCheckbox(int index)
     {
-        WebElement checkbox = Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index)
-                .findElement(getComponentElement());
-        if (checkbox.isSelected())
-            _driver.doAndWaitForPageSignal(() -> _driver.clickAndWait(checkbox, 0), UPDATE_SIGNAL);
+        elements().getRowCheckbox(index).uncheck();
     }
 
     public void pageFirst()
@@ -1385,17 +1366,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected class Elements extends Component.ElementCache
     {
-        private WebElement header = new LazyWebElement(Locator.id(getTableId() + "-header"), this);
-        private WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
+        private final WebElement header = Locator.id(getTableId() + "-header").findWhenNeeded(this);
+        private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private List<WebElement> allHeaderButtons;
         private Map<String, WebElement> headerButtons;
-        private WebElement columnHeaderRow = new LazyWebElement(Locator.id(getTableId() + "-column-header-row"), this);
+        private final WebElement columnHeaderRow = Locator.id(getTableId() + "-column-header-row").findWhenNeeded(this);
         private List<WebElement> columnHeaders;
-        private Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
+        private final Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
-        private WebElement summaryStatRow = new LazyWebElement(Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total"), _driver.getDriver());
+        private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(_driver.getDriver());
         private List<WebElement> summaryStatCells;
+        private final WebElement toggleAll = Locator.tagWithAttribute("input", "name", ".toggle").findWhenNeeded(this); // tri-state checkbox
 
         protected List<WebElement> getDataRows()
         {
@@ -1410,6 +1392,28 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         protected WebElement getDataRow(int row)
         {
             return getDataRows().get(row);
+        }
+
+        protected Checkbox getRowCheckbox(int index)
+        {
+            return getRowCheckbox(Locator.css(".labkey-selectors > input[type=checkbox][value]").index(index).findElement(this));
+        }
+
+        protected Checkbox getRowCheckbox(Object pk)
+        {
+            return getRowCheckbox(Locator.css(".labkey-selectors > input[type=checkbox][value=" + Locator.cq(String.valueOf(pk)) + "]").findElement(this));
+        }
+
+        private Checkbox getRowCheckbox(WebElement checkboxEl)
+        {
+            return new Checkbox(checkboxEl)
+            {
+                @Override
+                public void toggle()
+                {
+                    doAndWaitForUpdate(super::toggle);
+                }
+            };
         }
 
         protected List<WebElement> getCells(int row)
