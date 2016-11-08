@@ -613,7 +613,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Create list in container tab containers to prevent query validation failure");
         createPeopleListInTab(STUDY_FOLDER_TAB_LABEL);
-        createPeopleListInFolder(ASSAY_FOLDER_TAB_LABEL);
+        createPeopleListInTab(ASSAY_FOLDER_TAB_LABEL);
     }
 
     private void createPeopleListInFolder(String folderName)
