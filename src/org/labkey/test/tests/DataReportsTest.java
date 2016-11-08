@@ -216,7 +216,7 @@ public class DataReportsTest extends ReportTest
         _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
         WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(1);
-        DataRegionTable region = new DataRegionTable(this, table);
+        DataRegionTable region = new DataRegionTable(table, getDriver());
 
         Map<String, Integer> counts = new HashMap<>();
         for (String value : region.getColumnDataAsText("MouseId"))

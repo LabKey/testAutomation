@@ -30,6 +30,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class StudyHelper
 {
@@ -91,7 +92,7 @@ public class StudyHelper
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
         _test.waitForElement(Locators.pageSignal(DataRegionTable.UPDATE_SIGNAL));
         if (demographicsPresent)
-            DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
+            DataRegion(_test.getDriver()).withName("demoDataRegion").waitFor();
         _test.setFormElement(Locator.name("groupLabel"), groupName);
         if( ptids.length > 0 )
         {
@@ -144,23 +145,21 @@ public class StudyHelper
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locators.pageSignal(DataRegionTable.UPDATE_SIGNAL));
         if (demographicsPresent)
-            DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
+            DataRegion(_test.getDriver()).withName("demoDataRegion").waitFor();
 
-        if( newPtids != null && newPtids.length > 0 )
+        if (newPtids != null && newPtids.length > 0)
         {
-            StringBuilder csp = new StringBuilder(newPtids[0]);
-            for( int i = 1; i < newPtids.length; i++ )
-                csp.append(",").append(newPtids[i]);
+            String csp = String.join(",", Arrays.asList(newPtids));
 
             if (replaceExistingPtids)
             {
-                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp.toString());
+                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp);
             }
             else
             {
                 String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
                 if (currentIds != null && currentIds.length() > 0)
-                    _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp.toString());
+                    _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp);
             }
         }
         if( categoryName != null )
@@ -199,7 +198,7 @@ public class StudyHelper
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
-        DataRegionTable.waitForDataRegion(_test, "demoDataRegion");
+        DataRegion(_test.getDriver()).withName("demoDataRegion").waitFor();
 
         String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
         _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
