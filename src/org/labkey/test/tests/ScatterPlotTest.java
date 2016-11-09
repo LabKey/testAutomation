@@ -557,17 +557,18 @@ public class ScatterPlotTest extends GenericChartsTest
         click(Ext4Helper.Locators.ext4Button("OK"));
 
         // open developer panel and test JS function validation
+        Locator errorLoc = Locator.tagWithClass("span", "labkey-error");
         clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.clickDeveloperTab()
                 .setDeveloperSourceContent("")
                 .clickApplyWithError();
-        assertTextPresent("Error: the value provided does not begin with a function declaration.");
+        assertElementPresent(errorLoc.withText("Error: the value provided does not begin with a function declaration."));
         lookAndFeelDialog.setDeveloperSourceContent("function(){")
                 .clickApplyWithError();
-        assertTextPresent("Error parsing the function:");
+        assertElementPresent(errorLoc.containing("Error parsing the function:"));
         lookAndFeelDialog.clickDeveloperDisable(true);
-        assertTextNotPresent("Error");
+        assertElementNotPresent(errorLoc.containing("Error"));
         // test use-case to navigate to query page on click
         String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         lookAndFeelDialog.clickDeveloperEnable()
