@@ -35,6 +35,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -1411,7 +1412,21 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                 @Override
                 public void toggle()
                 {
-                    doAndWaitForUpdate(super::toggle);
+                    doAndWaitForUpdate(() -> {
+                        try
+                        {
+                            super.toggle();
+                        }
+                        catch (WebDriverException e)
+                        {
+                            if (e.getMessage().contains("Other element would receive the click: <div class=\"labkey-button-bar\">"))
+                            {
+                                // The checkbox obscured by the floating header
+                                getWrapper().scrollIntoView(getComponentElement());
+                                super.toggle();
+                            }
+                        }
+                    });
                 }
             };
         }
