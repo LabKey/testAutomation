@@ -272,7 +272,7 @@ public class TabTest extends SimpleModuleTest
 
         // Create the list again so we can pass query validation.
         log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(STUDY_FOLDER_TAB_LABEL, LIST_NAME,
+        _listHelper.createListFromTab(STUDY_FOLDER_TAB_LABEL, LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
