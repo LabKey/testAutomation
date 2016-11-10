@@ -400,8 +400,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
         public WebElement developerDisable = new LazyWebElement(Locator.xpath("//span[text()='Disable']"), this);
         // Making these elements locators because it looks like once a WebElement creates a reference it doesn't re-evaluate the xpath. These three elements are shared on multiple tabs.
-        public Locator visibleLinearScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='linear']/preceding-sibling::input[@type='button']");
-        public Locator visibleLogScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='log']/preceding-sibling::input[@type='button']");
+        public Locator visibleLinearScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Linear']/preceding-sibling::input[@type='button']");
+        public Locator visibleLogScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Log']/preceding-sibling::input[@type='button']");
         public Locator visibleAutomaticRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Automatic']/preceding-sibling::input[@type='button']");
         public Locator visibleManualRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Manual']/preceding-sibling::input[@type='button']");
         public Locator visibleLabelTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']");
