@@ -393,17 +393,17 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Override detailsURL in metadata...");
         String customMetadata =
-                "<ns:tables xmlns:ns=\"http://labkey.org/data/xml\">\n" +
-                "  <ns:table tableName=\"EmissionTest\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
-                "    <ns:tableTitle>Custom Query</ns:tableTitle>\n" +
-                "    <!--<ns:javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</ns:javaCustomizer>-->\n" +
-                "    <ns:titleColumn>rowid</ns:titleColumn>\n" +
-                "    <ns:updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</ns:updateUrl>\n" +
-                "    <ns:tableUrl>/query/XXX.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</ns:tableUrl>\n" +
-                "    <ns:insertUrl></ns:insertUrl>\n" +
-                "    <ns:importUrl>/query/importData.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}&amp;query.columns=*</ns:importUrl>\n" +
-                "  </ns:table>\n" +
-                "</ns:tables>";
+                "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+                "  <table tableName=\"EmissionTest\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
+                "    <tableTitle>Custom Query</tableTitle>\n" +
+                "    <!--<javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</javaCustomizer>-->\n" +
+                "    <titleColumn>rowid</titleColumn>\n" +
+                "    <updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</updateUrl>\n" +
+                "    <tableUrl>/query/XXX.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</tableUrl>\n" +
+                "    <insertUrl></insertUrl>\n" +
+                "    <importUrl>/query/importData.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}&amp;query.columns=*</importUrl>\n" +
+                "  </table>\n" +
+                "</tables>";
 
         overrideMetadata(getProjectName(), "vehicle", "EmissionTest", customMetadata);
         verifySimpleModuleTables("EmissionTest", "XXX.view", "XXX.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);

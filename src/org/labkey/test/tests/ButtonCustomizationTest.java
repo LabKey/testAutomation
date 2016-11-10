@@ -57,27 +57,27 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
 
     private String getMetadataXML(boolean includeStandardButtons)
     {
-        return "<ns:tables xmlns:ns=\"http://labkey.org/data/xml\">\n" +
-        "  <ns:table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-        "    <ns:columns></ns:columns>\n" +
-        "    <ns:buttonBarOptions position=\"top\" includeStandardButtons=\"" + includeStandardButtons + "\">\n" +
-        "        <ns:item text=\"" + METADATA_OVERRIDE_BUTTON + "\">\n" +
-        "            <ns:item text=\"" + METADATA_OVERRIDE_ON_CLICK_BUTTON + "\">\n" +
-        "                <ns:onClick>alert('" + METADATA_OVERRIDE_ON_CLICK_MSG + "');</ns:onClick>\n" +
-        "            </ns:item>\n" +
-        "            <ns:item text=\"" + METADATA_OVERRIDE_LINK_BUTTON + "\">\n" +
-        "                <ns:target>" + METADATA_OVERRIDE_LINK + "</ns:target>\n" +
-        "            </ns:item>\n" +
-        "        </ns:item>\n" +
-        "        <ns:item requiresSelection=\"true\" text=\"" + METADATA_GET_BUTTON + "\">\n" +
-        "            <ns:target method=\"GET\">" + METADATA_GET_URL + "</ns:target>\n" +
-        "        </ns:item>\n" +
-        "        <ns:item requiresSelection=\"true\" text=\"" + METADATA_LINK_BUTTON + "\">\n" +
-        "            <ns:target method=\"LINK\">" + METADATA_LINK_URL + "</ns:target>\n" +
-        "        </ns:item>\n" +
-        "    </ns:buttonBarOptions>  \n" +
-        "  </ns:table>\n" +
-        "</ns:tables>";
+        return "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+        "  <table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
+        "    <columns></columns>\n" +
+        "    <buttonBarOptions position=\"top\" includeStandardButtons=\"" + includeStandardButtons + "\">\n" +
+        "        <item text=\"" + METADATA_OVERRIDE_BUTTON + "\">\n" +
+        "            <item text=\"" + METADATA_OVERRIDE_ON_CLICK_BUTTON + "\">\n" +
+        "                <onClick>alert('" + METADATA_OVERRIDE_ON_CLICK_MSG + "');</onClick>\n" +
+        "            </item>\n" +
+        "            <item text=\"" + METADATA_OVERRIDE_LINK_BUTTON + "\">\n" +
+        "                <target>" + METADATA_OVERRIDE_LINK + "</target>\n" +
+        "            </item>\n" +
+        "        </item>\n" +
+        "        <item requiresSelection=\"true\" text=\"" + METADATA_GET_BUTTON + "\">\n" +
+        "            <target method=\"GET\">" + METADATA_GET_URL + "</target>\n" +
+        "        </item>\n" +
+        "        <item requiresSelection=\"true\" text=\"" + METADATA_LINK_BUTTON + "\">\n" +
+        "            <target method=\"LINK\">" + METADATA_LINK_URL + "</target>\n" +
+        "        </item>\n" +
+        "    </buttonBarOptions>  \n" +
+        "  </table>\n" +
+        "</tables>";
     }
 
     @Override
