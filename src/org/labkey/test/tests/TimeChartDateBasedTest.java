@@ -22,6 +22,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ChartLayoutDialog;
+import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -31,6 +33,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyC.class, Reports.class, Charting.class})
@@ -104,6 +107,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
     private static final String AXIS_TIME_CHART = "Axis Time Chart";
     @LogMethod private void axisRangeTest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         clickFolder(getFolderName());
         goToManageViews();
         clickAddChart("Time Chart");
@@ -121,9 +126,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         applyChanges();
         waitForElement(Locator.css("svg").withText("Viral Load Quantified (copies/ml)"), WAIT_FOR_JAVASCRIPT, false);
 
-        goToGroupingTab();
-        setNumberOfCharts("One Chart Per Participant");
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant).clickApply();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249318596"), WAIT_FOR_JAVASCRIPT, false);
 
         goToSvgAxisTab("Days Since Start Date");
@@ -132,15 +137,15 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
         assertSVG(SVG_AXIS_X, 1);
 
-        goToSvgAxisTab("Viral Load Quantified (copies/ml)");
-        click(Locator.id("leftaxis_range_automatic_per_chart-inputEl"));
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisLeftRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
         assertSVG(SVG_AXIS_X_LEFT, 1);
 
-        goToSvgAxisTab("CD4+ (cells/mm3)");
-        click(Locator.id("rightaxis_range_automatic_per_chart-inputEl"));
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisRightRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
         waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
         assertSVG(SVG_AXIS_X_LEFT_RIGHT, 1);
 
@@ -191,6 +196,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void visualizationTest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         log("Check visualization");
         enterMeasuresPanel();
         clickButton("Remove Measure", 0);
@@ -246,27 +253,37 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToSvgAxisTab(X_AXIS_LABEL);
         setAxisValue(Axis.X, "xaxis_range_manual", "15", "40", X_AXIS_LABEL_MANUAL, null, null, new String[] {X_AXIS_LABEL_MANUAL,"15","20","25","30","35","40"}, null);
 
-        log("Test Y-Axis");
-        goToSvgAxisTab("Viral Load Quantified (copies/ml)");
-        setAxisValue(Axis.LEFT, "leftaxis_range_manual", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","150000"});
-        goToSvgAxisTab(Y_AXIS_LABEL);
-        setAxisValue(Axis.LEFT, "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000"}, null );
+        log("Test Y-Axis change to manual min/max range");
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisRangeMinMax("200000", "400000")
+                .setYAxisLabel(Y_AXIS_LABEL)
+                .clickApply();
+        verifyAxisValueChanges(new String[] {Y_AXIS_LABEL, "200000", "400000"}, new String[] {"500000","150000"});
+        log("Test Y-Axis change to log scale");
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisRangeMinMax("10000", "1000000")
+                .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
+                .clickApply();
+        verifyAxisValueChanges(new String[] {"100000"}, new String[] {"200000","400000"});
     }
 
     @LogMethod public void generateChartPerParticipantTest()
     {
-        goToGroupingTab();
-        setParticipantSelection(PARTICIPANTS);
-        setNumberOfCharts(ONE_CHART_PER_PARTICIPANT);
-        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
-        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
-        applyChanges();
+        LookAndFeelTimeChart lookAndFeelDialog;
+
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants)
+                .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant)
+                .clickApply();
         waitForText("HIV Test Results: 249318596");
         assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
 
-        goToSvgAxisTab("HIV Test Results: 249318596");
-        setChartTitle(CHART_TITLE);
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setPlotTitle(CHART_TITLE).clickApply();
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 6); // 5 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
@@ -330,6 +347,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void pointClickFunctionTest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         log("Check Time Chart Point Click Function (Developer Only)");
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -339,46 +358,49 @@ public class TimeChartDateBasedTest extends TimeChartTest
         click(Locator.linkContainingText("Edit Report"));
         waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
         // change to the data points are visible again
-        goToSvgAxisTab(Y_AXIS_LABEL);
-        setAxisValue(Axis.LEFT, "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisLabel(Y_AXIS_LABEL)
+                .setYAxisRangeType(ChartLayoutDialog.RangeType.AutomaticAcrossCharts)
+                .setYAxisScale(ChartLayoutDialog.ScaleType.Linear)
+                .clickApply();
         goToSvgAxisTab(X_AXIS_LABEL_MANUAL);
         setAxisValue(Axis.X, "xaxis_range_automatic", null, null, null, null, null, null, null);
-        waitForText("249318596,\n Days", 40, WAIT_FOR_JAVASCRIPT); // 20 in first ptid chart and 20 in save dialog thumbnail preview
+        assertEquals("Unexpected number of plot data points", 48, getElementCount(Locator.css("svg g a path"))); // note this includes the count in the save thumbnail
         // open the developer panel and verify that it is disabled by default
-        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
-        goToDeveloperTab();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.clickDeveloperTab();
         assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
-        clickButton("Enable", 0);
-        _ext4Helper.clickTabContainingText("Help");
+        lookAndFeelDialog.clickDeveloperEnable()
+                .clickDeveloperHelpTab();
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
-        _ext4Helper.clickTabContainingText("Source");
-        String fn = _extHelper.getCodeMirrorValue("point-click-fn-textarea");
-        if (fn != null)
-            assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
+        lookAndFeelDialog.clickDeveloperSourceTab();
+        String fn = lookAndFeelDialog.getDeveloperSourceContent();
+        assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
-        applyChanges();
-        // TODO: Is this actually the selector we want?
+        lookAndFeelDialog.clickApply();
         click(Locator.css("svg g a path"));
         _extHelper.waitForExtDialog("Data Point Information");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         // open developer panel and test JS function validation
-        goToDeveloperTab();
-        _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
-        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
-        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
-        assertTextPresent("Error parsing the function:");
-        clickButton("Disable", 0);
-        _extHelper.waitForExtDialog("Confirmation...");
-        _ext4Helper.clickWindowButton("Confirmation...", "Yes", 0, 0);
-        clickButton("Enable", 0);
-        // test use-case to navigate to participang page on click
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.clickDeveloperTab()
+                .setDeveloperSourceContent("")
+                .clickApplyWithError();
+        Locator errorLoc = Locator.tagWithClass("span", "labkey-error");
+        assertElementPresent(errorLoc.withText("Error: the value provided does not begin with a function declaration."));
+        lookAndFeelDialog.setDeveloperSourceContent("function(){")
+                .clickApplyWithError();
+        assertElementPresent(errorLoc.containing("Error parsing the function:"));
+        // reset to the default point click function
+        lookAndFeelDialog.clickDeveloperDisable(true).clickDeveloperEnable();
+        // test use-case to navigate to participant page on click
         String function = TestFileUtils.getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
-        _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
-        applyChanges();
+        lookAndFeelDialog.setDeveloperSourceContent(function).clickApply();
         openSaveMenu();
         saveReport(false);
 
@@ -390,15 +412,19 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickReportDetailsLink(REPORT_NAME_1);
         click(Locator.linkContainingText("Edit Report"));
         waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
-        // TODO: Is this actually the selector we want?
         clickAndWait(Locator.css("svg a path"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
 
-        // verify that only developers can see the button to add point click function
+        // verify that only developers can see the options to add point click function
         // USER2 is not yet a developer, so shouldn't have permissions to this feature
         impersonate(USER2);
         popLocation();
         waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.clickGeneralTab();
+        assertFalse("Expecting developer tab to NOT be visible", lookAndFeelDialog.isDeveloperTabVisible());
+        lookAndFeelDialog.clickCancel();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
         // give USER2 developer perms and try again
@@ -406,12 +432,18 @@ public class TimeChartDateBasedTest extends TimeChartTest
         impersonate(USER2);
         popLocation();
         waitForText(WAIT_FOR_JAVASCRIPT, X_AXIS_LABEL_MANUAL);
-        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.clickGeneralTab();
+        assertTrue("Expecting developer tab to be visible", lookAndFeelDialog.isDeveloperTabVisible());
+        lookAndFeelDialog.clickCancel();
         stopImpersonating();
     }
 
     @LogMethod public void multiMeasureTimeChartTest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         log("Create multi-measure time chart.");
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -428,14 +460,15 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText("Lymphs (cells/mm3) from Lab Results");
         applyChanges();
         waitForElement(Locator.css("svg").withText("249318596 Lymphs (cells/mm3)"), WAIT_FOR_JAVASCRIPT, false);
-        goToGroupingTab();
-        setParticipantSelection(PARTICIPANTS);
-        setNumberOfCharts(ONE_CHART_PER_MEASURE);
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants)
+                .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerMeasureDimension)
+                .clickApply();
         waitForText("CD4+ (cells/mm3), Lymphs (cells/mm3)"); // y-axis default label
-        goToSvgAxisTab("Lab Results: CD4+ (cells/mm3)");
-        setChartTitle(CHART_TITLE);
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setPlotTitle(CHART_TITLE).clickApply();
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 3); // 2 for individual chart titles + 1 for chart title in thumbnail preview on save dialog
 
@@ -465,8 +498,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void participantGroupTimeChartTest()
     {
-        log("Test charting with participant groups");
+        LookAndFeelTimeChart lookAndFeelDialog;
 
+        log("Test charting with participant groups");
         clickFolder(getFolderName());
         goToManageViews();
         clickReportDetailsLink(REPORT_NAME_3);
@@ -481,13 +515,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
                 CHART_TITLE+": Lymphs (cells/mm3)",//, 1); // Title
                 CHART_TITLE+": CD4+ (cells/mm3)");//, 1); // Title
 
-        goToGroupingTab();
-        setParticipantSelection(PARTICIPANTS_GROUPS);
-        setNumberOfCharts(PER_GROUP);
-        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
-        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
-
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Groups)
+                .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerGroup)
+                .checkShowIndividualLines()
+                .uncheckShowMean()
+                .clickApply();
         waitForText(GROUP1_NAME);
         assertElementPresent(Locator.linkWithText("Manage Groups"));
         _ext4Helper.checkGridRowCheckbox(GROUP3_NAME);
@@ -574,6 +608,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
     private static final String SVG_MULTI_MANUAL_2 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n21.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
     @LogMethod public void multiAxisTimeChartTest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
@@ -600,12 +636,18 @@ public class TimeChartDateBasedTest extends TimeChartTest
         applyChanges();
         waitForElement(Locator.css("svg").withText(GROUP2_PTIDS[0]+" Hemoglobin"), WAIT_FOR_JAVASCRIPT, false);
 
-        goToSvgAxisTab("Hemoglobin");
-        setAxisValue(Axis.RIGHT, "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisRightRangeMinMax("12", "16")
+                .setYAxisRightLabel("Hemogoblins")
+                .clickApply();
         assertSVG(SVG_MULTI_MANUAL_1, 0);
 
-        goToSvgAxisTab("Hemogoblins");
-        setAxisValue(Axis.RIGHT, "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setYAxisRightRangeType(ChartLayoutDialog.RangeType.AutomaticAcrossCharts)
+                .setYAxisRightScale(ChartLayoutDialog.ScaleType.Log)
+                .clickApply();
         assertSVG(SVG_MULTI_MANUAL_2, 0);
 
         openSaveMenu();
@@ -615,6 +657,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
     //depends on:  participantGroupTimeChartTest
     @LogMethod public void aggregateTimeChartUITest()
     {
+        LookAndFeelTimeChart lookAndFeelDialog;
+
         goToNewTimeChart();
 
         //choose measure
@@ -623,20 +667,22 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.css("svg").withText("Days Since Start Date"), WAIT_FOR_JAVASCRIPT, false);
 
         //set to aggregate
-        goToGroupingTab();
-        setParticipantSelection(PARTICIPANTS_GROUPS);
-        setNumberOfCharts(PER_GROUP);
-        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
-        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Groups)
+                .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerGroup)
+                .checkShowIndividualLines()
+                .uncheckShowMean()
+                .clickApply();
 
         waitForText("Lab Results: " + GROUP1_NAME);
         waitForCharts(4);
 
-        goToGroupingTab();
-        _ext4Helper.checkCheckbox("Show Mean"); // select show mean
-        _ext4Helper.uncheckCheckbox("Show Individual Lines"); // de-select show individual lines
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.uncheckIndividualLines()
+                .checkShowMean()
+                .clickApply();
         waitForCharts(4);
 
         // uncheck all groups
@@ -658,11 +704,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
 //        assertTrue(elCount == 10 || elCount == 20); // 10 in chart and 10 in thumbnail (chrome seems to count the thumbnail, but firefox does not)
 //        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
-        goToGroupingTab();
-        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
-        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
-        setNumberOfCharts(ONE_CHART_PER_MEASURE);
-        applyChanges();
+        clickButton("Chart Layout", 0);
+        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog.uncheckShowMean()
+                .checkShowIndividualLines()
+                .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerMeasureDimension)
+                .clickApply();
         waitForCharts(1);
         waitForText("Lab Results: CD4");
 

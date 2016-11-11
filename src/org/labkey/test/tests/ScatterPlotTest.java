@@ -683,14 +683,14 @@ public class ScatterPlotTest extends GenericChartsTest
         // set y-axis manual range max only, and make sure decimals are allowed
         waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
-        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax(null, "35.5").clickApply();
+        lookAndFeelDialog.setYAxisRangeMinMax(null, "35.5").clickApply();
         assertSVG(SCATTER_PLOT_CPF_2);
         validateBinWarningMsg(true);
         validatePointsAndBins(0, 0, 4);
 
         // make sure we can use manual range values of zero, in this case for min
         waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
-        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax("0", "80").clickApply();
+        lookAndFeelDialog.setYAxisRangeMinMax("0", "80").clickApply();
         assertSVG(SCATTER_PLOT_CPF_3);
         validateBinWarningMsg(true);
         validatePointsAndBins(0, 0, 6);

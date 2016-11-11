@@ -65,13 +65,18 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         return this;
     }
 
+    public boolean isDeveloperTabVisible()
+    {
+        return getWrapper().isElementPresent(elementCache().developerTabLoc);
+    }
+
     public ChartLayoutDialog clickDeveloperTab()
     {
         clickTab(elementCache().developerTab);
         return this;
     }
 
-    private void clickTab(WebElement tabElement)
+    protected void clickTab(WebElement tabElement)
     {
         tabElement.click();
         getWrapper().sleep(500);
@@ -96,6 +101,12 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         {
             case Automatic:
                 getWrapper().click(elementCache().visibleAutomaticRangeRadioButton);
+                break;
+            case AutomaticAcrossCharts:
+                getWrapper().click(elementCache().visibleAutomaticAcrossRangeRadioButton);
+                break;
+            case AutomaticWithinChart:
+                getWrapper().click(elementCache().visibleAutomaticWithinRangeRadioButton);
                 break;
             case Manual:
                 getWrapper().click(elementCache().visibleManualRangeRadioButton);
@@ -168,22 +179,23 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     public ChartLayoutDialog setYAxisRangeMinMax(String min, String max)
     {
         clickYAxisTab();
+        setRangeType(RangeType.Manual);
         setRangeMin(min);
         setRangeMax(max);
         return this;
     }
 
-    private void setLabel(String label)
+    protected void setLabel(String label)
     {
         getWrapper().setFormElement(elementCache().visibleLabelTextBox, label);
     }
 
-    private void setRangeMin(String min)
+    protected void setRangeMin(String min)
     {
         getWrapper().setFormElement(elementCache().visibleRangeMinTextBox, min);
     }
 
-    private void setRangeMax(String min)
+    protected void setRangeMax(String min)
     {
         getWrapper().setFormElement(elementCache().visibleRangeMaxTextBox, min);
     }
@@ -199,6 +211,13 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     {
         clickGeneralTab();
         return getWrapper().getFormElement(elementCache().plotTitleTextBox);
+    }
+
+    public ChartLayoutDialog clickResetTitle()
+    {
+        clickGeneralTab();
+        elementCache().plotTitleResetBtn.click();
+        return this;
     }
 
     public ChartLayoutDialog setPlotWidth(String width)
@@ -385,15 +404,19 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     class ElementCache extends ChartWizardDialog.ElementCache
     {
         static public final String VISIBLE_PANEL_XPATH = "//div[contains(@class, 'center-panel')]//div[contains(@class, 'x4-fit-item')][not(contains(@class, 'x4-item-disabled'))][not(contains(@style, 'display: none;'))]";
+        static private final int wait = 10000;
 
-        public WebElement generalTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='General']"), this);
-        public WebElement xAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='X-Axis']"), this);
-        public WebElement yAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis']"), this);
-        public WebElement developerTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Developer']"), this);
+        public Locator developerTabLoc = Locator.xpath("//div[contains(@class, 'item')][text()='Developer']");
+        public WebElement generalTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='General']"), this).withTimeout(wait);
+        public WebElement xAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='X-Axis']"), this).withTimeout(wait);
+        public WebElement yAxisTab = new LazyWebElement(Locator.xpath("//div[contains(@class, 'item')][text()='Y-Axis']"), this).withTimeout(wait);
+        public WebElement developerTab = new LazyWebElement(developerTabLoc, this).withTimeout(wait);
         public WebElement visiblePanel = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH), getWrapper().getWrappedDriver());
         public WebElement plotTitleTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Title:']/parent::td/following-sibling::td//input"), this);
+        public WebElement plotTitleResetBtn = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//span[contains(@class, 'fa-refresh')]"), this);
         public WebElement plotWidthTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='width']"), this);
         public WebElement plotHeightTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='height']"), this);
+        public WebElement lineWidthSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Line Width:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement plotBinThresholdTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='binThresholdField']"), this);
         public WebElement hexagonShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Hexagon']/preceding-sibling::input[@type='button']"), this);
         public WebElement squareShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Square']/preceding-sibling::input[@type='button']"), this);
@@ -403,6 +426,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public Locator visibleLinearScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Linear']/preceding-sibling::input[@type='button']");
         public Locator visibleLogScaleRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Log']/preceding-sibling::input[@type='button']");
         public Locator visibleAutomaticRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Automatic']/preceding-sibling::input[@type='button']");
+        public Locator visibleAutomaticAcrossRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Automatic Across Charts']/preceding-sibling::input[@type='button']");
+        public Locator visibleAutomaticWithinRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Automatic Within Chart']/preceding-sibling::input[@type='button']");
         public Locator visibleManualRangeRadioButton = Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Manual']/preceding-sibling::input[@type='button']");
         public Locator visibleLabelTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='label']");
         public Locator visibleRangeMinTextBox = Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='rangeMin']");
@@ -418,6 +443,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     public enum RangeType
     {
         Automatic,
+        AutomaticAcrossCharts,
+        AutomaticWithinChart,
         Manual
     }
 

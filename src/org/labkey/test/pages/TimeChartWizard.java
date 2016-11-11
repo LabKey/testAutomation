@@ -36,7 +36,7 @@ public class TimeChartWizard
     public void createNewChart()
     {
         _test.goToManageViews();
-        _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Time Chart");
+        _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), "Time Chart");
         _test.waitForElement(Locator.tagWithText("div", "To get started, choose a Measure:"));
     }
 
@@ -52,7 +52,7 @@ public class TimeChartWizard
 
     public void waitForWarningMessage(String message)
     {
-        _test.waitForElement(Locator.tagWithText("td", message));
+        _test.waitForElement(Locator.tagWithText("div", message));
     }
 
     public void changeXAxisToVisitBased(String axisLabel, String newLabel)

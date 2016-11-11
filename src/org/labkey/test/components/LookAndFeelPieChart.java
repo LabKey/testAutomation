@@ -112,14 +112,8 @@ public class LookAndFeelPieChart extends ChartLayoutDialog<LookAndFeelPieChart.E
 
     public boolean showPercentagesChecked()
     {
-        String classValue;
-
-        classValue = elementCache().showPercentagesCheckboxValue.getAttribute("class");
-
-        if(classValue.toLowerCase().contains("x4-form-cb-checked"))
-            return true;
-        else
-            return false;
+        String classValue = elementCache().showPercentagesCheckboxValue.getAttribute("class");
+        return classValue.toLowerCase().contains("x4-form-cb-checked");
     }
 
     public LookAndFeelPieChart setHidePercentageWhen(String width)

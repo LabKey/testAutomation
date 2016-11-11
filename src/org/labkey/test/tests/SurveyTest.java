@@ -80,7 +80,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
 
-        log("Create survey disign at the project level");
+        log("Create survey design at the project level");
         _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         _containerHelper.enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
@@ -92,7 +92,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         _containerHelper.createSubfolder(getProjectName(), folderName);
 
-        log("Create survey disign at the subfolder level");
+        log("Create survey design at the subfolder level");
         _listHelper.importListArchive(folderName, new File(TestFileUtils.getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         clickFolder(folderName);
         portalHelper.addWebPart("Survey Designs");

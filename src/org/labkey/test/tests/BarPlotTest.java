@@ -342,12 +342,12 @@ public class BarPlotTest extends GenericChartsTest
         // set y-axis manual range, make sure we can use negative manual range values
         waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
-        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax("-50", "-40").clickApply();
+        lookAndFeelDialog.setYAxisRangeMinMax("-50", "-40").clickApply();
         assertSVG(THIRD_BAR_PLOT_SVG_TEXT);
 
         // set y-axis manual range max only, and make sure decimals are allowed
         waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
-        lookAndFeelDialog.setYAxisRangeType(ChartLayoutDialog.RangeType.Manual).setYAxisRangeMinMax(null, "3000.5").clickApply();
+        lookAndFeelDialog.setYAxisRangeMinMax(null, "3000.5").clickApply();
         assertSVG(FOURTH_BAR_PLOT_SVG_TEXT);
 
         savePlot(BAR_PLOT_SAVE_NAME_2, null, true);

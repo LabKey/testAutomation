@@ -123,13 +123,11 @@ public abstract class TimeChartTest extends ReportTest
 
     protected enum Axis
     {
-        X("x"),
-        LEFT("left"),
-        RIGHT("right");
+        X("x");
 
         String _axis;
 
-        private Axis(String axis)
+        Axis(String axis)
         {
             _axis = axis;
         }
@@ -178,6 +176,11 @@ public abstract class TimeChartTest extends ReportTest
 
         applyChanges();
 
+        verifyAxisValueChanges(textPresent, textNotPresent);
+    }
+
+    protected void verifyAxisValueChanges(@Nullable String[] textPresent, @Nullable String[] textNotPresent)
+    {
         String svgText = null;
 
         if(textNotPresent!=null)
@@ -262,37 +265,10 @@ public abstract class TimeChartTest extends ReportTest
                 "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
     }
 
-    protected void setChartTitle(String title)
-    {
-        setFormElement(Locator.name("chart-title-textfield"), title);
-    }
-
-    protected void goToGroupingTab()
-    {
-        clickButton("Grouping", 0);
-        waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
-    }
-
-    protected void goToDeveloperTab()
-    {
-        clickButton("Developer", 0);
-        waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
-    }
-
     protected void applyChanges()
     {
         clickButton("OK", 0);
         _ext4Helper.waitForMaskToDisappear();
-    }
-
-    protected void setParticipantSelection(String selection)
-    {
-        _ext4Helper.selectRadioButton("Participant Selection:", selection);
-    }
-
-    protected void setNumberOfCharts(String selection)
-    {
-        _ext4Helper.selectRadioButton("Number of Charts:", selection);
     }
 
     protected void waitForCharts(int count)

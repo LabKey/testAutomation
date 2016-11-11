@@ -100,10 +100,10 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
         return getSliderCurrentValue(elementCache().lineWidthSlider);
     }
 
-    public LookAndFeelBoxPlot setOpacity(int lineWidth)
+    public LookAndFeelBoxPlot setOpacity(int opacity)
     {
         clickGeneralTab();
-        setSliderValue(elementCache().opacitySlider, lineWidth);
+        setSliderValue(elementCache().opacitySlider, opacity);
         return this;
     }
 
@@ -113,10 +113,10 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
         return getSliderCurrentValue(elementCache().opacitySlider);
     }
 
-    public LookAndFeelBoxPlot setPointSize(int lineWidth)
+    public LookAndFeelBoxPlot setPointSize(int pointSize)
     {
         clickGeneralTab();
-        setSliderValue(elementCache().pointSizeSlider, lineWidth);
+        setSliderValue(elementCache().pointSizeSlider, pointSize);
         return this;
     }
 
@@ -176,7 +176,6 @@ public class LookAndFeelBoxPlot extends ChartLayoutDialog<LookAndFeelBoxPlot.Ele
     {
         public WebElement jitterPointsCheckbox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Jitter Points:']/parent::td/following-sibling::td//input"), this);
         public WebElement jitterPointsCheckboxValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Jitter Points:']/ancestor::table"), this);
-        public WebElement lineWidthSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Line Width:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement opacitySlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Opacity:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement pointSizeSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Point Size:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
     }
