@@ -185,15 +185,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                    newWebDriver = new ChromeDriver(capabilities)
-                    {
-                        @Override
-                        public void quit()
-                        {
-                            super.quit();
-                            sleep(5000); // Try to prevent Chromedriver instances from colliding
-                        }
-                    };
+                    newWebDriver = new ChromeDriver(capabilities);
                 }
                 break;
             }
