@@ -97,16 +97,23 @@ public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC
         waitForClose();
     }
 
+    /**
+     * TODO Issue #28463: Ext.Msg reuses the message WebElement, so close check will fail if another dialog opens
+     */
     public void waitForClose()
     {
         waitForClose(5000);
     }
 
+    /**
+     * TODO Issue #28463: Ext.Msg reuses the message WebElement, so close check will fail if another dialog opens
+     */
     public void waitForClose(int msWait)
     {
         getWrapper().waitFor(() -> {
             try
             {
+                //If we dont have the finder, just see if window is open
                 return !_window.isDisplayed();
             }
             catch (StaleElementReferenceException gone)
