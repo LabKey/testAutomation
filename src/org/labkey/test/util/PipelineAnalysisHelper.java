@@ -72,18 +72,25 @@ public class PipelineAnalysisHelper
         assertEquals("Wrong file(s)", fileString.toString(), _test.getText(Locator.id("fileStatus")));
         for (Map.Entry<String, String> property : protocolProperties.entrySet())
         {
-            WebElement protocolFormInput = Locator.id(property.getKey() + "Input").findElement(_test.getDriver());
-            if (protocolFormInput.getAttribute("type").equals("checkbox"))
+            if ("xmlParameters".equals(property.getKey()))
             {
-                boolean check = Boolean.parseBoolean(property.getValue());
-                if (check)
-                    _test.checkCheckbox(protocolFormInput);
-                else
-                    _test.uncheckCheckbox(protocolFormInput);
+                _test._extHelper.setCodeMirrorValue(property.getKey(), property.getValue());
             }
             else
             {
-                _test.setFormElement(protocolFormInput, property.getValue());
+                WebElement protocolFormInput = Locator.id(property.getKey() + "Input").findElement(_test.getDriver());
+                if (protocolFormInput.getAttribute("type").equals("checkbox"))
+                {
+                    boolean check = Boolean.parseBoolean(property.getValue());
+                    if (check)
+                        _test.checkCheckbox(protocolFormInput);
+                    else
+                        _test.uncheckCheckbox(protocolFormInput);
+                }
+                else
+                {
+                    _test.setFormElement(protocolFormInput, property.getValue());
+                }
             }
         }
 
@@ -169,7 +176,8 @@ public class PipelineAnalysisHelper
             _test.selectOptionByText(protocolSelect, "<New Protocol>");
             _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
             if (null != protocolDef)
-                _test.setFormElement(Locator.id("xmlParametersInput"), protocolDef);
+                _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
+
         }
 
         Locator retryButton = Locator.lkButton("Retry");
