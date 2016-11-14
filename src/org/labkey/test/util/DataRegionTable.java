@@ -235,6 +235,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public static class DataRegionFinder extends WebDriverComponentFinder<DataRegionTable, DataRegionFinder>
     {
+        private Locator _loc = Locators.dataRegion();
+
         private DataRegionFinder(WebDriver driver)
         {
             super(driver);
@@ -243,54 +245,20 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         public DataRegionFinder withName(String name)
         {
-            return new NamedDataRegionFinder(getDriver(), name);
+            _loc = Locators.dataRegion(name);
+            return this;
         }
 
         @Override
         protected Locator locator()
         {
-            return Locators.dataRegion();
+            return _loc;
         }
 
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
             return new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
-        }
-    }
-
-    private static class NamedDataRegionFinder extends DataRegionFinder
-    {
-        String _name;
-
-        private NamedDataRegionFinder(WebDriver driver, String name)
-        {
-            super(driver);
-            _name = name;
-        }
-
-        @Override
-        protected Locator locator()
-        {
-            return Locators.dataRegion(_name);
-        }
-
-        @Override
-        protected DataRegionTable construct(WebElement el, WebDriver driver)
-        {
-            return new DataRegionTable(_name, driver);
-        }
-
-        @Override
-        public DataRegionFinder index(int index)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public SimpleComponentFinder<DataRegionTable> locatedBy(Locator loc)
-        {
-            throw new UnsupportedOperationException();
         }
     }
 
