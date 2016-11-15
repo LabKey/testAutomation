@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -59,7 +60,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
     protected EC newElementCache()
     {
-        return null;
+        throw new NotImplementedException("Please override newElementCache() in your component class");
     }
 
     protected void clearElementCache()
