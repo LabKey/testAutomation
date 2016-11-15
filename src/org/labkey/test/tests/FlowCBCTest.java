@@ -23,10 +23,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
+import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.TimeChartHelper;
 
 import static org.junit.Assert.*;
 
@@ -210,11 +211,13 @@ public class FlowCBCTest extends BaseFlowTest
     private void verifyTimeChartFromFlowData()
     {
         beginAt("/visualization/Flow Verify Project/KoStudy/timeChartWizard.view?edit=true&queryName=mem naive CBCFlow&schemaName=study&dataRegionName=query&filterUrl=%2Flabkey%2Fquery%2FFlow%2520Verify%2520Project%2FKoStudy%2FexecuteQuery.view%3Fquery.queryName%3Dmem%2520naive%2520CBCFlow%26query.sort%3DParticipantId%26schemaName%3Dstudy");
-        TimeChartHelper tch = new TimeChartHelper(this);
-        tch.addAMeasure("CD3+ Lymph");
-        assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setYAxis("CD3+ Lymph").clickApply();
+        waitForElement(Locator.css("svg text").withText("CD3+ Lymph"));
+        timeChartWizard.verifySvgChart(100, null);
         assertTextNotPresent("There are no demographic date options available in this study");
-        tch.save("Flow Report");
+        timeChartWizard.saveReport("Flow Report", null, true);
     }
 
 }

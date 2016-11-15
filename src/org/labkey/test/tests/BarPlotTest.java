@@ -99,7 +99,7 @@ public class BarPlotTest extends GenericChartsTest
         svgDefaultWidth = getAttribute(Locator.css("svg"), "width");
 
         log("Change some of the look and feel settings.");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
         lookAndFeelDialog.setPlotTitle(TRICKY_CHART_TITLE)
                 .setFillColor(COLOR_RED)
@@ -128,8 +128,7 @@ public class BarPlotTest extends GenericChartsTest
         Assert.assertEquals("Stroke-width not as expected.", "5", getAttribute(Locator.css("svg a.bar-individual rect.bar-rect"), "stroke-width"));
 
         log("Add a y-axis value");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = clickChartTypeButton();
         chartTypeDialog.setYAxis(BP_DIASTOLIC)
                 .clickApply();
 
@@ -139,7 +138,7 @@ public class BarPlotTest extends GenericChartsTest
         assertSVG(SECOND_BAR_PLOT_SVG_TEXT);
 
         log("Change some more of the look and feel.");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
         lookAndFeelDialog.setFillColor(COLOR_GREEN)
                 .setLineColor(COLOR_RED)
@@ -226,7 +225,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog.clickCancel();
 
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
 
         strTemp = chartLayoutDialog.getPlotTitle();
@@ -319,7 +318,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog.clickCancel();
 
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         chartLayoutDialog = new LookAndFeelBarPlot(getDriver());
 
         strTemp = chartLayoutDialog.getPlotTitle();
@@ -334,19 +333,22 @@ public class BarPlotTest extends GenericChartsTest
     @LogMethod
     private void doAxisManualRangeBarPlotTest()
     {
+        LookAndFeelScatterPlot lookAndFeelDialog;
+
         clickProject(getProjectName());
         clickFolder(getFolderName());
         openSavedPlotInEditMode(BAR_PLOT_SAVE_NAME);
         assertSVG(SECOND_BAR_PLOT_SVG_TEXT);
 
         // set y-axis manual range, make sure we can use negative manual range values
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
-        LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setYAxisRangeMinMax("-50", "-40").clickApply();
         assertSVG(THIRD_BAR_PLOT_SVG_TEXT);
 
         // set y-axis manual range max only, and make sure decimals are allowed
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setYAxisRangeMinMax(null, "3000.5").clickApply();
         assertSVG(FOURTH_BAR_PLOT_SVG_TEXT);
 

@@ -105,80 +105,6 @@ public abstract class TimeChartTest extends ReportTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
-    protected void goToNewTimeChart()
-    {
-        clickFolder(getFolderName());
-        goToManageViews();
-        clickAddChart("Time Chart");
-        clickChooseInitialMeasure();
-    }
-
-    protected void clickChooseInitialMeasure()
-    {
-        // TODO: migrate usage to TimeChartWizard.chooseInitialMeasure
-        clickButton("Choose a Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
-    }
-
-    protected enum Axis
-    {
-        X("x");
-
-        String _axis;
-
-        Axis(String axis)
-        {
-            _axis = axis;
-        }
-
-        public String toString()
-        {
-            return _axis;
-        }
-    }
-
-    /**
-     * @param axis must be X, Left, or Right, case is important
-     * @param textNotPresent intended to be used for numbers that should no longer be present in the axes.
-     *                      ideally we'd calculate this automatically, but that's too complicated a problem for now
-     *                      TODO:  calculate not-present number automatically
-     *                      TODO: find a better way to determine if the range has changed approprietely (Something other than asserting text is or isnt present).
-     */
-    @LogMethod protected void setAxisValue(@LoggedParam Axis axis, @Nullable String rangeId, @Nullable String lowerBound, @Nullable String upperBound, @Nullable String label, @Nullable String scaleId, @Nullable String scale, @Nullable String[] textPresent, @Nullable String[] textNotPresent)
-    {
-        if(scaleId!=null && scale!=null)
-        {
-            _ext4Helper.selectComboBoxItemById(scaleId, scale);
-        }
-
-        if(label!=null)
-        {
-            setFormElement(Locator.name(axis + "-axis-label-textfield"), label);
-            waitForElementToDisappear(Locator.css(".x4-btn-disabled.revert"+axis+"AxisLabel"), WAIT_FOR_JAVASCRIPT);
-        }
-
-        if (rangeId!=null)
-        {
-            _ext4Helper.selectRadioButtonById(rangeId + "-boxLabelEl");
-            if (lowerBound!=null && upperBound!=null)
-            {
-                Locator minInput = Locator.name(axis + "axis_rangemin");
-                setFormElement(minInput, lowerBound);
-                assertEquals(lowerBound, getFormElement(minInput));
-//                sleep(500);
-
-                Locator maxInput = Locator.name(axis + "axis_rangemax");
-                setFormElement(maxInput, upperBound);
-                assertEquals(upperBound, getFormElement(maxInput));
-            }
-        }
-
-        applyChanges();
-
-        verifyAxisValueChanges(textPresent, textNotPresent);
-    }
-
     protected void verifyAxisValueChanges(@Nullable String[] textPresent, @Nullable String[] textNotPresent)
     {
         String svgText = null;
@@ -231,18 +157,10 @@ public abstract class TimeChartTest extends ReportTest
         _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
     }
 
-    protected void addMeasure()
-    {
-        clickButton("Add Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-    }
-
     protected void enterMeasuresPanel()
     {
         clickButton("Measures", 0);
         waitForText("Divide data into Series");
-        waitForElement(Ext4Helper.Locators.ext4Button("Add Measure"));
     }
 
     protected void openSaveMenu()

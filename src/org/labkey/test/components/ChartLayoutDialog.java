@@ -131,6 +131,7 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
     public ChartLayoutDialog setXAxisRangeMinMax(String min, String max)
     {
         clickXAxisTab();
+        setRangeType(RangeType.Manual);
         setRangeMin(min);
         setRangeMax(max);
         return this;

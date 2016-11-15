@@ -17,10 +17,13 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
@@ -69,22 +72,20 @@ public class TimeChartVisitBasedTest extends TimeChartTest
 
     @LogMethod public void visitBasedChartTest()
     {
-        log("Create multi-measure time chart.");
+        log("Test changing from date-based to visit-based time chart.");
         clickFolder(VISIT_FOLDER_NAME);
         goToManageViews();
         clickAddChart("Time Chart");
-        clickChooseInitialMeasure();
-        _ext4Helper.clickGridRowText("1. Weight", 0);
-        clickButton("Select", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "Days Since Contact Date");
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.selectStudyQuery("APX-1: Abbreviated Physical Exam")
+                .setYAxis("1. Weight")
+                .clickApply();
+        waitForElement(Locator.css("svg").containing("Days Since Contact Date"));
 
-        // TODO: migrate usage to TimeChartWizard.changeXAxisToVisitBased
-        goToSvgAxisTab("Days Since Contact Date");
-        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
-        assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
-        assertElementPresent(Locator.xpath("//table[//label[text() = 'Range:'] and contains(@class, 'x4-item-disabled')]"));
-        applyChanges();
+        log("Change to Visit-based for x-axis");
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElementToDisappear(Locator.css("svg").containing("Days Since Contact Date"));
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
         assertTextPresentInThisOrder(VISIT_STRINGS);
@@ -96,16 +97,11 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         // verify that other toolbar buttons have been hidden
         assertElementNotPresent(Locator.button("Export"));
         assertElementNotPresent(Locator.button("Measures"));
-        assertElementNotPresent(Locator.button("Grouping"));
-        assertElementNotPresent(Locator.button("Options"));
-        assertElementNotPresent(Locator.button("Developer"));
 
         DataRegionTable table = DataRegionTable.findDataRegion(this);
         List<String> displayOrders = table.getColumnDataAsText("Display Order");
         for (String str : displayOrders)
-        {
             assertEquals("Display order should default to zero.", "0", str);
-        }
 
         List<String> visits = table.getColumnDataAsText("Visit Label");
         List<String> missingVisits = new ArrayList<>(Arrays.asList(VISIT_STRINGS));
@@ -116,25 +112,23 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElementToDisappear(Locator.paginationText(19));
         waitForCharts(1);
         log("Revert to Date-based chart to check axis panel state.");
-        goToSvgAxisTab("Visit");
-        _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
-        assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
-        assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
-        applyChanges();
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Date).clickApply();
         waitForTextToDisappear(VISIT_STRINGS[0]);
         assertTextNotPresent(VISIT_STRINGS);
 
         log("Back to visit-based chart for save.");
-        goToSvgAxisTab("Days Since Contact Date");
-        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        applyChanges();
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME);
         setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
         saveReport(true);
-        waitForText(WAIT_FOR_JAVASCRIPT, VISIT_CHART_TITLE);
+        waitForElement(Locator.css("svg").containing(VISIT_CHART_TITLE));
     }
 
     @LogMethod public void filteredViewQueryMeasureTest()
@@ -159,36 +153,35 @@ public class TimeChartVisitBasedTest extends TimeChartTest
 
         log("Create a Time Chart from the measure in the new query");
         _extHelper.clickMenuButton("Charts", "Create Time Chart");
-        clickChooseInitialMeasure();
-        waitForText("My APX Query");
-        _ext4Helper.clickGridRowText("2. Body Temp", 0);
-        clickButton("Select", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
-        goToSvgAxisTab("Days Since Contact Date");
-        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        applyChanges();
-        waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
+        // note: the 'My APX Query' query should already be selected
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setYAxis("2. Body Temp").clickApply();
+        waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
+        clickButton("Chart Type", 0);
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
+        waitForCharts(1);
+        waitForElement(Locator.css("svg").containing("My APX Query"));
         _ext4Helper.clickParticipantFilterGridRowText("999320016", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "4 wk Post-V#2/V#3"); // last visit from ptid 999320016
-        assertTextPresent("2. Body Temp: ", 12); // hover text label (6 for chart (twice for each data point) and 6 for thumbnail in save dialog)
+        waitForElement(Locator.css("svg").containing("4 wk Post-V#2/V#3")); // last visit from ptid 999320016
+        assertTextPresent("2. Body Temp: ", 6); // point hover text label
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(9));
         assertTextNotPresent("801.0", "G1: 6wk/G2: 2wk"); // sequenceNum filtered out by default view filter
         clickButton("View Chart(s)", 0);
-        waitForElement(Locator.css("svg").withText("My APX Query"), WAIT_FOR_JAVASCRIPT, false);
+        waitForElement(Locator.css("svg").containing("My APX Query"));
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");
         saveReport(true);
-        waitForText(WAIT_FOR_JAVASCRIPT, "My APX Query");
+        waitForElement(Locator.css("svg").containing("My APX Query"));
     }
 
     @LogMethod private void errorMessageTest()
     {
         log("Test renaming time chart measure");
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
-        waitForText(VISIT_REPORT_NAME);
-        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitAndClickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
@@ -199,8 +192,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
-        waitForText(VISIT_REPORT_NAME);
-        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitAndClickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
         waitForText("Error: Unable to find field APXwtkg in study.APX-1.");
         assertTextPresent("The field may have been deleted, renamed, or you may not have permissions to read the data.");
 
@@ -212,8 +204,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertTrue(acceptAlert().contains("Are you sure you want to delete this dataset?"));
         waitForText("The study schedule defines"); // text on the Manage Datasets page
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
-        waitForText(VISIT_REPORT_NAME);
-        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitAndClickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
         waitForText("Error: Unable to find table study.APX-1.");
         assertTextPresent("The table may have been deleted, or you may not have permissions to read the data.");
 

@@ -2422,13 +2422,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return "true".equals(System.getProperty("dump.svgs"));
     }
 
-    public void goToSvgAxisTab(String axisLabel)
-    {
-        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
-        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
-        waitForElement(Ext4Helper.Locators.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
-    }
-
     public void createSurveyDesign(String label, @Nullable String description, String schemaName, String queryName, @Nullable File metadataFile)
     {
         clickButton("Create Survey Design");

@@ -107,7 +107,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title and the Y-Axis");
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setPlotTitle(CHART_TITLE)
                 .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
@@ -119,7 +119,7 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
 
         log("Set X Axis");
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setXAxisScale(ChartLayoutDialog.ScaleType.Log)
                 .setXAxisLabel("TestXAxis")
@@ -635,7 +635,7 @@ public class ScatterPlotTest extends GenericChartsTest
         validatePointsAndBins(10, 0, 0);
 
         // change binning threshold to force to hex bin
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setBinThreshold("13").clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
@@ -644,7 +644,7 @@ public class ScatterPlotTest extends GenericChartsTest
         validateBinSizes(expectedBinSizeCounts);
 
         // change bin shape from hex to square
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog.setBinShape(ChartLayoutDialog.BinShape.Square).clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
         validateBinWarningMsg(true);
@@ -652,14 +652,14 @@ public class ScatterPlotTest extends GenericChartsTest
         validateBinSizes(expectedBinSizeCounts);
 
         // change threshold to match the number of data points so the binning goes away
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog.setBinThreshold("14").clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
         validateBinWarningMsg(false);
         validatePointsAndBins(10, 0, 0);
 
         // change back to a binned plot and save
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog.setBinThreshold("13").clickApply();
         savePlot(SCATTER_PLOT_NAME_BIN, SCATTER_PLOT_DESC_BIN);
     }
@@ -681,7 +681,7 @@ public class ScatterPlotTest extends GenericChartsTest
         validatePointsAndBins(0, 0, 7);
 
         // set y-axis manual range max only, and make sure decimals are allowed
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setYAxisRangeMinMax(null, "35.5").clickApply();
         assertSVG(SCATTER_PLOT_CPF_2);
@@ -689,14 +689,14 @@ public class ScatterPlotTest extends GenericChartsTest
         validatePointsAndBins(0, 0, 4);
 
         // make sure we can use manual range values of zero, in this case for min
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("0", "80").clickApply();
         assertSVG(SCATTER_PLOT_CPF_3);
         validateBinWarningMsg(true);
         validatePointsAndBins(0, 0, 6);
 
         // set x-axis manual range
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelDialog.setXAxisRangeType(ChartLayoutDialog.RangeType.Manual).setXAxisRangeMinMax("0.55", "0.95").clickApply();
         assertSVG(SCATTER_PLOT_CPF_4);
         validateBinWarningMsg(true);

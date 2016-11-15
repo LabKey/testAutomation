@@ -116,7 +116,7 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%5%5%7%5%6%5%5%I'", svgText.contains("d25%9%5%5%7%5%6%5%5%I"));
 
         log("Now change the chart layout, also validate that the layout dialog is pre-populated as expected.");
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
 
         pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
         strTemp = pieChartLookAndFeel.getSubTitle();
@@ -139,14 +139,11 @@ public class PieChartTest extends GenericChartsTest
         percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should be no '%' values in the svg, found " + percentCount, 0, percentCount);
 
-        clickButton("Chart Layout", 0);
-
         log("Now add percentages back and change the limit when they are visible.");
+        clickChartLayoutButton();
         pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
-
-        if(!pieChartLookAndFeel.showPercentagesChecked())
+        if (!pieChartLookAndFeel.showPercentagesChecked())
             pieChartLookAndFeel.clickShowPercentages();
-
         pieChartLookAndFeel.setHidePercentageWhen("7");
 
         // Changing gradient, the radii and colors just to make sure no errors are generated.
@@ -169,10 +166,8 @@ public class PieChartTest extends GenericChartsTest
         Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
 
         log("Ok last bit of changing for the Pie Chart.");
-        clickButton("Chart Layout", 0);
-
+        clickChartLayoutButton();
         pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
-
         pieChartLookAndFeel.setPlotTitle(PLOT_TITLE)
                 .setInnerRadiusPercentage(0)
                 .setOuterRadiusPercentage(75)
@@ -255,7 +250,7 @@ public class PieChartTest extends GenericChartsTest
 
         chartTypeDialog.clickCancel();
 
-        clickButton("Chart Layout", 0);
+        clickChartLayoutButton();
         pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
 
         strTemp = pieChartLookAndFeel.getPlotTitle();

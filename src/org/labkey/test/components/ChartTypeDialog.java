@@ -138,9 +138,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
-    public ChartTypeDialog setYAxis(String columnName, boolean replaceExisting)
+    public ChartTypeDialog setYAxis(String columnName, boolean hasExistingSelection)
     {
-        if (replaceExisting)
+        if (hasExistingSelection)
             setValue(elementCache().yAxis(), columnName);
         else
             setValue(elementCache().yAxisDropText(), columnName);
@@ -325,6 +325,44 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return text;
     }
 
+    public ChartTypeDialog selectStudyQuery(String queryName)
+    {
+        getWrapper().waitForElementToDisappear(elementCache().queryColumnsPanelMask);
+        getWrapper().click(elementCache().studyQueryCombo.append("//div[contains(@class,'arrow')]"));
+        getWrapper().waitAndClick(Ext4Helper.Locators.comboListItem().withText(queryName));
+        return this;
+    }
+
+    public ChartTypeDialog setTimeAxisType(TimeAxisType axisType)
+    {
+        switch(axisType)
+        {
+            case Date:
+                getWrapper().click(elementCache().timeAxisDateBasedRadioButton);
+                getWrapper().waitForElementToDisappear(elementCache().disabledTimeInterval);
+                getWrapper().assertElementNotPresent(elementCache().disabledIntervalStartDate);
+                break;
+            case Visit:
+                getWrapper().click(elementCache().timeAxisVisitBasedRadioButton);
+                getWrapper().waitForElement(elementCache().disabledTimeInterval);
+                getWrapper().assertElementPresent(elementCache().disabledIntervalStartDate);
+                break;
+        }
+        return this;
+    }
+
+    public ChartTypeDialog setTimeInterval(String interval)
+    {
+        getWrapper()._ext4Helper.selectComboBoxItem("Time Interval:", interval);
+        return this;
+    }
+
+    public ChartTypeDialog setTimeIntervalStartDate(String startDateColLabel)
+    {
+        getWrapper()._ext4Helper.selectComboBoxItem("Interval Start Date:", startDateColLabel);
+        return this;
+    }
+
     public void clickApply()
     {
         clickApply(10000);
@@ -454,6 +492,13 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement shape() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement shapeDropText() {return Locator.xpath(SHAPE_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement shapeRemove() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
+
+        public Locator queryColumnsPanelMask = Locator.tagWithClass("div", "query-columns").withDescendant(Locator.tagWithClass("div", "x4-mask"));
+        public Locator.XPathLocator studyQueryCombo = Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/input[@placeholder='Select a query']]");
+        public Locator timeAxisDateBasedRadioButton = Locator.xpath("//label[text()='Date-Based']/preceding-sibling::input[@type='button']");
+        public Locator timeAxisVisitBasedRadioButton = Locator.xpath("//label[text()='Visit-Based']/preceding-sibling::input[@type='button']");
+        public Locator disabledTimeInterval = Locator.xpath("//table[//label[text() = 'Time Interval:'] and contains(@class, 'x4-item-disabled')]");
+        public Locator disabledIntervalStartDate = Locator.xpath("//table[//label[text() = 'Interval Start Date:'] and contains(@class, 'x4-item-disabled')]");
     }
 
     public enum ChartType
@@ -462,5 +507,11 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         Box,
         Pie,
         Scatter
+    }
+
+    public enum TimeAxisType
+    {
+        Date,
+        Visit
     }
 }

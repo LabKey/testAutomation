@@ -68,7 +68,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_MV_1);
 
         log("Set Plot Title");
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
         lookAndFeelBoxPlot.setPlotTitle(CHART_TITLE)
                 .clickYAxisTab()
@@ -85,7 +85,7 @@ public class BoxPlotTest extends GenericChartsTest
         chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY);
         chartTypeDialog.clickApply();
 
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
         lookAndFeelBoxPlot.setXAxisLabel("TestXAxis")
                 .clickApply();
@@ -143,7 +143,7 @@ public class BoxPlotTest extends GenericChartsTest
         assertSVG(BOX_PLOT_DR_2);
 
         //Enable point click function for this box plot
-        waitForElement(Ext4Helper.Locators.ext4Button("Chart Layout").enabled()).click();
+        clickChartLayoutButton();
         lookAndFeelBoxPlot = new LookAndFeelBoxPlot(getDriver());
         lookAndFeelBoxPlot.clickDeveloperTab()
                 .clickDeveloperEnable()

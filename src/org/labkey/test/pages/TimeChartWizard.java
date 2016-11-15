@@ -18,6 +18,9 @@ package org.labkey.test.pages;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -33,21 +36,23 @@ public class TimeChartWizard
         _test = test;
     }
 
-    public void createNewChart()
+    public ChartTypeDialog createNewChart()
     {
         _test.goToManageViews();
         _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), "Time Chart");
-        _test.waitForElement(Locator.tagWithText("div", "To get started, choose a Measure:"));
+        return new ChartTypeDialog(_test.getDriver());
     }
 
-    public void chooseInitialMeasure(String queryName, String measure)
+    public ChartTypeDialog clickChartTypeButton()
     {
-        _test.clickButton("Choose a Measure", 0);
-        _test._extHelper.waitForExtDialog("Add Measure...");
-        _test._extHelper.waitForLoadingMaskToDisappear(5 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test._ext4Helper.clickGridRowText(measure, 0);
-        _test.clickButton("Select", 0);
-        _test.waitForElement(Locator.css("svg text").withText(queryName));
+        _test.clickButton("Chart Type", 0);
+        return new ChartTypeDialog(_test.getDriver());
+    }
+
+    public LookAndFeelTimeChart clickChartLayoutButton()
+    {
+        _test.clickButton("Chart Layout", 0);
+        return new LookAndFeelTimeChart(_test.getDriver());
     }
 
     public void waitForWarningMessage(String message)
@@ -55,23 +60,9 @@ public class TimeChartWizard
         _test.waitForElement(Locator.tagWithText("div", message));
     }
 
-    public void changeXAxisToVisitBased(String axisLabel, String newLabel)
-    {
-        _test.goToSvgAxisTab(axisLabel);
-        _test._ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        _test.assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
-        _test.assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
-        _test.assertElementPresent(Locator.xpath("//table[//label[text() = 'Range:'] and contains(@class, 'x4-item-disabled')]"));
-        _test.setFormElement(Locator.name("x-axis-label-textfield"), newLabel);
-        _test.waitForElementToDisappear(Locator.css(".x4-btn-disabled.revertxAxisLabel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        applyChanges();
-        _test.waitForElementToDisappear(Locator.css("svg text").containing(axisLabel));
-        _test.waitForElement(Locator.css("svg text").withText(newLabel));
-    }
-
     public void verifySvgChart(int expectedNumLines, @Nullable String[] legendItems)
     {
-        _test.waitForElements(Locator.css("div.x4-container svg path.line"), expectedNumLines);
+        _test.waitForElements(Locator.css("div.x4-container svg path.line"), expectedNumLines, WebDriverWrapper.WAIT_FOR_JAVASCRIPT * 6);
 
         if (legendItems != null)
         {
@@ -137,7 +128,7 @@ public class TimeChartWizard
         if (!expectReload)
         {
             _test.waitForElement(Locator.tagWithClass("div", "x4-window").containing("Report saved successfully."));
-            _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test._ext4Helper.waitForMaskToDisappear();
         }
         _test.waitFor(() -> _test.isTextPresent("Please select at least one") || // group/participant
                         _test.isTextPresent("No data found") ||
