@@ -126,10 +126,18 @@ public class TimeChartWizard
         applyChanges();
     }
 
+    public void reSaveReport()
+    {
+        saveReport(null, null, false);
+    }
+
     public void saveReport(String name, String description, boolean expectReload)
     {
         openSaveMenu();
-        _test.setFormElement(Locator.name("reportName"), name);
+
+        if (name != null)
+            _test.setFormElement(Locator.name("reportName"), name);
+        if (description != null)
         _test.setFormElement(Locator.name("reportDescription"), description);
 
         _test.clickAndWait(_test.findButton("Save", 1), expectReload ? BaseWebDriverTest.WAIT_FOR_PAGE : 0);
