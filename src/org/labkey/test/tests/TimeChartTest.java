@@ -37,14 +37,9 @@ public abstract class TimeChartTest extends ReportTest
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     public static final String TEST_DATA_API_PATH = "server/test/data/api";
 
-    protected static final String ADD_MEASURE_DIALOG = "Add Measure...";
-    protected static final String PARTICIPANTS = "Participants";
-    protected static final String PARTICIPANTS_GROUPS = "Participant Groups";
     protected static final String GROUP1_NAME = "Some Participants";
     protected static final String GROUP2_NAME = "Other Participants";
     protected static final String GROUP3_NAME = "Yet More Participants";
-    public static final String ONE_CHART_PER_PARTICIPANT = "One Chart Per Participant";
-    public static final String ONE_CHART_PER_MEASURE = "One Chart Per Measure/Dimension";
 
     protected static final String[] GROUP1_PTIDS = {"249318596", "249320107"};
     protected static final String[] GROUP2_PTIDS = {"249320127", "249320489"};
@@ -157,6 +152,7 @@ public abstract class TimeChartTest extends ReportTest
         _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
     }
 
+    // TODO to be removed after time chart wizard conversion complete
     protected void enterMeasuresPanel()
     {
         clickButton("Measures", 0);
@@ -183,6 +179,7 @@ public abstract class TimeChartTest extends ReportTest
                 "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
     }
 
+    // TODO to be removed after time chart wizard conversion complete
     protected void applyChanges()
     {
         clickButton("OK", 0);

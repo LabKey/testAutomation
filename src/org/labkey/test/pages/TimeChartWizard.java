@@ -57,7 +57,15 @@ public class TimeChartWizard
 
     public void waitForWarningMessage(String message)
     {
-        _test.waitForElement(Locator.tagWithText("div", message));
+        waitForWarningMessage(message, false);
+    }
+
+    public void waitForWarningMessage(String message, boolean partialTextMatch)
+    {
+        if (partialTextMatch)
+            _test.isTextPresent(message);
+        else
+            _test.waitForElement(Locator.tagWithText("div", message));
     }
 
     public void verifySvgChart(int expectedNumLines, @Nullable String[] legendItems)

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -234,9 +235,8 @@ public class TimeChartImportTest extends StudyBaseTest
             return;
 
         // verify that clicking the Export as Script button works
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
-        _extHelper.waitForExtDialog("Export Script");
-        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
+        String exportScript = getExportScript();
+        Assert.assertTrue(exportScript != null);
 
         // verify that there is a PDF export for each plot
         _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), true, "PDF");
@@ -272,11 +272,7 @@ public class TimeChartImportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText(info.getName()));
         waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());
 
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
-        _extHelper.waitForExtDialog("Export Script");
-        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
-        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
-
+        String exportScript = getExportScript();
         clickFolder(EXPORT_TEST_FOLDER);
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
@@ -285,6 +281,18 @@ public class TimeChartImportTest extends StudyBaseTest
         wikiHelper.saveWikiPage();
 
         verifyTimeChartInfo(EXPORTED_CHARTS.get(0), false);
+    }
+
+    private String getExportScript()
+    {
+        Locator dlg = Locator.xpath("//div").withClass("chart-wizard-dialog").notHidden().withDescendant(Locator.xpath("//div").withClass("title-panel").withDescendant(Locator.xpath("//div")).withText("Export script"));
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
+        waitFor(() -> isElementPresent(dlg),
+                "Ext Dialog with title '" + "Export script" + "' did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
+        String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
+
+        return exportScript;
     }
 
     @Test

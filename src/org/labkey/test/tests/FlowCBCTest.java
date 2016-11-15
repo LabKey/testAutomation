@@ -214,8 +214,10 @@ public class FlowCBCTest extends BaseFlowTest
         TimeChartWizard timeChartWizard = new TimeChartWizard(this);
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setYAxis("CD3+ Lymph").clickApply();
-        waitForElement(Locator.css("svg text").withText("CD3+ Lymph"));
-        timeChartWizard.verifySvgChart(100, null);
+        waitForElement(Locator.css("svg text").withText("mem naive CBCFlow")); // main title
+        assertElementPresent(Locator.css("svg text").withText("CD3+ Lymph")); // y-axis label
+        assertElementPresent(Locator.css("svg text").withText("Days Since Date")); // x-axis label
+        timeChartWizard.verifySvgChart(1, null);
         assertTextNotPresent("There are no demographic date options available in this study");
         timeChartWizard.saveReport("Flow Report", null, true);
     }
