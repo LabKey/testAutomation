@@ -21,7 +21,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
-import org.labkey.test.util.Ext4Helper.TextMatchTechnique;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -63,6 +62,11 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         return _driverWrapper;
     }
 
+    public interface ComboListMatcher
+    {
+        Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText);
+    }
+
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String... selections)
     {
@@ -70,7 +74,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(TextMatchTechnique matchTechnique, @LoggedParam String... selections)
+    public void selectComboBoxItem(ComboListMatcher matchTechnique, @LoggedParam String... selections)
     {
         openComboList();
 
@@ -108,30 +112,14 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         getDriverWrapper().waitForElement(comboListItem());
     }
 
-    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique, boolean clickAt)
+    public void selectItemFromOpenComboList(String itemText, ComboListMatcher matchTechnique, boolean clickAt)
     {
         selectItemFromOpenComboList(getDriverWrapper(), itemText, matchTechnique, clickAt);
     }
 
-    public static void selectItemFromOpenComboList(WebDriverWrapper driverWrapper, String itemText, TextMatchTechnique matchTechnique, boolean clickAt)
+    public static void selectItemFromOpenComboList(WebDriverWrapper driverWrapper, String itemText, ComboListMatcher matchTechnique, boolean clickAt)
     {
-        Locator.XPathLocator listItem = comboListItem();
-
-        switch (matchTechnique)
-        {
-            case EXACT:
-                listItem = listItem.withText(itemText);
-                break;
-            case CONTAINS:
-                listItem = listItem.containing(itemText);
-                break;
-            case STARTS_WITH:
-                listItem = listItem.startsWith(itemText);
-                break;
-            case REGEX:
-                listItem = listItem.withTextMatching(itemText);
-                break;
-        }
+        Locator.XPathLocator listItem = matchTechnique.getLocator(comboListItem(), itemText);
 
         WebElement element = listItem.waitForElement(driverWrapper.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
@@ -145,12 +133,12 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         }
     }
 
-    public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
+    public void selectItemFromOpenComboList(String itemText, ComboListMatcher matchTechnique)
     {
-        selectItemFromOpenComboList(itemText, matchTechnique,false);
+        selectItemFromOpenComboList(itemText, matchTechnique, false);
     }
 
-    public static void selectItemFromOpenComboList(WebDriverWrapper driverWrapper, String itemText, TextMatchTechnique matchTechnique)
+    public static void selectItemFromOpenComboList(WebDriverWrapper driverWrapper, String itemText, ComboListMatcher matchTechnique)
     {
         selectItemFromOpenComboList(driverWrapper, itemText, matchTechnique,false);
     }

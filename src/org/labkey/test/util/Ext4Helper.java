@@ -19,6 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
@@ -63,8 +64,49 @@ public class Ext4Helper
         return _cssPrefix;
     }
 
-    public static enum TextMatchTechnique
-    {EXACT, CONTAINS, STARTS_WITH, REGEX}
+    public enum TextMatchTechnique implements ComboBox.ComboListMatcher
+    {
+        EXACT
+                {
+                    @Override
+                    public Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText)
+                    {
+                        return comboListItem.withText(itemText);
+                    }
+                },
+        LEADING_NBSP
+                {
+                    @Override
+                    public Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText)
+                    {
+                        return comboListItem.withText(Locator.NBSP + itemText);
+                    }
+                },
+        CONTAINS
+                {
+                    @Override
+                    public Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText)
+                    {
+                        return comboListItem.containing(itemText);
+                    }
+                },
+        STARTS_WITH
+                {
+                    @Override
+                    public Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText)
+                    {
+                        return comboListItem.startsWith(itemText);
+                    }
+                },
+        REGEX
+                {
+                    @Override
+                    public Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText)
+                    {
+                        return comboListItem.withTextMatching(itemText);
+                    }
+                }
+    }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String... selections)
@@ -108,23 +150,7 @@ public class Ext4Helper
 
     public void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique, boolean clickAt)
     {
-        Locator.XPathLocator listItem = Locators.comboListItem();
-
-        switch (matchTechnique)
-        {
-            case EXACT:
-                listItem = listItem.withText(itemText);
-                break;
-            case CONTAINS:
-                listItem = listItem.containing(itemText);
-                break;
-            case STARTS_WITH:
-                listItem = listItem.startsWith(itemText);
-                break;
-            case REGEX:
-                listItem = listItem.withTextMatching(itemText);
-                break;
-        }
+        Locator.XPathLocator listItem = matchTechnique.getLocator(Locators.comboListItem(), itemText);
 
         WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
