@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * WebElement wrapper that waits for an attempt to interact with the WebElement before actually finding it
  */
-public class LazyWebElement extends WebElementWrapper
+public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
 {
     protected WebElement _wrappedElement;
     private Locator _locator;
@@ -38,10 +38,10 @@ public class LazyWebElement extends WebElementWrapper
         _searchContext = searchContext;
     }
 
-    public LazyWebElement withTimeout(long ms)
+    public final T withTimeout(long ms)
     {
         _waitMs = ms;
-        return this;
+        return (T)this;
     }
 
     protected WebElement findWrappedElement()

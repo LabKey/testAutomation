@@ -22,7 +22,7 @@ import org.openqa.selenium.WebElement;
 /**
  * Re-find WebElement with every interaction
  */
-public class EphemeralWebElement extends LazyWebElement
+public class EphemeralWebElement extends LazyWebElement<EphemeralWebElement>
 {
     public EphemeralWebElement(Locator locator, SearchContext searchContext)
     {

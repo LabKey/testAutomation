@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.assertFalse;
 
-public class RefindingWebElement extends LazyWebElement
+public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
 {
     private List<Consumer<WebElement>> _listeners = new ArrayList<>();
 
