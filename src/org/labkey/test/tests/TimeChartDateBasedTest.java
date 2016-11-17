@@ -141,12 +141,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         timeChartWizard.verifySvgChart(10, null);
         assertElementPresent(Locator.css("svg text").withText("HIV Test Results, Lab Results"));
         assertElementPresent(Locator.css("svg text").withText(VL_MEASURE_LABEL + ", " + CD4_MEASURE_LABEL));
-        enterMeasuresPanel();
-        waitAndClick(Locator.tagWithClass("td", "x4-grid-cell").append(Locator.tagWithText("div", "CD4+ (cells/mm3) from Lab Results")));
-        _ext4Helper.selectComboBoxItem("Draw y-axis on:", "Right");
-        applyChanges();
-        waitForElement(Locator.css("svg text").withText(VL_MEASURE_LABEL));
-        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL));
+        // move second measure to right side of chart
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
+        chartTypeDialog.setYAxisSide(1, ChartTypeDialog.YAxisSide.Right).clickApply();
+        waitForElement(Locator.css("svg text").withText(VL_MEASURE_LABEL)); // left label
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL)); // right label
         assertElementNotPresent(Locator.css("svg text").withText(VL_MEASURE_LABEL + ", " + CD4_MEASURE_LABEL));
 
         clickButton("Chart Layout", 0);
@@ -653,10 +652,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         chartTypeDialog.setYAxis("Hemoglobin", true).clickApply();
         timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0]+" Hemoglobin", GROUP2_PTIDS[1]+" Hemoglobin"});
 
-        enterMeasuresPanel();
-        waitAndClick(Locator.tagWithClass("td", "x4-grid-cell").append(Locator.tagWithText("div", "Hemoglobin from Lab Results")));
-        _ext4Helper.selectComboBoxItem("Draw y-axis on:", "Right");
-        applyChanges();
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
+        chartTypeDialog.setYAxisSide(2, ChartTypeDialog.YAxisSide.Right).clickApply();
         timeChartWizard.verifySvgChart(6, new String[]{GROUP2_PTIDS[0]+" Hemoglobin", GROUP2_PTIDS[1]+" Hemoglobin"});
         waitForElement(Locator.css("svg text").withText("Hemoglobin")); // y-axis right label
         waitForElement(Locator.css("svg text").withText("12.0")); // y-axis min range
@@ -774,10 +771,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.css("svg text").withText("Days Since Start Date"));
         assertElementPresent(Locator.css("svg text").withText("Pulse"));
 
-        enterMeasuresPanel();
-        waitForText("This chart data is filtered");
-        assertTextPresent("(ParticipantId =");
-        clickButton("Cancel", 0);
+        waitAndClick(Locator.xpath("//span[contains(@class, 'x4-header-text') and text()='Base Query Filter']"));
+        assertElementPresent(Locator.tagContainingText("li", "ParticipantId ="));
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(10));
 

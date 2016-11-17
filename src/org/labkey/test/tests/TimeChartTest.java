@@ -152,13 +152,6 @@ public abstract class TimeChartTest extends ReportTest
         _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
     }
 
-    // TODO to be removed after time chart wizard conversion complete
-    protected void enterMeasuresPanel()
-    {
-        clickButton("Measures", 0);
-        waitForText("Divide data into Series");
-    }
-
     protected void openSaveMenu()
     {
         clickButtonByIndex("Save", 0, 0);
@@ -177,13 +170,6 @@ public abstract class TimeChartTest extends ReportTest
                        isTextPresent("No data found") ||
                        isElementPresent(Locator.css("svg")),
                 "Time chart failed to appear after saving", WAIT_FOR_JAVASCRIPT);
-    }
-
-    // TODO to be removed after time chart wizard conversion complete
-    protected void applyChanges()
-    {
-        clickButton("OK", 0);
-        _ext4Helper.waitForMaskToDisappear();
     }
 
     protected void waitForCharts(int count)

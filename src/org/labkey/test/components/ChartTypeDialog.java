@@ -147,6 +147,31 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
+    public ChartTypeDialog clickYAxisMeasure(String columnName)
+    {
+        getWrapper().waitAndClick(elementCache().Y_FIELD_TEXT.withText(columnName));
+        return this;
+    }
+
+    public ChartTypeDialog setYAxisSide(int measureIndex, YAxisSide side)
+    {
+        getWrapper().mouseOver(elementCache().yAxis());
+        switch(side)
+        {
+            case Left:
+                final WebElement leftArrow = elementCache().Y_FIELD_SIDE_LEFT.index(measureIndex).findElement(this);
+                leftArrow.click();
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(leftArrow));
+                break;
+            case Right:
+                final WebElement rightArrow = elementCache().Y_FIELD_SIDE_RIGHT.index(measureIndex).findElement(this);
+                rightArrow.click();
+                getWrapper().shortWait().until(ExpectedConditions.stalenessOf(rightArrow));
+                break;
+        }
+        return this;
+    }
+
     public ChartTypeDialog setCategories(String columnName)
     {
         setCategories(columnName, false);
@@ -246,7 +271,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
             return target.isDisplayed();
         }, "Target element is not displayed", 5000);
         target.click();
-        getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[@class='field-selection-display']")), columnName);
+        getWrapper().waitForFormElementToNotEqual(target.findElement(By.xpath("//div[contains(@class, 'field-selection-text')]")), columnName);
         return this;
     }
 
@@ -445,9 +470,13 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public final String SHAPE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]";
 
         public final String FIELD_AREA = "/following-sibling::div[contains(@class, 'field-area ')]";
-        public final String FIELD_DISPLAY = "//div[@class='field-selection-display']";
+        public final String FIELD_DISPLAY = "//div[contains(@class, 'field-selection-display')]";
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
+
+        public Locator Y_FIELD_TEXT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//div[contains(@class, 'field-selection-text')]");
+        public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-left')]");
+        public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-right')]");
 
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
 
@@ -513,5 +542,11 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     {
         Date,
         Visit
+    }
+
+    public enum YAxisSide
+    {
+        Left,
+        Right
     }
 }
