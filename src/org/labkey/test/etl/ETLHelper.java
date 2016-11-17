@@ -406,7 +406,7 @@ public class ETLHelper
     {
         _test.log("updating source row " + row);
         _test.clickTab("Portal");
-        _test.click(new Locator.LinkLocator(StringUtils.capitalize("source")));
+        _test.clickAndWait(Locator.linkWithText("Source"));
         _test.clickAndWait(Locator.linkWithText("edit").index(row));
         _test.waitForElement(Locator.name("quf_id"));
         if (null != id)
