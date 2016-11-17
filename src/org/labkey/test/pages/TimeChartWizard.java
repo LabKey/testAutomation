@@ -39,7 +39,7 @@ public class TimeChartWizard
     public ChartTypeDialog createNewChart()
     {
         _test.goToManageViews();
-        _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), "Time Chart");
+        _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Time Chart"));
         return new ChartTypeDialog(_test.getDriver());
     }
 

@@ -119,14 +119,14 @@ public abstract class ReportTest extends StudyBaseTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
     }
 
-    protected void clickAddChart(ChartTypes chartType)
+    protected void clickAddChart()
     {
-        clickAddChart(chartType.getMenuText());
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"));
     }
 
-    protected void clickAddChart(String reportName)
+    protected void clickAddTimeChart()
     {
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"), reportName);
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Time Chart"));
     }
 
     public static enum ChartTypes

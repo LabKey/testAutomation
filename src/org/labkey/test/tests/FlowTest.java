@@ -320,13 +320,13 @@ public class FlowTest extends BaseFlowTest
         List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
         List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
-        fcsAnalysisTable.clickHeaderMenu("Charts", "Create Box Plot");
+        fcsAnalysisTable.clickHeaderMenu("Charts", "Create Chart");
 
         // The new plot dialog shows all values from the grid that could be used in any aspect of a plot. So need to add these two values.
         expectedMeasures.add("Compensation Matrix");
         expectedMeasures.add("Run");
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         List<String> availableMeasures =  chartTypeDialog.getColumnList();
         assertEquals("Wrong measures in picker", new HashSet<>(expectedMeasures), new HashSet<>(availableMeasures));
         log("Validate that the values 'Compensation Matrix' and 'Run' cannot be assigned to the Y axis.");

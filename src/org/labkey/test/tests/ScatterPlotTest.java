@@ -93,13 +93,14 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart("Scatter Plot");
+        clickAddChart();
 
         ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectQuery(QUERY_APX_1);
         chartTypeDialog = queryDialog.clickOk();
 
-        chartTypeDialog.setYAxis(MEASURE_1_WEIGHT)
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis(MEASURE_1_WEIGHT)
                 .setXAxis(MEASURE_4_PULSE)
                 .clickApply();
 
@@ -163,10 +164,11 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.clickHeaderMenu("Charts", "Create Scatter Plot");
+        datasetTable.clickHeaderMenu("Charts", "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("1. Weight")
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis("1. Weight")
                 .setXAxis("4. Pulse")
                 .clickApply();
 
@@ -625,11 +627,14 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.clickHeaderMenu("Charts", "Create Scatter Plot");
+        drt.clickHeaderMenu("Charts", "Create Chart");
 
         // create scatter lot with point geom
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("1a. ALT (SGPT)").setXAxis("2a. Creatinine").clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis("1a. ALT (SGPT)")
+                .setXAxis("2a. Creatinine")
+                .clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
         validateBinWarningMsg(false);
         validatePointsAndBins(10, 0, 0);

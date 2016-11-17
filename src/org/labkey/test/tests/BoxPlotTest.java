@@ -55,14 +55,15 @@ public class BoxPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart("Box Plot");
+        clickAddChart();
 
         ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectQuery("RCF-1 (RCF-1: Reactogenicity-Day 2)");
         chartTypeDialog = queryDialog.clickOk();
 
-        chartTypeDialog.setYAxis("4c.Induration 1st measure");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)
+                .setYAxis("4c.Induration 1st measure")
+                .clickApply();
 
         //Verify box plot
         assertSVG(BOX_PLOT_MV_1);
@@ -125,11 +126,12 @@ public class BoxPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
-        datasetTable.clickHeaderMenu("Charts", "Create Box Plot");
+        datasetTable.clickHeaderMenu("Charts", "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("2.Body temperature");
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)
+                .setYAxis("2.Body temperature")
+                .clickApply();
 
         //Verify box plot
         assertSVG(BOX_PLOT_DR_1);

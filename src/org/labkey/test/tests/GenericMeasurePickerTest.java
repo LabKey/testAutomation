@@ -105,10 +105,10 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.clickHeaderMenu("Charts", "Create Box Plot");
+        datasetTable.clickHeaderMenu("Charts", "Create Chart");
 
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         assertFalse("List contains value '" + UNTAGGED_MEASURE + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
         assertFalse("List contains value '" + UNTAGGED_DIMENSION + "', it should not be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
         chartTypeDialog.setYAxis(TAGGED_MEASURE);
@@ -142,10 +142,10 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.clickHeaderMenu("Charts", "Create Box Plot");
+        datasetTable.clickHeaderMenu("Charts", "Create Chart");
 
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         assertTrue("List does not contains value '" + UNTAGGED_MEASURE + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_MEASURE));
         assertTrue("List does not contains value '" + UNTAGGED_DIMENSION + "', it should be there.", chartTypeDialog.getColumnList().contains(UNTAGGED_DIMENSION));
         chartTypeDialog.setYAxis(TAGGED_MEASURE);

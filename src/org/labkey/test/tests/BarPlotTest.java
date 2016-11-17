@@ -78,7 +78,7 @@ public class BarPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart(ChartTypes.BAR);
+        clickAddChart();
 
         queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectSchema("study")
@@ -86,6 +86,7 @@ public class BarPlotTest extends GenericChartsTest
         chartTypeDialog = queryDialog.clickOk();
 
         log("Start simply by setting just an X category.");
+        // note: this should default to a Bar plot when no render type provided
         chartTypeDialog.setXCategory(PREG_TEST_RESULTS)
                 .clickApply();
 
@@ -120,7 +121,7 @@ public class BarPlotTest extends GenericChartsTest
         shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css("svg")));
 
         log("Validate that the changes made are reflected in the bar plot.");
-        Assert.assertEquals("Plot widht not as expected.", "750", getAttribute(Locator.css("svg"), "width"));
+        Assert.assertEquals("Plot width not as expected.", "750", getAttribute(Locator.css("svg"), "width"));
         Assert.assertEquals("Plot height not as expected.", "750", getAttribute(Locator.css("svg"), "height"));
         Assert.assertEquals("Fill color not as expected.", "#" + COLOR_RED, getAttribute(Locator.css("svg a.bar-individual rect.bar-rect"), "fill"));
         Assert.assertEquals("fill-opacity not as expected.", "0.5", getAttribute(Locator.css("svg a.bar-individual rect.bar-rect"), "fill-opacity"));

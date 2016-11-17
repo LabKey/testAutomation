@@ -72,7 +72,7 @@ public class PieChartTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart(ChartTypes.PIE);
+        clickAddChart();
 
         queryDialog = new ChartQueryDialog(getDriver());
         chartTypeDialog = queryDialog.selectSchema("study")
@@ -80,8 +80,9 @@ public class PieChartTest extends GenericChartsTest
                 .clickOk();
 
         log("Set the minimal attributes necessary to create a pie chart.");
-        chartTypeDialog.setCategories(PIE_CHART_CATEGORY);
-        chartTypeDialog.clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Pie)
+                .setCategories(PIE_CHART_CATEGORY)
+                .clickApply();
 
         sleep(3000);  // TODO Is there a better trigger?
 

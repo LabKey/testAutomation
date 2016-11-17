@@ -75,7 +75,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         log("Test changing from date-based to visit-based time chart.");
         clickFolder(VISIT_FOLDER_NAME);
         goToManageViews();
-        clickAddChart("Time Chart");
+        clickAddTimeChart();
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.selectStudyQuery("APX-1: Abbreviated Physical Exam")
                 .setYAxis("1. Weight")

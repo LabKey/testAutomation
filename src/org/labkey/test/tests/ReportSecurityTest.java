@@ -103,7 +103,7 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        _extHelper.clickMenuButton("Charts", "Create Chart View");
+        _extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText(Locator.name("columnsX"), "1. Weight");
         selectOptionByText(Locator.name("columnsY"), "4. Pulse");
@@ -119,7 +119,7 @@ public class ReportSecurityTest extends ReportTest
 
         _extHelper.clickMenuButton("Grid Views", "default");
         waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickMenuButton("Charts", "Create Chart View");
+        _extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart

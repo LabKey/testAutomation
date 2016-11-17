@@ -125,7 +125,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToProjectHome();
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart("Time Chart");
+        clickAddTimeChart();
         timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.selectStudyQuery("HIV Test Results")
@@ -179,7 +179,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @LogMethod public void createChartTest()
     {
         goToManageViews();
-        clickAddChart("Time Chart");
+        clickAddTimeChart();
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.selectStudyQuery("NAbAssay");
 
@@ -470,7 +470,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart("Time Chart");
+        clickAddTimeChart();
         timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.selectStudyQuery("Lab Results")
@@ -685,7 +685,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddChart("Time Chart");
+        clickAddTimeChart();
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.selectStudyQuery("Lab Results")
                 .setYAxis(CD4_MEASURE_LABEL)
