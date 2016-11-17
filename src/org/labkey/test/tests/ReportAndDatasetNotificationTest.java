@@ -23,6 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -179,16 +180,14 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         // make modifications
         openReport(TIMECHART_NAME);
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
         waitForElement(Locator.css("svg"));
         clickButton("Edit");
-        waitForElement(Locator.css("svg"));
-        clickButton("Chart Layout", 0);
-        LookAndFeelTimeChart lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
-        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants);
-        doAndWaitForElementToRefresh(() -> lookAndFeelDialog.clickApply(), Locator.css("svg"), shortWait());
-        clickButtonByIndex("Save", 0, 0);
-        waitForElement(Ext4Helper.Locators.window("Save"));
-        saveReport(false);
+        timeChartWizard.verifySvgChart(2, null);
+        LookAndFeelTimeChart lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
+        lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants).clickApply();
+        timeChartWizard.verifySvgChart(5, null);
+        timeChartWizard.reSaveReport();
 
         openReport(R_NAME);
         waitAndClick(Ext4Helper.Locators.tab("Source"));
@@ -201,8 +200,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         clickButton("Edit");
         waitForElement(Locator.css("svg"));
         clickButton("Chart Type", 0);
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         assertEquals("Scatter", chartTypeDialog.getChartTypeTitle());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
         doAndWaitForElementToRefresh(() -> chartTypeDialog.clickApply(), Locator.css("svg"), shortWait());
