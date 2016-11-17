@@ -58,7 +58,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -1553,6 +1552,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
         assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
+    }
+
+    public String getTextInTable(int row, int column)
+    {
+        return getDriver().findElement(By.xpath("//table/tbody/tr[" + row + "]/td[" + column + "]")).getText();
+    }
+
+    public void assertTableRowOnPage(String textToCheck, int row, int column)
+    {
+        assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInTable(row, column));
     }
 
     /**
