@@ -455,6 +455,7 @@ src/org/labkey/test/components/ext4/ComboBox.java -text
 src/org/labkey/test/components/ext4/FormItemFinder.java -text
 src/org/labkey/test/components/ext4/RadioButton.java -text
 src/org/labkey/test/components/ext4/Window.java -text
+src/org/labkey/test/components/ext4/widgets/SearchPanel.java -text
 src/org/labkey/test/components/html/Checkbox.java -text
 src/org/labkey/test/components/html/EnumSelect.java -text
 src/org/labkey/test/components/html/FormItem.java -text
