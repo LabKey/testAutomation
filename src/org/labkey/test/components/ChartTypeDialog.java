@@ -475,8 +475,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
 
         public Locator Y_FIELD_TEXT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//div[contains(@class, 'field-selection-text')]");
-        public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-left')]");
-        public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-right')]");
+        public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-left')]");
+        public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-right')]");
 
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
 
