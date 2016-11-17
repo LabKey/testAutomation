@@ -23,6 +23,7 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -103,8 +104,9 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         try
         {
             WebDriverWrapper.waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
+            getDriverWrapper().waitForElement(comboListItem());
         }
-        catch (TimeoutException retry)
+        catch (TimeoutException | NoSuchElementException retry)
         {
             elementCache().arrowTrigger.click(); // try again if combo-box doesn't open
         }
