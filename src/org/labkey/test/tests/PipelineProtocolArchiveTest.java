@@ -3,12 +3,13 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineAnalysisHelper;
@@ -31,23 +32,17 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_PIPELINE = "pipeline";
     public static final String COLUMN_ARCHIVED = "Archived";
-    public static final int INDEX_ARCHIVE_BUTTON = 1;
-    public static final int INDEX_UNARCHIVE_BUTTON = 2;
-    PortalHelper _portalHelper = new PortalHelper(this);
+    public static final String CHECKMARK = "\u2714";
 
     private static final String SIMPLETEST_MODULE = "simpletest";
     private static final String PIPELINE_MODULE = "Pipeline";
-    private static final String DATA_INTEGRATION_MODULE = "DataIntegration";
     private static final String PIPELINE_TEST_MODULE = "pipelinetest";
-    private static final String PIPELINE = "pipeline";
-    //Files in /sampledata/pipeline
-    private static final String SAMPLE_INPUT_FILE_NAME1 = "sample1.testIn.tsv";
-    private static final String SAMPLE_INPUT_FILE_NAME2 = "sample2.testIn.tsv";
-    private static final String SAMPLE_INPUT_FILE_NAME3 = "sample3.testIn.tsv";
-    private static final String SAMPLE_INPUT_FILE_NAME4 = "sample4.testIn.tsv";
-    private static final String SAMPLE_INPUT_FILE_NAME5 = "sample5.testIn.tsv";
 
-
+    private static final File SAMPLE_INPUT_FILE1 = TestFileUtils.getSampleData("pipeline/sample1.testIn.tsv");
+    private static final File SAMPLE_INPUT_FILE2 = TestFileUtils.getSampleData("pipeline/sample2.testIn.tsv");
+    private static final File SAMPLE_INPUT_FILE3 = TestFileUtils.getSampleData("pipeline/sample3.testIn.tsv");
+    private static final File SAMPLE_INPUT_FILE4 = TestFileUtils.getSampleData("pipeline/sample4.testIn.tsv");
+    private static final File SAMPLE_INPUT_FILE5 = TestFileUtils.getSampleData("pipeline/sample5.testIn.tsv");
 
     @Nullable
     protected String getProjectName()
@@ -55,17 +50,24 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         return "Protocol Archive Test";
     }
 
-    @Before
-    public void doSetup() throws Exception
+    @BeforeClass
+    public static void setupProject()
+    {
+        PipelineProtocolArchiveTest init = (PipelineProtocolArchiveTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    public void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        _containerHelper.enableModules(Arrays.asList(DATA_INTEGRATION_MODULE, SIMPLETEST_MODULE,PIPELINE_TEST_MODULE, PIPELINE_MODULE));
+        _containerHelper.enableModules(Arrays.asList(SIMPLETEST_MODULE, PIPELINE_TEST_MODULE, PIPELINE_MODULE));
 
+        PortalHelper _portalHelper = new PortalHelper(this);
         _portalHelper.addWebPart("Data Pipeline");
         _portalHelper.addWebPart(WEB_PART_NAME_PIPELINE_PROTOCOLS);
-
     }
-        @Test
+
+    @Test
     public void  testArchiveProtocol() throws Exception
     {
         String PROTOCOL_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -79,7 +81,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 
         assertTextPresent("No data to show.");
 
-        runPipeline(PIPELINE, SAMPLE_INPUT_FILE_NAME1, PROTOCOL_NAME_B_R, PROTOCOL_DEF, false);
+        runPipeline(SAMPLE_INPUT_FILE1, PROTOCOL_NAME_B_R, PROTOCOL_DEF, false);
 
         clickProject(getProjectName());
 
@@ -91,7 +93,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         Assert.assertEquals("Wrong archived indication", "",protocol1_Archived);
 
 
-        runPipeline(PIPELINE, SAMPLE_INPUT_FILE_NAME2, PROTOCOL_NAME_A_M, PROTOCOL_DEF, false);
+        runPipeline(SAMPLE_INPUT_FILE2, PROTOCOL_NAME_A_M, PROTOCOL_DEF, false);
 
         clickProject(getProjectName());
 
@@ -105,55 +107,61 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
                 PROTOCOL_NAME_B_R,
                 PROTOCOL_NAME_A_M));
 
-        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE_NAME3);
+        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE3);
 
         clickProject(getProjectName());
         protocols.checkCheckbox(1);
-        doAndWaitForPageToLoad(()-> clickArchiveAndAcceptAlert(protocols));
+        archiveSelected(protocols);
         protocol2_Archived = protocols.getDataAsText(1,COLUMN_ARCHIVED);
-        Assert.assertNotEquals("Wrong archived indication", "",protocol2_Archived);
+        Assert.assertEquals("Wrong archived indication", CHECKMARK, protocol2_Archived);
 
         expectedOptions.remove(2);
 
-        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE_NAME4);
+        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE4);
 
         clickProject(getProjectName());
         protocols.checkCheckbox(1);
-        doAndWaitForPageToLoad(()-> clickUnarchiveAndAcceptAlert(protocols));
+        unarchiveSelected(protocols);
         protocol2_Archived = protocols.getDataAsText(1,COLUMN_ARCHIVED);
         Assert.assertEquals("Wrong archived indication", "",protocol2_Archived);
 
         expectedOptions.add(2,PROTOCOL_NAME_A_M);
 
-        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE_NAME5);
+        confirmProtocolSelectList(expectedOptions, SAMPLE_INPUT_FILE5);
 
     }
 
-    private void confirmProtocolSelectList(List<String> expectedOptions, String fileName)
+    private void confirmProtocolSelectList(List<String> expectedOptions, File file)
     {
         Locator.IdLocator protocolSelect = Locator.id("protocolSelect");
-        prepareToRunPipeline(PIPELINE, fileName);
+        prepareToRunPipeline(file);
 
         waitForElement(protocolSelect);
         List<String> protocolOptions = getSelectOptions(protocolSelect);
         Assert.assertEquals("Expected protocols " , expectedOptions, protocolOptions);
     }
 
-    private void clickArchiveAndAcceptAlert(DataRegionTable protocols)
+    private void archiveSelected(DataRegionTable protocols)
     {
-        protocols.getHeaderButtons().get(INDEX_ARCHIVE_BUTTON).click();
-        assertAlert("Are you sure you want to archive the selected protocol?");
+        doAndWaitForPageToLoad(()->
+        {
+            protocols.clickHeaderButtonByText("archive");
+            assertAlert("Are you sure you want to archive the selected protocol?");
+        });
     }
 
-    private void clickUnarchiveAndAcceptAlert(DataRegionTable protocols)
+    private void unarchiveSelected(DataRegionTable protocols)
     {
-        protocols.getHeaderButtons().get(INDEX_UNARCHIVE_BUTTON).click();
-        assertAlert("Are you sure you want to unarchive the selected protocol?");
+        doAndWaitForPageToLoad(()->
+        {
+            protocols.clickHeaderButtonByText("unarchive");
+            assertAlert("Are you sure you want to unarchive the selected protocol?");
+        });
     }
 
-    protected void runPipeline(@Nullable String dir, @NotNull String fileName, @NotNull String protocolName, @Nullable String protocolDef, boolean expectError)
+    protected void runPipeline(@NotNull File file, @NotNull String protocolName, @Nullable String protocolDef, boolean expectError)
     {
-        PipelineAnalysisHelper _pipelineHelper = prepareToRunPipeline(dir, fileName);
+        PipelineAnalysisHelper _pipelineHelper = prepareToRunPipeline(file);
 
         _pipelineHelper.runProtocol(protocolName, protocolDef, false);
 
@@ -164,16 +172,13 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     }
 
     @NotNull
-    private PipelineAnalysisHelper prepareToRunPipeline(@Nullable String dir, @NotNull String fileName)
+    private PipelineAnalysisHelper prepareToRunPipeline(File testFile)
     {
-        goToProjectHome();
-        PipelineAnalysisHelper _pipelineHelper = new PipelineAnalysisHelper(this);
         goToModule("Pipeline"); // this seems more robust than using the button on the home page.
         clickButton("Process and Import Data");
-        File testFile = null == dir ? TestFileUtils.getSampleData(fileName) : new File(TestFileUtils.getSampleData(dir), fileName);
         _fileBrowserHelper.uploadFile(testFile);
-        _fileBrowserHelper.importFile(fileName, getClientPipelineLabel());
-        return _pipelineHelper;
+        _fileBrowserHelper.importFile(testFile.getName(), getClientPipelineLabel());
+        return new PipelineAnalysisHelper(this);
     }
 
     protected String getClientPipelineLabel()
@@ -181,10 +186,15 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         return "Simpletest tail";
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override
     public List<String> getAssociatedModules()
     {
-        return null;
+        return Arrays.asList(PIPELINE_MODULE);
     }
 }
