@@ -238,7 +238,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
                     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 
-                    String browserPath = System.getProperty("selenium.browser.path", "");
+                    String browserPath = System.getProperty("selenium.firefox.binary", "");
                     if (browserPath.length() > 0)
                     {
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));

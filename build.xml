@@ -156,6 +156,9 @@
         <echo message="Randomize test order."/>
         <echo message="    -DshuffleTests=true"/>
         <echo message=""/>
+        <echo message="Override default browser. Firefox or Chrome."/>
+        <echo message="    -Dselenium.browser={browser}"/>
+        <echo message=""/>
         <echo message="Enumerate tests from a specific package or packages (comma-separated). Default = org.labkey.test"/>
         <echo message="    -Dtest.packages=&quot;org.labkey.test, com.custom.moldule.test&quot;"/>
         <echo message="Enumerate tests from a specific package or packages (comma-separated), in addition to those in 'test.packages'"/>
@@ -581,7 +584,7 @@
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
             <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
-            <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
+            <sysproperty key="selenium.firefox.binary" value="${sysprop.selenium.firefox.binary}"/>
             <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
@@ -940,9 +943,14 @@
             <isset property="selenium.debug.port"/>
         </condition>
 
-        <!-- Set property sysprop.selenium.browser.path -->
-        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}" else="${default.selenium.browser.path}">
+        <!-- Backward compatibility: Set property sysprop.selenium.firefox.binary -->
+        <condition property="selenium.firefox.binary">
             <isset property="selenium.browser.path"/>
+        </condition>
+
+        <!-- Set property sysprop.selenium.firefox.binary -->
+        <condition property="sysprop.selenium.firefox.binary" value="${selenium.firefox.binary}" else="${default.selenium.firefox.binary}">
+            <isset property="selenium.firefox.binary"/>
         </condition>
 
         <!-- Set property sysprop.shuffleTests: true or false -->
@@ -1128,7 +1136,7 @@
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
             <sysproperty key="close.on.fail" value="${sysprop.close.on.fail}"/>
             <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
-            <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
+            <sysproperty key="selenium.firefox.binary" value="${sysprop.selenium.firefox.binary}"/>
             <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
