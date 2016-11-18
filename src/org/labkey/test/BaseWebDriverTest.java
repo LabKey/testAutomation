@@ -2448,6 +2448,67 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(Locator.tagWithText("td", label));
     }
 
+    Locator.XPathLocator EXPORT_ICON = Locator.tagWithClass("div", "export-icon");
+    Locator.XPathLocator EXPORT_SCRIPT_ICON = Locator.tagWithClass("i", "fa-file-code-o");
+    Locator.XPathLocator EXPORT_PNG_ICON = Locator.tagWithClass("i", "fa-file-image-o");
+    Locator.XPathLocator EXPORT_PDF_ICON = Locator.tagWithClass("i", "fa-file-pdf-o");
+
+    public int getExportScriptIconCount(String chartParentCls)
+    {
+        Locator exportIconLoc = Locator.tagWithClass("div", chartParentCls).append(EXPORT_ICON).append(EXPORT_SCRIPT_ICON);
+        return exportIconLoc.findElements(getDriver()).size();
+    }
+
+    public void clickExportScriptIcon(String chartParentCls, int chartIndex)
+    {
+        Locator.XPathLocator chartLoc = Locator.tagWithClass("div", chartParentCls).index(chartIndex);
+        Locator exportIconLoc = chartLoc.append(EXPORT_ICON).append(EXPORT_SCRIPT_ICON);
+        WebElement exportIcon = exportIconLoc.findElement(getDriver());
+
+        String exportDialogTitle = "Export as script";
+        Locator exportDialog = Locator.tagWithClass("div", "chart-wizard-dialog").notHidden()
+                .withDescendant(Locator.tagWithClass("div", "title-panel"))
+                .withDescendant(Locator.tagWithText("div", exportDialogTitle));
+
+        mouseOver(chartLoc); // mouse over to make sure icon is visible
+        exportIcon.click();
+        waitFor(() -> isElementPresent(exportDialog),
+                "Ext4 Dialog with title '" + exportDialogTitle + "' did not appear after " + WAIT_FOR_JAVASCRIPT + "ms",
+                WAIT_FOR_JAVASCRIPT
+        );
+    }
+
+    public int getExportPNGIconCount(String chartParentCls)
+    {
+        Locator exportIconLoc = Locator.tagWithClass("div", chartParentCls).append(EXPORT_ICON).append(EXPORT_PNG_ICON);
+        return exportIconLoc.findElements(getDriver()).size();
+    }
+
+    public void clickExportPNGIcon(String chartParentCls, int chartIndex)
+    {
+        clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PNG_ICON);
+    }
+
+    public int getExportPDFIconCount(String chartParentCls)
+    {
+        Locator exportIconLoc = Locator.tagWithClass("div", chartParentCls).append(EXPORT_ICON).append(EXPORT_PDF_ICON);
+        return exportIconLoc.findElements(getDriver()).size();
+    }
+
+    public void clickExportPDFIcon(String chartParentCls, int chartIndex)
+    {
+        clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PDF_ICON);
+    }
+
+    private void clickExportImageIcon(String chartParentCls, int chartIndex, Locator.XPathLocator imageLoc)
+    {
+        Locator.XPathLocator chartLoc = Locator.tagWithClass("div", chartParentCls).index(chartIndex);
+        Locator iconLoc = chartLoc.append(EXPORT_ICON).append(imageLoc);
+        WebElement exportIcon = iconLoc.findElement(getDriver());
+        mouseOver(chartLoc); // mouse over to make sure icon is visible
+        doAndWaitForDownload(exportIcon::click, 1);
+    }
+
     protected void flash(WebElement element)
     {
         DebugUtils.flash(getDriver(), element, 3);

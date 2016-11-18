@@ -112,9 +112,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         filteredTimeChartRegressionTest(); // relies on nothing, wow.
     }
 
-    private static final String SVG_AXIS_X =              "0\n50\n100\n150\n200\n0.0\n50000.0\n100000.0\n150000.0\n200000.0\n250000.0\n300000.0\n350000.0\n400000.0\n450000.0\n500000.0\n550000.0\n600000.0\n650000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT =         "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X =              "0\n50\n100\n150\n200\n0.0\n50000.0\n100000.0\n150000.0\n200000.0\n250000.0\n300000.0\n350000.0\n400000.0\n450000.0\n500000.0\n550000.0\n600000.0\n650000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT =         "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
     private static final String AXIS_TIME_CHART = "Axis Time Chart";
     @LogMethod private void axisRangeTest()
     {
@@ -151,24 +151,28 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
         lookAndFeelDialog.setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant).clickApply();
-        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results: 249318596"));
+        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
+        assertElementPresent(Locator.css("svg text").withText("249318596")); //subtitle
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
         lookAndFeelDialog.setXAxisRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
-        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results: 249320107"));
+        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
+        assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
         assertSVG(SVG_AXIS_X, 1);
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
         lookAndFeelDialog.setYAxisLeftRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
-        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results: 249320107"));
+        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
+        assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
         assertSVG(SVG_AXIS_X_LEFT, 1);
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
         lookAndFeelDialog.setYAxisRightRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
-        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results: 249320107"));
+        waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results"));
+        assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
         assertSVG(SVG_AXIS_X_LEFT_RIGHT, 1);
 
         openSaveMenu();
@@ -298,20 +302,23 @@ public class TimeChartDateBasedTest extends TimeChartTest
         lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants)
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant)
                 .clickApply();
-        waitForText("HIV Test Results: 249318596");
-        assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
+        waitForCharts(5);
+        assertElementPresent(Locator.css("svg text").withText("HIV Test Results"), 5); // main title
+        assertElementPresent(Locator.css("svg text").withText("249318596"), 2); // subtitle + legend
+        assertElementPresent(Locator.css("svg text").withText("249320107"), 2); // subtitle + legend
+        assertElementPresent(Locator.css("svg text").withText("249320489"), 2); // subtitle + legend
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
         lookAndFeelDialog.setPlotTitle(CHART_TITLE).clickApply();
         waitForCharts(5);
-        assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 5);
+        assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 5); // main title
 
         // re-select participant
         _ext4Helper.checkGridRowCheckbox("249320127");
         waitForCharts(6);
-        assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 6);
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": 249320127"));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 6); // main title
+        assertElementPresent(Locator.css("svg text").withText("249320127"), 2); // subtitle + legend
     }
 
     @LogMethod public void saveTest()
@@ -501,19 +508,19 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickReportDetailsLink(REPORT_NAME_3);
         click(Locator.linkContainingText("Edit Report"));
         waitForCharts(2);
-        assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 2);
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + LYMPHS_MEASURE_LABEL));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + CD4_MEASURE_LABEL));
-        assertElementPresent(Locator.css("svg text").withText("Days Since Start Date"), 2);
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 2); // main title
+        assertElementPresent(Locator.css("svg text").withText(LYMPHS_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText("Days Since Start Date"), 2); // x-axis label
     }
 
     // This SVG text might change (due to shared axis ranges) if different groups are selected
-    private static final String SVG_PARTICIPANTGROUP_SOME = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Some Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+ (cells/mm3)\n249320107 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_SOME_MODIFIED = "50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\nNew Chart Title: Some Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_OTHER = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+ (cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_YET_MORE = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Yet More Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320897 CD4+ (cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+ (cells/mm3)\n249325717 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_1 = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Group 1: Accute HIV-1\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+ (cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_2 = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Group 2: HIV-1 Negative\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+ (cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320897 CD4+ (cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+ (cells/mm3)\n249325717 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_SOME = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title\nSome Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+ (cells/mm3)\n249320107 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_SOME_MODIFIED = "50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\nNew Chart Title\nSome Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_OTHER = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title\nOther Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+ (cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_YET_MORE = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title\nYet More Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320897 CD4+ (cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+ (cells/mm3)\n249325717 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_1 = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title\nGroup 1: Accute HIV-1\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+ (cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+ (cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 CD4+ (cells/mm3)\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_2 = "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title\nGroup 2: HIV-1 Negative\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+ (cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320897 CD4+ (cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+ (cells/mm3)\n249325717 Lymphs(cells/mm3)";
 
     @LogMethod public void participantGroupTimeChartTest()
     {
@@ -524,15 +531,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToManageViews();
         clickReportDetailsLink(REPORT_NAME_3);
         click(Locator.linkContainingText("Edit Report"));
-        waitForText(CHART_TITLE);
+        waitForCharts(2);
 
-        // kbl : TODO, filter panel behavior has changed and it's still not certain what the proper AND / OR behavior for categories is
-        // until the final details are worked out, just ignore the number of occurances of text, and fix them later
-        //
-        assertTextPresent(
-                "Days Since Start Date", //, 2); // X-Axis labels for each measure
-                CHART_TITLE+": Lymphs (cells/mm3)",//, 1); // Title
-                CHART_TITLE+": CD4+ (cells/mm3)");//, 1); // Title
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 2); // main title
+        assertElementPresent(Locator.css("svg text").withText(LYMPHS_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText("Days Since Start Date"), 2); // x-axis label
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
@@ -586,21 +590,24 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // re-select group 2
         _ext4Helper.checkGridRowCheckbox(GROUP2_NAME);
         waitForCharts(2);
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP1_NAME));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP2_NAME));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 2); // main title
+        assertElementPresent(Locator.css("svg text").withText(GROUP1_NAME), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText(GROUP2_NAME), 1); // subtitle
 
         // uncheck group 1
         _ext4Helper.clickParticipantFilterCategory(GROUP1_NAME);
         waitForCharts(1);
-        assertElementNotPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP1_NAME));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP2_NAME));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 1); // main title
+        assertElementPresent(Locator.css("svg text").withText(GROUP2_NAME), 1); // subtitle
+        assertElementNotPresent(Locator.css("svg text").withText(GROUP1_NAME)); // subtitle
 
         // reselect cohorts
         _ext4Helper.clickParticipantFilterCategory("Cohorts");
         waitForCharts(3);
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP2_NAME));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 1: Accute HIV-1"));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 2: HIV-1 Negative"));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 3); // main title
+        assertElementPresent(Locator.css("svg text").withText(GROUP2_NAME), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText("Group 1: Accute HIV-1"), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText("Group 2: HIV-1 Negative"), 1); // subtitle
 
         openSaveMenu();
         saveReport(false);
@@ -612,9 +619,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         waitForCharts(2);
         assertTextPresent("One or more of the participant groups originally saved with this chart are not currently visible.");
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 1: Accute HIV-1"));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 2: HIV-1 Negative"));
-        assertElementNotPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP2_NAME));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 2); // main title
+        assertElementPresent(Locator.css("svg text").withText("Group 1: Accute HIV-1"), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText("Group 2: HIV-1 Negative"), 1); // subtitle
+        assertElementNotPresent(Locator.css("svg text").withText(GROUP2_NAME)); // subtitle
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
         waitForText("No group selected. Please select at least one group.");
@@ -624,8 +632,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         stopImpersonating();
     }
 
-    private static final String SVG_MULTI_MANUAL_1 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n12.5\n13.0\n13.5\n14.0\n14.5\n15.0\n15.5\n16.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_MULTI_MANUAL_2 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n21.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_1 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n12.5\n13.0\n13.5\n14.0\n14.5\n15.0\n15.5\n16.0\nNew Chart Title\nOther Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_2 = "0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.0\n21.0\nNew Chart Title\nOther Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
     @LogMethod public void multiAxisTimeChartTest()
     {
         TimeChartWizard timeChartWizard;
@@ -643,9 +651,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
         waitForCharts(1);
-        assertElementNotPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 1: Accute HIV-1"));
-        assertElementNotPresent(Locator.css("svg text").withText(CHART_TITLE + ": Group 2: HIV-1 Negative"));
-        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE + ": " + GROUP2_NAME));
+        assertElementPresent(Locator.css("svg text").withText(CHART_TITLE), 1); // main title
+        assertElementPresent(Locator.css("svg text").withText(GROUP2_NAME), 1); // subtitle
+        assertElementNotPresent(Locator.css("svg text").withText("Group 1: Accute HIV-1")); // subtitle
+        assertElementNotPresent(Locator.css("svg text").withText("Group 2: HIV-1 Negative")); // subtitle
 
         timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
@@ -701,8 +710,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
                 .uncheckShowMean()
                 .clickApply();
 
-        waitForText("Lab Results: " + GROUP1_NAME);
         waitForCharts(4);
+        assertElementPresent(Locator.css("svg text").withText("Lab Results"), 4); // main title
+        assertElementPresent(Locator.css("svg text").withText(GROUP1_NAME), 1); // subtitle
 
         clickButton("Chart Layout", 0);
         lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
@@ -737,7 +747,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerMeasureDimension)
                 .clickApply();
         waitForCharts(1);
-        waitForText("Lab Results: CD4");
+        assertElementPresent(Locator.css("svg text").withText("Lab Results"), 1); // main title
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), "Aggregate");
@@ -746,7 +757,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1"); // TODO : Remove workaround for bad chart loading
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
         waitForCharts(1);
-        waitForText("Lab Results: CD4");
+        assertElementPresent(Locator.css("svg text").withText("Lab Results"), 1); // main title
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
     }
 
     /**

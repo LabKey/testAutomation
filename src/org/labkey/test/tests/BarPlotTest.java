@@ -256,17 +256,14 @@ public class BarPlotTest extends GenericChartsTest
         waitForElement(Locator.css("svg"));
 
         log("Export as PDF");
-        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PDF"), 1);
+        clickExportPDFIcon("chart-render-div", 0);
 
         log("Export as PNG");
-        doAndWaitForDownload(() -> _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "PNG"), 1);
+        clickExportPNGIcon("chart-render-div", 0);
 
         log("Export to script.");
-
-        Locator dlg = Locator.xpath("//div").withClass("chart-wizard-dialog").notHidden().withDescendant(Locator.xpath("//div").withClass("title-panel").withDescendant(Locator.xpath("//div")).withText("Export script"));
-        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Script");
-        waitFor(() -> isElementPresent(dlg),
-                "Ext Dialog with title '" + "Export script" + "' did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
+        Assert.assertEquals("Unexpected number of export script icons", 1, getExportScriptIconCount("chart-render-div"));
+        clickExportScriptIcon("chart-render-div", 0);
         String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 

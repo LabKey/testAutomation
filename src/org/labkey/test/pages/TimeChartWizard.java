@@ -119,13 +119,6 @@ public class TimeChartWizard
         }
     }
 
-    public void showGroupIndividualLines()
-    {
-        openGroupingPanel();
-        _test._ext4Helper.checkCheckbox("Show Individual Lines");
-        applyChanges();
-    }
-
     public void reSaveReport()
     {
         saveReport(null, null, false);
@@ -157,18 +150,4 @@ public class TimeChartWizard
         _test.clickButtonByIndex("Save", 0, 0);
         _test.waitForText("Viewable By");
     }
-
-    private void applyChanges()
-    {
-        _test.clickButton("OK", 0);
-        _test._ext4Helper.waitForMaskToDisappear();
-    }
-
-    private void openGroupingPanel()
-    {
-        _test.clickButton("Grouping", 0);
-        _test.findButton("Cancel");
-    }
-
-
 }

@@ -91,12 +91,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertTextPresentInThisOrder(VISIT_STRINGS);
 
         log("Check visit data.");
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Chart Type"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Chart Layout"));
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(19));
-
         // verify that other toolbar buttons have been hidden
-        assertElementNotPresent(Locator.button("Export"));
-        assertElementNotPresent(Locator.button("Measures"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Chart Type"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Chart Layout"));
 
         DataRegionTable table = DataRegionTable.findDataRegion(this);
         List<String> displayOrders = table.getColumnDataAsText("Display Order");
