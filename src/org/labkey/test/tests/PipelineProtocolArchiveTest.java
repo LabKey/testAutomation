@@ -7,19 +7,19 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PipelineAnalysisHelper;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class})
@@ -36,7 +36,6 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 
     private static final String SIMPLETEST_MODULE = "simpletest";
     private static final String PIPELINE_MODULE = "Pipeline";
-    private static final String PIPELINE_TEST_MODULE = "pipelinetest";
 
     private static final File SAMPLE_INPUT_FILE1 = TestFileUtils.getSampleData("pipeline/sample1.testIn.tsv");
     private static final File SAMPLE_INPUT_FILE2 = TestFileUtils.getSampleData("pipeline/sample2.testIn.tsv");
@@ -60,7 +59,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     public void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        _containerHelper.enableModules(Arrays.asList(SIMPLETEST_MODULE, PIPELINE_TEST_MODULE, PIPELINE_MODULE));
+        _containerHelper.enableModules(Arrays.asList(SIMPLETEST_MODULE));
 
         PortalHelper _portalHelper = new PortalHelper(this);
         _portalHelper.addWebPart("Data Pipeline");
@@ -77,7 +76,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
                 "</bioml>";
 
         DataRegionTable protocols = DataRegionTable.findDataRegionWithinWebpart(this, WEB_PART_NAME_PIPELINE_PROTOCOLS);
-        Assert.assertEquals("Expecting empty protocol list",0,protocols.getDataRowCount());
+        assertEquals("Expecting empty protocol list",0,protocols.getDataRowCount());
 
         assertTextPresent("No data to show.");
 
@@ -86,11 +85,11 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         String protocol1_Name = protocols.getDataAsText(0,COLUMN_NAME);
-        Assert.assertEquals("Wrong protocol name", PROTOCOL_NAME_B_R,protocol1_Name);
+        assertEquals("Wrong protocol name", PROTOCOL_NAME_B_R,protocol1_Name);
         String protocol1_Pipeline = protocols.getDataAsText(0, COLUMN_PIPELINE);
-        Assert.assertEquals("Wrong pipeline name", getClientPipelineLabel(),protocol1_Pipeline);
+        assertEquals("Wrong pipeline name", getClientPipelineLabel(),protocol1_Pipeline);
         String protocol1_Archived = protocols.getDataAsText(0, COLUMN_ARCHIVED);
-        Assert.assertEquals("Wrong archived indication", "",protocol1_Archived);
+        assertEquals("Wrong archived indication", "",protocol1_Archived);
 
 
         runPipeline(SAMPLE_INPUT_FILE2, PROTOCOL_NAME_A_M, PROTOCOL_DEF, false);
@@ -98,9 +97,9 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         String protocol2_Name = protocols.getDataAsText(1,COLUMN_NAME);
-        Assert.assertEquals("Wrong protocol name", PROTOCOL_NAME_A_M,protocol2_Name);
+        assertEquals("Wrong protocol name", PROTOCOL_NAME_A_M,protocol2_Name);
         String protocol2_Archived = protocols.getDataAsText(1,COLUMN_ARCHIVED);
-        Assert.assertEquals("Wrong archived indication", "",protocol2_Archived);
+        assertEquals("Wrong archived indication", "",protocol2_Archived);
 
         List<String> expectedOptions = new ArrayList<>(Arrays.asList(
                 PROTOCOL_NAME_NEW_PROTOCOL,
@@ -113,7 +112,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         protocols.checkCheckbox(1);
         archiveSelected(protocols);
         protocol2_Archived = protocols.getDataAsText(1,COLUMN_ARCHIVED);
-        Assert.assertEquals("Wrong archived indication", CHECKMARK, protocol2_Archived);
+        assertEquals("Wrong archived indication", CHECKMARK, protocol2_Archived);
 
         expectedOptions.remove(2);
 
@@ -123,7 +122,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
         protocols.checkCheckbox(1);
         unarchiveSelected(protocols);
         protocol2_Archived = protocols.getDataAsText(1,COLUMN_ARCHIVED);
-        Assert.assertEquals("Wrong archived indication", "",protocol2_Archived);
+        assertEquals("Wrong archived indication", "",protocol2_Archived);
 
         expectedOptions.add(2,PROTOCOL_NAME_A_M);
 
@@ -133,12 +132,11 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 
     private void confirmProtocolSelectList(List<String> expectedOptions, File file)
     {
-        Locator.IdLocator protocolSelect = Locator.id("protocolSelect");
-        prepareToRunPipeline(file);
+        final PipelineAnalysisHelper pipelineAnalysisHelper = prepareToRunPipeline(file);
 
-        waitForElement(protocolSelect);
-        List<String> protocolOptions = getSelectOptions(protocolSelect);
-        Assert.assertEquals("Expected protocols " , expectedOptions, protocolOptions);
+        final Select protocolSelect = pipelineAnalysisHelper.waitForProtocolSelect();
+        List<String> protocolOptions = getTexts(protocolSelect.getOptions());
+        assertEquals("Expected protocols" , expectedOptions, protocolOptions);
     }
 
     private void archiveSelected(DataRegionTable protocols)

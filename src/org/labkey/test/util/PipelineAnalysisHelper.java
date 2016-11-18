@@ -20,8 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.Map;
@@ -164,16 +164,15 @@ public class PipelineAnalysisHelper
     public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry)
     {
         // If the given protocol name already exists, select it. If not, define a new one
-        Locator.XPathLocator protocolSelect = Locator.id("protocolSelect");
-        _test.waitForElement(protocolSelect.append(Locator.tag("option").withText("<New Protocol>")));
-        try
+        Select protocolSelect = waitForProtocolSelect();
+        if (!Locator.tag("option").withText(protocolName).findElements(_test.getDriver()).isEmpty())
         {
-            _test.selectOptionByValue(protocolSelect, protocolName);
+            protocolSelect.selectByVisibleText(protocolName);
         }
-        catch (NoSuchElementException nse)
+        else
         {
             // Create a new one
-            _test.selectOptionByText(protocolSelect, "<New Protocol>");
+            protocolSelect.selectByVisibleText("<New Protocol>");
             _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
             if (null != protocolDef)
                 _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
@@ -190,5 +189,12 @@ public class PipelineAnalysisHelper
         }
 
         _test.waitForRunningPipelineJobs(BaseWebDriverTest.WAIT_FOR_PAGE);
+    }
+
+    public Select waitForProtocolSelect()
+    {
+        Locator.XPathLocator protocolSelect = Locator.id("protocolSelect");
+        _test.waitForElement(protocolSelect.append(Locator.tag("option").withText("<New Protocol>")));
+        return new Select(protocolSelect.findElement(_test.getDriver()));
     }
 }
