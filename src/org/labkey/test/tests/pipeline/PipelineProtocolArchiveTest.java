@@ -1,8 +1,7 @@
-package org.labkey.test.tests;
+package org.labkey.test.tests.pipeline;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

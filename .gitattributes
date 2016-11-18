@@ -651,7 +651,6 @@ src/org/labkey/test/tests/ParticipantListTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
 src/org/labkey/test/tests/PieChartTest.java -text
 src/org/labkey/test/tests/PipelineCancelTest.java -text
-src/org/labkey/test/tests/PipelineProtocolArchiveTest.java -text
 src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
@@ -716,6 +715,7 @@ src/org/labkey/test/tests/issues/IssuesTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
+src/org/labkey/test/tests/pipeline/PipelineProtocolArchiveTest.java -text
 src/org/labkey/test/tests/remoteapi/BulkUpdateGroupApiTest.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
