@@ -124,7 +124,7 @@
             var clipRect = plotConfigsArr[configIndex].applyClipRect;
             var series = plotConfigsArr[configIndex].series;
             var height = plotConfigsArr.length > 1 ? DEFAULT_MULTI_CHART_HEIGHT : DEFAULT_SINGLE_CHART_HEIGHT;
-            var labels = TCH.generateLabels(plotConfigsArr[configIndex].title, chartConfig.axis);
+            var labels = TCH.generateLabels(plotConfigsArr[configIndex].title, chartConfig.axis, plotConfigsArr[configIndex].subtitle);
             var layers = TCH.generateLayers(chartConfig, visitMap, individualColumnAliases, aggregateColumnAliases, plotConfigsArr[configIndex].aggregateData, series, intervalKey);
             var data = plotConfigsArr[configIndex].individualData ? plotConfigsArr[configIndex].individualData : plotConfigsArr[configIndex].aggregateData;
 

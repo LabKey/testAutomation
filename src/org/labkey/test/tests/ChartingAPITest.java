@@ -161,21 +161,29 @@ public class ChartingAPITest extends BaseWebDriverTest
         int testCount = Integer.parseInt(testCountStr);
         for (int currentTest = 0; currentTest < testCount; currentTest++)
         {
-            waitForSvgText(chartTitles[currentTest]);
+            waitForSvgWithTitle(chartTitles[currentTest]);
             checkSVGConversion();
             click(Ext4Helper.Locators.ext4Button("Next"));
         }
     }
 
-    private void waitForSvgText(String title)
+    private void waitForSvgWithTitle(String title)
     {
-        waitForSvgText(title, true);
+        waitForSvgWithTitle(title, true);
     }
 
-    private void waitForSvgText(String title, boolean wait)
+    private void waitForSvgWithTitle(String title, boolean wait)
+    {
+        waitForSvgWithTitleAndSubtitle(title, null, wait);
+    }
+
+    private void waitForSvgWithTitleAndSubtitle(String title, String subtitle, boolean wait)
     {
         Locator l = Locator.css("svg text").withText(title);
         assertOrWait(l, wait);
+
+        if (subtitle != null)
+            assertElementPresent(Locator.css("svg text").withText(subtitle));
     }
 
     private void assertErrorMessage(String msg, boolean wait)
@@ -240,19 +248,19 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         goToChartingTestPage("exportGenericChartTest");
 
-        waitForSvgText(SCATTER_ONE);
+        waitForSvgWithTitle(SCATTER_ONE);
         checkExportedChart(SCATTER_ONE, SCATTER_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(SCATTER_TWO);
+        waitForSvgWithTitle(SCATTER_TWO);
         checkExportedChart(SCATTER_TWO, SCATTER_TWO_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(BOX_ONE);
+        waitForSvgWithTitle(BOX_ONE);
         checkExportedChart(BOX_ONE, BOX_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(BOX_TWO);
+        waitForSvgWithTitle(BOX_TWO);
         checkExportedChart(BOX_TWO, BOX_TWO_TEXT, true);
 
         click(Locator.input("next-btn"));
@@ -260,10 +268,10 @@ public class ChartingAPITest extends BaseWebDriverTest
         checkExportedChart(BOX_THREE, null, true, 0);
     }
 
-    protected static final String TIME_CHART_1 = "Luminex: 249318596";
-    protected static final String TIME_CHART_1_TEXT_1 = "10\n15\n20\n25\n30\n35\n70\n700\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249318596\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249318596 Fi IL-10\n249318596 Fi IL-2\n249318596 Fi TNF-alpha\n249318596 ObsConc IL-10\n249318596 ObsConc IL-2\n249318596 ObsConc TNF-alpha";
-    protected static final String TIME_CHART_1_TEXT_2 = "0\n5\n10\n15\n20\n25\n30\n70\n700\n7000\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249320107\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320107 Fi IL-10\n249320107 Fi IL-2\n249320107 Fi TNF-alpha\n249320107 ObsConc IL-10\n249320107 ObsConc IL-2\n249320107 ObsConc TNF-alpha";
-    protected static final String TIME_CHART_1_TEXT_3 = "0\n5\n10\n15\n20\n25\n30\n80\n90\n100\n200\n300\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249320127\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320127 Fi IL-10\n249320127 Fi IL-2\n249320127 Fi TNF-alpha\n249320127 ObsConc IL-10\n249320127 ObsConc IL-2\n249320127 ObsConc TNF-alpha";
+    protected static final String TIME_CHART_1 = "Luminex";
+    protected static final String TIME_CHART_1_TEXT_1 = "10\n15\n20\n25\n30\n35\n70\n700\n50\n100\n150\n200\n250\n300\n350\nLuminex\n249318596\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249318596 Fi IL-10\n249318596 Fi IL-2\n249318596 Fi TNF-alpha\n249318596 ObsConc IL-10\n249318596 ObsConc IL-2\n249318596 ObsConc TNF-alpha";
+    protected static final String TIME_CHART_1_TEXT_2 = "0\n5\n10\n15\n20\n25\n30\n70\n700\n7000\n50\n100\n150\n200\n250\n300\n350\nLuminex\n249320107\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320107 Fi IL-10\n249320107 Fi IL-2\n249320107 Fi TNF-alpha\n249320107 ObsConc IL-10\n249320107 ObsConc IL-2\n249320107 ObsConc TNF-alpha";
+    protected static final String TIME_CHART_1_TEXT_3 = "0\n5\n10\n15\n20\n25\n30\n80\n90\n100\n200\n300\n50\n100\n150\n200\n250\n300\n350\nLuminex\n249320127\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320127 Fi IL-10\n249320127 Fi IL-2\n249320127 Fi TNF-alpha\n249320127 ObsConc IL-10\n249320127 ObsConc IL-2\n249320127 ObsConc TNF-alpha";
     protected static final String TIME_CHART_2 = "Luminex Two";
     protected static final String TIME_CHART_2_TEXT_1 = "1\n2\n3\n4\n5\n0.0\n0.2\n0.4\n0.6\n0.8\n1.0\n1.2\n1.4\n1.6\n1.8\n2.0\nLuminex Two\nVisits\nFI\n249318596\n249320127";
     protected static final String TIME_CHART_3 = "Male";
@@ -279,27 +287,27 @@ public class ChartingAPITest extends BaseWebDriverTest
     {
         goToChartingTestPage("exportTimeChartTest");
 
-        waitForSvgText(TIME_CHART_1);
+        waitForSvgWithTitleAndSubtitle(TIME_CHART_1, "249318596", true);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_1, false, 3, 0);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_2, false, 3, 1);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_3, false, 3, 2);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(TIME_CHART_2);
+        waitForSvgWithTitle(TIME_CHART_2);
         checkExportedChart(TIME_CHART_2, TIME_CHART_2_TEXT_1);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(TIME_CHART_3);
+        waitForSvgWithTitle(TIME_CHART_3);
         checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_1, false, 2, 0);
         checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_2, false, 2, 1);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(TIME_CHART_4);
+        waitForSvgWithTitle(TIME_CHART_4);
         checkExportedChart(TIME_CHART_4, TIME_CHART_4_TEXT_1, true);
         assertErrorMessage("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", false);
 
         click(Locator.input("next-btn"));
-        waitForSvgText(TIME_CHART_5);
+        waitForSvgWithTitle(TIME_CHART_5);
         checkExportedChart(TIME_CHART_5, TIME_CHART_5_TEXT_1, true);
         assertErrorMessage("The data limit for plotting has been reached. Consider filtering your data.", false);
         assertErrorMessage("No data found for the following measures/dimensions: IL-6", false);
@@ -338,20 +346,20 @@ public class ChartingAPITest extends BaseWebDriverTest
         Locator setAesBtn = Locator.input("set-aes-btn");
         goToChartingTestPage("setAesTest");
 
-        waitForSvgText(BOX_PLOT_COLOR_SHAPE);
+        waitForSvgWithTitle(BOX_PLOT_COLOR_SHAPE);
         click(setAesBtn);
-        waitForSvgText("119180");
-        waitForSvgText("Females");
+        waitForSvgWithTitle("119180");
+        waitForSvgWithTitle("Females");
 
         click(nextBtn);
-        waitForSvgText(SCATTER_PLOT_SHAPE_COLOR_X);
+        waitForSvgWithTitle(SCATTER_PLOT_SHAPE_COLOR_X);
         assertSVG(SCATTER_PLOT_SHAPE_COLOR_X_SVG_BEFORE);
         click(setAesBtn);
-        waitForSvgText("103866");
+        waitForSvgWithTitle("103866");
         assertSVG(SCATTER_PLOT_SHAPE_COLOR_X_SVG_AFTER);
 
         click(nextBtn);
-        waitForSvgText(SCATTER_HOVER_CLICK);
+        waitForSvgWithTitle(SCATTER_HOVER_CLICK);
         click(Locator.css("svg g a path"));
         waitForElement(Locator.css(".x4-window div").withText("Look a click handler!"));
         clickButton("OK", 0);
@@ -361,19 +369,19 @@ public class ChartingAPITest extends BaseWebDriverTest
         clickButton("OK", 0);
 
         click(nextBtn);
-        waitForSvgText(LINE_ERROR_COLOR_Y);
+        waitForSvgWithTitle(LINE_ERROR_COLOR_Y);
         click(setAesBtn);
-        waitForSvgText("Alan");
+        waitForSvgWithTitle("Alan");
         assertSVG(LINE_ERROR_COLOR_Y_SVG);
 
         click(nextBtn);
-        waitForSvgText(SCATTER_REMOVE_LEGEND);
+        waitForSvgWithTitle(SCATTER_REMOVE_LEGEND);
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_BEFORE);
         click(setAesBtn);
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_AFTER);
 
         click(nextBtn);
-        waitForSvgText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
+        waitForSvgWithTitle(BRUSHED_SCATTER_W_CUSTOM_SCALES);
         assertSVG(BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG);
 
         List<WebElement> points;
@@ -399,7 +407,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         Actions builder = new Actions(getDriver());
         List<WebElement> points;
         goToChartingTestPage("interactivityTest");
-        waitForSvgText("Interactive Plot");
+        waitForSvgWithTitle("Interactive Plot");
 
         /*
         The points on the scatter plot are split into two groups. Each 10 points wide and 20 points tall, for a
@@ -430,7 +438,7 @@ public class ChartingAPITest extends BaseWebDriverTest
         Actions builder = new Actions(getDriver());
         List<WebElement> points;
         goToChartingTestPage("interactivityTest");
-        waitForSvgText("Interactive Plot");
+        waitForSvgWithTitle("Interactive Plot");
 
         // Brush from the top left point of the left group, to the bottom right point of the left group.
         points = Locator.css("svg g a path").findElements(getDriver());
@@ -463,7 +471,7 @@ public class ChartingAPITest extends BaseWebDriverTest
 
         Actions builder = new Actions(getDriver());
         goToChartingTestPage("interactivityTest");
-        waitForSvgText("Interactive Plot");
+        waitForSvgWithTitle("Interactive Plot");
 
         WebElement xRightHandle = Locator.css(".x-axis-handle .resize.e").findElement(getDriver());
         WebElement yTopHandle = Locator.css(".y-axis-handle .resize.n").findElement(getDriver());
@@ -650,7 +658,7 @@ public class ChartingAPITest extends BaseWebDriverTest
 
         if (svgCount > 0)
         {
-            waitForSvgText(title, false);
+            waitForSvgWithTitle(title, false);
             assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
         }
         else
