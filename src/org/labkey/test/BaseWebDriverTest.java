@@ -714,8 +714,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 System.err.println(e.getMessage());
             }
 
-            if (error instanceof UnreachableBrowserException)
+            if (error instanceof UnreachableBrowserException || getWrappedDriver() == null)
             {
+                log("Browser is unavailable. Skipping browser-dependant failure handling.");
                 return;
             }
             if (error instanceof TestTimeoutException || error instanceof TimeoutException)
@@ -784,8 +785,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 log("Unable to dump screenshots");
                 System.err.println(e.getMessage());
             }
-
-            dismissAllAlerts();
         }
         finally
         {
