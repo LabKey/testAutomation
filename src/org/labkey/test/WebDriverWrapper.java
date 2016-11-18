@@ -244,8 +244,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
                         capabilities.setCapability(FirefoxDriver.BINARY, binary);
                     }
-                    newWebDriver = new FirefoxDriver(capabilities);
-
+                    try
+                    {
+                        newWebDriver = new FirefoxDriver(capabilities);
+                    }
+                    catch (WebDriverException rethrow)
+                    {
+                        log("ERROR: Failed to initialize FirefoxDriver. Ensure that you are not using a version newer than 45.");
+                        throw rethrow;
+                    }
                 }
                 break;
             }
