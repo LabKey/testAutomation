@@ -158,6 +158,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _elements;
     }
 
+    public DataRegionApi api()
+    {
+        return new DataRegionApi();
+    }
+
     public WebDriverWrapper getWrapper()
     {
         return _driver;
@@ -1464,6 +1469,39 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                 headerButtons.put(text, Locator.lkButton(text).findElement(buttonBar));
             }
             return headerButtons.get(text);
+        }
+    }
+
+    private abstract class BaseDataRegionApi
+    {
+        final String regionJS = "LABKEY.DataRegions['" + getTableName() + "']";
+
+        public void executeScript(String methodWithArgs)
+        {
+            getWrapper().executeScript(regionJS + "." + methodWithArgs);
+        }
+
+        public void callMethod(String apiMethod, String... args)
+        {
+            String dataRegionMethod = apiMethod + "(" + String.join(", ", args) + ");";
+            executeScript(dataRegionMethod);
+        }
+    }
+
+    public class DataRegionApi extends BaseDataRegionApi
+    {
+        public DataRegionApiExpectingRefresh expectingRefresh()
+        {
+            return new DataRegionApiExpectingRefresh();
+        }
+    }
+
+    public class DataRegionApiExpectingRefresh extends BaseDataRegionApi
+    {
+        @Override
+        public void executeScript(String methodWithArgs)
+        {
+            doAndWaitForUpdate(() -> super.executeScript(methodWithArgs));
         }
     }
 }

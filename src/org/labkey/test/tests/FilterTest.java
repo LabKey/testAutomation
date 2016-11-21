@@ -91,7 +91,7 @@ public class FilterTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Test
@@ -462,7 +462,6 @@ public class FilterTest extends BaseWebDriverTest
         public String filter1Value;
         public String filter2Type;
         public String filter2Value;
-        public String filterUrl;
 
         public String[] present;
         public String[] notPresent;
@@ -470,7 +469,7 @@ public class FilterTest extends BaseWebDriverTest
         public FilterArgs(String columnName,
                           String filter1Type, @Nullable String filter1Value,
                           @Nullable String filter2Type, @Nullable String filter2Value,
-                          String[] present, String[] notPresent, String filterUrl)
+                          String[] present, String[] notPresent)
         {
             this.columnName = columnName;
             this.filter1Type = filter1Type;
@@ -479,7 +478,6 @@ public class FilterTest extends BaseWebDriverTest
             this.filter2Value = filter2Value;
             this.present = present;
             this.notPresent = notPresent;
-            this.filterUrl = filterUrl;
         }
     }
 
@@ -488,7 +486,7 @@ public class FilterTest extends BaseWebDriverTest
                                               @Nullable String filter2Type, @Nullable String filter2Value,
                                               String[] present, String[] notPresent)
     {
-        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, null);
+        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent);
     }
 
     private List<FilterArgs> generateValidFilterArgsAndResponses()
@@ -520,6 +518,7 @@ public class FilterTest extends BaseWebDriverTest
         }
 
     //Issue 12787: Canceling filter dialog requires two clicks
+    @LogMethod
     private void filterCancelButtonWorksTest()
     {
         DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
@@ -535,15 +534,14 @@ public class FilterTest extends BaseWebDriverTest
                     a.columnName,
                     a.filter1Type, a.filter1Value,
                     a.filter2Type, a.filter2Value,
-                    a.present, a.notPresent.clone(), a.filterUrl);
+                    a.present, a.notPresent.clone());
     }
 
     @LogMethod
     private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
-            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String url)
+            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
     {
         String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
-        if (null == url)
         {
             log("** Filtering " + columnName + " with filter type: " + filter1Type + ", value: " + filter1);
             if (null != filter2Type)
@@ -551,24 +549,17 @@ public class FilterTest extends BaseWebDriverTest
             DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
             region.setFilter(fieldKey, filter1Type, filter1, filter2Type, filter2);
 
-            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Reports"), false, R_VIEW);
-        }
-        else
-            beginAt(url);
+            region.clickHeaderMenu("Reports", R_VIEW);
+            Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
+            checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
-        _ext4Helper.waitForMaskToDisappear();
-        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
-
-        if (url == null)
-        {
-            _ext4Helper.clickExt4MenuButton(false, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
+            _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
 
             log("** Checking filter values in filter dialog");
-            DataRegionTable region = new DataRegionTable(TABLE_NAME, this);
+            region = new DataRegionTable(TABLE_NAME, this);
             region.openFilterDialog(fieldKey);
             _extHelper.clickExtTab("Choose Filters");
             shortWait().until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(getDriver())));
@@ -602,20 +593,20 @@ public class FilterTest extends BaseWebDriverTest
                     // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
                     // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
                     if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
-                        assertFormElementEquals(Locator.id("value_1"), "true");
+                        assertEquals("true", getFormElement(Locator.id("value_1")));
                     else
-                        assertFormElementEquals(Locator.id("value_1"), filter1);
+                        assertEquals(filter1, getFormElement(Locator.id("value_1")));
                 }
                 else
                 {
-                    assertFormElementEquals(Locator.id("value_1"), filter1);
+                    assertEquals(filter1, getFormElement(Locator.id("value_1")));
                 }
             }
 
             if (filter2 != null)
-                assertFormElementEquals(Locator.id("value_2"), filter2);
+                assertEquals(filter2, getFormElement(Locator.id("value_2")));
             else
-                assertFormElementEquals(Locator.name("filterType_2"), "No Other Filter");
+                assertEquals("No Other Filter", getFormElement(Locator.name("filterType_2")));
 
             clickButtonContainingText("CANCEL", 0);
         }
@@ -630,33 +621,32 @@ public class FilterTest extends BaseWebDriverTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
 
-        final String regionJS = "LABKEY.DataRegions['" + TABLE_NAME + "']";
+        DataRegionTable region = new DataRegionTable(TABLE_NAME, this.getDriver());
 
         // Add search filter for 'ellow' matching Mellow / Yellow
-        executeScript(regionJS + ".addFilter(" + createSearchFilterJS("ellow") + ")");
+        region.api().expectingRefresh().executeScript("addFilter(" + createSearchFilterJS("ellow") + ")");
 
-        DataRegionTable region = new DataRegionTable(TABLE_NAME, this.getDriver());
         assertEquals("Should have 2 rows present after adding search filter", 2, region.getDataRowCount());
 
         // Replace search filter 'Robust'
-        executeScript(regionJS + ".replaceFilter(" + createSearchFilterJS("Robust") + ")");
+        region.api().expectingRefresh().executeScript("replaceFilter(" + createSearchFilterJS("Robust") + ")");
         assertEquals("Should have 1 row present after replacing search filter", 1, region.getDataRowCount());
 
         // Replace search filter with INJECT_CHARS_1
-        executeScript(regionJS + ".replaceFilter(" + createSearchFilterJS(INJECT_CHARS_1) + ")");
+        region.api().expectingRefresh().executeScript("replaceFilter(" + createSearchFilterJS(INJECT_CHARS_1) + ")");
         assertEquals("Should have 0 row present after replacing search filter", 0, region.getDataRowCount());
 
         // Clear all filters
-        executeScript(regionJS + ".clearAllFilters();");
+        region.api().expectingRefresh().executeScript("clearAllFilters();");
         assertEquals("Should have 4 rows present after clearing search filters", 4, region.getDataRowCount());
 
         // Set a filter, then add a case-insensitive "water" search filter to match "Water"
-        executeScript(regionJS + ".addFilter(LABKEY.Filter.create('JewelTone', true))");
-        executeScript(regionJS + ".addFilter(" + createSearchFilterJS("water") + ")");
+        region.api().expectingRefresh().executeScript("addFilter(LABKEY.Filter.create('JewelTone', true))");
+        region.api().expectingRefresh().executeScript("addFilter(" + createSearchFilterJS("water") + ")");
         assertEquals("Should have 1 row present after adding case-insensitive search filter", 1, region.getDataRowCount());
 
         // Remove just the search filter
-        executeScript(regionJS + ".removeFilter(" + createSearchFilterJS("Should not appear") + ")");
+        region.api().expectingRefresh().executeScript("removeFilter(" + createSearchFilterJS("Should not appear") + ")");
         assertEquals("Should have 2 rows present after removing only search filter", 2, region.getDataRowCount());
     }
 
