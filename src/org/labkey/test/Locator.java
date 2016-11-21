@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -91,6 +92,14 @@ public abstract class Locator
                 }
                 return null;
             }
+
+            @Override
+            public String toString()
+            {
+                List<String> locDescriptions = new ArrayList<>();
+                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                return String.join("\n--or--\n", locDescriptions);
+            }
         });
 
     }
@@ -111,6 +120,14 @@ public abstract class Locator
                     return els;
                 else
                     return null;
+            }
+
+            @Override
+            public String toString()
+            {
+                List<String> locDescriptions = new ArrayList<>();
+                Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
+                return String.join("\n--or--\n", locDescriptions);
             }
         });
 
@@ -269,6 +286,12 @@ public abstract class Locator
                 {
                     return findElements(context);
                 }
+
+                @Override
+                public String toString()
+                {
+                    return Locator.this.getLoggableDescription();
+                }
             });
         }
         catch (TimeoutException notFound)
@@ -294,6 +317,12 @@ public abstract class Locator
                 public WebElement apply(SearchContext context)
                 {
                     return findElement(context);
+                }
+
+                @Override
+                public String toString()
+                {
+                    return Locator.this.getLoggableDescription();
                 }
             });
         }
