@@ -748,17 +748,18 @@ public class TimeChartDateBasedTest extends TimeChartTest
                 .clickApply();
         waitForCharts(1);
         assertElementPresent(Locator.css("svg text").withText("Lab Results"), 1); // main title
-        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 2); // subtitle + y-axis label
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), "Aggregate");
         setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
         saveReport(true);
-        _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1"); // TODO : Remove workaround for bad chart loading
-        _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
+
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText("Aggregate"));
         waitForCharts(1);
         assertElementPresent(Locator.css("svg text").withText("Lab Results"), 1); // main title
-        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
+        assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 2); // subtitle + y-axis label
     }
 
     /**
