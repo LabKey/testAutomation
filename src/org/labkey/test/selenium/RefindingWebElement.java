@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertFalse;
 
 public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
 {
-    private List<Consumer<WebElement>> _listeners = new ArrayList<>();
+    private final List<Consumer<WebElement>> _listeners = new ArrayList<>();
 
     public RefindingWebElement(Locator locator, SearchContext searchContext)
     {
@@ -40,7 +41,14 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
     {
         this(Locator.id(element.getAttribute("id")), searchContext);
         withRefindListener(this::assertUniqueId);
-        _wrappedElement = element;
+        if (element instanceof RefindingWebElement)
+        {
+            throw new IllegalArgumentException("Nesting RefindingWebElements is not supported");
+        }
+        else
+        {
+            _wrappedElement = element;
+        }
     }
 
     /**
@@ -68,12 +76,16 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
         }
         catch (StaleElementReferenceException refind)
         {
+            boolean refound = false;
             try
             {
                 _wrappedElement = findWrappedElement();
-                callListeners(super.getWrappedElement());
+                refound = true;
             }
             catch (NoSuchElementException ignore) {}
+
+            if (refound)
+                callListeners(super.getWrappedElement());
         }
         return super.getWrappedElement();
     }
@@ -86,7 +98,14 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
 
     private void callListeners(WebElement newElement)
     {
-        for (Consumer<WebElement> listener : _listeners)
-            listener.accept(newElement);
+        try
+        {
+            for (Consumer<WebElement> listener : _listeners)
+                listener.accept(newElement);
+        }
+        catch (WebDriverException t)
+        {
+            throw new RuntimeException("Error after element refind", t);
+        }
     }
 }
