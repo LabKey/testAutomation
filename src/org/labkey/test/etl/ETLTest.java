@@ -415,7 +415,6 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.assertInTarget2(PREFIX + "2", newNameForRow1);
         // Check we really did UPDATE and not insert a new one
         _etlHelper.assertNotInTarget2(PREFIX + "1");
-        verifyCreatedMatchesSource();
     }
 
     private void verifyCreatedMatchesSource()
