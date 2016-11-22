@@ -187,27 +187,23 @@ public class TimeChartImportTest extends StudyBaseTest
     @Test
     public void verifyVisitBasedCharts()
     {
-        goToProjectHome();
-        clickFolder(VISIT_STUDY_FOLDER_NAME);
-        for (TimeChartInfo chartInfo : VISIT_CHARTS)
-        {
-            clickTab("Clinical and Assay Data");
-            waitForElement(Locator.linkWithText(chartInfo.getName()));
-            clickAndWait(Locator.linkWithText(chartInfo.getName()));
-            verifyTimeChartInfo(chartInfo, true);
-        }
+        verifyTimeCharts(VISIT_STUDY_FOLDER_NAME, VISIT_CHARTS);
     }
 
     @Test
     public void verifyDateBasedCharts()
     {
+        verifyTimeCharts(DATE_STUDY_FOLDER_NAME, DATE_CHARTS);
+    }
+
+    private void verifyTimeCharts(String folderName, List<TimeChartInfo> chartInfos)
+    {
         goToProjectHome();
-        clickFolder(DATE_STUDY_FOLDER_NAME);
-        for (TimeChartInfo chartInfo : DATE_CHARTS)
+        clickFolder(folderName);
+        for (TimeChartInfo chartInfo : chartInfos)
         {
             clickTab("Clinical and Assay Data");
-            waitForElement(Locator.linkWithText(chartInfo.getName()));
-            clickAndWait(Locator.linkWithText(chartInfo.getName()));
+            waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
             verifyTimeChartInfo(chartInfo, true);
         }
     }

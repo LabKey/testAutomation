@@ -515,8 +515,8 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
         waitForText("The source dataset, list, or query may have been deleted.");
 
-        Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn')]"));
-        Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn') and contains(@class, 'x4-item-disabled')]"));
+        Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'chart-wizard-report')]//div/a[contains(@class, 'x4-btn')]"));
+        Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'chart-wizard-report')]//div/a[contains(@class, 'x4-btn') and contains(@class, 'x4-item-disabled')]"));
         assertTrue("Only the help button should be enabled. More than one button enabled.", 1 == (buttonsCount - disabledButtonsCount));
     }
 
