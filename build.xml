@@ -564,6 +564,7 @@
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend.selenium},address=${sysprop.selenium.debug.port}" />
             <jvmarg value="-Dfile.encoding=UTF-8" />
+            <jvmarg value="-Duser.timezone=${env.TZ}" />
             <jvmarg value="${trustStore}" />
             <jvmarg value="${trustStorePassword}"/>
             <classpath refid="test.run.classpath"/>
