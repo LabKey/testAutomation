@@ -25,12 +25,12 @@ import org.openqa.selenium.WebElement;
 public class Input extends WebDriverComponent implements FormItem<String>
 {
     protected final WebElement _el;
-    protected final WebDriverWrapper _wDriver; // getFormElement requires javascript
+    protected final WebDriver _driver; // getFormElement uses javascript
 
     public Input(WebElement el, WebDriver driver)
     {
         _el = el;
-        _wDriver = new WebDriverWrapperImpl(driver);
+        _driver = driver;
     }
 
     public static SimpleComponentFinder<Input> Input(Locator loc, WebDriver driver)
@@ -46,23 +46,22 @@ public class Input extends WebDriverComponent implements FormItem<String>
     }
 
     @Override
+    public WebElement getComponentElement()
+    {
+        return _el;
+    }
+
+    @Override
     protected WebDriver getDriver()
     {
-        return getWrapper().getDriver();
+        return _driver;
     }
 
-    protected WebDriverWrapper getWrapper()
-    {
-        return _wDriver;
-    }
-
-    @Deprecated
     public String getValue()
     {
         return get();
     }
 
-    @Deprecated
     public void setValue(String value)
     {
         set(value);
@@ -80,9 +79,8 @@ public class Input extends WebDriverComponent implements FormItem<String>
         getWrapper().setFormElement(_el, value);
     }
 
-    @Override
-    public WebElement getComponentElement()
+    public void blur()
     {
-        return _el;
+        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);;
     }
 }
