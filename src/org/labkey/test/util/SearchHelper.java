@@ -70,7 +70,7 @@ public class SearchHelper
         // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retry below.
         waitForIndexer();
 
-        final int maxTries = 4;
+        final int maxTries = 8;
         for (int i = 1; i <= maxTries; i++)
         {
             _test.log("Verify search results, attempt " + i);
