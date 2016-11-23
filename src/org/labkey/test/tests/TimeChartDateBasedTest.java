@@ -124,16 +124,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         goToProjectHome();
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddTimeChart();
-        timeChartWizard = new TimeChartWizard(this);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.selectStudyQuery("HIV Test Results")
+        chartTypeDialog = clickAddChart("study", "HIV Test Results");
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis(VL_MEASURE_LABEL)
                 .clickApply();
         waitForElement(Locator.css("svg text").withText("HIV Test Results"));
 
         // adding second y-axis measure
+        timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.selectStudyQuery("Lab Results")
                 .setYAxis(CD4_MEASURE_LABEL, true)
@@ -148,28 +146,24 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL)); // right label
         assertElementNotPresent(Locator.css("svg text").withText(VL_MEASURE_LABEL + ", " + CD4_MEASURE_LABEL));
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant).clickApply();
         waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
         assertElementPresent(Locator.css("svg text").withText("249318596")); //subtitle
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setXAxisRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
         waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
         assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
         assertSVG(SVG_AXIS_X, 1);
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisLeftRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
         waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results")); //main title
         assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
         assertSVG(SVG_AXIS_X_LEFT, 1);
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRightRangeType(ChartLayoutDialog.RangeType.AutomaticWithinChart).clickApply();
         waitForElement(Locator.css("svg text").withText("HIV Test Results, Lab Results"));
         assertElementPresent(Locator.css("svg text").withText("249320107")); //subtitle
@@ -182,10 +176,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void createChartTest()
     {
-        goToManageViews();
-        clickAddTimeChart();
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.selectStudyQuery("NAbAssay");
+        ChartTypeDialog chartTypeDialog = clickAddChart("study", "NAbAssay");
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time);
 
         // TODO remove this or are we going to support search in new Chart Type dialog?
         //log("Test measure search.");
@@ -205,8 +197,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @LogMethod public void stdDevRegressionTest()
     {
         log("StdDev regression check");
-        clickButton("Chart Type", 0);
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
+        ChartTypeDialog chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.removeYAxis().clickButton("Apply", false);
         waitForElement(Locator.tagWithText("div", "Y Axis (Required)"));
         chartTypeDialog.selectStudyQuery("LuminexAssay").setYAxis("StdDev").clickApply();
@@ -254,13 +246,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         log("Test X-Axis default axis label on interval change");
         clickButton("View Chart(s)", 0);
         _ext4Helper.waitForMaskToDisappear();
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeInterval("Weeks").clickApply();
         waitForElement(Locator.css("svg text").withText("Weeks Since Start Date")); // x-axis label
         // manually set x-axis label to something other than the default
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setXAxisLabel(X_AXIS_LABEL).clickApply();
         waitForElement(Locator.css("svg text").withText(X_AXIS_LABEL)); // x-axis label
         // label shouldn't change automatically once it has been set manually
@@ -268,8 +258,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setTimeInterval("Days").clickApply();
         waitForElement(Locator.css("svg text").withText(X_AXIS_LABEL)); // x-axis label
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.clickXAxisTab();
         assertEquals("Axis label should not change after user edit to default value", X_AXIS_LABEL, lookAndFeelDialog.getXAxisLabel());
 
@@ -278,15 +267,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
         verifyAxisValueChanges(new String[] {X_AXIS_LABEL_MANUAL,"15","20","25","30","35","40"}, null);
 
         log("Test Y-Axis change to manual min/max range");
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("200000", "400000")
                 .setYAxisLabel(Y_AXIS_LABEL)
                 .clickApply();
         verifyAxisValueChanges(new String[] {Y_AXIS_LABEL, "200000", "400000"}, new String[] {"500000","150000"});
         log("Test Y-Axis change to log scale");
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("10000", "1000000")
                 .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
                 .clickApply();
@@ -295,10 +282,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void generateChartPerParticipantTest()
     {
-        LookAndFeelTimeChart lookAndFeelDialog;
-
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
+        LookAndFeelTimeChart lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Participants)
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerParticipant)
                 .clickApply();
@@ -308,8 +293,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementPresent(Locator.css("svg text").withText("249320107"), 2); // subtitle + legend
         assertElementPresent(Locator.css("svg text").withText("249320489"), 2); // subtitle + legend
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setPlotTitle(CHART_TITLE).clickApply();
         waitForCharts(5);
         assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 5); // main title
@@ -328,6 +312,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _extHelper.setExtFormElementByLabel("Report Name:", REPORT_NAME_1);
         _extHelper.setExtFormElementByLabel("Report Description:", REPORT_DESCRIPTION);
         saveReport(true);
+        clickButton("Edit");
         waitForCharts(6);
         assertElementPresent(Locator.css("svg text").containing(CHART_TITLE), 6);
 
@@ -375,6 +360,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void pointClickFunctionTest()
     {
+        TimeChartWizard timeChartWizard;
         LookAndFeelTimeChart lookAndFeelDialog;
 
         log("Check Time Chart Point Click Function (Developer Only)");
@@ -386,8 +372,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL);
         // change to the data points are visible again
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        timeChartWizard = new TimeChartWizard(this);
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisLabel(Y_AXIS_LABEL)
                 .setYAxisRangeType(ChartLayoutDialog.RangeType.AutomaticAcrossCharts)
                 .setYAxisScale(ChartLayoutDialog.ScaleType.Linear)
@@ -395,8 +381,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
                 .clickApply();
         assertEquals("Unexpected number of plot data points", 38, getElementCount(Locator.css("svg g a path")));
         // open the developer panel and verify that it is disabled by default
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.clickDeveloperTab();
         assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
@@ -413,8 +398,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _extHelper.waitForExtDialog("Data Point Information");
         waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         // open developer panel and test JS function validation
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.clickDeveloperTab()
                 .setDeveloperSourceContent("")
                 .clickApplyWithError();
@@ -447,8 +431,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         impersonate(USER2);
         popLocation();
         waitForText(X_AXIS_LABEL_MANUAL);
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.clickGeneralTab();
         assertFalse("Expecting developer tab to NOT be visible", lookAndFeelDialog.isDeveloperTabVisible());
         lookAndFeelDialog.clickCancel();
@@ -459,8 +442,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         impersonate(USER2);
         popLocation();
         waitForText(X_AXIS_LABEL_MANUAL);
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.clickGeneralTab();
         assertTrue("Expecting developer tab to be visible", lookAndFeelDialog.isDeveloperTabVisible());
         lookAndFeelDialog.clickCancel();
@@ -476,14 +458,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
         log("Create multi-measure time chart.");
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddTimeChart();
-        timeChartWizard = new TimeChartWizard(this);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.selectStudyQuery("Lab Results")
+        chartTypeDialog = clickAddChart("study", "Lab Results");
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis(CD4_MEASURE_LABEL)
                 .clickApply();
         waitForElement(Locator.css("svg text").withText(CD4_MEASURE_LABEL));
+        timeChartWizard = new TimeChartWizard(this);
         chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setYAxis(LYMPHS_MEASURE_LABEL, true).clickApply();
         waitForElement(Locator.css("svg text").withText("249318596 Lymphs (cells/mm3)"));
@@ -524,6 +504,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void participantGroupTimeChartTest()
     {
+        TimeChartWizard timeChartWizard;
         LookAndFeelTimeChart lookAndFeelDialog;
 
         log("Test charting with participant groups");
@@ -538,8 +519,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementPresent(Locator.css("svg text").withText(CD4_MEASURE_LABEL), 1); // subtitle
         assertElementPresent(Locator.css("svg text").withText("Days Since Start Date"), 2); // x-axis label
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        timeChartWizard = new TimeChartWizard(this);
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Groups)
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerGroup)
                 .checkShowIndividualLines()
@@ -668,15 +649,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.css("svg text").withText("12.0")); // y-axis min range
         waitForElement(Locator.css("svg text").withText("21.0")); // y-axis max range
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRightRangeMinMax("12", "16")
                 .setYAxisRightLabel("Hemogoblins")
                 .clickApply();
         assertSVG(SVG_MULTI_MANUAL_1, 0);
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRightRangeType(ChartLayoutDialog.RangeType.AutomaticAcrossCharts)
                 .setYAxisRightScale(ChartLayoutDialog.ScaleType.Log)
                 .clickApply();
@@ -689,21 +668,20 @@ public class TimeChartDateBasedTest extends TimeChartTest
     //depends on:  participantGroupTimeChartTest
     @LogMethod public void aggregateTimeChartUITest()
     {
+        TimeChartWizard timeChartWizard;
         ChartTypeDialog chartTypeDialog;
         LookAndFeelTimeChart lookAndFeelDialog;
 
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddTimeChart();
-        chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.selectStudyQuery("Lab Results")
+        chartTypeDialog = clickAddChart("study", "Lab Results");
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis(CD4_MEASURE_LABEL)
                 .clickApply();
         waitForElement(Locator.css("svg text").withText(CD4_MEASURE_LABEL));
 
         //set to aggregate
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        timeChartWizard = new TimeChartWizard(this);
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setSubjectSelectionType(LookAndFeelTimeChart.SubjectSelectionType.Groups)
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerGroup)
                 .checkShowIndividualLines()
@@ -714,8 +692,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementPresent(Locator.css("svg text").withText("Lab Results"), 4); // main title
         assertElementPresent(Locator.css("svg text").withText(GROUP1_NAME), 1); // subtitle
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.uncheckIndividualLines()
                 .checkShowMean()
                 .clickApply();
@@ -740,8 +717,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 //        assertTrue(elCount == 10 || elCount == 20); // 10 in chart and 10 in thumbnail (chrome seems to count the thumbnail, but firefox does not)
 //        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
-        clickButton("Chart Layout", 0);
-        lookAndFeelDialog = new LookAndFeelTimeChart(getDriver());
+        lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.uncheckShowMean()
                 .checkShowIndividualLines()
                 .setChartLayout(LookAndFeelTimeChart.ChartLayoutType.PerMeasureDimension)
@@ -778,9 +754,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         region.setFilter("ParticipantId", "Equals", ptid);
         assertTextPresent(ptid);
 
-        _extHelper.clickMenuButton("Charts", "Create Time Chart");
+        _extHelper.clickMenuButton("Charts", "Create Chart");
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("Pulse").clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
+                .setYAxis("Pulse")
+                .clickApply();
         waitForElement(Locator.css("svg text").withText("Days Since Start Date"));
         assertElementPresent(Locator.css("svg text").withText("Pulse"));
 

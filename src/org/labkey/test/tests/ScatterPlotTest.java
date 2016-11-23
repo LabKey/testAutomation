@@ -92,13 +92,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddChart();
-
-        ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
-        queryDialog.selectQuery(QUERY_APX_1);
-        chartTypeDialog = queryDialog.clickOk();
-
+        chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
                 .setYAxis(MEASURE_1_WEIGHT)
                 .setXAxis(MEASURE_4_PULSE)

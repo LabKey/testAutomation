@@ -77,13 +77,7 @@ public class BarPlotTest extends GenericChartsTest
         goToProjectHome();
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddChart();
-
-        queryDialog = new ChartQueryDialog(getDriver());
-        queryDialog.selectSchema("study")
-                .selectQuery(APX_1_QUERY);
-        chartTypeDialog = queryDialog.clickOk();
+        chartTypeDialog = clickAddChart("study", APX_1_QUERY);
 
         log("Start simply by setting just an X category.");
         // note: this should default to a Bar plot when no render type provided

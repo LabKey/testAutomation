@@ -64,6 +64,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
             case Scatter:
                 elementCache().plotTypeScatter.click();
                 break;
+            case Time:
+                elementCache().plotTypeTime.click();
+                break;
         }
 
         return this;
@@ -86,6 +89,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
                 break;
             case Scatter:
                 classValue = elementCache().plotTypeScatter.getAttribute("class");
+                break;
+            case Time:
+                classValue = elementCache().plotTypeTime.getAttribute("class");
                 break;
             default:
                 classValue = "-disabled";
@@ -140,10 +146,13 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
 
     public ChartTypeDialog setYAxis(String columnName, boolean hasExistingSelection)
     {
+        // the column selection grid differs depending on the selected chart type
+        String columnGridCls = "Time".equals(getChartTypeTitle()) ? "study-columns-grid" : "query-columns-grid";
+
         if (hasExistingSelection)
-            setValue(elementCache().yAxis(), columnName);
+            setValue(elementCache().yAxis(), columnName, columnGridCls);
         else
-            setValue(elementCache().yAxisDropText(), columnName);
+            setValue(elementCache().yAxisDropText(), columnName,columnGridCls);
         return this;
     }
 
@@ -266,7 +275,12 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
 
     private ChartTypeDialog setValue(WebElement target, String columnName)
     {
-        elementCache().getColumn(columnName).click();
+        return setValue(target, columnName, "query-columns-grid");
+    }
+
+    private ChartTypeDialog setValue(WebElement target, String columnName, String columnGridCls)
+    {
+        elementCache().getColumn(columnName, columnGridCls).click();
         getWrapper().waitFor(() -> {
             return target.isDisplayed();
         }, "Target element is not displayed", 5000);
@@ -419,7 +433,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     // Simply clicks a value int he column list. Can be used to see if the value can be dropped to one of the attributes.
     public ChartTypeDialog clickColumnValue(String columnValue)
     {
-        elementCache().getColumn(columnValue).click();
+        elementCache().getColumn(columnValue, "query-columns-grid").click();
         return this;
     }
 
@@ -481,9 +495,10 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
 
         public WebElement columnList = new LazyWebElement(Locator.xpath("//div[contains(@class, 'mapping-query-col')]"), this);
-        public WebElement getColumn(String column)
+        public WebElement getColumn(String column, String columnGridCls)
         {
-            return Locator.tagWithClass("tr", "x4-grid-data-row").withText(column).waitForElement(columnList, 10000);
+            Locator.XPathLocator gridLoc = Locator.tagWithClass("div", columnGridCls);
+            return gridLoc.append(Locator.tagWithClass("tr", "x4-grid-data-row").withText(column)).waitForElement(columnList, 10000);
         }
         public WebElement fieldTitles = new LazyWebElement(Locator.xpath("//div[contains(@class, 'field-title')]"), this);
 
@@ -491,6 +506,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement plotTypeBox = new LazyWebElement(Locator.xpath("//div[@id='chart-type-box_plot']"),  this);
         public WebElement plotTypePie = new LazyWebElement(Locator.xpath("//div[@id='chart-type-pie_chart']"),  this);
         public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath("//div[@id='chart-type-scatter_plot']"),  this);
+        public WebElement plotTypeTime = new LazyWebElement(Locator.xpath("//div[@id='chart-type-time_chart']"),  this);
 
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement xAxisDropText() {return Locator.xpath(XAXIS_CONTAINER + DROP_TEXT).findElement(this);}
@@ -535,7 +551,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         Bar,
         Box,
         Pie,
-        Scatter
+        Scatter,
+        Time
     }
 
     public enum TimeAxisType

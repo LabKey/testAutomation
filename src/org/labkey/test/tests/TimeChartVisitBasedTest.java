@@ -22,6 +22,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -74,17 +75,15 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     {
         log("Test changing from date-based to visit-based time chart.");
         clickFolder(VISIT_FOLDER_NAME);
-        goToManageViews();
-        clickAddTimeChart();
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.selectStudyQuery("APX-1: Abbreviated Physical Exam")
+        ChartTypeDialog chartTypeDialog = clickAddChart("study", "APX-1 (APX-1: Abbreviated Physical Exam)");
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis("1. Weight")
                 .clickApply();
         waitForElement(Locator.css("svg").containing("Days Since Contact Date"));
 
         log("Change to Visit-based for x-axis");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElementToDisappear(Locator.css("svg").containing("Days Since Contact Date"));
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
@@ -113,15 +112,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElementToDisappear(Locator.paginationText(19));
         waitForCharts(1);
         log("Revert to Date-based chart to check axis panel state.");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Date).clickApply();
         waitForTextToDisappear(VISIT_STRINGS[0]);
         assertTextNotPresent(VISIT_STRINGS);
 
         log("Back to visit-based chart for save.");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
 
@@ -153,13 +150,15 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElement(Locator.paginationText(31));
 
         log("Create a Time Chart from the measure in the new query");
-        _extHelper.clickMenuButton("Charts", "Create Time Chart");
+        _extHelper.clickMenuButton("Charts", "Create Chart");
         // note: the 'My APX Query' query should already be selected
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setYAxis("2. Body Temp").clickApply();
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
+                .setYAxis("2. Body Temp")
+                .clickApply();
         waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
-        clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(getDriver());
+        TimeChartWizard timeChartWizard = new TimeChartWizard(this);
+        chartTypeDialog = timeChartWizard.clickChartTypeButton();
         chartTypeDialog.setTimeAxisType(ChartTypeDialog.TimeAxisType.Visit).clickApply();
         waitForCharts(1);
         waitForElement(Locator.css("svg").containing("My APX Query"));

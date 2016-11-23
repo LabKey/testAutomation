@@ -36,13 +36,6 @@ public class TimeChartWizard
         _test = test;
     }
 
-    public ChartTypeDialog createNewChart()
-    {
-        _test.goToManageViews();
-        _test._extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Time Chart"));
-        return new ChartTypeDialog(_test.getDriver());
-    }
-
     public ChartTypeDialog clickChartTypeButton()
     {
         _test.clickButton("Chart Type", 0);

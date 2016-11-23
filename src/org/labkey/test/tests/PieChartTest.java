@@ -71,13 +71,7 @@ public class PieChartTest extends GenericChartsTest
         goToProjectHome();
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddChart();
-
-        queryDialog = new ChartQueryDialog(getDriver());
-        chartTypeDialog = queryDialog.selectSchema("study")
-                .selectQuery(AE_1_QUERY_NAME)
-                .clickOk();
+        chartTypeDialog = clickAddChart("study", AE_1_QUERY_NAME);
 
         log("Set the minimal attributes necessary to create a pie chart.");
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Pie)

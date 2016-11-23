@@ -54,13 +54,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        goToManageViews();
-        clickAddChart();
-
-        ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
-        queryDialog.selectQuery("RCF-1 (RCF-1: Reactogenicity-Day 2)");
-        chartTypeDialog = queryDialog.clickOk();
-
+        chartTypeDialog = clickAddChart("study", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)
                 .setYAxis("4c.Induration 1st measure")
                 .clickApply();

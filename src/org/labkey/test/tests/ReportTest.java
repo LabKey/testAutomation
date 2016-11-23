@@ -17,6 +17,8 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.ChartQueryDialog;
+import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.util.LogMethod;
 
 public abstract class ReportTest extends StudyBaseTest
@@ -119,14 +121,13 @@ public abstract class ReportTest extends StudyBaseTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
     }
 
-    protected void clickAddChart()
+    protected ChartTypeDialog clickAddChart(String schemaName, String queryName)
     {
+        goToManageViews();
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Chart"));
-    }
-
-    protected void clickAddTimeChart()
-    {
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Time Chart"));
+        ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
+        queryDialog.selectSchema(schemaName).selectQuery(queryName);
+        return queryDialog.clickOk();
     }
 
     public static enum ChartTypes
