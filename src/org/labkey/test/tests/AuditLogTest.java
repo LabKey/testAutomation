@@ -219,6 +219,7 @@ public class AuditLogTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(folderName));
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        waitForElement(Locator.name("quf_Name"));
         setFormElement(Locator.name("quf_Name"), "Data");
         submit();
     }
