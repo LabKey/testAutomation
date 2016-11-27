@@ -12,6 +12,7 @@ bin/windows/chromedriver.exe -text
 bin/windows/i386/IEDriverServer.exe -text
 bin/windows/i386/VERSION -text
 /bootstrap_stress_test.cmd -text
+/build.gradle -text
 /build.xml -text
 chromeextensions/jsErrorChecker/background.js -text
 chromeextensions/jsErrorChecker/jserrors.js -text

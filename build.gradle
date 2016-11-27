@@ -1,0 +1,23 @@
+//// This needs to be set before doing the import or IntelliJ will complain
+//ant.properties['tomcat.home'] = project.tomcatDir
+//
+//ant.importBuild 'build.xml'
+apply plugin: 'java'
+
+sourceSets {
+    debug {
+        java {
+            srcDirs = ['src/org/labkey/test/debug']
+        }
+        output.classesDir = "${project.buildDir}/classes"
+
+    }
+}
+
+dependencies {
+    debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
+}
+
+if (project.hasProperty("teamcity"))
+   // This plugin depends on the debugClasses task for ensureShutdown used on TeamCity
+   apply plugin: 'org.labkey.teamcity'
