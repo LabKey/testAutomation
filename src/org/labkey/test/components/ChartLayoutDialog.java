@@ -18,6 +18,7 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -249,8 +250,14 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
 
     protected void setColor(String colorLabel, String hexColorValue)
     {
-        String tempStr = hexColorValue.replace("#", "").toUpperCase();
-        getWrapper().click(Locator.xpath(elementCache().VISIBLE_PANEL_XPATH + "//label[text() = '" + colorLabel + "']/following-sibling::div[not(contains(@class, 'x4-item-disabled'))]/a[contains(@class, '" + tempStr + "')]"));
+        Locator.XPathLocator comboBox = Ext4Helper.Locators.formItemWithLabel(colorLabel);
+        Locator arrowTrigger = comboBox.append("//div[contains(@class,'x4-form-trigger')]");
+        getWrapper().waitAndClick(arrowTrigger);
+
+        String colorStr = hexColorValue.replace("#", "").toUpperCase();
+        Locator colorPickerItem = Locator.tagWithClass("div", "chart-option-color-picker")
+                .append(Locator.tagWithClass("a", "color-" + colorStr));
+        getWrapper().waitAndClick(colorPickerItem);
     }
 
     public ChartLayoutDialog setBinThreshold(String threshold)
