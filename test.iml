@@ -53,7 +53,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../remoteapi/java/lib/json_simple-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../remoteapi/java/lib/json-simple-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
