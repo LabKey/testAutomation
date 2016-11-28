@@ -204,7 +204,7 @@
             <include name="jackson-databind-2.6.4.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
-            <include name="labkey-client-api-${product.version}.jar"/>
+            <include name="labkey-client-api-*.jar"/>
         </fileset>
         <fileset dir="${javaclientlib.dir}">
             <include name="*.jar"/>
