@@ -1939,6 +1939,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return true;
     }
 
+    public WebElement waitForElementToBeVisible(final Locator locator)
+    {
+        // waitForElement first, to differentiate between element never present vs not visible
+        WebElement element = waitForElement(locator);
+        waitFor(element::isDisplayed,
+                "Timeout waiting for element to become visible", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        return element;
+    }
+
     public WebElement waitForAnyElement(String error, final Locator... locators)
     {
         if (locators.length == 0)
