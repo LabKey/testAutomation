@@ -36,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -744,7 +743,7 @@ public class ETLHelper
 
     protected String getDate()
     {
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         return format.format(calendar.getTime());
     }
