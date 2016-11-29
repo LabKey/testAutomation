@@ -315,7 +315,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         log("Verify user can import only into folders they have admin access to");
-        waitFor(() -> Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).findElement(getDriver()).isDisplayed(), 5000);
+        waitForElement(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).notHidden(), 5000);
         assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_PROJECT_FILE01));
         assertElementNotPresent(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI02));
 
