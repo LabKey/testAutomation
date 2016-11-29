@@ -96,7 +96,7 @@ public abstract class GenericChartsTest extends ReportTest
         saveChartDialog.waitForDialog(saveAs);
         saveChartDialog.setReportName(name);
         saveChartDialog.setReportDescription(description);
-        saveChartDialog.clickSave();
+        saveChartDialog.clickSave(saveAs);
         sleep(2500); // sleep while the save success message shows
         waitForText(name);
         waitFor(() ->

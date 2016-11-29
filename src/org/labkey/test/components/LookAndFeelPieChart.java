@@ -129,7 +129,7 @@ public class LookAndFeelPieChart extends ChartLayoutDialog<LookAndFeelPieChart.E
 
     public LookAndFeelPieChart setPercentagesColor(String hexColorValue)
     {
-        setColor("Percentages Color:", hexColorValue);
+        setColor("% Text Color:", hexColorValue);
         return this;
     }
 

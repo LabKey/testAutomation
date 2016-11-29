@@ -81,8 +81,13 @@ public class SaveChartDialog<EC extends Component.ElementCache> extends Componen
 
     public void clickSave()
     {
+        clickSave(false);
+    }
+
+    public void clickSave(boolean expectReload)
+    {
         Window w = new Window(elements().dialog, _test.getDriver());
-        w.clickButton("Save", 0);
+        w.clickButton("Save", expectReload ? _test.WAIT_FOR_PAGE : 0);
     }
 
     public void waitForInvalid()
