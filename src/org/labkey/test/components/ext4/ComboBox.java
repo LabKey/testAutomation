@@ -37,13 +37,15 @@ import static org.labkey.test.util.Ext4Helper.getCssPrefix;
 
 public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 {
-    WebElement _formItem;
-    WebDriverWrapper _driverWrapper;
+    private WebElement _formItem;
+    private WebDriverWrapper _driverWrapper;
+    private ComboListMatcher _matcher;
 
     private ComboBox(WebElement formItem, WebDriver driver)
     {
         _formItem = formItem;
         _driverWrapper = new WebDriverWrapperImpl(driver);
+        _matcher = EXACT;
     }
 
     @Override
@@ -68,10 +70,16 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
         Locator.XPathLocator getLocator(Locator.XPathLocator comboListItem, String itemText);
     }
 
+    public ComboBox setMatcher(ComboListMatcher matcher)
+    {
+        _matcher = matcher;
+        return this;
+    }
+
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String... selections)
     {
-        selectComboBoxItem(EXACT, selections);
+        selectComboBoxItem(_matcher, selections);
     }
 
     @LogMethod(quiet = true)
