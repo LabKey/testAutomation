@@ -886,7 +886,12 @@ public class Ext4Helper
 
         public static Locator.XPathLocator ext4Button(String text)
         {
-            return Locator.tag("a").notHidden().withClass(_cssPrefix + "btn").withText(text);
+            return ext4Button().withText(text);
+        }
+
+        public static Locator.XPathLocator ext4Button()
+        {
+            return Locator.tag("a").notHidden().withClass(_cssPrefix + "btn");
         }
 
         public static Locator.XPathLocator ext4ButtonEnabled(String text)
