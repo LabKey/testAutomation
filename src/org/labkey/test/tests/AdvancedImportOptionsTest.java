@@ -94,6 +94,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         File zipFile  = new File(TestFileUtils.getLabKeyRoot() + IMPORT_STUDY_FILE);
 
         log("Create a new project to import the existing data.");
+        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
 
         log("Get to the import page and validate that is looks as expected.");
@@ -109,9 +110,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         goToProjectHome(IMPORT_PROJECT_FILE01);
         validateFileImportResults();
-
-        log("Cleanup and remove the project.");
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
     }
 
     private void validateFileImportResults()
@@ -287,6 +285,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         _userHelper.createUser(LIMITED_USER);
 
         log("Create a new project to import the existing data into multiple folders.");
+        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01, false);
         _containerHelper.createProject(IMPORT_PROJECT_FILE01, "Study");
 
         log("Create subfolders and setup permissions.");
@@ -372,8 +371,6 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate that the expected data has been imported and the subfolder has been imported.");
         clickFolder(IMPORT_FOLDER_MULTI02);
         validateMultiFolderImportResults(IMPORT_FOLDER_MULTI02, true, true, true);
-
-        _containerHelper.deleteProject(IMPORT_PROJECT_FILE01);
     }
 
     public void validateMultiFolderImportResults(String folderName, boolean hasDatasets, boolean hasSpecimens, boolean hasSubfolder)
