@@ -1561,14 +1561,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
     }
 
-    public String getTextInTable(int row, int column)
+    public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getDriver().findElement(By.xpath("//table/tbody/tr[" + row + "]/td[" + column + "]")).getText();
+        return getTableCellText(Locator.xpath("//table/tbody/tr/th/span[text()='" + title + "']/../../../tr/td/table"), row, column);
     }
 
-    public void assertTableRowOnPage(String textToCheck, int row, int column)
+    public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)
     {
-        assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInTable(row, column));
+        assertEquals(textToCheck + " is not at that place in the table", textToCheck, getTextInNonDataRegionTable(title, row, column));
     }
 
     /**
