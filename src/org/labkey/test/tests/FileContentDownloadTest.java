@@ -40,6 +40,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, FileBrowser.class})
 public class FileContentDownloadTest extends BaseWebDriverTest
@@ -88,8 +89,11 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
         assertEquals(getZipDownloadFileName(), download.getName());
 
-        Set<String> filesInZip = getFilenamesInZip(download);
-        assertEquals(expectedFiles, filesInZip);
+        List<String> filesInZip = TestFileUtils.getFilesInZipArchive(download);
+        for(String file : expectedFiles)
+        {
+            assertTrue(filesInZip.stream().anyMatch((f)-> f.endsWith(file)));
+        }
     }
 
     @Test
@@ -118,8 +122,11 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
         assertEquals(getZipDownloadFileName(), download.getName());
 
-        Set<String> filesInZip = getFilenamesInZip(download);
-        assertEquals(expectedFiles, filesInZip);
+        List<String> filesInZip = TestFileUtils.getFilesInZipArchive(download);
+        for(String file : expectedFiles)
+        {
+            assertTrue(filesInZip.stream().anyMatch((f)-> f.endsWith(file)));
+        }
     }
 
     @Test
@@ -230,19 +237,4 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    private Set<String> getFilenamesInZip(File file) throws IOException
-    {
-        Set<String> filesInZip = new HashSet<>();
-
-        try (ZipFile zipFile = new ZipFile(file))
-        {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements())
-            {
-                ZipEntry zEntry = entries.nextElement();
-                filesInZip.add(zEntry.getName());
-            }
-        }
-        return filesInZip;
-    }
 }

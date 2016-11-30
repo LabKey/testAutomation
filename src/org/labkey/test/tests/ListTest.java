@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.writer.ZipFile;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -38,18 +39,27 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
+import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
 import static org.labkey.test.util.ListHelper.ListColumnType.Boolean;
@@ -138,6 +148,8 @@ public class ListTest extends BaseWebDriverTest
 
     private final File EXCEL_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/fruits.xls");
     private final File TSV_DATA_FILE = TestFileUtils.getSampleData("dataLoading/excel/fruits.tsv");
+    private final File EXCEL_APILIST_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
+    private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
     public List<java.lang.String> getAssociatedModules()
@@ -931,6 +943,63 @@ public class ListTest extends BaseWebDriverTest
         listHelper.addField(newCol);
         _listHelper.clickSave();
         assertTextBefore("FooFoo", "BarBar");
+    }
+
+    @Test
+    public void exportProtectedFileColumn() throws Exception
+    {
+        goToProjectHome(PROJECT_VERIFY);
+        String listName= "protectedFileColumnList";
+        String protectedColumn = "protected";
+        String unprotectedColumn = "unprotected";
+        log("Issue 28035: Protected file attachment columns shouldn't export their files when redaction is requested");
+        clickAndWait(Locator.linkContainingText("manage lists").waitForElement(getDriver(), 2000));
+        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "key",
+                new ListColumn("FileName", "FileName", ListHelper.ListColumnType.String, "name of the file"),
+                new ListColumn("FileExtension", "ext", ListHelper.ListColumnType.String, "the file extension"),
+                new ListColumn(unprotectedColumn, "PubFile", ListHelper.ListColumnType.Attachment, "the file itself"));
+        _listHelper.clickEditDesign();
+        _listHelper.addField(new ListColumn(protectedColumn, "File", ListHelper.ListColumnType.Attachment, "the file itself"));
+
+        // set 'protected'
+        _listHelper.selectPropertyTab("Advanced");
+        checkCheckbox(Locator.checkboxByName("protected"));
+        _listHelper.clickSave();
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+
+        // add rows to list
+        Map<String, String> xlsRow = new HashMap<>();
+        xlsRow.put(unprotectedColumn, EXCEL_APILIST_FILE.getAbsolutePath());
+        xlsRow.put("FileName", EXCEL_DATA_FILE.getName());
+        xlsRow.put("FileExtension", ".xls");
+        xlsRow.put(protectedColumn, EXCEL_DATA_FILE.getAbsolutePath());
+        _listHelper.insertNewRow(xlsRow, false);
+
+        Map<String, String> tsvRow = new HashMap<>();
+        tsvRow.put(unprotectedColumn, TSV_SAMPLE_FILE.getAbsolutePath());
+        tsvRow.put("FileName", TSV_DATA_FILE.getName());
+        tsvRow.put("FileExtension", ".tsv");
+        tsvRow.put(protectedColumn, TSV_DATA_FILE.getAbsolutePath());
+        _listHelper.insertNewRow(tsvRow, false);
+
+        // go to admin/folder/management, click 'export'
+        clickAdminMenuItem("Folder", "Management");
+        click(Locator.linkContainingText("Export"));
+        // select 'remove all columns tagged as protected'
+        checkCheckbox(Locator.checkboxByName("removeProtected").waitForElement(getDriver(), 2000));
+
+        // click 'export', capture the zip archive download
+        File projectZipArchive = clickAndWaitForDownload(Locator.buttonContainingText("Export").waitForElement(getDriver(), 2000));
+
+        assertFalse("Protected column attachment should not be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_DATA_FILE.getName()));
+        assertFalse("Protected column attachment should not be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_DATA_FILE.getName()));
+        assertTrue("Unprotected column attachment should be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
+        assertTrue("Unprotected column attachment should be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
     }
 
     //

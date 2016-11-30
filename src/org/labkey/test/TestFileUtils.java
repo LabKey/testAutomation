@@ -23,7 +23,9 @@ import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -31,8 +33,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -239,5 +244,24 @@ public abstract class TestFileUtils
             e.printStackTrace(System.err);
             return null;
         }
+    }
+
+    public static boolean isFileInZipArchive(File zipArchive, String fileName) throws IOException
+    {
+        List<String> files = getFilesInZipArchive(zipArchive);
+        return files.stream().anyMatch((f)-> f.endsWith(fileName));
+    }
+
+    public static List<String> getFilesInZipArchive(File zipArchive) throws IOException
+    {
+        final ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipArchive)));
+
+        ZipEntry entry;
+        List<String> files = new ArrayList<>();
+        while ((entry = zipInputStream.getNextEntry()) != null)
+        {
+            files.add(entry.getName());
+        }
+        return files;
     }
 }
