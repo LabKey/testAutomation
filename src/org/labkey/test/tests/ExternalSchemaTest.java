@@ -128,7 +128,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             return intNotNull == row.intNotNull &&
                    dateTimeNotNull.equals(row.dateTimeNotNull) &&
                    text.equals(row.text) &&
-                   (rowid == null || rowid.equals(row.rowid));
+                   (rowid == null || row.rowid == null || rowid.equals(row.rowid));
         }
 
         @Override
