@@ -931,19 +931,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void setFilter(String columnName, String filterType, @Nullable String filter, int waitMillis)
     {
         setUpFilter(columnName, filterType, filter);
-        _driver.clickButton("OK", waitMillis);
+        doAndWaitForUpdate(() -> _driver.clickButton("OK", waitMillis));
     }
 
     public void setFilter(String columnName, String filterType, @Nullable String filter, @Nullable String filter2Type, @Nullable String filter2)
     {
         setUpFilter(columnName, filterType, filter, filter2Type, filter2);
-        _driver.clickButton("OK", BaseWebDriverTest.WAIT_FOR_PAGE);
+        doAndWaitForUpdate(() -> _driver.clickButton("OK", BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
     public void setFacetedFilter(String columnName, String... values)
     {
         setUpFacetedFilter(columnName, values);
-        _driver.clickButton("OK");
+        doAndWaitForUpdate(() -> _driver.clickButton("OK"));
     }
 
     public void setUpFilter(String columnName, String filterType, String filter)
@@ -1057,7 +1057,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
         openFilterDialog(columnName);
-        _driver.clickButton("CLEAR ALL FILTERS");
+        doAndWaitForUpdate(() -> _driver.clickButton("CLEAR ALL FILTERS"));
     }
 
     private void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
