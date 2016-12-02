@@ -27,6 +27,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.SimpleModuleTest;
 import org.labkey.test.util.DataIntegrationHelper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 
 import java.io.File;
 import java.io.IOException;
@@ -129,7 +131,8 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
         assertEquals("Row " + index + " was not for name '" + name +"'", name, rows.get(index)[5]);
     }
 
-    protected void validatePipelineFileAnalysis(File dir, String jobId, int expectedOutputRows) throws IOException, CommandException
+    @LogMethod
+    protected void validatePipelineFileAnalysis(@LoggedParam File dir, @LoggedParam String jobId, int expectedOutputRows) throws IOException, CommandException
     {
         Pair<List<String[]>, List<String[]>> fileRows = readFile(dir, jobId, null, true);
         List<String> expectedColumns = new ArrayList<>();
