@@ -24,11 +24,12 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
-import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelScatterPlot;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -40,12 +41,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.ext4.Window.Window;
 
 @Category({DailyC.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
+    public static final String APXHEENT = "APXheent";
+    public static final String APXPULSE = "APXpulse";
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -65,8 +69,100 @@ public class ScatterPlotTest extends GenericChartsTest
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
         doBinnedScatterPlotTest();
         doAxisManualRangeScatterPlotTest(); // Uses scatter plot created by doBinnedScatterPlotTest()
+        doMostlyNumericDataPlotTest();
         doDeleteMeasureTest(); // Uses scatter plot created by doCustomizeScatterPlotTest()
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
+    }
+
+    private void doMostlyNumericDataPlotTest()
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+
+        log("Go to the schema browser and modify some of the fields.");
+        goToSchemaBrowser();
+        selectQuery("study", "APX-1");
+
+        click(Locator.linkWithText("view data"));
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+        table.clickInsertNewRowDropdown();
+        waitForElement(Locator.name("quf_MouseId"));
+        setFormElement(Locator.name("quf_MouseId"), "MID_Float");
+        setFormElement(Locator.name("quf_SequenceNum"), "3");
+        setFormElement(Locator.name("quf_date"), "1/1/2001");
+        setFormElement(Locator.name("quf_APXheent"), "12.5");
+        setFormElement(Locator.name("quf_APXpulse"), "98");
+        clickButton("Submit");
+
+
+        table.clickInsertNewRowDropdown();
+        waitForElement(Locator.name("quf_MouseId"));
+        setFormElement(Locator.name("quf_MouseId"), "MID_Negative");
+        setFormElement(Locator.name("quf_SequenceNum"), "4");
+        setFormElement(Locator.name("quf_date"), "1/1/2002");
+        setFormElement(Locator.name("quf_APXheent"), "-4");
+        setFormElement(Locator.name("quf_APXpulse"), "80");
+        clickButton("Submit");
+
+        table.clickInsertNewRowDropdown();
+        waitForElement(Locator.name("quf_MouseId"));
+        setFormElement(Locator.name("quf_MouseId"), "MID_Lessthan");
+        setFormElement(Locator.name("quf_SequenceNum"), "5");
+        setFormElement(Locator.name("quf_date"), "1/1/2003");
+        setFormElement(Locator.name("quf_APXheent"), "<5");
+        setFormElement(Locator.name("quf_APXpulse"), "83");
+        clickButton("Submit");
+
+        log("Go and edit the column definition to be a measure");
+        table.clickHeaderButtonAndWait("Manage");
+        click(Locator.linkWithText("edit definition"));
+
+        final PropertiesEditor datasetFieldsPanel = PropertiesEditor(getDriver()).withTitle("Dataset Fields").findWhenNeeded();
+        waitForElement(Locator.lkButton("Export Fields"));
+
+        log("Select the HEENT field");
+        datasetFieldsPanel.selectField(APXHEENT);
+
+        log("Change the column's reporting status to 'measure'");
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
+        Checkbox measure = Checkbox.Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(datasetFieldsPanel);
+        measure.check();
+
+        log("click on the 'Pulse' field");
+        datasetFieldsPanel.selectField(APXPULSE);
+
+        log("Change the column's reporting status to 'dimension'");
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
+        Checkbox dimension = Checkbox.Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(datasetFieldsPanel);
+        dimension.check();
+
+        doAndWaitForPageToLoad(()->{
+            click(Locator.linkWithSpan("Save"));
+            waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
+        });
+
+        ChartTypeDialog chartTypeDialog;
+        LookAndFeelScatterPlot lookAndFeelDialog;
+        SaveChartDialog saveChartDialog;
+
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        chartTypeDialog = clickAddChart("study", QUERY_APX_1);
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis(MEASURE_6_HEENT)
+                .setXAxis(MEASURE_4_PULSE)
+                .clickApply();
+        assertTextPresent("The y-axis measure '6. HEENT' had 34 value(s) that could not be converted to a number and are not included in the plot");
+
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        chartTypeDialog = clickAddChart("study", QUERY_APX_1);
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Bar)
+                .setYAxis(MEASURE_6_HEENT)
+                .setXCategory(MEASURE_4_PULSE)
+                .clickApply();
+        assertTextPresent("The y-axis measure '6. HEENT' had 34 value(s) that could not be converted to a number and are not included in the plot");
+
     }
 
     private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
@@ -77,6 +173,7 @@ public class ScatterPlotTest extends GenericChartsTest
     private static final String MEASURE_1_WEIGHT = "1. Weight";
     private static final String MEASURE_2_BODY_TEMP = "2. Body Temp";
     private static final String MEASURE_4_PULSE = "4. Pulse";
+    private static final String MEASURE_6_HEENT = "6. HEENT";
     private static final String MEASURE_7_NECK = "7. Neck";
     private static final String MEASURE_16_EVAL_SUM = "16. Evaluation Summary";
     private static final String MEASURE_FORM_LANGUAGE = "Form Language";
@@ -110,6 +207,7 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
 
         chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog.removeYAxis();
         chartTypeDialog.setYAxis(MEASURE_2_BODY_TEMP, true)
                 .clickApply();
 
