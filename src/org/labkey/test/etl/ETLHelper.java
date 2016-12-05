@@ -28,6 +28,8 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
@@ -236,12 +238,8 @@ public class ETLHelper
     private void waitForTransformLink(String linkText, String goBackText, String... waitForTexts)
     {
         _test.log("clicking link with text " + linkText + "'");
-        _test.click(Locator.linkWithText(linkText));
-        for (String waitForText : waitForTexts)
-        {
-            _test.log("waiting for text '" + waitForText + "'");
-            _test.waitForText(waitForText);
-        }
+        _test.clickAndWait(Locator.linkWithText(linkText));
+        _test.waitForText(waitForTexts);
         _test.goBack();
         _test.waitForText(goBackText);
     }
@@ -330,7 +328,7 @@ public class ETLHelper
     void insertDatasetRow(String id, String name)
     {
         _test.log("inserting dataset row " + name);
-        _test._extHelper.clickInsertNewRow(true);
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
         _test.waitForElement(Locator.name("quf_ParticipantId"));
         _test.setFormElement(Locator.name("quf_ParticipantId"), name);
         _test.setFormElement(Locator.name("quf_date"), getDate());
@@ -351,8 +349,8 @@ public class ETLHelper
             _test.clickTab("Portal");
         else
             _test.clickFolder(subFolder);
-        _test.click(new Locator.LinkLocator(StringUtils.capitalize(query)));
-        _test._extHelper.clickInsertNewRow(true);
+        _test.clickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
         _test.waitForElement(Locator.name("quf_id"));
         _test.setFormElement(Locator.name("quf_id"), id);
         _test.setFormElement(Locator.name("quf_name"), name);
@@ -387,8 +385,8 @@ public class ETLHelper
     {
         _test.log("inserting transfer row rowid " + rowId);
         _test.goToProjectHome();
-        _test.click(Locator.xpath("//span[text()='Transfers']"));
-        _test._extHelper.clickInsertNewRow(true);
+        _test.clickAndWait(Locator.xpath("//span[text()='Transfers']"));
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
         _test.waitForElement(Locator.name("quf_rowid"));
         _test.setFormElement(Locator.name("quf_rowid"), rowId);
         _test.setFormElement(Locator.name("quf_transferstart"), transferStart);
@@ -434,8 +432,8 @@ public class ETLHelper
     {
         _test.log("inserting row to 180 column table");
         _test.clickTab("Portal");
-        _test.click(Locators.qwp180columnSource);
-        _test._extHelper.clickInsertNewRow(true);
+        _test.clickAndWait(Locators.qwp180columnSource);
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
@@ -451,10 +449,8 @@ public class ETLHelper
     {
         _test.log("updating row " + row + " in 180 column table");
         _test.clickTab("Portal");
-        _test.click(Locators.qwp180columnSource);
-        Locator editLink = Locator.linkWithText("edit").index(row);
-        _test.waitForElement(editLink);
-        _test.clickAndWait(editLink);
+        _test.clickAndWait(Locators.qwp180columnSource);
+        _test.waitAndClickAndWait(Locator.linkWithText("edit").index(row));
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
@@ -624,18 +620,19 @@ public class ETLHelper
         _test.clickAndWait(_test.waitForElementWithRefresh(Locator.lkButton("Retry"), BaseWebDriverTest.WAIT_FOR_PAGE));
     }
 
-    void deleteSourceRow(String... ids)
+    @LogMethod
+    void deleteSourceRow(@LoggedParam String... ids)
     {
         _test.goToProjectHome();
         _test.clickAndWait(Locator.xpath("//span[text()='Source']"));
+        DataRegionTable query = new DataRegionTable("query", _test.getDriver());
         for(String id : ids)
         {
-            _test.log("deleting source row id " + id);
-            _test.click(Locator.xpath("//a[text()='" + id + "']/../../td/input[@type='checkbox']"));
+            query.checkCheckbox(query.getRowIndex("Id", id));
         }
         _test.doAndWaitForPageToLoad(() ->
         {
-            _test.click(Locator.xpath("//span[text()='Delete']"));
+            query.clickHeaderButtonByText("Delete");
             // eat the alert without spewing to the log file
             _test.acceptAlert();
         });
@@ -750,7 +747,7 @@ public class ETLHelper
 
     protected void verifyErrorLog(String transformName, List<String> errors)
     {
-        _test.click(Locator.xpath("//a[.='" + transformName + "']//..//..//a[.='ERROR']"));
+        _test.clickAndWait(Locator.xpath("//a[.='" + transformName + "']//..//..//a[.='ERROR']"));
 
         _test.assertTextPresent(errors);
     }
