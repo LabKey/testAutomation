@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -29,7 +30,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Data.class})
 public class PivotQueryTest extends BaseWebDriverTest
@@ -48,20 +50,20 @@ public class PivotQueryTest extends BaseWebDriverTest
         return getClass().getSimpleName() + "Project";
     }
 
-    protected void setupProject()
+    @BeforeClass
+    public static void initProject()
+    {
+        ((PivotQueryTest)getCurrentTest()).doInit();
+    }
+
+    protected void doInit()
     {
         _containerHelper.createProject(getProjectName(), "Study");
         importStudyFromZip(STUDY_ZIP);
     }
 
     @Test
-    public void testSteps()
-    {
-        setupProject();
-        verifyPivotQuery();
-    }
-
-    private void verifyPivotQuery()
+    public void testPivotQuery()
     {
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=LuminexPivot");
         DataRegionTable pivotTable = new DataRegionTable("query", this);
