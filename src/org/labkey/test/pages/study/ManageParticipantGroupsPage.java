@@ -42,8 +42,7 @@ public class ManageParticipantGroupsPage extends LabKeyPage
     public void selectGroup(String name)
     {
         Locator groupByName = Locator.xpath("//table[@role=\"presentation\"]/tbody/tr/td/div[contains(normalize-space(), '" + name + "')]");
-        waitForElement(groupByName);
-        groupByName.findElement(getDriver()).click();
+        waitAndClick(groupByName);
     }
 
     public void deleteGroup(String name)
