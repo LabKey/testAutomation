@@ -889,9 +889,9 @@ public class NabAssayTest extends AbstractQCAssayTest
     }
 
     private static final List<String> expectedRow11 = Arrays.asList("ptid + visit", "Specimen 5", "Specimen 5", "1", "12",
-            "107916.0", " ", " ", "Specimen 5", "Specimen 5, Replicate 1", "2", "1", " ", "A12");
+            "107916.0", " ", " ", "Specimen 5", "Specimen 5, Replicate 1", "2", "1", " ", "false", "A12");
     private static final List<String> expectedRow12 = Arrays.asList("ptid + visit", " ", "CELL_CONTROL_SAMPLE", "2", "1",
-            "993.0", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1", " ", "B1");
+            "993.0", "CELL_CONTROL_SAMPLE", " ", " ", " ", " ", "1", " ", "false", "B1");
 
     private static final List<String> expectedDilRow10 = Arrays.asList("ptid + visit", "4860.0", "6", "0.06%", "0.022583",
             "107300.0", "110753.0", "109026.5", "2441.6397", "Specimen 2", "Specimen 2, Replicate 3", "Specimen 2", "20.0", "43740.0", "1");
