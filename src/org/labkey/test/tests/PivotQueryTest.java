@@ -24,6 +24,9 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -34,9 +37,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyB.class, Data.class})
-public class PivotQueryTest extends BaseWebDriverTest
+public class PivotQueryTest extends ReportTest
 {
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
+
+    @Override
+    protected void doCreateSteps()
+    {
+
+    }
+
+    @Override
+    protected void doVerifySteps() throws Exception
+    {
+
+    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -100,6 +115,81 @@ public class PivotQueryTest extends BaseWebDriverTest
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
         assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
+    }
+
+    @Test
+    public void testPivotQueryChartingTextFieldMeasure(){
+        //Create new query "LuminexPivotString" based on study/LuminexAssay
+        String LUMINEX_PIVOT_STRING = "LuminexPivotString";
+        String CONC_INRANGE_STRING = "ConcInRangeString";
+        String MEASURE_COLUMN = "IL-10 (23)";
+        String X_AXIS_COLUMN = "Participant ID";
+        String querySource =
+        "SELECT\n" +
+        "        ParticipantId,\n" +
+        "        AnalyteName,\n" +
+                "MIN(" + CONC_INRANGE_STRING + ") AS ConcInRange_MIN\n" +
+        "FROM LuminexAssay\n" +
+        "GROUP BY ParticipantId, AnalyteName\n" +
+        "PIVOT\n" +
+        "        ConcInRange_MIN\n" +
+        "BY AnalyteName\n";
+
+        createQuery(getProjectName(), LUMINEX_PIVOT_STRING, "study",querySource, null,false);
+
+        //Edit definition LuminexAssay
+        // Make field ConcInRangeString a measure
+        log("Go and edit the column definition to be a measure");
+        clickProject(getProjectName());
+
+        log("Go to the schema browser and modify some of the fields.");
+        goToSchemaBrowser();
+        String LUMINEXASSAY = "LuminexAssay";
+        selectQuery("study", LUMINEXASSAY);
+        click(Locator.linkWithText("edit definition"));
+
+        final PropertiesEditor datasetFieldsPanel = PropertiesEditor.PropertiesEditor(getDriver()).withTitle("Dataset Fields").findWhenNeeded();
+        waitForElement(Locator.lkButton("Export Fields"));
+
+        log("Select the ConcInRange field");
+        datasetFieldsPanel.selectField(CONC_INRANGE_STRING);
+
+        log("Change the column's reporting status to 'measure'");
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
+        Checkbox measure = Checkbox.Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(datasetFieldsPanel);
+        measure.check();
+
+        doAndWaitForPageToLoad(()->{
+            click(Locator.linkWithSpan("Save"));
+            waitForText("LuminexAssay Dataset Properties");
+        });
+        // Add a value in LuminexAssay with ConcInRangeString non-numeric for Analyte IL-10 (23)
+        log("Go to the schema browser and add a row with non-number ConcInRangeString.");
+        goToSchemaBrowser();
+        selectQuery("study", LUMINEXASSAY);
+
+        click(Locator.linkWithText("view data"));
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+        table.clickInsertNewRowDropdown();
+        waitForElement(Locator.name("quf_ParticipantId"));
+        setFormElement(Locator.name("quf_ParticipantId"), "PID_Float");
+        setFormElement(Locator.name("quf_date"), "1/1/2001");
+        setFormElement(Locator.name("quf_AnalyteName"), "IL-10 (23)");
+        setFormElement(Locator.name("quf_ConcInRangeString"), "<12.5");
+        clickButton("Submit");
+
+        // Create a chart with the analyte as the y-axis
+        clickProject(getProjectName());
+        clickFolder(getProjectName());
+        ChartTypeDialog chartTypeDialog;
+        chartTypeDialog = clickAddChart("study", LUMINEX_PIVOT_STRING);
+        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
+                .setYAxis(MEASURE_COLUMN)
+                .setXAxis(X_AXIS_COLUMN)
+                .clickApply();
+
+        //Confirm warning message indicating a non-numeric value could not be used.
+        assertTextPresent("The y-axis measure '" + MEASURE_COLUMN +"' had 1 value(s) that could not be converted to a number and are not included in the plot");
     }
 
     @Override public BrowserType bestBrowser()
