@@ -84,6 +84,36 @@
                     </property>
                 </bean>
                 <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="dummy2aNlpPipeline"/>
+                    <property name="description" value="Dummy2a NLP invocation"/>
+                    <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
+                    <property name="protocolName" value="Dummy2a NLP invocation"/>
+                    <property name="protocolFactoryName" value="dummyNlpinvocation"/>
+                    <property name="initialInputExt" ref="nlpTsvFileType"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="dummy2aNlpEngineCommand"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="dummy2bNlpPipeline"/>
+                    <property name="description" value="Dummy2b NLP invocation"/>
+                    <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
+                    <property name="protocolName" value="Dummy NLP2b invocation"/>
+                    <property name="protocolFactoryName" value="dummyNlpinvocation"/>
+                    <property name="initialInputExt" ref="nlpTsvFileType"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="dummy2bNlpEngineCommand"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummyNlpPipelineNoResults"/>
                     <property name="description" value="Dummy NLP invocation No Results"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
@@ -284,6 +314,78 @@
                 </bean>
                 <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
                     <property name="value" value="../../../uiTest3.nlp.json"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="."/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dummy2aNlpEngineCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="dummy2aNlpEngine"/>
+        <property name="statusName" value="RUN NLP ENGINE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpTsvFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputPaths">
+            <map>
+                <entry key="output">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpJsonFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="mv"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="../../../uiTest2a.nlp.json"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="."/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dummy2bNlpEngineCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="dummy2bNlpEngine"/>
+        <property name="statusName" value="RUN NLP ENGINE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpTsvFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputPaths">
+            <map>
+                <entry key="output">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpJsonFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="mv"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="../../../uiTest2b.nlp.json"/>
                 </bean>
                 <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
                     <property name="value" value="."/>
