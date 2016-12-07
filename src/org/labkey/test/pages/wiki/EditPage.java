@@ -90,7 +90,7 @@ public class EditPage extends LabKeyPage<EditPage.ElementCache>
 
         public ChangeFormatWindow()
         {
-            super("Change Format", getDriver());
+            super("Change Format", EditPage.this.getDriver());
             _formatSelect = EnumSelect(Locator.id("wiki-input-window-change-format-to"), WikiRendererType.class).waitFor(this);
         }
 

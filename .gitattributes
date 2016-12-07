@@ -432,7 +432,6 @@ src/org/labkey/test/components/ComponentElements.java -text
 src/org/labkey/test/components/CrosstabDataRegion.java -text
 src/org/labkey/test/components/CustomizeView.java -text
 src/org/labkey/test/components/D3PieChart.java -text
-src/org/labkey/test/components/FloatingComponent.java -text
 src/org/labkey/test/components/IssueListDefDataRegion.java -text
 src/org/labkey/test/components/ListsWebPart.java -text
 src/org/labkey/test/components/LookAndFeelBarPlot.java -text

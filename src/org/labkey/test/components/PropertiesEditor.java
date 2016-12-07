@@ -517,7 +517,7 @@ public class PropertiesEditor extends WebPartPanel
     {
         private FieldTypeWindow()
         {
-            super(ExtHelper.Locators.window("Choose Field Type").waitForElement(PropertiesEditor.this.getWrapper().shortWait()), getDriver());
+            super(ExtHelper.Locators.window("Choose Field Type").waitForElement(PropertiesEditor.this.getWrapper().shortWait()), PropertiesEditor.this.getDriver());
         }
 
         public FieldTypeWindow selectType(FieldDefinition.ColumnType type)

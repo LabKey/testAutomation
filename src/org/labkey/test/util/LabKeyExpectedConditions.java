@@ -20,6 +20,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -138,6 +139,24 @@ public abstract class LabKeyExpectedConditions
             public String toString()
             {
                 return "element to be enabled: " + loc.getLoggableDescription();
+            }
+        };
+    }
+
+    public static ExpectedCondition<WebElement> elementPresent(final Locator loc, final SearchContext context) {
+        return new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver ignoreDriver)
+            {
+                return loc.findElementOrNull(context);
+            }
+
+            @Override
+            public String toString()
+            {
+                return "element '" + loc.getLoggableDescription() + "'" +
+                        "to be present in context: " + context.toString();
             }
         };
     }

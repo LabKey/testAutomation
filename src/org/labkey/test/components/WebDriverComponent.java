@@ -15,11 +15,13 @@
  */
 package org.labkey.test.components;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
@@ -36,7 +38,12 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
 
     protected abstract WebDriver getDriver();
 
-    public static abstract class WebDriverComponentFinder<C, F extends WebDriverComponentFinder<C, F>> extends ComponentFinder<SearchContext, C, F>
+    public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, int timeout)
+    {
+        return getWrapper().doAndWaitForElementToRefresh(func, loc, this, new WebDriverWait(getDriver(), timeout));
+    }
+
+    public static abstract class WebDriverComponentFinder<Cmp, Finder extends WebDriverComponentFinder<Cmp, Finder>> extends ComponentFinder<SearchContext, Cmp, Finder>
     {
         private final WebDriver driver;
         public WebDriverComponentFinder(WebDriver driver)
@@ -49,32 +56,32 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
             return driver;
         }
 
-        public C findWhenNeeded()
+        public Cmp findWhenNeeded()
         {
-            return super.findWhenNeeded(driver);
+            return super.findWhenNeeded(getDriver());
         }
 
-        public C find()
+        public Cmp find()
         {
-            return super.find(driver);
+            return super.find(getDriver());
         }
 
-        public C waitFor()
+        public Cmp waitFor()
         {
-            return super.waitFor(driver);
+            return super.waitFor(getDriver());
         }
 
-        public C findOrNull()
+        public Cmp findOrNull()
         {
-            return super.findOrNull(driver);
+            return super.findOrNull(getDriver());
         }
 
         @Override
-        protected final C construct(WebElement el)
+        protected final Cmp construct(WebElement el)
         {
-            return construct(el, driver);
+            return construct(el, getDriver());
         }
 
-        protected abstract C construct(WebElement el, WebDriver driver);
+        protected abstract Cmp construct(WebElement el, WebDriver driver);
     }
 }

@@ -17,20 +17,17 @@ package org.labkey.test.components.ext4;
 
 import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.FloatingComponent;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC>
+public class Window<EC extends Window.ElementCache> extends WebDriverComponent<EC>
 {
-    WebElement _window;
-    WebDriverWrapper _driver;
+    private final WebElement _window;
+    private final WebDriver _driver;
 
     public Window(String windowTitle, WebDriver driver)
     {
@@ -45,7 +42,7 @@ public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC
     public Window(WebElement window, WebDriver driver)
     {
         _window = window;
-        _driver = new WebDriverWrapperImpl(driver);
+        _driver = driver;
     }
 
     public static WindowFinder Window()
@@ -53,7 +50,8 @@ public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC
         return new WindowFinder();
     }
 
-    protected WebDriverWrapper getWrapper()
+    @Override
+    protected WebDriver getDriver()
     {
         return _driver;
     }
@@ -123,18 +121,12 @@ public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC
         }, "Window did not close", msWait);
     }
 
-    @Deprecated // Use #elementCache()
-    protected FloatingComponent.ElementCache elements()
-    {
-        return super.elementCache();
-    }
-
     protected EC newElementCache()
     {
         return (EC) new ElementCache();
     }
 
-    protected class ElementCache extends Component.ElementCache
+    protected class ElementCache extends WebDriverComponent.ElementCache
     {
         protected WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
         protected WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
@@ -155,6 +147,46 @@ public class Window<EC extends Window.ElementCache> extends FloatingComponent<EC
 
     public static class WindowFinder extends WebDriverComponentFinder<Window, WindowFinder>
     {
+        public WindowFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        /**
+         * Bridge transition from redundant FloatingComponent
+         */
+        private WebDriver _driver;
+        @Deprecated
+        public WindowFinder()
+        {
+            this(null);
+        }
+        @Deprecated
+        public Window find(WebDriver driver)
+        {
+            _driver = driver;
+            return super.find();
+        }
+        @Deprecated
+        public Window waitFor(WebDriver driver)
+        {
+            _driver = driver;
+            return super.waitFor();
+        }
+        @Deprecated
+        public Window findWhenNeeded(WebDriver driver)
+        {
+            _driver = driver;
+            return super.findWhenNeeded();
+        }
+        @Override @Deprecated
+        protected WebDriver getDriver()
+        {
+            if (_driver != null)
+                return _driver;
+            return super.getDriver();
+        }
+
         private String titleText = "";
         private boolean partialText = true;
 

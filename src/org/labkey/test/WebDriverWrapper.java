@@ -28,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
@@ -1767,7 +1768,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (!previousElement.isEmpty())
             wait.until(ExpectedConditions.stalenessOf(previousElement.get(0)));
 
-        return loc.waitForElement(wait);
+        return wait.until(LabKeyExpectedConditions.elementPresent(loc, context));
     }
 
     public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, WebDriverWait wait)
