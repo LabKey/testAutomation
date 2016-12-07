@@ -1,5 +1,6 @@
 * text=auto !eol
 /assayTransformWarning.R -text
+/build.gradle -text
 src/org/labkey/AbstractAssayValidator.java -text
 src/org/labkey/AssayTransform.java -text
 src/org/labkey/AssayTransformWarning.java -text

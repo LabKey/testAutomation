@@ -1,0 +1,78 @@
+import org.labkey.gradle.util.BuildUtils;
+
+apply plugin: 'java'
+
+dependencies {
+  BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:java")
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src']
+    }
+
+    output.classesDir = "${project.buildDir}/classes"
+  }
+}
+
+project.task('validatorJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for assay validation",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          baseName "validator"
+          version project.version
+          destinationDir = new File(project.buildDir, "libs")
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayValidator'
+          }
+        }
+)
+
+project.task('transformJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for doing assay transforms",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          baseName "transform"
+          version project.version
+          destinationDir = new File(project.buildDir, "libs")
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayTransform'
+          }
+        }
+)
+
+project.task('transformWarningJar',
+        group: "QC",
+        type: Jar,
+        description: "Builds jar for doing assay transform warnings",
+        {
+          from sourceSets.main.output
+          from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+          baseName "transformWarning"
+          version project.version
+          destinationDir = new File(project.buildDir, "libs")
+          manifest {
+            attributes 'Implementation-Title': 'Assay Validator Jar',
+                    'Implementation-Version': project.version,
+                    'Built-By' : System.getProperty("user.name"),
+                    'Main-Class': 'org.labkey.AssayTransformWarning'
+          }
+        }
+)
+
+project.tasks.jar.dependsOn(project.tasks.validatorJar)
+project.tasks.jar.dependsOn(project.tasks.transformJar)
+project.tasks.jar.dependsOn(project.tasks.transformWarningJar)
