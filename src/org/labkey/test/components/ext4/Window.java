@@ -31,7 +31,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
 
     public Window(String windowTitle, WebDriver driver)
     {
-        this(Window().withTitle(windowTitle), driver);
+        this(Window(driver).withTitle(windowTitle), driver);
     }
 
     protected Window(WindowFinder finder, WebDriver driver)
@@ -45,6 +45,12 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         _driver = driver;
     }
 
+    public static WindowFinder Window(WebDriver driver)
+    {
+        return new WindowFinder(driver);
+    }
+
+    @Deprecated
     public static WindowFinder Window()
     {
         return new WindowFinder();
