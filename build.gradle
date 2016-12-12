@@ -1,10 +1,20 @@
-//// This needs to be set before doing the import or IntelliJ will complain
-//ant.properties['tomcat.home'] = project.tomcatDir
-//
-//ant.importBuild 'build.xml'
+import org.labkey.gradle.util.BuildUtils
 apply plugin: 'java'
+apply plugin: 'org.labkey.test'
 
+configurations {
+    aspectj
+}
+
+dependencies {
+    aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
+}
 sourceSets {
+    test {
+      java {
+         srcDirs = ['src']
+      }
+    }
     debug {
         java {
             srcDirs = ['src/org/labkey/test/debug']
@@ -14,8 +24,33 @@ sourceSets {
     }
 }
 
+tasks.compileTestJava.doLast {
+    ant.taskdef(
+            resource: "org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties",
+            classpath: project.configurations.aspectj.asPath
+    )
+    ant.iajc(
+            destdir: "${project.buildDir}/classes",
+            source: project.labkey.sourceCompatibility,
+            target: project.labkey.targetCompatibility,
+            classpath: project.configurations.compile.asPath,
+            {
+                sourceSets.test.java.srcDirs.each {
+                    src(path: it)
+                }
+            }
+    )
+}
+
+
 dependencies {
     debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+    compile "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
+    compile "com.googlecode.sardine:sardine:${sardineVersion}"
+    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:java")
+    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":server:api")
+    compile "junit:junit:${junitVersion}"
 }
 
 if (project.hasProperty("teamcity"))
