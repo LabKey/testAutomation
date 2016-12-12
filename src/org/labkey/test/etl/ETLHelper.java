@@ -615,6 +615,12 @@ public class ETLHelper
         return runETL_API(transformId, true);
     }
 
+    public void runETL_API(String transformId, String expectedStatus) throws Exception
+    {
+        final String jobId = runETL_API(transformId).getJobId();
+        assertEquals("ETL did not have expected status", expectedStatus, _diHelper.getTransformStatus(jobId).toUpperCase());
+    }
+
     void clickRetryButton()
     {
         _test.clickAndWait(_test.waitForElementWithRefresh(Locator.lkButton("Retry"), BaseWebDriverTest.WAIT_FOR_PAGE));
