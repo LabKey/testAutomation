@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assume;
@@ -51,8 +50,8 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.search.SearchBodyWebPart;
-import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
@@ -65,7 +64,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -89,7 +87,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +101,6 @@ import static org.labkey.test.TestProperties.isInjectionCheckEnabled;
 import static org.labkey.test.TestProperties.isLeakCheckSkipped;
 import static org.labkey.test.TestProperties.isLinkCheckEnabled;
 import static org.labkey.test.TestProperties.isQueryCheckSkipped;
-import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
@@ -114,6 +110,7 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.isLocalServer;
 import static org.labkey.test.components.ext4.Window.Window;
+import static org.labkey.test.components.html.RadioButton.RadioButton;
 
 /**
  * This class should be used as the base for all functional test classes
@@ -1435,7 +1432,15 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             else
                 clickAndWait(Locator.linkWithText("override"));
         }
-        checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));
+        final RadioButton pipeOptionProjectSpecified = RadioButton(Locator.radioButtonById("pipeOptionProjectSpecified")).find(getDriver());
+        try
+        {
+            pipeOptionProjectSpecified.check();
+        }
+        catch (WebDriverException retry) // Workaround for "Other element would receive the click" error
+        {
+            pipeOptionProjectSpecified.check();
+        }
         setFormElement(Locator.id("pipeProjectRootPath"), rootPath);
 
         clickButton("Save");
