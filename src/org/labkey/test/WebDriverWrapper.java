@@ -108,6 +108,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.WebTestHelper.stripContextPath;
+import static org.labkey.test.components.html.RadioButton.RadioButton;
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
@@ -3120,7 +3121,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void checkRadioButton(Locator radioButtonLocator)
     {
-        checkCheckbox(radioButtonLocator);
+        RadioButton(radioButtonLocator).find(getDriver()).check();
     }
 
     public void checkCheckbox(Locator checkBoxLocator)
@@ -3142,8 +3143,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void setCheckbox(WebElement el, boolean check)
     {
         String type = el.getAttribute("type");
-        if (!"checkbox".equals(type) && !"radio".equals(type))
-            throw new IllegalArgumentException("Element not a radio button or checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
+        if ("radio".equals(type))
+        {
+            log("WARNING: Use checkRadioButton for radio buttons");
+        }
+        else if (!"checkbox".equals(type))
+        {
+            throw new IllegalArgumentException("Element not a checkbox: " + el.toString() + "\nTry Ext4Helper or ExtHelper.");
+        }
 
         boolean selected = el.isSelected();
         if (check != selected)
