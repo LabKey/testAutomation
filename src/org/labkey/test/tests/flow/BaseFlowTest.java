@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.labkey.test;
+package org.labkey.test.tests.flow;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.BeforeClass;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriverException;

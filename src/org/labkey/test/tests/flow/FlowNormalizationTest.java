@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.flow;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.RReportHelper;
