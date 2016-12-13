@@ -2,7 +2,6 @@ package org.labkey.test.components.studydesigner;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -88,12 +87,6 @@ public class TreatmentDialog extends Window
         clickButton("OK", 0);
         waitForClose();
         getWrapper().longWait();
-    }
-
-    public static class Locators extends org.labkey.test.Locators
-    {
-        public static final Locator.XPathLocator okButton = Ext4Helper.Locators.ext4Button("OK");
-        public static final Locator.XPathLocator cancelButton = Ext4Helper.Locators.ext4Button("Cancel");
     }
 
     public enum Sections

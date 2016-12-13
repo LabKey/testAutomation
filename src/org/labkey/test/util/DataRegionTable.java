@@ -90,7 +90,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         if (table == null)
         {
-            _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
+            _driver.waitForElement(org.labkey.test.Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
             _tableElement = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
             _regionName = name;
         }
@@ -105,7 +105,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                     withRefindListener(element ->
                     {
                         clearCache();
-                        _driver.waitForElement(Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
+                        _driver.waitForElement(org.labkey.test.Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
                     });
         }
 
@@ -1301,7 +1301,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return "Import Bulk Data";
     }
 
-    public static class Locators extends org.labkey.test.Locators
+    public static class Locators
     {
         public static Locator.XPathLocator dataRegion()
         {

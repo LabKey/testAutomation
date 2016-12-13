@@ -21,9 +21,9 @@ import org.junit.experimental.categories.Category;
 import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -174,7 +174,7 @@ public class DataRegionTest extends BaseWebDriverTest
             {
                 return true;
             }
-            if (isElementPresent(LabKeyPage.Locators.pageSignal(successSignal))) {
+            if (isElementPresent(Locators.pageSignal(successSignal))) {
                 return false;
             }
             sleep(500);

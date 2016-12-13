@@ -985,11 +985,10 @@ public class ListHelper extends LabKeySiteWrapper
     /**
      * Set of locators for navigating the List Designer page
      */
-    public static class DesignerLocators extends org.labkey.test.Locators
+    public static class DesignerLocators
     {
         public static Locator.XPathLocator maxCheckbox = Locator.xpath("//input[@name='isMaxText']");
         public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
-
     }
 
     public String getPropertyXPath(String propertyHeading)

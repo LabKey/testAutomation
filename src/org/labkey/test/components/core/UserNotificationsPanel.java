@@ -16,14 +16,11 @@
 package org.labkey.test.components.core;
 
 import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
-import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
@@ -31,6 +28,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UserNotificationsPanel extends Component
 {
@@ -54,7 +53,7 @@ public class UserNotificationsPanel extends Component
     public static UserNotificationsPanel clickInbox(BaseWebDriverTest test)
     {
         test.click(inboxIcon);
-        test.waitForElement(LabKeyPage.Locators.pageSignal("notificationPanelShown"), 2000);
+        test.waitForElement(Locators.pageSignal("notificationPanelShown"), 2000);
         return new UserNotificationsPanel(Locator.css("div.labkey-notification-panel").findElement(test.getDriver()));
     }
 

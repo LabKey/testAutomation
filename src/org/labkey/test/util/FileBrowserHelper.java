@@ -136,7 +136,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             }
             catch (StaleElementReferenceException staleSignal)
             {
-                waitForElement(Locators.pageSignal(IMPORT_SIGNAL_NAME));
+                waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
             }
             waitForGrid();
         }
@@ -515,7 +515,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public void waitForFileGridReady()
     {
-        waitForElement(Locators.pageSignal(IMPORT_SIGNAL_NAME));
+        waitForElement(org.labkey.test.Locators.pageSignal(IMPORT_SIGNAL_NAME));
         waitForGrid();
     }
 
@@ -533,7 +533,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         }
     }
 
-    public static abstract class Locators extends org.labkey.test.Locators
+    public static abstract class Locators
     {
         static Locator.XPathLocator fBrowser = Locator.tagWithClass("div", "fbrowser");
         static Locator.XPathLocator folderTree = fBrowser.append(Locator.tagWithClass("div", "treenav-panel").withoutClass("x4-collapsed"));
