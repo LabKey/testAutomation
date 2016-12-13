@@ -95,7 +95,6 @@ public class MethodLoggingAspect
     @AfterThrowing(value = "loggedMethod() && @annotation(logMethod)", throwing = "e", argNames = "joinPoint, logMethod, e")
     public void afterLoggedMethodException(JoinPoint joinPoint, LogMethod logMethod, Throwable e)
     {
-        TestLogger.resetLogger();
         String thrown = e.getClass().getSimpleName();
         logMethodEnd(joinPoint, logMethod, "** " + thrown + " **");
     }
