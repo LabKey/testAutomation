@@ -1,4 +1,5 @@
 import org.labkey.gradle.util.BuildUtils
+
 apply plugin: 'java'
 apply plugin: 'org.labkey.test'
 
@@ -6,22 +7,32 @@ configurations {
     aspectj
 }
 
-dependencies {
-    aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
-}
 sourceSets {
     test {
-      java {
-         srcDirs = ['src']
-      }
+        java {
+            srcDirs = ['src']
+        }
     }
     debug {
         java {
             srcDirs = ['src/org/labkey/test/debug']
         }
         output.classesDir = "${project.buildDir}/classes"
-
     }
+}
+
+dependencies {
+    aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
+    debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
+
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+    compile "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
+    compile "com.googlecode.sardine:sardine:${sardineVersion}"
+    compile "junit:junit:${junitVersion}"
+
+    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:java")
+    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":server:api")
+
 }
 
 tasks.compileTestJava.doLast {
@@ -40,17 +51,6 @@ tasks.compileTestJava.doLast {
                 }
             }
     )
-}
-
-
-dependencies {
-    debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
-    compile files("${System.properties['java.home']}/../lib/tools.jar")
-    compile "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
-    compile "com.googlecode.sardine:sardine:${sardineVersion}"
-    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:java")
-    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":server:api")
-    compile "junit:junit:${junitVersion}"
 }
 
 if (project.hasProperty("teamcity"))
