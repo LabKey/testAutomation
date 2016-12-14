@@ -1,7 +1,7 @@
 import org.labkey.gradle.util.BuildUtils
 
 apply plugin: 'java'
-apply plugin: 'org.labkey.test'
+apply plugin: 'org.labkey.testRunner'
 
 configurations {
     aspectj
