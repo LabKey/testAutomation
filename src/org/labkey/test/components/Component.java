@@ -87,7 +87,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
     {
         private static final int DEFAULT_TIMEOUT = 10000;
         private int timeout = 0;
-        private int index = 0;
+        private Integer index = null;
         private S _context;
 
         public F timeout(int timeout)
@@ -119,7 +119,7 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
 
         protected final Locator buildLocator()
         {
-            return locator().index(index);
+            return index != null ? locator().index(index) : locator();
         }
 
         protected final S getContext()
