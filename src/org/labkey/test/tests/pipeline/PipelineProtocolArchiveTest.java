@@ -68,6 +68,8 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     @Test
     public void  testArchiveProtocol() throws Exception
     {
+        goToProjectHome();
+
         String PROTOCOL_DEF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<bioml>\n" +
                 "<note label=\"diseaseGroup\" type=\"input\">brain</note>\n" +
