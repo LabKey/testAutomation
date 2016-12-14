@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.api.writer.ZipFile;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -39,24 +38,18 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.TextSearcher;
-import org.labkey.test.util.ZipUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -523,7 +516,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
-        assertEquals("details Links", 9, getElementCount(Locator.linkWithText("DETAILS"))); // List events should each have a link
+        // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
+        assertEquals("details Links", 6, getElementCount(Locator.linkWithText("DETAILS")));
         assertEquals("Project Links", 18 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
         assertEquals("List Links", 18 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
