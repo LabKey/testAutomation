@@ -518,6 +518,7 @@ src/org/labkey/test/pages/assay/DataImportPage.java -text
 src/org/labkey/test/pages/assay/DeleteSelectedRunsPage.java -text
 src/org/labkey/test/pages/assay/SampleSetImportPage.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text
+src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/issues/AdminPage.java -text
 src/org/labkey/test/pages/issues/BaseIssuePage.java -text
