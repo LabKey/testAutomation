@@ -45,6 +45,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.io.IOException;
@@ -245,6 +246,26 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String rowidStr = getText(Locator.id("model.rowid"));
         int rowid = Integer.parseInt(rowidStr);
         assertTrue("Expected rowid on model.html page", rowid > 0);
+
+        log("** Testing url expression null behavior...");
+        beginAt("/query/" + getProjectName() + "/begin.view?");
+        viewQueryData(VEHICLE_SCHEMA, "Models");
+        DataRegionTable modelsGrid = new DataRegionTable("query", this);
+        try
+        {
+            modelsGrid.link(0, "urlWithNullResult");
+            fail("Expected to not find URL on 'urlWithNullResult' column");
+        }
+        catch (NoSuchElementException e) { /* expected */ }
+
+        String href = modelsGrid.link(0, "urlWithNullValue").getAttribute("href");
+        assertTrue("Expected 'urlWithNullValue' to replace missing token with null: " + href, href.endsWith("&doesNotExist=null"));
+
+        href = modelsGrid.link(0, "urlWithBlankValue").getAttribute("href");
+        assertTrue("Expected 'urlWithBlankValue' to replace missing token with empty string: " + href, href.endsWith("&doesNotExist="));
+
+        href = modelsGrid.link(0, "urlWithDefaultValue").getAttribute("href");
+        assertTrue("Expected 'urlWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&doesNotExist=fred"));
 
         log("** Testing query of vehicle schema...");
         goToModule("Query");

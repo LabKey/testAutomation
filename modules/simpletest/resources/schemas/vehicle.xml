@@ -93,6 +93,18 @@
         </fk>
         <datatype>int</datatype>
       </column>
+        <column columnName="urlWithNullResult" wrappedColumnName="RowId">
+            <url replaceMissing="nullResult">/simpletest/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+        </column>
+        <column columnName="urlWithNullValue" wrappedColumnName="RowId">
+            <url replaceMissing="nullValue">/simpletest/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+        </column>
+        <column columnName="urlWithBlankValue" wrappedColumnName="RowId">
+            <url replaceMissing="blankValue">/simpletest/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist}</url>
+        </column>
+        <column columnName="urlWithDefaultValue" wrappedColumnName="RowId">
+            <url>/simpletest/model.view?rowid=${RowId}&amp;doesNotExist=${doesNotExist:defaultValue('fred')}</url>
+        </column>
     </columns>
   </table>
 
