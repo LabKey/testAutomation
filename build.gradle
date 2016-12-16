@@ -55,4 +55,4 @@ tasks.compileTestJava.doLast {
 
 if (project.hasProperty("teamcity"))
    // This plugin depends on the debugClasses task for ensureShutdown used on TeamCity
-   apply plugin: 'org.labkey.teamcity'
+   apply plugin: 'org.labkey.teamCity'
