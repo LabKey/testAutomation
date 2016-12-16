@@ -408,7 +408,7 @@ public class ETLTest extends ETLAbstractTest
 
         _etlHelper.insertSourceRow("610", PREFIX + "2", null);
         final String newNameForRow1 = "newNameForRow1";
-        _etlHelper.editSourceRow(0, null, newNameForRow1, null);
+        _etlHelper.editSourceRow0Name(newNameForRow1);
         _etlHelper.runETL_API(MERGE_ETL, "COMPLETE");
 
         // Check insert of new and update to existing
@@ -444,7 +444,7 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.insert180columnsRow(rowMap);
         rowMap.put(5, modifiedField5);
         rowMap.put(180, field180val);
-        _etlHelper.edit180columnsRow(0, rowMap);
+        _etlHelper.edit180columnsRow0(rowMap);
         _etlHelper.runETL_API(MERGE_ETL, "COMPLETE");
         _etlHelper.assertIn180columnTarget(secondField5, modifiedField5, field180val);
         _etlHelper.assertNotIn180columnTarget(firstField5);

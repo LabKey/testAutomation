@@ -17,7 +17,6 @@ package org.labkey.test.etl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -399,28 +398,18 @@ public class ETLHelper
         _test.clickTab("Portal");
     }
 
-    void editSourceRow(int row, @Nullable String id, @Nullable String name, @Nullable String runId)
+    void editSourceRow0Name(String name)
     {
-        _test.log("updating source row " + row);
+        _test.log("updating source row " + 0);
         _test.clickTab("Portal");
         _test.clickAndWait(Locator.linkWithText("Source"));
-        _test.clickAndWait(Locator.linkWithText("edit").index(row));
-        _test.waitForElement(Locator.name("quf_id"));
-        if (null != id)
-        {
-            _test.setFormElement(Locator.name("quf_id"), id);
-        }
-        if (null != name)
-        {
-            _test.setFormElement(Locator.name("quf_name"), name);
-        }
-        if (null != runId)
-        {
-            _test.setFormElement(Locator.name("quf_transformrun"), runId);
-        }
+        _test.clickAndWait(Locator.linkWithText("edit").index(0));
+        _test.waitForElement(Locator.name("quf_name"));
+        _test.setFormElement(Locator.name("quf_name"), name);
         _test.clickButton("Submit");
         _test.log("returning to project home or folder");
         _test.clickTab("Portal");
+        assertInSource(name);
     }
 
     /**
@@ -445,16 +434,17 @@ public class ETLHelper
      * so if you're trying to verify fields in "field10" to "field179", you'll need to unhide.
      *
      */
-    void edit180columnsRow(int row, Map<Integer, String> fieldValues)
+    void edit180columnsRow0(Map<Integer, String> fieldValues)
     {
-        _test.log("updating row " + row + " in 180 column table");
+        _test.log("updating row 0 in 180 column table");
         _test.clickTab("Portal");
         _test.clickAndWait(Locators.qwp180columnSource);
-        _test.waitAndClickAndWait(Locator.linkWithText("edit").index(row));
+        _test.waitAndClickAndWait(Locator.linkWithText("edit").index(0));
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
         _test.clickTab("Portal");
+        assertIn180ColumnSource(fieldValues.values().toArray(new String[fieldValues.size()]));
     }
 
     /**
@@ -660,6 +650,16 @@ public class ETLHelper
     void deleteAllRows(String tableName) throws Exception
     {
         _test.deleteAllRows(_projectName, VEHICLE_SCHEMA, tableName);
+    }
+
+    void assertInSource(String... targets)
+    {
+        assertQueryWebPart(ETL_SOURCE, "Source", true, targets);
+    }
+
+    void assertIn180ColumnSource(String... targets)
+    {
+        assertQueryWebPart(ETL_180_COLUMN_SOURCE, TITLE_180_COLUMN_SOURCE, true, targets);
     }
 
     void assertInTarget1(String... targets)
