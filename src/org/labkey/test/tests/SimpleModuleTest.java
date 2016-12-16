@@ -195,9 +195,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
         insertCmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Models");
         insertCmd.getRows().addAll(Arrays.asList(
                 Maps.of("ManufacturerId", toyotaId,
-                        "Name", "Prius C"),
+                        "Name", "Prius C",
+                        "InitialReleaseYear", null),
                 Maps.of("ManufacturerId", toyotaId,
-                        "Name", "Camry"),
+                        "Name", "Camry",
+                        "InitialReleaseYear", 1982),
                 Maps.of("ManufacturerId", fordId,
                         "Name", "Focus"),
                 Maps.of("ManufacturerId", fordId,
@@ -247,25 +249,69 @@ public class SimpleModuleTest extends BaseWebDriverTest
         int rowid = Integer.parseInt(rowidStr);
         assertTrue("Expected rowid on model.html page", rowid > 0);
 
-        log("** Testing url expression null behavior...");
-        beginAt("/query/" + getProjectName() + "/begin.view?");
-        viewQueryData(VEHICLE_SCHEMA, "Models");
+
+        log("** Testing url expression null behavior for null InitialReleaseYear...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isblank=");
         DataRegionTable modelsGrid = new DataRegionTable("query", this);
         try
         {
-            modelsGrid.link(0, "urlWithNullResult");
-            fail("Expected to not find URL on 'urlWithNullResult' column");
+            modelsGrid.link(0, "urlBadColumnWithDefaultBehavior");
+            fail("Expected to not find URL on 'urlBadColumnWithDefaultBehavior' column");
         }
         catch (NoSuchElementException e) { /* expected */ }
 
-        String href = modelsGrid.link(0, "urlWithNullValue").getAttribute("href");
-        assertTrue("Expected 'urlWithNullValue' to replace missing token with null: " + href, href.endsWith("&doesNotExist=null"));
+        try
+        {
+            modelsGrid.link(0, "urlBadColumnWithNullResult");
+            fail("Expected to not find URL on 'urlBadColumnWithNullResult' column");
+        }
+        catch (NoSuchElementException e) { /* expected */ }
 
-        href = modelsGrid.link(0, "urlWithBlankValue").getAttribute("href");
-        assertTrue("Expected 'urlWithBlankValue' to replace missing token with empty string: " + href, href.endsWith("&doesNotExist="));
+        String href = modelsGrid.link(0, "urlBadColumnWithNullValue").getAttribute("href");
+        assertTrue("Expected 'urlBadColumnWithNullValue' to replace missing token with null: " + href, href.endsWith("&doesNotExist=null"));
 
-        href = modelsGrid.link(0, "urlWithDefaultValue").getAttribute("href");
-        assertTrue("Expected 'urlWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&doesNotExist=fred"));
+        href = modelsGrid.link(0, "urlBadColumnWithBlankValue").getAttribute("href");
+        assertTrue("Expected 'urlBadColumnWithBlankValue' to replace missing token with empty string: " + href, href.endsWith("&doesNotExist="));
+
+        href = modelsGrid.link(0, "urlBadColumnWithDefaultValue").getAttribute("href");
+        assertTrue("Expected 'urlBadColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&doesNotExist=fred"));
+
+
+        href = modelsGrid.link(0, "urlNullableColumnWithDefaultBehavior").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithDefaultBehavior' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithNullResult").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithNullResult' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithNullValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithBlankValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithBlankValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithDefaultValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&nullableColumn=fred"));
+
+
+        log("** Testing url expression null behavior for non-null InitialReleaseYear...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isnonblank=");
+        modelsGrid = new DataRegionTable("query", this);
+
+        href = modelsGrid.link(0, "urlNullableColumnWithDefaultBehavior").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithDefaultBehavior' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithNullResult").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithNullResult' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithNullValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithBlankValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithBlankValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+
+        href = modelsGrid.link(0, "urlNullableColumnWithDefaultValue").getAttribute("href");
+        assertTrue("Expected 'urlNullableColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&nullableColumn=1982"));
+
 
         log("** Testing query of vehicle schema...");
         goToModule("Query");
