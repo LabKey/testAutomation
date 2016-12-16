@@ -28,6 +28,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return getTexts(elementCache().findActiveUsers());
     }
 
+    public CustomizeSitePage clickSiteSettings()
+    {
+        clickAndWait(elementCache().siteSettingsLink);
+        return new CustomizeSitePage(getDriver());
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -35,6 +41,8 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
+        protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
+
         protected List<WebElement> findActiveUsers()
         {
             return Locator.tagWithName("table", "activeUsers").append(Locator.tag("td").position(1)).findElements(this);
