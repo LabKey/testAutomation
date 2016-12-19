@@ -521,6 +521,7 @@ src/org/labkey/test/pages/assay/DeleteSelectedRunsPage.java -text
 src/org/labkey/test/pages/assay/SampleSetImportPage.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/core/admin/CustomizeSitePage.java -text
+src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/issues/AdminPage.java -text
@@ -706,6 +707,7 @@ src/org/labkey/test/tests/WebpartPermissionsTest.java -text
 src/org/labkey/test/tests/WikiLongTest.java -text
 src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
+src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text
 src/org/labkey/test/tests/flow/FlowCBCTest.java -text

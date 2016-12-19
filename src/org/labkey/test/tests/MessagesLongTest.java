@@ -45,6 +45,9 @@ import static org.labkey.test.Locator.NBSP;
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
+    public static final String NO_MESSAGES = "No messages";
+    public static final String NOT_CONTRIBUTOR_ONLY_TITLE = "Not-Contributor-only title";
+    public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
     PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "MessagesVerifyProject";
@@ -59,12 +62,14 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String MSG3_TITLE = "test message 3";
     private static final String MSG4_TITLE = "test message 4";
     private static final String MSG4_BODY = "test message 4 - special characters: " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String MSG5_TITLE = "test message 5";
     private static final String RESP2_BODY = "third test, thanks";
     private static final String USER1 = "messageslong_user1@messages.test";
     private static final String USER2 = "messageslong_user2@messages.test";
     private static final String USER3 = "messageslong_user3@messages.test";
     private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
+    private static final String CONTRIBUTOR = "contributor@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>${labkey.webPart(partName='Lists')}</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
@@ -204,7 +209,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
-        clickButton("Respond");
+        clickRespondButton();
         setFormElement(Locator.name("title"), RESP1_TITLE);
         setFormElement(Locator.name("expires"), EXPIRES2);
         setFormElement(Locator.id("body"), RESP1_BODY);
@@ -217,7 +222,7 @@ public class MessagesLongTest extends BaseWebDriverTest
                 RESP1_BODY);
 
         log("Add second response with attachment, make sure it was entered and recognized");
-        clickButton("Respond");
+        clickRespondButton();
         setFormElement(Locator.id("body"), RESP2_BODY);
         click(Locator.linkContainingText("Attach a file"));
         File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
@@ -267,7 +272,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond").index(1));
-        clickButton("Respond");
+        clickRespondButton();
         clickButton("Submit", longWaitForPage);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("Admin"));
@@ -293,7 +298,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent(displayNameFromEmail(USER1));
         clickButton("Cancel");
         clickAndWait(Locator.linkWithText(MSG2_TITLE));
-        clickButton("Respond");
+        clickRespondButton();
         selectOptionByText(Locator.name("status"), "Closed");
         assertEquals("", getFormElement(Locator.name("assignedTo")));
         clickButton("Submit", longWaitForPage);
@@ -359,6 +364,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
 
+        doTestMessageContributorRole();
     }
 
     private void verifyAdmin()
@@ -456,7 +462,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         impersonateRole("Editor");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
-        clickButton("Respond");
+        clickRespondButton();
         // enter invalid username, ensure error appears
         setFormElement(Locator.id(MEMBER_LIST), NOT_A_USER);
         clickButtonContainingText("Submit", NOT_A_USER + ": Invalid");
@@ -485,6 +491,54 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent("Members: "+ USER1 + " (" + displayNameFromEmail(USER1) +")");
     }
 
+
+    public void doTestMessageContributorRole(){
+        if (isImpersonating())
+        {
+            stopImpersonating();
+        }
+
+        clickProject(PROJECT_NAME);
+        createUserWithPermissions(CONTRIBUTOR, PROJECT_NAME, "Message Board Contributor");
+        clickButton("Save and Finish");
+
+        //As other role add a message
+        clickProject(PROJECT_NAME);
+        portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        setFormElement(Locator.name("title"), NOT_CONTRIBUTOR_ONLY_TITLE);
+        setFormElement(Locator.id("body"), NOT_CONTRIBUTOR_ONLY_MESSAGE);
+        clickButton("Submit", longWaitForPage);
+        //Confirm message
+        impersonate(CONTRIBUTOR);
+        portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        setFormElement(Locator.name("title"), MSG5_TITLE);
+        setFormElement(Locator.id("body"), "Contributor message");
+        clickButton("Submit", longWaitForPage);
+        assertTextPresent(MSG5_TITLE);
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        assertElementPresent(Locator.linkWithSpan("Delete Message"));//Confirm here to legitimize not-present assert later.
+        clickButton("Delete Message");
+        clickButton("Delete");
+
+        //confirm can read other user's message
+        clickAndWait(Locator.linkWithText(NOT_CONTRIBUTOR_ONLY_TITLE));
+
+        //confirm cannot delete other user's message
+        assertElementNotPresent(Locator.linkWithSpan("Delete Message"));//Confirm here to legitimize not-present assert later.
+
+        //confirm can respond to other user's message
+        clickRespondButton();
+        String contributorResponse = "Contributor response";
+        setFormElement(Locator.id("body"), contributorResponse);
+        clickButton("Submit");
+        assertTextPresent(contributorResponse);
+    }
+
+    private void clickRespondButton()
+    {
+        clickButton("Respond");
+    }
+
     //Expects an empty email record
     //Regression test: 14824: forum not sending email for message replies to users configured as "my conversations"
     private void doTestEmailPrefsMine()
@@ -507,7 +561,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(_messageTitle));
-        clickButton("Respond");
+        clickRespondButton();
         setFormElement(Locator.name("title"), _messageTitle + " response");
         setFormElement(Locator.id("body"), _messageBody + " response");
         clickButton("Submit");
@@ -615,7 +669,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("test add response");
         clickAndWait(Locator.linkWithText("view message or respond"));
-        clickButton("Respond");
+        clickRespondButton();
         setFormElement(Locator.name("title"), RESP1_TITLE);
         setFormElement(Locator.id("body"), RESP1_BODY);
         clickButton("Submit");
