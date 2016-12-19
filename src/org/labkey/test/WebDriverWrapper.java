@@ -822,6 +822,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
         getDriver().switchTo().window(windows.get(index));
     }
 
+    protected void closeExtraWindows()
+    {
+        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
+        for (int i = 1; i < windows.size(); i++)
+        {
+            getDriver().switchTo().window(windows.get(i));
+            executeScript("window.onbeforeunload = null;");
+            getDriver().close();
+        }
+        switchToMainWindow();
+    }
+
     public boolean isPageEmpty()
     {
         //IE and Firefox have different notions of empty.

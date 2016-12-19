@@ -253,18 +253,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         closeExtraWindows();
     }
 
-    private void closeExtraWindows()
-    {
-        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        for (int i = 1; i < windows.size(); i++)
-        {
-            getDriver().switchTo().window(windows.get(i));
-            executeScript("window.onbeforeunload = null;");
-            getDriver().close();
-        }
-        switchToMainWindow();
-    }
-
     public ArtifactCollector getArtifactCollector()
     {
         return _artifactCollector;
