@@ -75,5 +75,13 @@ public class TestScrubber extends ExtraSiteWrapper
         {
             log("Failed to reset Secondary Authentication after test");
         }
+        try
+        {
+            disableLoginAttemptLimit();
+        }
+        catch (RuntimeException e)
+        {
+            log("Failed to disable login attempt limit after test");
+        }
     }
 }
