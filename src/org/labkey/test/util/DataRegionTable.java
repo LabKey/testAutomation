@@ -75,6 +75,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     // Cached items
     private CustomizeView _customizeView;
+    private DataRegionExportHelper _exportHelper;
     protected final List<String> _columnLabels = new ArrayList<>();
     protected final List<String> _columnNames = new ArrayList<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
@@ -182,6 +183,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         _elements = null;
         _customizeView = null;
+        _exportHelper = null;
         _tableId = null;
         _columnLabels.clear();
         _columnNames.clear();
@@ -221,6 +223,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         getCustomizeView().closePanel();
         return this;
+    }
+
+    protected DataRegionExportHelper getExportPanel()
+    {
+        if (_exportHelper == null)
+            _exportHelper = new DataRegionExportHelper(this);
+        return _exportHelper;
+    }
+
+    public DataRegionExportHelper expandExportPanel()
+    {
+        return _exportHelper.expandExportPanel();
     }
 
     protected int getHeaderRowCount()
