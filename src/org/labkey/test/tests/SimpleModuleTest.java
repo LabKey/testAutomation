@@ -45,7 +45,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +56,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
 * Tests the simple module and file-based resources introduced in version 9.1
@@ -253,43 +256,32 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing url expression null behavior for null InitialReleaseYear...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isblank=");
         DataRegionTable modelsGrid = new DataRegionTable("query", this);
-        try
-        {
-            modelsGrid.link(0, "urlBadColumnWithDefaultBehavior");
-            fail("Expected to not find URL on 'urlBadColumnWithDefaultBehavior' column");
-        }
-        catch (NoSuchElementException e) { /* expected */ }
 
-        try
-        {
-            modelsGrid.link(0, "urlBadColumnWithNullResult");
-            fail("Expected to not find URL on 'urlBadColumnWithNullResult' column");
-        }
-        catch (NoSuchElementException e) { /* expected */ }
+        // URLs with a bad (missing) column should result in no URL being rendered
+        assertFalse("Expected to not find URL on 'urlBadColumnWithDefaultBehavior' column", modelsGrid.hasHref(0, "urlBadColumnWithDefaultBehavior"));
+        assertFalse("Expected to not find URL on 'urlBadColumnWithNullResult' column", modelsGrid.hasHref(0, "urlBadColumnWithNullResult"));
+        assertFalse("Expected to not find URL on 'urlBadColumnWithNullValue' column", modelsGrid.hasHref(0, "urlBadColumnWithNullValue"));
+        assertFalse("Expected to not find URL on 'urlBadColumnWithBlankValue' column", modelsGrid.hasHref(0, "urlBadColumnWithBlankValue"));
 
-        String href = modelsGrid.link(0, "urlBadColumnWithNullValue").getAttribute("href");
-        assertTrue("Expected 'urlBadColumnWithNullValue' to replace missing token with null: " + href, href.endsWith("&doesNotExist=null"));
-
-        href = modelsGrid.link(0, "urlBadColumnWithBlankValue").getAttribute("href");
-        assertTrue("Expected 'urlBadColumnWithBlankValue' to replace missing token with empty string: " + href, href.endsWith("&doesNotExist="));
-
-        href = modelsGrid.link(0, "urlBadColumnWithDefaultValue").getAttribute("href");
+        // ... except if the missing column has a defaultValue
+        String href = modelsGrid.getHref(0, "urlBadColumnWithDefaultValue");
         assertTrue("Expected 'urlBadColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&doesNotExist=fred"));
 
 
-        href = modelsGrid.link(0, "urlNullableColumnWithDefaultBehavior").getAttribute("href");
+        // URLs with column that is present (not missing) but is null should result in a URL with blanks
+        href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultBehavior");
         assertTrue("Expected 'urlNullableColumnWithDefaultBehavior' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithNullResult").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithNullResult' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+        // ... except if we override the NullValueBehavior to return a null result
+        assertFalse("Expected 'urlNullableColumnWithNullResult' to replace null value with null result", modelsGrid.hasHref(0, "urlNullableColumnWithNullResult"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithNullValue").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
+        href = modelsGrid.getHref(0, "urlNullableColumnWithNullValue");
+        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with 'null': " + href, href.endsWith("&nullableColumn=null"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithBlankValue").getAttribute("href");
+        href = modelsGrid.getHref(0, "urlNullableColumnWithBlankValue");
         assertTrue("Expected 'urlNullableColumnWithBlankValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn="));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithDefaultValue").getAttribute("href");
+        href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultValue");
         assertTrue("Expected 'urlNullableColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&nullableColumn=fred"));
 
 
@@ -297,19 +289,19 @@ public class SimpleModuleTest extends BaseWebDriverTest
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=Models&query.InitialReleaseYear~isnonblank=");
         modelsGrid = new DataRegionTable("query", this);
 
-        href = modelsGrid.link(0, "urlNullableColumnWithDefaultBehavior").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithDefaultBehavior' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+        href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultBehavior");
+        assertTrue("Expected 'urlNullableColumnWithDefaultBehavior' to replace missing token with value: " + href, href.endsWith("&nullableColumn=1982"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithNullResult").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithNullResult' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+        href = modelsGrid.getHref(0, "urlNullableColumnWithNullResult");
+        assertTrue("Expected 'urlNullableColumnWithNullResult' to replace missing token with value: " + href, href.endsWith("&nullableColumn=1982"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithNullValue").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+        href = modelsGrid.getHref(0, "urlNullableColumnWithNullValue");
+        assertTrue("Expected 'urlNullableColumnWithNullValue' to replace missing token with value: " + href, href.endsWith("&nullableColumn=1982"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithBlankValue").getAttribute("href");
-        assertTrue("Expected 'urlNullableColumnWithBlankValue' to replace missing token with blank: " + href, href.endsWith("&nullableColumn=1982"));
+        href = modelsGrid.getHref(0, "urlNullableColumnWithBlankValue");
+        assertTrue("Expected 'urlNullableColumnWithBlankValue' to replace missing token with value: " + href, href.endsWith("&nullableColumn=1982"));
 
-        href = modelsGrid.link(0, "urlNullableColumnWithDefaultValue").getAttribute("href");
+        href = modelsGrid.getHref(0, "urlNullableColumnWithDefaultValue");
         assertTrue("Expected 'urlNullableColumnWithDefaultValue' to replace missing token with default 'fred' string: " + href, href.endsWith("&nullableColumn=1982"));
 
 
