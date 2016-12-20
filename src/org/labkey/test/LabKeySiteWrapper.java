@@ -1168,6 +1168,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void enableExperimentalFeature(String feature)
     {
+        final String ENABLE = "ENABLE";
+        final String DISABLE = "DISABLE";
+
         log("Attempting to enable feature: " + feature);
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("experimental features"));
@@ -1178,13 +1181,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         else
         {
             final String linkText = link.getText();
-            if("Enable".equals(linkText))
+            if(ENABLE.equals(linkText))
             {
                 log("Feature currently disabled, enabling " + feature);
                 click(link);
-                shortWait().until(ExpectedConditions.textToBePresentInElement(link, "Disable"));
+                shortWait().until(ExpectedConditions.textToBePresentInElement(link, DISABLE));
             }
-            else if("Disable".equals(linkText))
+            else if(DISABLE.equals(linkText))
             {
                 log("Feature currently enabled: " + feature);
             }
