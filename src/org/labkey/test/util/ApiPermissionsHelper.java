@@ -193,6 +193,9 @@ public class ApiPermissionsHelper extends PermissionsHelper
 
     private Integer getSiteGroupId(String groupName)
     {
+        if ("Developers".equals(groupName))
+            return -4; // Actually a role, exposed as a group -- org.labkey.api.security.Group.groupDevelopers
+
         for (Map<String, Object> group : getSiteGroups())
         {
             if (groupName.equals(group.get("name")))
@@ -566,6 +569,8 @@ public class ApiPermissionsHelper extends PermissionsHelper
     public void addUserToProjGroup(String userName, String projectName, String groupName)
     {
         Integer groupId = getProjectGroupId(groupName, projectName);
+        if (groupId == null)
+            throw new IllegalArgumentException("Attempting to add user to non-existent group: " + groupName + ". Available: " + getGroupNames(projectName));
         addMembersToGroup(projectName, groupId, userName);
     }
 
@@ -573,7 +578,17 @@ public class ApiPermissionsHelper extends PermissionsHelper
     public void addUserToSiteGroup(String userName, String groupName)
     {
         Integer groupId = getSiteGroupId(groupName);
+        if (groupId == null)
+            throw new IllegalArgumentException("Attempting to add user to non-existent site group: " + groupName + ". Available: " + getGroupNames("/"));
         addMembersToGroup("/", groupId, userName);
+    }
+
+    private List<String> getGroupNames(String project)
+    {
+        final List<Map<String, Object>> groups = getGroups(project);
+        List<String> groupNames = new ArrayList<>();
+        groups.forEach(group -> groupNames.add((String)group.get("name")));
+        return groupNames;
     }
 
     @Override
