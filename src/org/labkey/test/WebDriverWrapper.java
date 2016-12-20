@@ -736,6 +736,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForElement(Locators.pageSignal("queryTreeRendered"));
     }
 
+    public void goToSchemaBrowser(int waitMilSec)
+    {
+        int waitSeconds = waitMilSec / 1000;
+
+        goToModule("Query");
+        new WebDriverWait(getDriver(), waitSeconds).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.lk-sb-instructions")));
+        waitForElement(Locators.pageSignal("queryTreeRendered"), waitMilSec);
+    }
+
     public void goToFolderManagement()
     {
         clickAdminMenuItem("Folder", "Management");
