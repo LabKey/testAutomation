@@ -44,6 +44,8 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -497,16 +499,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertTrue("Test user '" + getCurrentUser() + "' is not a site admin", isUserSystemAdmin());
     }
 
-    public void goToAdminConsole()
+    public ShowAdminPage goToAdminConsole()
     {
         ensureAdminMode();
         clickAdminMenuItem("Site", "Admin Console");
+        return new ShowAdminPage(getDriver());
     }
 
-    public void goToSiteSettings()
+    public CustomizeSitePage goToSiteSettings()
     {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("site settings"));
+        return goToAdminConsole().clickSiteSettings();
     }
 
     public void goToAuditLog()
