@@ -10,8 +10,15 @@ configurations {
 sourceSets {
     test {
         java {
-            srcDirs = ['src']
+            srcDirs = []
+            project.rootProject.allprojects { Project otherProj ->
+                if (otherProj.file("test/src").exists())
+                {
+                    srcDirs += otherProj.file("test/src")
+                }
+            }
         }
+        output.classesDir = "${project.buildDir}/classes"
     }
     debug {
         java {
