@@ -1149,7 +1149,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return text;
     }
 
-    private Alert waitForAlert()
+    protected Alert waitForAlert()
     {
         waitFor(() -> null != getAlertIfPresent(), WAIT_FOR_JAVASCRIPT);
         return getDriver().switchTo().alert();
