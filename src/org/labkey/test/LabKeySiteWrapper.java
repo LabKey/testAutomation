@@ -1162,7 +1162,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     *
      * @param feature  the enable link will have an id of the form "labkey-experimental-feature-[feature]
      */
     public void enableExperimentalFeature(String feature)
@@ -1171,20 +1170,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("experimental features"));
 
-        String xpath = "//div[div[text()='" + feature + "']]/a";
-        if (!isElementPresent(Locator.xpath(xpath)))
+        final WebElement link = Locator.tagWithId("a", "labkey-experimental-feature-" + feature).findElementOrNull(getDriver());
+        if (link == null)
             fail("No such feature found: " + feature);
         else
         {
-            Locator link = Locator.xpath(xpath + "[text()='Enable']");
-            if(isElementPresent(link))
+            final String linkText = link.getText();
+            if("Enable".equals(linkText))
             {
+                log("Feature currently disabled, enabling " + feature);
                 click(link);
-                log("Enable link found, enabling " + feature);
+                shortWait().until(ExpectedConditions.textToBePresentInElement(link, "Disable"));
+            }
+            else if("Disable".equals(linkText))
+            {
+                log("Feature currently enabled: " + feature);
             }
             else
             {
-                log("Link not found, presumed enabled: " + feature);
+                throw new IllegalStateException(String.format("Unknown link text [%s] for experimental feature '%s'", linkText, feature));
             }
         }
     }
