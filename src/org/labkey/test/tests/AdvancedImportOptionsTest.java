@@ -340,7 +340,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Select sub folders to import into");
         Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
         sleep(250);
-        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5)).click();
         sleep(250);
 
         log("Start the import and verify the confirmation dialog");

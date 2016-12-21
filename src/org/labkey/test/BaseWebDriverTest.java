@@ -1802,7 +1802,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setFormElement(Locator.name("folderZip"), folderFile);
         if (!validateQueries)
             uncheckCheckbox(Locator.name("validateQueries"));
-        clickButtonContainingText("Import Folder From Local Zip Archive");
+        clickButtonContainingText("Import Folder");
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(completedJobs, "Folder import", expectErrors, wait);
     }

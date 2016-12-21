@@ -49,7 +49,7 @@ public class StartImportPage extends LabKeyPage
         sip.setValidateQueriesCheckBox(validateQueries);
         sip.setAdvancedImportOptionsCheckBox(showAdvancedImportOptions);
 
-        test.clickButtonContainingText("Import Folder From Local Zip Archive");
+        test.clickButtonContainingText("Import Folder");
         test.waitForText("Select specific objects to import");
 
         return sip;
