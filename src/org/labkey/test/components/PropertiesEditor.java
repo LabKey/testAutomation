@@ -18,6 +18,7 @@ package org.labkey.test.components;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Checkbox;
@@ -51,6 +52,7 @@ import static org.labkey.test.util.TestLogger.log;
 public class PropertiesEditor extends WebPartPanel
 {
     public static final String EDITOR_CHANGE_SIGNAL = "propertiesEditorChange";
+    private boolean _haveAlreadyDeletedOneFieldRow = false;
 
     private PropertiesEditor(WebElement element, WebDriver driver)
     {
@@ -294,6 +296,23 @@ public class PropertiesEditor extends WebPartPanel
                 window.selectLookup(lookupInfo);
 
             window.clickApply();
+        }
+
+        public void markForDeletion()
+        {
+            Locator.xpath(".//div[contains(@id, 'partdelete_')]").waitForElement(getComponentElement(), 500).click();
+            if (!_haveAlreadyDeletedOneFieldRow) // if you've already dismissed this dialog, it won't appear again
+            {
+                WebDriverWrapper.waitFor(() ->
+                        Locator.xpath("//div[@class='gwt-Label' and contains(text(), 'Are you sure you want to remove this field?')]")
+                                .findElementOrNull(getDriver()) != null, 1000);
+                WebElement okBtn = Locator.xpath("//a[@class='labkey-button']")
+                        .withChild(Locator.xpath("./span[text()='OK']"))
+                        .findElementOrNull(getDriver());
+                if (null != okBtn)
+                    okBtn.click();
+                _haveAlreadyDeletedOneFieldRow = true;
+            }
         }
 
         private FormItem<String> findNameEl()
