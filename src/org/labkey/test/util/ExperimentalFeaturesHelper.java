@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class ExperimentalFeaturesHelper
 
     public static void setExperimentalFeature(Connection cn, String feature, boolean enable)
     {
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("feature", feature);
         parameters.put("enabled", enable);
@@ -37,11 +37,15 @@ public class ExperimentalFeaturesHelper
         command.setParameters(parameters);
         try
         {
-            org.labkey.remoteapi.CommandResponse rt = command.execute(cn, null);
+            CommandResponse rt = command.execute(cn, null);
         }
-        catch (IOException | CommandException e)
+        catch (IOException e)
         {
             throw new RuntimeException("Error setting experimental feature '" + feature + "'.", e);
+        }
+        catch (CommandException e)
+        {
+            throw new RuntimeException("Error setting experimental feature '" + feature + "': " + e.getStatusCode(), e);
         }
 
     }
