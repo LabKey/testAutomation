@@ -664,6 +664,7 @@ src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
 src/org/labkey/test/tests/ResourceEncodingTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text
+src/org/labkey/test/tests/SampleSetNameExpressionTest.java -text
 src/org/labkey/test/tests/SampleSetTest.java -text
 src/org/labkey/test/tests/ScatterPlotTest.java -text
 src/org/labkey/test/tests/SchemaBrowserTest.java -text
