@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.announcements.api.Announcement;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -51,7 +52,6 @@ public class DiscussionLinkTest extends BaseWebDriverTest
     @Test
     public void testDiscussionLink() throws Exception
     {
-        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Wiki");
         //Create wiki using WikiHelper
@@ -63,15 +63,14 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         click(Locator.linkContainingText(WIKI_NAME));
         assertElementPresent(Locator.linkContainingText("discussion"));
         //goto l and feel
-        goToProjectSettings();
+        ProjectSettingsPage projectSettingsPage = goToProjectSettings();
         //confirm Enable discussion enabled checked
-        ProjectSettingsPage projectSettingsPage = new ProjectSettingsPage(getDriver());
         org.labkey.test.components.html.Checkbox enableDiscussionCheckbox = projectSettingsPage.getEnableDiscussionCheckbox();
         assertEquals("Enable Discussion should be checked.",true, enableDiscussionCheckbox.isChecked());
 
         //un-check Enabled
         enableDiscussionCheckbox.uncheck();
-        clickButton("Save");
+        projectSettingsPage.save();
 
         //Confirm Discussion link is not present
         goToProjectHome();
@@ -95,6 +94,6 @@ public class DiscussionLinkTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("announcement");
     }
 }

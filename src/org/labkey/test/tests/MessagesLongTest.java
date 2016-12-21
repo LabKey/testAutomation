@@ -46,8 +46,6 @@ import static org.labkey.test.Locator.NBSP;
 public class MessagesLongTest extends BaseWebDriverTest
 {
     public static final String NO_MESSAGES = "No messages";
-    public static final String NOT_CONTRIBUTOR_ONLY_TITLE = "Not-Contributor-only title";
-    public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
     PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "MessagesVerifyProject";
@@ -62,14 +60,12 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String MSG3_TITLE = "test message 3";
     private static final String MSG4_TITLE = "test message 4";
     private static final String MSG4_BODY = "test message 4 - special characters: " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    private static final String MSG5_TITLE = "test message 5";
     private static final String RESP2_BODY = "third test, thanks";
     private static final String USER1 = "messageslong_user1@messages.test";
     private static final String USER2 = "messageslong_user2@messages.test";
     private static final String USER3 = "messageslong_user3@messages.test";
     private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
-    private static final String CONTRIBUTOR = "contributor@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>${labkey.webPart(partName='Lists')}</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
@@ -364,7 +360,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
 
-        doTestMessageContributorRole();
     }
 
     private void verifyAdmin()
@@ -492,49 +487,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     }
 
 
-    public void doTestMessageContributorRole(){
-        if (isImpersonating())
-        {
-            stopImpersonating();
-        }
-
-        clickProject(PROJECT_NAME);
-        createUserWithPermissions(CONTRIBUTOR, PROJECT_NAME, "Message Board Contributor");
-        clickButton("Save and Finish");
-
-        //As other role add a message
-        clickProject(PROJECT_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        setFormElement(Locator.name("title"), NOT_CONTRIBUTOR_ONLY_TITLE);
-        setFormElement(Locator.id("body"), NOT_CONTRIBUTOR_ONLY_MESSAGE);
-        clickButton("Submit", longWaitForPage);
-        //Confirm message
-        impersonate(CONTRIBUTOR);
-        portalHelper.clickWebpartMenuItem("Messages", true, "New");
-        setFormElement(Locator.name("title"), MSG5_TITLE);
-        setFormElement(Locator.id("body"), "Contributor message");
-        clickButton("Submit", longWaitForPage);
-        assertTextPresent(MSG5_TITLE);
-        clickAndWait(Locator.linkWithText("view message or respond"));
-        assertElementPresent(Locator.linkWithSpan("Delete Message"));//Confirm here to legitimize not-present assert later.
-        clickButton("Delete Message");
-        clickButton("Delete");
-
-        //confirm can read other user's message
-        clickAndWait(Locator.linkWithText(NOT_CONTRIBUTOR_ONLY_TITLE));
-
-        //confirm cannot delete other user's message
-        assertElementNotPresent(Locator.linkWithSpan("Delete Message"));//Confirm here to legitimize not-present assert later.
-
-        //confirm can respond to other user's message
-        clickRespondButton();
-        String contributorResponse = "Contributor response";
-        setFormElement(Locator.id("body"), contributorResponse);
-        clickButton("Submit");
-        assertTextPresent(contributorResponse);
-    }
-
-    private void clickRespondButton()
+     private void clickRespondButton()
     {
         clickButton("Respond");
     }

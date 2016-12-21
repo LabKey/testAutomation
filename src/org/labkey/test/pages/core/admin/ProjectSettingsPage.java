@@ -6,6 +6,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementCache>
 {
@@ -25,6 +26,11 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
         return new ProjectSettingsPage(driver.getDriver());
     }
 
+    public void save()
+    {
+        elementCache().saveButton.click();
+    }
+
     public Checkbox getEnableDiscussionCheckbox()
     {
         return elementCache().enableDiscussion;
@@ -38,5 +44,6 @@ public class ProjectSettingsPage extends LabKeyPage<ProjectSettingsPage.ElementC
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected final Checkbox enableDiscussion = Checkbox.Checkbox(Locator.name("enableDiscussion")).findWhenNeeded(this);
+        protected final WebElement saveButton = findButton("Save");
     }
 }
