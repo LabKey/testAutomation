@@ -29,6 +29,7 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.SetDefaultValuesListPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
+import org.labkey.test.util.DebugUtils;
 import org.labkey.test.util.ExtHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -326,7 +327,7 @@ public class PropertiesEditor extends WebPartPanel
         }
 
         private FormItem<String> nameInput;
-        private final Locator requiredFieldName = Locator.tag("td").index(6).child(Locator.tagWithClass("div", "gwt-Label"));
+        private final Locator requiredFieldName = Locator.tag("td").index(5).child(Locator.tagWithClass("div", "gwt-Label"));
         private final Locator customFieldName = Locator.tag("input").attributeStartsWith("name", "ff_name");
         private final Input labelInput = Input(Locator.tag("input").attributeStartsWith("name", "ff_label"), getDriver()).findWhenNeeded(this);
         private final WebElement spacer = Locator.css("td:last-child").findWhenNeeded(this);
