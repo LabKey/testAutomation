@@ -1753,7 +1753,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 uncheckCheckbox(createSharedDatasetsCheckbox);
         }
 
-        clickButton("Import Study From Local Zip Archive");
+        clickButton("Import Study");
         List<WebElement> errors = Locators.labkeyError.withText().findElements(getDriver());
         if (!errors.isEmpty())
         {
@@ -2278,7 +2278,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickButton("Reload Study");
         setFormElement(Locator.name("folderZip"), studyFile);
         if(! validateQueries) {uncheckCheckbox(Locator.checkboxByName("validateQueries"));}
-        clickButton("Reload Study From Local Zip Archive");
+        clickButton("Reload Study");
         waitForPipelineJobsToComplete(pipelineJobs, "Study Reload", false);
     }
 
