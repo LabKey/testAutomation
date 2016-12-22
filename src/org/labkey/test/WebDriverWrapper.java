@@ -58,8 +58,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -76,11 +74,9 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -97,7 +93,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -312,211 +307,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         {
             Connection cn = createDefaultConnection(false);
             ExperimentalFeaturesHelper.setExperimentalFeature(cn, "javascriptErrorServerLogging", false);
-        }
-    }
-
-    protected abstract class JSErrorChecker
-    {
-        public abstract void pause();
-        public abstract void resume();
-        @NotNull
-        public abstract List<LogEntry> getErrors();
-        @NotNull
-        protected abstract List<String> ignored();
-
-        public boolean isErrorIgnored(LogEntry error)
-        {
-            for (String ignoredText : ignored())
-            {
-                if(error.toString().contains(ignoredText))
-                    return true;
-            }
-
-            return false;
-        }
-    }
-
-    protected class LogEntryWithSourceInfo extends LogEntry
-    {
-        private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
-
-        private String sourceName;
-        private int lineNumber;
-
-        LogEntryWithSourceInfo(LogEntry entry, @NotNull String sourceName, int lineNumber)
-        {
-            super(entry.getLevel(), entry.getTimestamp(), entry.getMessage());
-            this.sourceName = sourceName;
-            this.lineNumber = lineNumber;
-        }
-
-        public String getSourceName()
-        {
-            return sourceName;
-        }
-
-        public int getLineNumber()
-        {
-            return lineNumber;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("[%s] %s", DATE_FORMAT.format(new Date(getTimestamp())), toStringNoTimestamp());
-        }
-
-        private String toStringNoTimestamp()
-        {
-            return String.format("%s {%s%s}",getMessage(), sourceName, sourceName.contains(".view?") ? "" : String.format(":%d", lineNumber));
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return toStringNoTimestamp().hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-
-            LogEntryWithSourceInfo that = (LogEntryWithSourceInfo) o;
-
-            return toStringNoTimestamp().equals(that.toStringNoTimestamp());
-        }
-    }
-
-    private class FirefoxJSErrorChecker extends JSErrorChecker
-    {
-        private boolean jsCheckerPaused = false;
-        private int _jsErrorPauseCount = 0; // To keep track of nested pauses
-        private List<Pair<Long, Long>> _pauseWindows = new ArrayList<>();
-        private long _pauseStart = Long.MAX_VALUE;
-
-        @Override
-        public void pause()
-        {
-            _jsErrorPauseCount++;
-            if (!jsCheckerPaused)
-            {
-                jsCheckerPaused = true;
-                _pauseStart = System.currentTimeMillis();
-            }
-        }
-
-        @Override
-        public void resume()
-        {
-            if (--_jsErrorPauseCount < 1 && jsCheckerPaused)
-            {
-                jsCheckerPaused = false;
-                _pauseWindows.add(new Pair<>(_pauseStart, System.currentTimeMillis()));
-                _pauseStart = Long.MAX_VALUE;
-            }
-        }
-
-        @Override @NotNull
-        public List<String> ignored()
-        {
-            return Arrays.asList(
-                    // non-fatal File browser errors
-                    "this.panel is null", // TODO: Investigate FilContentDownLoadTest.testDoubleClickDownload
-                    "PanelUI.panel is undefined", // TODO: Similar to the above. Downloading files sometimes triggers this
-                    "NS_ERROR_NOT_AVAILABLE", // TODO: Again, some weird non-fatal JS error in the file browser
-                    "NS_ERROR_NOT_UNEXPECTED",
-                    "el is null",
-
-                    "n is undefined",
-                    "me.cfg is undefined", // TODO: Investigate ICEMRModuleTest#enterDiagnosticsData()
-                    "Ext.Error: You're trying to decode an invalid JSON String:",
-                    "__webdriver_evaluate",
-                    "setting a property that has only a getter",
-                    "records[0].get is not a function",
-                    "{file: \"chrome://",
-                    "ext-base-debug.js",
-                    "ext-all-sandbox-debug.js",
-                    "ext-all-sandbox.js",
-                    "ext-all-sandbox-dev.js",
-                    "schemaMap.schemas", // EHR error
-                    "com.google.gwt", // Ignore GWT errors
-                    "d3-3.3.9.js", // Ignore internal D3 errors
-                    "XULElement.selectedIndex", // Ignore known Firefox Issue
-                    "Failed to decode base64 string!", // Firefox issue
-                    "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
-                    "Image corrupt or truncated:",
-                    "mutating the [[Prototype]] of an object will cause your code to run very slowly", //d3 issue: https://github.com/mbostock/d3/issues/1805
-                    "Using //@ to indicate", // jQuery
-                    "CodeMirror is not defined", // There will be more severe errors than this if CodeMirror is actually broken
-                    "Ext.EventManager is undefined", // Causing many TeamCity failures. No obvious culprit
-                    "NS_ERROR_FAILURE", // NS_ERROR_FAILURE:  [http://localhost:8111/labkey/vis/lib/d3pie.min.js:8]
-                    "NetworkError: A network error occurred.", // Just started appearing on TeamCity Linux/Firefox after r44480 ("26236 - Branding updates - Adjust for font rendering differences in Firefox") TODO: Track down culprit and remove this line
-                    "TypeError: view.getComputedStyle(...) is null", //only on firefox for argos. TODO: get rid of this once the issue is fixed
-                    "data-js-id=\"video-modal\"",  // Sometimes see this on CDS.
-                    "TypeError: view.getComputedStyle(...) is null", //only on firefox for argos. TODO: get rid of this once the issue is fixed
-                    "TypeError: str is undefined" //only on firefox for argos. TODO: get rid of this once the issue is fixed
-            );
-        }
-
-        @NotNull
-        @Override
-        public List<LogEntry> getErrors()
-        {
-            List<LogEntry> _jsErrors = new ArrayList<>();
-            List<LogEntry> errorsFromWebDriver = getDriver().manage().logs().get(LogType.BROWSER).filter(Level.SEVERE);
-
-            for (LogEntry error : errorsFromWebDriver)
-            {
-                if (!isErrorWhilePaused(error))
-                {
-                    _jsErrors.add(error);
-                }
-            }
-            return _jsErrors;
-        }
-
-        private boolean isErrorWhilePaused(LogEntry entry)
-        {
-            for (Pair<Long, Long> pauseWindow : _pauseWindows)
-            {
-                if (entry.getTimestamp() < pauseWindow.getKey())
-                    return false;
-                else if (entry.getTimestamp() < pauseWindow.getValue())
-                    return true;
-            }
-            return !(entry.getTimestamp() < _pauseStart);
-        }
-    }
-
-    private class ChromeJSErrorChecker extends JSErrorChecker
-    {
-        @Override
-        public void pause()
-        {
-            executeScript(
-                    "window.dispatchEvent(new Event('pauseJsErrorChecker'))");
-        }
-
-        @Override
-        public void resume()
-        {
-            executeScript(
-                    "window.dispatchEvent(new Event('resumeJsErrorChecker'))");
-        }
-
-        @Override @NotNull
-        public List<String> ignored()
-        {
-            return Collections.emptyList(); // Add ignored chromedriver errors to jserrors.js
-        }
-
-        @Override @NotNull
-        public List<LogEntry> getErrors()
-        {
-            return Collections.emptyList();
         }
     }
 
