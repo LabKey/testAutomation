@@ -112,7 +112,7 @@ public class WebTestHelper
 
     public static boolean isLocalServer()
     {
-        return getTargetServer().contains("localhost") || getTargetServer().contains("127.0.0.1");
+        return !getTargetServer().contains(".") || getTargetServer().contains("127.0.0.1");
     }
 
     public static Integer getWebPort()
