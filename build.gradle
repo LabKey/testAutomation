@@ -1,27 +1,7 @@
-import org.labkey.gradle.util.BuildUtils
-
 apply plugin: 'java'
-
-
-configurations {
-    aspectj
-}
+apply plugin: 'org.labkey.testRunner'
 
 sourceSets {
-    test {
-        java {
-            srcDirs = []
-            // we add the test/src directories from all other projects because the test suites encompass tests
-            // across modules.
-            project.rootProject.allprojects { Project otherProj ->
-                if (otherProj.file("test/src").exists())
-                {
-                    srcDirs += otherProj.file("test/src")
-                }
-            }
-        }
-        output.classesDir = "${project.buildDir}/classes"
-    }
     debug {
         java {
             srcDirs = ['src/org/labkey/test/debug']
@@ -30,42 +10,8 @@ sourceSets {
     }
 }
 
-apply plugin: 'org.labkey.testRunner'
-
-artifacts {
-    testCompile project.tasks.testJar
-}
-
 dependencies {
-    aspectj "org.aspectj:aspectjtools:${aspectjVersion}"
     debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
-
-    compile files("${System.properties['java.home']}/../lib/tools.jar")
-    compile "org.seleniumhq.selenium:selenium-server:${seleniumVersion}"
-    compile "com.googlecode.sardine:sardine:${sardineVersion}"
-    compile "junit:junit:${junitVersion}"
-
-    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":remoteapi:java")
-    BuildUtils.addLabKeyDependency(project: project, config: "compile", depProjectPath: ":server:api")
-
-}
-
-tasks.compileTestJava.doLast {
-    ant.taskdef(
-            resource: "org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties",
-            classpath: project.configurations.aspectj.asPath
-    )
-    ant.iajc(
-            destdir: "${project.buildDir}/classes",
-            source: project.labkey.sourceCompatibility,
-            target: project.labkey.targetCompatibility,
-            classpath: project.configurations.compile.asPath,
-            {
-                sourceSets.test.java.srcDirs.each {
-                    src(path: it)
-                }
-            }
-    )
 }
 
 if (project.hasProperty("teamcity"))
