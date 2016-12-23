@@ -62,8 +62,8 @@ public class StartImportPage extends LabKeyPage
 
         test.goToFolderManagement();
         test.clickAndWait(Locator.linkWithText("Import"));
-        test.waitForElement(Locator.linkWithText("Import Folder Using Pipeline"));
-        test.click(Locator.linkWithText("Import Folder Using Pipeline"));
+        test.waitForElement(Locator.linkWithText("Use Pipeline"));
+        test.click(Locator.linkWithText("Use Pipeline"));
 
         fileBrowserHelper.uploadFile(zipFile);
         fileBrowserHelper.importFile(zipFile.getName(), "Import Folder");
