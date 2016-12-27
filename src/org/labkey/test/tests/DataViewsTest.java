@@ -448,7 +448,7 @@ public class DataViewsTest extends ParticipantListTest
         deleteStudy();
 
         clickButton("Import Study");
-        clickButton("Import Study Using Pipeline");
+        clickButton("Use Pipeline");
         _fileBrowserHelper.importFile("export/study/study.xml", "Import Study");
         waitForText("Import Study from Pipeline");
         clickButton("Start Import");

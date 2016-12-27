@@ -1821,7 +1821,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
-        clickButtonContainingText("Import Folder Using Pipeline");
+        clickButtonContainingText("Use Pipeline");
         _fileBrowserHelper.importFile(folderFile, "Import Folder");
 
         waitForText("Import Folder from Pipeline");
