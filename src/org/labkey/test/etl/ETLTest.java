@@ -329,7 +329,7 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testStoredProcGlobalParams() throws Exception
     {
-        RunTransformResponse rtr = _etlHelper.runETL_API("SprocGlobalParameters");
+        RunTransformResponse rtr = _etlHelper.runETL_API("SProcGlobalParameters");
         assertEquals("Wrong transform status from using stored proc global parameters.", ETLHelper.COMPLETE, _diHelper.getTransformStatus(rtr.getJobId()));
     }
 
