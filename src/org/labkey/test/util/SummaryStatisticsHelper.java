@@ -109,7 +109,7 @@ public class SummaryStatisticsHelper
     public String getSummaryStatisticFooterAsString(DataRegionTable drt, String columnName)
     {
         if (drt.hasSummaryStatisticRow())
-            return drt.getTotal(columnName).replaceAll("\\s+", " ");
+            return drt.getSummaryStatFooterText(columnName).replaceAll("\\s+", " ");
 
         return null;
     }

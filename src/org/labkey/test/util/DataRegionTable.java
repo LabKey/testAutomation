@@ -405,18 +405,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return -1;
     }
 
-    public String getTotal(String columnLabel)
+    public String getSummaryStatFooterText(String columnLabel)
     {
         final int col = getColumnIndex(columnLabel);
         if (col == -1)
             fail("Couldn't find column '" + columnLabel + "'");
-        return getTotal(col);
+        return getSummaryStatFooterText(col);
     }
 
-    public String getTotal(int columnIndex)
+    public String getSummaryStatFooterText(int columnIndex)
     {
         columnIndex += _selectors ? 1 : 0;
-        return elements().getSummaryStatisticCells().get(columnIndex).getText();
+        String footerText = elements().getSummaryStatisticCells().get(columnIndex).getText();
+        return footerText != null ? footerText.replaceAll("\\?", "") : null;
     }
 
     /**
