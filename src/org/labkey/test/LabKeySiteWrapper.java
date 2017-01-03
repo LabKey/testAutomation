@@ -1268,6 +1268,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void stopImpersonating()
     {
+        stopImpersonating(true);
+    }
+
+    /**
+     * Stop impersonating user
+     * @param goHome go to Server Home or return to page where impersonation started
+     */
+    public void stopImpersonating(Boolean goHome)
+    {
         if (_impersonationStack.isEmpty())
         {
             throw new IllegalStateException("No impersonations are thought to be in progress, based on those that have been started within the test harness");
@@ -1276,7 +1285,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");
         assertSignedInNotImpersonating();
-        goToHome();
+        if (goHome)
+            goToHome();
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
