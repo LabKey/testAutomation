@@ -622,10 +622,9 @@ public class FolderExportTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         openFolderMenu();
         clickAndWait(Locator.linkWithText("Subfolder2").index(subfolderIndex));
-        if (fromTemplate)
-            assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
-        else
-            assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for 2 Monkeys."));
+
+        int expectedPtidCount = fromTemplate ? 0 : 2;
+        assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for " + expectedPtidCount + " Monkeys."));
 
         log("verify container tabs were imported");
         openFolderMenu();
@@ -637,10 +636,7 @@ public class FolderExportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Tab 2"));
         assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
         clickAndWait(Locator.linkWithText("Study Container"));
-        if (fromTemplate)
-            assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
-        else
-            assertElementPresent(Locator.css(".study-properties").withText("Study Container Tab Study tracks data in 0 datasets over 0 visits. Data is present for 0 Participants."));
+        assertElementPresent(Locator.css(".study-properties").withText("Study Container Tab Study tracks data in 0 datasets over 0 visits. Data is present for 0 Participants."));
     }
 
 
