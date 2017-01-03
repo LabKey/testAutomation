@@ -132,8 +132,10 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return (EC) new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    public class ElementCache extends WebDriverComponent.ElementCache
     {
+        protected ElementCache() { }
+
         protected WebElement title = new LazyWebElement(Locator.css(".x4-window-header-text"), this);
         protected WebElement body = new LazyWebElement(Locator.css(".x4-window-body"), this);
         WebElement closeButton = new LazyWebElement(Locator.css(".x4-window-header .x4-tool-close"), this);
