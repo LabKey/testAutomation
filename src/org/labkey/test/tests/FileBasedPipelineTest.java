@@ -250,8 +250,12 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
     {
         goToModule("FileContent");
 
-        _fileBrowserHelper.selectFileBrowserItem("/" + pipelineName);
-        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(protocolName));
+        // If there had been only one job when it was deleted, the folder for the pipeline will have been deleted as well.
+        if (isElementPresent(FileBrowserHelper.Locators.gridRowWithNodeId(pipelineName)))
+        {
+            _fileBrowserHelper.selectFileBrowserItem("/" + pipelineName);
+            assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(protocolName));
+        }
     }
 
     // Create an assay with 'Name' and 'Age' columns.
