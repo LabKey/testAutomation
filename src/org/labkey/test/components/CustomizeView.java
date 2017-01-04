@@ -441,9 +441,6 @@ public class CustomizeView extends Component
 
     public void addColumn(String fieldKey, String column_name)
     {
-        // fieldKey is the value contained in @fieldkey
-        _driver.log("Adding " + column_name + " column");
-
         addItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
     }
 
@@ -630,7 +627,6 @@ public class CustomizeView extends Component
 
     public void addSort(String[] fieldKeyParts, String column_name, SortDirection order)
     {
-        _driver.log("Adding " + column_name + " sort");
         Locator.XPathLocator itemXPath = itemXPath(ViewItemType.Sort, fieldKeyParts);
 
         _driver.assertElementNotPresent(itemXPath);
