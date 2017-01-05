@@ -566,6 +566,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
+                closeExtraWindows();
                 checkErrors();
             }
         };
