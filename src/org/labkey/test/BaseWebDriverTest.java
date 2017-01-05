@@ -665,8 +665,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     /**
      * Collect additional information about test failures and publish build artifacts for TeamCity
      */
-    @LogMethod // TODO: Make private
-    public void handleFailure(Throwable error, @LoggedParam String testName)
+    @LogMethod
+    private void handleFailure(Throwable error, @LoggedParam String testName)
     {
         _testFailed = true;
         _anyTestFailed = true;
