@@ -634,7 +634,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
             executeScript("window.onbeforeunload = null;");
             getDriver().close();
         }
-        switchToMainWindow();
+        if (windows.size() > 1)
+        {
+            getDriver().switchTo().window(windows.get(0));
+        }
     }
 
     public boolean isPageEmpty()
