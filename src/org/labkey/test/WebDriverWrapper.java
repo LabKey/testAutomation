@@ -1570,12 +1570,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public WebElement doAndWaitForElementToRefresh(Runnable func, Locator loc, SearchContext context, WebDriverWait wait)
     {
-        List<WebElement> previousElement = loc.findElements(context);
+        WebElement previousElement = loc.findElementOrNull(context);
 
         func.run();
 
-        if (!previousElement.isEmpty())
-            wait.until(ExpectedConditions.stalenessOf(previousElement.get(0)));
+        if (previousElement != null)
+            wait.until(ExpectedConditions.stalenessOf(previousElement));
 
         return wait.until(LabKeyExpectedConditions.elementPresent(loc, context));
     }
