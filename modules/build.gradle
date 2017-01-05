@@ -1,0 +1,30 @@
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'org.labkey.module'
+}
+
+task('build', group: 'Build', description: "Build all module files for subprojects",
+    {
+        subprojects.each { Project p ->
+            dependsOn(p.tasks.module)
+        }
+    }
+)
+
+task('deploy', group: 'Deploy', description: "Deploy all test module files",
+    {
+        subprojects.each { Project p ->
+            dependsOn(p.tasks.deployModule)
+        }
+        dependsOn(project.tasks.build)
+    }
+)
+
+task('clean', group: 'Clean', description: 'Clean all build directories for subprojects',
+    {
+        subprojects.each { Project p -> 
+            dependsOn(p.tasks.clean)
+        }
+    }
+)
