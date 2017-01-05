@@ -1,19 +1,21 @@
 apply plugin: 'java'
 apply plugin: 'org.labkey.testRunner'
 
-sourceSets {
-    debug {
-        java {
-            srcDirs = ['src/org/labkey/test/debug']
-        }
-        output.classesDir = "${project.buildDir}/classes"
-    }
-}
-
-dependencies {
-    debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
-}
-
 if (project.hasProperty("teamcity"))
+{
+    sourceSets {
+        debug {
+            java {
+                srcDirs = ['src/org/labkey/test/debug']
+            }
+            output.classesDir = "${project.buildDir}/classes"
+        }
+    }
+
+    dependencies {
+        debugCompile files("${System.properties['java.home']}/../lib/tools.jar")
+    }
+
    // This plugin depends on the debugClasses task for ensureShutdown used on TeamCity
    apply plugin: 'org.labkey.teamCity'
+}
