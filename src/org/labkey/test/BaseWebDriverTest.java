@@ -1366,8 +1366,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void assertNavTrail(String... links)
     {
-        ///TODO:  Would like this to be more sophisitcated
-        assertTextPresentInThisOrder(links);
+        String expectedNavTrail = String.join(" >  ", links) + " > ";
+        String navTrail = Locator.id("navTrailAncestors").findElement(getDriver()).getText();
+        assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
     }
 
     public void clickTab(String tabname)

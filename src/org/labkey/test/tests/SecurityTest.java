@@ -468,8 +468,7 @@ public class SecurityTest extends BaseWebDriverTest
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers", 1);
-        assertNavTrail("Site Users", "User Details", "Permission");
-//        assertTextPresent("Site Users >  User Details >  Permissions >  ");
+        assertNavTrail("Site Users", "User Details", "Permissions");
     }
 
     @LogMethod protected void checkGroupMembership(String userName, String groupName, int expectedCount)
