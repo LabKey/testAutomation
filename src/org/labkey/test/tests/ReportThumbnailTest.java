@@ -51,6 +51,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private static final File TEST_THUMBNAIL = TestFileUtils.getSampleData("Microarray/test1.jpg");
     private static final File TEST_ICON = TestFileUtils.getSampleData("fileTypes/jpg_sample.jpg");
     private static final String BOX_PLOT = "Example Box Plot";
+    private static final String WEIGHT_OVER_TIME = "Weight over Time";
     private static final String SCATTER_PLOT = "Example Scatter Plot";
     private static final String R_PARTICIPANT_VIEWS = "R Participant Views: Physical Exam";
     private static final String R_REGRESSION_BP_ALL = "R Regression: Blood Pressure: All";
@@ -109,6 +110,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void doVerifySteps()
     {
         testGenericChartThumbnails();
+        testDeleteCustomThumbnail();
+        testDeleteCustomIcon();
         testCustomIcon();
         testRThumbnails();
         testThumbnailRoundtrip();
@@ -245,10 +248,34 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         assignCustomIcon(BOX_PLOT, TEST_ICON, 1);
         assertNewIcon(BOX_PLOT);
         ICON_CUSTOM_DATA = ICON_DATA;
+    }
 
+    private void testDeleteCustomThumbnail(){
         goToDataViews();
-        setIconSRC(SCATTER_PLOT);
-        ICON_PLOT_NONE_DATA = ICON_DATA;
+        setThumbnailSRC(WEIGHT_OVER_TIME);
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(WEIGHT_OVER_TIME, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("customThumbnail"));
+        setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), TEST_THUMBNAIL);
+        _ext4Helper.clickWindowButton(WEIGHT_OVER_TIME, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+
+        deleteCustomThumbnail(WEIGHT_OVER_TIME);
+        verifyThumbnail(WEIGHT_OVER_TIME, THUMBNAIL_DATA);
+
+    }
+
+    private void testDeleteCustomIcon()
+    {
+        goToDataViews();
+        setIconSRC(WEIGHT_OVER_TIME);
+        assignCustomIcon(WEIGHT_OVER_TIME, TEST_ICON, 1);
+        assertNewIcon(WEIGHT_OVER_TIME);
+
+        deleteCustomIcon(WEIGHT_OVER_TIME);
+        verifyIcon(WEIGHT_OVER_TIME, null);
     }
 
     @Override
@@ -368,6 +395,27 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitForTextToDisappear("Saving...");
     }
 
+    protected void deleteCustomThumbnail(String chart){
+        goToDataViews();
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("thumbnail-remove")).click();
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+    }
+
+    protected void deleteCustomIcon(String chart){
+        goToDataViews();
+        waitAndClick(Locator.xpath("//span[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("icon-remove")).click();
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+    }
     protected boolean checkRevisionNumber(Locator loc, int num)
     {
         waitForElement(loc);
