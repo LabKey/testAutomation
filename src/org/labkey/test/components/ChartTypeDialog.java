@@ -138,6 +138,22 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
+    public String getXCategories()
+    {
+        String value;
+
+        try
+        {
+            return elementCache().xCategoriesDisplay().getText();
+        }
+        catch(org.openqa.selenium.NoSuchElementException nse)
+        {
+            value = "";
+        }
+
+        return value;
+    }
+
     public ChartTypeDialog setYAxis(String columnName)
     {
         setYAxis(columnName, false);
@@ -476,7 +492,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     class ElementCache extends ChartWizardDialog.ElementCache
     {
         public final String XAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis')]";
-        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Categories')]";
+        public final String XCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis Category')]";
+        public final String XSUBCATEGORY_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'X Axis Subcategory')]";
         public final String YAXIS_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Y Axis')]";
         public final String CATEGORIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Categories')]";
         public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
@@ -513,6 +530,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement xCategories() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xCategoriesDisplay() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement xCategoriesDropText() {return Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xCategoriesRemove() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 

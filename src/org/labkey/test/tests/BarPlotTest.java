@@ -212,7 +212,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog = clickChartTypeButton();
 
-        strTemp = chartTypeDialog.getCategories();
+        strTemp = chartTypeDialog.getXCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
 
         strTemp = chartTypeDialog.getMeasure();
@@ -302,7 +302,7 @@ public class BarPlotTest extends GenericChartsTest
 
         chartTypeDialog = clickChartTypeButton();
 
-        strTemp = chartTypeDialog.getCategories();
+        strTemp = chartTypeDialog.getXCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_BAR + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_BAR.toLowerCase()));
 
         strTemp = chartTypeDialog.getMeasure();
