@@ -686,7 +686,6 @@ src/org/labkey/test/tests/SpecimenExtendedTest.java -text
 src/org/labkey/test/tests/SpecimenGridExportTest.java -text
 src/org/labkey/test/tests/SpecimenImportTest.java -text
 src/org/labkey/test/tests/SpecimenMultipleImportTest.java -text
-src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
 src/org/labkey/test/tests/SpecimenTest.java -text
 src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
