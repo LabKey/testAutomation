@@ -1625,7 +1625,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void deleteUsersIfPresent(String... userEmails)
     {
-        deleteUsers(false, userEmails);
+        _userHelper.deleteUsers(false, userEmails);
     }
 
     @Deprecated @LogMethod
