@@ -23,9 +23,7 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.remoteapi.security.DeleteUserCommand;
 import org.labkey.remoteapi.security.GetUsersCommand;
 import org.labkey.remoteapi.security.GetUsersResponse;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebDriverWrapper;
-import org.openqa.selenium.WebDriver;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,7 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class APIUserHelper extends AbstractUserHelper
 {
@@ -69,7 +68,13 @@ public class APIUserHelper extends AbstractUserHelper
 
     public GetUsersResponse getUsers()
     {
+        return getUsers(false);
+    }
+
+    public GetUsersResponse getUsers(boolean includeDeactivatedAccounts)
+    {
         GetUsersCommand command = new GetUsersCommand();
+        command.setIncludeDeactivated(includeDeactivatedAccounts);
         Connection connection = _driver.createDefaultConnection(false);
 
         try
@@ -84,8 +89,13 @@ public class APIUserHelper extends AbstractUserHelper
 
     public Map<String, Integer> getUserIds(List<String> userEmails)
     {
+        return getUserIds(userEmails, false);
+    }
+
+    public Map<String, Integer> getUserIds(List<String> userEmails, Boolean includeDeactivated)
+    {
         Map<String, Integer> userIds = new HashMap<>();
-        List<GetUsersResponse.UserInfo> usersInfo = getUsers().getUsersInfo();
+        List<GetUsersResponse.UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
         for (GetUsersResponse.UserInfo userInfo : usersInfo)
         {
             if (userEmails.contains(userInfo.getEmail()))
@@ -122,7 +132,7 @@ public class APIUserHelper extends AbstractUserHelper
     @LogMethod
     public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
     {
-        Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails));
+        Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
         for (String userEmail : userEmails)
         {
             Integer userId = userIds.get(userEmail);
