@@ -158,7 +158,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
 
     public static final int MAX_WAIT_SECONDS = 10 * 60;
-    public static final int DEFAULT_CLASS_TIMEOUT = 40;
+    public static final int DEFAULT_CLASS_TIMEOUT = 25;
 
     public static final double DELTA = 10E-10;
 
