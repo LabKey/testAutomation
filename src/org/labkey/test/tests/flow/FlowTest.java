@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
@@ -42,8 +43,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.labkey.test.components.ext4.Window.Window;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
@@ -364,25 +365,25 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("No graph for:", "(<APC-A>)");
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
-        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets:Count");
-        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets:Freq_Of_Parent");
-        _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets$SL:Count");
-        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<APC-A>)");
-        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<Alexa 680-A>)");
-        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<FITC-A>)");
-        _customizeViewsHelper.removeCustomizeViewColumn("Graph/(<PE Cy55-A>)");
+        _customizeViewsHelper.removeColumn("Background/Count");
+        _customizeViewsHelper.removeColumn("Background/Singlets:Count");
+        _customizeViewsHelper.removeColumn("Background/Singlets:Freq_Of_Parent");
+        _customizeViewsHelper.removeColumn("Background/Singlets$SL:Count");
+        _customizeViewsHelper.removeColumn("Graph/(<APC-A>)");
+        _customizeViewsHelper.removeColumn("Graph/(<Alexa 680-A>)");
+        _customizeViewsHelper.removeColumn("Graph/(<FITC-A>)");
+        _customizeViewsHelper.removeColumn("Graph/(<PE Cy55-A>)");
 
-        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/PTID");
-        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/Visit");
-        _customizeViewsHelper.addCustomizeViewColumn("FCSFile/Sample/Stim");
-        _customizeViewsHelper.addCustomizeViewColumn("Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-        _customizeViewsHelper.addCustomizeViewColumn("Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
-        _customizeViewsHelper.addCustomizeViewColumn("Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-        _customizeViewsHelper.addCustomizeViewColumn("Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
-        _customizeViewsHelper.addCustomizeViewColumn("Graph/(FSC-H:FSC-A)");
-        _customizeViewsHelper.addCustomizeViewColumn("Graph/Singlets(SSC-A:FSC-A)");
-        _customizeViewsHelper.addCustomizeViewColumn("Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
+        _customizeViewsHelper.addColumn("FCSFile/Sample/PTID");
+        _customizeViewsHelper.addColumn("FCSFile/Sample/Visit");
+        _customizeViewsHelper.addColumn("FCSFile/Sample/Stim");
+        _customizeViewsHelper.addColumn("Statistic/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addColumn("Background/Singlets$SL$SLive$S3+$S4+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addColumn("Statistic/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addColumn("Background/Singlets$SL$SLive$S3+$S8+$S(IFNg+|IL2+):Freq_Of_Parent");
+        _customizeViewsHelper.addColumn("Graph/(FSC-H:FSC-A)");
+        _customizeViewsHelper.addColumn("Graph/Singlets(SSC-A:FSC-A)");
+        _customizeViewsHelper.addColumn("Graph/Singlets$SL$SLive$S3+(<PE Cy55-A>:<FITC-A>)");
         _customizeViewsHelper.saveCustomView();
 
         // check PTID value from sample set present
@@ -613,11 +614,11 @@ public class FlowTest extends BaseFlowTest
         String reportNameEscaped = EscapeUtil.fieldKeyEncodePart(reportName);
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Raw P" });
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Adjusted P"});
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { reportNameEscaped, "Response"});
-        _customizeViewsHelper.addCustomizeViewFilter(new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
-        _customizeViewsHelper.addCustomizeViewSort("Name", "Ascending");
+        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Raw P" });
+        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Adjusted P"});
+        _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Response"});
+        _customizeViewsHelper.addFilter(new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
+        _customizeViewsHelper.addSort("Name", SortDirection.fromString("Ascending"));
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
