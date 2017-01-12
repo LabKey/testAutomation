@@ -56,7 +56,7 @@ public class Ext4ComboRef extends Ext4FieldRef
 
     public void waitForStoreLoad()
     {
-        _test.waitFor(() -> (Boolean)getFnEval("return this.store && this.store.getCount() > 0;"),
+        _test.waitFor(() -> (Boolean)getFnEval("if(this.store){return (this.store.getCount() > 0);} else return false;"),
                 "No records loaded in store", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -68,7 +68,7 @@ public class Ext4ComboRef extends Ext4FieldRef
 
     public static Ext4ComboRef getForLabel(BaseWebDriverTest test, String label)
     {
-        Ext4ComboRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4ComboRef.class);
+        Ext4ComboRef ref = test._ext4Helper.queryOne("field.combobox[fieldLabel^=\"" + label + "\"]", Ext4ComboRef.class);
         if (ref == null)
             throw new NoSuchElementException("Unable to locate combo with label: " + label);
         return ref;
