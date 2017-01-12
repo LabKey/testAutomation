@@ -39,12 +39,16 @@ public class BarPlotTest extends GenericChartsTest
 {
 
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";
+    private final String SKIN = "14. Skin";
     private final String BP_DIASTOLIC = "3. BP diastolic /xxx";
     private final String BAR_PLOT_SAVE_NAME = "Simple Bar Plot test";
     private final String BAR_PLOT_SAVE_NAME_2 = "Simple Bar Plot test with manual ranges";
+    private final String BAR_PLOT_SAVE_NAME_3 = "Grouped Bar Plot Test";
 
     final String TRICKY_CHART_TITLE = CHART_TITLE + TRICKY_CHARACTERS;
     private final String SIMPLE_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\nAPX-1: Abbreviated Physical Exam\n" + PREG_TEST_RESULTS;
+    private final String GROUPED_BAR_PLOT_SVG_TEXT = "0\nNormal\nNot Done\n0\n2\n4\n6\n8\n10\n12\n14\n16\n18\n20\n22\nAPX-1: Abbreviated Physical Exam\n" + SKIN + "\n0\nNegative";
+    private final String ALT_GROUPED_BAR_PLOT_SVG_TEXT = "0\nNormal\nNot Done\n0\n2\n4\n6\n8\n10\n12\n14\n16\n18\n20\n22\nAPX-1: Abbreviated Physical Exam\nNew Label\n0\nNegative";
     private final String SECOND_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n" + TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String THIRD_BAR_PLOT_SVG_TEXT = "0\nNegative\n-50\n-49\n-48\n-47\n-46\n-45\n-44\n-43\n-42\n-41\n-40\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n2600\n2800\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
@@ -53,6 +57,7 @@ public class BarPlotTest extends GenericChartsTest
     protected void testPlots()
     {
         doBasicBarPlotTest();
+        doGroupedBarPlotTest();
         doColumnPlotClickThrough();
         doExportOfBarPlot();
         doQuickChart();
@@ -158,6 +163,50 @@ public class BarPlotTest extends GenericChartsTest
         log("Save the plot.");
         savePlot(BAR_PLOT_SAVE_NAME, "This is a bar plot from the simple bar plot test.");
 
+    }
+
+    @LogMethod
+    private void doGroupedBarPlotTest()
+    {
+        final String APX_1_QUERY = "APX-1 (APX-1: Abbreviated Physical Exam)";
+        ChartTypeDialog chartTypeDialog;
+        LookAndFeelBarPlot lookAndFeelDialog;
+        String strTemp;
+
+        log("Create a grouped bar chart with both standard X Axis categories and X Axis subcategories.");
+        goToProjectHome();
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        chartTypeDialog = clickAddChart("study", APX_1_QUERY);
+
+        log("Start simply by setting just an X category.");
+        // note: this should default to a Bar plot when no render type provided
+        chartTypeDialog.setXCategory(PREG_TEST_RESULTS);
+
+        log("Next, set an X subcategory");
+        // note: this should default to a Bar plot when no render type provided
+        chartTypeDialog.setXSubCategory(SKIN)
+                .clickApply();
+
+        shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css("svg")));
+
+        log("Validate that the plot text is as expected.");
+        assertSVG(GROUPED_BAR_PLOT_SVG_TEXT);
+
+        log("Validate that the label for the x-axis is as expected.");
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelBarPlot(getDriver());
+        lookAndFeelDialog.clickXAxisTab();
+        strTemp = lookAndFeelDialog.getXAxisLabel();
+        Assert.assertEquals("X-Axis label is not as expected.", SKIN, strTemp);
+
+        log("Validate that the label changes as expected.");
+        lookAndFeelDialog.setXAxisLabel("New Label");
+        lookAndFeelDialog.clickApply();
+        assertSVG(ALT_GROUPED_BAR_PLOT_SVG_TEXT);
+
+        log("Save the plot.");
+        savePlot(BAR_PLOT_SAVE_NAME_3, "This is a bar plot from the grouped bar plot test.");
     }
 
     @LogMethod
