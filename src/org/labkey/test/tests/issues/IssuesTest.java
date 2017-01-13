@@ -184,11 +184,18 @@ public class IssuesTest extends BaseWebDriverTest
 
         addLookupValues("issues", "area", Arrays.asList("Area51", "Fremont", "Downtown"));
         addLookupValues("issues", "type", Arrays.asList("UFO", "SPEC", "AAA"));
-        addLookupValues("issues", "milestone", Arrays.asList("2012", "2013"));
+        addLookupValues("issues", "milestone", Arrays.asList("2012", "2013", "15.3", "15.3modules", "16.1", "16.1modules", "16.2", "16.2modules", "16.3", "16.3Modules",
+                "17.1", "17.1modules", "17.2", "17.2modules", "17.3", "17.3modules", "18.1", "18.1modules", "18.2", "18.2modules", "18.3", "18.3modules",
+                "19.1", "19.1modules", "19.2", "19.2modules", "19.3", "19.3modules", "20.1", "20.1modules", "20.2", "20.2modules", "20.3", "20.3modules",
+                "TBD"));
 
         // create lookups for new custom fields
         createLookupList("issues", "MyFirstString", Arrays.asList("North", "South"));
         createLookupList("issues", "MyFifthString", Arrays.asList("Cadmium", "Polonium"));
+        createLookupList("issues", "Client", Arrays.asList("Grey alien", "Green alien", "Aubergine alien"));
+        createLookupList("issues", "UserStory", Arrays.asList("Alien landing investigation", "Alien diet study", "What is with all the circular symbols"));
+        createLookupList("issues", "Triage", Arrays.asList("Approved", "Investigate", "Review Requested"));
+        createLookupList("issues", "Note", Arrays.asList("Blocked", "Pending Doctor Action", "Take Me To Your Leader"));
 
         // SetCustomColumnConfigurationAction
         List<ListHelper.ListColumn> fields = new ArrayList<>();
@@ -199,6 +206,13 @@ public class IssuesTest extends BaseWebDriverTest
         fields.add(new ListHelper.ListColumn("MyThirdString", "MyThirdString", ListHelper.ListColumnType.String, ""));
         fields.add(new ListHelper.ListColumn("MyFourthString", "MyFourthString", ListHelper.ListColumnType.String, ""));
         fields.add(new ListHelper.ListColumn("MyFifthString", "MyFifthString", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "MyFifthString"))));
+
+        fields.add(new ListHelper.ListColumn("Client", "Client", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Client"))));
+        fields.add(new ListHelper.ListColumn("UserStory", "User Story", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "UserStory"))));
+        fields.add(new ListHelper.ListColumn("SupportTicket", "Support Ticket", ListHelper.ListColumnType.Integer, ""));
+        fields.add(new ListHelper.ListColumn("TeamCity", "TeamCity Note", ListHelper.ListColumnType.String, ""));
+        fields.add(new ListHelper.ListColumn("Triage", "Triage", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Triage"))));
+        fields.add(new ListHelper.ListColumn("Note", "Note", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("Issue Summary"));
