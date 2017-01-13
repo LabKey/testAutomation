@@ -196,7 +196,9 @@
             <include name="json-simple-1.1.jar" />
             <include name="junit-4.12.jar"/>
             <include name="slf4j-api-1.7.5.jar"/>
-            <include name="tika-app-1.5.jar"/>
+            <include name="tika-core-1.14.jar"/>
+            <include name="poi-3.15.jar"/>
+            <include name="poi-ooxml-3.15.jar"/>
             <include name="log4j-1.2.16.jar"/>
             <include name="xbean.jar" />
             <include name="jackson-core-2.6.4.jar" />
