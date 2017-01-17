@@ -26,12 +26,12 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.RefindingWebElement;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -874,25 +874,33 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _driver._ext4Helper.clickExt4MenuButton(false, menu, true /*openOnly*/, menuItem, subMenuItem);
     }
 
-    public void setSummaryStatistic(String columnName, String stat){
-        clickSummaryStatistic(columnName, stat, false);
-    }
-
-    public void clearSummaryStatistic(String columnName, String stat){
-        clickSummaryStatistic(columnName, stat, true);
-    }
-
-    private void clickSummaryStatistic(String columnName, String stat, boolean isExpectedToBeChecked)
+    public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
     {
-        String clearOrSet = isExpectedToBeChecked?"Clearing": "Setting";
+        clickSummaryStatistic(columnName, stat, false, expectedValue);
+    }
+
+    public void clearSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
+    {
+        clickSummaryStatistic(columnName, stat, true, expectedValue);
+    }
+
+    private void clickSummaryStatistic(String columnName, String stat, boolean isExpectedToBeChecked, @Nullable String expectedValue)
+    {
+        String clearOrSet = isExpectedToBeChecked ? "Clearing" : "Setting";
         TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + _regionName + " for " + columnName);
-        WebElement menuItem = getSubMenuItem(columnName, "Summary Statistics", stat);
+        clickColumnMenu(columnName, false, "Summary Statistics");
 
-        WebElement menuIcon = menuItem.findElement(By.xpath("../div[contains(@class, 'x4-menu-item-icon')]"));
-        boolean menuItemIsChecked = menuIcon.getAttribute("class").contains("fa-check-square-o");
-        assertEquals(String.format("Menu item %s for column %s is %s checked",stat,columnName,!menuItemIsChecked?"not":"already"), isExpectedToBeChecked, menuItemIsChecked);
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
 
-        _driver.clickAndWait(menuItem);
+        if (expectedValue != null)
+            assertEquals("Stat value not as expected for: " + stat, expectedValue, statsWindow.getValue(stat));
+
+        if (isExpectedToBeChecked)
+            statsWindow.deselect(stat);
+        else
+            statsWindow.select(stat);
+
+        statsWindow.apply();
     }
 
     public void removeColumn(String columnName)
@@ -1075,7 +1083,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         doAndWaitForUpdate(() -> _driver.clickButton("CLEAR ALL FILTERS"));
     }
 
-    private void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
+    public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
     {
         final WebElement menu = elements().getColumnHeader(columnName);
         _driver._ext4Helper.clickExt4MenuButton(pageLoad, menu, false, menuItems);

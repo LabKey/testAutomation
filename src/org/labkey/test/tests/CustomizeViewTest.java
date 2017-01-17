@@ -115,10 +115,10 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextPresent(customTitle);
 
         log("** Set summary statistics");
-        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM);
-        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT);
+        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM, "279");
+        drt.setSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT, "7");
         assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
-        String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279 " + SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
+        String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7 " + SummaryStatisticsHelper.BASE_STAT_SUM + ": 279";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn));
         assertTextPresent(customTitle);
 
@@ -127,11 +127,11 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextNotPresent("Oldness Factor");
 
         log("** Clear summary statistics");
-        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM);
+        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_SUM, "279");
         assertTrue("Summary statistic count should still be available", drt.hasSummaryStatisticRow());
         summaryStatStr = SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn));
-        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT);
+        drt.clearSummaryStatistic(statColumn, SummaryStatisticsHelper.BASE_STAT_COUNT, "7");
         assertFalse("Summary statistic row still present", drt.hasSummaryStatisticRow());
         assertTextNotPresent("Oldness Factor");
 
@@ -164,29 +164,29 @@ public class CustomizeViewTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("query", getDriver());
 
         log("** Set summary statistics for " + statColumn1);
-        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM);
+        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM, "279");
         assertTrue("Summary statistic row didn't appear", drt.hasSummaryStatisticRow());
         String summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
-        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN);
+        drt.setSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN, "39.857");
         summaryStatStr = SummaryStatisticsHelper.BASE_STAT_SUM + ": 279 " + SummaryStatisticsHelper.BASE_STAT_MEAN + ": 39.857";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
 
         log("** Set summary statistics for " + statColumn2);
         assertEquals("Wrong summary statistics", " ", _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn2));
-        drt.setSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT);
+        drt.setSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT, "7");
         summaryStatStr = SummaryStatisticsHelper.BASE_STAT_COUNT + ": 7";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn2));
 
         log("** Clear summary statistics for " + statColumn1);
-        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM);
+        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_SUM, "279");
         summaryStatStr = SummaryStatisticsHelper.BASE_STAT_MEAN + ": 39.857";
         assertEquals("Wrong summary statistics", summaryStatStr, _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
-        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN);
+        drt.clearSummaryStatistic(statColumn1, SummaryStatisticsHelper.BASE_STAT_MEAN, "39.857");
         assertEquals("Wrong summary statistics", " ", _summaryStatisticsHelper.getSummaryStatisticFooterAsString(drt, statColumn1));
 
         log("** Clear summary statistics for " + statColumn2);
-        drt.clearSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT);
+        drt.clearSummaryStatistic(statColumn2, SummaryStatisticsHelper.BASE_STAT_COUNT, "7");
         assertFalse("Summary statistic row shouldn't appear", drt.hasSummaryStatisticRow());
     }
 
@@ -195,27 +195,27 @@ public class CustomizeViewTest extends BaseWebDriverTest
     {
         // PK should not have mean and sum
         setColumns(LIST_KEY_COLUMN);
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(LIST_KEY_COLUMN, "integer", false, true);
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog(LIST_KEY_COLUMN, "integer", false, true);
 
         // String column should only have count
         setColumns(FIRST_NAME_COLUMN);
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(FIRST_NAME_COLUMN, "string");
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog(FIRST_NAME_COLUMN, "string");
 
         // Integer column should have all
         setColumns(AGE_COLUMN);
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(AGE_COLUMN, "integer");
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog(AGE_COLUMN, "integer");
 
         // Date column should not have mean and sum
         setColumns(TEST_DATE_COLUMN);
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu(TEST_DATE_COLUMN, "date");
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog(TEST_DATE_COLUMN, "date");
 
         // Folder column should only have count
         setColumns("container");
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu("container", "string");
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog("container", "string");
 
         // Lookup column should only have count
         setColumns("CreatedBy");
-        _summaryStatisticsHelper.verifySummaryStatisticsSubmenu("CreatedBy", "integer", true, false);
+        _summaryStatisticsHelper.verifySummaryStatisticsDialog("CreatedBy", "integer", true, false);
     }
 
     @Test

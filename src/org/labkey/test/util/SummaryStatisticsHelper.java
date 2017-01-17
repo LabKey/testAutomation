@@ -3,10 +3,13 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.SummaryStatisticsDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class SummaryStatisticsHelper
 {
@@ -86,24 +89,25 @@ public class SummaryStatisticsHelper
         return stats;
     }
 
-    public void verifySummaryStatisticsSubmenu(String columnName, String colType)
+    public void verifySummaryStatisticsDialog(String columnName, String colType)
     {
-        verifySummaryStatisticsSubmenu(columnName, colType, false, false);
+        verifySummaryStatisticsDialog(columnName, colType, false, false);
     }
 
-    public void verifySummaryStatisticsSubmenu(String columnName, String colType, boolean isLookup, boolean isPK)
+    public void verifySummaryStatisticsDialog(String columnName, String colType, boolean isLookup, boolean isPK)
     {
-        _wrapper.refresh(); // refresh to guarantee that we are only seeing the current column's menu items?
-
-        // they all have the base count stat so safe to use here for submenu item
         Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
-        _wrapper._ext4Helper.clickExt4MenuButton(false, colLoc, true /*openOnly*/, "Summary Statistics", SummaryStatisticsHelper.BASE_STAT_COUNT);
+        _wrapper._ext4Helper.clickExt4MenuButton(false, colLoc, false, "Summary Statistics");
+
+        SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(_wrapper.getDriver());
 
         for (String stat : getExpectedColumnStats(colType, isLookup, isPK))
-            _wrapper.assertElementPresent(Ext4Helper.Locators.menuItem(stat));
+            assertTrue("Expected summary stat is not present: " + stat, statsWindow.isPresent(stat));
 
         for (String stat : getUnexpectedColumnStats(colType, isLookup, isPK))
-            _wrapper.assertElementNotPresent(Ext4Helper.Locators.menuItem(stat));
+            assertTrue("Unexpected summary stat is present: " + stat, !statsWindow.isPresent(stat));
+
+        statsWindow.cancel();
     }
 
     public String getSummaryStatisticFooterAsString(DataRegionTable drt, String columnName)
