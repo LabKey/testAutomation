@@ -755,6 +755,21 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 System.err.println(e.getMessage());
             }
 
+            // Render any client-side errors to page before taking a screenshot (just biologics for now)
+            try
+            {
+                if (_lastPageURL != null && _lastPageURL.toString().contains("biologics"))
+                {
+                    log("Rendering client-side errors to page");
+                    executeScript("if (LABKEY.Mothership) { LABKEY.Mothership.renderLastErrors(); }");
+                }
+            }
+            catch (RuntimeException | Error e)
+            {
+                log("Unable to render client-side errors to page");
+                System.err.println(e.getMessage());
+            }
+
             try
             {
                 getArtifactCollector().dumpPageSnapshot(testName, null); // Snapshot of current window
