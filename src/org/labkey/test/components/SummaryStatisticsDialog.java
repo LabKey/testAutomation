@@ -4,6 +4,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,26 +35,25 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
 
     public boolean isSelected(String statLabel)
     {
-        return elementCache().statCellSelectedLoc.startsWith(statLabel).findElements(this).size() == 1;
+        return elementCache().checkbox(statLabel).isSelected();
     }
 
     public String getValue(String statLabel)
     {
-        Locator.XPathLocator statCellLoc = elementCache().statCellLoc.startsWith(statLabel);
-        return statCellLoc.parent().append(elementCache().statValueLoc).findElement(this).getText();
+        return elementCache().value(statLabel).getText();
     }
 
     public SummaryStatisticsDialog select(String statLabel)
     {
         assertSelected(statLabel, false);
-        elementCache().statCellLoc.startsWith(statLabel).findElement(this).click();
+        elementCache().checkbox(statLabel).click();
         return this;
     }
 
     public SummaryStatisticsDialog deselect(String statLabel)
     {
         assertSelected(statLabel, true);
-        elementCache().statCellLoc.startsWith(statLabel).findElement(this).click();
+        elementCache().checkbox(statLabel).click();
         return this;
     }
 
@@ -74,8 +74,25 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
         Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClass("tr", "row"));
         Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "label"));
-        Locator.XPathLocator statRowSelectedLoc = statRowLoc.withClass("x4-item-selected");
-        Locator.XPathLocator statCellSelectedLoc = statRowSelectedLoc.append(Locator.tagWithClass("td", "label"));
         Locator.XPathLocator statValueLoc = Locator.tagWithClass("td", "value");
+        Locator.XPathLocator statCheckLoc = Locator.tagWithClass("td", "check");
+
+        public WebElement checkbox(String statLabel)
+        {
+            Locator.XPathLocator labelLoc = statCellLoc.startsWith(statLabel);
+            Locator.XPathLocator cbInputLoc = labelLoc.parent().append(statCheckLoc.append(Locator.tag("input")));
+            return cbInputLoc.findElement(this);
+        }
+
+        public WebElement label(String statLabel)
+        {
+            return statCellLoc.startsWith(statLabel).findElement(this);
+        }
+
+        public WebElement value(String statLabel)
+        {
+            Locator.XPathLocator labelLoc = statCellLoc.startsWith(statLabel);
+            return labelLoc.parent().append(statValueLoc).findElement(this);
+        }
     }
 }
