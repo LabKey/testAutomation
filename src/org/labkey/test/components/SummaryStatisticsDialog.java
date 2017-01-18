@@ -3,8 +3,11 @@ package org.labkey.test.components;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,7 +33,7 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
 
     public boolean isPresent(String statLabel)
     {
-        return elementCache().statCellLoc.startsWith(statLabel).findElements(this).size() == 1;
+        return elementCache().statCellLoc.startsWith(statLabel).findElements(this).size() >= 1;
     }
 
     public boolean isSelected(String statLabel)
@@ -40,7 +43,28 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
 
     public String getValue(String statLabel)
     {
-        return elementCache().value(statLabel).getText();
+        Locator.XPathLocator statCellLoc = elementCache().statCellLoc.startsWith(statLabel);
+        String ret = "";
+        try
+        {
+            ret = statCellLoc.parent().append(elementCache().statValueLoc).findElement(this).getText();
+        }
+        catch(NoSuchElementException tryAlt)
+        {
+            int index = indexOfText(elementCache().statCellIndentLoc.findElements(this), statLabel);
+            ret = elementCache().statCellIndentValueLoc.findElements(this).get(index).getText();
+        }
+        return ret;
+    }
+
+    private int indexOfText(List<WebElement> els, String text)
+    {
+        int ret = -1;
+        for (WebElement el : els)
+        {
+            if (el.getText().equals(text)) ret = els.indexOf(el);
+        }
+        return ret;
     }
 
     public SummaryStatisticsDialog select(String statLabel)
@@ -72,8 +96,14 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
     protected class ElementCache extends Window.ElementCache
     {
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
-        Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClass("tr", "row"));
+        Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "row"));
         Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "label"));
+        //Locator.XPathLocator statValueLoc = statRowLoc.append(Locator.tagWithClass("td", "value"));
+        Locator.XPathLocator statCellIndentLoc = statCellLoc.append(Locator.tagWithClass("div", "indent"));
+        Locator.XPathLocator statCellIndentValueLoc = statRowLoc.append(Locator.tagWithClass("td", "value")).append(Locator.tag("div"));
+        Locator.XPathLocator statRowSelectedLoc = statRowLoc.withClass("x4-item-selected");
+        Locator.XPathLocator statCellSelectedLoc = statRowSelectedLoc.append(Locator.tagWithClass("td", "label"));
+
         Locator.XPathLocator statValueLoc = Locator.tagWithClass("td", "value");
         Locator.XPathLocator statCheckLoc = Locator.tagWithClass("td", "check");
 

@@ -23,12 +23,18 @@ public class SummaryStatisticsHelper
     public final static String PREMIUM_STAT_COUNT_DISTINCT = "Count (distinct)";
     public final static String PREMIUM_STAT_STDDEV = "Standard Deviation (of mean)";
     public final static String PREMIUM_STAT_STDERR = "Standard Error (of mean)";
+    public final static String PREMIUM_STAT_MEDIAN = "Median";
+    public final static String PREMIUM_STAT_INTERQUARTILE = "Interquartile Range";
+    public final static String PREMIUM_STAT_MEDIAN_ABS_STDDEV = "Median Absolute Deviation";
+    public final static String PREMIUM_STAT_QUARTILE = "Quartiles";
+    public final static String PREMIUM_STAT_Q1 = "Lower Quartile (Q1)";
+    public final static String PREMIUM_STAT_Q3 = "Upper Quartile (Q3)";
 
     public final static List<String> ALL_STATS;
     static {
         ALL_STATS = new ArrayList<>();
         ALL_STATS.addAll(Arrays.asList(BASE_STAT_COUNT, BASE_STAT_SUM, BASE_STAT_MEAN, BASE_STAT_MIN, BASE_STAT_MAX));
-        ALL_STATS.addAll(Arrays.asList(PREMIUM_STAT_COUNT_BLANK, PREMIUM_STAT_COUNT_DISTINCT, PREMIUM_STAT_STDDEV, PREMIUM_STAT_STDERR));
+        ALL_STATS.addAll(Arrays.asList(PREMIUM_STAT_COUNT_BLANK, PREMIUM_STAT_COUNT_DISTINCT, PREMIUM_STAT_STDDEV, PREMIUM_STAT_STDERR, PREMIUM_STAT_MEDIAN,PREMIUM_STAT_QUARTILE,PREMIUM_STAT_INTERQUARTILE, PREMIUM_STAT_MEDIAN_ABS_STDDEV));
     }
 
     private WebDriverWrapper _wrapper;
@@ -61,6 +67,10 @@ public class SummaryStatisticsHelper
             {
                 stats.add(PREMIUM_STAT_STDDEV);
                 stats.add(PREMIUM_STAT_STDERR);
+                stats.add(PREMIUM_STAT_MEDIAN);
+                stats.add(PREMIUM_STAT_QUARTILE);
+                stats.add(PREMIUM_STAT_INTERQUARTILE);
+                stats.add(PREMIUM_STAT_MEDIAN_ABS_STDDEV);
             }
         }
 
