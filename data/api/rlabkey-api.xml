@@ -558,6 +558,22 @@
             ]]>
         </response>
     </test>
+    <test name="select with array in response" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",
+                     schemaName="core", queryName="SiteUsers",
+                     colSelect=c("UserId", "Groups"))
+                 selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                  User Id Groups
+            ]]>
+        </response>
+    </test>
     <test name="final test" type="post">
         <url>
             <![CDATA[
