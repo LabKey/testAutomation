@@ -127,7 +127,11 @@ public abstract class TestFileUtils
         }
         else
         {
-            path = getSampledataPath();
+            sampledataDirsFile = new File(getLabKeyRoot(), "build/modules/test/sampledata.dirs");
+            if (sampledataDirsFile.exists())
+                path = getFileContents(sampledataDirsFile);
+            else
+                path = getSampledataPath();
         }
 
         List<String> splitPath = Arrays.asList(path.split(";"));
