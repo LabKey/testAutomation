@@ -40,7 +40,8 @@ public class PieChartTest extends GenericChartsTest
     private final String PIE_CHART_SAVE_NAME = "Simple Pie Chart Test";
     private final String PIE_CHART_CATEGORY = "1.Adverse Experience (AE)";
     private final String PIE_CHART_MEASURE = "9. Visit Code reported";
-
+    private final String PIE_CHART_QUERY_TEXT = "Injection site pain (L) deltoid\nPain @ injection site (Right Deltoid)\nFever\nVomiting";
+    private final String PIE_CHART_PERCENTAGES_TEXT = "18%\n11%\n5%\n5%\n5%\n5%\n";
     @LogMethod
     protected void testPlots()
     {
@@ -82,33 +83,35 @@ public class PieChartTest extends GenericChartsTest
 
         log("Validate that the text values of the pie chart are as expected.");
         svgText = getSVGText();
-        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY.replace(" ", "")));
-        Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
+        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY));
+        Assert.assertTrue("SVG did not contain query text: " + PIE_CHART_QUERY_TEXT, svgText.contains(PIE_CHART_QUERY_TEXT));
 
         log("Validate that the correct number of % values are shown.");
         percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 6 '%' in the svg, found " + percentCount, 6, percentCount);
-        Assert.assertTrue("Percentages in svg not as expected. Expected ')18%11%5%5%5%5%I'", svgText.contains(")18%11%5%5%5%5%I"));
+        Assert.assertTrue("Percentages in svg not as expected. Expected ')18%11%5%5%5%5%I'", svgText.contains(PIE_CHART_PERCENTAGES_TEXT));
 
-        log("Now add a measure to the pie chart.");
-        chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setMeasure(PIE_CHART_MEASURE)
-                .clickApply();
+        // Issue #29046: remove 'measures' option from Pie Chart
 
-        sleep(3000);  // TODO Is there a better trigger?
-
-        log("Again validate that the text on the pie chart is as expected.");
-        svgText = getSVGText();
-
-        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY.replace(" ", "")));
-        strTemp = "Sum of " + PIE_CHART_MEASURE;
-        Assert.assertTrue("SVG did not contain expected footer: '" + strTemp + "'", svgText.contains(strTemp.replace(" ", "")));
-        Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
-
-        log("The percentage values displayed should have changed when a measure is applied.");
-        percentCount = StringUtils.countMatches(svgText, "%");
-        Assert.assertEquals("There should only be 6 '%' in the svg, found " + percentCount, 9, percentCount);
-        Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%5%5%7%5%6%5%5%I'", svgText.contains("d25%9%5%5%7%5%6%5%5%I"));
+        //        log("Now add a measure to the pie chart.");
+        //        chartTypeDialog = clickChartTypeButton();
+        //        chartTypeDialog.setMeasure(PIE_CHART_MEASURE)
+        //                .clickApply();
+        //
+        //        sleep(3000);  // TODO Is there a better trigger?
+        //
+        //        log("Again validate that the text on the pie chart is as expected.");
+        //        svgText = getSVGText();
+        //
+        //        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY.replace(" ", "")));
+        //        strTemp = "Sum of " + PIE_CHART_MEASURE;
+        //        Assert.assertTrue("SVG did not contain expected footer: '" + strTemp + "'", svgText.contains(strTemp.replace(" ", "")));
+        //        Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
+        //
+        //        log("The percentage values displayed should have changed when a measure is applied.");
+        //        percentCount = StringUtils.countMatches(svgText, "%");
+        //        Assert.assertEquals("There should only be 6 '%' in the svg, found " + percentCount, 9, percentCount);
+        //        Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%5%5%7%5%6%5%5%I'", svgText.contains("d25%9%5%5%7%5%6%5%5%I"));
 
         log("Now change the chart layout, also validate that the layout dialog is pre-populated as expected.");
         clickChartLayoutButton();
@@ -116,8 +119,11 @@ public class PieChartTest extends GenericChartsTest
         pieChartLookAndFeel = new LookAndFeelPieChart(getDriver());
         strTemp = pieChartLookAndFeel.getSubTitle();
         Assert.assertTrue("Value in Subtitle text box not as expected. Expected '" + PIE_CHART_CATEGORY + "'", strTemp.equals(PIE_CHART_CATEGORY));
-        strTemp = pieChartLookAndFeel.getFooter();
-        Assert.assertTrue("Value in Footer text box not as expected. Expected 'Sum of " + PIE_CHART_MEASURE + "'", strTemp.equals("Sum of " + PIE_CHART_MEASURE));
+
+        // Issue #29046: remove 'measures' option from Pie Chart
+
+        //        strTemp = pieChartLookAndFeel.getFooter();
+        //        Assert.assertTrue("Value in Footer text box not as expected. Expected 'Sum of " + PIE_CHART_MEASURE + "'", strTemp.equals("Sum of " + PIE_CHART_MEASURE));
 
         log("Remove the percentages, and change the gradient.");
         if(pieChartLookAndFeel.showPercentagesChecked())
@@ -157,8 +163,8 @@ public class PieChartTest extends GenericChartsTest
 
         svgText = getSVGText();
         percentCount = StringUtils.countMatches(svgText, "%");
-        Assert.assertEquals("There should only be 3 '%' in the svg, found " + percentCount, 3, percentCount);
-        Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
+        Assert.assertEquals("There should only be 2 '%' in the svg, found " + percentCount, 2, percentCount);
+        Assert.assertTrue("Percentages in svg not as expected. Expected '18% 11%'", svgText.contains("18%\n11%"));
 
         log("Ok last bit of changing for the Pie Chart.");
         clickChartLayoutButton();
@@ -178,9 +184,9 @@ public class PieChartTest extends GenericChartsTest
 
         // There is one extra % because of the TRICKY_CHARACTERS used in the title.
         percentCount = StringUtils.countMatches(svgText, "%");
-        Assert.assertEquals("There should only be 4 '%' in the svg, found " + percentCount, 4, percentCount);
-        Assert.assertTrue("Percentages in svg not as expected. Expected 'd25%9%7%I'", svgText.contains("d25%9%7%I"));
-        Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE.replace(" ", "")));
+        Assert.assertEquals("There should only be 3 '%' in the svg, found " + percentCount, 3, percentCount);
+        Assert.assertTrue("Percentages in svg not as expected. Expected '18% 11%'", svgText.contains("18%\n11%"));
+        Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE));
         String svgWidth = getAttribute(Locator.css("svg"), "width");
         String svgHeight= getAttribute(Locator.css("svg"), "height");
         Assert.assertEquals("Width of svg not expected.", "500", svgWidth);
@@ -240,8 +246,10 @@ public class PieChartTest extends GenericChartsTest
         strTemp = chartTypeDialog.getCategories();
         Assert.assertTrue("Categories field did not contain the expected value. Expected '" + COL_TEXT_PIE + "'. Found '" + strTemp + "'", strTemp.toLowerCase().equals(COL_TEXT_PIE.toLowerCase()));
 
-        strTemp = chartTypeDialog.getMeasure();
-        Assert.assertEquals("Measure field was not empty. Found '" + strTemp + "'", 0, strTemp.trim().length());
+        // Issue #29046: remove 'measures' option from Pie Chart
+
+        //        strTemp = chartTypeDialog.getMeasure();
+        //        Assert.assertEquals("Measure field was not empty. Found '" + strTemp + "'", 0, strTemp.trim().length());
 
         chartTypeDialog.clickCancel();
 
