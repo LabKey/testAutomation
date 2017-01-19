@@ -1189,19 +1189,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("experimental features"));
 
-        final WebElement link = Locator.tagWithId("a", "labkey-experimental-feature-" + feature).findElementOrNull(getDriver());
+        final WebElement link = Locator.tagWithAttribute("a", "data-exp-flag", feature).findElementOrNull(getDriver());
         if (link == null)
             fail("No such feature found: " + feature);
         else
         {
             final String linkText = link.getText();
-            if(ENABLE.equals(linkText))
+            if (ENABLE.equals(linkText))
             {
                 log("Feature currently disabled, enabling " + feature);
                 click(link);
                 shortWait().until(ExpectedConditions.textToBePresentInElement(link, DISABLE));
             }
-            else if(DISABLE.equals(linkText))
+            else if (DISABLE.equals(linkText))
             {
                 log("Feature currently enabled: " + feature);
             }
