@@ -637,8 +637,8 @@
       <echo message="waiting for the server to shutdown: ${server.url}"/>
       <waitfor maxwait="2" maxwaitunit="minute">
           <or>
-            <not><socket server="${sysprop.labkey.server}" port="${sysprop.labkey.port}"/></not>
-            <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
+              <contains string="${sysprop.labkey.server}" substring="."/>
+              <not><socket server="${sysprop.labkey.server}" port="${sysprop.labkey.port}"/></not>
           </or>
       </waitfor>
     </target>
@@ -1103,8 +1103,8 @@
       <echo message="waiting for the server to start: ${server.started.url}"/>
       <waitfor maxwait="10" maxwaitunit="second" checkevery="100">
           <or>
-            <http url="${server.started.url}" />
-            <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
+              <contains string="${sysprop.labkey.server}" substring="."/>
+              <http url="${server.started.url}" />
           </or>
       </waitfor>
     </target>
