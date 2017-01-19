@@ -138,8 +138,7 @@ public class TimelineTest extends BaseWebDriverTest
     {
         portalHelper.addWebPart("Timeline");
         selectOptionByText(Locator.name("schemaName"), "lists");
-        waitFor(() -> isTextPresent("FirstName"),
-                "Could not find field", 10000);
+        waitForElement(Locator.tag("option").withAttribute("value", "FirstName"));
         selectOptionByText(Locator.name("titleField"), "FirstName");
         selectOptionByText(Locator.name("descriptionField"), "LastName");
         clickButton("Submit");
