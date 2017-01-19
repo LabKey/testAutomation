@@ -175,7 +175,6 @@ public class BarPlotTest extends GenericChartsTest
 
         log("Create a grouped bar chart with both standard X Axis categories and X Axis subcategories.");
         goToProjectHome();
-        clickProject(getProjectName());
         clickFolder(getFolderName());
         chartTypeDialog = clickAddChart("study", APX_1_QUERY);
 
