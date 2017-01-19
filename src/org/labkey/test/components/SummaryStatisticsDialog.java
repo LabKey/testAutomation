@@ -44,7 +44,7 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
     public String getValue(String statLabel)
     {
         Locator.XPathLocator statCellLoc = elementCache().statCellLoc.startsWith(statLabel);
-        String ret = "";
+        String ret;
         try
         {
             ret = statCellLoc.parent().append(elementCache().statValueLoc).findElement(this).getText();
@@ -98,11 +98,9 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
         Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "row"));
         Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "label"));
-        //Locator.XPathLocator statValueLoc = statRowLoc.append(Locator.tagWithClass("td", "value"));
         Locator.XPathLocator statCellIndentLoc = statCellLoc.append(Locator.tagWithClass("div", "indent"));
         Locator.XPathLocator statCellIndentValueLoc = statRowLoc.append(Locator.tagWithClass("td", "value")).append(Locator.tag("div"));
         Locator.XPathLocator statRowSelectedLoc = statRowLoc.withClass("x4-item-selected");
-        Locator.XPathLocator statCellSelectedLoc = statRowSelectedLoc.append(Locator.tagWithClass("td", "label"));
 
         Locator.XPathLocator statValueLoc = Locator.tagWithClass("td", "value");
         Locator.XPathLocator statCheckLoc = Locator.tagWithClass("td", "check");
