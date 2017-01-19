@@ -85,6 +85,7 @@ import static org.labkey.test.WebTestHelper.getBaseURL;
 import static org.labkey.test.WebTestHelper.getHttpClientBuilder;
 import static org.labkey.test.WebTestHelper.getHttpResponse;
 import static org.labkey.test.WebTestHelper.isLocalServer;
+import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
  * TODO: Move non-JUnit related methods from BWDT.
@@ -608,6 +609,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             assertTextPresent("Retype Password");
             verifyInitialUserError(email, PasswordUtil.getPassword(), PasswordUtil.getPassword(), null);
 
+            // Runner was unable to log the test start prior to initial user creation
+            try{logToServer("=== Starting " + getClass().getSimpleName() + " ===");} catch (CommandException | IOException ignore){}
+
             log("Attempting to register another initial user");
             popLocation();
             // Make sure we got redirected to the module status page, since we already have a user
@@ -693,7 +697,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedText)
+    private void verifyInitialUserError(@Nullable String email, @Nullable String password1, @Nullable String password2, @Nullable String expectedError)
     {
         if (null != email)
             setFormElement(Locator.id("email"), email);
@@ -706,8 +710,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         clickAndWait(Locator.linkWithText("Next"));
 
-        if (null != expectedText)
-            assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(getDriver()).getText());
+        if (null != expectedError)
+            assertEquals("Wrong error message.", expectedError, Locator.css(".labkey-error").findElement(getDriver()).getText());
     }
 
     private void verifyInitialUserRedirects()
