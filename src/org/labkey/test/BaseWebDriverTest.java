@@ -109,6 +109,7 @@ import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.buildURL;
 import static org.labkey.test.WebTestHelper.isLocalServer;
+import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.components.ext4.Window.Window;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
 
@@ -608,6 +609,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
                 TestLogger.resetLogger();
                 TestLogger.log("// Begin Test Case - " + description.getMethodName() + " \\\\");
+                try{logToServer("=== Begin Test Case - " + description.getTestClass().getSimpleName() + "." + description.getMethodName());} catch (CommandException | IOException ignore){}
                 TestLogger.increaseIndent();
             }
 
