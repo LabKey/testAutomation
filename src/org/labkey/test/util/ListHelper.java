@@ -762,6 +762,22 @@ public class ListHelper extends LabKeySiteWrapper
         setColumnType(prefix, index, type);
     }
 
+    public void addLookupField(String areaTitle, String name, String label, LookupInfo type)
+    {
+        String prefix = areaTitle==null ? "" : getPropertyXPath(areaTitle);
+        String addField = prefix + "//span" + Locator.lkButton("Add Field").getPath();
+
+        clickLastFieldIfExists(prefix);
+        // click the add field button
+        click(Locator.xpath(addField));
+        int index = findNewFieldIndex(prefix);
+
+        waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        setColumnName(prefix, index, name);
+        setColumnLabel(prefix, index, label);
+        setColumnType(prefix, index, type);
+    }
+
     public void deleteField(String areaTitle, int index)
     {
         String prefix = getPropertyXPathContains(areaTitle);
