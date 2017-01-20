@@ -71,10 +71,10 @@ public class APIUserHelper extends AbstractUserHelper
         return getUsers(false);
     }
 
-    public GetUsersResponse getUsers(boolean includeDeactivatedAccounts)
+    public GetUsersResponse getUsers(boolean includeDeactivated)
     {
         GetUsersCommand command = new GetUsersCommand();
-        command.setIncludeDeactivated(includeDeactivatedAccounts);
+        command.setIncludeDeactivated(includeDeactivated);
         Connection connection = _driver.createDefaultConnection(false);
 
         try
@@ -92,7 +92,7 @@ public class APIUserHelper extends AbstractUserHelper
         return getUserIds(userEmails, false);
     }
 
-    public Map<String, Integer> getUserIds(List<String> userEmails, Boolean includeDeactivated)
+    public Map<String, Integer> getUserIds(List<String> userEmails, boolean includeDeactivated)
     {
         Map<String, Integer> userIds = new HashMap<>();
         List<GetUsersResponse.UserInfo> usersInfo = getUsers(includeDeactivated).getUsersInfo();
