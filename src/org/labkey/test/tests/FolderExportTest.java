@@ -75,10 +75,10 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String subfolderPermsZip = "SubfolderWithPerms.folder.zip";
     private static final String inheritedPermsZip = "InheritingSubfolder.folder.zip";
 
-    private static final String testUser1 = "testuser1@test.me";
-    private static final String testUser2 = "testuser2@test.me";
-    private static final String testUser3 = "testuser3@test.me";
-    private static final String testUser4 = "testuser4@test.me";
+    private static final String testUser1 = "testuser1@folderexport.test";
+    private static final String testUser2 = "testuser2@folderexport.test";
+    private static final String testUser3 = "testuser3@folderexport.test";
+    private static final String testUser4 = "testuser4@folderexport.test";
     private static final String submitterGroup = "Submitters";
     private static final String superTesterGroup = "Super Testers";
     private static final String parentGroup = "Parent Group";
@@ -149,7 +149,7 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testImport() throws IOException
+    public void testImport() throws Exception
     {
         new File(dataDir, folderZip).delete();
         ZipUtil zipFolder = new ZipUtil(new File(dataDir, folderArchive), dataDir);
@@ -164,8 +164,8 @@ public class FolderExportTest extends BaseWebDriverTest
     @Test
     public void testImportProjectWithoutUsers()
     {
-//        test project import with users that do not exist
-        deleteUsersIfPresent(testUsers);
+        //test project import with users that do not exist
+        _userHelper.deleteUsers(false, testUsers);
         _containerHelper.createProject(importProjects[0], null);
         importFolder(importProjects[0], projectPermsZip);
         verifyProjectGroups(importProjects[0], notImportedGroups, importedGroups, false);
@@ -345,7 +345,7 @@ public class FolderExportTest extends BaseWebDriverTest
         log("Creating " + users.length + " users");
         for (String user : users)
         {
-            createUser(user, null);
+            _userHelper.createUser(user);
         }
     }
 
@@ -497,7 +497,7 @@ public class FolderExportTest extends BaseWebDriverTest
         else
             fileRoot = TestFileUtils.getDefaultFileRoot(folderName);
         File folderXmlFile = new File(fileRoot, "export" + File.separator + "folder.xml");
-        FolderDocument exportedFolderDocument = null;
+        FolderDocument exportedFolderDocument;
         try
         {
             exportedFolderDocument = FolderDocument.Factory.parse(folderXmlFile, XmlBeansUtil.getDefaultParseOptions());
@@ -639,7 +639,6 @@ public class FolderExportTest extends BaseWebDriverTest
         assertElementPresent(Locator.css(".study-properties").withText("Study Container Tab Study tracks data in 0 datasets over 0 visits. Data is present for 0 Participants."));
     }
 
-
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -648,7 +647,7 @@ public class FolderExportTest extends BaseWebDriverTest
         {
             _containerHelper.deleteProject(importProject, false);
         }
-        deleteUsersIfPresent(testUsers);
+        _userHelper.deleteUsers(false, testUsers);
     }
 
     @Override
