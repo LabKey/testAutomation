@@ -210,7 +210,6 @@ public class Crawler
         Map<ControllerActionId, List<String>> map = new HashMap<>();
         map.put(new ControllerActionId("assay", "assayResults"), Collections.singletonList("Data.Run/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
         map.put(new ControllerActionId("assay", "assayRuns"), Collections.singletonList("Data.Batch/RowId")); // TODO: 23321: Bad rowId input for assay details triggers server errors
-        map.put(new ControllerActionId("flow-editscript", "gateEditor"), Collections.singletonList("scriptId")); // TODO: 21332: flow-editscript.EditGateAction: IllegalArgumentException from un-parseable URL parameters
         map.put(new ControllerActionId("study-designer", "designer"), Collections.singletonList("panel")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
         map.put(new ControllerActionId("study-samples", "samples"), Collections.singletonList("AtRepository")); // TODO: 21337: study-samples.SamplesAction: SQLGenerationException from un-parseable URL parameters
 
