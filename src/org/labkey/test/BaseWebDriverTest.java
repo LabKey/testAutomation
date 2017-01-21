@@ -1586,20 +1586,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @Deprecated
     public CreateUserResponse createUser(String userName, @Nullable String cloneUserName)
     {
-        return createUser(userName, cloneUserName, true);
+        return _userHelper.createUser(userName);
     }
 
     @Deprecated
     public CreateUserResponse createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
     {
-        if(cloneUserName == null)
-        {
-            return _userHelper.createUser(userName, verifySuccess);
-        }
-        else
-        {
-            throw new IllegalArgumentException("cloneUserName support has been removed"); //not in use, so was not implemented in new user helpers
-        }
+        return _userHelper.createUser(userName, verifySuccess);
     }
 
     @Deprecated
@@ -1640,6 +1633,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
+    @Deprecated
     public void deleteUsersIfPresent(String... userEmails)
     {
         _userHelper.deleteUsers(false, userEmails);
