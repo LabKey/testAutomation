@@ -321,6 +321,7 @@ public class ScatterPlotTest extends GenericChartsTest
     private static final String COLOR_POINT_DEFAULT = "#3366FF";
     private static final String COLOR_POINT_NORMAL = "#FC8D62";
     private static final String COLOR_POINT_NOT_DONE = "#8DA0CB";
+    private static final String COLOR_POINT_NOT_DONE_DARK = "#4b67a6";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
@@ -397,13 +398,13 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickChartLayoutButton();
         lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
-        // TODO Add a test to validate that the point color selector is disabled.
 
         lookAndFeelDialog.setPlotWidth("750")
                 .setPlotHeight("500")
                 .clickJitterPoints()
                 .setOpacity(90)
                 .setPointSize(8)
+                .setPointColorPalette("dark")
                 .setXAxisScale(ChartLayoutDialog.ScaleType.Log)
                 .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
                 .clickApply();
@@ -411,7 +412,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Validate that the appropriate valuse have changed for points on the plot.");
         points = Locator.css("svg g a path").findElements(getDriver());
         assertEquals("Point at (70, 67) was not a triangle.", LARGE_TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
-        assertEquals("Point at (70, 67) was an unexpected color", COLOR_POINT_NOT_DONE, points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) was an unexpected color", COLOR_POINT_NOT_DONE_DARK, points.get(14).getAttribute("fill"));
         assertEquals("Point at (70, 67) did not have the expected fill opacity.", "0.9", points.get(14).getAttribute("fill-opacity"));
 
         log("Svg text: " + getSVGText());
@@ -730,9 +731,9 @@ public class ScatterPlotTest extends GenericChartsTest
         // change binning threshold to force to hex bin
         clickChartLayoutButton();
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
-        lookAndFeelDialog.setBinThreshold("13").clickApply();
+        lookAndFeelDialog.setBinThresholdToAlways(true).clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 7, 0);
         validateBinSizes(expectedBinSizeCounts);
 
@@ -740,20 +741,20 @@ public class ScatterPlotTest extends GenericChartsTest
         clickChartLayoutButton();
         lookAndFeelDialog.setBinShape(ChartLayoutDialog.BinShape.Square).clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 0, 7);
         validateBinSizes(expectedBinSizeCounts);
 
         // change threshold to match the number of data points so the binning goes away
         clickChartLayoutButton();
-        lookAndFeelDialog.setBinThreshold("14").clickApply();
+        lookAndFeelDialog.setBinThresholdToAlways(false).clickApply();
         assertSVG(SCATTER_PLOT_CPF_1);
         validateBinWarningMsg(false);
         validatePointsAndBins(10, 0, 0);
 
         // change back to a binned plot and save
         clickChartLayoutButton();
-        lookAndFeelDialog.setBinThreshold("13").clickApply();
+        lookAndFeelDialog.setBinThresholdToAlways(true).clickApply();
         savePlot(SCATTER_PLOT_NAME_BIN, SCATTER_PLOT_DESC_BIN);
     }
 
@@ -770,7 +771,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         openSavedPlotInEditMode(SCATTER_PLOT_NAME_BIN);
         assertSVG(SCATTER_PLOT_CPF_1);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 0, 7);
 
         // set y-axis manual range max only, and make sure decimals are allowed
@@ -778,21 +779,21 @@ public class ScatterPlotTest extends GenericChartsTest
         LookAndFeelScatterPlot lookAndFeelDialog = new LookAndFeelScatterPlot(getDriver());
         lookAndFeelDialog.setYAxisRangeMinMax(null, "35.5").clickApply();
         assertSVG(SCATTER_PLOT_CPF_2);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 0, 4);
 
         // make sure we can use manual range values of zero, in this case for min
         clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("0", "80").clickApply();
         assertSVG(SCATTER_PLOT_CPF_3);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 0, 6);
 
         // set x-axis manual range
         clickChartLayoutButton();
         lookAndFeelDialog.setXAxisRangeType(ChartLayoutDialog.RangeType.Manual).setXAxisRangeMinMax("0.55", "0.95").clickApply();
         assertSVG(SCATTER_PLOT_CPF_4);
-        validateBinWarningMsg(true);
+        validateBinWarningMsg(false);
         validatePointsAndBins(0, 0, 1);
 
         savePlot(SCATTER_PLOT_NAME_RANGE, SCATTER_PLOT_DESC_RANGE, true);

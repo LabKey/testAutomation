@@ -168,15 +168,22 @@ public class LookAndFeelScatterPlot extends ChartLayoutDialog<LookAndFeelScatter
         return this;
     }
 
-    public LookAndFeelScatterPlot setBinThreshold(String threshold)
+    public LookAndFeelScatterPlot setBinThresholdToAlways(boolean alwaysBin)
     {
-        super.setBinThreshold(threshold);
+        super.setBinThreshold(alwaysBin);
         return this;
     }
 
     public LookAndFeelScatterPlot setBinShape(BinShape shape)
     {
         super.setBinShape(shape);
+        return this;
+    }
+
+    public LookAndFeelScatterPlot setPointColorPalette(String colorPalette)
+    {
+        clickGeneralTab();
+        setColorPalette("Color Palette:", colorPalette);
         return this;
     }
 

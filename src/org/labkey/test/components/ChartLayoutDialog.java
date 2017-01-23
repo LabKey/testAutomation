@@ -260,10 +260,36 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         getWrapper().waitAndClick(colorPickerItem);
     }
 
-    public ChartLayoutDialog setBinThreshold(String threshold)
+    protected void setColorPalette(String colorLabel, String colorPalette)
+    {
+        Locator.XPathLocator comboBox = Ext4Helper.Locators.formItemWithLabel(colorLabel);
+        Locator arrowTrigger = comboBox.append("//div[contains(@class,'x4-form-trigger')]");
+        getWrapper().waitAndClick(arrowTrigger);
+        String colorStr;
+
+        if (colorPalette.toLowerCase().equals("dark"))
+            colorStr = "Dark";
+        else if (colorPalette.toLowerCase().equals("alternate"))
+            colorStr = "Alternate";
+        else
+            colorStr = "Light (default)";
+
+        Locator dropDownItem = Locator.tagWithClass("ul", "x4-list-plain")
+                .append(Locator.tagWithText("li", colorStr));
+        getWrapper().waitAndClick(dropDownItem);
+
+    }
+
+    public ChartLayoutDialog setBinThreshold(boolean alwaysBin)
     {
         clickGeneralTab();
-        getWrapper().setFormElement(elementCache().plotBinThresholdTextBox, threshold);
+        if (alwaysBin)
+        {
+            getWrapper().click(elementCache().alwaysBinThresholdRadioButton);
+        }
+        else {
+            getWrapper().click(elementCache().onlyWhenExceedsBinThresholdRadioButton);
+        }
         return this;
     }
 
@@ -426,6 +452,8 @@ public class ChartLayoutDialog<EC extends ChartLayoutDialog.ElementCache> extend
         public WebElement plotHeightTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='height']"), this);
         public WebElement lineWidthSlider = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Line Width:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement plotBinThresholdTextBox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//input[@name='binThresholdField']"), this);
+        public WebElement onlyWhenExceedsBinThresholdRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='When # of data points exceeds 10,000']/preceding-sibling::input[@type='button']"), this);
+        public WebElement alwaysBinThresholdRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Always']/preceding-sibling::input[@type='button']"), this);
         public WebElement hexagonShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Hexagon']/preceding-sibling::input[@type='button']"), this);
         public WebElement squareShapeRadioButton = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//label[text()='Square']/preceding-sibling::input[@type='button']"), this);
         public WebElement developerEnable = new LazyWebElement(Locator.xpath("//span[text()='Enable']"), this);
