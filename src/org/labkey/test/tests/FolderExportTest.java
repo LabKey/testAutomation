@@ -75,10 +75,11 @@ public class FolderExportTest extends BaseWebDriverTest
     private static final String subfolderPermsZip = "SubfolderWithPerms.folder.zip";
     private static final String inheritedPermsZip = "InheritingSubfolder.folder.zip";
 
-    private static final String testUser1 = "testuser1@folderexport.test";
-    private static final String testUser2 = "testuser2@folderexport.test";
-    private static final String testUser3 = "testuser3@folderexport.test";
-    private static final String testUser4 = "testuser4@folderexport.test";
+    // These specific usernames are used in the imported folder
+    private static final String testUser1 = "testuser1@test.me";
+    private static final String testUser2 = "testuser2@test.me";
+    private static final String testUser3 = "testuser3@test.me";
+    private static final String testUser4 = "testuser4@test.me";
     private static final String submitterGroup = "Submitters";
     private static final String superTesterGroup = "Super Testers";
     private static final String parentGroup = "Parent Group";
