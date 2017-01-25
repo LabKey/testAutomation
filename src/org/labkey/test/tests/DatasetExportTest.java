@@ -53,7 +53,7 @@ public class DatasetExportTest extends AssayResultsExportTest
     @Override
     protected String getExportedTsvTestColumnHeader()
     {
-        return "participantId";
+        return "Participant ID";
     }
 
     @Override

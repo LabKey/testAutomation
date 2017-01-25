@@ -59,7 +59,7 @@ public class ListExportTest extends AbstractExportTest
     @Override
     protected String getExportedTsvTestColumnHeader()
     {
-        return "name";
+        return "Name";
     }
 
     @Override
