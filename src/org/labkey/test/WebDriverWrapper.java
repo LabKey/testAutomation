@@ -2135,12 +2135,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }, pageTimeout);
     }
 
-    public void clickAndMove(final WebElement el, final int xTo, final int yTo)
-    {
-        Actions builder = new Actions(getDriver());
-        builder.dragAndDropBy(el, xTo, yTo).build().perform();
-    }
-
     public void clickAndWait(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
