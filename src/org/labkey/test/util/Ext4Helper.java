@@ -779,6 +779,11 @@ public class Ext4Helper
             return l;
         }
 
+        public static Locator.XPathLocator windowHeader(String title)
+        {
+            return Window.Locators.title().withText(title).parent();
+        }
+
         /**
          * @deprecated Use {@link org.labkey.test.components.ext4.Window}
          */
