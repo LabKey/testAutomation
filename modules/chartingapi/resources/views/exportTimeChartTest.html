@@ -85,13 +85,13 @@
 
         // Spec #28242: converted Time Chart helper to load data into MeasureStore
         if (responseData && responseData.individual) {
-            responseData.individual.measureStore = new LABKEY.Query.experimental.MeasureStore.create({
+            responseData.individual.measureStore = new LABKEY.Query.MeasureStore.create({
                 records: responseData.individual.rows,
                 responseMetadata: responseData.individual.metaData
             });
         }
         if (responseData && responseData.aggregate) {
-            responseData.aggregate.measureStore = new LABKEY.Query.experimental.MeasureStore.create({
+            responseData.aggregate.measureStore = new LABKEY.Query.MeasureStore.create({
                 records: responseData.aggregate.rows,
                 responseMetadata: responseData.aggregate.metaData
             });
