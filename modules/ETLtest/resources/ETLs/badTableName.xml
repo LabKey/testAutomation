@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>BadTableName</name>
+    <description>test error logging when runfilterstrategy is given a bad runTable</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source schemaName="etltest" queryName="source" />
+            <destination schemaName="etltest" queryName="target" />
+        </transform>
+        <transform id="step2" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target two</description>
+            <source schemaName="etltest" queryName="source" />
+            <destination schemaName="etltest" queryName="target2" />
+        </transform>
+    </transforms>
+    <!--incorrect runTable name here is intentional and meant to test for a checker error-->
+    <incrementalFilter className="RunFilterStrategy" runTableSchema="etltest" runTable="TransfersAndStuff" pkColumnName="Rowid" fkColumnName= "TransformRun" />
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>

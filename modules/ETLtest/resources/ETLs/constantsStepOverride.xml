@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Constants Step Override Test</name>
+    <description>Provide both global and step specific constant overrides</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy to target</description>
+            <source schemaName="etltest" queryName="source" />
+            <destination schemaName="etltest" queryName="target">
+            <constants>
+                <column name="name" type="VARCHAR" value="useStepName"/>
+            </constants>
+            </destination>
+        </transform>
+    </transforms>
+    <constants>
+        <column name="name" type="VARCHAR" value="useThisName"/>
+    </constants>    
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified"/>
+</etl>

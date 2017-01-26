@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Bad Procedure Name</name>
+    <description>Attempt to run a non existent stored proc</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlProcDoesntExist"/>
+        </transform>
+    </transforms>
+</etl>

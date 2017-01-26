@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Write Batched Files With BatchColumn</name>
+<description>Write rows from source to multiple files based on batchColumn</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," batchSize="2" batchColumn="Transformrun"/>
+    </transform>
+</transforms>
+</etl>

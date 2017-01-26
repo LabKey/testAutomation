@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Write to File Sleep before verify</name>
+<description>Write rows from source to a file</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+    </transform>
+    <transform id="sleep" type="TaskRefTransformStep">
+        <taskref ref="org.labkey.di.steps.TestTaskRefTask">
+            <settings>
+                <setting name="setting1" value="anything"/>
+                <setting name="sleep" value="10"/>
+            </settings>
+        </taskref>
+    </transform>
+    <transform id="TestETLPipeline" type="ExternalPipelineTask" externalTaskId="org.labkey.api.pipeline.cmd.CommandTask:etlTestTailCommand"/>
+</transforms>
+</etl>

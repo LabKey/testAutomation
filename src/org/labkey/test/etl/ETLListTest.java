@@ -24,6 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.ETL;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
 
@@ -34,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({DailyB.class})
+@Category({DailyB.class, ETL.class})
 public class ETLListTest extends BaseWebDriverTest
 {
     ETLHelper _etlHelper = new ETLHelper(this, getProjectName());

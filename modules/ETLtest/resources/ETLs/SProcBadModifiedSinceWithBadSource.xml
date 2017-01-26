@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Modified Since with Bad Source</name>
+    <description>Test with bad source specified</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <source schemaName="etltest" queryName="bad_source" />
+            <procedure schemaName="etltest" procedureName="etlTest">
+                <parameter name="@testMode" value="7"/>
+            </procedure>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+</etl>

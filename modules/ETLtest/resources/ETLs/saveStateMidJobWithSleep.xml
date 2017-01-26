@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Save State Midjob And Sleep</name>
+<description>Save State Midjob And Sleep</description>
+<transforms>
+    <transform id="step1" type="StoredProcedure" saveState="true">
+        <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+            <parameter name="@testMode" value="4"/>
+            <parameter name="@testInOutParam" value="before"/>
+        </procedure>
+    </transform>
+    <transform id="sleep" type="TaskRefTransformStep">
+        <taskref ref="org.labkey.di.steps.TestTaskRefTask">
+            <settings>
+                <setting name="setting1" value="anything"/>
+                <setting name="sleep" value="10"/>
+            </settings>
+        </taskref>
+    </transform>
+</transforms>
+</etl>

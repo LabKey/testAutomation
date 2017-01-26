@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Gate</name>
+    <description>Gate job on stored proc step</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+                <parameter name="@testMode" value="4"/>
+                <parameter name="@testInOutParam" value="before" noWorkValue="${testInOutParam}"/>
+            </procedure>
+        </transform>
+    </transforms>
+</etl>

@@ -16,6 +16,5 @@
     </clientDependencies>
     <requiredModuleContext>
         <requiredModule name="Core" />
-        <requiredModule name="DataIntegration" />
     </requiredModuleContext>
 </module>

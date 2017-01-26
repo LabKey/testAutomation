@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Append Mapped Columns</name>
+<description>append rows from source to target, mapping column names</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="etltest" queryName="target">
+            <columnTransforms>
+                <column source="id" target="name"/>
+                <column source="name" target="id"/>
+            </columnTransforms>
+        </destination>
+    </transform>
+</transforms>
+<incrementalFilter className="SelectAllFilterStrategy" />
+</etl>

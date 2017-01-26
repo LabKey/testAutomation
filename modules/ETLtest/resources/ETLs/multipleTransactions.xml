@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Multiple Transactions Test</name>
+<description>Truncate rows in target2, paste from file based query. Deliberate error in second transaction</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="transactionTest" />
+        <destination schemaName="etltest" queryName="target2" batchSize="2" targetOption="truncate"/>
+    </transform>
+</transforms>
+<incrementalFilter className="SelectAllFilterStrategy" />
+</etl>

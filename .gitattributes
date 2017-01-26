@@ -54,7 +54,64 @@ data/api/workbookAPITest.html -text
 modules/ETLtest/module.properties -text
 modules/ETLtest/resources/ETLs/AutoIncrementListAToListB_truncate.xml -text
 modules/ETLtest/resources/ETLs/ListAToListB.xml -text
+modules/ETLtest/resources/ETLs/SProcBadModifiedSinceWithBadSource.xml -text
+modules/ETLtest/resources/ETLs/SProcBadNonZeroReturnCode.xml -text
+modules/ETLtest/resources/ETLs/SProcBadProcedureName.xml -text
+modules/ETLtest/resources/ETLs/SProcBadThrowError.xml -text
+modules/ETLtest/resources/ETLs/SProcGate.xml -text
+modules/ETLtest/resources/ETLs/SProcGlobalParameters.xml -text
+modules/ETLtest/resources/ETLs/SProcModifiedSinceNoSource.xml -text
+modules/ETLtest/resources/ETLs/SProcModifiedSinceWithSource.xml -text
+modules/ETLtest/resources/ETLs/SProcNoWork.xml -text
+modules/ETLtest/resources/ETLs/SProcNormalOperation.xml -text
+modules/ETLtest/resources/ETLs/SProcOverridePersistedParameter.xml -text
+modules/ETLtest/resources/ETLs/SProcPersistedParameter.xml -text
+modules/ETLtest/resources/ETLs/SProcResultSet.xml -text
+modules/ETLtest/resources/ETLs/SProcRunFilter.xml -text
+modules/ETLtest/resources/ETLs/SimpleETLCausesKeyConstraintViolation.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/SleepTask.xml -text
+modules/ETLtest/resources/ETLs/SleepTaskAllowDoubleQueue.xml -text
+modules/ETLtest/resources/ETLs/TaskRefTask.xml -text
+modules/ETLtest/resources/ETLs/append.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendAndTaskRefTask.xml -text
+modules/ETLtest/resources/ETLs/appendContainerFilter.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendIdByRun.xml -text
+modules/ETLtest/resources/ETLs/appendMappedColumns.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendSelectAll.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendSelectAllNoTargetTx.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendTransformedColumn.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/appendWithRowversion.xml -text
+modules/ETLtest/resources/ETLs/badCast.xml -text
+modules/ETLtest/resources/ETLs/badTableName.xml -text
+modules/ETLtest/resources/ETLs/constantsGlobalOverride.xml -text
+modules/ETLtest/resources/ETLs/constantsNoMatchingSourceColumn.xml -text
+modules/ETLtest/resources/ETLs/constantsStepOverride.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/merge.xml -text
+modules/ETLtest/resources/ETLs/mergeManyColumns.xml -text
+modules/ETLtest/resources/ETLs/mergeWithAlternateKey.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/multipleTransactions.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/remote.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/remote_noTruncate.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/saveStateMidJobWithSleep.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/tailFile.xml -text
+modules/ETLtest/resources/ETLs/targetBatchedFiles.xml -text
+modules/ETLtest/resources/ETLs/targetBatchedFilesQueueTail.xml -text
+modules/ETLtest/resources/ETLs/targetBatchedFilesWithBatchColumn.xml -text
+modules/ETLtest/resources/ETLs/targetFile.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/targetFileParameterOverride.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/targetFileQueueTail.xml -text
+modules/ETLtest/resources/ETLs/targetFileWithSleep.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/truncate.xml -text
+modules/ETLtest/resources/ETLs/truncateWithoutDataTransfer.xml -text
+modules/ETLtest/resources/queries/etltest/TransactionTest.sql -text
+modules/ETLtest/resources/schemas/dbscripts/postgresql/etltest-0.00-16.30.sql -text
+modules/ETLtest/resources/schemas/dbscripts/sqlserver/etltest-0.00-16.30.sql -text
+modules/ETLtest/resources/schemas/etltest.xml -text
+modules/ETLtest/webapp/WEB-INF/etltest/etltestContext.xml -text
 modules/build.gradle -text
 modules/chartingapi/module.properties -text
 modules/chartingapi/resources/views/begin.html -text
@@ -150,59 +207,9 @@ modules/simpletest/resources/data/samples.tsv -text
 modules/simpletest/resources/data/todolist.tsv -text
 modules/simpletest/resources/domain-templates/TestingFromTemplate.template.xml -text svneol=unset#application/xml
 modules/simpletest/resources/domain-templates/todolist.template.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/SProcBadModifiedSinceWithBadSource.xml -text
-modules/simpletest/resources/etls/SProcBadNonZeroReturnCode.xml -text
-modules/simpletest/resources/etls/SProcBadProcedureName.xml -text
-modules/simpletest/resources/etls/SProcBadThrowError.xml -text
-modules/simpletest/resources/etls/SProcGate.xml -text
-modules/simpletest/resources/etls/SProcGlobalParameters.xml -text
-modules/simpletest/resources/etls/SProcModifiedSinceNoSource.xml -text
-modules/simpletest/resources/etls/SProcModifiedSinceWithSource.xml -text
-modules/simpletest/resources/etls/SProcNoWork.xml -text
-modules/simpletest/resources/etls/SProcNormalOperation.xml -text
-modules/simpletest/resources/etls/SProcOverridePersistedParameter.xml -text
-modules/simpletest/resources/etls/SProcPersistedParameter.xml -text
-modules/simpletest/resources/etls/SProcResultSet.xml -text
-modules/simpletest/resources/etls/SProcRunFilter.xml -text
-modules/simpletest/resources/etls/SimpleETLCausesKeyConstraintViolation.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/SleepTask.xml -text
-modules/simpletest/resources/etls/SleepTaskAllowDoubleQueue.xml -text
-modules/simpletest/resources/etls/TaskRefTask.xml -text
-modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendAndTaskRefTask.xml -text
-modules/simpletest/resources/etls/appendContainerFilter.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendIdByRun.xml -text
-modules/simpletest/resources/etls/appendMappedColumns.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendSelectAll.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendSelectAllNoTargetTx.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendTransformedColumn.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/appendWithRowversion.xml -text
-modules/simpletest/resources/etls/badCast.xml -text
-modules/simpletest/resources/etls/badTableName.xml -text
-modules/simpletest/resources/etls/constantsGlobalOverride.xml -text
-modules/simpletest/resources/etls/constantsNoMatchingSourceColumn.xml -text
-modules/simpletest/resources/etls/constantsStepOverride.xml -text svneol=unset#application/xml
+modules/simpletest/resources/etls/appendWithSpaces.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/merge.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/mergeManyColumns.xml -text
-modules/simpletest/resources/etls/mergeWithAlternateKey.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/multipleTransactions.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/saveStateMidJobWithSleep.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/tailFile.xml -text
-modules/simpletest/resources/etls/targetBatchedFiles.xml -text
-modules/simpletest/resources/etls/targetBatchedFilesQueueTail.xml -text
-modules/simpletest/resources/etls/targetBatchedFilesWithBatchColumn.xml -text
-modules/simpletest/resources/etls/targetFile.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/targetFileParameterOverride.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/targetFileQueueTail.xml -text
-modules/simpletest/resources/etls/targetFileWithSleep.xml -text svneol=unset#application/xml
-modules/simpletest/resources/etls/truncate.xml -text
-modules/simpletest/resources/etls/truncateWithoutDataTransfer.xml -text
+modules/simpletest/resources/etls/throwColumnTransformException.xml -text svneol=unset#application/xml
 modules/simpletest/resources/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/resources/folderTypes/FolderWithRestrictedModule.folderType.xml -text
@@ -219,7 +226,6 @@ modules/simpletest/resources/queries/study/verifyAssay.js -text
 modules/simpletest/resources/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/ParameterizedVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/Toyotas.sql -text
-modules/simpletest/resources/queries/vehicle/TransactionTest.sql -text
 modules/simpletest/resources/queries/vehicle/Vehicles/.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/EditableFileBasedView.qview.xml -text
@@ -268,6 +274,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.20-16.21.sq
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.20-16.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.21-16.22.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.30-16.31.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-16.31-16.32.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1.00.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-13.10.sql -text
@@ -299,6 +306,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.20-16.21.sql
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.20-16.30.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.21-16.22.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.30-16.31.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-16.31-16.32.sql -text
 modules/simpletest/resources/schemas/vehicle.xml -text
 modules/simpletest/resources/scripts/simpletest/Debug.js -text
 modules/simpletest/resources/scripts/simpletest/ScriptValidationExports.js -text

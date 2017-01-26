@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc persisted global parameter</name>
+    <description>Normal operation, use persisted global input parameter</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+                <parameter name="@testMode" value="4" scope="global"/>
+                <parameter name="@testInOutParam" value="before" scope="global"/>
+                <parameter name="@runCount" value="0" scope="global"/>
+            </procedure>
+        </transform>
+        <transform id="step2" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+            </procedure>
+        </transform>
+    </transforms>
+</etl>

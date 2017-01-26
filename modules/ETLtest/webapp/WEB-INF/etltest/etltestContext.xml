@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+    <bean id="etlTestPipelineRegistry" class="org.labkey.api.pipeline.TaskPipelineRegistrar">
+        <property name="factories">
+            <list>
+                <ref bean="etlTestTailCommand"/>
+            </list>
+        </property>
+        <property name="pipelines">
+            <list>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="etlTestPipeline"/>
+                    <property name="description" value="etlTest tail"/>
+                    <property name="protocolObjectId" value="etlTest.tail"/>
+                    <property name="protocolName" value="etlTest tail"/>
+                    <property name="protocolFactoryName" value="etlTestTail"/>
+                    <property name="initialInputExt" ref="testInTsvFileType"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="etlTestTailCommand"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="etlTestBadPipeline"/>
+                    <property name="description" value="etlTest tail bad exe"/>
+                    <property name="protocolObjectId" value="etlTest.tailBad"/>
+                    <property name="protocolName" value="etlTest tail bad exe"/>
+                    <property name="protocolFactoryName" value="etlTestTailBad"/>
+                    <property name="initialInputExt" ref="testInTsvFileType"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="etlTestTailBadCommand"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
+                
+            </list>
+        </property>
+    </bean>
+
+    <!-- Tasks registered in experiment module -->
+    <bean id="xarGeneratorId" class="org.labkey.api.pipeline.TaskId">
+        <constructor-arg><value type="java.lang.Class">org.labkey.api.exp.pipeline.XarGeneratorId</value></constructor-arg>
+    </bean>
+
+    <bean id="etlTestTailCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="etlTestTailCommand"/>
+        <property name="statusName" value="TAIL FILE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="testInTsvFileType" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputExtension" value=".testOut.tsv"/>
+        <property name="pipeToOutput" value="true"/>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="tail"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.ValueWithSwitch">
+                    <property name="parameter" value="numberOfLines"/>
+                    <property name="switchName" value="n"/>
+                    <property name="default" value="10"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.PathInLine">
+                    <property name="key" value="sourceDocs"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="testInTsvFileType" class="org.labkey.api.util.FileType">
+        <constructor-arg value=".testIn.tsv"/>
+    </bean>
+
+    <bean id="etlTestTailBadCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="etlTestTailBadCommand"/>
+        <property name="statusName" value="TAIL FILE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="testInTsvFileType" />
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputExtension" value=".testOut.tsv"/>
+        <property name="pipeToOutput" value="true"/>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="tail_bad"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.PathInLine">
+                    <property name="key" value="sourceDocs"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

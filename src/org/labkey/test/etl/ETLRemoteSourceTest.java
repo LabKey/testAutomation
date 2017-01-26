@@ -42,11 +42,11 @@ import java.util.List;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLRemoteSourceTest extends ETLAbstractTest
 {
-    private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
+    private static final String TRANSFORM_REMOTE = "{ETLtest}/remote";
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
-    private static final String TRANSFORM_REMOTE_BAD_DEST = "{simpletest}/remoteInvalidDestinationSchemaName";
-    private static final String TRANSFORM_REMOTE_NOTRUNC = "{simpletest}/remote_noTruncate";
+    private static final String TRANSFORM_REMOTE_BAD_DEST = "{ETLtest}/remoteInvalidDestinationSchemaName";
+    private static final String TRANSFORM_REMOTE_NOTRUNC = "{ETLtest}/remote_noTruncate";
     private static final File TRANSFORM_REMOTE_STUDY = new File(TestFileUtils.getSampledataPath(), "dataintegration/ETLTestStudy.zip");
 
 
@@ -162,7 +162,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         _etlHelper.insertSourceRow("12", "Patient 12", "");
         _etlHelper.runETL(TRANSFORM_REMOTE_NOTRUNC);
 
-        //since we just moved patient 12 to etl_target, running the etl a second time should give us a constraint violation
+        //since we just moved patient 12 to target, running the etl a second time should give us a constraint violation
         errors.add("AK_etltarget");
         errors.add("constraint");
         errors.add("ERROR: Error running executeCopy");

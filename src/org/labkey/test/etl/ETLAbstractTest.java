@@ -46,13 +46,13 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
     protected static final String DATA_INTEGRATION_TAB = "DataIntegration";
     static final String TRANSFORM_APPEND_DESC = "Append Test";
     static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
-    static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
-    static final String APPEND_WITH_ROWVERSION = "{simpletest}/appendWithRowversion";
-    static final String APPEND = "{simpletest}/append";
-    static final String APPEND_SELECT_ALL = "{simpletest}/appendSelectAll";
-    static final String TRANSFORM_BAD_THROW_ERROR_SP = "{simpletest}/SProcBadThrowError";
-    protected static final String TRANSFORM_APPEND = "{simpletest}/append";
-    protected static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
+    static final String TRANSFORM_BYRUNID = "{ETLtest}/appendIdByRun";
+    static final String APPEND_WITH_ROWVERSION = "{ETLtest}/appendWithRowversion";
+    static final String APPEND = "{ETLtest}/append";
+    static final String APPEND_SELECT_ALL = "{ETLtest}/appendSelectAll";
+    static final String TRANSFORM_BAD_THROW_ERROR_SP = "{ETLtest}/SProcBadThrowError";
+    protected static final String TRANSFORM_APPEND = "{ETLtest}/append";
+    protected static final String TRANSFORM_TRUNCATE = "{ETLtest}/truncate";
     public ETLHelper _etlHelper = new ETLHelper(this, getProjectName());
     protected DataIntegrationHelper _diHelper = _etlHelper.getDiHelper();
 
@@ -68,12 +68,12 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
         return Collections.singletonList("dataintegration");
     }
 
-    @Override
-    public void checkQueries()
-    {
-        log("Skipping query check. Some tables used by queries in simpletest module are not created in this test");
-        log("Query check from " + SimpleModuleTest.class.getSimpleName() + " should cover anything this would check");
-    }
+//    @Override
+//    public void checkQueries()
+//    {
+//        log("Skipping query check. Some tables used by queries in simpletest module are not created in this test");
+//        log("Query check from " + SimpleModuleTest.class.getSimpleName() + " should cover anything this would check");
+//    }
 
     protected void doSetup()
     {

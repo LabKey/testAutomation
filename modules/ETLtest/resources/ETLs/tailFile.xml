@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Tail a file</name>
+<description>Tail input file, for testing queueing</description>
+<transforms>
+    <transform id="TestETLPipeline" type="ExternalPipelineTask" externalTaskId="org.labkey.api.pipeline.cmd.CommandTask:etlTestTailCommand"/>
+</transforms>
+</etl>

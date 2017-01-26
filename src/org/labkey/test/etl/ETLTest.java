@@ -86,7 +86,7 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testMultipleTransactions() throws Exception // Migrated from ETLMultipleTransactionsTest
     {
-        final String ETL = "{simpletest}/multipleTransactions";
+        final String ETL = "{ETLtest}/multipleTransactions";
         String jobId = _etlHelper.runETL_API(ETL).getJobId();
         _etlHelper.incrementExpectedErrorCount();
 
@@ -109,14 +109,14 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testErrors() // Migrated from ETLErrorTest
     {
-        final String TRANSFORM_KEYCONSTRAINT_ERROR = "{simpletest}/SimpleETLCausesKeyConstraintViolation";
-        final String TRANSFORM_QUERY_ERROR = "{simpletest}/SimpleETLqueryDoesNotExist";
+        final String TRANSFORM_KEYCONSTRAINT_ERROR = "{ETLtest}/SimpleETLCausesKeyConstraintViolation";
+        final String TRANSFORM_QUERY_ERROR = "{ETLtest}/SimpleETLqueryDoesNotExist";
         final String TRANSFORM_QUERY_ERROR_NAME = "Error Bad Source Query";
-        final String TRANSFORM_NOCOL_ERROR = "{simpletest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
-        final String TRANSFORM_BADCAST = "{simpletest}/badCast";
-        final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
+        final String TRANSFORM_NOCOL_ERROR = "{ETLtest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
+        final String TRANSFORM_BADCAST = "{ETLtest}/badCast";
+        final String TRANSFORM_BADTABLE = "{ETLtest}/badTableName";
 
-        final String NO_CHEESEBURGER_TABLE = "Could not find table: vehicle.etl_source_cheeseburger";
+        final String NO_CHEESEBURGER_TABLE = "Could not find table: etltest.source_cheeseburger";
 
         goToProjectHome();
         clickTab(DATA_INTEGRATION_TAB);
@@ -138,7 +138,7 @@ public class ETLTest extends ETLAbstractTest
         assertTextPresent(NO_CHEESEBURGER_TABLE);
 
         _etlHelper.runETLNoNav(TRANSFORM_NOCOL_ERROR, false, true);
-        assertTextPresent("Column not found: etl_source.monkeys");
+        assertTextPresent("Column not found: source.monkeys");
         errors.clear();
 
         errors.add("contains value not castable");
@@ -166,15 +166,15 @@ public class ETLTest extends ETLAbstractTest
     @Test
     public void testStoredProcTransforms() throws Exception // Migrated from ETLStoredProcedureTest
     {
-        final String TRANSFORM_NORMAL_OPERATION_SP = "{simpletest}/SProcNormalOperation";
-        final String TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP = "{simpletest}/SProcBadNonZeroReturnCode";
-        final String TRANSFORM_BAD_PROCEDURE_NAME_SP = "{simpletest}/SProcBadProcedureName";
-        final String TRANSFORM_PERSISTED_PARAMETER_SP = "{simpletest}/SProcPersistedParameter";
-        final String TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP = "{simpletest}/SProcOverridePersistedParameter";
-        final String TRANSFORM_RUN_FILTER_SP = "{simpletest}/SProcRunFilter";
-        final String TRANSFORM_MODIFIED_FILTER_NO_SOURCE_SP = "{simpletest}/SProcModifiedSinceNoSource";
-        final String TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP = "{simpletest}/SProcModifiedSinceWithSource";
-        final String TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP = "{simpletest}/SProcBadModifiedSinceWithBadSource";
+        final String TRANSFORM_NORMAL_OPERATION_SP = "{ETLtest}/SProcNormalOperation";
+        final String TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP = "{ETLtest}/SProcBadNonZeroReturnCode";
+        final String TRANSFORM_BAD_PROCEDURE_NAME_SP = "{ETLtest}/SProcBadProcedureName";
+        final String TRANSFORM_PERSISTED_PARAMETER_SP = "{ETLtest}/SProcPersistedParameter";
+        final String TRANSFORM_OVERRIDE_PERSISTED_PARAMETER_SP = "{ETLtest}/SProcOverridePersistedParameter";
+        final String TRANSFORM_RUN_FILTER_SP = "{ETLtest}/SProcRunFilter";
+        final String TRANSFORM_MODIFIED_FILTER_NO_SOURCE_SP = "{ETLtest}/SProcModifiedSinceNoSource";
+        final String TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP = "{ETLtest}/SProcModifiedSinceWithSource";
+        final String TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP = "{ETLtest}/SProcBadModifiedSinceWithBadSource";
 
         /*
         Test modes as mapped in the proc etlTest
@@ -302,7 +302,7 @@ public class ETLTest extends ETLAbstractTest
     {
         _etlHelper.insertSourceRow(INSERTED_ID1, INSERTED_NAME1, null);
         _etlHelper.runETL(etl);
-        Map<String, Object> result = executeSelectRowCommand("vehicle", "etl_target").getRows().get(0);
+        Map<String, Object> result = executeSelectRowCommand("etltest", "target").getRows().get(0);
         assertEquals("Wrong transformed value for id field", expectedId, result.get("id"));
         assertEquals("Wrong transformed value for name field", expectedName, result.get("name"));
     }
@@ -373,13 +373,13 @@ public class ETLTest extends ETLAbstractTest
     public void customContainerFilter() throws Exception
     {
         // This ETL xml uses a CurrentAndSubfolders containerFilter
-        final String APPEND_CONTAINER_FILTER = "{simpletest}/appendContainerFilter";
+        final String APPEND_CONTAINER_FILTER = "{ETLtest}/appendContainerFilter";
         final String MY_ROW = "own row";
         final String CHILD_FOLDER = "child";
         _etlHelper.insertSourceRow("1", MY_ROW, "1");
         _containerHelper.createSubfolder(getProjectName(), CHILD_FOLDER);
         clickFolder(CHILD_FOLDER);
-        new PortalHelper(this).addQueryWebPart("Source", ETLHelper.VEHICLE_SCHEMA, ETL_SOURCE, null);
+        new PortalHelper(this).addQueryWebPart("Source", ETLHelper.ETL_TEST_SCHEMA, ETL_SOURCE, null);
         final String CHILD_ROW = "child row";
         _etlHelper.insertSourceRow("2", CHILD_ROW, "1", CHILD_FOLDER);
         _etlHelper.runETL_API(APPEND_CONTAINER_FILTER);
@@ -399,7 +399,7 @@ public class ETLTest extends ETLAbstractTest
     public void testBasicMerge() throws Exception
     {
         final String PREFIX = "Subject for merge test";
-        final String MERGE_ETL = "{simpletest}/merge";
+        final String MERGE_ETL = "{ETLtest}/merge";
         _etlHelper.insertSourceRow("600", PREFIX + "1", null);
         _etlHelper.runETL_API(MERGE_ETL);
         // Check the ETL works at all
@@ -419,8 +419,8 @@ public class ETLTest extends ETLAbstractTest
 
     private void verifyCreatedMatchesSource()
     {
-        Object target2created = executeSelectRowCommand("vehicle", "etl_target2").getRows().get(0).get("Created");
-        Object sourceCreated = executeSelectRowCommand("vehicle", "etl_source").getRows().get(0).get("Created");
+        Object target2created = executeSelectRowCommand("etltest", "target2").getRows().get(0).get("Created");
+        Object sourceCreated = executeSelectRowCommand("etltest", "source").getRows().get(0).get("Created");
         assertEquals("Created field in target2 did not match source", sourceCreated, target2created);
     }
 
@@ -428,7 +428,7 @@ public class ETLTest extends ETLAbstractTest
     public void testManyColumnMerge() throws Exception
     {
         // Mostly identical coverage as the basic case, but with > 100 columns.
-        final String MERGE_ETL = "{simpletest}/mergeManyColumns";
+        final String MERGE_ETL = "{ETLtest}/mergeManyColumns";
         final String firstField5 = "55555";
         final String secondField5 = "66666";
         final String modifiedField5 = "77777";
@@ -454,7 +454,7 @@ public class ETLTest extends ETLAbstractTest
     public void testMergeWithAlternateKey() throws Exception
     {
         final String PREFIX = "Subject for AlternateKey test";
-        final String MERGE_ETL = "{simpletest}/mergeWithAlternateKey";
+        final String MERGE_ETL = "{ETLtest}/mergeWithAlternateKey";
         final String ALT_KEY_VAL = "7777";
         _etlHelper.insertSourceRow(ALT_KEY_VAL, PREFIX + "1", null);
         _etlHelper.runETL_API(MERGE_ETL);

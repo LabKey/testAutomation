@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Write to File Queue Tail test</name>
+<description>Write rows from source to a file, queue tail</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination type="file" dir="etlOut" fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" rowDelimiter="\r" quote="'" columnDelimiter="," />
+    </transform>
+    <transform id="QueueTail" type="TaskrefTransformStep">
+        <taskref ref="org.labkey.di.steps.QueueJobTask">
+            <settings>
+                <setting name="transformId" value="{ETLtest}/tailFile"/>
+            </settings>
+        </taskref>
+    </transform>
+</transforms>
+</etl>

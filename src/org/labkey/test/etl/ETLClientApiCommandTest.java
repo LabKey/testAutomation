@@ -50,7 +50,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLClientApiCommandTest extends ETLAbstractTest
 {
-    private static final String TRANSFORM_NOTFOUND = "{simpletest}/notfound";
+    private static final String TRANSFORM_NOTFOUND = "{ETLtest}/notfound";
 
     @Override
     protected String getProjectName()

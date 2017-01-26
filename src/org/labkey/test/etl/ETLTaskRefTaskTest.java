@@ -39,11 +39,11 @@ import static org.junit.Assert.assertTrue;
 public class ETLTaskRefTaskTest extends ETLAbstractTest
 {
     private static final String PROJECT_NAME = "ETLTaskRefTaskProject";
-    private static final String ETL = "{simpletest}/TaskRefTask";
+    private static final String ETL = "{ETLtest}/TaskRefTask";
     public static final String LOG_MESSAGE = "Log from test task";
-    private static final String TRANSFORM_SLEEP = "{simpletest}/SleepTask";
+    private static final String TRANSFORM_SLEEP = "{ETLtest}/SleepTask";
     private static final String TRANSFORM_SLEEP_NAME = "SleepTask";
-    private static final String TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE = "{simpletest}/SleepTaskAllowDoubleQueue";
+    private static final String TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE = "{ETLtest}/SleepTaskAllowDoubleQueue";
     private static final String TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME = "SleepTask Allow Multiple Queueing";
 
     @Nullable

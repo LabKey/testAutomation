@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc RunFilter</name>
+    <description>SP with Run based filter</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest">
+                <parameter name="@testMode" value="6" />
+            </procedure>
+        </transform>
+    </transforms>
+    <incrementalFilter className="RunFilterStrategy" runTableSchema="etltest" runTable="Transfer" pkColumnName="Rowid" />
+</etl>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Error Bad Source Query</name>
+<description>source schema does not exist</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source_cheeseburger" />
+        <destination schemaName="etltest" queryName="target" />
+    </transform>
+</transforms>
+<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+<schedule>
+    <poll interval="15s" />
+</schedule>
+</etl>

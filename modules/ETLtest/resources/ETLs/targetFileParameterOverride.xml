@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml" loadReferencedFiles="true">
+<name>Write to File test override parameter</name>
+<description>Write rows from source to a file, overriding default parameter setting</description>
+<pipelineParameters>
+    <parameter name="numberOfLines" value="2"/>
+</pipelineParameters>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination type="file"  fileBaseName="report-${TransformRunId}" fileExtension="testIn.tsv" quote="'" columnDelimiter="," />
+    </transform>
+    <transform id="TestETLPipeline" type="ExternalPipelineTask" externalTaskId="org.labkey.api.pipeline.cmd.CommandTask:etlTestTailCommand"/>
+</transforms>
+</etl>

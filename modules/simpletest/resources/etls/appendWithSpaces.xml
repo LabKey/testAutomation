@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-<name>Merge Test</name>
-<description>Merge rows from source to target2</description>
+<name>Append With Spaces Test</name>
+<description>append rows from etl_source to etl_target and etl_target2</description>
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
-        <source schemaName="etltest" queryName="source" />
-        <destination schemaName="etltest" queryName="target2" targetOption="merge"/>
+        <source schemaName="vehicle" queryName="etlTestSourceWithSpaces" />
+        <destination schemaName="vehicle" queryName="etlTestTargetWithSpaces" />
     </transform>
 </transforms>
 <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified"/>

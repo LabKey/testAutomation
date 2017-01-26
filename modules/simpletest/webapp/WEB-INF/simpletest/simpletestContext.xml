@@ -3,41 +3,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
     <bean id="simpletestPipelineRegistry" class="org.labkey.api.pipeline.TaskPipelineRegistrar">
-        <property name="factories">
-            <list>
-                <ref bean="simpleTestTailCommand"/>
-            </list>
-        </property>
         <property name="pipelines">
             <list>
-                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
-                    <constructor-arg value="simpletestPipeline"/>
-                    <property name="description" value="Simpletest tail"/>
-                    <property name="protocolObjectId" value="simpletest.tail"/>
-                    <property name="protocolName" value="Simpletest tail"/>
-                    <property name="protocolFactoryName" value="simpletestTail"/>
-                    <property name="initialInputExt" ref="testInTsvFileType"/>
-                    <property name="taskProgressionSpec">
-                        <list>
-                            <ref bean="simpleTestTailCommand"/>
-                            <ref bean="xarGeneratorId"/>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
-                    <constructor-arg value="simpletestBadPipeline"/>
-                    <property name="description" value="simpletest tail bad exe"/>
-                    <property name="protocolObjectId" value="simpletest.tailBad"/>
-                    <property name="protocolName" value="simpletest tail bad exe"/>
-                    <property name="protocolFactoryName" value="simpletestTailBad"/>
-                    <property name="initialInputExt" ref="testInTsvFileType"/>
-                    <property name="taskProgressionSpec">
-                        <list>
-                            <ref bean="simpleTestTailBadCommand"/>
-                            <ref bean="xarGeneratorId"/>
-                        </list>
-                    </property>
-                </bean>
                 <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummyNlpPipeline"/>
                     <property name="description" value="Dummy NLP invocation"/>
@@ -151,68 +118,6 @@
     <bean id="xarGeneratorId" class="org.labkey.api.pipeline.TaskId">
         <constructor-arg><value type="java.lang.Class">org.labkey.api.exp.pipeline.XarGeneratorId</value></constructor-arg>
     </bean>
-
-    <bean id="simpleTestTailCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
-        <constructor-arg value="simpleTestTailCommand"/>
-        <property name="statusName" value="TAIL FILE"/>
-        <property name="inputPaths">
-            <map>
-                <entry key="sourceDocs">
-                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
-                        <constructor-arg ref="testInTsvFileType" />
-                    </bean>
-                </entry>
-            </map>
-        </property>
-        <property name="outputExtension" value=".testOut.tsv"/>
-        <property name="pipeToOutput" value="true"/>
-        <property name="converters">
-            <list>
-                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
-                    <property name="exePath" value="tail"/>
-                </bean>
-                <bean class="org.labkey.api.pipeline.cmd.ValueWithSwitch">
-                    <property name="parameter" value="numberOfLines"/>
-                    <property name="switchName" value="n"/>
-                    <property name="default" value="10"/>
-                </bean>
-                <bean class="org.labkey.api.pipeline.cmd.PathInLine">
-                    <property name="key" value="sourceDocs"/>
-                </bean>
-            </list>
-        </property>
-    </bean>
-
-    <bean id="testInTsvFileType" class="org.labkey.api.util.FileType">
-        <constructor-arg value=".testIn.tsv"/>
-    </bean>
-
-    <bean id="simpleTestTailBadCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
-        <constructor-arg value="simpleTestTailBadCommand"/>
-        <property name="statusName" value="TAIL FILE"/>
-        <property name="inputPaths">
-            <map>
-                <entry key="sourceDocs">
-                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
-                        <constructor-arg ref="testInTsvFileType" />
-                    </bean>
-                </entry>
-            </map>
-        </property>
-        <property name="outputExtension" value=".testOut.tsv"/>
-        <property name="pipeToOutput" value="true"/>
-        <property name="converters">
-            <list>
-                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
-                    <property name="exePath" value="tail_bad"/>
-                </bean>
-                <bean class="org.labkey.api.pipeline.cmd.PathInLine">
-                    <property name="key" value="sourceDocs"/>
-                </bean>
-            </list>
-        </property>
-    </bean>
-
 
     <bean id="dummyNlpEngineCommand" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
         <constructor-arg value="dummyNlpEngine"/>

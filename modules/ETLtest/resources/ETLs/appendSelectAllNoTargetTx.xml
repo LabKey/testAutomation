@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-<name>Merge Test</name>
-<description>Merge rows from source to target2</description>
+<name>Append With Select All No Target Tx Test</name>
+<description>append rows from source to target and target2</description>
 <transforms>
     <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
         <description>Copy to target</description>
         <source schemaName="etltest" queryName="source" />
-        <destination schemaName="etltest" queryName="target2" targetOption="merge"/>
+        <destination schemaName="etltest" queryName="target" useTransaction="false"/>
     </transform>
 </transforms>
-<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified"/>
+<incrementalFilter className="SelectAllFilterStrategy" />
 </etl>

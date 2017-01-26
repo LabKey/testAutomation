@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Truncate A Target Without Transferring Data</name>
+    <description>Truncate A Target Without Transferring Data</description>
+    <transforms>
+        <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+            <destination schemaName="etltest" queryName="target" targetOption="truncate"/>
+        </transform>
+    </transforms>
+</etl>

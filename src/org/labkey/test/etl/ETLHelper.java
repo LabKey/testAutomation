@@ -46,19 +46,19 @@ import static org.junit.Assert.assertTrue;
 
 public class ETLHelper
 {
-    static final String VEHICLE_SCHEMA = "vehicle";
-    static final String ETL_SOURCE = "etl_source";
-    static final String ETL_TARGET = "etl_target";
-    private static final String ETL_TARGET_2 = "etl_target2";
-    private static final String ETL_DELETE = "etl_delete";
+    static final String ETL_TEST_SCHEMA = "etltest";
+    static final String ETL_SOURCE = "source";
+    static final String ETL_TARGET = "target";
+    private static final String ETL_TARGET_2 = "target2";
+    private static final String ETL_DELETE = "delete";
     private static final String TRANSFER = "transfer";
     public static final String COMPLETE = "COMPLETE";
     private static final String DATAINTEGRATION_MODULE = "DataIntegration";
     private static final String DATAINTEGRATION_SCHEMA = "dataintegration";
-    private static final String ETL_180_COLUMN_SOURCE = "etl_180column_source";
-    private static final String ETL_180_COLUMN_TARGET = "etl_180column_target";
-    private static final String TITLE_180_COLUMN_SOURCE = "180ColumnSource";
-    private static final String TITLE_180_COLUMN_TARGET = "180ColumnTarget";
+    private static final String ETL_180_COLUMN_SOURCE = "x180column_source";
+    private static final String ETL_180_COLUMN_TARGET = "x180column_target";
+    private static final String TITLE_180_COLUMN_SOURCE = "x180ColumnSource";
+    private static final String TITLE_180_COLUMN_TARGET = "x180ColumnTarget";
     private BaseWebDriverTest _test;
 
     private int _jobsComplete;
@@ -154,7 +154,7 @@ public class ETLHelper
     {
         _test.log("running setup");
         _test._containerHelper.createProject(_projectName, null);
-        _test._containerHelper.enableModules(Arrays.asList(DATAINTEGRATION_MODULE, "simpletest"));
+        _test._containerHelper.enableModules(Arrays.asList(DATAINTEGRATION_MODULE, "ETLtest"));
     }
 
     protected void doSetup()
@@ -166,15 +166,15 @@ public class ETLHelper
     {
         doBasicSetup();
         PortalHelper portalHelper = new PortalHelper(_test);
-        portalHelper.addQueryWebPart("Source", VEHICLE_SCHEMA, ETL_SOURCE, null);
-        portalHelper.addQueryWebPart("Target1", VEHICLE_SCHEMA, ETL_TARGET, null);
-        portalHelper.addQueryWebPart("Target2", VEHICLE_SCHEMA, ETL_TARGET_2, null);
+        portalHelper.addQueryWebPart("Source", ETL_TEST_SCHEMA, ETL_SOURCE, null);
+        portalHelper.addQueryWebPart("Target1", ETL_TEST_SCHEMA, ETL_TARGET, null);
+        portalHelper.addQueryWebPart("Target2", ETL_TEST_SCHEMA, ETL_TARGET_2, null);
 
         if (!addAllWebparts)
             return;
 
-        portalHelper.addQueryWebPart("Delete", VEHICLE_SCHEMA, ETL_DELETE, null);
-        portalHelper.addQueryWebPart("Transfers", VEHICLE_SCHEMA, TRANSFER, null);
+        portalHelper.addQueryWebPart("Delete", ETL_TEST_SCHEMA, ETL_DELETE, null);
+        portalHelper.addQueryWebPart("Transfers", ETL_TEST_SCHEMA, TRANSFER, null);
 
         // UNDONE: remove when we finalize casing of table names versus views across pg and mssql
         String transformRun =  (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ?
@@ -197,8 +197,8 @@ public class ETLHelper
         {
             _test.log("Adding query web parts for 180column source and target");
             PortalHelper portalHelper = new PortalHelper(_test);
-            portalHelper.addQueryWebPart(TITLE_180_COLUMN_SOURCE, VEHICLE_SCHEMA, ETL_180_COLUMN_SOURCE, null);
-            portalHelper.addQueryWebPart(TITLE_180_COLUMN_TARGET, VEHICLE_SCHEMA, ETL_180_COLUMN_TARGET, null);
+            portalHelper.addQueryWebPart(TITLE_180_COLUMN_SOURCE, ETL_TEST_SCHEMA, ETL_180_COLUMN_SOURCE, null);
+            portalHelper.addQueryWebPart(TITLE_180_COLUMN_TARGET, ETL_TEST_SCHEMA, ETL_180_COLUMN_TARGET, null);
         }
         else
         {
@@ -580,7 +580,7 @@ public class ETLHelper
     {
         if (!StringUtils.startsWith(transformId, "{"))
         {
-            transformId = "{simpletest}/" + transformId;
+            transformId = "{ETLtest}/" + transformId;
         }
         return transformId;
     }
@@ -649,7 +649,7 @@ public class ETLHelper
 
     void deleteAllRows(String tableName) throws Exception
     {
-        _test.deleteAllRows(_projectName, VEHICLE_SCHEMA, tableName);
+        _test.deleteAllRows(_projectName, ETL_TEST_SCHEMA, tableName);
     }
 
     void assertInSource(String... targets)
@@ -664,7 +664,7 @@ public class ETLHelper
 
     void assertInTarget1(String... targets)
     {
-        assertQueryWebPart("etl_target", "Target1", true, targets);
+        assertQueryWebPart("target", "Target1", true, targets);
     }
 
     void assertInTarget2(String... targets)
@@ -714,12 +714,12 @@ public class ETLHelper
 
     void assertNotInTarget1(String... targets)
     {
-        assertQueryWebPart("etl_target", "Target1", false, targets);
+        assertQueryWebPart("target", "Target1", false, targets);
     }
 
     void assertNotInTarget2(String... targets)
     {
-        assertQueryWebPart("etl_target2", "Target2", false, targets);
+        assertQueryWebPart("target2", "Target2", false, targets);
     }
 
     protected void assertInLog(String... targets)

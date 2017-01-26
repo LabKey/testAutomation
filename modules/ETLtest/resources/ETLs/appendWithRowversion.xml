@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>AppendWithRowversion</name>
+<description>append rows from source to target, use rowversion column for filter</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="etltest" queryName="source" />
+        <destination schemaName="etltest" queryName="target" />
+    </transform>
+</transforms>
+<incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="rowversion">
+    <deletedRowsSource schemaName="etltest" queryName="delete" deletedSourceKeyColumnName="id" timestampColumnName="created" targetKeyColumnName="id"/>
+</incrementalFilter>
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
+</etl>

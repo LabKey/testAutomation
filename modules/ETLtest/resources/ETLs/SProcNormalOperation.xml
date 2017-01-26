@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Normal Operation</name>
+    <description>Normal operation</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <procedure schemaName="etltest" procedureName="etlTest" useTransaction="false">
+                <parameter name="@testMode" value="1"/>
+                <parameter name="testInOutParam" value="before"/>
+            </procedure>
+        </transform>
+    </transforms>
+    <schedule>
+        <poll interval="5s" />
+    </schedule>
+</etl>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+<name>Throw Exception From ColumnTransform</name>
+<description>append rows from etl_source to etl_target, applying column transformations</description>
+<transforms>
+    <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
+        <description>Copy to target</description>
+        <source schemaName="vehicle" queryName="etl_source" />
+        <destination schemaName="vehicle" queryName="etl_target">
+            <columnTransforms>
+                <column source="name" transformClass="org.labkey.di.columnTransforms.TestThrowingColumnTransform"/>
+            </columnTransforms>
+        </destination>
+    </transform>
+</transforms>
+<incrementalFilter className="SelectAllFilterStrategy" />
+</etl>
