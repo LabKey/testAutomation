@@ -118,8 +118,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
         clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setXAxis(TAGGED_DIMENSION);
         chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -155,8 +154,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         assertTrue(currentSvg.getText().contains(TAGGED_MEASURE));
 
         clickButton("Chart Type", 0);
-        chartTypeDialog = new ChartTypeDialog(this);
-        chartTypeDialog.waitForDialog();
+        chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setXAxis(TAGGED_DIMENSION);
         chartTypeDialog.clickApply();
         currentSvg = Locator.css("svg").waitForElement(getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

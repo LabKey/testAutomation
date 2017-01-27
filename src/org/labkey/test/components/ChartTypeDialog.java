@@ -196,6 +196,12 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
+    public ChartTypeDialog setYAxisAggregateMethod(String aggMethod)
+    {
+        getWrapper()._ext4Helper.selectComboBoxItem("Aggregate Method:", aggMethod);
+        return this;
+    }
+
     public ChartTypeDialog setCategories(String columnName)
     {
         setCategories(columnName, false);
