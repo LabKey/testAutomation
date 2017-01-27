@@ -93,9 +93,10 @@ public class LookAndFeelPieChart extends ChartLayoutDialog<LookAndFeelPieChart.E
         return getSliderCurrentValue(elementCache().outerRadiusSlider);
     }
 
-    public LookAndFeelPieChart setColorPalette(ColorPalette paletteValue)
+    public LookAndFeelPieChart setColorPalette(String paletteValue)
     {
-        getWrapper()._ext4Helper.selectComboBoxItem("Color palette:", paletteValue.dropDownText());
+        //getWrapper()._ext4Helper.selectComboBoxItem("Color palette:", paletteValue.dropDownText());
+        setColorPalette("Color Palette:", paletteValue);
         return this;
     }
 

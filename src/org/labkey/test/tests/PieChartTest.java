@@ -172,13 +172,13 @@ public class PieChartTest extends GenericChartsTest
                 .setOuterRadiusPercentage(75)
                 .setPlotWidth("500")
                 .setPlotHeight("500")
-                .setColorPalette(LookAndFeelPieChart.ColorPalette.Alternate)
+                .setColorPalette("alternate")
                 .clickApply();
 
         sleep(3000);  // Is there a better trigger?
 
         svgText = getSVGText();
-        log("Last scgText: " + svgText);
+        log("Last svgText: " + svgText);
 
         // There is one extra % because of the TRICKY_CHARACTERS used in the title.
         percentCount = StringUtils.countMatches(svgText, "%");
