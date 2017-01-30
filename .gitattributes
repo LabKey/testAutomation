@@ -111,7 +111,7 @@ modules/ETLtest/resources/queries/etltest/TransactionTest.sql -text
 modules/ETLtest/resources/schemas/dbscripts/postgresql/etltest-0.00-16.30.sql -text
 modules/ETLtest/resources/schemas/dbscripts/sqlserver/etltest-0.00-16.30.sql -text
 modules/ETLtest/resources/schemas/etltest.xml -text
-modules/ETLtest/webapp/WEB-INF/ETLtest_temp/etltestContext.xml -text
+modules/ETLtest/webapp/WEB-INF/ETLtest/etltestContext.xml -text
 modules/build.gradle -text
 modules/chartingapi/module.properties -text
 modules/chartingapi/resources/views/begin.html -text
