@@ -888,7 +888,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         String clearOrSet = isExpectedToBeChecked ? "Clearing" : "Setting";
         TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + _regionName + " for " + columnName);
-        clickColumnMenu(columnName, false, "Summary Statistics");
+        clickColumnMenu(columnName, false, "Summary Statistics...");
 
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
 

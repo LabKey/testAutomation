@@ -114,7 +114,7 @@ public class SummaryStatisticsHelper
     public void verifySummaryStatisticsDialog(String columnName, String colType, boolean isLookup, boolean isPK)
     {
         Locator colLoc = DataRegionTable.Locators.columnHeader("query", columnName);
-        _wrapper._ext4Helper.clickExt4MenuButton(false, colLoc, false, "Summary Statistics");
+        _wrapper._ext4Helper.clickExt4MenuButton(false, colLoc, false, "Summary Statistics...");
 
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(_wrapper.getDriver());
 
