@@ -165,7 +165,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         String columnGridCls = "Time".equals(getChartTypeTitle()) ? "study-columns-grid" : "query-columns-grid";
 
         if (hasExistingSelection)
-            setValue(elementCache().yAxis(), columnName, columnGridCls);
+            setValue(elementCache().yAxisTitle(), columnName, columnGridCls);
         else
             setValue(elementCache().yAxisDropText(), columnName,columnGridCls);
         return this;
@@ -546,38 +546,46 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement plotTypeTime = new LazyWebElement(Locator.xpath("//div[@id='chart-type-time_chart']"),  this);
 
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xAxisTitle() {return Locator.xpath(XAXIS_CONTAINER).findElement(this);}
         public WebElement xAxisDropText() {return Locator.xpath(XAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement xCategories() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xCategoriesTitle() {return Locator.xpath(XCATEGORY_CONTAINER).findElement(this);}
         public WebElement xCategoriesDisplay(){return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement xCategoriesDropText() {return Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xCategoriesRemove() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement xSubCategories() {return Locator.xpath(XSUBCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement xSubCategoriesTitle() {return Locator.xpath(XSUBCATEGORY_CONTAINER).findElement(this);}
         public WebElement xSubCategoriesDisplay(){return Locator.xpath(XSUBCATEGORY_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement xSubCategoriesDropText(){return Locator.xpath(XSUBCATEGORY_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xSubCategoriesRemove(){return Locator.xpath(XSUBCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement yAxis() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement yAxisTitle() {return Locator.xpath(YAXIS_CONTAINER).findElement(this);}
         public WebElement yAxisDropText() {return Locator.xpath(YAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement yAxisRemove() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement categories() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement categoriesTitle() {return Locator.xpath(CATEGORIES_CONTAINER).findElement(this);}
         public WebElement categoriesDisplay() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement categoriesDropText() {return Locator.xpath(CATEGORIES_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement categoriesRemove() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement measure() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement measureTitle() {return Locator.xpath(MEASURE_CONTAINER).findElement(this);}
         public WebElement measureDisplay() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement measureDropText() {return Locator.xpath(MEASURE_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement measureRemove() {return Locator.xpath(MEASURE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement color() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement colorTitle() {return Locator.xpath(COLOR_CONTAINER).findElement(this);}
         public WebElement colorDropText() {return Locator.xpath(COLOR_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement colorRemove() {return Locator.xpath(COLOR_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement shape() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement shapeTitle() {return Locator.xpath(SHAPE_CONTAINER).findElement(this);}
         public WebElement shapeDropText() {return Locator.xpath(SHAPE_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement shapeRemove() {return Locator.xpath(SHAPE_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
