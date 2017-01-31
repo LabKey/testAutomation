@@ -452,7 +452,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void failed(Throwable e, Description description)
             {
-                if (e instanceof TestTimedOutException)
+                if (e instanceof TestTimedOutException || e instanceof InterruptedException)
                 {
                     _driver.clear();
                     currentTest = null;
