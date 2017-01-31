@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -586,11 +587,11 @@ public class ListTest extends BaseWebDriverTest
         waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
-        File expFile = helper.exportText(DataRegionExportHelper.TextSeparator.COMMA);
+        File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
         TextSearcher srch = new TextSearcher(() -> TestFileUtils.getFileContents(expFile)).setSearchTransformer(t -> t);
-        assertTextPresent(srch, LIST_KEY_NAME2.toLowerCase() + _listCol1.getName(),
-                LIST_KEY_NAME2.toLowerCase() + _listCol2.getName(),
-                LIST_KEY_NAME2.toLowerCase() + _listCol4.getName(),
+        assertTextPresent(srch, LIST_KEY_NAME2 + '/' + _listCol1.getName(),
+                LIST_KEY_NAME2 + '/' + _listCol2.getName(),
+                LIST_KEY_NAME2 + '/' + _listCol4.getName(),
                 LIST2_FOREIGN_KEY_OUTSIDE,
                 LIST3_COL2);
         assertTextNotPresent(srch, LIST2_KEY, LIST2_KEY4);
