@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
@@ -62,36 +63,43 @@ public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportH
 
     public File exportExcel(ExcelFileType type)
     {
-        return exportExcel(type, null);
+        return exportExcel(ColumnHeaderType.Caption, type, null);
     }
 
-    public File exportExcel(ExcelFileType type, @Nullable Boolean exportSelected)
+    public File exportExcel(ColumnHeaderType exportHeaderType, ExcelFileType type, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
         elementCache().excelTab.click();
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         getWrapper().checkRadioButton(type.getRadioLocator());
+        getWrapper().selectOptionByValue(Locator.name("xls_header_type"), exportHeaderType.name());
         getWrapper().scrollIntoView(Locator.lkButton("Export to Excel"));
         return getWrapper().clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
     }
 
     public File exportText()
     {
-        return exportText(TextSeparator.TAB, TextQuote.DOUBLE, null);
+        return exportText(ColumnHeaderType.Caption, TextSeparator.TAB, TextQuote.DOUBLE, null);
     }
 
     public File exportText(TextSeparator delim)
     {
-        return exportText(delim, TextQuote.DOUBLE, null);
+        return exportText(ColumnHeaderType.Caption, delim, TextQuote.DOUBLE, null);
     }
 
-    public File exportText(TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
+    public File exportText(ColumnHeaderType exportHeaderType, TextSeparator delim)
+    {
+        return exportText(exportHeaderType, delim, TextQuote.DOUBLE, null);
+    }
+
+    public File exportText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
         expandExportPanel();
         elementCache().textTab.click();
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         getWrapper().selectOptionByValue(Locator.name("delim"), delim.toString());
         getWrapper().selectOptionByValue(Locator.name("quote"), quote.toString());
+        getWrapper().selectOptionByValue(Locator.name("txt_header_type"), exportHeaderType.name());
         return getWrapper().clickAndWaitForDownload(Locator.lkButton("Export to Text"), _expectedFileCount)[0];
     }
 

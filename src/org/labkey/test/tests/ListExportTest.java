@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
+import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
@@ -57,7 +58,19 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
-    protected String getExportedTsvTestColumnHeader()
+    public ColumnHeaderType[] getExportHeaderTypes()
+    {
+        return new ColumnHeaderType[]{ColumnHeaderType.Caption, ColumnHeaderType.None, ColumnHeaderType.FieldKey};
+    }
+
+    @Override
+    protected String getExportedXlsTestColumnHeader(ColumnHeaderType exportType)
+    {
+        return "Name";
+    }
+
+    @Override
+    protected String getExportedTsvTestColumnHeader(ColumnHeaderType exportType)
     {
         return "Name";
     }

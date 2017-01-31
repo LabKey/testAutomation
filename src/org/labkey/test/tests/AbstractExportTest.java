@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -50,7 +51,8 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected abstract boolean hasSelectors();
     protected abstract String getTestColumnTitle();
     protected abstract int getTestColumnIndex();
-    protected abstract String getExportedTsvTestColumnHeader(); // tsv column headers might be field name, rather than label
+    protected abstract String getExportedXlsTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
+    protected abstract String getExportedTsvTestColumnHeader(ColumnHeaderType exportType); // tsv column headers might be field name, rather than label
     protected abstract String getDataRegionColumnName();
     protected abstract String getDataRegionSchemaName();
     protected abstract String getDataRegionQueryName();
@@ -86,10 +88,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         int rowCount = 2;
         checkFirstNRows(rowCount);
 
-        File exportedFile = exportHelper.exportText(DataRegionExportHelper.TextSeparator.TAB, DataRegionExportHelper.TextQuote.DOUBLE, true);
-        assertExportExists(exportedFile, DataRegionExportHelper.TextSeparator.TAB.getFileExtension());
-
-        assertTextExportContents(exportedFile, rowCount);
+        for (ColumnHeaderType exportHeaderType : getExportHeaderTypes())
+        {
+            File exportedFile = exportHelper.exportText(exportHeaderType, DataRegionExportHelper.TextSeparator.TAB, DataRegionExportHelper.TextQuote.DOUBLE, true);
+            assertExportExists(exportedFile, DataRegionExportHelper.TextSeparator.TAB.getFileExtension());
+            assertTextExportContents(exportHeaderType, exportedFile, rowCount);
+        }
     }
 
     @Test
@@ -100,19 +104,20 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         int rowCount = 3;
         checkFirstNRows(rowCount);
 
-        File exportedFile = exportHelper.exportText(DataRegionExportHelper.TextSeparator.TAB, DataRegionExportHelper.TextQuote.DOUBLE, false);
-        assertExportExists(exportedFile, DataRegionExportHelper.TextSeparator.TAB.getFileExtension());
-
-        assertTextExportContents(exportedFile, dataRegion.getDataRowCount());
+        for (ColumnHeaderType exportHeaderType : getExportHeaderTypes())
+        {
+            File exportedFile = exportHelper.exportText(exportHeaderType, DataRegionExportHelper.TextSeparator.TAB, DataRegionExportHelper.TextQuote.DOUBLE, false);
+            assertExportExists(exportedFile, DataRegionExportHelper.TextSeparator.TAB.getFileExtension());
+            assertTextExportContents(exportHeaderType, exportedFile, dataRegion.getDataRowCount());
+        }
     }
 
     @Test
     public final void testExportAllTSV()
     {
-        File exportedFile = exportHelper.exportText(DataRegionExportHelper.TextSeparator.TAB);
+        File exportedFile = exportHelper.exportText(ColumnHeaderType.Caption, DataRegionExportHelper.TextSeparator.TAB);
         assertExportExists(exportedFile, DataRegionExportHelper.TextSeparator.TAB.getFileExtension());
-
-        assertTextExportContents(exportedFile, dataRegion.getDataRowCount());
+        assertTextExportContents(ColumnHeaderType.Caption, exportedFile, dataRegion.getDataRowCount());
     }
 
     @Test
@@ -123,10 +128,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         int rowCount = 4;
         checkFirstNRows(rowCount);
 
-        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX, true);
-        assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
-
-        assertExcelExportContents(exportedFile, rowCount);
+        for (ColumnHeaderType exportHeaderType : getExportHeaderTypes())
+        {
+            File exportedFile = exportHelper.exportExcel(exportHeaderType, DataRegionExportHelper.ExcelFileType.XLSX, true);
+            assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
+            assertExcelExportContents(exportHeaderType, exportedFile, rowCount);
+        }
     }
 
     @Test
@@ -137,10 +144,12 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         int rowCount = 5;
         checkFirstNRows(rowCount);
 
-        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX, false);
-        assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
-
-        assertExcelExportContents(exportedFile, dataRegion.getDataRowCount());
+        for (ColumnHeaderType exportHeaderType : getExportHeaderTypes())
+        {
+            File exportedFile = exportHelper.exportExcel(exportHeaderType, DataRegionExportHelper.ExcelFileType.XLSX, false);
+            assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
+            assertExcelExportContents(exportHeaderType, exportedFile, dataRegion.getDataRowCount());
+        }
     }
 
     @Test
@@ -148,8 +157,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     {
         File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
         assertExportExists(exportedFile, DataRegionExportHelper.ExcelFileType.XLSX.getFileExtension());
-
-        assertExcelExportContents(exportedFile, dataRegion.getDataRowCount());
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, dataRegion.getDataRowCount());
     }
 
     @Test
@@ -158,7 +166,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         int allRows = dataRegion.getDataRowCount();
 
         List<String> expectedExportColumn = new ArrayList<>();
-        expectedExportColumn.add(getTestColumnTitle());
+        expectedExportColumn.add(getExportedXlsTestColumnHeader(ColumnHeaderType.Caption));
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()));
 
         assertEquals(allRows, expectedExportColumn.size()-1);
@@ -167,7 +175,7 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         dataRegion.setMaxRows(2);
         assertEquals(2, dataRegion.getDataRowCount());
         File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
-        assertExcelExportContents(exportedFile, allRows, expectedExportColumn);
+        assertExcelExportContents(ColumnHeaderType.Caption, exportedFile, allRows, expectedExportColumn);
     }
 
     @Test
@@ -324,15 +332,20 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         waitFor(() -> exportedFile.length() > 0, "Exported file is empty", WAIT_FOR_JAVASCRIPT);
     }
 
-    protected final void assertTextExportContents(File exportedFile, int expectedDataRowCount)
+    protected final void assertTextExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount)
     {
         String fileContents = TestFileUtils.getFileContents(exportedFile);
         String[] exportedRows = fileContents.split("\n");
-
-        assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedDataRowCount + 1, exportedRows.length);
-
         List<String> expectedExportColumn = new ArrayList<>();
-        expectedExportColumn.add(getExportedTsvTestColumnHeader());
+        int expectedFileRowCount = expectedDataRowCount;
+
+        if (!exportHeaderType.equals(ColumnHeaderType.None))
+        {
+            expectedFileRowCount++;     // need to account for the column header
+            expectedExportColumn.add(getExportedTsvTestColumnHeader(exportHeaderType));
+        }
+
+        assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedFileRowCount, exportedRows.length);
         expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
 
         List<String> exportedColumn = new ArrayList<>();
@@ -344,23 +357,29 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
         assertColumnContentsEqual(expectedExportColumn, exportedColumn);
     }
 
-    protected final void assertExcelExportContents(File exportedFile, int expectedDataRowCount)
+    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount)
     {
         List<String> expectedExportColumn = new ArrayList<>();
-        expectedExportColumn.add(getTestColumnTitle());
-        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
+        if (!exportHeaderType.equals(ColumnHeaderType.None))
+            expectedExportColumn.add(getExportedXlsTestColumnHeader(exportHeaderType));
 
-        assertExcelExportContents(exportedFile, expectedDataRowCount, expectedExportColumn);
+        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
+        assertExcelExportContents(exportHeaderType, exportedFile, expectedDataRowCount, expectedExportColumn);
     }
 
-    protected final void assertExcelExportContents(File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
+    protected final void assertExcelExportContents(ColumnHeaderType exportHeaderType, File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
     {
         try
         {
             Workbook workbook = ExcelHelper.create(exportedFile);
             Sheet sheet = workbook.getSheetAt(0);
+            int expectedFileRowCount = expectedDataRowCount;
+            if (exportHeaderType.equals(ColumnHeaderType.None))
+            {
+                expectedFileRowCount--;
+            }
 
-            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedDataRowCount, sheet.getLastRowNum());
+            assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedFileRowCount, sheet.getLastRowNum());
 
             List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
             assertColumnContentsEqual(expectedExportColumn, exportedColumn);
@@ -463,5 +482,10 @@ public abstract class AbstractExportTest extends BaseWebDriverTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    public ColumnHeaderType[] getExportHeaderTypes()
+    {
+        return new ColumnHeaderType[]{ColumnHeaderType.Caption};
     }
 }
