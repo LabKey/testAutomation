@@ -117,7 +117,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setXAxis(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().xAxis(), columnName);
+            setValue(elementCache().xAxisTitle(), columnName);
         else
             setValue(elementCache().xAxisDropText(), columnName);
         return this;
@@ -132,7 +132,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setXCategory(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().xCategories(), columnName);
+            setValue(elementCache().xCategoriesTitle(), columnName);
         else
             setValue(elementCache().xCategoriesDropText(), columnName);
         return this;
@@ -147,7 +147,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setXSubCategory(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().xSubCategories(), columnName);
+            setValue(elementCache().xSubCategoriesTitle(), columnName);
         else
             setValue(elementCache().xSubCategoriesDropText(), columnName);
         return this;
@@ -211,7 +211,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setCategories(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().categories(), columnName);
+            setValue(elementCache().categoriesTitle(), columnName);
         else
             setValue(elementCache().categoriesDropText(), columnName);
         return this;
@@ -257,7 +257,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setMeasure(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().measure(), columnName);
+            setValue(elementCache().measureTitle(), columnName);
         else
             setValue(elementCache().measureDropText(), columnName);
         return this;
@@ -288,7 +288,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setColor(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().color(), columnName);
+            setValue(elementCache().colorTitle(), columnName);
         else
             setValue(elementCache().colorDropText(), columnName);
         return this;
@@ -303,7 +303,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
     public ChartTypeDialog setShape(String columnName, boolean replaceExisting)
     {
         if (replaceExisting)
-            setValue(elementCache().shape(), columnName);
+            setValue(elementCache().shapeTitle(), columnName);
         else
             setValue(elementCache().shapeDropText(), columnName);
         return this;
