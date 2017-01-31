@@ -83,8 +83,9 @@ public class PieChartTest extends GenericChartsTest
 
         log("Validate that the text values of the pie chart are as expected.");
         svgText = getSVGText();
-        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY.replace(" ", "")));
-        Assert.assertTrue("SVG did not contain query text 'Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting'", svgText.contains("Injectionsitepain(L)deltoidPain@injectionsite(RightDeltoid)FeverVomiting"));
+        log("svg text: '" + svgText + "'");
+        Assert.assertTrue("SVG did not contain expected title: '" + PIE_CHART_CATEGORY + "'", svgText.contains(PIE_CHART_CATEGORY));
+        Assert.assertTrue("SVG did not contain query text 'Injection site pain (L) deltoidPain @ injection site (Right Deltoid)FeverVomiting'", svgText.contains("Injection site pain (L) deltoidPain @ injection site (Right Deltoid)FeverVomiting"));
 
         log("Validate that the correct number of % values are shown.");
         percentCount = StringUtils.countMatches(svgText, "%");
@@ -134,7 +135,11 @@ public class PieChartTest extends GenericChartsTest
 
         sleep(3000);  // TODO Is there a better trigger?
 
+        // Move mouse to make sure it is not over a pie wedge (and would generate a % in a pop-up text).
+        mouseOver(Locator.linkWithText("LabKey Server"));
+
         svgText = getSVGText();
+        log("svg text: '" + svgText + "'");
         percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should be no '%' values in the svg, found " + percentCount, 0, percentCount);
 
@@ -160,6 +165,7 @@ public class PieChartTest extends GenericChartsTest
         log("Just a quick change.");
 
         svgText = getSVGText();
+        log("svg text: '" + svgText + "'");
         percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 2 '%' in the svg, found " + percentCount, 2, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected '18%11%", svgText.contains("18%11%"));
@@ -178,13 +184,13 @@ public class PieChartTest extends GenericChartsTest
         sleep(3000);  // Is there a better trigger?
 
         svgText = getSVGText();
-        log("Last svgText: " + svgText);
+        log("Last svgText: '" + svgText + "'");
 
         // There is one extra % because of the TRICKY_CHARACTERS used in the title.
         percentCount = StringUtils.countMatches(svgText, "%");
         Assert.assertEquals("There should only be 3 '%' in the svg, found " + percentCount, 3, percentCount);
         Assert.assertTrue("Percentages in svg not as expected. Expected '18%11%", svgText.contains("18%11%"));
-        Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE.replace(" ", "")));
+        Assert.assertTrue("Expected Title '" + PLOT_TITLE + "' wasn't present.", svgText.contains(PLOT_TITLE));
         String svgWidth = getAttribute(Locator.css("svg"), "width");
         String svgHeight= getAttribute(Locator.css("svg"), "height");
         Assert.assertEquals("Width of svg not expected.", "500", svgWidth);

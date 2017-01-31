@@ -2386,7 +2386,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         waitFor(() -> { return isElementPresent(svgLoc);}, WAIT_FOR_JAVASCRIPT);
 
-        return prepareSvgText(getText(svgLoc));
+        String svgText = getText(svgLoc);
+        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0";
+        svgText = svgText.replace(ignoredRaphaelText, "");
+        svgText = svgText.trim();
+        svgText = svgText.replaceAll("[\n]", "");
+        return svgText;
 
     }
 
