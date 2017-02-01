@@ -71,8 +71,13 @@ public class WikiHelper
         {
             _test.click(Locator.linkWithText("Attach a file"));
             _test.setFormElement(Locator.name("formFiles[0]"), attachment);
+            Locator.lkButton("remove").waitForElement(_test.shortWait());
         }
         saveWikiPage();
+        if (attachment != null)
+        {
+            _test.assertElementPresent(Locator.linkWithText(" " + attachment.getName()));
+        }
     }
 
     public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, @Nullable File attachment)
