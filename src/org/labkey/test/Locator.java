@@ -1197,7 +1197,7 @@ public abstract class Locator
         @Override
         public WebElement findElement(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver))
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
             {
                 String relativeXPath = getRelativeXPath();
                 if (!relativeXPath.equals(getLoc()))
@@ -1209,7 +1209,7 @@ public abstract class Locator
         @Override
         public List<WebElement> findElements(SearchContext context)
         {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver))
+            if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
                 return context.findElements(By.xpath(getRelativeXPath()));
             else
                 return context.findElements(this.toBy());
