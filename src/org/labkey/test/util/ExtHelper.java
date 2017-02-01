@@ -425,7 +425,13 @@ public class ExtHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
-        Locator.XPathLocator comboArrow = parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]");
+        selectComboBoxItem(parentLocator.findElement(_test.getDriver()), selection);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(WebElement comboEl, @LoggedParam String selection)
+    {
+        WebElement comboArrow = Locator.css(".x-form-arrow-trigger").findElement(comboEl);
         _test.click(comboArrow);
         Locator.XPathLocator comboListItem = Locators.comboListItem().withText(selection);
         _test.waitAndClick(comboListItem);
