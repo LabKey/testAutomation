@@ -33,7 +33,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     public static final String COLUMN_ARCHIVED = "Archived";
     public static final String CHECKMARK = "\u2714";
 
-    private static final String SIMPLETEST_MODULE = "simpletest";
+    private static final String ETL_MODULE = "ETLtest";
     private static final String PIPELINE_MODULE = "Pipeline";
 
     private static final File SAMPLE_INPUT_FILE1 = TestFileUtils.getSampleData("pipeline/sample1.testIn.tsv");
@@ -58,7 +58,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
     public void doSetup()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        _containerHelper.enableModules(Arrays.asList(SIMPLETEST_MODULE));
+        _containerHelper.enableModules(Arrays.asList(ETL_MODULE));
 
         PortalHelper _portalHelper = new PortalHelper(this);
         _portalHelper.addWebPart("Data Pipeline");
@@ -182,7 +182,7 @@ public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 
     protected String getClientPipelineLabel()
     {
-        return "Simpletest tail";
+        return "etlTest tail";
     }
 
     @Override
