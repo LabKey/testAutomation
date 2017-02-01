@@ -301,6 +301,10 @@ public class ExtHelper
         return _test.getFormElement(formElement);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.ext4.Window} or {@link Locators#window(String)}
+     */
+    @Deprecated
     public String getExtDialogXPath(String windowTitle)
     {
         if (windowTitle == null) return "";
