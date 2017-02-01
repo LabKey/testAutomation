@@ -469,6 +469,7 @@ src/org/labkey/test/components/ext4/FormItemFinder.java -text
 src/org/labkey/test/components/ext4/RadioButton.java -text
 src/org/labkey/test/components/ext4/Window.java -text
 src/org/labkey/test/components/ext4/widgets/SearchPanel.java -text
+src/org/labkey/test/components/flow/FlowReportsWebpart.java -text
 src/org/labkey/test/components/html/Checkbox.java -text
 src/org/labkey/test/components/html/EnumSelect.java -text
 src/org/labkey/test/components/html/FormItem.java -text
@@ -536,6 +537,10 @@ src/org/labkey/test/pages/core/admin/CustomizeSitePage.java -text
 src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
+src/org/labkey/test/pages/flow/reports/BeginPage.java -text
+src/org/labkey/test/pages/flow/reports/PositivityReportEditorPage.java -text
+src/org/labkey/test/pages/flow/reports/QCReportEditorPage.java -text
+src/org/labkey/test/pages/flow/reports/ReportEditorPage.java -text
 src/org/labkey/test/pages/issues/AdminPage.java -text
 src/org/labkey/test/pages/issues/BaseIssuePage.java -text
 src/org/labkey/test/pages/issues/BaseUpdatePage.java -text
