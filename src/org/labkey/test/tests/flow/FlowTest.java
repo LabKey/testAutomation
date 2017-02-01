@@ -26,6 +26,9 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
+import org.labkey.test.components.flow.FlowReportsWebpart;
+import org.labkey.test.pages.flow.reports.QCReportEditorPage;
+import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelper;
@@ -68,6 +71,10 @@ public class FlowTest extends BaseFlowTest
         RReportHelper _rReportHelper = new RReportHelper(getCurrentTest());
         _rReportHelper.ensureRConfig();
 
+        goToFlowDashboard();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Flow Reports");
+
         setupQuery();
         importFiles();
     }
@@ -81,6 +88,7 @@ public class FlowTest extends BaseFlowTest
         sampleSetAndMetadataTest();
         customGraphQuery();
         positivityReportTest();
+        qcReportTest();
         copyAnalysisScriptTest();
         removeAnalysisFilter();
         verifyDiscoverableFCSFiles();
@@ -456,6 +464,31 @@ public class FlowTest extends BaseFlowTest
     }
 
     @LogMethod
+    public void qcReportTest()
+    {
+        String reportName = "QC report " + TRICKY_CHARACTERS;
+
+        log("** Creating QC report '" + reportName + "'");
+        goToFlowDashboard();
+
+        final QCReportEditorPage qcReport = new FlowReportsWebpart(getDriver()).createQCReport();
+
+        qcReport.setName(reportName);
+        qcReport.setSubset("Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
+        qcReport.setStatistic(QCReportEditorPage.Stat.Freq_Of_Parent);
+
+        qcReport.addFieldFilter("Name", "Contains", "L02");
+
+        qcReport.save();
+
+        clickAndWait(Locator.linkWithText(reportName));
+        final int expectedRows = 15;
+
+        assertEquals("Wrong number of rows in TSV output", expectedRows + 1, Locator.css(".labkey-r-tsvout tr").findElements(getDriver()).size());
+        assertEquals("Found links to filtered out run: " + FCS_FILE_2, 0, Locator.linkContainingText("L04").findElements(getDriver()).size());
+    }
+
+    @LogMethod
     public void copyAnalysisScriptTest()
     {
         // bug 4625
@@ -539,34 +572,17 @@ public class FlowTest extends BaseFlowTest
     {
         log("** Creating positivity report '" + reportName + "'");
         goToFlowDashboard();
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Flow Reports");
 
-        clickAndWait(Locator.linkWithText("create positivity report"));
+        final ReportEditorPage positivityReport = new FlowReportsWebpart(getDriver()).createPositivityReport();
 
-        setFormElement(Locator.name("reportName"), reportName);
-        setFormElement(Locator.name("reportDescription"), description);
-
-        Locator l = Locator.name("subset");
-        click(l);
-        setFormElement(l, "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
-
-        // click on TriggerField trigger image
-        click(Locator.tagWithName("input", "filter[2].property_subset").append("/../img"));
-        // Selenium XPath doesn't support attribute namespaces.
-        Locator CD4 = Locator.xpath("//div[contains(@class, 'x-tree-node-el') and @*='Singlets/L/Live/3+/4+']");
-        waitForElement(CD4, WAIT_FOR_JAVASCRIPT);
-        click(CD4);
-        fireEvent(Locator.name("filter[2].property_subset"), SeleniumEvent.blur);
-
-//        Issue 12630: add stat/threshold fo TCell filter to positivity report
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[2].property_stat']]"), "Count");
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[2].op']]"), "Is Greater Than or Equal To");
+        positivityReport.setName(reportName);
+        positivityReport.setDescription(description);
+        positivityReport.setSubset("Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
 
         // NOTE: this filter is set high so we filter out all of the data and produce an error message.
-        setFormElement(Locator.name("filter[2].value"), "5000");
+        positivityReport.addStatisticFilter("Singlets/L/Live/3+/4+", "Count", "Is Greater Than or Equal To", "5000");
 
-        clickButton("Save");
+        positivityReport.save();
     }
 
     @LogMethod(quiet = true)
@@ -618,7 +634,7 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Adjusted P"});
         _customizeViewsHelper.addColumn(new String[] { reportNameEscaped, "Response"});
         _customizeViewsHelper.addFilter(new String[] { reportNameEscaped, "Response"}, "Response", "Equals", "1");
-        _customizeViewsHelper.addSort("Name", SortDirection.fromString("Ascending"));
+        _customizeViewsHelper.addSort("Name", SortDirection.ASC);
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("query", getDriver());
