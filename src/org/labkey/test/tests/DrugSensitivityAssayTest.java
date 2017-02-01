@@ -212,7 +212,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         clickButton("Copy to Study");
 
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        clickButton("Next");
+        clickButton("Next", 60000);
         clickButton("Copy to Study");
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
