@@ -7,7 +7,6 @@ import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
@@ -23,6 +22,7 @@ import static org.labkey.test.util.Ext4Helper.TextMatchTechnique.LEADING_NBSP;
 public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
 {
     private static final String LOAD_SIGNAL = "extSearchPanelLoaded";
+    protected static final String DEFAULT_TITLE = "Search Criteria";
     private final WebElement _el;
     private final WebDriver _driver;
 
@@ -33,11 +33,16 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
         Locators.pageSignal(LOAD_SIGNAL).waitForElement(driver, 30000);
     }
 
+    protected SearchPanel(String title, String idPrefix, WebDriver driver)
+    {
+        this(Locator.tag("div").attributeStartsWith("id", idPrefix)
+                .withDescendant(Locator.tag("div").attributeStartsWith("id", idPrefix).attributeEndsWith("id", "_header").withText(title))
+                .waitForElement(driver, 10000), driver);
+    }
+
     public SearchPanel(String title, WebDriver driver)
     {
-        this(Locator.tag("div").attributeStartsWith("id", "labkey-searchpanel-")
-                .withDescendant(Locator.tag("div").attributeStartsWith("id", "labkey-searchpanel-").attributeEndsWith("id", "_header").withText(title))
-                .waitForElement(driver, 10000), driver);
+        this(title, "labkey-searchpanel-", driver);
     }
 
     @Override
