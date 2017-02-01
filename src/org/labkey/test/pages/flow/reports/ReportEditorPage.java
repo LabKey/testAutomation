@@ -3,7 +3,6 @@ package org.labkey.test.pages.flow.reports;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.ExtHelper;
@@ -15,7 +14,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.labkey.test.components.ext4.ComboBox.ComboBox;
 import static org.labkey.test.components.html.Input.Input;
 
 public abstract class ReportEditorPage<Page extends ReportEditorPage> extends LabKeyPage<ReportEditorPage.ElementCache>
