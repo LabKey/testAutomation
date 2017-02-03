@@ -203,7 +203,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         selectFileBrowserItem(currentName);
         clickFileBrowserButton(BrowserAction.RENAME);
-        Window renameWindow = Window().withTitle("Rename").waitFor(getDriver());
+        Window renameWindow = Window(getDriver()).withTitle("Rename").waitFor();
         setFormElement(Locator.name("renameText-inputEl").findElement(renameWindow), newName);
         renameWindow.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForElement(fileGridCell.withText(newName));
@@ -213,7 +213,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         selectFileBrowserItem(fileName);
         clickFileBrowserButton(BrowserAction.MOVE);
-        Window moveWindow = Window().withTitle("Choose Destination").waitFor(getDriver());
+        Window moveWindow = Window(getDriver()).withTitle("Choose Destination").waitFor();
         //NOTE:  this doesn't yet support nested folders
         WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
         shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
@@ -230,7 +230,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         selectFileBrowserItem(fileName);
         clickFileBrowserButton(BrowserAction.DELETE);
-        Window().withTitle("Delete Files").waitFor(getDriver())
+        Window(getDriver()).withTitle("Delete Files").waitFor()
                 .clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         waitForElementToDisappear(fileGridCell.withText(fileName));
     }
@@ -265,7 +265,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public void goToConfigureButtonsTab()
     {
-        if (Window().withTitle("Manage File Browser Configuration").findOrNull(getDriver()) == null)
+        if (Window(getDriver()).withTitle("Manage File Browser Configuration").findOrNull() == null)
             goToAdminMenu();
 
         _ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
@@ -275,13 +275,13 @@ public class FileBrowserHelper extends WebDriverWrapper
     public void goToAdminMenu()
     {
         clickFileBrowserButton(BrowserAction.ADMIN);
-        Window().withTitle("Manage File Browser Configuration").waitFor(getDriver());
+        Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
     }
 
     public void selectImportDataAction(@LoggedParam String actionName)
     {
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-        Window importWindow = Window().withTitle("Import Data").waitFor(getDriver());
+        Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
         Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
         long startTime = System.currentTimeMillis();
         while (!isElementPresent(actionRadioButton) && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
@@ -289,7 +289,7 @@ public class FileBrowserHelper extends WebDriverWrapper
             importWindow.clickButton("Cancel", true);
             _ext4Helper.waitForMaskToDisappear();
             clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-            importWindow = Window().withTitle("Import Data").waitFor(getDriver());
+            importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
         }
         click(actionRadioButton);
         clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
@@ -340,7 +340,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
             if (replace)
             {
-                Window confirmation = Window().withTitle("File Conflict:").waitFor(getDriver());
+                Window confirmation = Window(getDriver()).withTitle("File Conflict:").waitFor();
                 assertTrue("Unexpected confirmation message.", confirmation.getBody().contains("Would you like to replace it?"));
                 confirmation.clickButton("Yes", true);
             }
@@ -360,7 +360,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
-            Window propWindow = Window().withTitle("Extended File Properties").waitFor(getDriver());
+            Window propWindow = Window(getDriver()).withTitle("Extended File Properties").waitFor();
             waitForText("File (1 of ");
             for (FileBrowserExtendedProperty prop : fileProperties)
             {
