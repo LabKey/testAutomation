@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.writer.PrintWriters;
 import org.labkey.test.util.TestLogger;
@@ -116,6 +117,7 @@ public abstract class TestFileUtils
      * @param relativePath e.g. "lists/ListDemo.lists.zip" or "OConnor_Test.folder.zip"
      * @return File object with the full path to the specified file
      */
+    @NotNull
     public static File getSampleData(String relativePath)
     {
         String path;
