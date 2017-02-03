@@ -188,6 +188,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("download.default_directory", downloadDir.getAbsolutePath());
                     prefs.put("profile.content_settings.pattern_pairs.*.multiple-automatic-downloads", 1); // Turns off multiple download warning
                     prefs.put("security.warn_submit_insecure", "false");
+                    prefs.put("pdfjs.disabled", true); // Download PDFs
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
@@ -231,6 +232,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                                     "application/x-zip-compressed," +
                                     "application/xml," +
                                     "image/png," +
+                                    "image/tiff," +
                                     "text/html," +
                                     "text/plain," +
                                     "text/xml," +
