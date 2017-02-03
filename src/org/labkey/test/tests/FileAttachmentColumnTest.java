@@ -18,10 +18,12 @@ package org.labkey.test.tests;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -35,15 +37,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+@Category({DailyC.class})
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
     private final String FOLDER_NAME = "TestFolder";
     private final String LIST_NAME = "TestList";
     private final String LIST_KEY = "TestListId";
     private final String SAMPLESET_NAME = "FileSamples";
-    private final String DATAFILE_DIRECTORY = TestFileUtils.getLabKeyRoot() + "\\sampledata\\fileTypes\\";
-    private List<Map<String, String>> LIST_CONTENTS = new ArrayList<>();
+    private final File DATAFILE_DIRECTORY = TestFileUtils.getSampleData("fileTypes");
+    private final File SAMPLE_CSV = new File(DATAFILE_DIRECTORY, "csv_sample.csv");
+    private final File SAMPLE_JPG = new File(DATAFILE_DIRECTORY, "jpg_sample.jpg");
+    private final File SAMPLE_PDF = new File(DATAFILE_DIRECTORY, "pdf_sample.pdf");
+    private final File SAMPLE_TIF = new File(DATAFILE_DIRECTORY, "tif_sample.tif");
 
     @Test
     public void verifyFileDownloadOnClick()
@@ -52,20 +57,16 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         DataRegionTable testListRegion = new DataRegionTable("query", getDriver());
 
         // verify file download behavior for csv, tif
-        doAndWaitForDownload(()->click(Locator.linkContainingText("csv_sample.csv")));
-        doAndWaitForDownload(()->click(Locator.linkContainingText("tif_sample.tif")));
+        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_CSV.getName())));
+        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_TIF.getName())));
 
         // expected behavior for pdf: render as a web page.
-        pushLocation();
-        doAndWaitForPageToLoad(()->click(Locator.linkContainingText("pdf_sample.pdf")));
-        // todo: verify file contents
-        popLocation();
+        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
 
         // verify popup/sprite for jpeg
-        mouseOver(Locator.xpath("//img[@title='jpg_sample.jpg']"));
-        shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'jpg_sample.jpg')]")));
+        mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
+        shortWait().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div/span[contains(text(),'" + SAMPLE_JPG.getName() + "')]")));
         mouseOut();
-        String foo="stop here";
     }
 
     @Override
@@ -92,9 +93,6 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         //create sampleset with file columns
         createSampleSet();
-
-
-
     }
 
     private void createList()
@@ -111,16 +109,16 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         // todo: import actual data here
         Map<String, String> csvRow = new HashMap<>();
         csvRow.put("Name", "csv file");
-        csvRow.put("File", DATAFILE_DIRECTORY+"csv_sample.csv");
+        csvRow.put("File", SAMPLE_CSV.getAbsolutePath());
         Map<String, String> jpgRow = new HashMap<>();
         jpgRow.put("Name", "jpeg file");
-        jpgRow.put("File", DATAFILE_DIRECTORY+"jpg_sample.jpg");
+        jpgRow.put("File", SAMPLE_JPG.getAbsolutePath());
         Map<String, String> pdfRow = new HashMap<>();
         pdfRow.put("Name", "pdf file");
-        pdfRow.put("File", DATAFILE_DIRECTORY+"pdf_sample.pdf");
+        pdfRow.put("File", SAMPLE_PDF.getAbsolutePath());
         Map<String, String> tifRow = new HashMap<>();
         tifRow.put("Name", "tif file");
-        tifRow.put("File", DATAFILE_DIRECTORY+"tif_sample.tif");
+        tifRow.put("File", SAMPLE_TIF.getAbsolutePath());
         listHelper.insertNewRow(csvRow, false);
         listHelper.insertNewRow(jpgRow, false);
         listHelper.insertNewRow(pdfRow, false);
@@ -159,7 +157,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         samplesTable.clickImportBulkDataDropdown();
 
         StringBuilder sb = new StringBuilder("Name\tcolor\tfile\n");
-        for (File file : new File(DATAFILE_DIRECTORY).listFiles())
+        for (File file : DATAFILE_DIRECTORY.listFiles())
         {
             String newRow = file.getName() + "\tred\t\"" + file.getPath() + "\"\n";
             sb.append(newRow);
