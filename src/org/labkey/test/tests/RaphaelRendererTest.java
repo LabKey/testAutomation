@@ -116,23 +116,23 @@ public class RaphaelRendererTest extends BaseWebDriverTest
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "Two Measures: cd4 left axis and vl right axis by participant", 3, 23, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID\n249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID\n249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID\n249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
                 }
         ));
 

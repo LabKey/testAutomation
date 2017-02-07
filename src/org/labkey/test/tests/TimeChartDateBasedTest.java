@@ -112,9 +112,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         filteredTimeChartRegressionTest(); // relies on nothing, wow.
     }
 
-    private static final String SVG_AXIS_X =              "0\n50\n100\n150\n200\n0.0\n50000.0\n100000.0\n150000.0\n200000.0\n250000.0\n300000.0\n350000.0\n400000.0\n450000.0\n500000.0\n550000.0\n600000.0\n650000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT =         "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X =              "0\n50\n100\n150\n200\n0.0\n50000.0\n1e+5\n1.5e+5\n2e+5\n2.5e+5\n3e+5\n3.5e+5\n4e+5\n4.5e+5\n5e+5\n5.5e+5\n6e+5\n6.5e+5\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT =         "0\n50\n100\n150\n200\n2e+5\n2.1e+5\n2.2e+5\n2.3e+5\n2.4e+5\n2.5e+5\n2.6e+5\n2.7e+5\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT_RIGHT =   "0\n50\n100\n150\n200\n2e+5\n2.1e+5\n2.2e+5\n2.3e+5\n2.4e+5\n2.5e+5\n2.6e+5\n2.7e+5\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\nHIV Test Results, Lab Results\n249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
     private static final String AXIS_TIME_CHART = "Axis Time Chart";
     @LogMethod private void axisRangeTest()
     {
@@ -271,13 +271,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
         lookAndFeelDialog.setYAxisRangeMinMax("200000", "400000")
                 .setYAxisLabel(Y_AXIS_LABEL)
                 .clickApply();
-        verifyAxisValueChanges(new String[] {Y_AXIS_LABEL, "200000", "400000"}, new String[] {"500000","150000"});
+        verifyAxisValueChanges(new String[] {Y_AXIS_LABEL, "2e+5", "4e+5"}, new String[] {"1.5e+5","5e+5"});
         log("Test Y-Axis change to log scale");
         lookAndFeelDialog = timeChartWizard.clickChartLayoutButton();
         lookAndFeelDialog.setYAxisRangeMinMax("10000", "1000000")
                 .setYAxisScale(ChartLayoutDialog.ScaleType.Log)
                 .clickApply();
-        verifyAxisValueChanges(new String[] {"100000"}, new String[] {"200000","400000"});
+        verifyAxisValueChanges(new String[] {"1e+5"}, new String[] {"2e+5","4e+5"});
     }
 
     @LogMethod public void generateChartPerParticipantTest()
