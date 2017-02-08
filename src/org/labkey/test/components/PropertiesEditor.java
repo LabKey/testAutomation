@@ -548,7 +548,7 @@ public class PropertiesEditor extends WebPartPanel
 
         public FieldTypeWindow selectLookup(FieldDefinition.LookupInfo lookup)
         {
-            Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+            Locator.xpath("//label[text()='Lookup']/../input[@name = 'rangeURI']").findElement(this).click();
 
             if (lookup.getFolder() != null)
             {
@@ -574,7 +574,9 @@ public class PropertiesEditor extends WebPartPanel
         private void selectLookupComboItem(String fieldName, String value, int attempt)
         {
             log("Select lookup combo item '" + fieldName + "', value=" + value + ", attempt=" + attempt);
-            Locator.tagWithName("input", fieldName).childTag("div").withClass("x-form-trigger").findElement(this).click();
+            Locator.tagWithName("input", fieldName)
+                    .followingSibling("div")
+                    .withClass("x-form-trigger").findElement(this).click();
             try
             {
                 getWrapper().scrollIntoView(Locator.tag("div").withClass("x-combo-list-item").withText(value), false);
@@ -615,7 +617,7 @@ public class PropertiesEditor extends WebPartPanel
                             String.format("%s (%s)", table, tableType);
             log("Select lookup table combo item '" + table + "', attempt=" + attempt);
             String fieldName = "table";
-            Locator.tagWithName("input", fieldName).childTag("div").withClass("x-form-trigger").findElement(this).click();
+            Locator.tagWithName("input", fieldName).followingSibling("div").withClass("x-form-trigger").findElement(this).click();
             try
             {
                 getWrapper().waitAndClick(Locator.tag("div").withClass("x-combo-list-item").startsWith(comboSubstring));
