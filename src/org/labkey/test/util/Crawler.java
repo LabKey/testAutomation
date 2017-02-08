@@ -138,6 +138,7 @@ public class Crawler
             new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("issues", "download"),
+            new ControllerActionId("list", "download"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "enable"),      // TODO: These should be post actions (product issue)
             new ControllerActionId("login", "disable"),      // TODO: These should be post actions (product issue)
