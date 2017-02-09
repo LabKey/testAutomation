@@ -503,7 +503,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         for (String label : requiredFieldLabels)
         {
-            expectedErrors.add(String.format("Field %s cannot be blank.", label));
+            expectedErrors.add(String.format("Missing value for required property: %s", label));
         }
 
         Set<String> errors = new CaseInsensitiveHashSet(getTexts(Locators.labkeyError.findElements(getDriver())));
@@ -520,7 +520,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("New Issue");
         clickButton("Save");
 
-        assertTextPresentCaseInsensitive("Field title cannot be blank.");
+        assertTextPresentCaseInsensitive("Missing value for required property: title");
         clickButton("Cancel");
     }
 
