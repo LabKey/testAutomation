@@ -417,6 +417,11 @@ public class ApiPermissionsHelper extends PermissionsHelper
         }
     }
 
+    public void addMemberToRoles(String userOrGroupName, List<String> permissionStrings, MemberType memberType)
+    {
+        permissionStrings.forEach(permissionString -> {addMemberToRole(userOrGroupName, permissionString, memberType);});
+    }
+
     protected Integer getPrincipalId(String userOrGroupName, MemberType principalType, String project)
     {
         switch (principalType)
