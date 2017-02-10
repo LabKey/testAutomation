@@ -1391,7 +1391,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);
-        clickAndWait(Locator.folderTab(tabname));
+        clickAndWait(Locator.folderTab(tabname).waitForElement(shortWait()));
     }
 
     public void verifyTabSelected(String caption)
