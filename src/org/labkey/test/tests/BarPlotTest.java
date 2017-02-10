@@ -53,11 +53,11 @@ public class BarPlotTest extends GenericChartsTest
     private final String SECOND_BAR_PLOT_SVG_TEXT = "0\nNegative\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n" + TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String THIRD_BAR_PLOT_SVG_TEXT = "0\nNegative\n-50\n-49\n-48\n-47\n-46\n-45\n-44\n-43\n-42\n-41\n-40\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
     private final String FOURTH_BAR_PLOT_SVG_TEXT = "0\nNegative\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\n2400\n2600\n2800\n3000\n"+ TRICKY_CHART_TITLE + "\n" + PREG_TEST_RESULTS + "\nSum of " + BP_DIASTOLIC;
-    private final String SUM_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n20000000\n40000000\n60000000\n80000000\n100000000\n120000000\n140000000\n160000000\n180000000\n200000000\n220000000\n240000000\nTypes\nStudy: Cohort\nSum of Double";
+    private final String SUM_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\n1.4e+8\n1.6e+8\n1.8e+8\n2e+8\n2.2e+8\n2.4e+8\nTypes\nStudy: Cohort\nSum of Double";
     private final String COUNT_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2\n4\n6\n8\n10\n12\n14\n16\n18\n20\n22\nTypes\nStudy: Cohort\nCount of Double";
     private final String MIN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n-1\n-0.9\n-0.8\n-0.7\n-0.6\n-0.5\n-0.4\n-0.3\n-0.2\n-0.1\n0\nTypes\nStudy: Cohort\nMin of Double";
-    private final String MAX_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n10000000\n20000000\n30000000\n40000000\n50000000\n60000000\n70000000\n80000000\n90000000\n100000000\n110000000\n120000000\nTypes\nStudy: Cohort\nMax of Double";
-    private final String MEAN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2000000\n4000000\n6000000\n8000000\n10000000\n12000000\n14000000\n16000000\n18000000\n20000000\nTypes\nStudy: Cohort\nMean of Double";
+    private final String MAX_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n1e+7\n2e+7\n3e+7\n4e+7\n5e+7\n6e+7\n7e+7\n8e+7\n9e+7\n1e+8\n1.1e+8\n1.2e+8\nTypes\nStudy: Cohort\nMax of Double";
+    private final String MEAN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n2e+6\n4e+6\n6e+6\n8e+6\n1e+7\n1.2e+7\n1.4e+7\n1.6e+7\n1.8e+7\n2e+7\nTypes\nStudy: Cohort\nMean of Double";
     private final String MEDIAN_BAR_PLOT_SVG_TEXT = "Group 1\nGroup 2\n0\n0.05\n0.1\n0.15\n0.2\n0.25\n0.3\n0.35\n0.4\n0.45\n0.5\n0.55\n0.6\nTypes\nStudy: Cohort\nMedian of Double";
 
     @LogMethod

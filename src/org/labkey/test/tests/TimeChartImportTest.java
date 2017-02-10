@@ -102,15 +102,15 @@ public class TimeChartImportTest extends StudyBaseTest
         VISIT_CHARTS.add(new TimeChartInfo(
                 "Two Measure: group mean with one plot per dimension", 2, 38, false,
                 new String[]{
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80.0\n100.0\n120.0\n140.0\n160.0\n180.0\n200.0\nAPX-1: Abbreviated Physical Exam\n1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n32.0\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nAPX-1: Abbreviated Physical Exam\n2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n32\n33\n34\n35\n36\n37\n38\n39\n40\nAPX-1: Abbreviated Physical Exam\n2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: filtered for pregnancy records", 1, 6, false,
                 new String[]{
-                        "50\n100\n150\n200\n250\n56.0\n58.0\n60.0\n62.0\n64.0\n66.0\n68.0\n70.0\n72.0\n74.0\n76.0\n78.0\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
+                        "50\n100\n150\n200\n250\n56\n58\n60\n62\n64\n66\n68\n70\n72\n74\n76\n78\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
                 }
         ));
 
@@ -131,46 +131,46 @@ public class TimeChartImportTest extends StudyBaseTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex IL-10 and IL-2 data by Analyte dimension", 2, 30, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n80.0\n800.0\nLuminex\nIL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
-                        "0\n50\n100\n150\n200\n60.0\n600.0\nLuminex\nIL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
+                        "0\n50\n100\n150\n200\n80\n800\nLuminex\nIL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
+                        "0\n50\n100\n150\n200\n60\n600\nLuminex\nIL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex with thin lines and no data points", 1, 5, false,
                 new String[]{
-                        "50\n100\n150\n200\n70.0\n700.0\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
+                        "50\n100\n150\n200\n70\n700\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measures: cd4 left axis and vl right axis by participant", 3, 23, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n1e+5\n1e+6\n1e+7\nPTID\n249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200\n1300\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nPTID\n249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200\n1300\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nPTID\n249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200\n300\n400\n500\n600\n700\n800\n900\n1000\n1100\n1200\n1300\n10\n100\n1000\n10000\n1e+5\n1e+6\n1e+7\nPTID\n249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measure: all cohorts and groups", 8, 99, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results\nGroup 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results\nGroup 2: HIV-1 Negative\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 2: HIV-1 NegativeHemoglobin\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nLab Results\nGroup 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200\n400\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nLab Results\nGroup 2: HIV-1 Negative\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 2: HIV-1 NegativeHemoglobin\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)"
                 }
         ));
 

@@ -157,7 +157,7 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
 
-    private static final String BOX_PLOT_QC = "Group 1\nGroup 2\n0.0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\nTypes\nStudy: Cohort\nDouble";
+    private static final String BOX_PLOT_QC = "Group 1\nGroup 2\n0\n2e+7\n4e+7\n6e+7\n8e+7\n1e+8\n1.2e+8\nTypes\nStudy: Cohort\nDouble";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
     @LogMethod
