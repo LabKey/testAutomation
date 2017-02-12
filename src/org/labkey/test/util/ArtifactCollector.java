@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -128,6 +129,13 @@ public class ArtifactCollector
         TestLogger.log("Threads dumped to standard labkey log file");
     }
 
+    private String screenshotBaseName(@NotNull String suffix)
+    {
+        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
+        String baseName = dateFormat.format(new Date()) + _test.getClass().getSimpleName();
+        return baseName + "#" + suffix;
+    }
+
     public void dumpPageSnapshot(String testName, @Nullable String subdir)
     {
         File dumpDir = ensureDumpDir();
@@ -138,9 +146,7 @@ public class ArtifactCollector
                 dumpDir.mkdirs();
         }
 
-        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-        String baseName = dateFormat.format(new Date()) + _test.getClass().getSimpleName();
-        baseName += "#" + testName;
+        String baseName = screenshotBaseName(testName);
 
         dumpFullScreen(dumpDir, baseName);
         dumpScreen(dumpDir, baseName);
@@ -172,6 +178,13 @@ public class ArtifactCollector
             TestLogger.log("Unable to move HeapDump file to test logs directory.");
 
         _driver.popLocation(); // go back to get screenshot if needed.
+    }
+
+    public File dumpScreen(@NotNull String suffix)
+    {
+        File dumpDir = ensureDumpDir();
+        String baseName = screenshotBaseName(suffix);
+        return dumpScreen(dumpDir, baseName);
     }
 
     public File dumpScreen(File dir, String baseName)
