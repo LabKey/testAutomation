@@ -15,36 +15,50 @@
  */
 package org.labkey.test.components.core;
 
-import org.openqa.selenium.By;
+import org.labkey.test.Locator;
+import org.labkey.test.components.Component;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class NotificationPanelItem
+import static org.labkey.test.WebDriverWrapper.waitFor;
+
+public class NotificationPanelItem extends Component
 {
-    WebElement _parent;
+    WebElement _el;
+    WebElement _createdBy = Locator.css("div.labkey-notification-createdby").findWhenNeeded(this);
+    WebElement _notificationBody = Locator.css("div.labkey-notification-body").findWhenNeeded(this);
+    WebElement _markAsRead = Locator.css("div.labkey-notification-times").findWhenNeeded(this);
+    WebElement _icon = Locator.css("div.labkey-notification-icon").findWhenNeeded(this);
 
     public NotificationPanelItem(WebElement rowItem)
     {
-        _parent = rowItem;
+        _el = rowItem;
+    }
+
+    @Override
+    public WebElement getComponentElement()
+    {
+        return _el;
     }
 
     public String getCreatedBy()
     {
-        return _parent.findElement(By.cssSelector(" div.labkey-notification-createdby")).getText();
+        return _createdBy.getText();
     }
 
     public String getBody()
     {
-        return _parent.findElement(By.cssSelector(" div.labkey-notification-body")).getText();
+        return _notificationBody.getText();
     }
 
     public String getIconType()
     {
         String[] classValue;
         String iconName = "";
-        classValue = _parent.findElement(By.cssSelector(" div.labkey-notification-icon")).getAttribute("class").split(" ");
+        classValue = _icon.getAttribute("class").split(" ");
         for(String str : classValue)
         {
-            if(str.contains("fa-"))
+            if(str.startsWith("fa-"))
             {
                 iconName = str;
                 break;
@@ -56,17 +70,18 @@ public class NotificationPanelItem
 
     public void markAsRead()
     {
-        _parent.findElement(By.cssSelector(" div.labkey-notification-times")).click();
+        _markAsRead.click();
+        waitFor(() -> ExpectedConditions.stalenessOf(_el).apply(null), 1000);
     }
 
     public void toggleExpand()
     {
-        _parent.findElement(By.cssSelector(" div.labkey-notification-toggle")).click();
+        final WebElement notificationBody = Locator.css(".labkey-notification-body").findElement(this);
+        Locator.css(" div.labkey-notification-toggle").findElement(this).click();
     }
 
     public void click()
     {
-        _parent.click();
+        _el.click();
     }
-
 }
