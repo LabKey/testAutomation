@@ -157,6 +157,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     @Deprecated // Use ApiPermissionsHelper unless UI testing is necessary
     public UIPermissionsHelper _permissionsHelper = new UIPermissionsHelper(this);
+    public ApiPermissionsHelper _apiPermissionsHelper = new ApiPermissionsHelper(this);
 
     public static final int MAX_WAIT_SECONDS = 10 * 60;
     public static final int DEFAULT_CLASS_TIMEOUT = 25;
