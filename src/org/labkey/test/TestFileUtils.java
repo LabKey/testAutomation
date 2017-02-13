@@ -161,7 +161,7 @@ public abstract class TestFileUtils
 
     public static String getSampledataPath()
     {
-        File path = new File(getLabKeyRoot(), "sampledata");
+        File path = new File(getLabKeyRoot(), "server/customModules/genotyping/test/sampledata");
         return path.toString();
     }
 
