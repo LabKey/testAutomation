@@ -390,6 +390,7 @@ src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/aspects/MethodLoggingAspect.java -text
 src/org/labkey/test/aspects/StaleElementRetryAspect.java -text
 src/org/labkey/test/aspects/TestPerfAspect.java -text
+src/org/labkey/test/categories/Aics_samples.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/Base.java -text
