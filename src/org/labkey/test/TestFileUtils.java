@@ -48,6 +48,7 @@ import static org.junit.Assert.assertNotNull;
 public abstract class TestFileUtils
 {
     private static File _labkeyRoot = null;
+    public static final File DEFAULT_SAMPLEDATA_DIR = new File(getLabKeyRoot(), "sampledata");
 
     public static String getFileContents(String rootRelativePath)
     {
@@ -133,7 +134,7 @@ public abstract class TestFileUtils
             if (sampledataDirsFile.exists())
                 path = getFileContents(sampledataDirsFile);
             else
-                path = getSampledataPath();
+                path = DEFAULT_SAMPLEDATA_DIR.toString();
         }
 
         List<String> splitPath = Arrays.asList(path.split(";"));
@@ -157,16 +158,6 @@ public abstract class TestFileUtils
         assertNotNull("Sample data not found: " + relativePath + "\n" +
                 "In: " + path, foundFile);
         return foundFile;
-    }
-
-    /**
-     * @deprecated Use {@link #getSampleData(String)} to find sample data files
-     */
-    @Deprecated
-    public static String getSampledataPath()
-    {
-        File path = new File(getLabKeyRoot(), "sampledata");
-        return path.toString();
     }
 
     public static File getApiScriptFolder()

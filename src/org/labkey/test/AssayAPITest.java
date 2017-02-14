@@ -55,15 +55,15 @@ public class AssayAPITest extends BaseWebDriverTest
         goToProjectHome();
         int pipelineCount = 0;
         String runName = "trial01.xls";
-        importAssayAndRun(new File(TestFileUtils.getSampledataPath() + "/AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
-                new File(TestFileUtils.getSampledataPath() + "/GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
+        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
+                TestFileUtils.getSampleData( "GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
         waitForElement(Locator.paginationText(1, 100, 201));
 //
         goToProjectHome();
 
         //Issue 16073
-        importAssayAndRun(new File(TestFileUtils.getSampledataPath() + "/AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
-                new File(TestFileUtils.getSampledataPath() + "/GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
+        importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
+                TestFileUtils.getSampleData("GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
         waitForElement(Locator.paginationText(1, 100, 201));
 //        _assayHelper.getCurrentAssayNumber();
     }

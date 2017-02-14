@@ -129,7 +129,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         final String CLINIC_ASSAY_TAB = "Clinical and Assay Data";
         final String GENERATED_THUMBNAIL_NAME = "thumbnail.view";
 
-        final String ATTACH_SAMPLE_DATA_PATH = TestFileUtils.getSampledataPath() + "/query/attachments/";
+        final File ATTACH_SAMPLE_DATA_PATH = TestFileUtils.getSampleData("query/attachments");
 
         goToDataViews();
         clickTab("Manage");
@@ -139,21 +139,21 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_1);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
-        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "PowerPoint_JPEG_Thumbnail.pptx");
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "PowerPoint_JPEG_Thumbnail.pptx"));
         clickButton("Save", defaultWaitForPage);
 
         // Create xlsx attachment report
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_2);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
-        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "Excel_Document_JPEG_Thumbnail.xlsx");
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "Excel_Document_JPEG_Thumbnail.xlsx"));
         clickButton("Save", defaultWaitForPage);
 
         // Create docx attachment report
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_3);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
-        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), ATTACH_SAMPLE_DATA_PATH + "Word_Document_JPEG_Thumbnail.docx");
+        setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "Word_Document_JPEG_Thumbnail.docx"));
         clickButton("Save", defaultWaitForPage);
 
         // Verify generated thumbnail images exist and not stock pptx, xlsx and docx images

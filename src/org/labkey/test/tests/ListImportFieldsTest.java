@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 public class ListImportFieldsTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "List Import Fields Test";
-    private static final File LIST_FIELD_IMPORT = new File(TestFileUtils.getSampledataPath(), "lists/ListImportFields.txt");
+    private static final File LIST_FIELD_IMPORT = TestFileUtils.getSampleData("lists/ListImportFields.txt");
     private static final String LIST_NAME = "Test List";
     private static final String REPLACEMENT_COL = "Nukeum";
     private ListHelper listHelper = new ListHelper(this);

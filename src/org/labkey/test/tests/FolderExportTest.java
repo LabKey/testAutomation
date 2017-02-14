@@ -61,7 +61,7 @@ public class FolderExportTest extends BaseWebDriverTest
 {
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
-    File dataDir = new File(TestFileUtils.getSampledataPath(), "FolderExport");
+    File dataDir = TestFileUtils.getSampleData("FolderExport");
     private static final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
     private static final String folderFromPipelineZip = "2 Folder From Pipeline Zip";
     private static final String folderFromPipelineExport = "3 Folder From Pipeline Export";

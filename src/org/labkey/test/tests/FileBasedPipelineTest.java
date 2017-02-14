@@ -51,7 +51,7 @@ import static org.junit.Assert.assertTrue;
 public class FileBasedPipelineTest extends BaseWebDriverTest
 {
     private static final String PIPELINETEST_MODULE = "pipelinetest";
-    private static final File SAMPLE_FILE = new File(TestFileUtils.getSampledataPath(), "fileTypes/sample.txt");
+    private static final File SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
 
     @BeforeClass

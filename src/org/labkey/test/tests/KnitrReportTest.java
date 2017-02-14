@@ -187,7 +187,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains, true, rmdReport.getFileName() + "MarkdownV2");
     }
 
-    final Path libXmlSource = Paths.get(TestFileUtils.getSampledataPath(), "knitr/knitr.lib.xml");
+    final Path libXmlSource = Paths.get(TestFileUtils.getSampleData("knitr/knitr.lib.xml").toURI());
     final Path libXmlDest = Paths.get(TestFileUtils.getDefaultWebAppRoot()).resolve(libXmlSource.getFileName());
     final Path libXmlBackup = libXmlDest.resolveSibling(libXmlDest.getFileName() + ".bak");
 

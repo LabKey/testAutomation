@@ -47,7 +47,7 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
     private static final String TRANSFORM_REMOTE_BAD_DEST = "{ETLtest}/remoteInvalidDestinationSchemaName";
     private static final String TRANSFORM_REMOTE_NOTRUNC = "{ETLtest}/remote_noTruncate";
-    private static final File TRANSFORM_REMOTE_STUDY = new File(TestFileUtils.getSampledataPath(), "dataintegration/ETLTestStudy.zip");
+    private static final File TRANSFORM_REMOTE_STUDY = TestFileUtils.getSampleData( "dataintegration/ETLTestStudy.zip");
 
 
     @Nullable

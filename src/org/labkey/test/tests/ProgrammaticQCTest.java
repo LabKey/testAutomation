@@ -105,10 +105,10 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkContainingText("QC Assay"));
         _assayHelper.clickEditAssayDesign();
         AssayDesignerPage assayDesigner = new AssayDesignerPage(this);
-        assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/validator.jar"));
+        assayDesigner.addTransformScript((TestFileUtils.getSampleData("qc/validator.jar")));
         assayDesigner.saveAndClose();
         goToProjectHome();
-        _listHelper.importListArchive(getProjectName(), new File(TestFileUtils.getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
+        _listHelper.importListArchive(getProjectName(), TestFileUtils.getSampleData("ProgrammaticQC/Programmatic QC.lists.zip"));
     }
 
     private void defineTransformAssay(String assayName, boolean addQCScript)

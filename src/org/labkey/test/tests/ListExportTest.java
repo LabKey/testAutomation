@@ -30,7 +30,7 @@ import java.util.List;
 @Category({DailyB.class})
 public class ListExportTest extends AbstractExportTest
 {
-    private static final File LIST_ARCHIVE = new File(TestFileUtils.getSampledataPath(), "lists/ListDemo.lists.zip");
+    private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
 
     @Override

@@ -29,7 +29,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class QueryExportTest extends AbstractExportTest
 {
-    private static final File LIST_ARCHIVE = new File(TestFileUtils.getSampledataPath(), "lists/ListDemo.lists.zip");
+    private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
     private static final String QUERY_NAME = "NIMHQuery";
 
