@@ -16,12 +16,10 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.labkey.test.components.ext4.Window;
-import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.SearchContext;
+import org.labkey.test.components.ext4.ComboBox;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+
+import static org.labkey.test.components.ext4.ComboBox.ComboBox;
 
 public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.ElementCache>
 {
@@ -36,20 +34,15 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
         this(test.getDriver());
     }
 
-    @Deprecated // TODO: Remove
-    public void waitForDialog()
-    {
-    }
-
     public ChartQueryDialog selectSchema(String schemaName)
     {
-        getWrapper()._ext4Helper.selectComboBoxItem("Schema:", schemaName);
+        elementCache().schemaCombo.selectComboBoxItem(schemaName);
         return this;
     }
 
     public ChartQueryDialog selectQuery(String queryName)
     {
-        getWrapper()._ext4Helper.selectComboBoxItem("Query:", queryName);
+        elementCache().queryCombo.selectComboBoxItem(queryName);
         return this;
     }
 
@@ -74,5 +67,7 @@ public class ChartQueryDialog extends ChartWizardDialog<ChartQueryDialog.Element
 
     class ElementCache extends ChartWizardDialog.ElementCache
     {
+        protected ComboBox schemaCombo = ComboBox(getDriver()).withLabel("Schema:").findWhenNeeded(this);
+        protected ComboBox queryCombo = ComboBox(getDriver()).withLabel("Query:").findWhenNeeded(this);
     }
 }
