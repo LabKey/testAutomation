@@ -55,6 +55,9 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE6_NAME = "Index";
     private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test";
 
+    private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
+    private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
+
     private static final String DISC1_TITLE = "Let's Talk";
     private static final String DISC1_BODY = "I don't know how normal this wiki is";
     private static final String RESP1_TITLE = "Let's Keep Talking";
@@ -487,11 +490,9 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check that 'Copy Pages' in TOC works");
         portalHelper.clickWebpartMenuItem("Test Customize TOC", true, "Copy");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
         clickButton("Copy Pages");
-        clickProject(PROJECT_NAME);
-        clickTab("Wiki");
-        assertTextPresent(WIKI_PAGE1_TITLE);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 2);
 
         log("Check that 'New Page' works");
         clickProject(PROJECT2_NAME);
@@ -511,7 +512,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_TITLE), 1);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_NAME), 1);
 
         indexTest();
 
