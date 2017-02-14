@@ -31,6 +31,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.util.Ext4Helper.Locators.comboListItem;
 import static org.labkey.test.util.Ext4Helper.TextMatchTechnique.EXACT;
 import static org.labkey.test.util.Ext4Helper.getCssPrefix;
@@ -87,6 +88,8 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     {
         openComboList();
 
+        boolean multiSelect = isOpenComboBoxMultiSelect();
+
         try
         {
             for (String selection : selections)
@@ -102,6 +105,12 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             }
         }
 
+        if (!multiSelect && !waitFor(() -> comboListItem().findElements(getDriver()).isEmpty(), 1000))
+        {
+            // Selection failed, retry
+            selectItemFromOpenComboList(selections[0], matchTechnique);
+        }
+
         closeComboList();
     }
 
@@ -111,7 +120,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
 
         try
         {
-            WebDriverWrapper.waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
+            waitFor(() -> getComponentElement().getAttribute("class").contains("pickerfield-open"), 1000);
             getDriverWrapper().waitForElement(comboListItem());
         }
         catch (TimeoutException | NoSuchElementException retry)
