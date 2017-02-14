@@ -390,7 +390,6 @@ src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/aspects/MethodLoggingAspect.java -text
 src/org/labkey/test/aspects/StaleElementRetryAspect.java -text
 src/org/labkey/test/aspects/TestPerfAspect.java -text
-src/org/labkey/test/categories/Aics_samples.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/Base.java -text
@@ -408,7 +407,6 @@ src/org/labkey/test/categories/Disabled.java -text
 src/org/labkey/test/categories/ETL.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
-src/org/labkey/test/categories/FileTransfer.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/Git.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
