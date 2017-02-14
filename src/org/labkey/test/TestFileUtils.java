@@ -159,9 +159,13 @@ public abstract class TestFileUtils
         return foundFile;
     }
 
+    /**
+     * @deprecated Use {@link #getSampleData(String)} to find sample data files
+     */
+    @Deprecated
     public static String getSampledataPath()
     {
-        File path = new File(getLabKeyRoot(), "server/customModules/genotyping/test/sampledata");
+        File path = new File(getLabKeyRoot(), "sampledata");
         return path.toString();
     }
 
