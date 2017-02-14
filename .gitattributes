@@ -408,6 +408,7 @@ src/org/labkey/test/categories/Disabled.java -text
 src/org/labkey/test/categories/ETL.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
+src/org/labkey/test/categories/FileTransfer.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/Git.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
