@@ -497,10 +497,10 @@ public class TestHelper
             }
         }
 
-        Enumeration<CheckNode> childNodes = node.children();
+        Enumeration<TreeNode> childNodes = node.children();
         while (childNodes.hasMoreElements())
         {
-            selected.addAll(getChecked(childNodes.nextElement(), testsOnly));
+            selected.addAll(getChecked((CheckNode)childNodes.nextElement(), testsOnly));
         }
         return selected;
     }
@@ -692,10 +692,10 @@ public class TestHelper
         else
             node.setSelected(false);
 
-        Enumeration<CheckNode> childNodes = node.children();
+        Enumeration<TreeNode> childNodes = node.children();
         while (childNodes.hasMoreElements())
         {
-            check(childNodes.nextElement(), paths);
+            check((CheckNode)childNodes.nextElement(), paths);
         }
     }
 

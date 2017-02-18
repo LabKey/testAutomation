@@ -363,6 +363,7 @@
         <antcall target="clean" />
         <antcall target="prepare" />
 
+        <!-- Change "iajc" to "javac" below to build without aspectj -->
         <iajc
             destdir="${test.build.home}/classes"
             debug="${test.compile.debug}"
