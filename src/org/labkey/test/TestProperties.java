@@ -137,14 +137,10 @@ public abstract class TestProperties
                         break;
                 }
             }
-            if (chromeExe != null)
-            {
-                File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
-                File chromePath = new File(testBin, chromeExe);
-                System.setProperty(key, chromePath.getAbsolutePath());
-            }
-            else
-                System.out.println("Unable to locate chromedriver executable - Using Firefox instead");
+
+            File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
+            File chromePath = new File(testBin, chromeExe);
+            System.setProperty(key, chromePath.getAbsolutePath());
         }
 
         return System.getProperty(key);
