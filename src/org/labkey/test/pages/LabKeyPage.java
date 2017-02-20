@@ -59,6 +59,11 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
         public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
     }
 
+    protected final void clearCache()
+    {
+        _elementCache = null;
+    }
+
     protected EC elementCache()
     {
         if (null == _elementCache)

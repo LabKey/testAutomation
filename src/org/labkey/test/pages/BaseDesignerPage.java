@@ -77,6 +77,7 @@ public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache>
     {
         doAndExpectClean(() -> clickButton("Save", 0));
         waitForElement(Locator.tagWithClass("div", "gwt-HTML").withText("Save successful."), 20000);
+        clearCache();
         return null;
     }
 
