@@ -83,16 +83,35 @@ public abstract class TestFileUtils
     {
         if (_labkeyRoot == null)
         {
-            _labkeyRoot = new File(System.getProperty("labkey.root", ".."));
+            final String labkeyRootProperty = System.getProperty("labkey.root");
 
-            if (!_labkeyRoot.exists())
+            if (labkeyRootProperty != null)
             {
-                throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
+                _labkeyRoot = new File(labkeyRootProperty);
+
+                if (!_labkeyRoot.exists())
+                {
+                    throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg labkey.root={yourroot}");
+                }
+                if (!new File(_labkeyRoot, "server/test").exists())
+                {
+                    throw new IllegalStateException("Specified LabKey root exists [" + _labkeyRoot + "] but isn't the root of a LabKey enlistment. Configure this by passing VM arg labkey.root={yourroot}");
+                }
+
+                _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(_labkeyRoot);
+
+                TestLogger.log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
             }
-
-            _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(_labkeyRoot);
-
-            System.out.println("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
+            else
+            {
+                _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(new File(""));
+                if (_labkeyRoot.getName().equals("server"))
+                    _labkeyRoot = _labkeyRoot.getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
+                else if (!new File(_labkeyRoot, "server").exists())
+                {
+                    throw new IllegalStateException("Unable to locate enlistment. Working directory [" + _labkeyRoot + "] isn't a recognized location. Configure manually with passing VM arg labkey.root={yourroot}");
+                }
+            }
         }
         return _labkeyRoot.toString();
     }
