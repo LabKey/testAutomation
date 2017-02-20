@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
@@ -106,26 +107,19 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
 
     private void createAssay(String name, String description, String templateName, boolean singleFile, boolean singlePlateDilution)
     {
-        clickButton("New Assay Design");
-        if (singlePlateDilution)
-            checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)"));
-        else
-            checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)"));
-        clickButton("Next");
+        String type = singlePlateDilution ?
+                "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)" :
+                "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)";
 
-        log("Setting up NAb assay");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), name);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), description);
-        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), templateName);
-
-        if(singleFile)
+        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit(type, name);
+        designerPage.setPlateTemplate(templateName);
+        if (singleFile)
         {
-            selectOptionByValue(Locator.xpath("//select[@id='metadataInputFormat']"), "COMBINED");
+            designerPage.setMetaDataInputFormat(AssayDesignerPage.MetadataInputFormat.COMBINED);
         }
+        designerPage.setDescription(description);
 
-        sleep(1000);
-        clickButton("Save & Close");
+        designerPage.saveAndClose();
     }
 
     @Before

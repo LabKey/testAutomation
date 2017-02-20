@@ -56,6 +56,12 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         elementCache().descriptionInput.get();
     }
 
+    @Override
+    public AssayDesignerPage save()
+    {
+        return (AssayDesignerPage) super.save();
+    }
+
     public AssayDesignerPage setName(String name)
     {
         elementCache().nameInput.set(name);
@@ -65,7 +71,8 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
 
     public AssayDesignerPage setDescription(String description)
     {
-        elementCache().descriptionInput.set(description);
+        doAndExpectDirty(() ->
+                elementCache().descriptionInput.set(description));
         return this;
     }
 
@@ -279,7 +286,8 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
     public enum MetadataInputFormat implements OptionSelect.SelectOption
     {
         MANUAL,
-        FILE_BASED;
+        FILE_BASED,
+        COMBINED;
 
         @Override
         public String getValue()
