@@ -23,6 +23,7 @@ import org.labkey.remoteapi.admin.GetModulesResponse;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -367,7 +368,7 @@ public abstract class AbstractContainerHelper
         // confirm delete:
         _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
-        _test.assertElementPresent(Locator.currentProject().withText(project));
+        _test.assertElementPresent(Locators.folderMenu.withText(project));
         _test.openFolderMenu();
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
     }
@@ -391,7 +392,7 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Save");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        _test.assertElementPresent(Locator.currentProject().withText(project));
+        _test.assertElementPresent(Locators.folderMenu.withText(project));
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
@@ -421,10 +422,10 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Confirm Move");
 
         // verify that we're not on an error page with a check for folder link:
-        _test.assertElementPresent(Locator.currentProject().withText(projectName));
+        _test.assertElementPresent(Locators.folderMenu.withText(projectName));
         _test.openFolderMenu();
         _test.waitForElement(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
-        String newProject = _test.getText(Locator.currentProject());
+        String newProject = _test.getText(Locators.folderMenu);
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(newProject, folderName));
     }

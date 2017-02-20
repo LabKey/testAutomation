@@ -674,12 +674,6 @@ public abstract class Locator
     }
 
     @Deprecated
-    public static XPathLocator currentProject()
-    {
-        return id("folderBar");
-    }
-
-    @Deprecated
     public static XPathLocator divByInnerText(String text)
     {
         return xpath("//div[.='" + text + "']");
