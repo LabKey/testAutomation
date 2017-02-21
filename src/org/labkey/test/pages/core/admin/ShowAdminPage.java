@@ -34,6 +34,12 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new CustomizeSitePage(getDriver());
     }
 
+    public ConfigureFileSystemAccessPage clickFiles()
+    {
+        clickAndWait(elementCache().filesLink);
+        return new ConfigureFileSystemAccessPage(getDriver());
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -42,6 +48,7 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
+        protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {
