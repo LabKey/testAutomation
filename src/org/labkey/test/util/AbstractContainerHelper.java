@@ -27,7 +27,6 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public abstract class AbstractContainerHelper
@@ -379,7 +379,7 @@ public abstract class AbstractContainerHelper
         _test.log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
         _test.clickProject(project);
         _test.clickFolder(folderName);
-        _test.ensureAdminMode();
+        final String expectedContainerPath = _test.getCurrentContainerPath().replace("/" + folderName, "/" + newFolderName);
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName).notHidden());
         _test.clickButton("Rename");
@@ -392,12 +392,12 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Save");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        _test.assertElementPresent(Locators.folderMenu.withText(project));
+        assertEquals("Wrong project after folder rename.", project, Locators.folderMenu.findElement(_test.getDriver()).getText());
+        assertEquals("Wrong container path after rename.", expectedContainerPath, _test.getCurrentContainerPath());
         _test.openFolderMenu();
         _test.waitForElement(Locator.linkWithText(newFolderName));
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
-        new Actions(_test.getDriver()).moveByOffset(-500, -500).build().perform(); // Make sure folder menu doesn't reappear
-        _test.refresh();
+        _test.mouseOut();
     }
 
     @LogMethod
@@ -406,7 +406,6 @@ public abstract class AbstractContainerHelper
         _test.log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
         _test.clickProject(projectName);
         _test.clickFolder(folderName);
-        _test.ensureAdminMode();
         _test.goToFolderManagement();
         _test.waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(folderName));
         _test.clickButton("Move");
