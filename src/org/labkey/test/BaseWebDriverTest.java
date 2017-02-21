@@ -1925,7 +1925,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        // wait for tool tip to disappear, in case it is covering the element we want to click on
+        mouseOut(); // Dismiss tooltip, in case it is covering the element we want to click on
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
         Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName).notHidden();
         waitAndClick(loc);
