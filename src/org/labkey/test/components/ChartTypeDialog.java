@@ -539,11 +539,11 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         }
         public WebElement fieldTitles = new LazyWebElement(Locator.xpath("//div[contains(@class, 'field-title')]"), this);
 
-        public WebElement plotTypeBar = new LazyWebElement(Locator.xpath("//div[@id='chart-type-bar_chart']"),  this);
-        public WebElement plotTypeBox = new LazyWebElement(Locator.xpath("//div[@id='chart-type-box_plot']"),  this);
-        public WebElement plotTypePie = new LazyWebElement(Locator.xpath("//div[@id='chart-type-pie_chart']"),  this);
-        public WebElement plotTypeScatter = new LazyWebElement(Locator.xpath("//div[@id='chart-type-scatter_plot']"),  this);
-        public WebElement plotTypeTime = new LazyWebElement(Locator.xpath("//div[@id='chart-type-time_chart']"),  this);
+        public WebElement plotTypeBar = Locator.xpath("//div[@id='chart-type-bar_chart']").findWhenNeeded(this).withTimeout(1000);
+        public WebElement plotTypeBox = Locator.xpath("//div[@id='chart-type-box_plot']").findWhenNeeded(this).withTimeout(1000);
+        public WebElement plotTypePie = Locator.xpath("//div[@id='chart-type-pie_chart']").findWhenNeeded(this).withTimeout(1000);
+        public WebElement plotTypeScatter = Locator.xpath("//div[@id='chart-type-scatter_plot']").findWhenNeeded(this).withTimeout(1000);
+        public WebElement plotTypeTime = Locator.xpath("//div[@id='chart-type-time_chart']").findWhenNeeded(this).withTimeout(1000);
 
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement xAxisTitle() {return Locator.xpath(XAXIS_CONTAINER).findElement(this);}
