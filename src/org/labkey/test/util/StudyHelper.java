@@ -405,6 +405,11 @@ public class StudyHelper
         _test.waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
     }
 
+    public Locator.XPathLocator editVisitLoc(String visitLabel)
+    {
+        return Locator.xpath("//table[@id='visits']//tr[./td[text() = '" + visitLabel + "']]/td/a[text() = 'edit']");
+    }
+
     public static String getStudySampleDataPath()
     {
         return "/sampledata/study/";
