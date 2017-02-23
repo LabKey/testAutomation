@@ -15,10 +15,10 @@
  */
 package org.labkey.test.pages.assay;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -26,9 +26,9 @@ import org.openqa.selenium.WebElement;
  */
 public class DeleteSelectedRunsPage extends LabKeyPage<DeleteSelectedRunsPage.Elements>
 {
-    public DeleteSelectedRunsPage(BaseWebDriverTest test)
+    public DeleteSelectedRunsPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
     }
 
     public void clickOK()

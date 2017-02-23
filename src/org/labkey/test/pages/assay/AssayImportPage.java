@@ -15,13 +15,13 @@
  */
 package org.labkey.test.pages.assay;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -29,9 +29,9 @@ import java.io.File;
 
 public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
 {
-    public AssayImportPage(BaseWebDriverTest test)
+    public AssayImportPage(WebDriver driver)
     {
-        super(test);
+        super(driver);
     }
 
     public AssayImportPage setNamedInputText(String name, String text)
@@ -93,7 +93,7 @@ public class AssayImportPage extends LabKeyPage<AssayImportPage.Elements>
     public AssayImportPage clickSaveAndImportAnother()
     {
         doAndWaitForPageToLoad(()-> elementCache().saveAndImportAnotherButton.click());
-        return new AssayImportPage(BaseWebDriverTest.getCurrentTest());
+        return new AssayImportPage(getDriver());
     }
 
     public void clickResetDefaults()
