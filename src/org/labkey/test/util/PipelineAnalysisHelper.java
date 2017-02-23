@@ -29,6 +29,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.html.Checkbox.Checkbox;
 
 public class PipelineAnalysisHelper
 {
@@ -155,15 +156,20 @@ public class PipelineAnalysisHelper
         }
     }
 
+    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry)
+    {
+        runProtocol(protocolName, protocolDef, allowRetry, null);
+    }
+
     /**
      * Run a given protocol. Create it if it doesn't exist
      * @param protocolName The name of the protocol to run
      * @param protocolDef Optional bioml xml definition to use for this protocol
      * @param allowRetry  Allowing retrying the run if the Retry button is present. If false and the Retry button is present, a test failure occurs
      */
-    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry)
+    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry, @Nullable String workflowConfigName)
     {
-        // If the given protocol name already exists, select it. If not, define a new one
+        // If the given protocol name already exists, select it. If not, define a new one.
         Select protocolSelect = waitForProtocolSelect();
         if (!Locator.tag("option").withText(protocolName).findElements(_test.getDriver()).isEmpty())
         {
@@ -171,12 +177,27 @@ public class PipelineAnalysisHelper
         }
         else
         {
-            // Create a new one
             protocolSelect.selectByVisibleText("<New Protocol>");
             _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
             if (null != protocolDef)
                 _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
+        }
 
+        // If the given configuration name already exists, select it. If not define a new one.
+        if (_test.isElementPresent(Locator.tagWithText("div", "Document processing configuration")))
+        {
+            Select workflowConfigSelect = waitForConfigurationSelect();
+            if (workflowConfigName != null && !Locator.tag("option").withText(workflowConfigName).findElements(_test.getDriver()).isEmpty())
+            {
+                workflowConfigSelect.selectByVisibleText(workflowConfigName);
+            }
+            else
+            {
+                workflowConfigSelect.selectByVisibleText("<New Configuration>");
+                _test.setFormElement(Locator.id("name"), workflowConfigName == null ? protocolName + " Configuration" : workflowConfigName);
+                if (workflowConfigName == null)
+                    Checkbox(Locator.id("saveWorkflowConfigInput")).find(_test.getDriver()).uncheck();
+            }
         }
 
         Locator retryButton = Locator.lkButton("Retry");
@@ -196,5 +217,12 @@ public class PipelineAnalysisHelper
         Locator.XPathLocator protocolSelect = Locator.id("protocolSelect");
         _test.waitForElement(protocolSelect.append(Locator.tag("option").withText("<New Protocol>")));
         return new Select(protocolSelect.findElement(_test.getDriver()));
+    }
+
+    private Select waitForConfigurationSelect()
+    {
+        Locator.XPathLocator workflowConfigSelect = Locator.id("workflowConfigSelect");
+        _test.waitForElement(workflowConfigSelect.append(Locator.tag("option").withText("<New Configuration>")));
+        return new Select(workflowConfigSelect.findElement(_test.getDriver()));
     }
 }
