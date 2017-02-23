@@ -133,10 +133,20 @@ public class FlowCBCTest extends BaseFlowTest
         href = getAttribute(Locator.linkWithText("06-20-12 mem naive"), "href");
         assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
 
-        // verify graph img is displayed (no error) and the src attribute goes to the flow container
+        // verify graph img is displayed (no error) and the src attribute goes to the CURRENT container
         assertTextNotPresent("Error generating graph");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:SSC-H)']"), "src");
-        assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
+        assertTrue("Expected graph img links to current container: " + href, href.contains("/" + STUDY_FOLDER + "/") && href.contains("showGraph.view"));
+
+        // verify viewing the image redirects us to the original flow container
+        pushLocation();
+        log("navigating to image url: " + href);
+        beginAt(href);
+        String finalHref = getCurrentRelativeURL();
+        assertNotEquals("Expected graph img links to redirect to flow container: " + finalHref, href, finalHref);
+        assertTrue("Expected graph img links to redirect to flow container: " + finalHref, finalHref.contains("/" + getFolderName() + "/") && finalHref.contains("showGraph.view"));
+        log("image url redirected to url: " + finalHref);
+        popLocation();
 
         pushLocation();
         clickButton("View Source Assay");
