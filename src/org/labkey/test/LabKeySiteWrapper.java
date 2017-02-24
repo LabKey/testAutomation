@@ -708,7 +708,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (null != password2)
             setFormElement(Locator.id("password2"), password2);
 
-        clickAndWait(Locator.linkWithText("Next"));
+        clickAndWait(Locator.linkWithText("Next"), 90000); // Initial user creation blocks during upgrade script execution
 
         if (null != expectedError)
             assertEquals("Wrong error message.", expectedError, Locator.css(".labkey-error").findElement(getDriver()).getText());
