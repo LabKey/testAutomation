@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.133")
+                print("Latest Rlabkey version: 2.1.134")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.133"
-                [1] "Found Rlabkey version: 2.1.133"
+                [1] "Latest Rlabkey version: 2.1.134"
+                [1] "Found Rlabkey version: 2.1.134"
             ]]>
         </response>
     </test>
@@ -166,7 +166,7 @@
                 s<-getSession(baseUrl="%baseUrl%", folderPath="/RlabkeyVerifyProject")
                 scobj <- getSchema(s, "lists")
                 lucols <- getLookups(s, scobj$AllTypes$Category)  # can add fields from related queries
-                cols <- c(names(scobj$AllTypes)[2:6], names(lucols)[8:10])
+                cols <- c(names(scobj$AllTypes)[9:13], names(lucols)[8:10])
                 simpledf <- getRows(s, scobj$AllTypes, colSelect=paste(cols, sep=","), colNameOpt="caption")
                 simpledf
             ]]>
