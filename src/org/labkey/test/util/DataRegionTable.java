@@ -1230,17 +1230,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (!_driver.isElementPresent(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName)))
         {
-            clickHeaderButtonByText("Filter");
+            clickHeaderButton("Filter");
             _driver.waitForElement(Locator.css(".lk-filter-panel-label"));
         }
         WebElement panelEl = _driver.waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName));
         return new DatasetFacetPanel(panelEl, this);
     }
 
-    // TODO: Rename to 'clickHeaderButton' once deprecated method is safely removed
+    @Deprecated
     public void clickHeaderButtonByText(String buttonText)
     {
-        elements().getHeaderButton(buttonText).click();
+        clickHeaderButton(buttonText);
     }
 
     public void clickHeaderButtonAndWait(String buttonText)
@@ -1248,16 +1248,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         _driver.clickAndWait(elements().getHeaderButton(buttonText));
     }
 
-    @Deprecated // TODO: Remove after 16.3. Possibly used in unmerged git branches
-    public void clickHeaderButton(String buttonText, String ... subMenuLabels)
+    public void clickHeaderButton(String buttonText)
     {
-        clickHeaderMenu(buttonText, subMenuLabels);
-    }
-
-    @Deprecated // TODO: Remove after 16.3. Possibly used in unmerged git branches
-    public void clickHeaderButton(String buttonText, boolean wait, String ... subMenuLabels)
-    {
-        clickHeaderMenu(buttonText, wait, subMenuLabels);
+        elements().getHeaderButton(buttonText).click();
     }
 
     public void openHeaderMenu(String buttonText, String ... subMenuLabels)
