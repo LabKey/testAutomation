@@ -405,6 +405,13 @@ public class StudyHelper
         _test.waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
     }
 
+    public void goToManageVisits()
+    {
+        _test.goToManageStudy();
+        _test.waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
+    }
+
+    @Deprecated // user ManageVisitPage.goToEditVisit()
     public Locator.XPathLocator editVisitLoc(String visitLabel)
     {
         return Locator.xpath("//table[@id='visits']//tr[./td[text() = '" + visitLabel + "']]/td/a[text() = 'edit']");

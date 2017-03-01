@@ -95,6 +95,11 @@ public class StartImportPage extends LabKeyPage
         setInitialCheckBox(Locator.css("input[name='applyToMultipleFolders']"), check);
     }
 
+    public void setFailForUndefinedVisitsCheckBox(boolean check)
+    {
+        setInitialCheckBox(Locator.css("input[name='failForUndefinedVisits']"), check);
+    }
+
     private void setInitialCheckBox(Locator checkBox, boolean check)
     {
         if (check)
