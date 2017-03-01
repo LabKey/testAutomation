@@ -115,19 +115,18 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (!"Sign In".equals(getDriver().getTitle()))
         {
             executeScript("window.onbeforeunload = null;"); // Just get logged in, ignore 'unload' alerts
-            beginAt("/login/login.view?");
+            beginAt(WebTestHelper.buildURL("login", "login"));
+            waitForElement(Locator.id("email"), defaultWaitForPage);
         }
 
         if (PasswordUtil.getUsername().equals(getCurrentUser()))
         {
+            log("Already logged in as " +  PasswordUtil.getUsername());
             goToHome();
-            return;
         }
-
-        // Sign in if browser isn't already signed in.  Otherwise, we'll be on the home page.
-        if ("Sign In".equals(getDriver().getTitle()))
+        else
         {
-            waitForElement(Locator.id("email"), defaultWaitForPage);
+            log("Signing in as " + PasswordUtil.getUsername());
             assertElementPresent(Locator.tagWithName("form", "login"));
             setFormElement(Locator.name("email"), PasswordUtil.getUsername());
             setFormElement(Locator.name("password"), PasswordUtil.getPassword());
