@@ -26,10 +26,10 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.components.html.Checkbox.Checkbox;
 
 public class PipelineAnalysisHelper
 {
@@ -167,7 +167,7 @@ public class PipelineAnalysisHelper
      * @param protocolDef Optional bioml xml definition to use for this protocol
      * @param allowRetry  Allowing retrying the run if the Retry button is present. If false and the Retry button is present, a test failure occurs
      */
-    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry, @Nullable String workflowConfigName)
+    public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry, @Nullable UnaryOperator<BaseWebDriverTest> setConfigDelegate)
     {
         // If the given protocol name already exists, select it. If not, define a new one.
         Select protocolSelect = waitForProtocolSelect();
@@ -187,16 +187,13 @@ public class PipelineAnalysisHelper
         if (_test.isElementPresent(Locator.tagWithText("div", "Document processing configuration")))
         {
             Select workflowConfigSelect = waitForConfigurationSelect();
-            if (workflowConfigName != null && !Locator.tag("option").withText(workflowConfigName).findElements(_test.getDriver()).isEmpty())
-            {
-                workflowConfigSelect.selectByVisibleText(workflowConfigName);
-            }
+            if (setConfigDelegate != null)
+                setConfigDelegate.apply(_test);
             else
             {
                 workflowConfigSelect.selectByVisibleText("<New Configuration>");
-                _test.setFormElement(Locator.id("name"), workflowConfigName == null ? protocolName + " Configuration" : workflowConfigName);
-                if (workflowConfigName == null)
-                    Checkbox(Locator.id("saveWorkflowConfigInput")).find(_test.getDriver()).uncheck();
+                _test.setFormElement(Locator.id("name"), protocolName + " Configuration");
+                _test.uncheckCheckbox(Locator.id("saveWorkflowConfigInput"));
             }
         }
 
@@ -219,7 +216,7 @@ public class PipelineAnalysisHelper
         return new Select(protocolSelect.findElement(_test.getDriver()));
     }
 
-    private Select waitForConfigurationSelect()
+    public Select waitForConfigurationSelect()
     {
         Locator.XPathLocator workflowConfigSelect = Locator.id("workflowConfigSelect");
         _test.waitForElement(workflowConfigSelect.append(Locator.tag("option").withText("<New Configuration>")));
