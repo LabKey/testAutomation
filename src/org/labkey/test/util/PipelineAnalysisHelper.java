@@ -169,19 +169,7 @@ public class PipelineAnalysisHelper
      */
     public void runProtocol(@NotNull String protocolName, @Nullable String protocolDef, boolean allowRetry, @Nullable UnaryOperator<BaseWebDriverTest> setConfigDelegate)
     {
-        // If the given protocol name already exists, select it. If not, define a new one.
-        Select protocolSelect = waitForProtocolSelect();
-        if (!Locator.tag("option").withText(protocolName).findElements(_test.getDriver()).isEmpty())
-        {
-            protocolSelect.selectByVisibleText(protocolName);
-        }
-        else
-        {
-            protocolSelect.selectByVisibleText("<New Protocol>");
-            _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
-            if (null != protocolDef)
-                _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
-        }
+        setProtocol(protocolName, protocolDef);
 
         // If the given configuration name already exists, select it. If not define a new one.
         if (_test.isElementPresent(Locator.tagWithText("div", "Document processing configuration")))
@@ -221,5 +209,22 @@ public class PipelineAnalysisHelper
         Locator.XPathLocator workflowConfigSelect = Locator.id("workflowConfigSelect");
         _test.waitForElement(workflowConfigSelect.append(Locator.tag("option").withText("<New Configuration>")));
         return new Select(workflowConfigSelect.findElement(_test.getDriver()));
+    }
+
+    public void setProtocol(String protocolName, String protocolDef)
+    {
+        // If the given protocol name already exists, select it. If not, define a new one.
+        Select protocolSelect = waitForProtocolSelect();
+        if (!Locator.tag("option").withText(protocolName).findElements(_test.getDriver()).isEmpty())
+        {
+            protocolSelect.selectByVisibleText(protocolName);
+        }
+        else
+        {
+            protocolSelect.selectByVisibleText("<New Protocol>");
+            _test.setFormElement(Locator.id("protocolNameInput"), protocolName);
+            if (null != protocolDef)
+                _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
+        }
     }
 }
