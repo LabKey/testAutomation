@@ -211,10 +211,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
                         "Zoe\t1\t25\tQ\tfemale\t\n" +
                         "J.D.\t1\t50\t\tmale\t.Q";
 
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Visits"));
-        clickAndWait(Locator.linkWithText("Import Visit Map"));
         // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
+        _studyHelper.goToManageVisits().goToImportVisitMap();
         setFormElement(Locator.name("content"), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<visitMap xmlns=\"http://labkey.org/study/xml\">\n" +
                 "  <visit label=\"Only Visit\" typeCode=\"S\" sequenceNum=\"20.0\" visitDateDatasetId=\"1\" sequenceNumHandling=\"normal\">\n" +

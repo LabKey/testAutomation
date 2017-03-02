@@ -22,6 +22,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.study.CreateStudyPage;
+import org.labkey.test.pages.study.ManageVisitPage;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -405,16 +406,11 @@ public class StudyHelper
         _test.waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
     }
 
-    public void goToManageVisits()
+    public ManageVisitPage goToManageVisits()
     {
         _test.goToManageStudy();
         _test.waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
-    }
-
-    @Deprecated // user ManageVisitPage.goToEditVisit()
-    public Locator.XPathLocator editVisitLoc(String visitLabel)
-    {
-        return Locator.xpath("//table[@id='visits']//tr[./td[text() = '" + visitLabel + "']]/td/a[text() = 'edit']");
+        return new ManageVisitPage(_test.getDriver());
     }
 
     public static String getStudySampleDataPath()
