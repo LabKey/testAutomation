@@ -502,7 +502,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void importListData()
     {
-        File lists = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
+        File lists = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
         _listHelper.importListArchive(SOURCE_FOLDER, lists);
 
         //Create second folder that should be not visible to linked schemas and import lists again
