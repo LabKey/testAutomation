@@ -31,12 +31,18 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
 
     public Window(String windowTitle, WebDriver driver)
     {
-        this(Window(driver).withTitle(windowTitle), driver);
+        this(Window(driver).withTitle(windowTitle));
     }
 
+    @Deprecated
     protected Window(WindowFinder finder, WebDriver driver)
     {
         this(finder.waitFor(driver).getComponentElement(), driver);
+    }
+
+    protected Window(WindowFinder finder)
+    {
+        this(finder.waitFor().getComponentElement(), finder.getDriver());
     }
 
     public Window(WebElement window, WebDriver driver)
@@ -187,7 +193,7 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
             _driver = driver;
             return super.findWhenNeeded();
         }
-        @Override @Deprecated
+        @Override
         protected WebDriver getDriver()
         {
             if (_driver != null)

@@ -225,7 +225,7 @@ public class CustomizeView extends Component
 
         protected SaveWindow(WebDriver driver)
         {
-            super(Window().withTitleContaining("Save Custom Grid View"), driver);
+            super(Window(driver).withTitleContaining("Save Custom Grid View"));
         }
 
         public void setName(String name)
