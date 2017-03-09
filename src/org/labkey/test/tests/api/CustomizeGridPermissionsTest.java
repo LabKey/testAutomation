@@ -36,6 +36,10 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
 
+    private static final String VIEW_NAME = "My View";
+    private static final String COLUMN_NAME = "Container";
+    private static final String COLUMN_LABEL = "Folder";
+
     private static String listId;
 
     @Override
@@ -105,63 +109,137 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     }
 
     @Test
-    public void testReaderCustomGrid() throws Exception
+    public void testReaderDefaultCustomGrid() throws Exception
     {
         impersonate(READER);
         {
             DataRegionTable list = goToList();
-            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains("Folder"));
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
             final CustomizeView customizeView = list.openCustomizeGrid();
-            customizeView.addColumn("CONTAINER");
+            customizeView.addColumn(COLUMN_NAME);
             final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
             assertFalse("Share view checkbox should be disabled for Reader", saveWindow.shareCheckbox.isEnabled());
             saveWindow.save();
-            assertTrue("Failed to add Folder column", list.getColumnLabels().contains("Folder"));
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
         }
         stopImpersonating();
 
         final DataRegionTable list = goToList();
-        assertFalse("Reader's customized view shouldn't be visible to other users", list.getColumnLabels().contains("Folder"));
+        assertFalse("Reader's customized view shouldn't be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
     }
 
     @Test
-    public void testEditorCustomGrid() throws Exception
+    public void testEditorDefaultCustomGrid() throws Exception
     {
         impersonate(EDITOR);
         {
             DataRegionTable list = goToList();
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
             final CustomizeView customizeView = list.openCustomizeGrid();
-            customizeView.addColumn("CONTAINER");
+            customizeView.addColumn(COLUMN_NAME);
             final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
             assertTrue("Share view checkbox should be enabled for Editor", saveWindow.shareCheckbox.isEnabled());
             saveWindow.shareCheckbox.check();
             saveWindow.save();
-            assertTrue("Failed to add Folder column", list.getColumnLabels().contains("Folder"));
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
         }
         stopImpersonating();
 
         final DataRegionTable list = goToList();
-        assertTrue("View Editor's shared view should be visible to other users", list.getColumnLabels().contains("Folder"));
+        assertTrue("View Editor's shared view should be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
     }
 
     @Test
-    public void testViewEditorCustomGrid() throws Exception
+    public void testViewEditorDefaultCustomGrid() throws Exception
     {
         impersonate(VIEW_EDITOR);
         {
             DataRegionTable list = goToList();
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
             final CustomizeView customizeView = list.openCustomizeGrid();
-            customizeView.addColumn("CONTAINER");
+            customizeView.addColumn(COLUMN_NAME);
             final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
             assertTrue("Share view checkbox should be enabled for View Editor", saveWindow.shareCheckbox.isEnabled());
             saveWindow.shareCheckbox.check();
             saveWindow.save();
-            assertTrue("Failed to add Folder column", list.getColumnLabels().contains("Folder"));
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
+            pushLocation();
         }
         stopImpersonating();
 
         final DataRegionTable list = goToList();
-        assertTrue("View Editor's customized view should be visible to other users", list.getColumnLabels().contains("Folder"));
+        assertTrue("View Editor's customized view should be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
+    }
+
+    @Test
+    public void testReaderNamedCustomGrid() throws Exception
+    {
+        impersonate(READER);
+        {
+            DataRegionTable list = goToList();
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
+            final CustomizeView customizeView = list.openCustomizeGrid();
+            customizeView.addColumn(COLUMN_NAME);
+            final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
+            assertFalse("Share view checkbox should be disabled for Reader", saveWindow.shareCheckbox.isEnabled());
+            saveWindow.setName(VIEW_NAME);
+            saveWindow.save();
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
+            pushLocation();
+        }
+        stopImpersonating();
+
+        popLocation();
+        final DataRegionTable list = new DataRegionTable("query", this);
+        assertFalse("Reader's customized view shouldn't be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
+    }
+
+    @Test
+    public void testEditorNamedCustomGrid() throws Exception
+    {
+        impersonate(EDITOR);
+        {
+            DataRegionTable list = goToList();
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
+            final CustomizeView customizeView = list.openCustomizeGrid();
+            customizeView.addColumn(COLUMN_NAME);
+            final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
+            assertTrue("Share view checkbox should be enabled for Editor", saveWindow.shareCheckbox.isEnabled());
+            saveWindow.shareCheckbox.check();
+            saveWindow.setName(VIEW_NAME);
+            saveWindow.save();
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
+            pushLocation();
+        }
+        stopImpersonating();
+
+        popLocation();
+        final DataRegionTable list = new DataRegionTable("query", this);
+        assertTrue("View Editor's shared view should be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
+    }
+
+    @Test
+    public void testViewEditorNamedCustomGrid() throws Exception
+    {
+        impersonate(VIEW_EDITOR);
+        {
+            DataRegionTable list = goToList();
+            assertFalse("Folder columns shouldn't be visible before test", list.getColumnLabels().contains(COLUMN_LABEL));
+            final CustomizeView customizeView = list.openCustomizeGrid();
+            customizeView.addColumn(COLUMN_NAME);
+            final CustomizeView.SaveWindow saveWindow = customizeView.clickSave();
+            assertTrue("Share view checkbox should be enabled for View Editor", saveWindow.shareCheckbox.isEnabled());
+            saveWindow.shareCheckbox.check();
+            saveWindow.setName(VIEW_NAME);
+            saveWindow.save();
+            assertTrue("Failed to add Folder column", list.getColumnLabels().contains(COLUMN_LABEL));
+            pushLocation();
+        }
+        stopImpersonating();
+
+        popLocation();
+        final DataRegionTable list = new DataRegionTable("query", this);
+        assertTrue("View Editor's customized view should be visible to other users", list.getColumnLabels().contains(COLUMN_LABEL));
     }
 
     @Override
