@@ -24,6 +24,7 @@ import org.labkey.api.util.FileUtil;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
+import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -613,9 +614,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         clickAdminMenuItem("Manage Assays");
     }
-    public void goToManageLists()
+
+    public BeginPage goToManageLists()
     {
         clickAdminMenuItem("Manage Lists");
+        return new BeginPage(getDriver());
     }
 
     public void goToCreateProject()

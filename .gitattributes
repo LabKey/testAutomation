@@ -484,6 +484,7 @@ src/org/labkey/test/components/html/TextSelect.java -text
 src/org/labkey/test/components/labkey/FormItemFinder.java -text
 src/org/labkey/test/components/labkey/GenericFormItem.java -text
 src/org/labkey/test/components/labkey/ReadOnlyFormItem.java -text
+src/org/labkey/test/components/list/ManageListsGrid.java -text
 src/org/labkey/test/components/search/SearchBodyWebPart.java -text
 src/org/labkey/test/components/search/SearchForm.java -text
 src/org/labkey/test/components/search/SearchSideWebPart.java -text
@@ -557,6 +558,9 @@ src/org/labkey/test/pages/issues/ListPage.java -text
 src/org/labkey/test/pages/issues/ReopenPage.java -text
 src/org/labkey/test/pages/issues/ResolvePage.java -text
 src/org/labkey/test/pages/issues/UpdatePage.java -text
+src/org/labkey/test/pages/list/BeginPage.java -text
+src/org/labkey/test/pages/list/GridPage.java -text
+src/org/labkey/test/pages/list/ImportListArchivePage.java -text
 src/org/labkey/test/pages/list/SetDefaultValuesListPage.java -text
 src/org/labkey/test/pages/query/ExecuteQueryParameterized.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
