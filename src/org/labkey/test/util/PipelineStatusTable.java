@@ -32,15 +32,6 @@ public class PipelineStatusTable extends DataRegionTable
         _mapDescriptionStatus = new LinkedHashMap<>();
     }
 
-    /**
-     * @deprecated No longer need to specify caching. Retain for 16.2.3 feature branches
-     */
-    @Deprecated
-    public PipelineStatusTable(BaseWebDriverTest test, boolean cache)
-    {
-        this(test);
-    }
-
     @Override
     protected void clearCache()
     {
