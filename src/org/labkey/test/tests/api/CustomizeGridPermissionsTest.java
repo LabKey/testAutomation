@@ -5,10 +5,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.list.ManageListsGrid;
@@ -19,7 +17,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,8 +36,6 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     private static final String VIEW_NAME = "My View";
     private static final String COLUMN_NAME = "Container";
     private static final String COLUMN_LABEL = "Folder";
-
-    private static String listId;
 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -90,22 +85,11 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
                 clickImportArchive().
                 setZipFile(LIST_ARCHIVE).
                 clickImport();
-        String href = Locator.linkWithText(LIST_NAME).findElement(getDriver()).getAttribute("href");
-        listId = WebTestHelper.parseUrlQuery(new URL(href)).get("listId");
     }
 
     private DataRegionTable goToList()
     {
-        if (listId != null)
-        {
-            return GridPage.beginAt(this, getProjectName(), listId).getGrid();
-        }
-        else
-        {
-            BeginPage.beginAt(this, getProjectName());
-            clickAndWait(Locator.linkWithText(LIST_NAME));
-            return new DataRegionTable("query", this);
-        }
+        return GridPage.beginAt(this, getProjectName(), LIST_NAME).getGrid();
     }
 
     @Test
@@ -257,6 +241,6 @@ public class CustomizeGridPermissionsTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("list", "api");
     }
 }

@@ -14,14 +14,25 @@ public class GridPage extends LabKeyPage<GridPage.ElementCache>
         super(driver);
     }
 
-    public static GridPage beginAt(WebDriverWrapper driver, String listId)
+    public static GridPage beginAt(WebDriverWrapper driver, int listId)
     {
         return beginAt(driver, driver.getCurrentContainerPath(), listId);
     }
 
-    public static GridPage beginAt(WebDriverWrapper driver, String containerPath, String listId)
+    public static GridPage beginAt(WebDriverWrapper driver, String containerPath, int listId)
     {
-        driver.beginAt(WebTestHelper.buildURL("list", containerPath, "grid",  Maps.of("listId", listId)));
+        driver.beginAt(WebTestHelper.buildURL("list", containerPath, "grid",  Maps.of("listId", String.valueOf(listId))));
+        return new GridPage(driver.getDriver());
+    }
+
+    public static GridPage beginAt(WebDriverWrapper driver, String name)
+    {
+        return beginAt(driver, driver.getCurrentContainerPath(), name);
+    }
+
+    public static GridPage beginAt(WebDriverWrapper driver, String containerPath, String name)
+    {
+        driver.beginAt(WebTestHelper.buildURL("list", containerPath, "grid",  Maps.of("name", name)));
         return new GridPage(driver.getDriver());
     }
 
