@@ -230,6 +230,7 @@ public class CustomizeView extends Component
 
         public void setName(String name)
         {
+            namedViewRadio.check();
             getWrapper().setFormElement(viewNameInput, name);
         }
 
