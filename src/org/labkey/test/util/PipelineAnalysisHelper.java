@@ -202,6 +202,8 @@ public class PipelineAnalysisHelper
         if (!Locator.tag("option").withText(protocolName).findElements(_test.getDriver()).isEmpty())
         {
             protocolSelect.selectByVisibleText(protocolName);
+            if (null != protocolDef)
+                verifySavedProtocolDef(protocolDef, _test._extHelper.getCodeMirrorValue("xmlParameters"));
         }
         else
         {
@@ -210,5 +212,21 @@ public class PipelineAnalysisHelper
             if (null != protocolDef)
                 _test._extHelper.setCodeMirrorValue("xmlParameters", protocolDef);
         }
+    }
+
+    private void verifySavedProtocolDef(String expected, String actual)
+    {
+        String expectedStr = getConcatStrFromXML(expected);
+        String actualStr = getConcatStrFromXML(actual);
+        assertEquals("Protocol XML definition not as expected", expectedStr, actualStr);
+    }
+
+    private String getConcatStrFromXML(String xml)
+    {
+        String concatStr = "";
+        String xmlStr = xml.replace(" standalone=\"no\"", "");
+        for (String line : xmlStr.split("[\n\r]"))
+            concatStr += line.trim();
+        return concatStr;
     }
 }
