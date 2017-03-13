@@ -13,6 +13,7 @@
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommand"/>
@@ -28,6 +29,7 @@
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy2NlpEngineCommand"/>
@@ -43,6 +45,7 @@
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy3NlpEngineCommand"/>
@@ -58,6 +61,7 @@
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy2aNlpEngineCommand"/>
