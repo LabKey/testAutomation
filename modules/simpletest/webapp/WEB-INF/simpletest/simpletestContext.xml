@@ -9,7 +9,7 @@
                     <constructor-arg value="dummyNlpPipeline"/>
                     <property name="description" value="Dummy NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
-                    <property name="protocolName" value="I like Pink"/>
+                    <property name="protocolName" value="Dummy NLP invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
