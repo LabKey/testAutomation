@@ -110,7 +110,7 @@
             <![CDATA[
                 DisplayFld TextFld IntFld DoubleFld DateTimeFld
                 Row 2 Empty Vals
-                Inserted from R how its done 98 12.345 2010-03-01
+                Inserted from R how its done 98 12.345 2010/03/01
                 The quick brown fox jumped over the fence.
                 AttachmentFld RequiredText RequiredInt Category
                 lots of words for empty 456 EMPTY
