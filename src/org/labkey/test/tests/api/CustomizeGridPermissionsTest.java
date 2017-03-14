@@ -27,9 +27,9 @@ import static org.labkey.test.util.PermissionsHelper.MemberType;
 @Category({DailyC.class})
 public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 {
-    private static final String READER = "reader@gridpermissions.test";
-    private static final String EDITOR = "editor@gridpermissions.test";
-    private static final String VIEW_EDITOR = "view_editor@gridpermissions.test";
+    private static final String READER = "gp_reader@gridpermissions.test";
+    private static final String EDITOR = "gp_editor@gridpermissions.test";
+    private static final String VIEW_EDITOR = "gp_view_editor@gridpermissions.test";
     private static final File LIST_ARCHIVE = TestFileUtils.getSampleData("lists/ListDemo.lists.zip");
     private static final String LIST_NAME = "NIMHDemographics";
 
