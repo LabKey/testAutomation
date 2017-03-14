@@ -673,6 +673,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _testFailed = true;
         _anyTestFailed = true;
 
+        error.printStackTrace();
+
         if (error instanceof TestTimedOutException ||
                 error instanceof InterruptedException ||
                 error.getCause() != null && error.getCause() instanceof InterruptedException)
