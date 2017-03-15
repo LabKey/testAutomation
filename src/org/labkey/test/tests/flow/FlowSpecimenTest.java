@@ -23,6 +23,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PipelineStatusTable;
 
 import static org.junit.Assert.*;
 
@@ -71,6 +72,8 @@ public class FlowSpecimenTest extends BaseFlowTest
     @Test
     public void _doTestSteps()
     {
+        importFCS31File();
+
         importFCSFiles();
 
         verifyFCSFileSpecimenFK();
@@ -109,6 +112,35 @@ public class FlowSpecimenTest extends BaseFlowTest
         setProtocolMetadata("Keyword $SRC", null, null, null, false);
     }
 
+    @LogMethod
+   protected void importFCS31File()
+    {
+        log("** Import microFCS directory, set TargetStudy");
+        goToFlowDashboard();
+        clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
+        _fileBrowserHelper.selectFileBrowserItem("version");
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
+        clickButton("Import Selected Runs");
+        goToModule("Pipeline");
+        waitForRunningPipelineJobs(10000);
+        verifyUploadReport(
+                "Reading keywords from file Fake_2_0.fcs",
+                "Reading keywords from file Fake_3_0.fcs",
+                "Reading keywords from file Fake_3_1.fcs",
+                "The FSC version FCS3.2 is not support for file Fake_3_2.fcs. Supported versions are FCS2.0,FCS3.0,FCS3.1.");
+
+    }
+    @LogMethod
+    private void verifyUploadReport(String... reportText)
+    {
+        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
+        goToFlowDashboard();
+        waitForPipeline("/" + getProjectName() + "/" + getFolderName());
+        clickAndWait(Locator.linkContainingText("Show Jobs"));
+        PipelineStatusTable statusTable = new PipelineStatusTable(this);
+        statusTable.clickStatusLink(0);
+        assertTextPresent(reportText);
+    }
     @LogMethod
     protected void importFlowAnalysis()
     {
