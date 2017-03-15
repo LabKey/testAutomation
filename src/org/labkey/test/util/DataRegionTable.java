@@ -1178,6 +1178,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         clickHeaderMenu("Paging", wait, size + " per page");
     }
 
+    public void setContainerFilter(ContainerFilterType filterType)
+    {
+        clickHeaderMenu("Folder Filter", true, filterType.getLabel());
+    }
+
     /**
      * Set the current offset by manipulating the url rather than using the pagination buttons.
      */
@@ -1518,6 +1523,25 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         public void executeScript(String methodWithArgs)
         {
             doAndWaitForUpdate(() -> super.executeScript(methodWithArgs));
+        }
+    }
+
+    public enum ContainerFilterType
+    {
+        CURRENT_FOLDER("Current folder"),
+        CURRENT_AND_SUBFOLDERS("Current folder and subfolders"),
+        ALL_FOLDERS("All folders");
+
+        private final String _label;
+
+        ContainerFilterType(String label)
+        {
+            _label = label;
+        }
+
+        public String getLabel()
+        {
+            return _label;
         }
     }
 }
