@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class PipelineStatusTable extends DataRegionTable
 {
     private final Map<String, String> _mapDescriptionStatus;
 
-    public PipelineStatusTable(BaseWebDriverTest test)
+    public PipelineStatusTable(WebDriverWrapper test)
     {
         super("StatusFiles", test);
         _mapDescriptionStatus = new LinkedHashMap<>();
@@ -39,12 +39,12 @@ public class PipelineStatusTable extends DataRegionTable
         _mapDescriptionStatus.clear();
     }
 
-    public int getStatusColumn()
+    private int getStatusColumnIndex()
     {
         return getColumnIndex("Status");
     }
 
-    public int getDescriptionColumn()
+    private int getDescriptionColumnIndex()
     {
         return getColumnIndex("Description");
     }
@@ -64,8 +64,8 @@ public class PipelineStatusTable extends DataRegionTable
         if (_mapDescriptionStatus.isEmpty())
         {
             int rows = getDataRowCount();
-            int colStatus = getStatusColumn();
-            int colDescripton = getDescriptionColumn();
+            int colStatus = getStatusColumnIndex();
+            int colDescripton = getDescriptionColumnIndex();
 
             for (int i = 0; i < rows; i++)
             {
@@ -97,7 +97,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public String getJobDescription(int row)
     {
-        return getDataAsText(row, getDescriptionColumn());
+        return getDataAsText(row, getDescriptionColumnIndex());
     }
 
     public void clickStatusLink(String description)
@@ -107,7 +107,7 @@ public class PipelineStatusTable extends DataRegionTable
 
     public void clickStatusLink(int row)
     {
-        _driver.clickAndWait(link(row, getStatusColumn()));
+        _driver.clickAndWait(link(row, getStatusColumnIndex()));
     }
 
     private int getExpectedJobRow(String description)
