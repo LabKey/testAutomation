@@ -151,7 +151,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
         // Only show running jobs (not complete, cancelled, or error)
         beginAt(containerPath + "/pipeline-status-showList.view?StatusFiles.Status~notin=COMPLETE%3BCANCELLED%3BERROR");
-        waitForRunningPipelineJobs(MAX_WAIT_SECONDS);
+        waitForRunningPipelineJobs(MAX_WAIT_SECONDS * 1000);
 
         popLocation(longWaitForPage);
     }

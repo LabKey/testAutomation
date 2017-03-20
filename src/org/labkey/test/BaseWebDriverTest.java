@@ -90,6 +90,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1419,7 +1420,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
     public List<String> getPipelineStatusValues()
     {
-        DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
+        PipelineStatusTable status = new PipelineStatusTable(this);
         return status.getColumnDataAsText("Status");
     }
 
@@ -1476,7 +1477,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         for (String statusValue : statusValues)
         {
-            if ("COMPLETE".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
+            if ("COMPLETE".equals(statusValue))
                 complete++;
         }
 
@@ -1486,11 +1487,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // Returns count of "COMPLETE" and "ERROR"
     public int getFinishedCount(List<String> statusValues)
     {
-        int finished = 0;
-        for (String statusValue : statusValues)
-            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
-                finished++;
-        return finished;
+        List<String> finishedStates = Arrays.asList("COMPLETE", "ERROR", "CANCELLED");
+        return statusValues.stream().filter(finishedStates::contains).collect(Collectors.toList()).size();
     }
 
     /**
@@ -1661,11 +1659,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     protected void startTimer()
     {
         start = System.currentTimeMillis();
-    }
-
-    protected long elapsedSeconds()
-    {
-        return (System.currentTimeMillis() - start) / 1000;
     }
 
     protected long elapsedMilliseconds()
@@ -2183,39 +2176,28 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-
     public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError)
     {
         waitForPipelineJobsToComplete(completeJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
     }
 
-    // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     @LogMethod
     public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError, int wait)
     {
-        log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
+        final List<String> statusValues = waitForRunningPipelineJobs(wait);
 
-        log(">> Waiting for " + description);
-        TestLogger.increaseIndent();
-        waitFor(() -> {
-                    List<String> statusValues = getPipelineStatusValues();
-                    log("[" + StringUtils.join(statusValues,",") + "]");
-                    if (!expectError)
-                    {
-                        assertElementNotPresent(Locator.linkWithText("ERROR"));
-                    }
-                    if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
-                    {
-                        refresh();
-                        return false;
-                    }
-                    return true;
-                },
-                "Pipeline jobs did not complete.", wait);
+        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getFinishedCount(statusValues));
+        if (expectError)
+            assertTrue("Did not find expected error.", statusValues.contains("ERROR"));
+        else
+            assertFalse("Found unexpected error.", statusValues.contains("ERROR"));
 
-        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
-        TestLogger.decreaseIndent();
-        log("<< " + description + " complete");
+        DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
+        final List<String> actualDescriptions = status.getColumnDataAsText("Description");
+        if (!actualDescriptions.contains(description))
+        {
+            log("WARNING: Did not find a job with expected description: " + description); // TODO: change to fail state?
+        }
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
@@ -2223,34 +2205,38 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
-        List<String> statusValues = getPipelineStatusValues();
-        startTimer();
-        while (getFinishedCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
-        {
-            sleep(1000);
-            refresh();
-            statusValues = getPipelineStatusValues();
-        }
+        List<String> statusValues = waitForRunningPipelineJobs(MAX_WAIT_SECONDS * 1000);
         assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     @LogMethod
-    public void waitForRunningPipelineJobs(int wait)
+    public List<String> waitForRunningPipelineJobs(int timeoutMilliseconds)
     {
-        log("Waiting for running pipeline jobs list to be empty.");
         List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (statusValues.size() > 0 && elapsedSeconds() < wait)
+        while (statusValues.size() > getFinishedCount(statusValues) && elapsedMilliseconds() < timeoutMilliseconds)
         {
             log("[" + StringUtils.join(statusValues,",") + "]");
-            log("Waiting for " + statusValues.size() + " jobs to complete...");
+            log("Waiting for " + (statusValues.size() - getFinishedCount(statusValues)) + " job(s) to complete...");
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
-            statusValues.removeAll(Arrays.asList("COMPLETE", "ERROR"));
         }
 
-        assertTrue("Running pipeline jobs were found.  Timeout:" + wait, statusValues.size() == 0);
+        boolean waitingJobs = statusValues.stream().anyMatch(status -> status.contains("WAIT"));
+        if (waitingJobs)
+        {
+            log("WARNING: Pipeline appears stalled. Showing all unfinished jobs.");
+            PipelineStatusTable pipelineStatusTable = new PipelineStatusTable(this);
+            pipelineStatusTable.setContainerFilter(DataRegionTable.ContainerFilterType.ALL_FOLDERS);
+            addUrlParameter(pipelineStatusTable.getTableName() + ".Status~notin=COMPLETE;CANCELLED;ERROR&" +
+                    pipelineStatusTable.getTableName() + ".Status~doesnotcontain=WAIT");
+            final List<String> descriptions = pipelineStatusTable.getColumnDataAsText("Description");
+            fail("Timed out waiting for pipeline job to start. Waiting on " + (descriptions.isEmpty() ? "<unknown>" : descriptions));
+        }
+        assertTrue("Running pipeline jobs were found.  Timeout:" + timeoutMilliseconds + "sec", statusValues.size() == getFinishedCount(statusValues));
+
+        return statusValues;
     }
 
     @LogMethod
