@@ -25,7 +25,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineStatusTable;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This test checks the flow specimen foreign key behavior from flow.FCSFiles and flow.FCSAnalyses.
@@ -121,8 +122,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         _fileBrowserHelper.selectFileBrowserItem("version");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         clickButton("Import Selected Runs");
-        goToModule("Pipeline");
-        waitForRunningPipelineJobs(10000);
+        waitForPipeline(getContainerPath());
         verifyUploadReport(
                 "Reading keywords from file Fake_2_0.fcs",
                 "Reading keywords from file Fake_3_0.fcs",
