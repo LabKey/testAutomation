@@ -1180,7 +1180,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void setContainerFilter(ContainerFilterType filterType)
     {
-        clickHeaderMenu("Folder Filter", true, filterType.getLabel());
+        clickHeaderMenu("Grid Views", true, "Folder Filter", filterType.getLabel());
     }
 
     /**
