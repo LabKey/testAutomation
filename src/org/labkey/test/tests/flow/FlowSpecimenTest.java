@@ -95,7 +95,7 @@ public class FlowSpecimenTest extends BaseFlowTest
     {
         log("** Import microFCS directory, set TargetStudy");
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
+        clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
         _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
@@ -114,9 +114,9 @@ public class FlowSpecimenTest extends BaseFlowTest
     }
 
     @LogMethod
-   protected void importFCS31File()
+    protected void importFCS31File()
     {
-        log("** Import microFCS directory, set TargetStudy");
+        log("** Import FCS files of supported, and not, versions");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
         _fileBrowserHelper.selectFileBrowserItem("version");
@@ -127,9 +127,10 @@ public class FlowSpecimenTest extends BaseFlowTest
                 "Reading keywords from file Fake_2_0.fcs",
                 "Reading keywords from file Fake_3_0.fcs",
                 "Reading keywords from file Fake_3_1.fcs",
-                "The FSC version FCS3.2 is not support for file Fake_3_2.fcs. Supported versions are FCS2.0,FCS3.0,FCS3.1.");
+                "The FCS version FCS3.2 is not supported for file Fake_3_2.fcs. Supported versions are FCS2.0,FCS3.0,FCS3.1.");
 
     }
+
     @LogMethod
     private void verifyUploadReport(String... reportText)
     {
