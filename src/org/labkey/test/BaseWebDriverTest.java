@@ -1654,18 +1654,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("user " + email + " exists.");
     }
 
-    private long start = 0;
-
-    protected void startTimer()
-    {
-        start = System.currentTimeMillis();
-    }
-
-    protected long elapsedMilliseconds()
-    {
-        return System.currentTimeMillis() - start;
-    }
-
     /**
      * Used by CohortTest and StudyCohortExportTest
      * Returns the data region for the the cohort table to enable setting
@@ -2176,17 +2164,17 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError)
+    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError)
     {
-        waitForPipelineJobsToComplete(completeJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
+        waitForPipelineJobsToComplete(finishedJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
     }
 
     @LogMethod
-    public void waitForPipelineJobsToComplete(@LoggedParam final int completeJobsExpected, @LoggedParam final String description, final boolean expectError, int wait)
+    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, int timeoutMilliseconds)
     {
-        final List<String> statusValues = waitForRunningPipelineJobs(wait);
+        final List<String> statusValues = waitForRunningPipelineJobs(timeoutMilliseconds);
 
-        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getFinishedCount(statusValues));
+        assertEquals("Did not find correct number of completed pipeline jobs.", finishedJobsExpected, getFinishedCount(statusValues));
         if (expectError)
             assertTrue("Did not find expected error.", statusValues.contains("ERROR"));
         else
@@ -2202,19 +2190,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
     @LogMethod
-    public void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
+    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         List<String> statusValues = waitForRunningPipelineJobs(MAX_WAIT_SECONDS * 1000);
         assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
+        return statusValues;
     }
 
     @LogMethod
     public List<String> waitForRunningPipelineJobs(int timeoutMilliseconds)
     {
         List<String> statusValues = getPipelineStatusValues();
-        startTimer();
-        while (statusValues.size() > getFinishedCount(statusValues) && elapsedMilliseconds() < timeoutMilliseconds)
+        long start = System.currentTimeMillis();
+        while (statusValues.size() > getFinishedCount(statusValues) && System.currentTimeMillis() - start < timeoutMilliseconds)
         {
             log("[" + StringUtils.join(statusValues,",") + "]");
             log("Waiting for " + (statusValues.size() - getFinishedCount(statusValues)) + " job(s) to complete...");
