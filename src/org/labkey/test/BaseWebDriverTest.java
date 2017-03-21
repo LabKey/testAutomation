@@ -2164,7 +2164,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }
     }
 
-    public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError)
+    public void waitForPipelineJobsToComplete(final int finishedJobsExpected, final String description, final boolean expectError)
     {
         waitForPipelineJobsToComplete(finishedJobsExpected, description, expectError, MAX_WAIT_SECONDS * 1000);
     }
@@ -2172,34 +2172,48 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     public void waitForPipelineJobsToComplete(@LoggedParam final int finishedJobsExpected, @LoggedParam final String description, final boolean expectError, int timeoutMilliseconds)
     {
-        final List<String> statusValues = waitForRunningPipelineJobs(timeoutMilliseconds);
+        final List<String> statusValues = waitForPipelineJobsToFinish(finishedJobsExpected, Duration.ofMillis(timeoutMilliseconds));
 
-        assertEquals("Did not find correct number of completed pipeline jobs.", finishedJobsExpected, getFinishedCount(statusValues));
         if (expectError)
             assertTrue("Did not find expected error.", statusValues.contains("ERROR"));
         else
             assertFalse("Found unexpected error.", statusValues.contains("ERROR"));
 
-        DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
-        final List<String> actualDescriptions = status.getColumnDataAsText("Description");
-        if (!actualDescriptions.contains(description))
+        if (description != null)
         {
-            log("WARNING: Did not find a job with expected description: " + description); // TODO: change to fail state?
+            DataRegionTable status = new DataRegionTable("StatusFiles", getDriver());
+            final List<String> actualDescriptions = status.getColumnDataAsText("Description");
+            if (actualDescriptions.parallelStream().noneMatch(desc -> desc.contains(description)))
+            {
+                log("WARNING: Did not find a job with expected description: " + description); // TODO: change to fail state?
+            }
         }
+    }
+
+    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
+    {
+        return waitForPipelineJobsToFinish(jobsExpected, Duration.ofSeconds(MAX_WAIT_SECONDS));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
     @LogMethod
-    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
+    public List<String> waitForPipelineJobsToFinish(@LoggedParam int jobsExpected, @LoggedParam Duration timeout)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
-        List<String> statusValues = waitForRunningPipelineJobs(MAX_WAIT_SECONDS * 1000);
+        Timer timer = new Timer(timeout);
+        List<String> statusValues = waitForRunningPipelineJobs(timeout.toMillis());
+        while (statusValues.size() < jobsExpected && !timer.isTimedOut())
+        {
+            sleep(1000);
+            refresh();
+            statusValues = waitForRunningPipelineJobs(timer.timeRemaining().toMillis());
+        }
         assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
         return statusValues;
     }
 
     @LogMethod
-    public List<String> waitForRunningPipelineJobs(int timeoutMilliseconds)
+    public List<String> waitForRunningPipelineJobs(long timeoutMilliseconds)
     {
         List<String> statusValues = getPipelineStatusValues();
         long start = System.currentTimeMillis();
