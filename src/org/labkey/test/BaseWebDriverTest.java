@@ -1338,25 +1338,41 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return clickAndWaitForDownload(Locator.extButton("Export"));
     }
 
-    public void setModuleProperties(List<ModulePropertyValue> values)
+    private void goToModuleProperties()
     {
         goToFolderManagement();
-        log("setting module properties");
         clickAndWait(Locator.linkWithText("Module Properties"));
-        waitForText("Save Changes");
-        waitForText("Property:");  //proxy for the panel actually loading
+        waitForElement(Ext4Helper.Locators.ext4Button("Save Changes"));
+    }
+
+    private Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("moduleName", property.getModuleName());
+        map.put("containerPath", property.getContainerPath());
+        map.put("propName", property.getPropertyName());
+        waitForText(property.getPropertyName()); //wait for the property name to appear
+        String query = ComponentQuery.fromAttributes("field", map);
+        return _ext4Helper.queryOne(query, Ext4FieldRef.class);
+    }
+
+    public String getModulePropertyValue(ModulePropertyValue property)
+    {
+        goToModuleProperties();
+        Ext4FieldRef ref = getModulePropertyFieldRef(property);
+        return (String)ref.getValue();
+    }
+
+    public void setModuleProperties(List<ModulePropertyValue> values)
+    {
+        log("setting module properties");
+        goToModuleProperties();
 
         boolean changed = false;
         for (ModulePropertyValue value : values)
         {
             log("setting property: " + value.getPropertyName() + " for container: " + value.getContainerPath() + " to value: " + value.getValue());
-            Map<String, String> map = new HashMap<>();
-            map.put("moduleName", value.getModuleName());
-            map.put("containerPath", value.getContainerPath());
-            map.put("propName", value.getPropertyName());
-            waitForText(value.getPropertyName()); //wait for the property name to appear
-            String query = ComponentQuery.fromAttributes("field", map);
-            Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
+            Ext4FieldRef ref = getModulePropertyFieldRef(value);
             String val = (String)ref.getValue();
             if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
             {

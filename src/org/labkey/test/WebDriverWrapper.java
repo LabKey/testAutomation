@@ -2784,7 +2784,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public String getLinkHref(String linkText, String controller, String folderPath)
     {
         Locator link = Locator.linkWithText(linkText);
-        String localAddress = getButtonHref(link);
+        String localAddress = getButtonHref(link, true);
         // IE puts the entire link in href, not just the local address
         if (localAddress.contains("/"))
         {
@@ -2796,11 +2796,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
 
-    public String getButtonHref(Locator buttonLoc)
+    public String getButtonHref(Locator buttonLoc, boolean truncate)
     {
         String address = getAttribute(buttonLoc, "href");
         // IE puts the entire link in href, not just the local address
-        if (address.contains("/"))
+        if (truncate && address.contains("/"))
         {
             int location = address.lastIndexOf("/");
             if (location < address.length() - 1)
