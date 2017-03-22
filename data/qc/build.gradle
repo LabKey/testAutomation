@@ -23,9 +23,8 @@ project.task('validatorJar',
         {
           from sourceSets.main.output
           from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          baseName "validator"
-          version project.version
-          destinationDir = new File(project.buildDir, "libs")
+          archiveName "validator.jar"
+          destinationDir = project.projectDir
           manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
                     'Implementation-Version': project.version,
@@ -42,9 +41,8 @@ project.task('transformJar',
         {
           from sourceSets.main.output
           from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          baseName "transform"
-          version project.version
-          destinationDir = new File(project.buildDir, "libs")
+          archiveName "transform.jar"
+          destinationDir = project.projectDir
           manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
                     'Implementation-Version': project.version,
@@ -61,9 +59,8 @@ project.task('transformWarningJar',
         {
           from sourceSets.main.output
           from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-          baseName "transformWarning"
-          version project.version
-          destinationDir = new File(project.buildDir, "libs")
+          archiveName "transformWarning.jar"
+          destinationDir = project.projectDir
           manifest {
             attributes 'Implementation-Title': 'Assay Validator Jar',
                     'Implementation-Version': project.version,
