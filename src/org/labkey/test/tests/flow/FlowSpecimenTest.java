@@ -127,7 +127,7 @@ public class FlowSpecimenTest extends BaseFlowTest
                 "Reading keywords from file Fake_2_0.fcs",
                 "Reading keywords from file Fake_3_0.fcs",
                 "Reading keywords from file Fake_3_1.fcs",
-                "The FCS version FCS3.2 is not supported for file Fake_3_2.fcs. Supported versions are FCS2.0,FCS3.0,FCS3.1.");
+                "WARN : The FCS version FCS3.2 is not supported for file Fake_3_2.fcs. Supported versions are FCS2.0,FCS3.0,FCS3.1.");
 
     }
 
