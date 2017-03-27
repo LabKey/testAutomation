@@ -102,7 +102,7 @@ public class ETLTaskRefTaskTest extends ETLAbstractTest
         assertElementPresent(_etlHelper.findLastStatusCell(TRANSFORM_SLEEP, "RUNNING", true));
         // lastly, wait for the queued job to finish running
         clickTab("Pipeline");
-        waitForRunningPipelineJobs(21000);
+        waitForRunningPipelineJobs(30000);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ETLTaskRefTaskTest extends ETLAbstractTest
     {
         tryDoubleQueueing(TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE, TRANSFORM_SLEEP_ALLOW_MULTIPLE_QUEUE_NAME, true);
         clickTab("Pipeline");
-        waitForRunningPipelineJobs(45000);
+        waitForRunningPipelineJobs(120000);
     }
 
     private void tryDoubleQueueing(String etl, String etlName, boolean shouldDoubleQueue) throws Exception
