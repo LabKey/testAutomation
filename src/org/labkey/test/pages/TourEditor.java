@@ -29,6 +29,7 @@ public class TourEditor extends LabKeyPage
     public void save()
     {
         click(Locators.saveButton);
+        waitForElement(Locator.id("status").withText("Saved."), 1000, false);
     }
 
     public void saveAndClose()
