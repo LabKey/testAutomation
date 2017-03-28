@@ -161,6 +161,16 @@ public class ListHelper extends LabKeySiteWrapper
                 case "file":
                     setFormElement(field, new File(data.get(key)));
                     break;
+                case "checkbox":
+                    if(data.get(key).toLowerCase().equals("true"))
+                    {
+                        setCheckbox(field, true);
+                    }
+                    else
+                    {
+                        setCheckbox(field, false);
+                    }
+                    break;
                 default:
                     setFormElement(field, data.get(key));
             }
