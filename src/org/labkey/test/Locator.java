@@ -352,7 +352,7 @@ public abstract class Locator
             @Override
             public String toString()
             {
-                return "element to disappear";
+                return "element to disappear: " + getLoggableDescription();
             }
         });
     }
