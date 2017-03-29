@@ -1918,7 +1918,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
             mouseOut(); // Dismiss tooltip
-            waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-tip')").notHidden());
+            waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden());
         }
     }
 
@@ -1927,7 +1927,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         mouseOut(); // Dismiss tooltip, in case it is covering the element we want to click on
-        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-tip')").notHidden());
+        waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden());
         Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName).notHidden();
         waitAndClick(loc);
         // NOTE: consider abstracting this.
