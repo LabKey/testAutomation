@@ -29,6 +29,12 @@
         <nullable>true</nullable>
         <datatype>varchar</datatype>
       </column>
+      <column columnName="TriggerScriptProperty">
+        <isUserEditable>true</isUserEditable>
+        <nullable>false</nullable>
+        <datatype>varchar</datatype>
+        <isHidden>true</isHidden>
+      </column>
     </columns>
   </table>
 

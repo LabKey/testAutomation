@@ -72,6 +72,9 @@ function beforeInsert(row, errors) {
     // Values can be transformed during insert and update
     row.Name = row.Name + "!";
     rows.push(row);
+
+    // this is a field set to userEditable=false, but has a value provided by the trigger script
+    row.TriggerScriptProperty = 'set';
 }
 
 function afterInsert(row, errors) {
