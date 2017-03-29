@@ -1917,6 +1917,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (StaleElementReferenceException ignore) {}
             doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
+            mouseOut(); // Dismiss tooltip
+            waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-tip')").notHidden());
         }
     }
 
@@ -1925,7 +1927,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         mouseOut(); // Dismiss tooltip, in case it is covering the element we want to click on
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
+        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-tip')").notHidden());
         Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName).notHidden();
         waitAndClick(loc);
         // NOTE: consider abstracting this.
@@ -1938,8 +1940,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         selectSchema(subfolder);
-        // wait for tool tip to disappear, in case it is covering the element we want to click on
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x4-tip-body')]"));
         Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName);
         waitAndClick(loc);
         // NOTE: consider abstracting this.
