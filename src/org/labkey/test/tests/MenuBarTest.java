@@ -185,14 +185,6 @@ public class MenuBarTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER));
     }
 
-    protected void hoverMenu(String menuText)
-    {
-        Locator menuItem = Locator.css("#menubar .labkey-main-menu-item").withText(menuText);
-        String menuId = menuItem.findElement(getDriver()).getAttribute("id");
-        String hoverNavigationPart = "_" + menuId.split("-Header")[0];
-        executeScript("HoverNavigation.Parts[\"" +hoverNavigationPart + "\"].show();");
-    }
-
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
