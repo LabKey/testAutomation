@@ -3,7 +3,13 @@
     <name>List A to List B</name>
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
-            <source schemaName="lists" queryName="ListA" />
+            <source schemaName="lists" queryName="ListA">
+                <sourceColumns>
+                    <column>xKey</column>
+                    <column>Field1</column>
+                    <column>Field2</column>
+                </sourceColumns>
+            </source>
             <destination schemaName="lists" queryName="ListB" targetOption="merge"/>
         </transform>
     </transforms>
