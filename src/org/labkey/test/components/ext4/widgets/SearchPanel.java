@@ -12,6 +12,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -55,6 +56,11 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
     protected WebDriver getDriver()
     {
         return _driver;
+    }
+
+    public List<String> getAllSearchCriteria()
+    {
+        return getWrapper().getTexts(rowLabelLoc.findElements(this));
     }
 
     public void setView(String view)
@@ -117,6 +123,8 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
         protected final WebElement submitButton = Ext4Helper.Locators.ext4Button("Submit").findWhenNeeded(this);
     }
 
+    private static final Locator.XPathLocator rowLoc = Locator.tagWithClass("div", "search-panel-row");
+    private static final Locator.XPathLocator rowLabelLoc = Locator.tagWithClass("div", "search-panel-row-label");
     protected abstract class SearchPanelRow extends Component
     {
         private final WebElement row;
@@ -125,9 +133,7 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
         protected SearchPanelRow(String rowLabel)
         {
             this.label = rowLabel;
-            row = Locator.tagWithClass("div", "search-panel-row")
-                    .withDescendant(Locator.tagWithClass("div", "search-panel-row-label").withText(rowLabel + ":"))
-                    .findElement(SearchPanel.this);
+            row = rowLoc.withDescendant(rowLabelLoc.withText(rowLabel + ":")).findElement(SearchPanel.this);
         }
 
         @Override
