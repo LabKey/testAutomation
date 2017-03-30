@@ -103,7 +103,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         checkHelpLinks(getProjectName(), true, false);
         checkHelpLinks(getProjectAltertedName(), false, true);
 
-        //change proj 2 to exclude both help and suport
+        //change proj 2 to exclude both help and support
         goToProjectSettings(getProjectAltertedName());
         uncheckCheckbox(Locator.checkboxByName("enableHelpMenu"));
         clickButtonContainingText("Save");
