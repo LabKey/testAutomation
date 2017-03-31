@@ -19,7 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component.SimpleComponentFinder;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -30,12 +32,14 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
 
 public class FileBrowserHelper extends WebDriverWrapper
@@ -282,16 +286,18 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
-        Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
-        long startTime = System.currentTimeMillis();
-        while (!isElementPresent(actionRadioButton) && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
+        SimpleComponentFinder<RadioButton> finder = RadioButton().
+                locatedBy(Locator.tagContainingText("label", actionName).precedingSibling("input[@type='button' and not(@disabled)]"));
+        RadioButton radio;
+        Timer timer = new Timer(Duration.ofMillis(WAIT_FOR_JAVASCRIPT));
+        while (!(radio = finder.find(importWindow)).isEnabled() && !timer.isTimedOut())
         { // Retry until action is present
             importWindow.clickButton("Cancel", true);
             _ext4Helper.waitForMaskToDisappear();
             clickFileBrowserButton(BrowserAction.IMPORT_DATA);
             importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
         }
-        click(actionRadioButton);
+        radio.check();
         clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
     }
 
