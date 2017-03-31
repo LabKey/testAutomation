@@ -25,11 +25,16 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.FolderManagementFolderTree;
+import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebElement;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
@@ -171,7 +176,8 @@ public class FolderTest extends BaseWebDriverTest
         }
     }
 
-    private void verifyFolderContents(String folder, String project)
+    @LogMethod
+    private void verifyFolderContents(@LoggedParam String folder, @LoggedParam String project)
     {
         goToProjectHome(project);
         clickFolder(folder);
@@ -201,32 +207,33 @@ public class FolderTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText("HIV Test Results"));
         waitForText("Contains up to one row of HIV Test Results data for each Participant/Date combination.", "Positive", "Negative");
 
-        goToManageLists();
-        waitAndClick(Locator.tagWithText("span", "Grid Views"));
-        mouseOver(Locator.tagWithText("span", "Folder Filter"));
-        waitAndClick(Locator.tagWithText("span", "Current folder and subfolders"));
-        sleep(500);
-        testLinksWithText("Lab Machines", "Reagents", "Technicians");
+        final BeginPage beginPage = goToManageLists();
+        beginPage.getGrid().setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
+        verifyLinksWithText("Lab Machines", "Reagents", "Technicians");
     }
 
     //Just make sure the list loaded in a DRT without error
-    private void testLinksWithText(String... texts)
+    @LogMethod
+    private void verifyLinksWithText(@LoggedParam String... texts)
     {
-        for(String text : texts)
+        Set<String> hrefs = new HashSet<>();
+        for (String text : texts)
         {
             List<WebElement> links = Locator.linkWithText(text).findElements(getDriver());
-            for(int i = 0; i < links.size(); i++)
+            for (WebElement link : links)
             {
-                pushLocation();
-                Locator.linkWithText(text).findElements(getDriver()).get(i).click();
-                waitForElement(Locator.tagWithText("span", "Grid Views"));
-                assertElementPresent(Locator.tagWithText("span", "Reports"));
-                assertElementPresent(Locator.tagWithText("span", "Charts"));
-                assertElementPresent(Locator.tagWithText("span", "Design"));
-                assertElementPresent(Locator.linkWithText("edit"));
-                assertElementPresent(Locator.linkWithText("details"));
-                popLocation();
+                hrefs.add(link.getAttribute("href"));
             }
+        }
+        for (String href : hrefs)
+        {
+            beginAt(href);
+            waitForElement(Locator.tagWithText("span", "Grid Views"));
+            assertElementPresent(Locator.tagWithText("span", "Reports"));
+            assertElementPresent(Locator.tagWithText("span", "Charts"));
+            assertElementPresent(Locator.tagWithText("span", "Design"));
+            assertElementPresent(Locator.linkWithText("edit"));
+            assertElementPresent(Locator.linkWithText("details"));
         }
     }
 
