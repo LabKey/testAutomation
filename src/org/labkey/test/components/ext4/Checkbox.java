@@ -32,6 +32,12 @@ public class Checkbox extends org.labkey.test.components.html.Checkbox
         return new CheckboxFinder();
     }
 
+    @Override
+    public boolean isEnabled()
+    {
+        return getComponentElement().getAttribute("disabled") != null;
+    }
+
     public boolean isChecked()
     {
         assertElementType();
