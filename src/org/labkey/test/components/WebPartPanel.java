@@ -88,7 +88,7 @@ public class WebPartPanel extends WebDriverComponent
 
         protected Locator.XPathLocator titleLocator()
         {
-            return Locator.xpath("tbody/tr/th/span").withClass("labkey-wp-title-text");
+            return Locator.xpath("tbody/tr/th/a/span").withClass("labkey-wp-title-text");
         }
     }
 }
