@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.categories.ETL;
@@ -78,6 +79,13 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         importStudyFromZip(TRANSFORM_REMOTE_STUDY, true /*ignore query validation*/);
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+        deleteRemoteConnection();
+    }
+
     @Before
     public void preTest() throws Exception
     {
@@ -89,7 +97,6 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
     @After
     public void postTest()
     {
-        deleteRemoteConnection();
         if (!_testFailed)
             resetErrors();
     }
