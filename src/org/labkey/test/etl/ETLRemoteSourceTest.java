@@ -130,9 +130,9 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
             _etlHelper.insertDatasetRow(String.valueOf(i), "Subject " + String.valueOf(i));
         }
 
-        //
-        // create our remote connection
-        //
+        _etlHelper.runETL_JobError(TRANSFORM_REMOTE);
+        _etlHelper.checkRun(true /*expect error*/);
+
         createRemoteConnection();
 
         //
