@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -193,9 +194,9 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         clickButton("Manage Assays");
         clickButton("Configure Plate Templates");
         clickAndWait(Locator.linkWithText("new 96 well (8x12) Drug Sensitivity default template"));
-        Locator nameField = Locator.id("templateName");
-        waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
-        setFormElement(nameField, PLATE_TEMPLATE_NAME);  sleep(100);
+        final WebElement nameField = waitForElement(Locator.id("templateName"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(nameField, PLATE_TEMPLATE_NAME);
+        fireEvent(nameField, SeleniumEvent.change);
 
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
@@ -211,9 +212,12 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         checkAllOnPage("Data");
         clickButton("Copy to Study");
 
-        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        clickButton("Next", 60000);
-        clickButton("Copy to Study");
+        WebElement studySelect = Locator.name("targetStudy").findElement(getDriver());
+        selectOptionByText(studySelect, "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+        fireEvent(studySelect, SeleniumEvent.blur);
+        clickButton("Next");
+        new DataRegionTable("Data", this).
+                clickHeaderButtonAndWait("Copy to Study");
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
 
