@@ -470,7 +470,6 @@ public class ETLHelper
     public void runETL(String transformId)
     {
         _runETL(transformId, true, false, false);
-        _jobsComplete++;
     }
 
     public void runETL_JobError(String transformId)
@@ -525,6 +524,7 @@ public class ETLHelper
             {
                 waitForEtl();
             }
+            _jobsComplete++;
         }
         else
         {
