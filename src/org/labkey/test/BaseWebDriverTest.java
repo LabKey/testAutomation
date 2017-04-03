@@ -1371,8 +1371,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         boolean changed = false;
         for (ModulePropertyValue value : values)
         {
-            log("setting property: " + value.getPropertyName() + " for container: " + value.getContainerPath() + " to value: " + value.getValue());
+            String desc = value.getPropertyName() + " for container: " + value.getContainerPath();
             Ext4FieldRef ref = getModulePropertyFieldRef(value);
+            if (ref == null)
+                fail("Module property not found: " + desc);
+            else
+                log("setting property: " + desc + " to value: " + value.getValue());
             String val = (String)ref.getValue();
             if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
             {
