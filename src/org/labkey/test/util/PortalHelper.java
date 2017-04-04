@@ -255,7 +255,7 @@ public class PortalHelper extends WebDriverWrapper
         waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         selectOptionByText(form.append("//select"), webPartName);
-        clickAndWait(form.append(Locator.linkWithText("Add")));
+        clickAndWait(form.append(Locator.lkButton("Add")));
     }
 
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
