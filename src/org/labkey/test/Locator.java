@@ -497,7 +497,7 @@ public abstract class Locator
 
     public static XPathLocator linkContainingText(String text)
     {
-        return tag("a").withAttribute("href").containing(text);
+        return tag("a").containing(text);
     }
 
     public static XPathLocator menuItem(String text)
@@ -1418,7 +1418,7 @@ public abstract class Locator
 
         public LinkLocator(String linkText)
         {
-            super(tag("a").withAttribute("href").withText(linkText).toXpath());
+            super(tag("a").withText(linkText).toXpath());
             _linkText = linkText;
         }
 
