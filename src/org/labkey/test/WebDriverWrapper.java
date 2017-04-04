@@ -1390,7 +1390,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getTextInNonDataRegionTable(String title, int row, int column)
     {
-        return getTableCellText(Locator.xpath("//table/tbody/tr/th/span[text()='" + title + "']/../../../tr/td/table"), row, column);
+        return getTableCellText(Locator.xpath("//table/tbody/tr/th/a/span[text()='" + title + "']/../../../../tr/td/table"), row, column);
     }
 
     public void assertTableRowInNonDataRegionTable(String title, String textToCheck, int row, int column)
