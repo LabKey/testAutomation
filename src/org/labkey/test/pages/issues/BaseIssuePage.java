@@ -123,7 +123,7 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
         protected final Map<String, FormItem> formItems = new CaseInsensitiveHashMap<>();
 
         protected FormItem<String> status = formItemWithLabel("Status");
-        protected FormItem<String> assignedTo = formItemWithLabel("Assigned\u00a0To");
+        protected FormItem<String> assignedTo = formItemWithLabel("Assigned To");
         protected FormItem<String> priority = formItemWithLabel("Pri");
         protected FormItem<String> resolution = formItemWithLabel("Resolution");
         protected FormItem<String> duplicate = formItemWithLabel("Duplicate");
