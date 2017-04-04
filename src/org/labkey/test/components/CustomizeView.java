@@ -983,7 +983,9 @@ public class CustomizeView extends Component
 
         public Window clickEdit()
         {
-            Locator.css("div.labkey-tool-gear").findElement(getComponentElement()).click();
+            WebElement gear = Locator.css("div.labkey-tool-gear").findElement(getComponentElement());
+            _driver.scrollIntoView(gear);
+            gear.click();
             return Window().withTitleContaining("Edit title for").find(_driver.getDriver());
         }
     }
