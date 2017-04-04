@@ -79,13 +79,6 @@ public class ETLRemoteSourceTest extends ETLAbstractTest
         importStudyFromZip(TRANSFORM_REMOTE_STUDY, true /*ignore query validation*/);
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-        deleteRemoteConnection();
-    }
-
     @Before
     public void preTest() throws Exception
     {
