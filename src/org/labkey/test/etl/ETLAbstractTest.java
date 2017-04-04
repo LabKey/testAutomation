@@ -159,6 +159,7 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
         if (null != batchNum && batchNum > 0)
             baseName = baseName + "-" + batchNum;
         File etlFile = new File(dir, baseName + ".testIn.tsv");
+        log("Reading file: " + etlFile.getName());
         String fileContents = TestFileUtils.getFileContents(etlFile);
 
         List<String> rows = Arrays.asList(fileContents.split("[\\n\\r]+"));
