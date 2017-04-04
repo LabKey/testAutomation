@@ -110,9 +110,10 @@ public class WikiTest extends BaseWebDriverTest
 
         DataRegionTable.waitForDataRegion(this, WIKI_PAGE_WEBPART_ID);
         assertTextPresent("common.properties", "Some HTML content");
-        assertElementPresent(Locator.linkContainingText("_Test Wiki"));
+        final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
+        assertElementPresent(wikiTitleLink);
         impersonateRole("Reader");
-        assertElementNotPresent(Locator.linkContainingText("_Test Wiki"));
+        assertElementNotPresent(wikiTitleLink);
         stopImpersonatingRole();
 
         log("test search wiki");
