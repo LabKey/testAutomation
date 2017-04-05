@@ -54,11 +54,6 @@ public class LabKeyPage<EC extends LabKeyPage.ElementCache> extends WebDriverWra
 
     protected void waitForPage() {}
 
-    public static class Locators extends org.labkey.test.Locators // TODO: Stop extending Locators (leaving for feature branches)
-    {
-        public static Locator.XPathLocator bodyPanel = Locator.id("bodypanel");
-    }
-
     protected final void clearCache()
     {
         _elementCache = null;

@@ -17,6 +17,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
