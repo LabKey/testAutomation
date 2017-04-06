@@ -1343,6 +1343,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Module Properties"));
         waitForElement(Ext4Helper.Locators.ext4Button("Save Changes"));
+        waitForElementToDisappear(Locator.tag("div").withText("Loading..."));
     }
 
     private Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)
