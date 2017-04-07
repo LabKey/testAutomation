@@ -568,6 +568,7 @@ src/org/labkey/test/pages/query/ExecuteQueryParameterized.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
 src/org/labkey/test/pages/study/CreateStudyPage.java -text
 src/org/labkey/test/pages/study/ManageParticipantGroupsPage.java -text
+src/org/labkey/test/pages/study/ManageVisitPage.java -text
 src/org/labkey/test/pages/study/OverviewPage.java -text
 src/org/labkey/test/pages/test/TestActions.java -text
 src/org/labkey/test/pages/wiki/EditPage.java -text
