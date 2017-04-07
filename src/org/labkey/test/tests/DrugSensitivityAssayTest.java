@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -214,8 +215,11 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
 
         WebElement studySelect = Locator.name("targetStudy").findElement(getDriver());
         selectOptionByText(studySelect, "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        fireEvent(studySelect, SeleniumEvent.blur);
-        clickButton("Next");
+        try
+        {
+            clickButton("Next", 1000);
+        }
+        catch (TimeoutException ignore) {} // WebDriver getting stuck on this click on TeamCity
         new DataRegionTable("Data", this).
                 clickHeaderButtonAndWait("Copy to Study");
 
