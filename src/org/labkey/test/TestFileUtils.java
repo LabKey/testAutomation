@@ -48,6 +48,7 @@ import static org.junit.Assert.assertNotNull;
 public abstract class TestFileUtils
 {
     private static File _labkeyRoot = null;
+    private static File _buildDir = null;
     public static final File DEFAULT_SAMPLEDATA_DIR = new File(getLabKeyRoot(), "sampledata");
 
     public static String getFileContents(String rootRelativePath)
@@ -114,6 +115,20 @@ public abstract class TestFileUtils
             }
         }
         return _labkeyRoot.toString();
+    }
+
+    public static File getTestBuildDir()
+    {
+        if (_buildDir == null)
+        {
+            _buildDir = new File(getLabKeyRoot(), "build/modules/test"); // Gradle
+            if (!_buildDir.exists())
+            {
+                _buildDir = new File(getLabKeyRoot(), "server/test/build"); // Ant
+            }
+            _buildDir = FileUtil.getAbsoluteCaseSensitiveFile(_buildDir);
+        }
+        return _buildDir;
     }
 
     public static File getDefaultDeployDir()
