@@ -82,6 +82,7 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -190,10 +191,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     prefs.put("profile.content_settings.pattern_pairs.*.multiple-automatic-downloads", 1); // Turns off multiple download warning
                     prefs.put("security.warn_submit_insecure", "false");
                     prefs.put("pdfjs.disabled", true); // Download PDFs
+                    prefs.put("credentials_enable_service", false);
+                    prefs.put("profile.password_manager_enabled", false);
                     options.setExperimentalOption("prefs", prefs);
                     options.addArguments("test-type"); // Suppress '--ignore-certificate-errors' warning
                     options.addArguments("disable-xss-auditor");
                     options.addArguments("ignore-certificate-errors");
+                    options.addArguments("disable-infobars");
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);

@@ -154,6 +154,7 @@ public class ListHelper extends LabKeySiteWrapper
     {
         for(String key : data.keySet())
         {
+            waitForElement(Locator.name("quf_" + key));
             WebElement field = Locator.name("quf_" + key).findElement(getDriver());
             String inputType = field.getAttribute("type");
             switch (inputType)
