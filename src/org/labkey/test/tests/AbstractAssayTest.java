@@ -16,6 +16,8 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
+import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
@@ -23,6 +25,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,14 +62,14 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
      * @param project name of project for which the pipeline should be setup
      */
     @LogMethod
-    protected void setupPipeline(String project)
+    protected void setupPipeline(String project) throws IOException
     {
         log("Setting up data pipeline for project " + project);
         clickProject(project);
         portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = TestFileUtils.getTestTempDir();
-        dir.delete();
+        FileUtils.deleteDirectory(dir);
         dir.mkdirs();
 
         setPipelineRoot(dir.getAbsolutePath());

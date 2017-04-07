@@ -89,7 +89,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     }
 
     @BeforeClass
-    public static void initProject()
+    public static void initProject() throws Exception
     {
         ElispotAssayTest init = (ElispotAssayTest)getCurrentTest();
         init.setupFolder();
@@ -280,7 +280,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    protected void setupFolder()
+    protected void setupFolder() throws Exception
     {
         //revert to the admin user
         ensureSignedInAsPrimaryTestUser();

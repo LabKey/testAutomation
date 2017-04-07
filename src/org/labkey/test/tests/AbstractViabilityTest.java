@@ -107,7 +107,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         waitForText(20000, "Save successful.");
     }
 
-    protected void setupPipeline()
+    protected void setupPipeline() throws Exception
     {
         log("** Setting pipeline root");
         setupPipeline(getProjectName());

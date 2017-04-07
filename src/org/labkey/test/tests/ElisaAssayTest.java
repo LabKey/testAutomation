@@ -59,7 +59,7 @@ public class ElisaAssayTest extends AbstractQCAssayTest
     }
     
     @Test
-    public void runUITests()
+    public void runUITests() throws Exception
     {
         log("Starting ELISA Assay BVT Test");
 

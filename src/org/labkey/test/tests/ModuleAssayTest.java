@@ -199,7 +199,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent(MODULE_NAME);
     }
 
-    protected void setupProject()
+    protected void setupProject() throws Exception
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.enableModule("miniassay");

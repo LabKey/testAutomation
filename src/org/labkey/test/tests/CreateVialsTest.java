@@ -98,7 +98,7 @@ public class CreateVialsTest extends AbstractViabilityTest
     }
 
     @Test
-    public void runUITests()
+    public void runUITests() throws Exception
     {
         // Create study with 'Letvin' module activated
         initializeStudyFolder("Letvin");

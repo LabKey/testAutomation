@@ -51,7 +51,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
     protected final String TEST_ASSAY_DATA_ACQUISITION_FILE3 = TestFileUtils.getLabKeyRoot() + "/sampledata/DrugSensitivity/acquisition3.xlsx";
 
     @Test
-    public void runUITests()
+    public void runUITests() throws Exception
     {
         PortalHelper portalHelper = new PortalHelper(this);
 
