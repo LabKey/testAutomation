@@ -126,7 +126,6 @@ public abstract class TestFileUtils
             {
                 _buildDir = new File(getLabKeyRoot(), "server/test/build"); // Ant
             }
-            _buildDir = FileUtil.getAbsoluteCaseSensitiveFile(_buildDir);
         }
         return _buildDir;
     }
@@ -156,20 +155,12 @@ public abstract class TestFileUtils
     public static File getSampleData(String relativePath)
     {
         String path;
-        File sampledataDirsFile = new File(getLabKeyRoot(), "server/test/build/sampledata.dirs");
+        File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
 
         if (sampledataDirsFile.exists())
-        {
             path = getFileContents(sampledataDirsFile);
-        }
         else
-        {
-            sampledataDirsFile = new File(getLabKeyRoot(), "build/modules/test/sampledata.dirs");
-            if (sampledataDirsFile.exists())
-                path = getFileContents(sampledataDirsFile);
-            else
-                path = DEFAULT_SAMPLEDATA_DIR.toString();
-        }
+            path = DEFAULT_SAMPLEDATA_DIR.toString();
 
         List<String> splitPath = Arrays.asList(path.split(";"));
 
