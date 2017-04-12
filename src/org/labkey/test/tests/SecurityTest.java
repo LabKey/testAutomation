@@ -237,7 +237,7 @@ public class SecurityTest extends BaseWebDriverTest
         pushLocation();
         impersonate(user);
         popLocation();
-        assertTextPresent("You must be a site administrator to view the email record");
+        assertTextPresent("You must be a site or application administrator to view the email record.");
         stopImpersonating();
     }
 
