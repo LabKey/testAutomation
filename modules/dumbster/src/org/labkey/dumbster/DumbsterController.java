@@ -69,7 +69,7 @@ public class DumbsterController extends SpringActionController
             if (getUser().hasRootAdminPermission())
                 return new MailWebPart();
             else
-                return new HtmlView("You must be a site or application administrator to view the email record");
+                return new HtmlView("You must be a site or application administrator to view the email record.");
         }
 
         public NavTree appendNavTrail(NavTree root)
