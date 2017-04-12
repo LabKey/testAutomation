@@ -23,14 +23,18 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.components.ext4.ComboBox;
+import org.labkey.test.components.ext4.Window;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserExtendedProperty;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 
@@ -40,6 +44,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+import static org.labkey.test.components.ext4.RadioButton.RadioButton;
+import static org.labkey.test.components.ext4.Window.Window;
+import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
 @Category({BVT.class, FileBrowser.class})
@@ -82,8 +90,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
-        deleteUsersIfPresent(TEST_USER);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
+        _userHelper.deleteUsers(false, TEST_USER);
     }
 
     private void doSetupSteps()
@@ -93,9 +101,9 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Files");
-        _permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
-        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
-        _permissionsHelper.exitPermissionsUI();
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
+        permissionsHelper.setPermissions(TEST_GROUP, "Editor");
     }
 
     @Test
@@ -154,10 +162,10 @@ public class FileContentUploadTest extends BaseWebDriverTest
                 "annotations updated: " + CUSTOM_PROPERTY + "=" + CUSTOM_PROPERTY_VALUE,
                 "File deleted from project: /" + getProjectName());
 
-        beginAt(getBaseURL() + "/filecontent/" + EscapeUtil.encode(getProjectName()) + "/sendShortDigest.view");
+        sendFileDigest();
         goToModule("Dumbster");
         addUrlParameter("reverse=true"); // List emails chronologically, in case of multiple notifications
-        click(Locator.linkWithText("File Management Notification"));
+        waitForElementWithRefresh(Locator.linkWithText("File Management Notification"), WAIT_FOR_JAVASCRIPT).click();
         // All notifications might not appear in one digest
         if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
             click(Locator.linkWithText("File Management Notification").index(1));
@@ -166,6 +174,14 @@ public class FileContentUploadTest extends BaseWebDriverTest
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
     }
 
+    @LogMethod(quiet = true)
+    private void sendFileDigest()
+    {
+        beginAt(WebTestHelper.buildURL("filecontent", getProjectName(), "sendShortDigest"));
+        assertElementPresent(Locator.tagWithText("div", "15 Minute digest sent"));
+    }
+
+    @LogMethod
     private void setupNotifications()
     {
         goToProjectHome();
@@ -174,25 +190,22 @@ public class FileContentUploadTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Notifications"));
 
-
         _ext4Helper.selectComboBoxItem(MessagesLongTest.FILES_DEFAULT_COMBO, "15 minute digest");
         doAndWaitForPageSignal(() -> clickButton("Update", 0), "notificationSettingUpdate"); // signal in notifySettings.jsp
         waitForElementToDisappear(Ext4Helper.Locators.mask());
 
-
         // Change user setting TEST_USER -> No Email
         DataRegionTable table = new DataRegionTable("Users", this);
-        table.checkCheckbox(table.getRow("Email", TEST_USER));
+        table.checkCheckbox(table.getRowIndex("Email", TEST_USER));
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON)));
         _ext4Helper.clickExt4MenuButton(false, Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON), false, MessagesLongTest.FILES_MENU_ITEM);
-        waitForElement(Ext4Helper.Locators.window("Update User Settings For Files"));
-        _ext4Helper.selectComboBoxItem(MessagesLongTest.NEW_SETTING_LABEL, "No Email");
-        clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, 0);
-        table.doAndWaitForUpdate(() -> waitAndClick(Ext4Helper.Locators.windowButton("Update Selected Users", "Yes")));
-        waitForElementToDisappear(Ext4Helper.Locators.window("Update Selected Users"));
+        final Window window = Window(getDriver()).withTitle("Update User Settings For Files").waitFor();
+        ComboBox.ComboBox(getDriver()).withLabel(MessagesLongTest.NEW_SETTING_LABEL).find(window).selectComboBoxItem("No Email");
+        window.clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, true);
+        table.doAndWaitForUpdate(() -> Window(getDriver()).withTitle("Update Selected Users").waitFor().
+                clickButton("Yes"));
 
-        table = new DataRegionTable("Users", this);
-        assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
+        assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRowIndex("Email", TEST_USER), "File Settings"));
 
         enableEmailRecorder();
     }
@@ -207,11 +220,12 @@ public class FileContentUploadTest extends BaseWebDriverTest
         _fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
 
-        waitAndClick(Ext4Helper.Locators.ext4CheckboxById("importAction"));
+        Window window = Window(getDriver()).withTitle("Manage File Browser Configuration").waitFor();
+        Ext4Checkbox().locatedBy(Locator.id("importAction-inputEl")).find(window).check();
 
         waitAndClick(Ext4Helper.Locators.ext4Tab("File Properties"));
-        click(Ext4Helper.Locators.ext4Radio("Use Custom File Properties"));
-        clickButton("edit properties");
+        RadioButton().withLabel("Use Custom File Properties").find(window).check();
+        window.clickButton("edit properties");
 
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
