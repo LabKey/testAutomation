@@ -64,6 +64,7 @@ public class Checkbox extends Component implements FormItem<Boolean>
     @Override
     public WebElement getComponentElement()
     {
+        // assertElementType(); //TODO: Enable once we verify that it doesn't break tests
         return _el;
     }
 
@@ -116,7 +117,7 @@ public class Checkbox extends Component implements FormItem<Boolean>
 
     protected void assertElementType()
     {
-        String type = _el.getCssValue("type");
+        String type = _el.getAttribute("type");
         Assert.assertEquals("Not a checkbox: " + _el.toString(), "checkbox", type);
     }
 }
