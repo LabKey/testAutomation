@@ -25,7 +25,7 @@ import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
 import org.labkey.api.data.Container;
 import org.labkey.api.security.RequiresPermission;
-import org.labkey.api.security.RequiresSiteAdmin;
+import org.labkey.api.security.permissions.AdminPermission;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
@@ -33,6 +33,7 @@ import org.labkey.api.util.MailHelper;
 import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.NavTree;
+import org.labkey.api.view.UnauthorizedException;
 import org.labkey.api.view.template.PageConfig;
 import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
@@ -65,10 +66,10 @@ public class DumbsterController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            if (getUser().isSiteAdmin())
+            if (getUser().hasRootAdminPermission())
                 return new MailWebPart();
             else
-                return new HtmlView("You must be a site administrator to view the email record");
+                return new HtmlView("You must be a site or application administrator to view the email record");
         }
 
         public NavTree appendNavTrail(NavTree root)
@@ -77,11 +78,14 @@ public class DumbsterController extends SpringActionController
         }
     }
 
-    @RequiresSiteAdmin
+    @RequiresPermission(AdminPermission.class)
     public class SetRecordEmailAction extends ApiAction<RecordEmailForm>
     {
         public ApiResponse execute(RecordEmailForm form, BindException errors) throws Exception
         {
+            if (!getUser().hasRootAdminPermission())
+                throw new UnauthorizedException();
+
             if (form.isRecord())
             {
 
@@ -152,12 +156,15 @@ public class DumbsterController extends SpringActionController
         return url;
     }
 
-    @RequiresSiteAdmin
+    @RequiresPermission(AdminPermission.class)
     public class ViewMessage extends ExportAction<MessageForm>
     {
         @Override
         public void export(MessageForm form, HttpServletResponse response, BindException errors) throws Exception
         {
+            if (!getUser().hasRootAdminPermission())
+                throw new UnauthorizedException();
+
             SmtpMessage message = DumbsterManager.get().getMessages()[form.getMessage()];
             Map<String, String> map = MailHelper.getBodyParts(DumbsterManager.convertToMimeMessage(message));
 
