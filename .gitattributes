@@ -413,6 +413,7 @@ src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/Git.java -text
+src/org/labkey/test/categories/Hosting.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/Issues.java -text
 src/org/labkey/test/categories/LabModule.java -text
@@ -542,6 +543,7 @@ src/org/labkey/test/pages/core/admin/ConfigureFileSystemAccessPage.java -text
 src/org/labkey/test/pages/core/admin/CustomizeSitePage.java -text
 src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
+src/org/labkey/test/pages/core/admin/logger/ManagerPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
 src/org/labkey/test/pages/flow/reports/BeginPage.java -text
 src/org/labkey/test/pages/flow/reports/PositivityReportEditorPage.java -text

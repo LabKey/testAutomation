@@ -21,17 +21,25 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Hosting;
+import org.labkey.test.pages.core.admin.logger.ManagerPage;
+import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.io.File;
 
 import static org.junit.Assert.*;
 
-@Category({DailyA.class})
+@Category({Hosting.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
@@ -42,6 +50,8 @@ public class AuditLogTest extends BaseWebDriverTest
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
     private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
     private static final String AUDIT_TEST_USER3 = "audit_user3@auditlog.test";
+
+    private static final String AUDIT_SECURITY_GROUP = "Testers";
 
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
@@ -88,21 +98,126 @@ public class AuditLogTest extends BaseWebDriverTest
         // Needed for pre-clean only. User & project are deleted during test.
         if (!afterTest)
         {
-            deleteUsers(false, AUDIT_TEST_USER);
+            _userHelper.deleteUsers(false, AUDIT_TEST_USER);
             _containerHelper.deleteProject(getProjectName(), false);
         }
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws IOException
     {
+        turnOnAuditLogFile();
+
         userAuditTest();
         groupAuditTest();
         canSeeAuditLogTest();
     }
 
-    protected void userAuditTest()
+    protected void turnOnAuditLogFile()
     {
+        goToHome();
+
+        ManagerPage lmp = ManagerPage.beginAt(this);
+
+        lmp.setSearchText("org.labkey.audit.event");
+
+        log("Setting org.labkey.audit.event and org.labkey.audit.event.UserAuditEvent to ALL.");
+        if(lmp.getLoggingLevel("org.labkey.audit.event") != LoggingLevel.ALL)
+            lmp.setLoggingLevel("org.labkey.audit.event", LoggingLevel.ALL).clickRefresh();
+
+        // Setting org.labkey.audit.event.UserAuditEvent because it is called out in the webapps/log4j.xml file.
+        if((lmp.isLoggerPresent("org.labkey.audit.event.UserAuditEvent")) && (lmp.getLoggingLevel("org.labkey.audit.event.UserAuditEvent") != LoggingLevel.ALL))
+            lmp.setLoggingLevel("org.labkey.audit.event.UserAuditEvent", LoggingLevel.ALL).clickRefresh();
+
+        lmp.setSearchText("").clickRefresh();
+
+    }
+
+    protected ArrayList<String> getAuditLogFromFile() throws IOException
+    {
+        ArrayList<String> auditLog = new ArrayList<>();
+        File auditLogFile = new File(TestProperties.getTomcatHome(), "logs/labkey-audit.log");
+
+        try(FileReader fileReader = new FileReader(auditLogFile))
+        {
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                auditLog.add(line);
+            }
+        }
+
+        return auditLog;
+    }
+
+    protected void compareAuditLogFileEntries(ArrayList<String> auditLogBefore, ArrayList<String> auditLogAfter, ArrayList<String> expectedValues)
+    {
+        boolean pass = true;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        log("Validating entries in the Audit Log file.");
+
+        ArrayList<String> diff = new ArrayList<>(auditLogAfter);
+        diff.removeAll(auditLogBefore);
+
+        // First check if the count is right.
+        if(expectedValues.size() != diff.size())
+        {
+            stringBuilder.append("Number of audit logs recorded in the file not as expected. Expected: ")
+                    .append(expectedValues.size())
+                    .append(" found: ")
+                    .append(diff.size())
+                    .append("\n");
+            pass = false;
+        }
+
+        // Check to see if all of the expected values did show up.
+        for(String expectedValue : expectedValues)
+        {
+            log("Searching Audit Log file for entry: '" + expectedValue + "'.");
+            boolean found = false;
+            for(int j = 0; (!found) && (j < diff.size()); j ++)
+            {
+                if(diff.get(j).contains(expectedValue))
+                {
+                    // If we found the expected message remove it from the list and stop checking.
+                    found = true;
+                    diff.remove(j);
+                }
+            }
+
+            if(!found)
+            {
+                stringBuilder.append("Did not find '")
+                        .append(expectedValue)
+                        .append("' in log file\n");
+                pass = false;
+            }
+
+        }
+
+        // If there is anything left in the list it means there was an log message recorded that we weren't expecting.
+        if(diff.size() > 0)
+        {
+            pass = false;
+            for(String extraLog : diff)
+                stringBuilder.append("Found this unexpected log in the file: ")
+                        .append(extraLog)
+                        .append("\n");
+        }
+
+        assertTrue(stringBuilder.toString(), pass);
+    }
+
+    protected void userAuditTest() throws IOException
+    {
+        ArrayList<String> auditLogBefore;
+        ArrayList<String> auditLogAfter;
+
+        auditLogBefore = getAuditLogFromFile();
+
         log("testing user audit events");
         createUser(AUDIT_TEST_USER, null);
         impersonate(AUDIT_TEST_USER);
@@ -113,40 +228,73 @@ public class AuditLogTest extends BaseWebDriverTest
         simpleSignIn();
         deleteUsers(true, AUDIT_TEST_USER);
 
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was added to the system", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was impersonated by", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, "impersonated " + AUDIT_TEST_USER, 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was no longer impersonated by", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, "stopped impersonating " + AUDIT_TEST_USER, 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " failed to login: incorrect password", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + "fail failed to login: user does not exist", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
+        ArrayList<String> expectedLogValues = new ArrayList<>();
+        expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
+        expectedLogValues.add(getCurrentUser() + " impersonated " + AUDIT_TEST_USER);
+        expectedLogValues.add(AUDIT_TEST_USER + " was impersonated by " + getCurrentUser());
+        expectedLogValues.add(AUDIT_TEST_USER + " was no longer impersonated by " + getCurrentUser());
+        expectedLogValues.add(getCurrentUser() + " stopped impersonating " + AUDIT_TEST_USER);
+        expectedLogValues.add(getCurrentUser() + " logged out.");
+        expectedLogValues.add(AUDIT_TEST_USER + " failed to login: incorrect password");
+        expectedLogValues.add(getCurrentUser() + " logged in successfully via Database authentication.");
+        expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
+        expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
+
+        for(String msg : expectedLogValues)
+        {
+            verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 10);
+        }
+
+        // Check the file after the UI check, if the UI tests passed then we should have confidence that the entry is in the file.
+        auditLogAfter = getAuditLogFromFile();
+
+        compareAuditLogFileEntries(auditLogBefore, auditLogAfter, expectedLogValues);
     }
 
-    protected void groupAuditTest()
+    protected void groupAuditTest() throws IOException
     {
+        ArrayList<String> auditLogBefore;
+        ArrayList<String> auditLogAfter;
+
+        auditLogBefore = getAuditLogFromFile();
+
         log("testing group audit events");
 
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
-        _permissionsHelper.createPermissionsGroup("Testers");
-        _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
-        _permissionsHelper.setPermissions("Testers", "Editor");
+        _permissionsHelper.createPermissionsGroup(AUDIT_SECURITY_GROUP);
+        _permissionsHelper.assertPermissionSetting(AUDIT_SECURITY_GROUP, "No Permissions");
+        _permissionsHelper.setPermissions(AUDIT_SECURITY_GROUP, "Editor");
 
-        _permissionsHelper.clickManageGroup("Testers");
+        _permissionsHelper.clickManageGroup(AUDIT_SECURITY_GROUP);
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The group Testers was assigned to the security role Editor.", 10);
-        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "User: " + AUDIT_TEST_USER + " was added as a member to Group: Testers", 10);
-        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
+        ArrayList<String> expectedLogValues = new ArrayList<>();
+        expectedLogValues.add("Project " + AUDIT_TEST_PROJECT + " was created");
+        expectedLogValues.add("A new security group named " + AUDIT_SECURITY_GROUP + " was created.");
+        expectedLogValues.add("The group Guests was removed from the security role No Permissions.");
+        expectedLogValues.add("The group " + AUDIT_SECURITY_GROUP + " was assigned to the security role Editor.");
+        expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
+        expectedLogValues.add("User: " + AUDIT_TEST_USER + " was added as a member to Group: " + AUDIT_SECURITY_GROUP);
+        expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
+        expectedLogValues.add("Project /" + AUDIT_TEST_PROJECT + " was deleted");
+
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(1), 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(3), 10);
+        verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(5), 10);
+        verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(6), 10);
 
         log("testing project audit events");
-        verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 5);
-        verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was deleted", 5);
+        verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(0), 10);
+        verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, expectedLogValues.get(7), 10);
+
+        // Check the file after the UI check, if the UI tests passed then we should have confidence that the entry is in the file.
+        auditLogAfter = getAuditLogFromFile();
+
+        compareAuditLogFileEntries(auditLogBefore, auditLogAfter, expectedLogValues);
     }
 
     protected void canSeeAuditLogTest()
@@ -206,9 +354,7 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyListAuditLogQueries(Visibility.ChildFolder);
         stopImpersonating();
 
-        deleteUsers(true, AUDIT_TEST_USER);
-        deleteUsers(true, AUDIT_TEST_USER2);
-        deleteUsers(true, AUDIT_TEST_USER3);
+        _userHelper.deleteUsers(true, AUDIT_TEST_USER, AUDIT_TEST_USER2, AUDIT_TEST_USER3);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
     }
 
@@ -262,26 +408,6 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
-    }
-
-    public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, List<String> columns, List<String> msgs, int rowsToSearch)
-    {
-        if (!instance.isTextPresent("Audit Log"))
-        {
-            instance.ensureAdminMode();
-
-            instance.goToAdminConsole();
-            instance.clickAndWait(Locator.linkWithText("audit log"));
-        }
-
-        if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
-        {
-            instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
-        }
-
-        assertEquals(columns.size(), msgs.size());
-        for (int i = 0; i < columns.size(); i += 1)
-            verifyAuditQueryEvent(instance, columns.get(i), msgs.get(i), rowsToSearch);
     }
 
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch)
