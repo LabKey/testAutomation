@@ -82,7 +82,6 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -522,6 +521,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
         _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
+    }
+    public void clickDevMenuItem(boolean wait, String... items)
+    {
+        waitForElement(Locators.DEVELOPER_MENU);
+        _ext4Helper.clickExt4MenuButton(wait, Locators.DEVELOPER_MENU, false, items);
     }
 
     public void clickUserMenuItem(String... items)

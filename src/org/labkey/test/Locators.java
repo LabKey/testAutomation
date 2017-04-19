@@ -19,6 +19,7 @@ public abstract class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
+    public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
     public static final Locator.IdLocator projectBar = Locator.id("projectBar");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
