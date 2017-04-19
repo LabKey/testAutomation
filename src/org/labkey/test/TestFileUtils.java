@@ -181,7 +181,8 @@ public abstract class TestFileUtils
         }
 
         assertNotNull("Sample data not found: " + relativePath + "\n" +
-                "In: " + path, foundFile);
+                "In: " + path + "\n" +
+                "You may need to build or run your test from the command line once to find its sample data", foundFile);
         return foundFile;
     }
 
