@@ -72,6 +72,7 @@ public class IssuesTest extends BaseWebDriverTest
     private final String NAME = displayNameFromEmail(getUsername());
     private final Map<String, String> ISSUE_0 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
     private final Map<String, String> ISSUE_1 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
+    private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
 
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
@@ -138,7 +139,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Create issues
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.addIssue(ISSUE_0);
         _issuesHelper.addIssue(ISSUE_1);
     }
@@ -148,7 +149,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         enableEmailRecorder();
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
 
         // clear region selection and filters
@@ -215,7 +216,7 @@ public class IssuesTest extends BaseWebDriverTest
         fields.add(new ListHelper.ListColumn("Note", "Note", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
@@ -225,7 +226,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
 
         // InsertAction
         clickButton("New Issue");
@@ -315,7 +316,7 @@ public class IssuesTest extends BaseWebDriverTest
 
     private void setDefaultValues(Map<String, String> defaultValues)
     {
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.goToAdmin();
         click(Locator.tag("div").withClass("gwt-Label").withText("Area"));
         click(Locator.tag("span").withClass("x-tab-strip-text").withText("Advanced"));
@@ -489,7 +490,7 @@ public class IssuesTest extends BaseWebDriverTest
         fields.add(new ListHelper.ListColumn("CustomerName", "Customer Name", ListHelper.ListColumnType.String, ""));
 
         clickFolder(subFolder);
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
@@ -612,7 +613,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(issue1);
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         // Set the container filter to include subfolders
         _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder and subfolders");
 
@@ -799,7 +800,7 @@ public class IssuesTest extends BaseWebDriverTest
         _userHelper.createUser(deletedUser);
         _permissionsHelper.addUserToProjGroup(deletedUser, getProjectName(), TEST_GROUP);
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentUser(displayNameFromEmail(deletedUser));
         clickButton("Save");
@@ -808,7 +809,7 @@ public class IssuesTest extends BaseWebDriverTest
         _userHelper.deleteUsers(true, deletedUser, user);
 
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("Issue Summary"));
+        clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         clickButton("New Issue");
         // NPE
         //clickButton("Cancel");
