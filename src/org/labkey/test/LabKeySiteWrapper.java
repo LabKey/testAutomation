@@ -496,12 +496,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             goToHome();
             waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
         }
-        assertTrue("Test user '" + getCurrentUser() + "' is not a site admin", isUserSystemAdmin());
+        assertTrue("Test user '" + getCurrentUser() + "' is not an admin", isUserAdmin());
     }
 
     public ShowAdminPage goToAdminConsole()
     {
-        ensureAdminMode();
         clickAdminMenuItem("Site", "Admin Console");
         return new ShowAdminPage(getDriver());
     }

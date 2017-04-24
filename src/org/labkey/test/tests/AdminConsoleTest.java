@@ -15,14 +15,21 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.pages.core.admin.CustomizeSitePage;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +38,9 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class AdminConsoleTest extends BaseWebDriverTest
 {
+    protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
+    protected static final String APP_ADMIN_USER_PASS = "JZJLCQ9y2xcjTX9VsmT9";
+
     public String getProjectName()
     {
         return null;
@@ -100,6 +110,146 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementNotPresent(ribbonLink);
     }
 
+    @Test
+    public void testAppAdminRole()
+    {
+       // log out as siteAdmin, log in as appAdmin
+        signOut();
+        signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+        clickButton("Submit");
+
+        ShowAdminPage adminPage = goToAdminConsole();
+        // verify expected UI present or absent
+
+        //analytics settings
+        URL url = getURL(); // will capture with redirect url
+        clickAndWait(Locator.linkWithText("analytics settings"));
+        clickButton("done");
+        assertTrue("expect to return to admin console" ,url.toString().startsWith(getURL().toString()));
+        url = getURL(); // will capture without redirect url
+
+        //authentication
+        clickAndWait(Locator.linkWithText("authentication"));
+        assertNull("expect 'enable' links to be disabled for appAdmin", Locator.linkWithText("enable").findElementOrNull(getDriver()));
+        assertNull("expect 'configure' links to be disabled for appAdmin", Locator.linkWithText("configure").findElementOrNull(getDriver()));
+        clickAndWait(Locator.tagWithClass("a", "labkey-button").withChild(Locator.tagWithText("span", "Done")));
+        assertEquals("expect to return to admin console" ,url, getURL());
+
+        //change user properties
+        assertNotNull(Locator.linkWithText("change user properties").findElementOrNull(getDriver()));
+
+        //email customization
+        clickAndWait(Locator.linkWithText("email customization"), WAIT_FOR_PAGE);
+        clickAndWait(Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(), 'Cancel')]]"));
+        assertEquals(url, getURL());
+
+        //folder types
+        assertNotNull(Locator.linkWithText("folder types").findElementOrNull(getDriver()));
+
+        //look and feel settings
+        assertNotNull(Locator.linkWithText("look and feel settings").findElementOrNull(getDriver()));
+
+        //missing value indicators
+        assertNotNull(Locator.linkWithText("missing value indicators").findElementOrNull(getDriver()));
+
+        //profiler
+        assertNotNull(Locator.linkWithText("profiler").findElementOrNull(getDriver()));
+
+        //project display order
+        assertNotNull(Locator.linkWithText("project display order").findElementOrNull(getDriver()));
+
+        //short urls
+        assertNotNull(Locator.linkWithText("short urls").findElementOrNull(getDriver()));
+
+        //site settings
+        CustomizeSitePage customizeSitePage = adminPage.clickSiteSettings();
+        Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(),'Done')]]").findElement(getDriver()).click();
+
+        //system maintenance
+        clickAndWait(Locator.linkWithText("system maintenance"), WAIT_FOR_PAGE);
+        Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(),'Done')]]").findElement(getDriver()).click();
+
+        // views and scripting
+        clickAndWait(Locator.linkWithText("system maintenance"), WAIT_FOR_PAGE);
+        assertNull(Locator.buttonContainingText("Edit").findElementOrNull(getDriver()));
+        goBack();
+        assertEquals(url, getURL());
+
+        //audit log
+        assertNotNull(Locator.linkWithText("audit log").findElementOrNull(getDriver()));
+
+        //etl-all job histories
+        assertNotNull(Locator.linkWithText("etl- all job histories").findElementOrNull(getDriver()));
+
+        //etl run site scope etls
+        assertNotNull(Locator.linkWithText("etl- run site scope etls").findElementOrNull(getDriver()));
+
+        //full-text search
+        assertNotNull(Locator.linkWithText("full-text search").findElementOrNull(getDriver()));
+
+        //ms1
+        assertNotNull(Locator.linkWithText("ms1").findElementOrNull(getDriver()));
+
+        //pipeline
+        assertNotNull(Locator.linkWithText("pipeline").findElementOrNull(getDriver()));
+
+        //site-wide terms of use
+        assertNotNull(Locator.linkWithText("site-wide terms of use").findElementOrNull(getDriver()));
+
+        //actions
+        assertNotNull(Locator.linkWithText("actions").findElementOrNull(getDriver()));
+
+        //caches
+        assertNotNull(Locator.linkWithText("caches").findElementOrNull(getDriver()));
+
+        //credits
+        assertNotNull(Locator.linkWithText("credits").findElementOrNull(getDriver()));
+
+        //data sources
+        assertNotNull(Locator.linkWithText("data sources").findElementOrNull(getDriver()));
+
+        //dump heap
+        assertNotNull(Locator.linkWithText("dump heap").findElementOrNull(getDriver()));
+
+        //environment variables
+        assertNotNull(Locator.linkWithText("environment variables").findElementOrNull(getDriver()));
+
+        //memory usage
+        assertNotNull(Locator.linkWithText("memory usage").findElementOrNull(getDriver()));
+
+        //queries
+        assertNotNull(Locator.linkWithText("queries").findElementOrNull(getDriver()));
+
+        //reset site errors
+        assertNotNull(Locator.linkWithText("reset site errors").findElementOrNull(getDriver()));
+
+        //running threads
+        assertNotNull(Locator.linkWithText("running threads").findElementOrNull(getDriver()));
+
+        //site validation
+        assertNotNull(Locator.linkWithText("site validation").findElementOrNull(getDriver()));
+
+        //system properties
+        assertNotNull(Locator.linkWithText("system properties").findElementOrNull(getDriver()));
+
+        //test email configuration
+        assertNotNull(Locator.linkWithText("test email configuration").findElementOrNull(getDriver()));
+
+        //view all site errors
+        assertNotNull(Locator.linkWithText("view all site errors").findElementOrNull(getDriver()));
+
+        //view all site errors since reset
+        assertNotNull(Locator.linkWithText("view all site errors since reset").findElementOrNull(getDriver()));
+
+        //view primary site log file
+        assertNotNull(Locator.linkWithText("view primary site log file").findElementOrNull(getDriver()));
+
+        // log out as appAdmin
+        signOut();
+        // log in as siteAdmin again
+        signIn();
+    }
+
     public List<String> getAssociatedModules()
     {
         return Arrays.asList("admin");
@@ -115,5 +265,32 @@ public class AdminConsoleTest extends BaseWebDriverTest
     public void checkViews()
     {
 
+    }
+
+    @BeforeClass
+    public static void doSetup() throws Exception
+    {
+          AdminConsoleTest initTest = (AdminConsoleTest)getCurrentTest();
+          initTest.createTestUser();
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        removeTestUser();
+    }
+
+    private void createTestUser()
+    {
+        _userHelper.createUser(APP_ADMIN_USER, true, false);
+        setInitialPassword(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
+
+        ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
+        apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");
+    }
+
+    private void removeTestUser()
+    {
+        _userHelper.deleteUsers(false, APP_ADMIN_USER);
     }
 }

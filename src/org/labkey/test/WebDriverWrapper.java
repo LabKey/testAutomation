@@ -876,6 +876,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return (Boolean)executeScript("return LABKEY.user.isSystemAdmin;");
     }
 
+    public boolean isUserAdmin()
+    {
+        return (Boolean)executeScript("return LABKEY.user.isAdmin;");
+    }
+
     public boolean isSignedInAsPrimaryTestUser()
     {
         return PasswordUtil.getUsername().equals(getCurrentUser());
