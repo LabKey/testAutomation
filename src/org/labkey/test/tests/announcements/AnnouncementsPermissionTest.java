@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PortalHelper;
 
@@ -21,11 +20,6 @@ public class AnnouncementsPermissionTest extends BaseWebDriverTest
     public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
     private static final String CONTRIBUTOR = "contributor@messages.test";
     private static final String MSG5_TITLE = "test message 5";
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
 
     @BeforeClass
     public static void setupProject()
@@ -47,7 +41,8 @@ public class AnnouncementsPermissionTest extends BaseWebDriverTest
     }
 
     @Test
-    public void doTestMessageContributorRole(){
+    public void doTestMessageContributorRole()
+    {
         clickProject(getProjectName());
         createUserWithPermissions(CONTRIBUTOR, getProjectName(), "Message Board Contributor");
         clickButton("Save and Finish");
@@ -101,6 +96,6 @@ public class AnnouncementsPermissionTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList();
+        return Arrays.asList("announcements");
     }
 }
