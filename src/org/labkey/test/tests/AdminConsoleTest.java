@@ -21,10 +21,12 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -39,7 +41,7 @@ import static org.junit.Assert.*;
 public class AdminConsoleTest extends BaseWebDriverTest
 {
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
-    protected static final String APP_ADMIN_USER_PASS = "JZJLCQ9y2xcjTX9VsmT9";
+    protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 
     public String getProjectName()
     {
@@ -89,7 +91,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertNotNull("Link not present in ribbon bar", el);
 
         String href = el.getAttribute("href");
-        String expected = getBaseURL() + "/project/home/begin.view";
+        String expected = WebTestHelper.getBaseURL() + "/project/home/begin.view";
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
