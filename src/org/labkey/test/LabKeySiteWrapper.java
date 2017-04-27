@@ -1224,7 +1224,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Group");
+        clickUserMenuItem(false, false, "Impersonate", "Group");
         waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
         _ext4Helper.selectComboBoxItem("Group:", Ext4Helper.TextMatchTechnique.STARTS_WITH, (isSiteGroup ? "Site: " : "") + group);
         clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Group", "Impersonate"));
@@ -1237,7 +1237,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateRoles(String oneRole, String... roles)
     {
-        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Roles");
+        clickUserMenuItem(false, false, "Impersonate", "Roles");
         waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
 
         waitAndClick(Ext4GridRef.locateExt4GridCell(oneRole));
@@ -1264,7 +1264,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void impersonate(String fakeUser)
     {
         scrollIntoView(Locators.USER_MENU);
-        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
+        clickUserMenuItem(false, false, "Impersonate", "User");
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
         _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");
         clickAndWait(Ext4Helper.Locators.windowButton("Impersonate User", "Impersonate"));
