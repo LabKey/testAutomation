@@ -524,8 +524,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
     public void clickDevMenuItem(boolean wait, String... items)
     {
-        waitForElement(Locators.DEVELOPER_MENU);
-        _ext4Helper.clickExt4MenuButton(wait, Locators.DEVELOPER_MENU, false, items);
+        final WebElement devMenu = waitForElement(Locators.DEVELOPER_MENU);
+        scrollIntoView(devMenu);
+        _ext4Helper.clickExt4MenuButton(wait, devMenu, false, items);
     }
 
     public void clickUserMenuItem(String... items)
@@ -535,8 +536,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
     {
-        waitForElement(Locators.USER_MENU);
-        _ext4Helper.clickExt4MenuButton(wait, Locators.USER_MENU, onlyOpen, items);
+        final WebElement userMenu = waitForElement(Locators.USER_MENU);
+        scrollIntoView(userMenu);
+        _ext4Helper.clickExt4MenuButton(wait, userMenu, onlyOpen, items);
     }
 
     // Click on a module listed on the admin menu
