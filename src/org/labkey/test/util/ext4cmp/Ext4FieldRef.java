@@ -15,8 +15,8 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
@@ -29,17 +29,17 @@ import java.util.Date;
 
 public class Ext4FieldRef extends Ext4CmpRef
 {
-    public Ext4FieldRef(String id, BaseWebDriverTest test)
+    public Ext4FieldRef(String id, WebDriverWrapper test)
     {
         super(id, test);
     }
 
-    public Ext4FieldRef(WebElement el, BaseWebDriverTest test)
+    public Ext4FieldRef(WebElement el, WebDriverWrapper test)
     {
         super(el, test);
     }
 
-    public static Ext4FieldRef getForLabel(BaseWebDriverTest test, String label)
+    public static Ext4FieldRef getForLabel(WebDriverWrapper test, String label)
     {
         Ext4FieldRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
         if (ref == null)
@@ -47,7 +47,7 @@ public class Ext4FieldRef extends Ext4CmpRef
         return ref;
     }
 
-    public static Ext4FieldRef getForBoxLabel(BaseWebDriverTest test, String boxLabel)
+    public static Ext4FieldRef getForBoxLabel(WebDriverWrapper test, String boxLabel)
     {
         Ext4FieldRef ref = test._ext4Helper.queryOne("field[boxLabel^=\"" + boxLabel + "\"]", Ext4FieldRef.class);
         if (ref == null)
@@ -55,16 +55,16 @@ public class Ext4FieldRef extends Ext4CmpRef
         return ref;
     }
 
-    public static boolean isFieldPresent(BaseWebDriverTest test, String label)
+    public static boolean isFieldPresent(WebDriverWrapper test, String label)
     {
         return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
     }
 
     @LogMethod(quiet = true)
-    public static void waitForField(final BaseWebDriverTest test, @LoggedParam final String label)
+    public static void waitForField(final WebDriverWrapper test, @LoggedParam final String label)
     {
         test.waitFor(() -> isFieldPresent(test, label),
-                "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Field did not appear: " + label, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setValue(Object val)

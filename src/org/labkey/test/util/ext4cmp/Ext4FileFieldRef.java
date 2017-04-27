@@ -15,26 +15,26 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
 public class Ext4FileFieldRef extends Ext4CmpRef
 {
-    public Ext4FileFieldRef(String id, BaseWebDriverTest test)
+    public Ext4FileFieldRef(String id, WebDriverWrapper test)
     {
         super(id, test);
     }
 
-    public Ext4FileFieldRef(WebElement el, BaseWebDriverTest test)
+    public Ext4FileFieldRef(WebElement el, WebDriverWrapper test)
     {
         super(el, test);
     }
 
     //often there is only one file field on screen, so we'll just grab that
-    public static Ext4FileFieldRef create(BaseWebDriverTest test)
+    public static Ext4FileFieldRef create(WebDriverWrapper test)
     {
         return test._ext4Helper.queryOne("filefield", Ext4FileFieldRef.class);
     }

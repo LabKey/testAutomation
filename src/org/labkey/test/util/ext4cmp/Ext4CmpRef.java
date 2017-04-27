@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
@@ -27,17 +27,17 @@ import java.util.List;
 public class Ext4CmpRef
 {
     protected String _id;
-    protected BaseWebDriverTest _test;
+    protected WebDriverWrapper _test;
     protected WebElement _el;
 
-    public Ext4CmpRef(String id, BaseWebDriverTest test)
+    public Ext4CmpRef(String id, WebDriverWrapper test)
     {
         this._id = id;
         this._test = test;
         this._el = test.getDriver().findElement(By.id(id));
     }
 
-    public Ext4CmpRef(WebElement el, BaseWebDriverTest test)
+    public Ext4CmpRef(WebElement el, WebDriverWrapper test)
     {
         this._id = el.getAttribute("id");
         this._test = test;
@@ -81,14 +81,14 @@ public class Ext4CmpRef
     public void waitForEnabled()
     {
         _test.waitFor(() -> (Boolean)getFnEval("return !this.isDisabled();"),
-                "Component was not enabled", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Component was not enabled", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
-    public static void waitForComponent(final BaseWebDriverTest test, @LoggedParam final String query)
+    public static void waitForComponent(final WebDriverWrapper test, @LoggedParam final String query)
     {
         test.waitFor(() -> (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;"),
-                "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Component did not appear: " + query, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public <Type extends Ext4CmpRef> Type down(String componentSelector, Class<Type> clazz)

@@ -15,8 +15,8 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
@@ -29,13 +29,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class Ext4GridRef extends Ext4CmpRef
 {
     private int _clicksToEdit = 2;
 
-    public Ext4GridRef(String id, BaseWebDriverTest test)
+    public Ext4GridRef(String id, WebDriverWrapper test)
     {
         super(id, test);
     }
@@ -177,13 +178,13 @@ public class Ext4GridRef extends Ext4CmpRef
     public void waitForGridEditor()
     {
         _test.waitFor(() ->  getActiveGridEditor() != null,
-                "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Unable to find element", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForGridEditorToDisappear()
     {
         _test.waitFor(() -> getActiveGridEditor() == null,
-                "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Unable to find element", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public int getRowCount()
@@ -199,13 +200,13 @@ public class Ext4GridRef extends Ext4CmpRef
     public void waitForRowCount(final int count)
     {
         _test.waitFor(() -> getRowCount() == count,
-                "Expected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Expected row count did not appear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForSelected(final int count)
     {
         _test.waitFor(() -> getSelectedCount() == count,
-                "Expected selected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "Expected selected row count did not appear", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public WebElement getActiveGridEditor()

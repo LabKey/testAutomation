@@ -15,23 +15,23 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.WebDriverWrapper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 public class Ext4ComboRef extends Ext4FieldRef
 {
-    public Ext4ComboRef(String id, BaseWebDriverTest test)
+    public Ext4ComboRef(String id, WebDriverWrapper test)
     {
         super(id, test);
     }
 
-    public Ext4ComboRef(WebElement el, BaseWebDriverTest test)
+    public Ext4ComboRef(WebElement el, WebDriverWrapper test)
     {
         super(el, test);
     }
 
-    public Ext4ComboRef(Ext4CmpRef cmp, BaseWebDriverTest test)
+    public Ext4ComboRef(Ext4CmpRef cmp, WebDriverWrapper test)
     {
         super(cmp.getId(), test);
     }
@@ -57,7 +57,7 @@ public class Ext4ComboRef extends Ext4FieldRef
     public void waitForStoreLoad()
     {
         _test.waitFor(() -> (Boolean)getFnEval("if(this.store){return (this.store.getCount() > 0);} else return false;"),
-                "No records loaded in store", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                "No records loaded in store", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setComboByDisplayValue(String displayValue)
@@ -66,7 +66,7 @@ public class Ext4ComboRef extends Ext4FieldRef
         eval("setValue(arguments[0]);", value);
     }
 
-    public static Ext4ComboRef getForLabel(BaseWebDriverTest test, String label)
+    public static Ext4ComboRef getForLabel(WebDriverWrapper test, String label)
     {
         Ext4ComboRef ref = test._ext4Helper.queryOne("field.combobox[fieldLabel^=\"" + label + "\"]", Ext4ComboRef.class);
         if (ref == null)
