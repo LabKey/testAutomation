@@ -71,7 +71,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -95,8 +94,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
-
-    private Stack<String> _impersonationStack = new Stack<>();
 
     public boolean isGuestModeTest()
     {
@@ -1247,28 +1244,24 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Roles", "Impersonate"));
     }
 
+    @Deprecated
     public void stopImpersonatingRole()
     {
-        clickUserMenuItem("Stop Impersonating");
-        assertSignedInNotImpersonating();
-        goToHome();
+        stopImpersonating();
     }
 
+    @Deprecated
     public void stopImpersonatingGroup()
     {
-        clickUserMenuItem("Stop Impersonating");
-        assertSignedInNotImpersonating();
-        goToHome();
+        stopImpersonating();
     }
 
     public void impersonate(String fakeUser)
     {
-        scrollIntoView(Locators.USER_MENU);
         clickUserMenuItem(false, false, "Impersonate", "User");
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
         _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");
         clickAndWait(Ext4Helper.Locators.windowButton("Impersonate User", "Impersonate"));
-        _impersonationStack.push(fakeUser);
 
         if (isElementPresent(Locator.lkButton("Home")))
         {
@@ -1287,17 +1280,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void stopImpersonating(Boolean goHome)
     {
-        if (_impersonationStack.isEmpty())
-        {
-            throw new IllegalStateException("No impersonations are thought to be in progress, based on those that have been started within the test harness");
-        }
-        String fakeUser = _impersonationStack.pop();
-        assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
+        if (!isImpersonating())
+            throw new IllegalStateException("Not currently impersonating");
         clickUserMenuItem("Stop Impersonating");
         assertSignedInNotImpersonating();
         if (goHome)
             goToHome();
-        assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
+
+        if (isImpersonating())
+            throw new IllegalStateException("Failed to stop impersonating");
     }
 
     protected final Map<String, String> usersAndDisplayNames = new HashMap<>();
