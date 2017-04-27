@@ -9,6 +9,7 @@ import org.labkey.test.components.ext4.ComboBox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -86,6 +87,12 @@ public class SearchPanel extends WebDriverComponent<SearchPanel.ElementCache>
         elementCache().findFacetedRow(fieldLabel)
                 .value()
                 .selectComboBoxItem(LEADING_NBSP, values);
+    }
+
+    // NOTE: only using this for dates at the moment, though the code is more general
+    public void setInput(String fieldName, String value)
+    {
+        Ext4FieldRef.getForName(getWrapper(), fieldName).setValue(value);
     }
 
     public DataRegionTable submit()

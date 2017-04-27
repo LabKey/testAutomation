@@ -55,6 +55,14 @@ public class Ext4FieldRef extends Ext4CmpRef
         return ref;
     }
 
+    public static Ext4FieldRef getForName(WebDriverWrapper test, String name)
+    {
+        Ext4FieldRef ref = test._ext4Helper.queryOne("field[name^=\"" + name + "\"]", Ext4FieldRef.class);
+        if (ref == null)
+            throw new NoSuchElementException("Unable to locate field with name: " + name);
+        return ref;
+    }
+
     public static boolean isFieldPresent(WebDriverWrapper test, String label)
     {
         return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
