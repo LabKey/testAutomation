@@ -625,7 +625,7 @@ public class Ext4Helper
             List<Type> ret = new ArrayList<>(ids.size());
             for (String id : ids)
             {
-                Constructor<Type> constructor = clazz.getConstructor(String.class, BaseWebDriverTest.class);
+                Constructor<Type> constructor = clazz.getConstructor(String.class, WebDriverWrapper.class);
                 ret.add(constructor.newInstance(id, _test));
             }
             return ret;
