@@ -417,6 +417,9 @@ public class IssuesTest extends BaseWebDriverTest
     {
         Map<String, String> ISSUE = Maps.of("assignedTo", displayNameFromEmail(USER1), "title", "A not so serious issue", "priority", "4", "comment", "No big whup", "notifyList", USER2);
 
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentList(null);
+        clickButton("Save");
         goToModule("Issues");
 
         // EmailPrefsAction
@@ -752,6 +755,9 @@ public class IssuesTest extends BaseWebDriverTest
 
         String user1DisplayName = displayNameFromEmail(USER1);
 
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentList(null);
+        clickButton("Save");
         goToModule("Issues");
 
         // check for no default
