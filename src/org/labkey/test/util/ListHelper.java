@@ -133,6 +133,15 @@ public class ListHelper extends LabKeySiteWrapper
         clickButton("Submit", wait);
     }
 
+    public void checkIndexFileAttachements(boolean index)
+    {
+        Locator indexFileAttachmentsCheckbox = Locator.checkboxByLabel("Index file attachments", false);
+        if (index)
+            checkCheckbox(indexFileAttachmentsCheckbox);
+        else
+            uncheckCheckbox(indexFileAttachmentsCheckbox);
+    }
+
     /**
      * From the list data grid, insert a new entry into the current list
      *

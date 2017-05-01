@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -38,6 +39,7 @@ import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
@@ -56,6 +58,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.labkey.test.util.DataRegionTable.DataRegion;
+import static org.labkey.test.util.ListHelper.ListColumnType.Attachment;
 import static org.labkey.test.util.ListHelper.ListColumnType.Boolean;
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
@@ -168,7 +171,6 @@ public class ListTest extends BaseWebDriverTest
     {
         log("Setup project and list module");
         _containerHelper.createProject(PROJECT_VERIFY, null);
-        setUpList(getProjectName());
 
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
@@ -179,6 +181,14 @@ public class ListTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _containerHelper.deleteProject(PROJECT_OTHER, afterTest);
+    }
+
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        if (isElementPresent(PortalHelper.Locators.webPartTitle("Search")))
+            new PortalHelper(this).removeWebPart("Search");
     }
 
     @Override
@@ -208,6 +218,10 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     protected void setUpList(String projectName)
     {
+        // TODO: Break this up into explicit test cases and remove redundant test coverage.
+        // But at least now it's only called from the one test case that relies on this list, testCustomViews().
+        // Previously it was called from the @BeforeClass method, even though none of the other test cases use this list.
+
         log("Add list -- " + LIST_NAME_COLORS);
         _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
@@ -443,6 +457,9 @@ public class ListTest extends BaseWebDriverTest
     @Test
     public void testCustomViews()
     {
+        goToProjectHome();
+        setUpList(getProjectName());
+
         goToProjectHome();
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
 
@@ -952,9 +969,9 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "key",
                 new ListColumn("FileName", "FileName", ListHelper.ListColumnType.String, "name of the file"),
                 new ListColumn("FileExtension", "ext", ListHelper.ListColumnType.String, "the file extension"),
-                new ListColumn(unprotectedColumn, "PubFile", ListHelper.ListColumnType.Attachment, "the file itself"));
+                new ListColumn(unprotectedColumn, "PubFile", Attachment, "the file itself"));
         _listHelper.clickEditDesign();
-        _listHelper.addField(new ListColumn(protectedColumn, "File", ListHelper.ListColumnType.Attachment, "the file itself"));
+        _listHelper.addField(new ListColumn(protectedColumn, "File", Attachment, "the file itself"));
 
         // set 'protected'
         _listHelper.selectPropertyTab("Advanced");
@@ -995,6 +1012,42 @@ public class ListTest extends BaseWebDriverTest
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
         assertTrue("Unprotected column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
+    }
+
+    @Test
+    public void testAttachmentSearch()
+    {
+        final String listName = "Attachment Search List";
+        final String path = TestFileUtils.getSampleData("lists/searchData.tsv").getAbsolutePath();
+        final String attachmentCol = "Attachment";
+        final String descriptionCol = "Description";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(descriptionCol, "randomText");
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        // create list with an attachment column
+        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "id",
+                col(descriptionCol, String),
+                col(attachmentCol, Attachment));
+        // index on attachment column
+        _listHelper.clickEditDesign();
+        _listHelper.checkIndexFileAttachements(true);
+        _listHelper.clickSave();
+
+        // Insert data, upload attachment
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row);
+
+        startSystemMaintenance("SearchService");
+        SearchHelper.waitForIndexer();
+
+        goToProjectHome();
+        new PortalHelper(this).addWebPart("Search");
+        searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
     }
 
     //

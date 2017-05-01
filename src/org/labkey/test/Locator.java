@@ -565,6 +565,15 @@ public abstract class Locator
         return radioButton().withAttribute("name", name);
     }
 
+    public static XPathLocator checkboxByLabel(String labelText, boolean labelBeforeBox)
+    {
+        XPathLocator label = tagWithText("label", labelText);
+        if (labelBeforeBox)
+            return label.followingSibling("input").withAttribute("type", "checkbox");
+        else
+            return label.precedingSibling("input").withAttribute("type", "checkbox");
+    }
+
     public static XPathLocator checkboxByName(String name)
     {
         return checkbox().withAttribute("name", name);
