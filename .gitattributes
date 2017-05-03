@@ -742,7 +742,6 @@ src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text
-src/org/labkey/test/tests/flow/FlowCBCTest.java -text
 src/org/labkey/test/tests/flow/FlowImportTest.java -text
 src/org/labkey/test/tests/flow/FlowJoQueryTest.java -text
 src/org/labkey/test/tests/flow/FlowNormalizationTest.java -text
