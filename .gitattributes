@@ -617,7 +617,6 @@ src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/ColumnChartTest.java -text
 src/org/labkey/test/tests/ColumnResizeTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
-src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeEmailTemplateTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
