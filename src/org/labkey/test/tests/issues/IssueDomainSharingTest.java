@@ -139,8 +139,11 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 "This existing definition will be shared with your new issue list if created.",
                 confirmationWindow.getBody());
         confirmationWindow.clickButton("Yes");
+        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), listDef);
+        adminPage.setIssueAssignmentList(null);
+        adminPage.save();
 
-        AdminPage adminPage = AdminPage.beginAt(this, "Shared", listDef);
+        adminPage = AdminPage.beginAt(this, "Shared", listDef);
         adminPage.configureFields().addField(new FieldDefinition(inheritedField).setLabel(inheritedField).setType(ColumnType.String));
         adminPage.saveAndClose();
 

@@ -26,6 +26,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
@@ -74,6 +75,9 @@ public class IssuesAdminTest extends BaseWebDriverTest
         _userHelper.createUser(USER);
         _containerHelper.createProject(getProjectName(), null);
         _issuesHelper.createNewIssuesList(LIST_NAME, _containerHelper);
+        AdminPage adminPage = AdminPage.beginAt(this, getProjectName(), LIST_NAME);
+        adminPage.setIssueAssignmentList(null);
+        adminPage.save();
     }
 
     @Test
