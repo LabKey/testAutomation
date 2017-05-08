@@ -145,28 +145,28 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
         protected <T> FormItem<T> formItemWithLabel(String label)
         {
-            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label).findWhenNeeded(this));
+            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label).timeout(1000).findWhenNeeded(this));
         }
 
         protected <T> FormItem<T> formItemNamed(String name)
         {
-            return replaceIfNewer(name, FormItem(getDriver()).withName(name).findWhenNeeded(this));
+            return replaceIfNewer(name, FormItem(getDriver()).withName(name).timeout(1000).findWhenNeeded(this));
         }
 
         protected ReadOnlyFormItem readOnlyItem(String label)
         {
-            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label).findWhenNeeded(this));
+            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label).timeout(1000).findWhenNeeded(this));
         }
 
         protected OptionSelect getSelect(String name)
         {
-            FormItem formItem = replaceIfNewer(name, OptionSelect(fieldLocator(name)).findWhenNeeded(this));
+            FormItem formItem = replaceIfNewer(name, OptionSelect(fieldLocator(name)).timeout(1000).findWhenNeeded(this));
             return (OptionSelect) formItem;
         }
 
         protected Input getInput(String name)
         {
-            FormItem formItem = replaceIfNewer(name, Input(fieldLocator(name), getDriver()).findWhenNeeded(this));
+            FormItem formItem = replaceIfNewer(name, Input(fieldLocator(name), getDriver()).timeout(1000).findWhenNeeded(this));
             return (Input) formItem;
         }
 
