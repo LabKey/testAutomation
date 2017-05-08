@@ -15,6 +15,7 @@
  */
 package org.labkey.test.selenium;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.test.Locator;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
@@ -32,7 +33,7 @@ public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
     private SearchContext _searchContext;
     private Long _waitMs;
 
-    public LazyWebElement(Locator locator, SearchContext searchContext)
+    public LazyWebElement(@NotNull Locator locator, @NotNull SearchContext searchContext)
     {
         _locator = locator;
         _searchContext = searchContext;
