@@ -44,10 +44,12 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
+import org.labkey.test.components.internal.ImpersonateGroupWindow;
+import org.labkey.test.components.internal.ImpersonateRoleWindow;
+import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -56,7 +58,6 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
 import org.labkey.test.util.TextSearcher;
-import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -1222,9 +1223,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
         clickUserMenuItem(false, false, "Impersonate", "Group");
-        waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
-        _ext4Helper.selectComboBoxItem("Group:", Ext4Helper.TextMatchTechnique.STARTS_WITH, (isSiteGroup ? "Site: " : "") + group);
-        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Group", "Impersonate"));
+        final ImpersonateGroupWindow window = new ImpersonateGroupWindow(getDriver());
+        if (isSiteGroup)
+            window.selectSiteGroup(group);
+        else
+            window.selectGroup(group);
+
+        window.clickImpersonate();
     }
 
     public void impersonateRole(String role)
@@ -1235,13 +1240,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void impersonateRoles(String oneRole, String... roles)
     {
         clickUserMenuItem(false, false, "Impersonate", "Roles");
-        waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
+        final ImpersonateRoleWindow window = new ImpersonateRoleWindow(getDriver());
+        window.selectRoles(oneRole);
+        window.selectRoles(roles);
+        window.clickImpersonate();
+    }
 
-        waitAndClick(Ext4GridRef.locateExt4GridCell(oneRole));
-        for (String role : roles)
-            waitAndClick(Ext4GridRef.locateExt4GridCell(role));
+    public void impersonate(String fakeUser)
+    {
+        clickUserMenuItem(false, false, "Impersonate", "User");
+        final ImpersonateUserWindow window = new ImpersonateUserWindow(getDriver());
+        window.selectUser(fakeUser);
+        window.clickImpersonate();
 
-        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate Roles", "Impersonate"));
+        if (isElementPresent(Locator.lkButton("Home")))
+        {
+            clickAndWait(Locator.lkButton("Home"));
+        }
     }
 
     @Deprecated
@@ -1254,19 +1269,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void stopImpersonatingGroup()
     {
         stopImpersonating();
-    }
-
-    public void impersonate(String fakeUser)
-    {
-        clickUserMenuItem(false, false, "Impersonate", "User");
-        waitForElement(Ext4Helper.Locators.window("Impersonate User"));
-        _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");
-        clickAndWait(Ext4Helper.Locators.windowButton("Impersonate User", "Impersonate"));
-
-        if (isElementPresent(Locator.lkButton("Home")))
-        {
-            clickAndWait(Locator.lkButton("Home"));
-        }
     }
 
     public void stopImpersonating()
