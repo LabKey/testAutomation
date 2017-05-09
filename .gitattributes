@@ -1,5 +1,4 @@
 * text=auto !eol
-/Dumbster.iml -text
 /module.properties -text
 src/com/dumbster/smtp/SimpleSmtpServer.java -text
 src/com/dumbster/smtp/SmtpActionType.java -text
