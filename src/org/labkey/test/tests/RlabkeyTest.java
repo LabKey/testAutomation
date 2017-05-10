@@ -90,20 +90,33 @@ public class RlabkeyTest extends BaseWebDriverTest
         issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
 
         clickProject(PROJECT_NAME);
-        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
+        createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_0));
 
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME);
         apiPermissionsHelper.checkInheritedPermissions();
 
-        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
+        createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_1));
 
         clickProject(PROJECT_NAME_2);
-        issuesHelper.createNewIssuesList(ISSUE_LIST_NAME, _containerHelper);
+        createNewIssueList(issuesHelper, ISSUE_LIST_NAME);
         issuesHelper.addIssue(Maps.of("assignedTo", getDefaultDisplayName(USER), "title", ISSUE_TITLE_2));
         
         _rReportHelper.ensureRConfig();
+    }
+
+    /**
+     * Create a new issues list and override the default assigned to group
+     */
+    private void createNewIssueList(IssuesHelper issuesHelper, String name)
+    {
+        issuesHelper.createNewIssuesList(name, _containerHelper);
+
+        goToModule("Issues");
+        issuesHelper.goToAdmin();
+        issuesHelper.setIssueAssignmentList(null);
+        clickButton("Save");
     }
 
     @Test
