@@ -18,6 +18,7 @@ package org.labkey.test.pages.issues;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.Maps;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends UpdatePage
@@ -43,4 +44,20 @@ public class InsertPage extends UpdatePage
         driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "insert", Maps.of("issueDefName", issueDefName)));
         return new InsertPage(driver.getDriver());
     }
+
+    @Override
+    protected void waitForPage()
+    {
+        waitFor(() -> {
+            try
+            {
+                return title().getComponentElement().isDisplayed();
+            }
+            catch (NoSuchElementException retry)
+            {
+                return false;
+            }
+        }, WAIT_FOR_JAVASCRIPT);
+    }
+
 }

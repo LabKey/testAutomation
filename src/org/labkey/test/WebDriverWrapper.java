@@ -2122,6 +2122,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return el;
     }
 
+    public void scrollBy(Integer x, Integer y)
+    {
+        executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
+    }
+
     public void click(WebElement el)
     {
         clickAndWait(el, 0); // WebElement#click() doesn't use our scroll/retry logic
