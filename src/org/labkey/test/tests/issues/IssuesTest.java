@@ -197,6 +197,7 @@ public class IssuesTest extends BaseWebDriverTest
         createLookupList("issues", "UserStory", Arrays.asList("Alien landing investigation", "Alien diet study", "What is with all the circular symbols"));
         createLookupList("issues", "Triage", Arrays.asList("Approved", "Investigate", "Review Requested"));
         createLookupList("issues", "Note", Arrays.asList("Blocked", "Pending Doctor Action", "Take Me To Your Leader"));
+        createLookupList("issues", "module", Arrays.asList("Unity", "Zvezda", "Kibo", "Columbus"));
 
         // SetCustomColumnConfigurationAction
         List<ListHelper.ListColumn> fields = new ArrayList<>();
@@ -214,6 +215,7 @@ public class IssuesTest extends BaseWebDriverTest
         fields.add(new ListHelper.ListColumn("TeamCity", "TeamCity Note", ListHelper.ListColumnType.String, ""));
         fields.add(new ListHelper.ListColumn("Triage", "Triage", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Triage"))));
         fields.add(new ListHelper.ListColumn("Note", "Note", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Note"))));
+        fields.add(new ListHelper.ListColumn("Module", "Module", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, "lists", getLookupTableName("issues", "Module"))));
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
@@ -233,6 +235,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), issueTitle);
         selectOptionByText(Locator.name("type"), "UFO");
         selectOptionByText(Locator.name("area"), "Area51");
+        selectOptionByText(Locator.name("module"), "Zvezda");
         selectOptionByText(Locator.name("priority"), "2");
         setFormElement(Locator.name("comment"), ISSUE_0.get("comment"));
         selectOptionByText(Locator.name("assignedTo"), NAME);
