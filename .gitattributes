@@ -343,6 +343,7 @@ modules/triggerTestModule/triggerTestModule.iml -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/junit/rules/TestWatcher.java -text
+src/org/labkey/junit/runner/WebTestProperties.java -text
 src/org/labkey/remoteapi/admin/GetModulesCommand.java -text
 src/org/labkey/remoteapi/admin/GetModulesResponse.java -text
 src/org/labkey/remoteapi/experiment/LineageCommand.java -text
