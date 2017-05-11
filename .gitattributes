@@ -198,7 +198,6 @@ modules/scriptpad/resources/reports/schemas/script_rserve.report.xml -text
 modules/scriptpad/resources/views/scriptpad.html -text
 modules/scriptpad/resources/views/scriptpad.webpart.xml -text
 modules/scriptpad/resources/web/input_data.tsv -text
-modules/scriptpad/scriptpad.iml -text
 modules/simpletest/module.properties -text
 modules/simpletest/resources/config/module.xml -text
 modules/simpletest/resources/data/category.tsv -text
@@ -339,7 +338,6 @@ modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
 modules/triggerTestModule/resources/queries/lists/Employees.js -text
 modules/triggerTestModule/resources/queries/study/Demographics.js -text
 modules/triggerTestModule/resources/scripts/TriggerTestModule/EmployeeLib.js -text
-modules/triggerTestModule/triggerTestModule.iml -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
 src/org/labkey/junit/rules/TestWatcher.java -text
