@@ -1,7 +1,10 @@
 
-subprojects {
-  apply plugin: 'java'
-  apply plugin: 'org.labkey.module'
+subprojects { Project p ->
+    apply plugin: 'java'
+    if (p.file("src").exists())
+        apply plugin: 'org.labkey.module'
+    else
+        apply plugin: 'org.labkey.fileModule'
 }
 
 task('build', group: 'Build', description: "Build all module files for subprojects",
