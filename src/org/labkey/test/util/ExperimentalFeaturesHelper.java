@@ -19,6 +19,8 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.PostCommand;
+import org.labkey.test.WebDriverWrapper;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,9 +28,18 @@ import java.util.Map;
 
 public class ExperimentalFeaturesHelper
 {
-
     public static void setExperimentalFeature(Connection cn, String feature, boolean enable)
     {
+        setExperimentalFeature(cn, feature, enable, null);
+    }
+
+    public static void setExperimentalFeature(Connection cn, String feature, boolean enable, WebDriverWrapper test)
+    {
+        if (null != test)
+        {
+            test.log((enable ? "Enabling" : "Disabling") + " experimental feature " + feature);
+        }
+
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("feature", feature);
         parameters.put("enabled", enable);
