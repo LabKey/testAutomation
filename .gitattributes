@@ -199,7 +199,6 @@ modules/scriptpad/resources/views/scriptpad.html -text
 modules/scriptpad/resources/views/scriptpad.webpart.xml -text
 modules/scriptpad/resources/web/input_data.tsv -text
 modules/simpletest/module.properties -text
-modules/simpletest/resources/config/module.xml -text
 modules/simpletest/resources/data/category.tsv -text
 modules/simpletest/resources/data/priority.tsv -text
 modules/simpletest/resources/data/samples.tsv -text
