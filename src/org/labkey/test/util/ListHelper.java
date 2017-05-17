@@ -159,7 +159,7 @@ public class ListHelper extends LabKeySiteWrapper
         setRowData(data, validateText);
     }
 
-    private void setRowData(Map<String, String> data, boolean validateText)
+    protected void setRowData(Map<String, String> data, boolean validateText)
     {
         for(String key : data.keySet())
         {

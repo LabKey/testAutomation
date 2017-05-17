@@ -1307,6 +1307,13 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         elements().getHeaderButton("Insert New Row").click();
     }
 
+    public void clickDeleteAllButton()
+    {
+        elements().getHeaderButton("Delete All Rows").click();
+        getWrapper().waitAndClick(Locator.linkWithText("Yes"));  //Confirmation popup
+        getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
+    }
+
     public void clickImportBulkDataButton()
     {
         elements().getHeaderButton("Import Bulk Data").click();

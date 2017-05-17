@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -27,11 +28,17 @@ import org.labkey.test.util.Maps;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Category({DailyA.class})
 public class AssayAPITest extends BaseWebDriverTest
@@ -56,9 +63,9 @@ public class AssayAPITest extends BaseWebDriverTest
         int pipelineCount = 0;
         String runName = "trial01.xls";
         importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
-                TestFileUtils.getSampleData( "GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
+                TestFileUtils.getSampleData("GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
         waitForElement(Locator.paginationText(1, 100, 201));
-//
+
         goToProjectHome();
 
         //Issue 16073
@@ -66,6 +73,74 @@ public class AssayAPITest extends BaseWebDriverTest
                 TestFileUtils.getSampleData("GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
         waitForElement(Locator.paginationText(1, 100, 201));
 //        _assayHelper.getCurrentAssayNumber();
+    }
+
+    // Issue 30003: support importing assay data relative to pipeline root
+    @Test
+    public void testImportRun_serverFilePath() throws Exception
+    {
+        goToProjectHome();
+
+        String assayName = "GPAT-RunFilePath";
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
+        assayHelper.createAssayWithDefaults("General", assayName);
+        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
+
+        // First, simulate file already being uploaded to the server by copying to the pipeline root
+        List<String> lines1 = Arrays.asList(
+                "ptid\tdate\n",
+                "p01\t2017-05-10\n",
+                "p02\t2017-05-10\n"
+        );
+        Path relativePath1 = Paths.get("testImportRunFilePath", "results1.tsv");
+        Path pipelinePath1 = createDataFile(relativePath1, lines1);
+
+        // import the file using a relative path
+        ImportRunResponse resp = assayHelper.importAssay(assayId, relativePath1.toString(), getProjectName(), Collections.emptyMap());
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("p01", "p02");
+
+        goToProjectHome();
+
+        List<String> lines2 = Arrays.asList(
+                "ptid\tdate\n",
+                "p03\t2017-05-10\n",
+                "p04\t2017-05-10\n"
+        );
+        Path relativePath2 = Paths.get("testImportRunFilePath", "results2.tsv");
+        Path pipelinePath2 = createDataFile(relativePath2, lines2);
+
+        // import the file using an absolute path
+        resp = assayHelper.importAssay(assayId, pipelinePath2.toString(), getProjectName(), Collections.emptyMap());
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("p03", "p04");
+
+        // attempt to import file outside of pipeline root
+        try
+        {
+            File runFilePath = TestFileUtils.getSampleData("GPAT/trial01.xls");
+            assayHelper.importAssay(assayId, runFilePath.toString(), getProjectName(), Collections.emptyMap());
+            fail("Expected exception trying to read file outside of pipeline root");
+        }
+        catch (CommandException ex)
+        {
+            assertTrue("Expected 'File not found', got: " + ex.getMessage(), ex.getMessage().contains("File not found"));
+            assertTrue("Expected 'trial01.xls', got: " + ex.getMessage(), ex.getMessage().contains("trial01.xls"));
+        }
+    }
+
+    private Path createDataFile(Path relativePath, Iterable<String> lines) throws IOException
+    {
+        File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+        Path pipelinePath = fileRoot.toPath().resolve(relativePath);
+        if (!Files.isRegularFile(pipelinePath))
+        {
+            Files.createDirectories(pipelinePath.getParent());
+            Files.write(pipelinePath, lines);
+            if (!Files.isRegularFile(pipelinePath))
+                fail("Failed to create file " + pipelinePath);
+        }
+        return pipelinePath;
     }
 
     // Issue 21247: Import runs into GPAT assay using LABKEY.Experiment.saveBatch() API

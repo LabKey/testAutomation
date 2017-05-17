@@ -21,6 +21,7 @@ import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.Batch;
 import org.labkey.remoteapi.assay.ImportRunCommand;
+import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.remoteapi.assay.Run;
 import org.labkey.remoteapi.assay.SaveAssayBatchCommand;
 import org.labkey.test.BaseWebDriverTest;
@@ -33,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 public class APIAssayHelper extends AbstractAssayHelper
 {
@@ -44,13 +45,22 @@ public class APIAssayHelper extends AbstractAssayHelper
     }
 
     @LogMethod(quiet = true)
-    public void importAssay(int assayID, File file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
+    public ImportRunResponse importAssay(int assayID, File file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+    }
 
+    @LogMethod(quiet = true)
+    public ImportRunResponse importAssay(int assayID, String runFilePath, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
+    {
+        ImportRunCommand  irc = new ImportRunCommand(assayID);
+        irc.setRunFilePath(runFilePath);
+        irc.setBatchProperties(batchProperties);
+        irc.setTimeout(180000); // Wait 3 minutes for assay import
+        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
 
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
@@ -69,7 +79,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         _test.beginAt(WebTestHelper.buildURL("experiment", _test.getCurrentContainerPath(), "showAddXarFile"));
     }
 
-    private int getIdFromAssayName(String assayName, String projectPath)
+    public int getIdFromAssayName(String assayName, String projectPath)
     {
         AssayListCommand alc = new AssayListCommand();
         alc.setName(assayName);
