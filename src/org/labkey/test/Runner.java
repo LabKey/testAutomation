@@ -691,37 +691,53 @@ public class Runner extends TestSuite
         return result.toString();
     }
 
-    protected static TestSet getTestSet()
+    private static TestSet getCompositeTestSet(String suites)
     {
-        String suites = System.getProperty("suite");
-        if (suites != null)
+        suites = StringUtils.trimToEmpty(suites);
+        List<String> suitesColl = new ArrayList<>(Arrays.asList(suites.split("\\s*,\\s*")));
+        if (suitesColl.isEmpty())
+            _suites.getTestSet(DEFAULT_SUITE);
+        if (suitesColl.size() == 1)
+            return getSuite(suitesColl.get(0));
+
+        TestSet tests = new TestSet();
+        List<String> includeSuites = new ArrayList<>();
+        List<String> excludeSuites = new ArrayList<>();
+
+        suitesColl.forEach(s ->
         {
-            TestSet tests = null;
-            String[] suitesColl = StringUtils.split(suites, ",");
-            for(String suiteName : suitesColl)
-            {
-                try
-                {
-                    if(null == tests)
-                    {
-                        tests = _suites.getTestSet(suiteName);
-                    }
-                    else
-                    {
-                        tests.addTests(_suites.getTestSet(suiteName));
-                    }
-                }
-                catch (Exception e)
-                {
-                    System.err.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
-                    for (String suite : _suites.getSuites())
-                        System.err.println("   " + suite);
-                    throw new IllegalArgumentException("Couldn't find suite '" + suiteName + "'. Check log for details.");
-                }
-            }
-            return tests;
+            if (s.startsWith("-"))
+                excludeSuites.add(s.substring(1));
+            else
+                includeSuites.add(s);
+        });
+
+        for (String includedSuite : includeSuites)
+        {
+            tests.addTests(getSuite(includedSuite));
         }
-        return _suites.getTestSet(DEFAULT_SUITE);
+
+        for (String excludedSuite : excludeSuites)
+        {
+            tests.removeTests(getSuite(excludedSuite));
+        }
+
+        return tests;
+    }
+
+    private static TestSet getSuite(String suiteName)
+    {
+        try
+        {
+            return _suites.getTestSet(suiteName);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
+            for (String suite : _suites.getSuites())
+                System.err.println("   " + suite);
+            throw new IllegalArgumentException("Couldn't find suite '" + suiteName + "'. Check log for details.");
+        }
     }
 
     protected static List<String> getTestNames()
@@ -741,10 +757,21 @@ public class Runner extends TestSuite
     {
         try
         {
-            TestSet set = getTestSet();
+            final String allTestsSuite = org.labkey.test.categories.Test.class.getSimpleName();
             List<String> testNames = getTestNames();
+            TestSet set;
+            final String suiteProperty = System.getProperty("suite");
+            if (testNames.isEmpty())
+            {
+                set = getCompositeTestSet(suiteProperty);
+            }
+            else
+            {
+                System.out.println("Custom test list specified. Ignoring specified suite(s): " + suiteProperty);
+                set = getCompositeTestSet(allTestsSuite);
+            }
 
-            if (set.getSuite().equalsIgnoreCase(org.labkey.test.categories.Test.class.getSimpleName()) && testNames.isEmpty())
+            if (set.getSuite().equalsIgnoreCase(allTestsSuite) && testNames.isEmpty())
             {
                 TestHelper.ResultPair pair = TestHelper.run();
                 if (pair != null)

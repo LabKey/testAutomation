@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,11 @@ public class TestSet
         _suite = suite;
     }
 
+    TestSet()
+    {
+        this(new HashSet<>(), "Custom");
+    }
+
     void setTests(List<Class> tests)
     {
         _tests = tests;
@@ -43,6 +49,11 @@ public class TestSet
     void addTests(TestSet tests)
     {
         _tests.addAll(tests.getTestList());
+    }
+
+    void removeTests(TestSet tests)
+    {
+        _tests.removeAll(tests.getTestList());
     }
 
     public String name()
