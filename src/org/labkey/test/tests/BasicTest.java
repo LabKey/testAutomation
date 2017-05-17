@@ -120,7 +120,7 @@ public class BasicTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting("testers", "Editor");
     }
 
-    @Test @Ignore("27659: Credits check fails with Gradle build")
+    @Test
     public void testCredits()
     {
         // Navigate to the credits page and verify that all external components are documented
