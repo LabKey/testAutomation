@@ -25,7 +25,6 @@ public class TestSet
 {
     private String _suite;
     private List<Class> _tests;
-    private int _crawlerTimeout = 90000;
 
     TestSet(Set<Class> tests, String suite)
     {
@@ -54,11 +53,6 @@ public class TestSet
     public String getSuite()
     {
         return _suite;
-    }
-
-    public int getCrawlerTimeout()
-    {
-        return _crawlerTimeout;
     }
 
     public List<Class> getTestList()

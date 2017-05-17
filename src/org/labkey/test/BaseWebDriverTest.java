@@ -1188,7 +1188,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         if (isLinkCheckEnabled())
         {
             pauseJsErrorChecker();
-            Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
+            String crawlerTimeoutProp = System.getProperty("crawlerTimeout");
+            int crawlerTimeout = 90000;
+            if (crawlerTimeoutProp != null)
+                crawlerTimeout = Integer.parseInt(crawlerTimeoutProp);
+
+            Crawler crawler = new Crawler(this, crawlerTimeout);
             crawler.addExcludedActions(getUncrawlableActions());
             crawler.setInjectionCheckEnabled(isInjectionCheckEnabled());
             crawler.addProject(getProjectName());
