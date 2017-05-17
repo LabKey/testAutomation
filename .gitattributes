@@ -588,8 +588,6 @@ src/org/labkey/test/pipeline/PipelineFolder.java -text
 src/org/labkey/test/pipeline/PipelineTestParams.java -text
 src/org/labkey/test/pipeline/PipelineTestsBase.java -text
 src/org/labkey/test/pipeline/PipelineWebTestBase.java -text
-src/org/labkey/test/qc/JavaQC.java -text
-src/org/labkey/test/qc/build.xml -text
 src/org/labkey/test/selenium/EphemeralWebElement.java -text
 src/org/labkey/test/selenium/LazyWebElement.java -text
 src/org/labkey/test/selenium/RefindingWebElement.java -text
