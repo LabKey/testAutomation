@@ -125,7 +125,7 @@ public class WebTestHelper
                 if (webPortStr == null || webPortStr.length() == 0)
                 {
                     System.out.println("Using default labkey port (" + DEFAULT_WEB_PORT +
-                                        ").\nThis can be changed by passing VM arg '-Dlabkey.port=[yourport]'.");
+                                        ").\nThis can be changed by setting the property 'labkey.port=[yourport]'.");
                     _webPort = DEFAULT_WEB_PORT;
                 }
                 else
@@ -148,7 +148,7 @@ public class WebTestHelper
                 if (_targetServer == null || _targetServer.length() == 0)
                 {
                     System.out.println("Using default target server (" + DEFAULT_TARGET_SERVER +
-                                        ").\nThis can be changed by passing VM arg '-Dlabkey.server=[yourserver]'.");
+                                        ").\nThis can be changed by setting the property 'labkey.server=[yourserver]'.");
                     _targetServer = DEFAULT_TARGET_SERVER;
                 }
                 else
@@ -233,7 +233,7 @@ public class WebTestHelper
                 if (_contextPath == null)
                 {
                     System.out.println("Using default labkey context path (" + DEFAULT_CONTEXT_PATH +
-                                        ").\nThis can be changed by passing VM arg '-Dlabkey.contextpath=[yourpath]'.");
+                                        ").\nThis can be changed by setting the property 'labkey.contextpath=[yourpath]'.");
                     _contextPath = DEFAULT_CONTEXT_PATH;
                 }
                 else
