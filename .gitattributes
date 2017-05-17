@@ -245,6 +245,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-13.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-13.20.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-0.00-14.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-11.30-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-12.30-13.10.sql -text
@@ -264,7 +265,7 @@ modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-14.10
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-15.00-15.01.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/obsolete/vehicle-15.20-15.21.sql -text
-modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-0.00-14.10.sql -text
+modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-0.00-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.10-15.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/postgresql/vehicle-15.20-15.30.sql -text
@@ -279,6 +280,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-1
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-13.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-13.20.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-0.00-14.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-12.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-12.30-13.10.sql -text
@@ -298,7 +300,7 @@ modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-14.10-
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-15.00-15.01.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-15.10-15.11.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/obsolete/vehicle-15.20-15.21.sql -text
-modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-0.00-14.10.sql -text
+modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-0.00-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-14.30-15.10.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.10-15.20.sql -text
 modules/simpletest/resources/schemas/dbscripts/sqlserver/vehicle-15.20-15.30.sql -text
