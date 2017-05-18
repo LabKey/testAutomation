@@ -1963,12 +1963,12 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
     }
 
-    public void viewQueryData(String schemaName, String queryName)
+    public DataRegionTable viewQueryData(String schemaName, String queryName)
     {
-        viewQueryData(schemaName, queryName, null);
+        return viewQueryData(schemaName, queryName, null);
     }
 
-    public void viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
+    public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
         selectQuery(schemaName, queryName);
         Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
@@ -1978,6 +1978,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertTextPresent("Defined in " + moduleName + " module");
         log("Navigating to " + href);
         beginAt(href);
+        return new DataRegionTable("query", this);
     }
 
     public void editQueryProperties(String schemaName, String queryName)
