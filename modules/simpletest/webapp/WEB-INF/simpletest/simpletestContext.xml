@@ -5,17 +5,15 @@
     <bean id="simpletestPipelineRegistry" class="org.labkey.api.pipeline.TaskPipelineRegistrar">
         <property name="pipelines">
             <list>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummyNlpPipeline"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy NLP invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommand"/>
@@ -23,17 +21,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummy2NlpPipeline"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy2 NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy2 NLP invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy2NlpEngineCommand"/>
@@ -41,17 +37,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummy3NlpPipeline"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy3 NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy NLP3 invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy3NlpEngineCommand"/>
@@ -59,17 +53,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummy2aNlpPipeline"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy2a NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy2a NLP invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy2aNlpEngineCommand"/>
@@ -77,17 +69,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummy2bNlpPipeline"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy2b NLP invocation"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy NLP2b invocation"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocation"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummy2bNlpEngineCommand"/>
@@ -95,17 +85,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummyNlpPipelineNoResults"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy NLP invocation No Results"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy NLP invocation No Results"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocationNoResults"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommandNoResults"/>
@@ -113,17 +101,15 @@
                         </list>
                     </property>
                 </bean>
-                <bean class="org.labkey.api.nlp.pipeline.AbstractionFileAnalysisTaskPipelineSettings">
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
                     <constructor-arg value="dummyNlpPipelineCytogenetics"/>
-                    <constructor-arg>
-                        <bean class="org.labkey.nlp.pipeline.HutchEngineAbstractionConfig"/>
-                    </constructor-arg>
                     <property name="description" value="Dummy NLP invocation Cytogenetics"/>
                     <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
                     <property name="protocolName" value="Dummy NLP invocation Cytogenetics"/>
                     <property name="protocolFactoryName" value="dummyNlpinvocationCytogenetics"/>
                     <property name="initialInputExt" ref="nlpTsvFileType"/>
                     <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
                     <property name="taskProgressionSpec">
                         <list>
                             <ref bean="dummyNlpEngineCommandCytogenetics"/>
