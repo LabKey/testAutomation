@@ -10,6 +10,23 @@
                 <permission>UPDATE</permission>
             </editPermissions>
         </propertyDescriptor>
+        <propertyDescriptor name="TestCheckbox">
+            <inputType>checkbox</inputType>
+        </propertyDescriptor>
+        <propertyDescriptor name="TestSelect">
+            <inputType>select</inputType>
+            <options>
+                <option display="display1" value="value1"/>
+                <option display="display2" value="value2"/>
+            </options>
+        </propertyDescriptor>
+        <propertyDescriptor name="TestCombo">
+            <inputType>combo</inputType>
+            <options>
+                <option display="comboDisplay1" value="comboValue1"/>
+                <option display="comboDisplay2" value="comboValue2"/>
+            </options>
+        </propertyDescriptor>
     </properties>
     <clientDependencies>
         <dependency path="/simpletest/testfile.js" />

@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -45,6 +46,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +57,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -93,32 +96,40 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String RESTRICTED_FOLDER_IMPORT_NAME =
             "/sampledata/SimpleAndRestrictedModule/FolderWithRestricted.folder.zip";
 
+    private final PortalHelper portalHelper = new PortalHelper(this);
+
     protected String getProjectName()
     {
         return getClass().getSimpleName() + " Project";
     }
 
+    @BeforeClass
+    @LogMethod
+    public static void initTest()
+    {
+        SimpleModuleTest init = (SimpleModuleTest) getCurrentTest();
+        init.doSetup();
+    }
+    
     protected void doSetup()
     {
         assertModuleDeployed(MODULE_NAME);
         _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
         assertModuleEnabledByDefault("Portal");
-        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault(MODULE_NAME);
         assertModuleEnabledByDefault("Query");
 
         _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, TABBED_FOLDER_TYPE);
         assertModuleEnabledByDefault("Portal");
-        assertModuleEnabledByDefault("simpletest");
+        assertModuleEnabledByDefault(MODULE_NAME);
         assertModuleEnabledByDefault("Query");
         assertModuleEnabledByDefault("Study");
-
-        createList();
     }
 
     @Test
     public void testSteps() throws Exception
     {
-        doSetup();
+        createList();
         doVerifySteps();
     }
 
@@ -131,7 +142,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestTableAudit();
         doTestViews();
         doTestWebParts();
-        doTestModuleProperties();
         doTestQueries();
         doTestQueryViews();
         doTestReports();
@@ -307,7 +317,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("** Testing query of vehicle schema...");
         goToModule("Query");
-        viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
+        viewQueryData(VEHICLE_SCHEMA, "Toyotas", MODULE_NAME);
 
         assertTextPresent("Prius", "Camry");
 
@@ -557,7 +567,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void cleanupSchema(Connection cn) throws IOException
     {
         // enable simpletest module in Home so we can delete from all containers
-        _containerHelper.enableModule("Home", "simpletest");
+        _containerHelper.enableModule("Home", MODULE_NAME);
 
         cleanupTable(cn, "Vehicles");
         cleanupTable(cn, "Models");
@@ -735,7 +745,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestReports()
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
-        PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
         _rReportHelper.ensureRConfig();
@@ -919,33 +928,78 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
+    private final String subfolderPath = "/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?";
     @LogMethod
-    private void doTestModuleProperties() throws Exception
+    @Test
+    public void testModuleProperties() throws Exception
     {
         String prop1 = "TestProp1";
         String prop1Value = "Prop1Value";
         String prop2 = "TestProp2";
 
-        beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
-        addWebPart("Simple Module Web Part");
+        beginAt(subfolderPath);
+        portalHelper.addWebPart("Simple Module Web Part");
         waitForText("This is a web part view in the simple test module");
 
-        assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+        assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
 
         Map<String, List<String[]>> props = new HashMap<>();
         List<ModulePropertyValue> propList = new ArrayList<>();
-        propList.add(new ModulePropertyValue("simpletest", "/", prop1, prop1Value));
-        propList.add(new ModulePropertyValue("simpletest", "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/", prop1, prop1Value));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCheckbox", "true", ModulePropertyValue.InputType.checkbox));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestSelect", "value1", ModulePropertyValue.InputType.select));
+        propList.add(new ModulePropertyValue(MODULE_NAME, "/", "TestCombo", "comboValue1", ModulePropertyValue.InputType.combo));
 
+        validateInputTypes(propList);
         setModuleProperties(propList);
-
-        beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
-
-        assertEquals("Module context not set propertly", prop1Value, executeScript("return LABKEY.getModuleContext('simpletest')." + prop1));
-        assertEquals("Module context not set propertly", "FolderValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
-
+        // Validate values in folder in which they were set
+        validateValues(propList);
+        // Now check value at parent level
         goToProjectHome();
-        assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+        assertEquals("Module context not set properly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
+    }
+
+    private void validateInputTypes(List<ModulePropertyValue> propList)
+    {
+        List<String> errors = new ArrayList<>();
+        beginAt(subfolderPath);
+        goToModuleProperties();
+        propList.forEach(property -> {
+            Ext4FieldRef ref = getModulePropertyFieldRef(property);
+            String error = "Module property " + property.getPropertyName();
+            if (null == ref)
+                errors.add(error + " was not present");
+            else if (!property.getInputType().getXtype().equals(ref.getEval("xtype")))
+                errors.add(error + " was wrong xtype. Expected " + property.getInputType().getXtype() + " but was " + ref.getEval("xtype"));
+            else if (!property.getInputType().isValid(ref))
+                errors.add(error + " was invalid for its input type " + property.getInputType().toString());
+        });
+
+        if (!errors.isEmpty())
+        {
+            StringJoiner sj = new StringJoiner("\n", "\n", "");
+            errors.forEach(sj::add);
+            fail(sj.toString());
+        }
+    }
+
+    private void validateValues(List<ModulePropertyValue> propList)
+    {
+        List<String> errors = new ArrayList<>();
+        beginAt(subfolderPath);
+        propList.forEach(property ->
+        {
+            Object actualValue = executeScript("return LABKEY.getModuleContext('simpletest')." + property.getPropertyName());
+            if (!property.getValue().equals(actualValue))
+                errors.add(property.getPropertyName() + " has incorrect value. Expected " + property.getValue() + " but was " + actualValue);
+        });
+        if (!errors.isEmpty())
+        {
+            StringJoiner sj = new StringJoiner("\n", "\n", "");
+            errors.forEach(sj::add);
+            fail(sj.toString());
+        }
     }
 
     private static final String DATASET_NAME = "Data Name";
@@ -995,7 +1049,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickFolder(RESTRICTED_FOLDER_NAME);
         impersonateRole("Reader");
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
-        stopImpersonatingRole();
+        stopImpersonating();
         clickProject(getProjectName());
         clickFolder(RESTRICTED_FOLDER_NAME);
         impersonateRole("Folder Administrator");
@@ -1015,7 +1069,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 "Folder type 'Folder With Restricted Module' not set because it requires a restricted module for which you do not have permission.",
                 "Modules not enabled because module 'restrictedModule' is restricted and you do not have the necessary permission to enable it."
         );
-        stopImpersonatingRole();
+        stopImpersonating();
         checkExpectedErrors(2);
     }
 
@@ -1059,7 +1113,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("simpletest");
+        return Arrays.asList(MODULE_NAME);
     }
 
     @Override

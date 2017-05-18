@@ -1343,7 +1343,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return clickAndWaitForDownload(Locator.extButton("Export"));
     }
 
-    private void goToModuleProperties()
+    protected void goToModuleProperties()
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Module Properties"));
@@ -1351,7 +1351,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElementToDisappear(Locator.tag("div").withText("Loading..."));
     }
 
-    private Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)
+    protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)
     {
         Map<String, String> map = new HashMap<>();
         map.put("moduleName", property.getModuleName());
@@ -1383,7 +1383,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 fail("Module property not found: " + desc);
             else
                 log("setting property: " + desc + " to value: " + value.getValue());
-            String val = (String)ref.getValue();
+            String val = value.getInputType().valueToString(ref.getValue());
             if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
             {
                 changed = true;

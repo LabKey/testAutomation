@@ -15,19 +15,82 @@
  */
 package org.labkey.test;
 
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+
 public class ModulePropertyValue
 {
     private String _moduleName;
     private String _containerPath;
     private String _propertyName;
     private String _value;
+    private InputType _inputType;
 
-    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String value)
+    public enum InputType
+    {
+        display("displayfield"),
+        text("textfield"),
+        select("combo")
+                {
+                    @Override
+                    public boolean isValid(Ext4FieldRef field)
+                    {
+                        return !((boolean) field.getEval("editable"));
+                    }
+                },
+        combo("combo")
+                {
+                    @Override
+                    public boolean isValid(Ext4FieldRef field)
+                    {
+                        return ((boolean) field.getEval("editable"));
+                    }
+                },
+        checkbox("checkbox")
+                {
+                    @Override
+                    public String valueToString(Object value)
+                    {
+                        return value.toString();
+                    }
+                };
+
+        String _xtype;
+
+        InputType(String xtype)
+        {
+            _xtype = xtype;
+        }
+
+        public String getXtype()
+        {
+            return _xtype;
+        }
+
+        public boolean isValid(Ext4FieldRef field)
+        {
+            return true;
+        }
+
+        public String valueToString(Object value)
+        {
+            return (String)value;
+        }
+    }
+
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String value, InputType inputType)
     {
         _moduleName = moduleName;
         _containerPath = containerPath;
+        if (!_containerPath.startsWith("/"))
+            _containerPath = "/" + _containerPath;
         _propertyName = propertyName;
         _value = value;
+        _inputType = inputType;
+    }
+
+    public ModulePropertyValue(String moduleName, String containerPath, String propertyName, String value)
+    {
+        this(moduleName, containerPath, propertyName, value, InputType.text);
     }
 
     public String getModuleName()
@@ -48,5 +111,10 @@ public class ModulePropertyValue
     public String getValue()
     {
         return _value;
+    }
+
+    public InputType getInputType()
+    {
+        return _inputType;
     }
 }
