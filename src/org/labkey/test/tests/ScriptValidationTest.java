@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
@@ -48,8 +50,12 @@ import static org.junit.Assert.fail;
  * Test JavaScript validation in file-based modules.
  */
 @Category({DailyB.class, Data.class})
-public class ScriptValidationTest extends SimpleModuleTest
+public class ScriptValidationTest extends BaseWebDriverTest
 {
+    public static final String MODULE_NAME = "simpletest";
+    public static final String VEHICLE_SCHEMA = "vehicle";
+    public static final String LIST_NAME = "People";
+
     public static class ColorRecord
     {
         public String name, hex;
@@ -74,7 +80,6 @@ public class ScriptValidationTest extends SimpleModuleTest
     @Test
     public void testSteps() throws Exception
     {
-        assertModuleDeployed(MODULE_NAME);
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModule(getProjectName(), MODULE_NAME);
         _containerHelper.enableModule(getProjectName(), "Query");
@@ -439,5 +444,17 @@ public class ScriptValidationTest extends SimpleModuleTest
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("simpletest");
+    }
+
+    @Override
+    protected @Nullable String getProjectName()
+    {
+        return getClass().getSimpleName() + " Project";
     }
 }
