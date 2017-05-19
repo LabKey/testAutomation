@@ -187,7 +187,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         _artifactCollector = new ArtifactCollector(this);
         _listHelper = new ListHelper(this);
-        _customizeViewsHelper = DataRegionTable.isNewDataRegion ? new CustomizeView(this) : new CustomizeViewsHelper(this);
+        _customizeViewsHelper = new CustomizeView(this);
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)

@@ -200,10 +200,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (_customizeView == null)
         {
-            if (isNewDataRegion)
-                _customizeView = new CustomizeView(this);
-            else
-                _customizeView = new CustomizeViewsHelper(this);
+            _customizeView = new CustomizeView(this);
         }
         return _customizeView;
     }
