@@ -263,7 +263,7 @@ public class SecurityTest extends BaseWebDriverTest
 //    protected static final int CHANGE_PASSWORD = 2;
 
     /**RESET_PASSWORD means user or admin initiated password change that
-     * involves visiting a webpage specified in an e-mail to change the password,
+     * involves visiting a webpage specified in an email to change the password,
      * without knowing the past password.
      * CHANGE_PASSWORD means a user went into their account information and initiated the change by
      * selecting "change password".  This requires the old password to work.
@@ -338,7 +338,7 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
     String[] wrongPasswordEntered =
-                new String[] {"The e-mail address and password you entered did not match any accounts on file.",
+                new String[] {"The email address and password you entered did not match any accounts on file.",
                 "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
 
     /**

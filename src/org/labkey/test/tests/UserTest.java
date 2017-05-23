@@ -55,7 +55,7 @@ public class UserTest extends BaseWebDriverTest
      *  the search function can't handle the line breaks
      */
     private static final String[] EMAIL_PASSWORD_MISMATCH_ERROR =
-            {"The e-mail address and password you entered did not match any accounts on file.",
+            {"The email address and password you entered did not match any accounts on file.",
              "Note: Passwords are case sensitive; make sure your Caps Lock is off."};
 
     private static final String NORMAL_USER = "normal_user@user.test";
@@ -63,7 +63,7 @@ public class UserTest extends BaseWebDriverTest
     private static final String DEACTIVATED_USER = "disabled_user@user.test";
     private static final String PASSWORD_RESET_USER = "pwreset_user@user.test";
 
-    //users for change e-mail tests.  Both included at top level so they can be included in the clean up.
+    //users for change email tests.  Both included at top level so they can be included in the clean up.
     // only one should exist at any one time, but by deleting both we ensure that nothing persists even if
     // the test fails
     private static final String CHANGE_EMAIL_USER = "pre-pw_change@user.test";

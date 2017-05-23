@@ -145,7 +145,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 if (errors.length() == 0 && null != getUrlParam("message", true))
                     errors = getUrlParam("message", true);
 
-                if (errors.contains("The e-mail address and password you entered did not match any accounts on file."))
+                if (errors.contains("The email address and password you entered did not match any accounts on file."))
                     throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
                 else if (errors.contains("Your password does not meet the complexity requirements; please choose a new password."))
                     throw new IllegalStateException("Password complexity requirement was left on by a previous test");
@@ -445,7 +445,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
-     * change user's e-mail from userEmail to newUserEmail from admin console
+     * change user's email from userEmail to newUserEmail from admin console
      */
     protected void changeUserEmail(String userEmail, String newUserEmail)
     {
