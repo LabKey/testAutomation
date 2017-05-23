@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -34,8 +35,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
-import org.labkey.test.util.PasswordUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,6 @@ public class ScriptValidationTest extends BaseWebDriverTest
 {
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
-    public static final String LIST_NAME = "People";
 
     public static class ColorRecord
     {
@@ -77,19 +77,29 @@ public class ScriptValidationTest extends BaseWebDriverTest
         }
     }
 
-    @Test
-    public void testSteps() throws Exception
+    @BeforeClass
+    public static void initTest()
+    {
+        ScriptValidationTest init = (ScriptValidationTest) getCurrentTest();
+        init.doSetup();
+    }
+
+    @LogMethod
+    protected void doSetup()
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.enableModule(getProjectName(), MODULE_NAME);
-        _containerHelper.enableModule(getProjectName(), "Query");
+    }
 
+    @Test
+    public void testSteps() throws Exception
+    {
         clickProject(getProjectName());
         doTestTransformation();
         doTestValidation();
 
-        log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(getProjectName(), LIST_NAME,
+        log("Create list to prevent query validation failure");
+        _listHelper.createList(getProjectName(), "People",
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
@@ -99,15 +109,15 @@ public class ScriptValidationTest extends BaseWebDriverTest
     private void doTestTransformation() throws Exception
     {
         List<ColorRecord> inserted = insertColors(Arrays.asList(
-                new ColorRecord("Red", "#f00"),
-                new ColorRecord("Blue", "#0f0")
+                new ColorRecord("Yellow", "#f00"),
+                new ColorRecord("Cyan", "#0f0")
         ));
-        assertEquals("Red!", inserted.get(0).name);
-        assertEquals("Blue!", inserted.get(1).name);
+        assertEquals("Yellow!", inserted.get(0).name);
+        assertEquals("Cyan!", inserted.get(1).name);
 
         List<ColorRecord> updated = updateColors(inserted);
-        assertEquals("Red?", updated.get(0).name);
-        assertEquals("Blue?", updated.get(1).name);
+        assertEquals("Yellow?", updated.get(0).name);
+        assertEquals("Cyan?", updated.get(1).name);
     }
 
     private void doTestValidation() throws Exception
@@ -379,7 +389,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
     {
         log("** Selecting colors...");
 
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = createDefaultConnection(true);
         SelectRowsCommand cmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.addFilter("Name", StringUtils.join(names, ";"), Filter.Operator.IN);
         SelectRowsResponse response = cmd.execute(cn, getProjectName());
@@ -403,7 +413,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             list.add(color.toMap());
 
         log("** Inserting colors...");
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = createDefaultConnection(true);
         InsertRowsCommand cmd = new InsertRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
@@ -428,7 +438,7 @@ public class ScriptValidationTest extends BaseWebDriverTest
             list.add(color.toMap());
 
         log("** Updating colors...");
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = createDefaultConnection(true);
         UpdateRowsCommand cmd = new UpdateRowsCommand(VEHICLE_SCHEMA, "Colors");
         cmd.getRows().addAll(list);
         cmd.setExtraContext(extraContext);
