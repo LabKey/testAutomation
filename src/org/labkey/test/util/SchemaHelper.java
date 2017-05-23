@@ -76,11 +76,11 @@ public class SchemaHelper
             // There are multiple Ext form elements on this row, so the label for the actual combo box is empty
             _test._ext4Helper.selectComboBoxItem("", sourceSchemaName);
 
+            _test.waitForElement(Locator.css(".query-loaded-marker"));
         }
 
         if (tables != null)
         {
-            _test.waitForElement(Locator.css(".query-loaded-marker"));
             if (schemaTemplate != null)
             {
                 // click "Override template value" widget
