@@ -25,6 +25,7 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,12 @@ public class UserNotificationsPanel extends Component
         _notificationPanel = we;
     }
 
-    public static String getInboxCount(BaseWebDriverTest test)
+    public static int getInboxCount(BaseWebDriverTest test)
     {
-        return test.getText(inboxCount);
+        String s = test.getText(inboxCount);
+        if (StringUtils.isEmpty(s))
+            return 0;
+        return Integer.parseInt(s);
     }
 
     public static UserNotificationsPanel clickInbox(BaseWebDriverTest test)
