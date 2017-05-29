@@ -730,9 +730,9 @@ public class Crawler
                 crawlLink(urlToCheck);
                 linkCount++;
             }
+            _crawlTime = (int) (System.currentTimeMillis() - startTime);
         }
 
-        _crawlTime = (int) (System.currentTimeMillis() - startTime);
         return linkCount;
     }
 
