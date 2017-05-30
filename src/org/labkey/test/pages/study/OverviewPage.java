@@ -18,6 +18,8 @@ package org.labkey.test.pages.study;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.CachingLocator;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
@@ -37,6 +39,12 @@ public class OverviewPage extends LabKeyPage
     public OverviewPage(WebDriver driver)
     {
         super(driver);
+    }
+
+    public static OverviewPage beginAt(WebDriverWrapper driver)
+    {
+        driver.beginAt(WebTestHelper.buildURL("study", driver.getCurrentContainerPath(), "overview"));
+        return new OverviewPage(driver.getDriver());
     }
 
     public boolean isParticipantCountShown()
@@ -130,7 +138,7 @@ public class OverviewPage extends LabKeyPage
     {
         Map<String, List<CountPair>> datasetRowData = new HashMap<>();
         List<WebElement> overviewRows = elements().getStudyOverviewRows();
-        overviewRows = overviewRows.subList(1, overviewRows.size() - 1);
+        overviewRows = overviewRows.subList(1, overviewRows.size());
 
         for (WebElement row : overviewRows)
         {
