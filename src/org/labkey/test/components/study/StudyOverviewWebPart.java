@@ -15,34 +15,34 @@
  */
 package org.labkey.test.components.study;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.pages.study.OverviewPage;
 import org.labkey.test.selenium.LazyWebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StudyOverviewWebPart extends BodyWebPart
+public class StudyOverviewWebPart extends BodyWebPart<StudyOverviewWebPart.Elements>
 {
     private static final String DEFAULT_TITLE = "Study Overview";
 
-    public StudyOverviewWebPart(BaseWebDriverTest test)
+    public StudyOverviewWebPart(WebDriver driver)
     {
-        this(test, DEFAULT_TITLE);
+        this(driver, DEFAULT_TITLE);
     }
 
-    public StudyOverviewWebPart(BaseWebDriverTest test, String title)
+    public StudyOverviewWebPart(WebDriver driver, String title)
     {
-        super(test, title);
+        super(driver, title);
     }
 
     public int getParticipantCount()
     {
-        String studyProperties = elements().studyProperties.getText();
+        String studyProperties = elementCache().studyProperties.getText();
         Pattern participantCountPattern = Pattern.compile("Data is present for (\\d+)");
         Matcher matcher = participantCountPattern.matcher(studyProperties);
         if (matcher.find())
@@ -53,29 +53,29 @@ public class StudyOverviewWebPart extends BodyWebPart
 
     public OverviewPage clickStudyNavigator()
     {
-        _test.clickAndWait(elements().linkStudyNavigator);
+        getWrapper().clickAndWait(elementCache().linkStudyNavigator);
         return new OverviewPage(getDriver());
     }
 
     public LabKeyPage clickManageStudy()
     {
-        _test.clickAndWait(elements().linkManageStudy);
+        getWrapper().clickAndWait(elementCache().linkManageStudy);
         return new LabKeyPage(getDriver());
     }
 
     public LabKeyPage clickManageFiles()
     {
-        _test.clickAndWait(elements().linkManageFiles);
+        getWrapper().clickAndWait(elementCache().linkManageFiles);
         return new LabKeyPage(getDriver());
     }
 
     @Override
-    protected Elements elements()
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    private class Elements extends BodyWebPart.Elements
+    protected class Elements extends BodyWebPart.ElementCache
     {
         WebElement studyProperties = new LazyWebElement(Locator.css("td.study-properties"), this);
         WebElement linkStudyNavigator = new LazyWebElement(Locator.tag("a").withText("Study Navigator"), this);
