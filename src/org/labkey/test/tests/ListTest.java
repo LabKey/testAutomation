@@ -1045,6 +1045,41 @@ public class ListTest extends BaseWebDriverTest
         searchFor(getProjectName(), "hypertrophimadeupword", 1, null);
     }
 
+    @Test
+    public void testAttachmentColumnDeletion()
+    {
+        final String listName = "Attachment Column Delete List";
+        final String path = TestFileUtils.getSampleData("lists/searchData.tsv").getAbsolutePath();
+        final String attachmentCol = "Attachment";
+        final String descriptionCol = "Description";
+
+        Map<String, String> row = new HashMap<>();
+        row.put(descriptionCol, "randomText");
+        row.put(attachmentCol, path);
+
+        goToProjectHome();
+
+        // create list with an attachment column
+        _listHelper.createList(getProjectName(), listName, ListHelper.ListColumnType.AutoInteger, "id",
+                               col(descriptionCol, String),
+                               col(attachmentCol, Attachment));
+        // index on attachment column
+        _listHelper.clickEditDesign();
+        _listHelper.checkIndexFileAttachements(true);
+        _listHelper.clickSave();
+
+        // Insert data, upload attachment
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.insertNewRow(row);
+
+        // Now remove attachment column and check audit log
+        dataregionToEditDesign();
+        _listHelper.deleteField("List Fields", 2);
+        _listHelper.clickSave();
+        AuditLogTest.verifyAuditEvent(this, "Attachment events", AuditLogTest.COMMENT_COLUMN, "The attachment searchData.tsv was deleted", 1);
+    }
+
     //
     // CUSTOMIZE URL tests
     //
