@@ -75,16 +75,34 @@ public class AssayAPITest extends BaseWebDriverTest
 //        _assayHelper.getCurrentAssayNumber();
     }
 
+    protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
+                                      String runName, String[] textToCheck) throws IOException, CommandException
+    {
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
+        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
+        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
+
+        log("verify import worked");
+        goToProjectHome();
+        clickAndWait(Locator.linkContainingText(assayName));
+        clickAndWait(Locator.linkContainingText(runName));
+        assertTextPresent(textToCheck);
+    }
+
     // Issue 30003: support importing assay data relative to pipeline root
     @Test
     public void testImportRun_serverFilePath() throws Exception
     {
         goToProjectHome();
 
-        String assayName = "GPAT-RunFilePath";
+        String assayName = "GPAT-ImportRunApi";
         APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.createAssayWithDefaults("General", assayName);
-        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
+        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
+        if (assayId == 0)
+        {
+            assayHelper.createAssayWithDefaults("General", assayName);
+            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
+        }
 
         // First, simulate file already being uploaded to the server by copying to the pipeline root
         List<String> lines1 = Arrays.asList(
@@ -92,8 +110,9 @@ public class AssayAPITest extends BaseWebDriverTest
                 "p01\t2017-05-10\n",
                 "p02\t2017-05-10\n"
         );
+        File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         Path relativePath1 = Paths.get("testImportRunFilePath", "results1.tsv");
-        Path pipelinePath1 = createDataFile(relativePath1, lines1);
+        Path pipelinePath1 = createDataFile(fileRoot, relativePath1, lines1);
 
         // import the file using a relative path
         ImportRunResponse resp = assayHelper.importAssay(assayId, relativePath1.toString(), getProjectName(), Collections.emptyMap());
@@ -108,7 +127,7 @@ public class AssayAPITest extends BaseWebDriverTest
                 "p04\t2017-05-10\n"
         );
         Path relativePath2 = Paths.get("testImportRunFilePath", "results2.tsv");
-        Path pipelinePath2 = createDataFile(relativePath2, lines2);
+        Path pipelinePath2 = createDataFile(fileRoot, relativePath2, lines2);
 
         // import the file using an absolute path
         resp = assayHelper.importAssay(assayId, pipelinePath2.toString(), getProjectName(), Collections.emptyMap());
@@ -129,9 +148,8 @@ public class AssayAPITest extends BaseWebDriverTest
         }
     }
 
-    private Path createDataFile(Path relativePath, Iterable<String> lines) throws IOException
+    public static Path createDataFile(File fileRoot, Path relativePath, Iterable<String> lines) throws IOException
     {
-        File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
         Path pipelinePath = fileRoot.toPath().resolve(relativePath);
         if (!Files.isRegularFile(pipelinePath))
         {
@@ -142,6 +160,31 @@ public class AssayAPITest extends BaseWebDriverTest
         }
         return pipelinePath;
     }
+
+    // Issue 22632: import runs into GPAT assay using LABKEY.Assay.importRun() API with data rows
+    @Test
+    public void testImportRun_dataRows() throws Exception
+    {
+        String assayName = "GPAT-ImportRunApi";
+        APIAssayHelper assayHelper = new APIAssayHelper(this);
+        int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
+        if (assayId == 0)
+        {
+            assayHelper.createAssayWithDefaults("General", assayName);
+            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
+        }
+
+        List<Map<String, Object>> dataRows = Arrays.asList(
+                Maps.of("ptid", "p01", "date", "2017-05-10"),
+                Maps.of("ptid", "p02", "date", "2017-05-10")
+        );
+
+        // import the file using a relative path
+        ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.emptyMap());
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("p01", "p02");
+    }
+
 
     // Issue 21247: Import runs into GPAT assay using LABKEY.Experiment.saveBatch() API
     @Test
@@ -166,20 +209,6 @@ public class AssayAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(runName));
         DataRegionTable table = new DataRegionTable("Data", this);
         Assert.assertEquals(Arrays.asList("K770K3VY-19", "A770K4W1-15"), table.getColumnDataAsText("SpecimenID"));
-    }
-
-    protected void  importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
-                                      String runName, String[] textToCheck) throws IOException, CommandException
-    {
-        APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
-        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
-
-        log("verify import worked");
-        goToProjectHome();
-        clickAndWait(Locator.linkContainingText(assayName));
-        clickAndWait(Locator.linkContainingText(runName));
-        assertTextPresent(textToCheck);
     }
 
     @Override

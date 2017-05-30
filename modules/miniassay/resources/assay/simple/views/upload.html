@@ -51,6 +51,7 @@
   </tr>
 </table>
 
+<br/>
 <div id='runs_div'></div>
 
 <script type="text/javascript">
@@ -206,16 +207,18 @@ function renderRunsWebPart()
 {
   if (LABKEY.page.batch.id)
   {
-    var partConfig = {};
-    partConfig.viewProtocolId = LABKEY.page.assay.id;
-    partConfig[LABKEY.page.assay.name + " Runs.Batch/RowId~eq"] = LABKEY.page.batch.id;
-
-    webpart = new LABKEY.WebPart({
-      partName: 'Assay Runs',
+    webpart = new LABKEY.QueryWebPart({
       renderTo: 'runs_div',
       frame: 'none',
-      partConfig: partConfig
-      });
+      schemaName: LABKEY.page.assay.protocolSchemaName,
+      queryName: 'Runs',
+      filters: [ LABKEY.Filter.create('Batch/RowId', LABKEY.page.batch.id) ],
+      buttonBar: {
+          position: 'none'
+      },
+      showDetailsColumn: false,
+      showRecordSelectors: false
+    });
   }
 
   if (webpart) webpart.render();

@@ -63,6 +63,16 @@ public class APIAssayHelper extends AbstractAssayHelper
         return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
     }
 
+    @LogMethod(quiet = true)
+    public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
+    {
+        ImportRunCommand  irc = new ImportRunCommand(assayID, dataRows);
+        irc.setName(runName);
+        irc.setBatchProperties(batchProperties);
+        irc.setTimeout(180000); // Wait 3 minutes for assay import
+        return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
+    }
+
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         importAssay(assayName, file, projectPath, Collections.singletonMap("ParticipantVisitResolver", "SampleInfo"));
@@ -81,6 +91,11 @@ public class APIAssayHelper extends AbstractAssayHelper
 
     public int getIdFromAssayName(String assayName, String projectPath)
     {
+        return getIdFromAssayName(assayName, projectPath, true);
+    }
+
+    public int getIdFromAssayName(String assayName, String projectPath, boolean failIfNotFound)
+    {
         AssayListCommand alc = new AssayListCommand();
         alc.setName(assayName);
         AssayListResponse alr = null;
@@ -90,16 +105,23 @@ public class APIAssayHelper extends AbstractAssayHelper
         }
         catch (CommandException | IOException e)
         {
-            if(e.getMessage().contains("Not Found"))
-                throw new AssertionError("Assay or project not found", e);
+            if (e.getMessage().contains("Not Found"))
+            {
+                if (failIfNotFound)
+                    throw new AssertionError("Assay or project not found", e);
+                return 0;
+            }
             else
                 throw new RuntimeException(e);
         }
 
-        if(alr.getDefinition(assayName)==null)
-            fail("Assay not found");
+        if (alr.getDefinition(assayName) == null)
+        {
+            if (failIfNotFound)
+                fail("Assay not found");
+            return 0;
+        }
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
-
     }
 
     public void saveBatch(String assayName, String runName, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException

@@ -16,21 +16,33 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.assay.ImportRunResponse;
+import org.labkey.test.AssayAPITest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.APIAssayHelper;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Assays.class})
 public class ModuleAssayTest extends AbstractAssayTest
@@ -64,13 +76,77 @@ public class ModuleAssayTest extends AbstractAssayTest
         return BrowserType.CHROME;
     }
 
+    @Before
+    public void preTest()
+    {
+        clickProject(PROJECT_NAME);
+    }
+
+    @BeforeClass
+    public static void setupStuff() throws Exception
+    {
+        ModuleAssayTest init = (ModuleAssayTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup() throws Exception
+    {
+        checkModuleDeployed();
+        setupProject();
+    }
+
+    protected void setupProject() throws Exception
+    {
+        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.enableModule("miniassay");
+        setupPipeline(PROJECT_NAME);
+        createAssayDesign();
+        createSampleSet();
+        checkErrors();
+    }
+
+    protected void createAssayDesign()
+    {
+        PortalHelper portalHelper = new PortalHelper(this);
+
+        log("Creating assay design");
+        clickProject(PROJECT_NAME);
+
+        portalHelper.addWebPart("Assay List");
+        clickButton("Manage Assays");
+        clickButton("New Assay Design");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Noblis Simple"));
+        clickButton("Next");
+
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        log("Setting up simple assay");
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "My Simple Assay Description");
+
+        sleep(1000);
+        clickButton("Save", 0);
+        waitForText(20000, "Save successful.");
+    }
+
+    protected void createSampleSet()
+    {
+        PortalHelper portalHelper = new PortalHelper(this);
+
+        log("Creating sample set");
+        clickProject(PROJECT_NAME);
+
+        portalHelper.addWebPart("Sample Sets");
+        clickButton("Import Sample Set");
+        setFormElement(Locator.name("name"), SAMPLE_SET);
+        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
+        clickButton("Submit");
+    }
+
     @Test
     public void runUITests() throws Exception
     {
         log("Starting ModuleAssayTest");
-
-        checkModuleDeployed();
-        setupProject();
 
         String batchName = "First Batch";
         uploadBatch(batchName, "run01.tsv", "run02.tsv");
@@ -93,7 +169,8 @@ public class ModuleAssayTest extends AbstractAssayTest
         _extHelper.clickMenuButton("Grid Views", "default");
 
         log("Visit batch details page");
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable table = new DataRegionTable("Batches", this);
+        clickAndWait(table.detailsLink(table.getRowIndex("Name", batchName)));
         assertTitleEquals(batchName + " Details: /" + PROJECT_NAME);
         waitForElement(Locator.id("RunName_0"), WAIT_FOR_JAVASCRIPT);
         assertElementContains(Locator.id("RunName_0"), "run01");
@@ -192,58 +269,76 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent("LegacyPrefixsuper secret!Suffix", "LegacyPrefixwakka wakkaSuffix");
     }
 
+    @Test
+    public void testImportRun_uploadFile() throws Exception
+    {
+        APIAssayHelper ah = new APIAssayHelper(this);
+
+        File dataRoot = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/miniassay/data");
+        File file = new File(dataRoot, "run01.tsv");
+        assertTrue(file.exists());
+
+        int assayId = ah.getIdFromAssayName(ASSAY_NAME, PROJECT_NAME);
+        ImportRunResponse resp = ah.importAssay(assayId, file, PROJECT_NAME, null);
+
+        int runId = resp.getRunId();
+        Assert.assertTrue("Expected to insert a run", runId > 0);
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("Monkey 1", "Monkey 2");
+    }
+
+    @Test
+    public void testImportRun_serverFilePath() throws Exception
+    {
+        APIAssayHelper ah = new APIAssayHelper(this);
+
+        // First, simulate file already being uploaded to the server by copying to the pipeline root
+        List<String> lines1 = Arrays.asList(
+                "sampleId\ttimepoint\thiddenData\n",
+                "Monkey 45\t2017-05-23\tlololol\n"
+        );
+        Path relativePath1 = Paths.get("testImportRunFilePath", "results1.tsv");
+        File fileRoot = TestFileUtils.getTestTempDir();
+        Path pipelinePath1 = AssayAPITest.createDataFile(fileRoot, relativePath1, lines1);
+
+        int assayId = ah.getIdFromAssayName(ASSAY_NAME, PROJECT_NAME);
+        ImportRunResponse resp = ah.importAssay(assayId, relativePath1.toString(), PROJECT_NAME, null);
+
+        int runId = resp.getRunId();
+        Assert.assertTrue("Expected to insert a run", runId > 0);
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("Monkey 45");
+
+    }
+
+    // Issue 22632: import runs into module-based assay using LABKEY.Assay.importRun() API with data rows
+    @Test
+    public void testImportRun_dataRows() throws Exception
+    {
+        APIAssayHelper ah = new APIAssayHelper(this);
+
+        List<Map<String, Object>> dataRows = new ArrayList<>();
+        dataRows.add(Maps.of(
+                "sampleId", "Monkey 72",
+                "timepoint", "2017-05-26",
+                "doubleData", 2.3,
+                "hiddenData", "foo"));
+
+        int assayId = ah.getIdFromAssayName(ASSAY_NAME, PROJECT_NAME);
+        ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, PROJECT_NAME, null);
+
+        int runId = resp.getRunId();
+        Assert.assertTrue("Expected to insert a run", runId > 0);
+        beginAt(resp.getSuccessURL());
+        assertTextPresent("Monkey 72");
+    }
+
+
     protected void checkModuleDeployed()
     {
         log("Checking miniassay module is deployed");
         goToAdminConsole();
         assertTextPresent(MODULE_NAME);
-    }
-
-    protected void setupProject() throws Exception
-    {
-        _containerHelper.createProject(PROJECT_NAME, null);
-        _containerHelper.enableModule("miniassay");
-        setupPipeline(PROJECT_NAME);
-        createAssayDesign();
-        createSampleSet();
-    }
-
-    protected void createAssayDesign()
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-
-        log("Creating assay design");
-        clickProject(PROJECT_NAME);
-
-        portalHelper.addWebPart("Assay List");
-        clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Noblis Simple"));
-        clickButton("Next");
-
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-
-        log("Setting up simple assay");
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "My Simple Assay Description");
-
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
-    }
-
-    protected void createSampleSet()
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-
-        log("Creating sample set");
-        clickProject(PROJECT_NAME);
-
-        portalHelper.addWebPart("Sample Sets");
-        clickButton("Import Sample Set");
-        setFormElement(Locator.name("name"), SAMPLE_SET);
-        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
-        clickButton("Submit");
     }
 
     protected void uploadBatch(String batchName, String... uploadedFiles)
