@@ -1,8 +1,11 @@
 package org.labkey.test.pages;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
  * Created by RyanS on 5/18/2017.
@@ -25,10 +28,26 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
         _extHelper.selectComboBoxItem("Format:", format.format);
     }
 
-    public void setUseAltKey(boolean useAltKey)
+    public void setImportLookupByAlternateKey(boolean useAltKey)
     {
-        if(useAltKey)checkCheckbox(elementCache().importAltKeyChk);
-        else uncheckCheckbox(elementCache().importAltKeyChk);
+        // Find the checkbox for the currently expanded section
+        List<WebElement> els = elementCache().importAltKeyChk.findElements(this.elementCache());
+        WebElement input = null;
+        for (WebElement el : els)
+        {
+            if (!el.isDisplayed())
+                continue;
+            input = el;
+            break;
+        }
+
+        if (input == null)
+            Assert.fail("Failed to find checkbox: " + elementCache().importAltKeyChk.toString());
+
+        if (useAltKey)
+            checkCheckbox(input);
+        else
+            uncheckCheckbox(input);
     }
 
     public void selectUpload()
@@ -72,7 +91,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
 
     public void submit()
     {
-        click(elementCache().submitBtn);
+        clickAndWait(elementCache().submitBtn);
     }
 
     public void cancel()
@@ -102,7 +121,7 @@ public class ImportDataPage extends LabKeyPage<ImportDataPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         WebElement pasteDataTextArea = Locator.xpath("//div[@id='copypasteDiv1']/descendant::textarea").findWhenNeeded(this);
-        WebElement importAltKeyChk = Locator.input("importLookupByAlternateKey").findWhenNeeded(this);
+        Locator importAltKeyChk = Locator.input("importLookupByAlternateKey");//.findWhenNeeded(this);
         WebElement submitBtn = Locator.button("Submit").findWhenNeeded(this);
         WebElement cancelBtn = Locator.button("Cancel").findWhenNeeded(this);
         WebElement uploadExpando = Locator.id("uploadFileDiv2Expando").findWhenNeeded(this);

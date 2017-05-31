@@ -51,12 +51,12 @@ public class ExtHelper
 
     public void clickImportBulkData()
     {
-        clickMenuButton(true, "Insert", "Insert New Row");
+        clickMenuButton(true, "Insert", "Import Bulk Data");
     }
 
     public void clickImportBulkData(boolean wait)
     {
-        clickMenuButton(wait, "Insert", "Insert New Row");
+        clickMenuButton(wait, "Insert", "Import Bulk Data");
     }
 
     public void clickMenuButton(String menusLabel, String... subMenuLabels)
