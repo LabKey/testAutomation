@@ -20,6 +20,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
     public EditDatasetDefinitionPage saveExpectFail(String partialAlertTxt)
     {
         click(elementCache().saveButton);
+        sleep(1000);
         assertAlertContains(partialAlertTxt);
         cancel();
         return new EditDatasetDefinitionPage(getDriver());
