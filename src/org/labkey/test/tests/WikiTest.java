@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
@@ -64,7 +63,7 @@ public class WikiTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected String getSubolderName()
+    protected String getSubfolderName()
     {
           return "Subfolder";
     }
@@ -104,12 +103,12 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
-        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
+        File file = wikiHelper.getSampleFile();
         setFormElement(Locator.name("formFiles[0]"), file);
         wikiHelper.saveWikiPage();
 
         DataRegionTable.waitForDataRegion(this, WIKI_PAGE_WEBPART_ID);
-        assertTextPresent("common.properties", "Some HTML content");
+        assertTextPresent(file.getName(), "Some HTML content");
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);
         impersonateRole("Reader");
@@ -133,7 +132,7 @@ public class WikiTest extends BaseWebDriverTest
         doTestInlineEditor();
 
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
-        _containerHelper.createSubfolder(getProjectName(), getSubolderName(), new String[]{});
+        _containerHelper.createSubfolder(getProjectName(), getSubfolderName(), new String[]{});
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + getProjectName());
@@ -149,7 +148,7 @@ public class WikiTest extends BaseWebDriverTest
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
 
         log("verify second wiki part pointing to first handled delete well");
-        clickFolder(getSubolderName());
+        clickFolder(getSubfolderName());
         assertTextPresent("This folder does not currently contain any wiki pages to display");
     }
 

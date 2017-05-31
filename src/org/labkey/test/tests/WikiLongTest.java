@@ -210,10 +210,10 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
 
-        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
+        File file = _wikiHelper.getSampleFile();
         setFormElement(Locator.name("formFiles[0]"), file);
         _wikiHelper.saveWikiPage();
-        waitForElement(Locator.linkContainingText("common.properties"));
+        waitForElement(Locator.linkContainingText(file.getName()));
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST,
                 "Some HTML content");
 

@@ -45,9 +45,6 @@ import static org.labkey.test.Locator.NBSP;
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
-    public static final String NO_MESSAGES = "No messages";
-    PortalHelper portalHelper = new PortalHelper(this);
-
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
     private static final String MSG1_BODY = "this is a test message to Banana";
@@ -71,10 +68,9 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
     private static final String TEMPLATE_TEXT = "***Please do not reply to this email notification. Replies to this email are routed to an unmonitored mailbox. Instead, please use the link below.***";
+    private static final String USER = "message_user@gmail.com";
+    private static final String GROUP = "Message group";
 
-    String user = "message_user@gmail.com";
-    String group = "Message group";
-    String messageUserId;
     public static final String FILES_DEFAULT_COMBO = "Default Setting For Files:";
     public static final String MESSAGES_DEFAULT_COMBO = "Default Setting For Messages:";
     public static final String USERS_UPDATE_BUTTON = "Update User Settings";
@@ -82,6 +78,9 @@ public class MessagesLongTest extends BaseWebDriverTest
     public static final String POPUP_UPDATE_BUTTON = "Update Settings For 1 User";
     public static final String FILES_MENU_ITEM = "For Files";
     public static final String MESSAGES_MENU_ITEM = "For Messages";
+
+    private final PortalHelper _portalHelper = new PortalHelper(this);
+    private String _messageUserId;
 
     public List<String> getAssociatedModules()
     {
@@ -120,17 +119,15 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, user);
+        deleteUsersIfPresent(USER1, USER2, USER3, RESPONDER, USER);
         _containerHelper.deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
         modifyTemplate(false);
         goToHome();
-
     }
 
     @Test
     public void testSteps()
     {
-
         log("Modify the default email template for message board notification.");
         // This is done to test Issue 23934: Allow customization of email template for message board notifications
         modifyTemplate(true);
@@ -153,13 +150,13 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
         clickButton("Update");
         clickButton("Done");
 
         log("Customize message board");
-        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.checkboxByName("expires"));
         clickButton("Save");
 
@@ -167,7 +164,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
-        portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         selectOptionByText(Locator.name("rendererType"), "Wiki Page");
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.name("expires"), EXPIRES1);
@@ -221,8 +218,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickRespondButton();
         setFormElement(Locator.id("body"), RESP2_BODY);
         click(Locator.linkContainingText("Attach a file"));
-        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
-        setFormElement(Locator.name("formFiles[00]"), file);
+        File attachmentFile = TestFileUtils.getSampleData("fileTypes/pdf_sample.pdf");
+        setFormElement(Locator.name("formFiles[00]"), attachmentFile);
         clickButton("Submit", longWaitForPage);
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
@@ -241,7 +238,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check with security");
         clickProject(PROJECT_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
         permissionCheck("Reader", false);
@@ -249,18 +246,18 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check if the customized names work");
         clickProject(PROJECT_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         setFormElement(Locator.name("boardName"), "Notes");
         setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
         assertTextPresent("Notes", "thread");
-        portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
+        _portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
         setFormElement(Locator.name("boardName"), "Messages");
         setFormElement(Locator.name("conversationName"), "Message");
         clickButton("Save");
 
         log("Check if sorting works");
-        portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.name("title"), MSG2_TITLE);
         clickButton("Submit", longWaitForPage);
         clickAndWait(Locator.linkWithText("Messages"));
@@ -309,7 +306,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         testMemberLists();
 
         clickProject(PROJECT_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure"));
         clickButton("Save");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
@@ -349,9 +346,9 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check attachment linked in emailed message");
         click(Locator.linkWithText("RE: " + MSG1_TITLE));
-        assertTextPresent("common.properties");
+        assertTextPresent(attachmentFile.getName());
         assertTextNotPresent(TEMPLATE_TEXT);
-        assertElementPresent(Locator.linkWithText("common.properties"));
+        assertElementPresent(Locator.linkWithText(attachmentFile.getName()));
 
         log("Validate that the Message Board Daily Digest is sent.");
         getDriver().navigate().to(WebTestHelper.getBaseURL() + "/announcements/home/sendDailyDigest.view?");
@@ -359,7 +356,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertTextPresent("New posts to /" + PROJECT_NAME, 2);
         click(Locator.linkWithText("New posts to /" + PROJECT_NAME));
         assertTextPresent("The following new posts were made yesterday");
-
     }
 
     private void verifyAdmin()
@@ -371,7 +367,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         final String fileDefaultNewSetting = "Daily digest";
 
         log("Check folder default settings");
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Administration");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Administration");
 
         assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
 
@@ -387,7 +383,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         final String messageColumn = "Message Settings";
 
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
-        new DataRegionTable(usersDataRegion, getDriver()).checkCheckboxByPrimaryKey(messageUserId);
+        new DataRegionTable(usersDataRegion, getDriver()).checkCheckboxByPrimaryKey(_messageUserId);
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
         click(Locator.lkButton(USERS_UPDATE_BUTTON));
         waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
@@ -397,7 +393,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Yes");
 
         DataRegionTable dr = new DataRegionTable(usersDataRegion, getDriver());
-        assertEquals(dr.getDataAsText(messageUserId, messageColumn), userSettingNew);
+        assertEquals(dr.getDataAsText(_messageUserId, messageColumn), userSettingNew);
      }
 
     private void testMemberLists()
@@ -426,7 +422,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         clickProject(PROJECT_NAME);
-        portalHelper.clickWebpartMenuItem("Messages", true, "New");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.id(MEMBER_LIST), USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
         clickButtonContainingText("OK", 0);
@@ -487,7 +483,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     }
 
 
-     private void clickRespondButton()
+    private void clickRespondButton()
     {
         clickButton("Respond");
     }
@@ -503,7 +499,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         clickButton("Save and Finish");
 
-        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
+        _portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
         clickButton("Update");
         clickButton("Done");
@@ -549,15 +545,15 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void basicMessageTests()
     {
         log("Add search to project");
-        portalHelper.addWebPart("Search");
+        _portalHelper.addWebPart("Search");
 
-        messageUserId = _userHelper.createUser(user).getUserId().toString();
+        _messageUserId = _userHelper.createUser(USER).getUserId().toString();
         goToHome();
         goToProjectHome();
-        _permissionsHelper.createPermissionsGroup(group);
-        _permissionsHelper.setPermissions(group, "Editor");
+        _permissionsHelper.createPermissionsGroup(GROUP);
+        _permissionsHelper.setPermissions(GROUP, "Editor");
 //        add
-        _permissionsHelper.addUserToProjGroup(user, getProjectName(), group);
+        _permissionsHelper.addUserToProjGroup(USER, getProjectName(), GROUP);
         goToProjectHome();
 
         log("Check that Plain Text message works and is added everywhere");
@@ -576,11 +572,10 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("test attachments too");
         click(Locator.linkContainingText("Attach a file"));
-        File file = new File(TestFileUtils.getLabKeyRoot() + "/common.properties");
-        setFormElement(Locator.name("formFiles[00]"), file);
+        File attachmentFile = TestFileUtils.getSampleData("fileTypes/docx_sample.docx");
+        setFormElement(Locator.name("formFiles[00]"), attachmentFile);
         clickButton("Submit");
-        assertTextPresent("common.properties",
-                MSG1_BODY_FIRST);
+        assertTextPresent(attachmentFile.getName(), MSG1_BODY_FIRST);
         clickAndWait(Locator.linkWithText("view message or respond"));
         clickAndWait(Locator.linkWithText("view list"));
         assertTextPresent(MSG1_TITLE);
@@ -594,14 +589,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         click(Locator.linkWithText("remove"));
         waitForText("This cannot be undone");
         clickButton("OK", 0);
-        waitForTextToDisappear("common.properties");
-        assertTextNotPresent("common.properties");
+        waitForTextToDisappear(attachmentFile.getName());
+        assertTextNotPresent(attachmentFile.getName());
         clickButton("Submit");
         assertTextPresent(MSG1_BODY);
 
-
         log("verify a user can subscribe to a thread");
-        impersonate(user);
+        impersonate(USER);
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("view message"));
         Locator subscribeButton = Locator.tagWithText("span", "subscribe");
@@ -615,7 +609,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickAndWait(Locator.tagWithText("span", "forum"));
         clickButton("Update");
         clickButton("Done");
-
 
         stopImpersonating();
         goToProjectHome();
@@ -645,7 +638,6 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     private void schemaTest()
     {
-
         SelectRowsCommand selectCmd = new SelectRowsCommand("announcement", "ForumSubscription");
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
@@ -660,7 +652,6 @@ public class MessagesLongTest extends BaseWebDriverTest
             selectResp = executeSelectRowCommand("announcement", queries[i]);
             assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
         }
-
     }
 
     private void modifyTemplate(boolean modify)
@@ -683,5 +674,4 @@ public class MessagesLongTest extends BaseWebDriverTest
             }
         }
     }
-
 }

@@ -85,6 +85,12 @@ public class WikiHelper
         createWikiPage(name, format, title, body, true, attachment, true);
     }
 
+    public File getSampleFile()
+    {
+        // Just a random file to test attachments, etc.
+        return TestFileUtils.getSampleData("fileTypes/xls_sample.xls");
+    }
+
     private void setSourceFromFile(File file)
     {
         setSource(TestFileUtils.getFileContents(file));
