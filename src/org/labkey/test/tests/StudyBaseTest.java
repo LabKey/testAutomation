@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.StudyHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Select;
 
@@ -101,14 +102,22 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         return Arrays.asList("study");
     }
 
+    /**
+     * @deprecated TODO: Inline and remove
+     */
+    @Deprecated
     protected static String getStudySampleDataPath()
     {
-        return "/sampledata/study/";
+        return StudyHelper.getStudySampleDataPath();
     }
 
+    /**
+     * @deprecated TODO: Inline and remove
+     */
+    @Deprecated
     protected String getPipelinePath()
     {
-        return TestFileUtils.getLabKeyRoot() + getStudySampleDataPath();
+        return StudyHelper.getPipelinePath();
     }
 
     protected String getProjectName()
