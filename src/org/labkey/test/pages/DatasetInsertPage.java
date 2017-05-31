@@ -33,6 +33,7 @@ public class DatasetInsertPage extends InsertPage
     public DatasetInsertPage(WebDriver driver, String datasetName)
     {
         super(driver, "Insert new entry: " + datasetName);
+        waitForReady();
     }
 
     protected void waitForReady()
@@ -41,7 +42,12 @@ public class DatasetInsertPage extends InsertPage
         waitForElement(Locator.tag("*").attributeStartsWith("name", "quf_"));
     }
 
-    public void insert(Map<String, String> values)
+    public void insert(Map<String,String> values)
+    {
+        insert(values,true,"");
+    }
+
+    public void insert(Map<String, String> values, boolean expectSuccess, String errorMsg)
     {
         for (Map.Entry<String, String> entry : values.entrySet())
         {
@@ -74,6 +80,9 @@ public class DatasetInsertPage extends InsertPage
             }
         }
 
-        clickButton("Submit");
+        //clickButton("Submit");
+        clickAndWait(Locator.lkButton("Submit"));
+        if(!expectSuccess){assertTextPresent(errorMsg);}
+        else{assertTextNotPresent(errorMsg);}
     }
 }

@@ -25,7 +25,6 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APITestHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Select;
@@ -216,6 +215,14 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
         log("Import new study with alt-ID");
         importFolderFromZip(TestFileUtils.getSampleData("studies/AltIdStudy.folder.zip"));
+    }
+
+    protected void importStudy(File studyArchive, @Nullable String pipelinePath)
+    {
+        initializeFolder();
+        initializePipeline(pipelinePath);
+        clickFolder(getFolderName());
+        importFolderFromZip(studyArchive);
     }
 
     protected void exportStudy(boolean zipFile)
