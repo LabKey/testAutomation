@@ -44,6 +44,7 @@ public class SearchHelper
         _test = test;
     }
     private static final Locator noResultsLocator = Locator.css("table.labkey-search-results-counts").withText("Found 0 results");
+    private static final String unsearchableValue = "UNSEARCHABLE";
 
     public void initialize()
     {
@@ -54,6 +55,15 @@ public class SearchHelper
     public void clearSearchQueue()
     {
         _searchQueue.clear();
+        enqueueSearchItem(getUnsearchableValue());
+    }
+
+    /**
+     * Add this value to documents or objects that are expected to be ignored by the search indexer
+     */
+    public static String getUnsearchableValue()
+    {
+        return unsearchableValue;
     }
 
     @LogMethod(quiet = true)
