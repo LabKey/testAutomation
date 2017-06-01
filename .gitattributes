@@ -552,6 +552,7 @@ src/org/labkey/test/pages/assay/SampleSetImportPage.java -text
 src/org/labkey/test/pages/core/UserNotificationsPage.java -text
 src/org/labkey/test/pages/core/admin/ConfigureFileSystemAccessPage.java -text
 src/org/labkey/test/pages/core/admin/CustomizeSitePage.java -text
+src/org/labkey/test/pages/core/admin/FileTransferConfigurationPage.java -text
 src/org/labkey/test/pages/core/admin/LookAndFeelSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
