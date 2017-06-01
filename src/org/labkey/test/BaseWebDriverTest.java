@@ -2323,12 +2323,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _containerHelper = containerHelper;
     }
 
-    //hopefully we'll come up with a better solution soon
-    public void waitForSaveAssay()
-    {
-        sleep(5000);
-    }
-
     public void assertSVG(final String expectedSvgText)
     {
         assertSVG(expectedSvgText, 0);
@@ -2512,9 +2506,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return exportIconLoc.findElements(getDriver()).size();
     }
 
-    public void clickExportPNGIcon(String chartParentCls, int chartIndex)
+    public File clickExportPNGIcon(String chartParentCls, int chartIndex)
     {
-        clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PNG_ICON);
+        return clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PNG_ICON);
     }
 
     public int getExportPDFIconCount(String chartParentCls)
@@ -2523,18 +2517,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return exportIconLoc.findElements(getDriver()).size();
     }
 
-    public void clickExportPDFIcon(String chartParentCls, int chartIndex)
+    public File clickExportPDFIcon(String chartParentCls, int chartIndex)
     {
-        clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PDF_ICON);
+        return clickExportImageIcon(chartParentCls, chartIndex, EXPORT_PDF_ICON);
     }
 
-    private void clickExportImageIcon(String chartParentCls, int chartIndex, Locator.XPathLocator imageLoc)
+    private File clickExportImageIcon(String chartParentCls, int chartIndex, Locator.XPathLocator imageLoc)
     {
         Locator.XPathLocator chartLoc = Locator.tagWithClass("div", chartParentCls).index(chartIndex);
         Locator iconLoc = chartLoc.append(EXPORT_ICON).append(imageLoc);
         WebElement exportIcon = iconLoc.findElement(getDriver());
         mouseOver(chartLoc); // mouse over to make sure icon is visible
-        doAndWaitForDownload(exportIcon::click, 1);
+        return doAndWaitForDownload(exportIcon::click);
     }
 
     protected void flash(WebElement element)
