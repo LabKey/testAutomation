@@ -283,8 +283,8 @@ public class ScriptValidationTest extends BaseWebDriverTest
         {
             log("** Test errors: error in complete");
             insertColors(Arrays.asList(
-                    new ColorRecord("Red", "#f00"),
-                    new ColorRecord("Blue", "#0f0"),
+                    new ColorRecord("Yellow", "#f00"),
+                    new ColorRecord("Cyan", "#0f0"),
                     new ColorRecord("TestErrorInComplete", "")
             ));
             fail("Should throw an exception");
@@ -374,9 +374,9 @@ public class ScriptValidationTest extends BaseWebDriverTest
         try
         {
             log("** Test errors: updating hex value");
-            ColorRecord red = selectColor("Red?").get(0);
-            red.hex = "shouldn't happen";
-            updateColors(Arrays.asList(red));
+            ColorRecord yellow = selectColor("Yellow?").get(0);
+            yellow.hex = "shouldn't happen";
+            updateColors(Arrays.asList(yellow));
             fail("Should throw an exception");
         }
         catch (CommandException e)
