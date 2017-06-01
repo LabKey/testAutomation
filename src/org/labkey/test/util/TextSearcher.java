@@ -72,6 +72,8 @@ public class TextSearcher
         for (String text : texts)
         {
             String transformedText = searchTransformer.apply(text);
+            if (transformedText.isEmpty())
+                continue;
             if (!textHandler.handle(transformedSource, transformedText))
                 return;
         }
