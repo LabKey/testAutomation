@@ -80,9 +80,14 @@ public class DatasetInsertPage extends InsertPage
             }
         }
 
-        //clickButton("Submit");
         clickAndWait(Locator.lkButton("Submit"));
-        if(!expectSuccess){assertTextPresent(errorMsg);}
-        else{assertTextNotPresent(errorMsg);}
+
+        if (errorMsg != null && !errorMsg.isEmpty())
+        {
+            if(!expectSuccess)
+                assertTextPresent(errorMsg);
+            else
+                assertTextNotPresent(errorMsg);
+        }
     }
 }
