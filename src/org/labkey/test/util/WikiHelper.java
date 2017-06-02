@@ -247,6 +247,17 @@ public class WikiHelper
         }
     }
 
+    // need to be on a wiki page in the source container, and destinationFolder needs to be a unique link on the page
+    public void copyAllWikiPages(String destinationFolder, boolean copyHistory)
+    {
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.clickWebpartMenuItem("Pages", "Copy");
+        _test.clickAndWait(Locator.linkWithText(destinationFolder));
+        if(copyHistory)
+            _test.clickAndWait(Locator.checkboxById("isCopyingHistory"), 0);
+        _test.clickButton("Copy Pages");
+    }
+
     public enum WikiRendererType
     {
         RADEOX ("Wiki Page"),
