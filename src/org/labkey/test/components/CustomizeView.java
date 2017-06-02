@@ -45,7 +45,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
@@ -360,7 +359,7 @@ public class CustomizeView extends Component
     /**
      * expand customize view menu to all but the last of fieldKeyParts
      * @param fieldKeyParts
-     * @return The &lt;tr&gt; element for the specified field in the "Available Fields" column tree.
+     * @return The data-recordid property of the &lt;tr&gt; element for the specified field in the "Available Fields" column tree.
      */
     private WebElement expandPivots(String[] fieldKeyParts)
     {
