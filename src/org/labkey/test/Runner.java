@@ -266,24 +266,40 @@ public class Runner extends TestSuite
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
 
-                if (loggingStub != null)
-                    testResult.endTest(loggingStub); // This will allow static test methods to be recognized by TeamCity when successful
-
+                boolean testClassError = false;
+                boolean someTestTimedOut = false;
                 Enumeration<TestFailure> errors = testResult.errors();
                 while (errors.hasMoreElements())
                 {
-                    Throwable error = errors.nextElement().thrownException();
-                    if (error instanceof TestTimedOutException)
+                    final TestFailure testFailure = errors.nextElement();
+                    if (loggingStub != null &&
+                            testFailure.failedTest() instanceof TestSuite &&
+                            ((TestSuite)testFailure.failedTest()).getName().equals(((JUnit4TestAdapter)test).getTestClass().getName()))
                     {
-                        TestLogger.log("Test class timed out: waiting a bit to let it wrap up");
-                        try
+                        testClassError = true;
+                        Throwable t = testFailure.thrownException();
+                        if (t instanceof TestTimedOutException)
                         {
-                            Thread.sleep(30000);
+                            someTestTimedOut = true;
+                            break;
                         }
-                        catch (InterruptedException ignore) {}
-                        break;
                     }
                 }
+
+                if (someTestTimedOut)
+                {
+                    TestLogger.log("Test class timed out: waiting a bit to let it wrap up");
+                    try
+                    {
+                        Thread.sleep(30000);
+                    }
+                    catch (InterruptedException ignore)
+                    {
+                    }
+                }
+
+                if (loggingStub != null && !testClassError)
+                    testResult.endTest(loggingStub); // This will allow static test methods to be recognized by TeamCity when successful
 
                 String result = failed || errored ? "Failed " : "Completed ";
                 TestLogger.resetLogger();
