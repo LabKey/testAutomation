@@ -274,13 +274,13 @@ public class FilterTest extends BaseWebDriverTest
 
         HashMap<String, String> projectIssue = new HashMap<>();
         projectIssue.put("title", "project issue1");
-        projectIssue.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        projectIssue.put("assignedTo", getDisplayName());
         projectIssue.put("type", "typea");
         projectIssue.put("priority", "1");
         issuesHelper.addIssue(projectIssue);
         HashMap<String, String> projectIssue2 = new HashMap<>();
         projectIssue2.put("title", "project issue2");
-        projectIssue2.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        projectIssue2.put("assignedTo", getDisplayName());
         projectIssue2.put("type", "typeb");
         projectIssue2.put("priority", "2");
         issuesHelper.addIssue(projectIssue2);
@@ -303,13 +303,13 @@ public class FilterTest extends BaseWebDriverTest
 
         HashMap<String, String> subfolderIssue = new HashMap<>();
         subfolderIssue.put("title", "subfolder issue1");
-        subfolderIssue.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        subfolderIssue.put("assignedTo", getDisplayName());
         subfolderIssue.put("type", "typed");
         subfolderIssue.put("priority", "3");
         issuesHelper.addIssue(subfolderIssue);
         HashMap<String, String> subfolderIssue2 = new HashMap<>();
         subfolderIssue2.put("title", "subfolder issue2");
-        subfolderIssue2.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        subfolderIssue2.put("assignedTo", getDisplayName());
         subfolderIssue2.put("type", "typee");
         subfolderIssue2.put("priority", "4");
         issuesHelper.addIssue(subfolderIssue2);
