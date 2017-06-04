@@ -149,7 +149,7 @@ public class GroupTest extends BaseWebDriverTest
     private void permissionsReportTest()
     {
         clickAndWait(Locator.linkWithText("view permissions report"));
-        DataRegionTable drt = new DataRegionTable("access", getDriver()); // TODO: This faked up region doesn't work as a real region -- see userAccess.jsp
+        DataRegionTable drt = new DataRegionTable("access", getDriver()); // TODO: This faked up region doesn't work as a real region -- see securityAccess.jsp
 
         waitForText("Access Modification History For This Folder");
         assertTextPresent("Folder Access Details");
