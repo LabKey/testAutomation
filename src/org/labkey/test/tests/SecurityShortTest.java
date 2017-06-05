@@ -16,9 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Base;
 import org.labkey.test.categories.DRT;
 
-@Category({DRT.class})
+@Category({DRT.class, Base.class})
 public class SecurityShortTest extends SecurityTest
 {
     @Override
