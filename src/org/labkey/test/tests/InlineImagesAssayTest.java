@@ -42,6 +42,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category(DailyB.class)
 public class InlineImagesAssayTest extends BaseWebDriverTest
@@ -106,15 +107,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
                 "101\t2A2B\t3\n" +
                 "102\t3A2B\t3";
 
-        DataRegionTable list;
-        DataRegionExportHelper exportHelper;
-        File exportedFile;
-        Workbook workbook;
-        Sheet sheet;
-        List<String> exportedColumn;
-
         log("Create an Assay.");
-
         AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
 
         log("Mark the assay as editable.");
@@ -192,32 +185,26 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 2);
 
         log("Export the grid to excel.");
+        File exportedFile;
+        Workbook workbook;
+        DataRegionTable list;
+        DataRegionExportHelper exportHelper;
+
         list = new DataRegionTable("Data", getDriver());
         exportHelper = new DataRegionExportHelper(list);
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
         workbook = ExcelHelper.create(exportedFile);
-        sheet = workbook.getSheetAt(0);
 
-        assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
+        validateExcelExport(exportedFile, workbook);
 
-        log("Validate that the value for the file columns is as expected.");
-        exportedColumn = ExcelHelper.getColumnData(sheet, 4);
-        assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", LRG_PNG_FILE.getName()),
-                exportedColumn);
-
-        exportedColumn = ExcelHelper.getColumnData(sheet, 5);
-        assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Run File Field", "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName()),
-                exportedColumn);
-
-        exportedColumn = ExcelHelper.getColumnData(sheet, 7);
+        log("Validate that the 'File' (last) column is as expected.");
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
                 Arrays.asList("Batch File Field", "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName(), "assaydata" + File.separator + XLS_FILE.getName()),
-                exportedColumn);
+                ExcelHelper.getColumnData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 7));
 
-        log("Remove the 'File' column from the batch and see that things still work.");
+
+        log("Remove the 'File' (last) column from the batch and see that things still work.");
 
         assayDesigner = _assayHelper.clickEditAssayDesign();
         assayDesigner.removeBatchField("BatchFileField");
@@ -239,26 +226,62 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLS);
 
         workbook = ExcelHelper.create(exportedFile);
-        sheet = workbook.getSheetAt(0);
 
+        validateExcelExport(exportedFile, workbook);
+
+        log("Validate that the removed column no longer shows up in the export.");
+        List<String> exportedHeaders = ExcelHelper.getRowData(workbook.getSheetAt(workbook.getActiveSheetIndex()), 0);
+        assertFalse("Value of removed 'File' column not exported as expected [" + exportedFile.getName() + "]",
+                exportedHeaders.contains("Batch File Field"));
+    }
+
+    private void validateExcelExport(File exportedFile, Workbook workbook)
+    {
+        Sheet sheet;
+        List<String> exportedColumn;
+
+        sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
+
+        log("Validate number of rows exported");
         assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
 
-        log("Validate that the value for the file columns is as expected.");        exportedColumn = ExcelHelper.getColumnData(sheet, 4);
-        assertEquals("Value of 'File' column not exported as expected [" + exportedFile.getName() + "]",
+        log("Validate that the 'Pictures' collection in excel has the correct number of images/pictures.");
+        assertEquals("Number of pictures in excel collection not as expected.", 5, workbook.getAllPictures().size());
+
+        final int COLUMN_WIDTH_LARGE_LBOUND = 11100;
+        final int COLUMN_WIDTH_LARGE_UBOUND = 11500;
+        final int COLUMN_WIDTH_SMALL_LBOUND = 3700;
+        final int COLUMN_WIDTH_SMALL_UBOUND = 3940;
+        final int IMAGE_COL_01 = 4;
+        final int IMAGE_COL_02 = 5;
+
+        log("Look at the cell sizes and use that as an indication the image is rendered on the sheet.");
+        assertTrue("Column '" + sheet.getRow(0).getCell(IMAGE_COL_01).getStringCellValue() + "' width not in expected range (" + COLUMN_WIDTH_LARGE_LBOUND + " to " + COLUMN_WIDTH_LARGE_UBOUND + "). Actual width: " + sheet.getColumnWidth(IMAGE_COL_01), (sheet.getColumnWidth(IMAGE_COL_01) > COLUMN_WIDTH_LARGE_LBOUND) && (sheet.getColumnWidth(IMAGE_COL_01) < COLUMN_WIDTH_LARGE_UBOUND));
+        assertTrue("Column '" + sheet.getRow(0).getCell(IMAGE_COL_02).getStringCellValue() + "' width not in expected range (" + COLUMN_WIDTH_SMALL_LBOUND + " to " + COLUMN_WIDTH_SMALL_UBOUND + "). Actual width: " + sheet.getColumnWidth(IMAGE_COL_02), (sheet.getColumnWidth(IMAGE_COL_02) > COLUMN_WIDTH_SMALL_LBOUND) && (sheet.getColumnWidth(IMAGE_COL_02) < COLUMN_WIDTH_SMALL_UBOUND));
+
+        for(int j=0; j <= sheet.getLastRowNum(); j++)
+        {
+            log("Row " + j + " height: " + sheet.getRow(j).getHeight());
+        }
+
+        final int ROW_HEIGHT_LARGE_LBOUND = 6500;
+        final int ROW_HEIGHT_LARGE_UBOUND = 6800;
+        final int ROW_HEIGHT_SMALL_LBOUND = 800;
+        final int ROW_HEIGHT_SMALL_UBOUND = 1000;
+        assertTrue("Height of row 1 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(1).getHeight(), (sheet.getRow(1).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(1).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
+        assertTrue("Height of row 2 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(2).getHeight(), (sheet.getRow(2).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(2).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
+        assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
+
+        log("Validate that the value for the file columns is as expected.");
+        exportedColumn = ExcelHelper.getColumnData(sheet, 4);
+        assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
                 Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", LRG_PNG_FILE.getName()),
                 exportedColumn);
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
-        assertEquals("Value of 'File' column not exported as expected [" + exportedFile.getName() + "]",
+        assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
                 Arrays.asList("Run File Field", "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName(), "assaydata" + File.separator + PNG01_FILE.getName()),
                 exportedColumn);
 
-        exportedColumn = ExcelHelper.getColumnData(sheet, 7);
-        assertEquals("Value of removed 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("", "", "", ""), exportedColumn);
-
-        List<String> exportedHeaders = ExcelHelper.getRowData(sheet, 0);
-        assertFalse("Value of removed 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                exportedHeaders.contains("Batch File Field"));
     }
 }
