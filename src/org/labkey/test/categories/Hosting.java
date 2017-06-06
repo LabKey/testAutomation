@@ -15,6 +15,6 @@
  */
 package org.labkey.test.categories;
 
-public class Hosting extends Weekly
+public abstract class Hosting extends Test
 {
 }
