@@ -59,6 +59,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -200,6 +201,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                    capabilities.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, 1);
                     newWebDriver = new ChromeDriver(capabilities);
                 }
                 break;
@@ -260,6 +262,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     {
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
                         capabilities.setCapability(FirefoxDriver.BINARY, binary);
+                        capabilities.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, 1);
                     }
                     try
                     {
