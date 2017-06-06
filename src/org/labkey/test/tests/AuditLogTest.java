@@ -23,6 +23,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
@@ -30,16 +31,17 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-@Category({Hosting.class})
+@Category({DailyA.class, Hosting.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
