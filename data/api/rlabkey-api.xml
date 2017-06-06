@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.134")
+                print("Latest Rlabkey version: 2.1.135")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.134"
-                [1] "Found Rlabkey version: 2.1.134"
+                [1] "Latest Rlabkey version: 2.1.135"
+                [1] "Found Rlabkey version: 2.1.135"
             ]]>
         </response>
     </test>
@@ -173,7 +173,7 @@
         </url>
         <response>
             <![CDATA[
-                Text Field Integer Field Double Field DateTime Field Boolean Field                
+                Text Field Integer Field Double Field DateTime Field Boolean Field
                 some text here 99 987.654 2010-02-14 FALSE
                 More plane values -34 98123.450 1999-01-01 FALSE
                 null NULL NA and na 123 44.330 2002-02-20 FALSE
