@@ -124,7 +124,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
     }
 
-    public void saveBatch(String assayName, String runName, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException
+    public void saveBatch(String assayName, String runName, Map<String, Object> runProperties, List<Map<String, Object>> resultRows, String projectName) throws IOException, CommandException
     {
         int assayId = getIdFromAssayName(assayName, projectName);
 
@@ -132,6 +132,8 @@ public class APIAssayHelper extends AbstractAssayHelper
         List<Run> runs = new ArrayList<>();
         Run run = new Run();
         run.setName(runName);
+        if (!runProperties.isEmpty())
+            run.setProperties(runProperties);
         run.setResultData(resultRows);
         runs.add(run);
         batch.setRuns(runs);

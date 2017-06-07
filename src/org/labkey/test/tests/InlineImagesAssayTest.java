@@ -52,6 +52,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
     protected final static File XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
     protected final static File PNG01_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File LRG_PNG_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
+    protected final static File HELP_JPG_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
 
     @Override
     public List<String> getAssociatedModules()
@@ -128,6 +129,11 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assayDesigner.saveAndClose();
         sleep(1000);
 
+        log("upload inline files to the pipeline root");
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(LRG_PNG_FILE);
+
+        goToManageAssays();
         log("Populate the assay with data.");
         clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
@@ -160,7 +166,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         String src = Locator.xpath("//div[@id='helpDiv']//img[contains(@src, 'downloadFileLink')]").findElement(getDriver()).getAttribute("src");
         assertEquals("Bad response from run field pop-up", HttpStatus.SC_OK, WebTestHelper.getHttpResponse(src).getResponseCode());
 
-        // Not going to try and download the file as part of the automaiton, although that could be added if wanted int he future.
+        // Not going to try and download the file as part of the automation, although that could be added if wanted int he future.
 
         log("View the results grid.");
         clickAndWait(Locator.linkWithText("view results"));
@@ -168,21 +174,20 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Verify that the correct number of file fields are populated as expected.");
         assertElementPresent("Did not find the expected number of links for the file " + XLS_FILE.getName(), Locator.xpath("//a[contains(text(), '" + XLS_FILE.getName() + "')]"), 3);
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
-
-        log("Verify that the reference to the png that was in the data used for populating is listed as unavailable.");
-        assertTextPresent(LRG_PNG_FILE.getName() + " (unavailable)");
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
 
         log("Add the image to one of the result's 'File' column.");
-
         List<WebElement> editLinks = Locator.linkWithText("edit").findElements(getDriver());
         clickAndWait(editLinks.get(2));
 
-        setFormElement(Locator.name("quf_DataFileField"), LRG_PNG_FILE);
+        setFormElement(Locator.name("quf_DataFileField"), HELP_JPG_FILE);
         clickButton("Submit");
-        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been renedered.
+        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been rendered.
 
         log("Validate that two links to this image file are now present.");
-        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 2);
+        assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
         log("Export the grid to excel.");
         File exportedFile;
@@ -217,7 +222,8 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
         log("Verify that the other 'File' fields are not affected.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);
-        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 2);
+        assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + HELP_JPG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_JPG_FILE.getName() + "')]"), 1);
 
 
         log("Export the grid to excel again and make sure that everything is as expected.");
@@ -270,12 +276,12 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         final int ROW_HEIGHT_SMALL_UBOUND = 1000;
         assertTrue("Height of row 1 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(1).getHeight(), (sheet.getRow(1).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(1).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
         assertTrue("Height of row 2 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(2).getHeight(), (sheet.getRow(2).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(2).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
-        assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_LARGE_LBOUND + " to " + ROW_HEIGHT_LARGE_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_LARGE_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_LARGE_UBOUND));
+        assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
 
         log("Validate that the value for the file columns is as expected.");
         exportedColumn = ExcelHelper.getColumnData(sheet, 4);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
-                Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", LRG_PNG_FILE.getName()),
+                Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", HELP_JPG_FILE.getName()),
                 exportedColumn);
 
         exportedColumn = ExcelHelper.getColumnData(sheet, 5);
