@@ -201,7 +201,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                    capabilities.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, 1);
                     newWebDriver = new ChromeDriver(capabilities);
                 }
                 break;
@@ -262,7 +261,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     {
                         FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
                         capabilities.setCapability(FirefoxDriver.BINARY, binary);
-                        capabilities.setCapability(CapabilityType.ELEMENT_SCROLL_BEHAVIOR, 1);
                     }
                     try
                     {
