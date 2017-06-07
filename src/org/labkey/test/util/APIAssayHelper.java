@@ -64,10 +64,12 @@ public class APIAssayHelper extends AbstractAssayHelper
     }
 
     @LogMethod(quiet = true)
-    public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
+    public ImportRunResponse importAssay(int assayID, String runName, List<Map<String, Object>> dataRows, String projectPath,
+                                         Map<String, Object> runProperties, Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, dataRows);
         irc.setName(runName);
+        irc.setProperties(runProperties);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
         return irc.execute(_test.createDefaultConnection(false), "/" + projectPath);

@@ -35,7 +35,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +59,12 @@ public class AssayAPITest extends BaseWebDriverTest
     {
         AssayAPITest initTest = (AssayAPITest)getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), "Assay");
+
+        initTest.log("upload inline files to the pipeline root");
+        initTest.goToModule("FileContent");
+        initTest._fileBrowserHelper.uploadFile(CREST_FILE);
+        initTest._fileBrowserHelper.uploadFile(SCREENSHOT_FILE);
+        initTest._fileBrowserHelper.uploadFile(FOO_XLS_FILE);
     }
 
     @Test
@@ -70,6 +75,8 @@ public class AssayAPITest extends BaseWebDriverTest
         String runName = "trial01.xls";
         importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
                 TestFileUtils.getSampleData("GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
+        // verify images are resolved and rendered properly
+        assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 100);
         waitForElement(Locator.paginationText(1, 100, 201));
 
         goToProjectHome();
@@ -170,24 +177,35 @@ public class AssayAPITest extends BaseWebDriverTest
     @Test
     public void testImportRun_dataRows() throws Exception
     {
-        String assayName = "GPAT-ImportRunApi";
+        goToManageAssays();
+        String assayName = "GPAT-ImportRunApi-dataRows";
         APIAssayHelper assayHelper = new APIAssayHelper(this);
+        AssayDesignerPage assayDesigner = assayHelper.createAssayAndEdit("General", assayName);
+        log("Create a 'File' column for the assay run.");
+        assayDesigner.addRunField("RunFileField", "Run File Field", "File");
+
+        log("Create a 'File' column for the assay data.");
+        assayDesigner.addDataField("DataFileField", "Data File Field", "File");
+        assayDesigner.save();
+        assayDesigner.saveAndClose();
+        DataRegionTable.waitForDataRegion(this, "AssayList");
+
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
-        if (assayId == 0)
-        {
-            assayHelper.createAssayWithDefaults("General", assayName);
-            assayId = assayHelper.getIdFromAssayName(assayName, getProjectName());
-        }
 
         List<Map<String, Object>> dataRows = Arrays.asList(
-                Maps.of("ptid", "p01", "date", "2017-05-10"),
-                Maps.of("ptid", "p02", "date", "2017-05-10")
+                Maps.of("ptid", "p01", "date", "2017-05-10", "DataFileField", "crest.png"),
+                Maps.of("ptid", "p02", "date", "2017-05-10", "DataFileField", "screenshot.png")
         );
 
         // import the file using a relative path
-        ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.emptyMap());
+        ImportRunResponse resp = assayHelper.importAssay(assayId, "x", dataRows, getProjectName(), Collections.singletonMap("RunFileField", "foo.xls"), Collections.emptyMap());
         beginAt(resp.getSuccessURL());
         assertTextPresent("p01", "p02");
+
+        // verify images are resolved and rendered properly
+        assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
+        assertElementPresent("Did not find the expected number of icons for images for " + FOO_XLS_FILE.getName() + " from the runs.", Locator.xpath("//a[contains(text(), '" + FOO_XLS_FILE.getName() + "')]"), 2);
     }
 
 
@@ -209,22 +227,13 @@ public class AssayAPITest extends BaseWebDriverTest
         assayDesigner.saveAndClose();
         DataRegionTable.waitForDataRegion(this, "AssayList");
 
-        log("upload inline files to the pipeline root");
-        goToModule("FileContent");
-        _fileBrowserHelper.uploadFile(CREST_FILE);
-        _fileBrowserHelper.uploadFile(SCREENSHOT_FILE);
-        _fileBrowserHelper.uploadFile(FOO_XLS_FILE);
-
         log("create run via saveBatch");
         String runName = "created-via-saveBatch";
         List<Map<String, Object>> resultRows = new ArrayList<>();
         resultRows.add(Maps.of("ptid", "188438418", "SpecimenID", "K770K3VY-19", "DataFileField", "crest.png"));
         resultRows.add(Maps.of("ptid", "188487431", "SpecimenID", "A770K4W1-15", "DataFileField", "screenshot.png"));
 
-        Map<String, Object> runProps = new HashMap<>();
-        runProps.put("RunFileField", "foo.xls");
-
-        ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, runProps, resultRows, getProjectName());
+        ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "foo.xls"), resultRows, getProjectName());
 
         log("verify assay saveBatch worked");
         goToManageAssays();

@@ -325,7 +325,7 @@ public class ModuleAssayTest extends AbstractAssayTest
                 "hiddenData", "foo"));
 
         int assayId = ah.getIdFromAssayName(ASSAY_NAME, PROJECT_NAME);
-        ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, PROJECT_NAME, null);
+        ImportRunResponse resp = ah.importAssay(assayId, "importRuns.api with dataRows", dataRows, PROJECT_NAME, null, null);
 
         int runId = resp.getRunId();
         Assert.assertTrue("Expected to insert a run", runId > 0);
