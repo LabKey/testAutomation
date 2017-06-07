@@ -62,8 +62,8 @@ public class FolderTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-        _containerHelper.deleteProject(secondProject, afterTest);
+        _containerHelper.deleteProject(getProjectName(), false);
+        _containerHelper.deleteProject(secondProject, false);
     }
 
     @BeforeClass
