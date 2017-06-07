@@ -1587,6 +1587,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 clickAndWait(users.detailsLink(userRow));
 
                 clickButton("Edit");
+                assertEquals("Editing details for wrong user.",
+                        email, Locator.id("labkey-nav-trail-current-page").findElement(getDriver()).getText());
                 setFormElement(Locator.name("quf_DisplayName"), newDisplayName);
                 clickButton("Submit");
             }
