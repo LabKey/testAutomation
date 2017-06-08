@@ -861,6 +861,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String getCurrentUserName()
     {
+        return getDisplayName();
+    }
+
+    // Return display name that's currently shown in the header
+    public String getDisplayName()
+    {
         return (String)executeScript("return LABKEY.user.displayName");
     }
 
@@ -3197,12 +3203,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void setDefaultWaitForPage(int defaultWaitForPage)
     {
         this.defaultWaitForPage = defaultWaitForPage;
-    }
-
-    // Return display name that's currently shown in the header
-    public String getDisplayName()
-    {
-        return getText(Locator.id("userMenuPopupText"));
     }
 
     public String getHtmlSource()
