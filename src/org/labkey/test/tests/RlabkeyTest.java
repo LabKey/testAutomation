@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
 public class RlabkeyTest extends BaseWebDriverTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);
-    private static final String PROJECT_NAME = "RlabkeyVerifyProject";
+    private static final String PROJECT_NAME = "RlabkeyVerifyProject\u2603";
     private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
@@ -130,7 +130,7 @@ public class RlabkeyTest extends BaseWebDriverTest
 
             if (!tests.isEmpty())
             {
-                clickProject(PROJECT_NAME);
+                clickProject(getProjectName());
                 clickAndWait(Locator.linkWithText(LIST_NAME));
                 DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", "Create R Report");
 
@@ -143,11 +143,13 @@ public class RlabkeyTest extends BaseWebDriverTest
                     StringBuilder sb = new StringBuilder(pathCmd);
 
                     sb.append('\n');
-                    String testScript = test.getUrl().trim().replaceAll("%baseUrl%", WebTestHelper.getBaseURL());
+                    String testScript = test.getUrl().trim()
+                            .replaceAll("%baseUrl%", WebTestHelper.getBaseURL())
+                            .replaceAll("%projectName%", getProjectName());
                     if (WebTestHelper.getBaseURL().startsWith("https")) // Allow self-signed certificate
                         testScript = testScript.replace("library(Rlabkey)", "library(Rlabkey)\nlabkey.setCurlOptions(ssl.verifypeer=FALSE)");
                     sb.append(testScript);
-                    String verify = test.getResponse().trim();
+                    String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
 
                     log("exceute test: " + test.getName());
                     if (!_rReportHelper.executeScript(sb.toString(), verify))
