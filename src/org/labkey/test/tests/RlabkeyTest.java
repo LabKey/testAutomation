@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
 public class RlabkeyTest extends BaseWebDriverTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);
-    private static final String PROJECT_NAME = "RlabkeyVerifyProject\u2603";
+    private static final String PROJECT_NAME = "RlabkeyTest Project\u2603";
     private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";
     private static final String LIBPATH_OVERRIDE = ".libPaths(\"%s\")";
