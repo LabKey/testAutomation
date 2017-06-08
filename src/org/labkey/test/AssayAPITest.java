@@ -192,9 +192,12 @@ public class AssayAPITest extends BaseWebDriverTest
 
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
 
+        File fileRoot = TestFileUtils.getDefaultFileRoot(getProjectName());
+        Path fullPath = fileRoot.toPath().resolve("screenshot.png");
+
         List<Map<String, Object>> dataRows = Arrays.asList(
                 Maps.of("ptid", "p01", "date", "2017-05-10", "DataFileField", "crest.png"),
-                Maps.of("ptid", "p02", "date", "2017-05-10", "DataFileField", "screenshot.png")
+                Maps.of("ptid", "p02", "date", "2017-05-10", "DataFileField", fullPath.toString())
         );
 
         // import the file using a relative path
