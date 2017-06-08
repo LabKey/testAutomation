@@ -22,10 +22,21 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
+import java.io.StringReader;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -216,17 +227,39 @@ public class PipelineAnalysisHelper
 
     private void verifySavedProtocolDef(String expected, String actual)
     {
-        String expectedStr = getConcatStrFromXML(expected);
-        String actualStr = getConcatStrFromXML(actual);
-        assertEquals("Protocol XML definition not as expected", expectedStr, actualStr);
+        Map<String, String> expectedParameters = loadParameterMapFromXmlString(expected);
+        Map<String, String> actualParameters = loadParameterMapFromXmlString(actual);
+        assertEquals("Protocol XML definition not as expected", expectedParameters, actualParameters);
     }
 
-    private String getConcatStrFromXML(String xml)
+    private Map<String, String> loadParameterMapFromXmlString(String xml)
     {
-        String concatStr = "";
-        String xmlStr = xml.replace(" standalone=\"no\"", "");
-        for (String line : xmlStr.split("[\n\r]"))
-            concatStr += line.trim();
-        return concatStr;
+        try
+        {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(xml));
+            Document doc = builder.parse(is);
+
+            XPathFactory xPathFactory = XPathFactory.newInstance();
+            XPath xpath = xPathFactory.newXPath();
+            XPathExpression expr = xpath.compile("//bioml//note");
+            NodeList all = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            // Strictly speaking this doesn't need to be a TreeMap to do the comparison, but having the parameters
+            // ordered by name will make it easier to human parse the errors.
+            Map<String, String> parameters = new TreeMap<>();
+            if (all != null && all.getLength() > 0)
+            {
+                for (int i = 0; i < all.getLength(); i++)
+                {
+                    parameters.put(all.item(i).getAttributes().getNamedItem("label").getNodeValue(), all.item(i).getTextContent());
+                }
+            }
+            return parameters;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Exception parsing xml string " + xml, e);
+        }
     }
 }
