@@ -152,7 +152,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public final CustomizeView _customizeViewsHelper;
     public StudyHelper _studyHelper = new StudyHelper(this);
     public final ListHelper _listHelper;
-    public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
@@ -1565,37 +1564,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
 
-    }
-
-    protected void setDisplayName(String email, String newDisplayName)
-    {
-        String previousDisplayName = usersAndDisplayNames.get(email);
-        String defaultDisplayName = getDefaultDisplayName(email);
-        usersAndDisplayNames.remove(email);
-
-        if (previousDisplayName == null && newDisplayName.equals(defaultDisplayName))
-            return;
-        else
-        {
-            if (!newDisplayName.equals(previousDisplayName))
-            {
-                goToSiteUsers();
-
-                DataRegionTable users = new DataRegionTable("Users", getDriver());
-                int userRow = users.getRowIndex("Email", email);
-                assertFalse("No such user: " + email, userRow == -1);
-                clickAndWait(users.detailsLink(userRow));
-
-                clickButton("Edit");
-                assertEquals("Editing details for wrong user.",
-                        email, Locator.id("labkey-nav-trail-current-page").findElement(getDriver()).getText());
-                setFormElement(Locator.name("quf_DisplayName"), newDisplayName);
-                clickButton("Submit");
-            }
-        }
-
-        if (!newDisplayName.equals(defaultDisplayName))
-            usersAndDisplayNames.put(email, newDisplayName);
     }
 
     /**

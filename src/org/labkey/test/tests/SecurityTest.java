@@ -424,12 +424,12 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String newDisplayName = "changeDisplayTest";
 
-        setDisplayName(NORMAL_USER, newDisplayName);
+        _userHelper.setDisplayName(NORMAL_USER, newDisplayName);
         assertTextPresent(newDisplayName);
 
         String injectDisplayName = "displayNameInjection" + INJECT_CHARS_1;
 
-        setDisplayName(NORMAL_USER, injectDisplayName); // Link crawler will do more thorough check
+        _userHelper.setDisplayName(NORMAL_USER, injectDisplayName);
         assertTextPresent(injectDisplayName);
         assertTextNotPresent(newDisplayName);
     }

@@ -16,15 +16,74 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public abstract class AbstractUserHelper
 {
-    protected WebDriverWrapper _driver;
+    private WebDriverWrapper _driverWrapper;
+    protected static final Map<String, String> usersAndDisplayNames = new HashMap<>();
 
-    public AbstractUserHelper(WebDriverWrapper driver)
+    public WebDriverWrapper getWrapper()
     {
-        _driver = driver;
+        return _driverWrapper;
+    }
+
+    public void saveCurrentDisplayName()
+    {
+        usersAndDisplayNames.put(getWrapper().getCurrentUser(), getWrapper().getCurrentUserName());
+    }
+
+    // assumes there are not collisions in the database causing unique numbers to be appended
+    public String getDisplayNameForEmail(String email)
+    {
+        if (usersAndDisplayNames.containsKey(email))
+            return usersAndDisplayNames.get(email);
+        else
+            return getDefaultDisplayName(email);
+    }
+
+    public static String getDefaultDisplayName(String email)
+    {
+        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
+        display = display.replace('_', ' ');
+        display = display.replace('.', ' ');
+        return display.trim();
+    }
+
+    @LogMethod
+    public void setDisplayName(@LoggedParam String email, @LoggedParam String newDisplayName)
+    {
+        String previousDisplayName = usersAndDisplayNames.get(email);
+
+        if (!newDisplayName.equals(previousDisplayName))
+        {
+            usersAndDisplayNames.remove(email); // Forget cached display name in case something goes wrong
+            getWrapper().goToSiteUsers();
+
+            DataRegionTable users = new DataRegionTable("Users", getWrapper().getDriver());
+            int userRow = users.getRowIndex("Email", email);
+            assertFalse("No such user: " + email, userRow == -1);
+            getWrapper().clickAndWait(users.detailsLink(userRow));
+
+            getWrapper().clickButton("Edit");
+            assertEquals("Editing details for wrong user.",
+                    email, Locator.id("labkey-nav-trail-current-page").findElement(getWrapper().getDriver()).getText());
+            getWrapper().setFormElement(Locator.name("quf_DisplayName"), newDisplayName);
+            getWrapper().clickButton("Submit");
+            usersAndDisplayNames.put(email, newDisplayName);
+        }
+    }
+
+    public AbstractUserHelper(WebDriverWrapper driverWrapper)
+    {
+        _driverWrapper = driverWrapper;
     }
 
     public CreateUserResponse createUser(String userName)
@@ -47,8 +106,24 @@ public abstract class AbstractUserHelper
         return createUser(userName, true, verifySuccess);
     }
 
-    public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
+    @LogMethod
+    public final void deleteUser(@LoggedParam String userEmail)
+    {
+        usersAndDisplayNames.remove(userEmail);
+        _deleteUser(userEmail);
+    }
 
-    public abstract void deleteUser(String userEmail);
-    public abstract void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails);
+    @LogMethod
+    public final void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
+    {
+        for (String userEmail : userEmails)
+        {
+            usersAndDisplayNames.remove(userEmail);
+        }
+        _deleteUsers(failIfNotFound, userEmails);
+    }
+
+    public abstract CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess);
+    protected abstract void _deleteUser(String userEmail);
+    protected abstract void _deleteUsers(boolean failIfNotFound, String... userEmails);
 }

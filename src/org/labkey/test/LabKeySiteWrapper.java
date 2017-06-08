@@ -49,6 +49,8 @@ import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
+import org.labkey.test.util.APIUserHelper;
+import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -95,6 +97,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
+    public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
     {
@@ -165,6 +168,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             clickAndWait(Locator.lkButton("Next"));
         }
 
+        _userHelper.saveCurrentDisplayName();
         WebTestHelper.setDefaultSession(getDriver());
     }
 
@@ -690,6 +694,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 webPart.delete();
             for (SideWebPart webPart : portalHelper.getSideWebParts())
                 webPart.delete();
+            if (bootstrapped)
+                _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
         }
     }
 
@@ -1253,6 +1259,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         window.selectUser(fakeUser);
         window.clickImpersonate();
 
+        _userHelper.saveCurrentDisplayName();
+
         if (isElementPresent(Locator.lkButton("Home")))
         {
             clickAndWait(Locator.lkButton("Home"));
@@ -1293,24 +1301,22 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             throw new IllegalStateException("Failed to stop impersonating");
     }
 
-    protected final Map<String, String> usersAndDisplayNames = new HashMap<>();
-
-    // assumes there are not collisions in the database causing unique numbers to be appended
-    // TODO Can be static should be moved to the WebTestHelper test class.
+    /**
+     * @deprecated TODO: Inline and remove
+     */
+    @Deprecated
     public String displayNameFromEmail(String email)
     {
-        if (usersAndDisplayNames.containsKey(email))
-            return usersAndDisplayNames.get(email);
-        else
-            return getDefaultDisplayName(email);
+        return _userHelper.getDisplayNameForEmail(email);
     }
 
+    /**
+     * @deprecated TODO: Inline and remove in 17.3
+     */
+    @Deprecated
     protected static String getDefaultDisplayName(String email)
     {
-        String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
-        display = display.replace('_', ' ');
-        display = display.replace('.', ' ');
-        return display.trim();
+        return AbstractUserHelper.getDefaultDisplayName(email);
     }
 
     public void goToHome()

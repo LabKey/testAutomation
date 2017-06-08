@@ -46,7 +46,7 @@ public class APIUserHelper extends AbstractUserHelper
     {
         CreateUserCommand command = new CreateUserCommand(userName);
         command.setSendEmail(sendEmail);
-        Connection connection = _driver.createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection(false);
         try
         {
             CreateUserResponse response = command.execute(connection, "");
@@ -56,6 +56,7 @@ public class APIUserHelper extends AbstractUserHelper
                 assertEquals(userName, response.getEmail());
                 assertTrue("Invalid userId", response.getUserId() != null);
             }
+
             return response;
         }
         catch (CommandException | IOException e)
@@ -75,7 +76,7 @@ public class APIUserHelper extends AbstractUserHelper
     {
         GetUsersCommand command = new GetUsersCommand();
         command.setIncludeDeactivated(includeDeactivated);
-        Connection connection = _driver.createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection(false);
 
         try
         {
@@ -110,14 +111,14 @@ public class APIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public void deleteUser(String userEmail)
+    protected void _deleteUser(String userEmail)
     {
         deleteUsers(false, userEmail);
     }
 
     private void deleteUser(@NotNull Integer userId)
     {
-        Connection connection = _driver.createDefaultConnection(false);
+        Connection connection = getWrapper().createDefaultConnection(false);
         DeleteUserCommand command = new DeleteUserCommand(userId);
         try
         {
@@ -129,8 +130,8 @@ public class APIUserHelper extends AbstractUserHelper
         }
     }
 
-    @LogMethod
-    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
+    @Override
+    protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         Map<String, Integer> userIds = getUserIds(Arrays.asList(userEmails), true);
         for (String userEmail : userEmails)

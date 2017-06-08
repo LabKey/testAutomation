@@ -35,22 +35,22 @@ public class UIUserHelper extends AbstractUserHelper
     @Override
     public CreateUserResponse createUser(String userName, boolean sendEmail, boolean verifySuccess)
     {
-        _driver.goToSiteUsers();
-        _driver.clickButton("Add Users");
+        getWrapper().goToSiteUsers();
+        getWrapper().clickButton("Add Users");
 
-        _driver.setFormElement(Locator.name("newUsers"), userName);
-        _driver.setCheckbox(Locator.checkboxByName("sendMail").findElement(_driver.getDriver()), sendEmail);
+        getWrapper().setFormElement(Locator.name("newUsers"), userName);
+        getWrapper().setCheckbox(Locator.checkboxByName("sendMail").findElement(getWrapper().getDriver()), sendEmail);
         //            if (cloneUserName != null)
 //            {
 //                checkCheckbox("cloneUserCheck");
 //                setFormElement("cloneUser", cloneUserName);
 //            }
-        _driver.clickButton("Add Users");
+        getWrapper().clickButton("Add Users");
 
         if (verifySuccess)
-            assertTrue("Failed to add user " + userName, _driver.isTextPresent(userName + " added as a new user to the system"));
+            assertTrue("Failed to add user " + userName, getWrapper().isTextPresent(userName + " added as a new user to the system"));
 
-        WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(_driver.getDriver());
+        WebElement resultEl = Locator.css(".labkey-error, .labkey-message").findElement(getWrapper().getDriver());
         String message = resultEl.getText();
 
         String email;
@@ -91,19 +91,19 @@ public class UIUserHelper extends AbstractUserHelper
     }
 
     @Override
-    public void deleteUser(String userEmail)
+    protected void _deleteUser(String userEmail)
     {
-        deleteUsers(false, userEmail);
+        _deleteUsers(false, userEmail);
     }
 
-    @LogMethod
-    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
+    @Override
+    protected void _deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         int checked = 0;
         List<String> displayNames = new ArrayList<>();
-        _driver.beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
+        getWrapper().beginAt("user/showUsers.view?inactive=true&Users.showRows=all");
 
-        DataRegionTable usersTable = new DataRegionTable("Users", _driver.getDriver());
+        DataRegionTable usersTable = new DataRegionTable("Users", getWrapper().getDriver());
 
         for(String userEmail : userEmails)
         {
@@ -126,10 +126,10 @@ public class UIUserHelper extends AbstractUserHelper
 
         if(checked > 0)
         {
-            _driver.clickButton("Delete");
-            _driver.assertTextPresent(displayNames);
-            _driver.clickButton("Permanently Delete");
-            _driver.assertTextNotPresent(userEmails);
+            getWrapper().clickButton("Delete");
+            getWrapper().assertTextPresent(displayNames);
+            getWrapper().clickButton("Permanently Delete");
+            getWrapper().assertTextNotPresent(userEmails);
         }
     }
 }
