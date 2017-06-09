@@ -79,7 +79,7 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @LogMethod
     @Override
-    public void doDeleteProject(String project, boolean failIfNotFound, int wait)
+    protected void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
         _test.openProjectMenu();
 

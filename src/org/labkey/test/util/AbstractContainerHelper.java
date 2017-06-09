@@ -97,7 +97,7 @@ public abstract class AbstractContainerHelper
 
     public void deleteProject(String project, boolean failIfNotFound) throws TestTimeoutException
     {
-        deleteProject(project, failIfNotFound, 120000);
+        deleteProject(project, failIfNotFound, 240000);
     }
 
     @LogMethod
@@ -107,7 +107,7 @@ public abstract class AbstractContainerHelper
         _createdProjects.remove(projectName);
     }
 
-    public abstract void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
+    protected abstract void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
 
     @LogMethod(quiet = true)
     public void setFolderType(@LoggedParam String folderType)
