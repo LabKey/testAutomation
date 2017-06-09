@@ -333,6 +333,23 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTextPresent("Monkey 72");
     }
 
+    @Test
+    public void testModuleQuerySqlSource() throws Exception
+    {
+        goToSchemaBrowser();
+        selectQuery("assay.simple." + ASSAY_NAME, "AssayProviderScopedRunQuery");
+        waitAndClickAndWait(Locator.linkWithText("View Source").notHidden());
+        String expectedQuery = "SELECT *, 'Prefix' || Name || 'Suffix' AS WrappedName FROM Runs";
+        String querySource = Locator.tagWithClass("div", "labkey-query-source").findElement(getDriver())
+                .getText().trim().replaceAll("(?s)/\\*.*\\*/", "").trim();
+        assertEquals("Query Source", expectedQuery, querySource);
+
+        String queryMetadata = Locator.css("div.labkey-query-metadata > pre").findElement(getDriver())
+                .getText();
+        assertTrue("Wrong query metadata",
+                queryMetadata.contains("tableName=\"AssayProviderScopedRunQuery\"") &&
+                        queryMetadata.contains("columnName=\"WrappedName\""));
+    }
 
     protected void checkModuleDeployed()
     {
