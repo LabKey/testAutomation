@@ -37,7 +37,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.categories.Base;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.UnitTests;
 
@@ -51,7 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
-@Category({BVT.class, UnitTests.class, External.class, Base.class})
+@Category({BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
