@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
 
 public class Window<EC extends Window.ElementCache> extends WebDriverComponent<EC>
 {
-    private final WebElement _window;
+    private WebElement _window;
     private final WebDriver _driver;
 
     public Window(String windowTitle, WebDriver driver)
@@ -101,36 +101,36 @@ public class Window<EC extends Window.ElementCache> extends WebDriverComponent<E
         return elementCache().body.getText();
     }
 
+    public boolean isClosed()
+    {
+        try
+        {
+            return !getComponentElement().isDisplayed();
+        }
+        catch (StaleElementReferenceException gone)
+        {
+            return true;
+        }
+    }
+
     public void close()
     {
         elementCache().closeButton.click();
         waitForClose();
     }
 
-    /**
-     * TODO Issue #28463: Ext.Msg reuses the message WebElement, so close check will fail if another dialog opens
-     */
     public void waitForClose()
     {
         waitForClose(5000);
     }
 
-    /**
-     * TODO Issue #28463: Ext.Msg reuses the message WebElement, so close check will fail if another dialog opens
-     */
     public void waitForClose(int msWait)
     {
-        getWrapper().waitFor(() -> {
-            try
-            {
-                //If we dont have the finder, just see if window is open
-                return !_window.isDisplayed();
-            }
-            catch (StaleElementReferenceException gone)
-            {
-                return true;
-            }
-        }, "Window did not close", msWait);
+        getWrapper().waitFor(this::isClosed, "Window did not close", msWait);
+
+        // Ext4 can reuse the Window element. Hide that from the tests to avoid surprising behavior.
+        _window = null;
+        clearElementCache();
     }
 
     protected EC newElementCache()
