@@ -100,10 +100,19 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
         return _title;
     }
 
-    public void delete()
+    public void remove()
     {
         clickMenuItem(false, "Remove From Page");
         waitForStale();
+    }
+
+    /**
+     * @deprecated Use {@link #remove()}
+     */
+    @Deprecated
+    public void delete()
+    {
+        remove();
     }
 
     public void moveUp()
