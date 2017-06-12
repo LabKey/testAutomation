@@ -78,15 +78,12 @@ public class TreatmentDialog extends Window
 
     public void clickCancel()
     {
-        clickButton("Cancel", 0);
-        waitForClose();
+        clickButton("Cancel", true);
     }
 
     public void clickOk()
     {
-        clickButton("OK", 0);
-        waitForClose();
-        getWrapper().longWait();
+        clickButton("OK", true);
     }
 
     public enum Sections
