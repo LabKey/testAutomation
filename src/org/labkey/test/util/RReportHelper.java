@@ -83,11 +83,9 @@ public class RReportHelper
      * Execute an R script and verify the specified text is present.
      * @return - true if the test result was present
      */
-    @LogMethod
+    @LogMethod (quiet = true)
     public boolean executeScript(String script, String expectedLines, boolean failOnError)
     {
-        _test.log("execute script");
-
         // running a saved script
         _test.waitAndClick(Ext4Helper.Locators.tab("Source"));
 

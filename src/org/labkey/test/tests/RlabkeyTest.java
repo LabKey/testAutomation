@@ -31,10 +31,12 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.TestLogger;
 
 import java.io.File;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({DailyB.class})
@@ -152,8 +154,10 @@ public class RlabkeyTest extends BaseWebDriverTest
                     String verify = test.getResponse().trim().replaceAll("%projectName%", getProjectName());
 
                     log("exceute test: " + test.getName());
-                    if (!_rReportHelper.executeScript(sb.toString(), verify))
-                        fail("Failed executing R script for test case: " + test.getName());
+                    TestLogger.increaseIndent();
+                    final boolean success = _rReportHelper.executeScript(sb.toString(), verify);
+                    TestLogger.decreaseIndent();
+                    assertTrue("Failed executing R script for test case: " + test.getName(), success);
                 }
                 _rReportHelper.clickSourceTab();
                 _rReportHelper.saveReport("dummy");
