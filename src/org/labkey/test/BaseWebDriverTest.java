@@ -1888,7 +1888,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             if (isElementPresent(selectedSchema))
                 continue; // already selected
             log("Selecting schema " + schemaWithParents + " in the schema browser...");
-            mouseOut(); // Dismiss tooltip
             waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
             // select/expand tree node
             try{
@@ -1897,7 +1896,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             catch (StaleElementReferenceException ignore) {}
             doAndWaitForPageSignal(() -> click(loc), "queryTreeSelectionChange");
             waitForElement(selectedSchema, 60000);
-            mouseOut(); // Dismiss tooltip
+            fireEvent(loc, SeleniumEvent.mouseout);
             waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden());
         }
     }
@@ -1906,21 +1905,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        mouseOut(); // Dismiss tooltip, in case it is covering the element we want to click on
-        waitForElementToDisappear(Locator.tagWithClass("div", "x4-tip").notHidden());
         Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName).notHidden();
-        waitAndClick(loc);
-        // NOTE: consider abstracting this.
-        waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
-        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
-    }
-
-    public void selectQueryInSubfolder(String schemaName,String subfolder, String queryName)
-    {
-        log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
-        selectSchema(schemaName);
-        selectSchema(subfolder);
-        Locator loc = Locator.tagWithClass("span", "labkey-link").withText(queryName);
         waitAndClick(loc);
         // NOTE: consider abstracting this.
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
