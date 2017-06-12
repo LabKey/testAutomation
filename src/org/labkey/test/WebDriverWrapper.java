@@ -18,6 +18,7 @@ package org.labkey.test;
 import com.google.common.base.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
@@ -723,11 +724,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
+    @Contract(pure = true)
     public WebDriverWait shortWait()
     {
         return new WebDriverWait(getDriver(), 10);
     }
 
+    @Contract(pure = true)
     public WebDriverWait longWait()
     {
         return new WebDriverWait(getDriver(), 30);
