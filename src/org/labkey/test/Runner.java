@@ -463,15 +463,18 @@ public class Runner extends TestSuite
                 String databaseType = System.getProperty("databaseType");
                 String databaseVersion = System.getProperty("databaseVersion");
                 String osName = System.getProperty("os.name", "<unknown>");
-                if(interfaces.contains(PostgresOnlyTest.class) && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
+                if (!StringUtils.isEmpty(databaseType)) // Prefer to run illegal tests vs missing coverage when databaseType isn't set
                 {
-                    illegalTest = true;
-                    System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
-                }
-                else if(interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
-                {
-                    illegalTest = true;
-                    System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                    if (interfaces.contains(PostgresOnlyTest.class) && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
+                    {
+                        illegalTest = true;
+                        System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                    }
+                    else if (interfaces.contains(SqlserverOnlyTest.class) && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
+                    {
+                        illegalTest = true;
+                        System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                    }
                 }
                 else if(interfaces.contains(DevModeOnlyTest.class) && !"true".equals(System.getProperty("devMode")))
                 {
