@@ -20,12 +20,14 @@ import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StudyHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Select;
@@ -293,11 +295,17 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         click(Locator.checkboxByTitle("Pipeline"));
-        submit();
-        addWebPart("Data Pipeline");
-        addWebPart("Datasets");
-        addWebPart("Specimens");
-        addWebPart("Views");
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            clickButton("Update Folder");
+        } else
+        {
+            submit();
+        }
+        new PortalHelper(getDriver()).addWebPart("Data Pipeline");
+        new PortalHelper(getDriver()).addWebPart("Datasets");
+        new PortalHelper(getDriver()).addWebPart("Specimens");
+        new PortalHelper(getDriver()).addWebPart("Views");
         // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
         // in IE testing
         executeScript("LABKEY.disablePipelineRefresh = true;");

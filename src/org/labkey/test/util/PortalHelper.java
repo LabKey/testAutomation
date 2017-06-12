@@ -18,11 +18,14 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -247,23 +250,60 @@ public class PortalHelper extends WebDriverWrapper
 
     public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        _extHelper.clickExtMenuButton(wait, Locator.xpath("//span[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
+            webPart.clickMenuItem(wait, items);
+        }
+        else
+        {
+            _extHelper.clickExtMenuButton(wait, Locator.xpath("//span[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
+        }
+    }
+
+    public void enterAdminMode()
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            new SiteNavBar(getDriver()).enterAdminMode();
+    }
+
+    public void exitAdminMode()
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            new SiteNavBar(getDriver()).exitAdminMode();
+    }
+
+    public boolean isInAdminMode()
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return new SiteNavBar(getDriver()).isInAdminMode();
+        return false;
     }
 
     @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
     {
+        enterAdminMode();
         waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         selectOptionByText(form.append("//select"), webPartName);
         clickAndWait(form.append(Locator.lkButton("Add")));
+        exitAdminMode();
     }
 
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        int startCount = getElementCount(Locators.webPartTitle(webPartTitle));
-        clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
-        waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
+            webPart.delete();
+        }
+        else
+        {
+            int startCount = getElementCount(Locators.webPartTitle(webPartTitle));
+            clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
+            waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
+        }
     }
 
     public void addQueryWebPart(@LoggedParam String schemaName)
@@ -491,5 +531,6 @@ public class PortalHelper extends WebDriverWrapper
         }
 
         public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");
+
     }
 }

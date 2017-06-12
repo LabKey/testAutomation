@@ -476,6 +476,7 @@ src/org/labkey/test/components/ext4/RadioButton.java -text
 src/org/labkey/test/components/ext4/Window.java -text
 src/org/labkey/test/components/ext4/widgets/SearchPanel.java -text
 src/org/labkey/test/components/flow/FlowReportsWebpart.java -text
+src/org/labkey/test/components/html/BootstrapMenu.java -text
 src/org/labkey/test/components/html/Checkbox.java -text
 src/org/labkey/test/components/html/EnumSelect.java -text
 src/org/labkey/test/components/html/FormItem.java -text
@@ -483,6 +484,7 @@ src/org/labkey/test/components/html/Input.java -text
 src/org/labkey/test/components/html/OptionSelect.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
 src/org/labkey/test/components/html/SelectWrapper.java -text
+src/org/labkey/test/components/html/SiteNavBar.java -text
 src/org/labkey/test/components/html/Table.java -text
 src/org/labkey/test/components/html/TextSelect.java -text
 src/org/labkey/test/components/internal/ImpersonateGroupWindow.java -text

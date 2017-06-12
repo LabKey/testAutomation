@@ -16,9 +16,11 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.LogMethod;
@@ -154,7 +156,14 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public void clickMenuItem(boolean wait, String... items)
     {
-        getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), elementCache().UX_MENU).clickMenuButton(wait, false, items);
+        }
+        else
+        {
+            getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
+        }
     }
 
     @Deprecated // Use elementCache()
@@ -172,6 +181,8 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     public class ElementCache extends Component.ElementCache
     {
         public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
+        public WebElement UX_MENU = new LazyWebElement(
+                Locator.xpath("//span[contains(@class,'dropdown') and ./a[@data-toggle='dropdown']]"), this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
     }
 
@@ -185,7 +196,11 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     protected static class Locators
     {
-        public static final Locator.XPathLocator leftTitle = Locator.tag("tbody/tr/th");
-        public static final Locator.XPathLocator webPart = Locator.tag("table").withAttribute("name", "webpart");
+        public static final Locator.XPathLocator leftTitle = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.xpath("//h3/a[ ./span[@class='labkey-wp-title-text']]") :
+                Locator.tag("tbody/tr/th");
+        public static final Locator.XPathLocator webPart = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.tag("div").withAttribute("name", "webpart") :
+                Locator.tag("table").withAttribute("name", "webpart");
     }
 }

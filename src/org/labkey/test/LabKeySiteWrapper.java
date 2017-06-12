@@ -97,11 +97,34 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 {
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
+    public static boolean IS_BOOTSTRAP_LAYOUT = true; // use to toggle between ux refresh UI and standard labkey
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
     {
         return false;
+    }
+
+    /**
+     * Don't use me.
+     */
+    @Deprecated
+    private boolean isExperimentalUXEnabled()
+    {
+        Boolean useExperimentalCoreUI = (Boolean) executeScript("return LABKEY.experimental.useExperimentalCoreUI;");
+        if (useExperimentalCoreUI == null)
+            useExperimentalCoreUI = true; // In the future, absence of this flag means new UX is finalized.
+        return useExperimentalCoreUI ;
+    }
+
+    /**
+     * Don't use me.
+     */
+    @Deprecated
+    private void enableExperimentalUX()
+    {
+        enableExperimentalFeature("useExperimentalCoreUI");
+        IS_BOOTSTRAP_LAYOUT = true;
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -134,8 +157,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             acceptTermsOfUse(null, false);
             clickButton("Sign In", 0);
 
-            if (!waitFor(() -> {
-                if (isElementPresent(Locator.id("userMenuPopupLink")))
+            // verify we're signed in now
+            if (!waitFor(() ->
+            {
+                if (isElementPresent(IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU))
                     return true;
                 bypassSecondaryAuthentication();
                 return false;
@@ -190,7 +215,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         if (!isElementPresent(Locators.signInButtonOrLink)) // Sign-out action stopped impersonation
             simpleSignOut();
-        waitForElement(Locators.signInButtonOrLink);
+        waitForElement(IS_BOOTSTRAP_LAYOUT ? Locators.UX_SIGNIN_LINK : Locators.signInButtonOrLink);
     }
 
     @LogMethod
@@ -220,7 +245,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         assertTrue("Not signed in", isSignedIn());
         assertFalse("Impersonating", isImpersonating());
-        assertElementPresent(Locators.USER_MENU);
+        assertElementPresent(IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU);
     }
 
     /**
@@ -340,7 +365,15 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             }
         }
 
-        assertTitleEquals("Sign In");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            assertTitleContains("Sign In");
+        }
+        else
+        {
+            assertTitleEquals("Sign In");
+        }
+
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
         setFormElement(Locator.id("password"), password);
@@ -493,10 +526,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (isImpersonating())
                 simpleSignOut();
         }
-        if (!isElementPresent(Locators.projectBar))
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            goToHome();
-            waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
+            if (!isElementPresent(Locators.UX_PROJECT_LIST_CONTAINER))
+            {
+                goToHome();
+                if (Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(Locators.UX_PAGE_NAV.waitForElement(getDriver(), WAIT_FOR_PAGE))==null)
+                {   // toggle the menu flyout
+                    click(Locators.UX_FOLDER_TAB);
+                }
+                waitForElement(Locators.UX_PROJECT_LIST_CONTAINER, WAIT_FOR_PAGE);
+            }
+        }
+        else
+        {
+            if (!isElementPresent(Locators.projectBar))
+            {
+                goToHome();
+                waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
+            }
         }
         assertTrue("Test user '" + getCurrentUser() + "' is not an admin", isUserAdmin());
     }
@@ -537,6 +585,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
                 WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
+                IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
 
                 if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {
@@ -696,6 +745,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 webPart.delete();
             if (bootstrapped)
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
+            if (false)
+                enableExperimentalUX(); // Flip flag to test new UX
         }
     }
 
@@ -1127,16 +1178,34 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public WebElement openProjectMenu()
     {
-        waitForHoverNavigationReady();
-        return shortWait().until(new ExpectedCondition<WebElement>()
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            @Override
-            public WebElement apply(@Nullable WebDriver driver)
+            WebElement projectListContainer = Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(getDriver());
+            if (projectListContainer==null || !projectListContainer.isDisplayed() )
+                Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
+            return shortWait().until(new ExpectedCondition<WebElement>()
             {
-                click(Locators.projectBar);
-                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")).apply(driver);
-            }
-        });
+                @Override
+                public WebElement apply(@Nullable WebDriver driver)
+                {
+                    click(Locators.UX_FOLDER_TAB);
+                    return ExpectedConditions.visibilityOfElementLocated(Locators.UX_PROJECT_LIST_CONTAINER.toBy()).apply(driver);
+                }
+            });
+        }
+        else
+        {
+            waitForHoverNavigationReady();
+            return shortWait().until(new ExpectedCondition<WebElement>()
+            {
+                @Override
+                public WebElement apply(@Nullable WebDriver driver)
+                {
+                    click(Locators.projectBar);
+                    return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#projectBar_menu .project-nav")).apply(driver);
+                }
+            });
+        }
     }
 
     public void clickProject(String project)
@@ -1152,23 +1221,51 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (assertDestination)
         {
             acceptTermsOfUse(null, true);
-            waitForElement(Locator.id("folderBar").withText(project));
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                waitFor(()-> getCurrentContainer().equals(project), WAIT_FOR_JAVASCRIPT);
+            }
+            else
+            {
+                waitForElement(Locator.id("folderBar").withText(project));
+            }
         }
     }
 
     public WebElement openFolderMenu()
     {
-        waitForElement(Locators.folderMenu.withText());
-        waitForFolderNavigationReady();
-        return shortWait().until(new ExpectedCondition<WebElement>()
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            @Override
-            public WebElement apply(@Nullable WebDriver driver)
+            waitForElement(Locators.UX_FOLDER_TAB);
+            Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
+
+            return shortWait().until(new ExpectedCondition<WebElement>()
             {
-                click(Locators.folderMenu);
-                return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#folderBar_menu .folder-nav")).apply(driver);
-            }
-        });
+                @Override
+                public WebElement apply(@Nullable WebDriver driver)
+                {
+                    WebElement projectList = Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(getDriver());
+                    if (null == projectList || !projectList.isDisplayed())
+                        Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
+                    return ExpectedConditions.visibilityOfElementLocated(Locators.UX_FOLDER_LIST_CONTAINER.toBy()).apply(driver);
+                }
+            });
+        }
+        else
+        {
+            waitForElement(Locators.folderMenu.withText());
+            waitForFolderNavigationReady();
+
+            return shortWait().until(new ExpectedCondition<WebElement>()
+            {
+                @Override
+                public WebElement apply(@Nullable WebDriver driver)
+                {
+                    click(Locators.folderMenu);
+                    return ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#folderBar_menu .folder-nav")).apply(driver);
+                }
+            });
+        }
     }
 
     public void clickFolder(String folder)
@@ -1176,6 +1273,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         final WebElement folderMenu = openFolderMenu();
         expandFolderTree(folder);
         clickAndWait(Locator.linkWithText(folder).waitForElement(folderMenu, WAIT_FOR_JAVASCRIPT));
+    }
+
+    public String getCurrentContainer()
+    {
+        return (String) executeScript( "return LABKEY.container.title;");
     }
 
     private void waitForFolderNavigationReady()
@@ -1187,8 +1289,19 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     private void waitForHoverNavigationReady()
     {
-        waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
-                "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            waitFor(()->
+            {
+                WebElement elem = Locators.UX_FOLDER_LIST_CONTAINER.findElementOrNull(getDriver());
+                return  elem != null && elem.isDisplayed();
+            }, WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
+                    "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     /**
@@ -1196,33 +1309,18 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      */
     public void enableExperimentalFeature(String feature)
     {
-        final String ENABLE = "ENABLE";
-        final String DISABLE = "DISABLE";
-
-        log("Attempting to enable feature: " + feature);
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("experimental features"));
-
-        final WebElement link = Locator.tagWithAttribute("a", "data-exp-flag", feature).findElementOrNull(getDriver());
-        if (link == null)
-            fail("No such feature found: " + feature);
-        else
+        Connection connection = createDefaultConnection(true);
+        PostCommand enableCommand = new PostCommand("admin", "experimentalFeatures");
+        Map<String, Object> params = Maps.of("feature", feature,
+                "enabled", true);
+        enableCommand.setParameters(params);
+        try
         {
-            final String linkText = link.getText();
-            if (ENABLE.equals(linkText))
-            {
-                log("Feature currently disabled, enabling " + feature);
-                click(link);
-                shortWait().until(ExpectedConditions.textToBePresentInElement(link, DISABLE));
-            }
-            else if (DISABLE.equals(linkText))
-            {
-                log("Feature currently enabled: " + feature);
-            }
-            else
-            {
-                throw new IllegalStateException(String.format("Unknown link text [%s] for experimental feature '%s'", linkText, feature));
-            }
+            enableCommand.execute(connection, "/");
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
         }
     }
 

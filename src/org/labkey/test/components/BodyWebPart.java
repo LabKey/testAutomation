@@ -16,13 +16,14 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static org.labkey.test.components.WebPart.Locators.*;
 
-public class BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
+public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 {
     public BodyWebPart(WebDriver driver, WebElement webPartElement)
     {
@@ -32,7 +33,7 @@ public class BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     public BodyWebPart(WebDriver test, String title, int index)
     {
-        this(test, locator().withDescendant(leftTitle.withAttribute("title", title)).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, find(test, title, index));
         _title = title;
     }
 
@@ -45,6 +46,22 @@ public class BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
     {
         this(test, locator().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
+
+    static public WebElement find(WebDriver test, String title, int index)
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            return locator().withDescendant(leftTitle.withAttribute("name", title))
+                    .waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+        else
+        {
+            return locator().withDescendant(leftTitle.withAttribute("title", title))
+                    .index(index)
+                    .waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+    }
+
 
     @Deprecated
     public BodyWebPart(BaseWebDriverTest test, String title, int index)
@@ -63,6 +80,8 @@ public class BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     private static Locator.XPathLocator locator()
     {
-        return Locator.id("bodypanel").append(webPart);
+        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.xpath("//div[@class='container']").append(webPart) :
+                Locator.id("bodypanel").append(webPart);
     }
 }

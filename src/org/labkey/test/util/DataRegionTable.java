@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
@@ -699,7 +700,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             while (true)
             {
-                String value = _driver.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+5) + "]//input[@name='.select']"), "value");
+                String value = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                        _driver.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+1) + "]//input[@name='.select']"), "value"):
+                        _driver.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getTableId()) +"]//tr[" + (row+5) + "]//input[@name='.select']"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;
@@ -1472,8 +1475,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         protected List<WebElement> getColumnHeaders()
         {
+            String cssSelector = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? "th.labkey-column-header" : "td.labkey-column-header";
             if (columnHeaders == null)
-                columnHeaders = ImmutableList.copyOf(Locator.css("td.labkey-column-header").findElements(columnHeaderRow));
+                columnHeaders = ImmutableList.copyOf(Locator.css(cssSelector).findElements(columnHeaderRow));
             return columnHeaders;
         }
 

@@ -33,6 +33,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RelativeUrl;
 import org.labkey.test.util.TestLogger;
@@ -521,9 +522,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickAdminMenuItem(String... items)
     {
-        longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
-        _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            longWait().until(ExpectedConditions.elementToBeClickable(Locators.UX_ADMIN_MENU_TOGGLE.toBy()));
+            clickMenuButton(true, Locators.UX_ADMIN_MENU_TOGGLE.waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), false, items);
+        }
+        else
+        {
+            longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
+            _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
+        }
     }
+
     public void clickDevMenuItem(boolean wait, String... items)
     {
         final WebElement devMenu = waitForElement(Locators.DEVELOPER_MENU);
@@ -541,6 +551,41 @@ public abstract class WebDriverWrapper implements WrapsDriver
         final WebElement userMenu = waitForElement(Locators.USER_MENU);
         scrollIntoView(userMenu);
         _ext4Helper.clickExt4MenuButton(wait, userMenu, onlyOpen, items);
+    }
+
+    @LogMethod(quiet = true)
+    public WebElement clickMenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    {
+        menu.click();
+        try
+        {
+            waitForElement(Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+        }
+        catch (NoSuchElementException retry)
+        {
+            menu.click(); // Sometimes ext4 menus don't open on the first try
+            waitForElement(Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+        }
+        if (onlyOpen && subMenuLabels.length == 0)
+            return null;
+
+        for (int i = 0; i < subMenuLabels.length - 1; i++)
+        {
+            WebElement subMenuItem = waitForElement(Locators.bootstrapMenuItem(subMenuLabels[i]).notHidden(), 2000);
+            clickAndWait(subMenuItem, 0);
+        }
+        WebElement item = waitForElement(Locators.bootstrapMenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
+        if (onlyOpen)
+        {
+            mouseOver(item);
+            return item;
+        }
+
+        if (wait)
+            clickAndWait(item);
+        else
+            clickAndWait(item, 0);
+        return null;
     }
 
     // Click on a module listed on the admin menu

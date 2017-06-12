@@ -155,7 +155,17 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        _extHelper.clickInsertNewRow(true);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            clickMenuButton(true,
+                    Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
+                    false,
+                    "Insert New Row");
+        }
+        else
+        {
+            _extHelper.clickInsertNewRow(true);
+        }
         setRowData(data, validateText);
     }
 
@@ -442,8 +452,6 @@ public class ListHelper extends LabKeySiteWrapper
         assertElementNotPresent(Locator.tagWithClass("div", "labkey-error"));
     }
 
-
-
     public void clickImportData()
     {
         if(isElementPresent(Locator.lkButton("Import Data")))
@@ -451,7 +459,17 @@ public class ListHelper extends LabKeySiteWrapper
         else
         {
             log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            _extHelper.clickMenuButton(true, "Insert", "Import Bulk Data");
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                clickMenuButton(true,
+                        Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
+                        false,
+                        "Import Bulk Data");
+            }
+            else
+            {
+                _extHelper.clickMenuButton(true, "Insert", "Import Bulk Data");
+            }
         }
         waitForElement(Locator.id("tsv3"));
     }
