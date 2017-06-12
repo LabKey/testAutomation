@@ -338,7 +338,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     {
         goToSchemaBrowser();
         selectQuery("assay.simple." + ASSAY_NAME, "AssayProviderScopedRunQuery");
-        waitAndClickAndWait(Locator.linkWithText("View Source").notHidden());
+        waitAndClickAndWait(Locator.linkWithText("view source").notHidden());
         String expectedQuery = "SELECT *, 'Prefix' || Name || 'Suffix' AS WrappedName FROM Runs";
         String querySource = Locator.tagWithClass("div", "labkey-query-source").findElement(getDriver())
                 .getText().trim().replaceAll("(?s)/\\*.*\\*/", "").trim();
