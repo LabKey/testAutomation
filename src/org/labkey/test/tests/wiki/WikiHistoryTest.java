@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.labkey.test.tests;
+package org.labkey.test.tests.wiki;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -40,8 +40,8 @@ import java.util.List;
 @Category({InDevelopment.class, Wiki.class})
 public class WikiHistoryTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiHistoryVerifyProject";
-    private static final String SUBFOLDER_DESTINATION_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiHistoryVerifyDestinationFolder";
+    private static final String PROJECT_NAME = "WikiHistoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String SUBFOLDER_DESTINATION_NAME = "WikiHistoryVerifyDestinationFolder" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_ALTTITLE_2 = "The third wiki page title";
@@ -54,11 +54,6 @@ public class WikiHistoryTest extends BaseWebDriverTest
                     "queryName='Users', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
     private static final String WIKI_CHECK_CONTENT_2 = "Amazing HTML content here";
-
-    public WikiHistoryTest()
-    {
-        setContainerHelper(new UIContainerHelper(this));
-    }
 
     public List<String> getAssociatedModules()
     {
@@ -79,10 +74,6 @@ public class WikiHistoryTest extends BaseWebDriverTest
 
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.checkboxByTitle("Wiki"));
-        submit();
 
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("full-text search"));
@@ -101,7 +92,7 @@ public class WikiHistoryTest extends BaseWebDriverTest
         wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
         wikiHelper.saveWikiPage();
 
-        DataRegionTable.waitForDataRegion(this, WIKI_PAGE_WEBPART_ID);
+        DataRegionTable wikiDataRegion = new DataRegionTable(WIKI_PAGE_WEBPART_ID, getDriver());  // just waiting on the wiki data region
         final Locator.XPathLocator wikiTitleLink = Locator.linkContainingText("_Test Wiki").withAttribute("href");
         assertElementPresent(wikiTitleLink);
 
@@ -131,10 +122,6 @@ public class WikiHistoryTest extends BaseWebDriverTest
 
         log("create subfolder for wiki copying");
         _containerHelper.createSubfolder(PROJECT_NAME, SUBFOLDER_DESTINATION_NAME);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.checkboxByTitle("Wiki"));
-        submit();
 
         log("test copying wiki without history");
         beginAt(WebTestHelper.buildURL("project", PROJECT_NAME, "begin"));
@@ -144,6 +131,7 @@ public class WikiHistoryTest extends BaseWebDriverTest
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);  // can't check first title because it's part of the title of the history page
 
         log("test copying wiki with history");
+        // delete previously copied wiki first though
         clickAndWait(Locator.linkWithText("Return To Page"));
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Delete"));
