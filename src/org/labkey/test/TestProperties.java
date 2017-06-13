@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Properties;
 
+import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
+
 public abstract class TestProperties
 {
     static
@@ -112,7 +114,7 @@ public abstract class TestProperties
 
     public static String ensureChromedriverExeProperty()
     {
-        final String key = "webdriver.chrome.driver";
+        final String key = CHROME_DRIVER_EXE_PROPERTY;
         String currentProperty = System.getProperty(key);
         if (currentProperty == null)
         {
