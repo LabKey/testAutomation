@@ -44,6 +44,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -580,6 +581,21 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         int col = getColumnIndex(name);
         return getColumnDataAsText(col);
+    }
+
+    public Map<String, String> getRowDataAsMap(String colName, String value)
+    {
+        return getRowDataAsMap(getRowIndex(colName, value));
+    }
+
+    public Map<String, String> getRowDataAsMap(int row)
+    {
+        Map<String, String> rowMap = new LinkedHashMap<>();
+        for (String colName : getColumnNames())
+        {
+            rowMap.put(colName, getDataAsText(row, colName));
+        }
+        return rowMap;
     }
 
     public List<String> getRowDataAsText(int row)
