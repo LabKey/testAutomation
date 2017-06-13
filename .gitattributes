@@ -675,7 +675,6 @@ src/org/labkey/test/tests/KnitrReportTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
-src/org/labkey/test/tests/ListPublishTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LookupToSampleIDTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
