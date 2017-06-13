@@ -61,7 +61,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -79,9 +78,11 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -110,6 +111,8 @@ import static org.junit.Assert.fail;
 import static org.labkey.test.TestProperties.isScriptCheckEnabled;
 import static org.labkey.test.WebTestHelper.stripContextPath;
 import static org.labkey.test.components.html.RadioButton.RadioButton;
+import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY;
+import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY;
 
 public abstract class WebDriverWrapper implements WrapsDriver
 {
@@ -185,6 +188,18 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 if(oldWebDriver == null)
                 {
                     TestProperties.ensureChromedriverExeProperty();
+                    if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
+                    {
+                        String logFileName = new SimpleDateFormat("'chromedriver_'HHmmss'.log'").format(new Date());
+                        final String logPath = new File(downloadDir.getParentFile(), logFileName).getAbsolutePath();
+                        log("Saving chromedriver log to: " + logPath);
+                        System.setProperty(CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
+                        System.setProperty(CHROME_DRIVER_LOG_PROPERTY, logPath);
+                    }
+                    else
+                    {
+                        log("Failed to create directory for chromedriver log: " + downloadDir.getParentFile().getAbsolutePath());
+                    }
                     ChromeOptions options = new ChromeOptions();
                     Dictionary<String, Object> prefs = new Hashtable<>();
 
