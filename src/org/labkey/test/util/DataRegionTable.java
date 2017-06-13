@@ -43,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -780,6 +781,51 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (col == -1)
             return null;
         return getDataAsText(row, col);
+    }
+
+    public void updateRow(int id, Map<String, String> data)
+    {
+        updateRow(id, data, true);
+    }
+
+    public void updateRow(int id, Map<String, String> data, boolean validateText)
+    {
+        _driver.clickAndWait(updateLink(id - 1));
+        setRowData(data, validateText);
+    }
+
+    protected void setRowData(Map<String, String> data, boolean validateText)
+    {
+        for(String key : data.keySet())
+        {
+            _driver.waitForElement(Locator.name("quf_" + key));
+            WebElement field = Locator.name("quf_" + key).findElement(getDriver());
+            String inputType = field.getAttribute("type");
+            switch (inputType)
+            {
+                case "checkbox":
+                    if(data.get(key).toLowerCase().equals("true"))
+                    {
+                        _driver.setCheckbox(field, true);
+                    }
+                    else
+                    {
+                        _driver.setCheckbox(field, false);
+                    }
+                    break;
+                case "file":
+                    _driver.setFormElement(field, new File(data.get(key)));
+                    break;
+                default:
+                    _driver.setFormElement(field, data.get(key));
+            }
+        }
+        _driver.clickButton("Submit");
+
+        if(validateText)
+        {
+            _driver.assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
+        }
     }
 
     public String getDetailsHref(int row)

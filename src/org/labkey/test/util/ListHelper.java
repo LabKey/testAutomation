@@ -208,12 +208,19 @@ public class ListHelper extends LabKeySiteWrapper
      * From the list data grid, edit an existing row
      *
      * @param id the row number (1 based)
+     * @deprecated use {@link DataRegionTable#updateRow(int, Map)}
      */
+    @Deprecated
     public void updateRow(int id, Map<String, String> data)
     {
         updateRow(id, data, true);
     }
 
+    /**
+     *
+     * @deprecated use {@link DataRegionTable#updateRow(int, Map, boolean)}
+     */
+    @Deprecated
     public void updateRow(int id, Map<String, String> data, boolean validateText)
     {
         DataRegionTable dr = new DataRegionTable("query", getDriver());
