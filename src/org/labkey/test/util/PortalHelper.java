@@ -24,7 +24,6 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
-import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -295,7 +294,7 @@ public class PortalHelper extends WebDriverWrapper
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
             WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
-            webPart.delete();
+            webPart.remove();
         }
         else
         {

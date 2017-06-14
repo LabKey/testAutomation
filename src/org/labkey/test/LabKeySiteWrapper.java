@@ -740,9 +740,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             // Tests hit Home portal a lot. Make it load as fast as possible
             PortalHelper portalHelper = new PortalHelper(this);
             for (BodyWebPart webPart : portalHelper.getBodyWebParts())
-                webPart.delete();
+                webPart.remove();
             for (SideWebPart webPart : portalHelper.getSideWebParts())
-                webPart.delete();
+                webPart.remove();
             if (bootstrapped)
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
             if (false)

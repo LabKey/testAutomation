@@ -82,7 +82,7 @@ public class PortalTest extends BaseWebDriverTest
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         WebPart wikiWebPart = new BodyWebPart(getDriver(), "Wiki");
-        wikiWebPart.delete();
+        wikiWebPart.remove();
 
         refresh();
         // verify that the web part removal was correctly saved:

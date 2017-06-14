@@ -108,15 +108,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
         waitForStale();
     }
 
-    /**
-     * @deprecated Use {@link #remove()}
-     */
-    @Deprecated
-    public void delete()
-    {
-        remove();
-    }
-
     public void moveUp()
     {
         moveWebPart(false);
