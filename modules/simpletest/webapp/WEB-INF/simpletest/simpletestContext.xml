@@ -117,6 +117,22 @@
                         </list>
                     </property>
                 </bean>
+                <bean class="org.labkey.api.pipeline.file.FileAnalysisTaskPipelineSettings">
+                    <constructor-arg value="dummyNlpPipelineLungAndBrain"/>
+                    <property name="description" value="Dummy NLP invocation LungAndBrain"/>
+                    <property name="protocolObjectId" value="nlp.dummyengineInvocation"/>
+                    <property name="protocolName" value="Dummy NLP invocation LungAndBrain"/>
+                    <property name="protocolFactoryName" value="dummyNlpinvocationLungAndBrain"/>
+                    <property name="initialInputExt" ref="nlpTsvFileType"/>
+                    <property name="workflowProcessKey" value="NLP:documentProcessingWithNLP"/>
+                    <property name="analyzeURL" value="/nlp-runPipeline.view"/>
+                    <property name="taskProgressionSpec">
+                        <list>
+                            <ref bean="dummyNlpEngineCommandLungAndBrain"/>
+                            <ref bean="xarGeneratorId"/>
+                        </list>
+                    </property>
+                </bean>
             </list>
         </property>
     </bean>
@@ -370,6 +386,42 @@
                 </bean>
                 <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
                     <property name="value" value="../../../cytogenetics1.nlp.json"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="."/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dummyNlpEngineCommandLungAndBrain" class="org.labkey.api.pipeline.cmd.CommandTaskFactorySettings">
+        <constructor-arg value="dummyNlpEngineLungAndBrain"/>
+        <property name="statusName" value="RUN NLP ENGINE"/>
+        <property name="inputPaths">
+            <map>
+                <entry key="sourceDocs">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpTsvFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="outputPaths">
+            <map>
+                <entry key="output">
+                    <bean class="org.labkey.api.pipeline.cmd.TaskPath">
+                        <constructor-arg ref="nlpJsonFileType"/>
+                    </bean>
+                </entry>
+            </map>
+        </property>
+        <property name="converters">
+            <list>
+                <bean class="org.labkey.api.pipeline.cmd.ExeToCommandArgs">
+                    <property name="exePath" value="mv"/>
+                </bean>
+                <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
+                    <property name="value" value="../../../lungAndBrain.nlp.json"/>
                 </bean>
                 <bean class="org.labkey.api.pipeline.cmd.RequiredInLine">
                     <property name="value" value="."/>
