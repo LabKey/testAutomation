@@ -1311,8 +1311,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         Connection connection = createDefaultConnection(true);
         PostCommand enableCommand = new PostCommand("admin", "experimentalFeatures");
-        Map<String, Object> params = Maps.of("feature", feature,
-                "enabled", true);
+        Map<String, Object> params = new HashMap<>(Maps.of(
+                "feature", feature,
+                "enabled", true));
         enableCommand.setParameters(params);
         try
         {
