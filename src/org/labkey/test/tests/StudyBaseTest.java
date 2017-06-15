@@ -55,7 +55,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
-    protected int datasetCount = 48;
+    protected int datasetCount = getDatasetCount();
     protected int visitCount = 65;
 
     private SpecimenImporter _specimenImporter;
@@ -64,6 +64,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     abstract protected void doVerifySteps() throws Exception;
 
+    protected int getDatasetCount(){return 48;}
 
     protected void setupRequestStatuses()
     {

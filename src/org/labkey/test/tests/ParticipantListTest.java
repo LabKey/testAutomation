@@ -77,7 +77,7 @@ public class ParticipantListTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Change Properties"));
 
         int dsCount = getElementCount(Locator.xpath("//tr[@data-datasetid]"));
-        assertEquals("Unexpected number of Datasets.", datasetCount, dsCount);
+        assertEquals("Unexpected number of Datasets.", 48, dsCount);
 
         // create new categories, then assign them out
         for (String category : CATEGORIES)

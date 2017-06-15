@@ -14,6 +14,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
     {
         super(driver);
         //WebDriverWrapper.waitFor(()-> elementCache().datasetFieldRow.isDisplayed(),WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.checkboxByName("demographicData"));
         sleep(10000);
     }
 
@@ -23,7 +24,7 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         sleep(1000);
         assertAlertContains(partialAlertTxt);
         cancel();
-        return new EditDatasetDefinitionPage(getDriver());
+        return this;
     }
 
     public DatasetPropertiesPage save()

@@ -54,10 +54,7 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-//        Locator QCStates = Locator.xpath("//span[b[text()='QC States:']]");
-//        Locator datasetNavLink = Locator.xpath("//span[@id='navTrailAncestors']/a");
-//        Locator manageDataset = Locator.lkButton("Manage");
-        //WebElement QCStates = Locator.xpath("//span[b[text()='QC States:']]").findWhenNeeded(this);
+        WebElement QCStates = Locator.xpath("//span[b[text()='QC States:']]").findWhenNeeded(this);
         WebElement datasetNavLink = Locator.xpath("//span[@id='navTrailAncestors']/a").findWhenNeeded(this);
         WebElement manageDataset = Locator.lkButton("Manage").findWhenNeeded(this);
     }
