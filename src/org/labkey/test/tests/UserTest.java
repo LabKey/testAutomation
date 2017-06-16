@@ -28,6 +28,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
@@ -43,6 +44,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
@@ -68,8 +70,8 @@ public class UserTest extends BaseWebDriverTest
     // the test fails
     private static final String CHANGE_EMAIL_USER = "pre-pw_change@user.test";
     private static final String CHANGE_EMAIL_USER_ALTERNATE = "post-pw_change@user.test";
-    private static final String SELF_SERVICE_EMAIL_USER = "changeemail@oldaddress.com";
-    private static final String SELF_SERVICE_EMAIL_USER_CHANGED = "changeemail@newaddress.com";
+    private static final String SELF_SERVICE_EMAIL_USER = "oldaddress@user.test";
+    private static final String SELF_SERVICE_EMAIL_USER_CHANGED = "newaddress@user.test";
 
     public UserTest()
     {
@@ -239,17 +241,9 @@ public class UserTest extends BaseWebDriverTest
         assertTrue(null != getEmailChangeMsgBody("Notification .* Web Site email has changed.*"));
 
         log("Validate that the old email address has been removed.");
-        try
-        {
-            assertUserExists(SELF_SERVICE_EMAIL_USER);
-            hitExpectedError = false;
-        }
-        catch(AssertionError ae)
-        {
-            hitExpectedError = true;
-        }
 
-        assertTrue("Searching for user email '" + SELF_SERVICE_EMAIL_USER + "' did not throw the expected error.", hitExpectedError);
+        final Integer userId = new ApiPermissionsHelper(this).getUserId(SELF_SERVICE_EMAIL_USER);
+        assertNull("Searching for user email '" + SELF_SERVICE_EMAIL_USER + "' did not throw the expected error.", userId);
 
         log("Impersonate using the new email address " + SELF_SERVICE_EMAIL_USER_CHANGED);
         goToHome();

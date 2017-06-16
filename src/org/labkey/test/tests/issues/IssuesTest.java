@@ -69,7 +69,8 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER1 = "user1_issuetest@issues.test";
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
-    private final String NAME = displayNameFromEmail(getUsername());
+    private static final String user = "reader@issues.test";
+    private final String NAME = _userHelper.getDisplayNameForEmail(getUsername());
     private final Map<String, String> ISSUE_0 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
     private final Map<String, String> ISSUE_1 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
@@ -748,7 +749,6 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void defaultAssignedToTest()
     {
-        String user = "reader@email.com";
         Locator.XPathLocator specificUserSelect = Locator.tagWithClass("select", "assigned-to-user");
 
         // create reader user (issue 20598)

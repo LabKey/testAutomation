@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.util.Ext4Helper;
@@ -27,12 +28,20 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
+    public static final String AUTHOR_USER = "author@dataviews.test";
+    public static final String EDITOR_USER = "editor@dataviews.test";
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        _userHelper.deleteUsers(afterTest, AUTHOR_USER, EDITOR_USER);
     }
 
     protected void doCreateSteps()
@@ -55,13 +64,13 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _permissionsHelper.createPermissionsGroup("Editor Group");
         _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
         _permissionsHelper.setPermissions("Editor Group", "Editor");
-        createUserInProjectForGroup("Editor@test.com", "StudyVerifyProject", "Editor Group", false);
+        createUserInProjectForGroup(EDITOR_USER, "StudyVerifyProject", "Editor Group", false);
         clickFolder("My Study");
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Author Group");
         _permissionsHelper.assertPermissionSetting("Author Group", "No Permissions");
         _permissionsHelper.setPermissions("Author Group", "Author");
-        createUserInProjectForGroup("Author@test.com", "StudyVerifyProject", "Author Group", false);
+        createUserInProjectForGroup(AUTHOR_USER, "StudyVerifyProject", "Author Group", false);
 
         clickFolder("My Study");
         clickTab("Manage");
@@ -115,9 +124,8 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     }
 
     protected void doVerifySteps()
-
     {
-        impersonate ("editor@test.com");
+        impersonate (EDITOR_USER);
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 4");
         sleep(1000);
@@ -128,7 +136,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickProject("StudyVerifyProject");
         clickFolder("My Study");
         sleep(500);
-        impersonate("author@test.com");
+        impersonate(AUTHOR_USER);
         PortalHelper portalHelper1 = new PortalHelper(this);
         portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), "Report 5");

@@ -68,7 +68,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
     private static final String MEMBER_LIST = "memberListInput";
     private static final String TEMPLATE_TEXT = "***Please do not reply to this email notification. Replies to this email are routed to an unmonitored mailbox. Instead, please use the link below.***";
-    private static final String USER = "message_user@gmail.com";
+    private static final String USER = "message_user@messages.test";
     private static final String GROUP = "Message group";
 
     public static final String FILES_DEFAULT_COMBO = "Default Setting For Files:";

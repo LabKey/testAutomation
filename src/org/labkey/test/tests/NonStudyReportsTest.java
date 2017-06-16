@@ -307,7 +307,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement(Locator.name("viewName"), LINK_REPORT1_NAME);
         waitForElementToDisappear(Locator.tag("li").containing("This field is required").index(1));
         setFormElement(Locator.name("description"), LINK_REPORT1_DESCRIPTION);
-        setFormElement(Locator.name("linkUrl"), "mailto:kevink@example.com");
+        setFormElement(Locator.name("linkUrl"), "mailto:kevink@linkreport.test");
         waitForElementToDisappear(Locator.tag("li").containing("This field is required"));
         assertElementPresent(Locator.tag("li").containing("URL must be absolute"));
         setFormElement(Locator.name("linkUrl"), WebTestHelper.getContextPath() + LINK_REPORT1_URL);
