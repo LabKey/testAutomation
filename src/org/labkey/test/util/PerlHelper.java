@@ -47,7 +47,7 @@ public class PerlHelper
             return;
 
         _test.log("Try configuring Perl");
-        String perlHome = System.getenv("PERL_HOME");
+        String perlHome = System.getProperty("perl.home", System.getenv("PERL_HOME"));
         if (perlHome != null)
         {
             _test.log("PERL_HOME is set to: " + perlHome + " searching for the Perl application");
