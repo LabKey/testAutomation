@@ -17,7 +17,6 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -81,6 +80,6 @@ public class Input extends WebDriverComponent implements FormItem<String>
 
     public void blur()
     {
-        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);;
+        getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
     }
 }
