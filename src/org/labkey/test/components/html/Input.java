@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.html;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -23,8 +24,8 @@ import org.openqa.selenium.WebElement;
 
 public class Input extends WebDriverComponent implements FormItem<String>
 {
-    protected final WebElement _el;
-    protected final WebDriver _driver; // getFormElement uses javascript
+    private final WebElement _el;
+    private final WebDriver _driver; // getFormElement uses javascript
 
     public Input(WebElement el, WebDriver driver)
     {
@@ -47,6 +48,7 @@ public class Input extends WebDriverComponent implements FormItem<String>
     @Override
     public WebElement getComponentElement()
     {
+        assertElementType(_el);
         return _el;
     }
 
@@ -69,17 +71,23 @@ public class Input extends WebDriverComponent implements FormItem<String>
     @Override
     public String get()
     {
-        return getWrapper().getFormElement(_el);
+        return getWrapper().getFormElement(getComponentElement());
     }
 
     @Override
     public void set(String value)
     {
-        getWrapper().setFormElement(_el, value);
+        getWrapper().setFormElement(getComponentElement(), value);
     }
 
     public void blur()
     {
         getWrapper().fireEvent(getComponentElement(), WebDriverWrapper.SeleniumEvent.blur);
+    }
+
+    protected void assertElementType(WebElement el)
+    {
+        String tag = el.getTagName();
+        Assert.assertEquals("Not an input: " + el.toString(), "input", tag);
     }
 }
