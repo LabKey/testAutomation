@@ -28,14 +28,14 @@ public class ResolvePage extends BaseUpdatePage<ResolvePage.ElementCache>
         super(driver);
     }
 
-    public static ResolvePage beginAt(WebDriverWrapper driver, int issueId)
+    public static ResolvePage beginAt(WebDriverWrapper driver, String issueId)
     {
         return beginAt(driver, driver.getCurrentContainerPath(), issueId);
     }
 
-    public static ResolvePage beginAt(WebDriverWrapper driver, String containerPath, int issueId)
+    public static ResolvePage beginAt(WebDriverWrapper driver, String containerPath, String issueId)
     {
-        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "resolve", Maps.of("issueId", String.valueOf(issueId))));
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "resolve", Maps.of("issueId", issueId)));
         return new ResolvePage(driver.getDriver());
     }
 

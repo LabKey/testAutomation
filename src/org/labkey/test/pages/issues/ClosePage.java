@@ -27,14 +27,14 @@ public class ClosePage extends BaseUpdatePage<ClosePage.ElementCache>
         super(driver);
     }
 
-    public static ClosePage beginAt(WebDriverWrapper driver, int issueId)
+    public static ClosePage beginAt(WebDriverWrapper driver, String issueId)
     {
         return beginAt(driver, driver.getCurrentContainerPath(), issueId);
     }
 
-    public static ClosePage beginAt(WebDriverWrapper driver, String containerPath, int issueId)
+    public static ClosePage beginAt(WebDriverWrapper driver, String containerPath, String issueId)
     {
-        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "close", Maps.of("issueId", String.valueOf(issueId))));
+        driver.beginAt(WebTestHelper.buildURL("issues", containerPath, "close", Maps.of("issueId", issueId)));
         return new ClosePage(driver.getDriver());
     }
 
