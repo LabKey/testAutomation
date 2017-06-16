@@ -49,6 +49,8 @@ data/api/webPartTest.js -text
 data/api/webdavTest.html -text
 data/api/webdavTest.js -text
 data/api/workbookAPITest.html -text
+data/filenames/<img[!!-~]src=''[!!-~]onerror='alert(0)'> -text
+data/filenames/hello&nbsp;&lt;world -text
 /gradle.properties -text
 modules/ETLtest/module.properties -text
 modules/ETLtest/resources/ETLs/AutoIncrementListAToListB_truncate.xml -text
@@ -764,6 +766,7 @@ src/org/labkey/test/tests/flow/FlowSpecimenTest.java -text
 src/org/labkey/test/tests/flow/FlowTest.java -text
 src/org/labkey/test/tests/issues/IssueDomainSharingTest.java -text
 src/org/labkey/test/tests/issues/IssuesAdminTest.java -text
+src/org/labkey/test/tests/issues/IssuesAttachmentTest.java -text
 src/org/labkey/test/tests/issues/IssuesTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/SchemaBrowserPerfTest.java -text
