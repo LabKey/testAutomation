@@ -52,6 +52,7 @@ import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -1304,25 +1305,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    /**
-     * @param feature  the enable link will have an id of the form "labkey-experimental-feature-[feature]
-     */
     public void enableExperimentalFeature(String feature)
     {
-        Connection connection = createDefaultConnection(true);
-        PostCommand enableCommand = new PostCommand("admin", "experimentalFeatures");
-        Map<String, Object> params = new HashMap<>(Maps.of(
-                "feature", feature,
-                "enabled", true));
-        enableCommand.setParameters(params);
-        try
-        {
-            enableCommand.execute(connection, "/");
-        }
-        catch (IOException | CommandException e)
-        {
-            throw new RuntimeException(e);
-        }
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), feature);
     }
 
     public void impersonateGroup(String group, boolean isSiteGroup)
