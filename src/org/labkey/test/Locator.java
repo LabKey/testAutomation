@@ -895,6 +895,14 @@ public abstract class Locator
         }
 
         @Override
+        public XPathLocator last()
+        {
+            return new XPathCSSLocator(
+                    _xLoc.last(),
+                    _cssLoc.lastChild());
+        }
+
+        @Override
         public XPathLocator append(XPathLocator child)
         {
             XPathLocator xLoc = _xLoc.append(child);
@@ -1030,7 +1038,7 @@ public abstract class Locator
 
         public XPathLocator last()
         {
-            return new XPathLocator("("+getLoc()+")[last()]");
+            return append("[last()]");
         }
 
         public XPathLocator append(String clause)
@@ -1400,6 +1408,11 @@ public abstract class Locator
         public CssLocator withClass(String cssClass)
         {
             return append("." + cssClass);
+        }
+
+        public CssLocator lastChild()
+        {
+            return append(":last-child");
         }
 
         @Override
