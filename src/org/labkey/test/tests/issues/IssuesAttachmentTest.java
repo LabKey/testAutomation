@@ -6,7 +6,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsListPage;
 import org.labkey.test.pages.issues.DetailsPage;
@@ -21,10 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Category({DailyC.class})
+@Category({InDevelopment.class})
 public class IssuesAttachmentTest extends BaseWebDriverTest
 {
-    public static final File ALERT_FILE = TestFileUtils.getSampleData("filenames/<img src='' onerror='alert(0)'>");
+    public static final File ALERT_FILE = TestFileUtils.getSampleData("filenames/<img src='invalid' onerror='alert(0);'>");
     public static final File ESCAPE_FILE = TestFileUtils.getSampleData("filenames/hello&nbsp;&lt;world");
     public static final String LIST_DEF_NAME = "Issues";
     private IssuesHelper issuesHelper = new IssuesHelper(this);
