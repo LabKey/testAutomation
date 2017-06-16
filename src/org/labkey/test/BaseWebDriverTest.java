@@ -396,6 +396,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                 // Skip teardown if another test has already started
                 if (description.getTestClass().equals(getCurrentTestClass()))
                 {
+                    doTearDown();
                     if (!isTestCleanupSkipped())
                     {
                         try (TestScrubber scrubber = new TestScrubber(BrowserType.FIREFOX, getDownloadDir()))
@@ -403,7 +404,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                             scrubber.cleanSiteSettings();
                         }
                     }
-                    doTearDown();
                 }
             }
         };
