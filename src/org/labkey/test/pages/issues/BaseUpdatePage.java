@@ -16,12 +16,15 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.FileInput;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import java.io.File;
 
 public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> extends BaseIssuePage<EC>
 {
@@ -74,6 +77,12 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
         return new EmailPrefsPage(getDriver());
     }
 
+    public void addAttachment(File file)
+    {
+        elementCache().filePickerLink.click();
+        elementCache().findLastAttachmentInput().set(file);
+    }
+
     public abstract LabKeyPage save();
 
     public UpdatePage saveFail()
@@ -105,7 +114,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
 
     protected class ElementCache extends BaseIssuePage.ElementCache
     {
-        public ElementCache()
+        protected ElementCache()
         {
             assignedTo = getSelect("assignedTo");
             priority = getSelect("priority");
@@ -115,6 +124,13 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
 
         protected Input titleInput = getInput("title");
         protected Input commentInput = getInput("comment");
+
+        protected WebElement filePickerTable = Locator.id("filePickerTable").findWhenNeeded(this);
+        protected FileInput findLastAttachmentInput()
+        {
+            return new FileInput(Locator.tag("tbody").childTag("tr").last().append(Locator.tag("input")).findElement(filePickerTable), getDriver());
+        }
+        protected WebElement filePickerLink = Locator.id("filePickerLink").findWhenNeeded(this);
 
         protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this);
         protected WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);

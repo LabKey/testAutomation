@@ -177,17 +177,12 @@ public class IssuesHelper extends WebDriverWrapper
             insertPage.fieldWithName(field.getKey()).set(field.getValue());
         }
 
-        for (int i = 0; i < attachments.length; i++)
+        for (File file : attachments)
         {
-            if (i == 0)
-                click(Locator.linkWithText("Attach a file"));
-            else
-                click(Locator.linkWithText("Attach another file"));
-
-            setFormElement(Locator.id(String.format("formFile%02d", i + 1)), attachments[i]);
+           insertPage.addAttachment(file);
         }
 
-        clickButton("Save");
+        insertPage.save();
 
         List<String> errors = getTexts(Locators.labkeyError.findElements(getDriver()));
 
