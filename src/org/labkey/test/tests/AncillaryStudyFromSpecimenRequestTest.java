@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExperimentalFeaturesHelper;
 
 @Category({DailyC.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
@@ -32,7 +33,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     @Override
     public void doCreateSteps()
     {
-        enableExperimentalFeature("CreateSpecimenStudy");
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "CreateSpecimenStudy");
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);

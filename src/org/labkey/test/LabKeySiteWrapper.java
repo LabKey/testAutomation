@@ -124,7 +124,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @Deprecated
     private void enableExperimentalUX()
     {
-        enableExperimentalFeature("useExperimentalCoreUI");
+        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "useExperimentalCoreUI");
         IS_BOOTSTRAP_LAYOUT = true;
     }
 
@@ -1303,11 +1303,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
                     "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
         }
-    }
-
-    public void enableExperimentalFeature(String feature)
-    {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), feature);
     }
 
     public void impersonateGroup(String group, boolean isSiteGroup)
