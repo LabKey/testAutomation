@@ -275,8 +275,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     private static void doTearDown()
     {
-        boolean leaveWindowOpen = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
-        _driver.tearDown(!leaveWindowOpen || isTestRunningOnTeamCity());
+        boolean closeWindow = !_testFailed || Boolean.parseBoolean(System.getProperty("close.on.fail", "true"));
+        _driver.tearDown(closeWindow || isTestRunningOnTeamCity());
     }
 
     private void populateLastPageInfo()
