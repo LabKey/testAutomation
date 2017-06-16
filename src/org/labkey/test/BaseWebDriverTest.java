@@ -2546,7 +2546,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
                     _webDriver.quit();
                 }
             }
-            catch (UnreachableBrowserException ignore) {}
+            catch (UnreachableBrowserException ignore)
+            {
+                ignore.printStackTrace(System.out);
+            }
             finally
             {
                 clear();
