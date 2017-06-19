@@ -39,6 +39,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
@@ -217,8 +218,7 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
-        WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(0);
-        DataRegionTable region = new DataRegionTable(table, getDriver());
+        DataRegionTable region = DataRegion(getDriver()).find();
 
         Map<String, Integer> counts = new HashMap<>();
         for (String value : region.getColumnDataAsText("MouseId"))
