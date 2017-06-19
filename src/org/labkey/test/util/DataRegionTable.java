@@ -144,7 +144,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         this(null, regionName, test);
     }
 
-    public DataRegionTable(WebElement table, WebDriver driver)
+    protected DataRegionTable(WebElement table, WebDriver driver)
     {
         this(table, null, new WebDriverWrapperImpl(driver));
     }
@@ -263,7 +263,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         private Locator _loc = Locators.dataRegion();
 
-        private DataRegionFinder(WebDriver driver)
+        public DataRegionFinder(WebDriver driver)
         {
             super(driver);
             timeout(DEFAULT_WAIT);
