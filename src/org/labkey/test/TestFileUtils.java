@@ -15,6 +15,10 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -27,8 +31,10 @@ import org.labkey.test.util.TestLogger;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,6 +43,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -292,5 +299,65 @@ public abstract class TestFileUtils
             files.add(entry.getName());
         }
         return files;
+    }
+
+    /** Untar an input file into an output file.
+     * The output file is created in the output folder, having the same name
+     * as the input file, minus the '.tar' extension.
+     */
+    private static List<File> unTar(final File inputFile, final File outputDir) throws IOException, ArchiveException
+    {
+        final List<File> untaredFiles = new ArrayList<>();
+        try (InputStream is = new FileInputStream(inputFile);
+             TarArchiveInputStream inputStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", is))
+        {
+            TarArchiveEntry entry;
+            while ((entry = (TarArchiveEntry) inputStream.getNextEntry()) != null)
+            {
+                final File outputFile = new File(outputDir, entry.getName());
+                if (entry.isDirectory())
+                {
+                    if (!outputFile.exists())
+                    {
+                        if (!outputFile.mkdirs())
+                        {
+                            throw new IllegalStateException(String.format("Couldn't create directory %s.", outputFile.getAbsolutePath()));
+                        }
+                    }
+                }
+                else
+                {
+                    try (OutputStream outputFileStream = new FileOutputStream(outputFile))
+                    {
+                        org.apache.commons.compress.utils.IOUtils.copy(inputStream, outputFileStream);
+                    }
+                }
+                untaredFiles.add(outputFile);
+            }
+        }
+
+        return untaredFiles;
+    }
+
+    /**
+     * Ungzip an input file into an output file.
+     */
+    private static File unGzip(final File inputFile, final File outputDir) throws IOException
+    {
+        final File outputFile = new File(outputDir, inputFile.getName().substring(0, inputFile.getName().length() - 3));
+
+        try (GZIPInputStream in = new GZIPInputStream(new FileInputStream(inputFile));
+             FileOutputStream out = new FileOutputStream(outputFile))
+        {
+            IOUtils.copy(in, out);
+        }
+
+        return outputFile;
+    }
+
+    public static List<File> extractTarGz(File archive, File destDir) throws IOException, ArchiveException
+    {
+        destDir.mkdirs();
+        return unTar(unGzip(archive, destDir), destDir);
     }
 }
