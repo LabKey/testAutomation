@@ -47,6 +47,7 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
+import org.labkey.test.util.NonWindowsTest;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.TestLogger;
@@ -482,6 +483,11 @@ public class Runner extends TestSuite
                     System.out.println("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
                 }
                 else if(interfaces.contains(WindowsOnlyTest.class) && !osName.toLowerCase().contains("windows"))
+                {
+                    illegalTest = true;
+                    System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
+                }
+                else if(interfaces.contains(NonWindowsTest.class) && osName.toLowerCase().contains("windows"))
                 {
                     illegalTest = true;
                     System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
