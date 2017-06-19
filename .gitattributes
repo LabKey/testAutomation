@@ -49,6 +49,8 @@ data/api/webPartTest.js -text
 data/api/webdavTest.html -text
 data/api/webdavTest.js -text
 data/api/workbookAPITest.html -text
+data/filenames/README -text
+data/filenames/illegal_chars.tar.gz -text
 /gradle.properties -text
 modules/ETLtest/module.properties -text
 modules/ETLtest/resources/ETLs/AutoIncrementListAToListB_truncate.xml -text
@@ -760,6 +762,7 @@ src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
 src/org/labkey/test/tests/announcements/AnnouncementsPermissionTest.java -text
 src/org/labkey/test/tests/announcements/DiscussionLinkTest.java -text
+src/org/labkey/test/tests/announcements/MessagesAttachmentTest.java -text
 src/org/labkey/test/tests/api/CustomizeGridPermissionsTest.java -text
 src/org/labkey/test/tests/flow/BaseFlowTest.java -text
 src/org/labkey/test/tests/flow/FlowAnalysisResolverTest.java -text

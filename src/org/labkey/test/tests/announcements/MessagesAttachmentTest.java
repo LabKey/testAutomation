@@ -1,4 +1,4 @@
-package org.labkey.test.tests.issues;
+package org.labkey.test.tests.announcements;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -8,26 +8,19 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.pages.issues.ClosePage;
-import org.labkey.test.pages.issues.DetailsListPage;
-import org.labkey.test.pages.issues.DetailsPage;
-import org.labkey.test.pages.issues.ReopenPage;
-import org.labkey.test.pages.issues.ResolvePage;
-import org.labkey.test.pages.issues.UpdatePage;
-import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.Maps;
+import org.labkey.test.pages.announcements.InsertPage;
+import org.labkey.test.pages.announcements.RespondPage;
 import org.labkey.test.util.NonWindowsTest;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 
 @Category({InDevelopment.class})
-public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
+public class MessagesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {
     private static final File FILES_ARCHIVE = TestFileUtils.getSampleData("filenames/illegal_chars.tar.gz");
     private static final File EXTRACTION_DIR = new File(FILES_ARCHIVE.getParentFile(), "extracted");
@@ -35,10 +28,6 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     // hard-code these filenames to make sure they don't get corrupted by compression or extraction
     public static final File ALERT_FILE = new File(EXTRACTION_DIR, "<img src='invalid' onerror='alert(0);'>");
     public static final File ESCAPE_FILE = new File(EXTRACTION_DIR, "hello&nbsp;&lt;world");
-
-    public static final String LIST_DEF_NAME = "Issues";
-
-    private IssuesHelper issuesHelper = new IssuesHelper(this);
 
     @Override
     protected void doCleanup(boolean afterTest)
@@ -57,55 +46,82 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     @BeforeClass
     public static void setupProject() throws Exception
     {
-        IssuesAttachmentTest init = (IssuesAttachmentTest) getCurrentTest();
+        assertFalse("Do not run this test on Windows. It uses files with illegal characters", System.getProperty("os.name").toLowerCase().contains("windows"));
 
+        MessagesAttachmentTest init = (MessagesAttachmentTest) getCurrentTest();
         init.doSetup();
     }
 
     private void doSetup() throws Exception
     {
-        assertFalse("Do not run this test on Windows. It uses files with illegal characters", System.getProperty("os.name").toLowerCase().contains("windows"));
+        _containerHelper.createProject(getProjectName(), null);
 
         TestFileUtils.extractTarGz(FILES_ARCHIVE, EXTRACTION_DIR);
-
-        _containerHelper.createProject(getProjectName(), null);
-        issuesHelper.createNewIssuesList(LIST_DEF_NAME, _containerHelper);
     }
 
     @Test
-    public void testAttachmentInjection() throws Exception
+    public void testMessageAttachmentInjection() throws Exception
     {
-        Map<String, String> issue = Maps.of("assignedTo", getDisplayName(), "title", "Attempt Issue Attachment Injection");
-        final DetailsPage detailsPage = issuesHelper.addIssue(issue, ALERT_FILE, ESCAPE_FILE);
-        final String issueId = detailsPage.getIssueId();
+        final String messageTitle = "Attempt Message Attachment Injection";
 
-        // details page
+        InsertPage.beginAt(this)
+                .setTitle(messageTitle)
+                .addAttachments(ALERT_FILE, ESCAPE_FILE)
+                .submit();
+
+        final String id = getUrlParam("entityId");
+
+        // thread page
         assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
         assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
 
-        detailsPage.clickPrint();
+        RespondPage.beginAt(this, id);
+        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
+        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+    }
+
+    @Test
+    public void testResponseAttachmentInjection() throws Exception
+    {
+        final String messageTitle = "Attempt Response Attachment Injection";
+
+        InsertPage.beginAt(this)
+                .setTitle(messageTitle)
+                .submit()
+                .clickRespond()
+                .addAttachments(ALERT_FILE, ESCAPE_FILE)
+                .submit();
+
+        final String id = getUrlParam("entityId");
+
+        // thread page
         assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
         assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
 
-        UpdatePage.beginAt(this, issueId);
+        RespondPage.beginAt(this, id);
         assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
         assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+    }
 
-        ResolvePage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+    @Test
+    public void testMessageAttachmentDeletion() throws Exception
+    {
+        final String messageTitle = "Attempt Message Attachment Deletion";
 
-        ClosePage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        InsertPage.beginAt(this)
+                .setTitle(messageTitle)
+                .addAttachments(ALERT_FILE, ESCAPE_FILE)
+                .submit()
+                .clickEdit()
+                .removeAttachment(0)
+                .removeAttachment(0)
+                .submit();
 
-        ReopenPage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        final String id = getUrlParam("entityId");
 
-        DetailsListPage.beginAt(this, LIST_DEF_NAME);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        // thread page
+        assertElementNotPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
+        assertElementNotPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
     }
 
     @Override
@@ -117,12 +133,12 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
     @Override
     protected String getProjectName()
     {
-        return "IssuesAttachmentTest Project";
+        return "MessagesAttachmentTest Project";
     }
 
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("issues");
+        return Arrays.asList("announcements");
     }
 }
