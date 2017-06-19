@@ -106,7 +106,9 @@ public abstract class TestFileUtils
             else
             {
                 _labkeyRoot = FileUtil.getAbsoluteCaseSensitiveFile(new File(""));
-                if (_labkeyRoot.getName().equals("server"))
+                if (_labkeyRoot.getName().equals("test") && _labkeyRoot.getParentFile().getName().equals("server"))
+                    _labkeyRoot = _labkeyRoot.getParentFile().getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
+                else if (_labkeyRoot.getName().equals("server"))
                     _labkeyRoot = _labkeyRoot.getParentFile(); // Working directory is in '{labkey.root}/server'; otherwise is in enlistment root
                 else if (!new File(_labkeyRoot, "server").exists())
                 {
