@@ -23,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
+
 /**
  * Wrapper for components that need a WebDriver for full functionality (e.g. page navigation or JavaScript execution)
  */
@@ -64,6 +66,11 @@ public abstract class WebDriverComponent<EC extends Component.ElementCache> exte
         public Cmp find()
         {
             return super.find(getDriver());
+        }
+
+        public List<Cmp> findAll()
+        {
+            return super.findAll(getDriver());
         }
 
         public Cmp waitFor()

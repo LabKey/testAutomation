@@ -21,6 +21,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Component<EC extends Component.ElementCache> implements SearchContext
@@ -140,10 +141,35 @@ public abstract class Component<EC extends Component.ElementCache> implements Se
             return buildLocator().waitForElement(context, timeout > 0 ? timeout : DEFAULT_TIMEOUT);
         }
 
+        private List<WebElement> findElements(S context)
+        {
+            if (timeout > 0)
+                return waitForElements(context);
+            else
+                return buildLocator().findElements(context);
+        }
+
+        private List<WebElement> waitForElements(S context)
+        {
+            return buildLocator().waitForElements(context, timeout > 0 ? timeout : DEFAULT_TIMEOUT);
+        }
+
         public C find(S context)
         {
             _context = context;
             return construct(findElement(context));
+        }
+
+        public List<C> findAll(S context)
+        {
+            _context = context;
+            final List<WebElement> elements = findElements(context);
+            List<C> components = new ArrayList<>();
+            for (WebElement element : elements)
+            {
+                components.add(construct(element));
+            }
+            return components;
         }
 
         public C waitFor(S context)
