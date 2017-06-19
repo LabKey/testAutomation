@@ -858,7 +858,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         }, msWait);
     }
 
-    private void cleanup(boolean afterTest) throws TestTimeoutException
+    private void cleanup(boolean afterTest)
     {
         if (!ClassUtils.getAllInterfaces(getClass()).contains(ReadOnlyTest.class) || ((ReadOnlyTest) this).needsSetup())
         {
@@ -869,7 +869,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     // Standard cleanup: delete created projects
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest)
     {
         String projectName = getProjectName();
 
@@ -1241,7 +1241,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      * @deprecated Use {@link org.labkey.test.util.AbstractContainerHelper#deleteProject(String, boolean)}
      */
     @Deprecated
-    public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
+    public void deleteProject(String project, boolean failIfFail)
     {
         _containerHelper.deleteProject(project, failIfFail);
     }
