@@ -22,6 +22,8 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
+
 public class Input extends WebDriverComponent implements FormItem<String>
 {
     private final WebElement _el;
@@ -88,6 +90,6 @@ public class Input extends WebDriverComponent implements FormItem<String>
     protected void assertElementType(WebElement el)
     {
         String tag = el.getTagName();
-        Assert.assertEquals("Not an input: " + el.toString(), "input", tag);
+        Assert.assertTrue("Not an input or textarea: " + el.toString(), Arrays.asList("input", "textarea").contains(tag));
     }
 }
