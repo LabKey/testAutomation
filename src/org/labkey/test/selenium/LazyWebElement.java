@@ -75,5 +75,11 @@ public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
     {
         return _searchContext;
     }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + ":" + String.valueOf(_wrappedElement);
+    }
 }
 
