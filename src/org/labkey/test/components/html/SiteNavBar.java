@@ -50,25 +50,25 @@ public class SiteNavBar extends Component
         return this;
     }
 
-    public SiteNavBar enterAdminMode()
+    public SiteNavBar enterPageAdminMode()
     {
-        if (isInAdminMode())
+        if (isInPageAdminMode())
             return this;
-        clickAdminMenuItem(true, false, "Enter Admin Mode");
+        clickAdminMenuItem(true, false, "Page Admin Mode");
         return this;
     }
 
-    public SiteNavBar exitAdminMode()
+    public SiteNavBar exitPageAdminMode()
     {
-        if (isInAdminMode())
+        if (isInPageAdminMode())
         {
             Locators.exitAdminBtn.findElement(getDriver()).click();
-            _driver.waitFor(()-> !isInAdminMode(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            _driver.waitFor(()-> !isInPageAdminMode(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return this;
     }
 
-    public boolean isInAdminMode()
+    public boolean isInPageAdminMode()
     {
         return Locators.exitAdminBtn.findElementOrNull(getDriver()) != null;
     }

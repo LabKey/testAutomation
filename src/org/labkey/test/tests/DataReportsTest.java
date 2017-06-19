@@ -186,7 +186,8 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));
-        _customizeViewsHelper.openCustomizeViewPanel();
+        DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
+        dataSetTable.openCustomizeGrid();
         _customizeViewsHelper.addFilter("MouseId", "Mouse Id", "Equals One Of", String.join(";", PTIDS_FOR_CUSTOM_VIEW));
         _customizeViewsHelper.saveCustomView(QUERY_REPORT_VIEW_NAME_2);
 
@@ -216,7 +217,7 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
-        WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(1);
+        WebElement table = DataRegionTable.Locators.dataRegion().findElements(this.getDriver()).get(0);
         DataRegionTable region = new DataRegionTable(table, getDriver());
 
         Map<String, Integer> counts = new HashMap<>();
@@ -336,7 +337,8 @@ public class DataReportsTest extends ReportTest
         saveReport(R_SCRIPTS[0]);
 
         log("Create view");
-        _customizeViewsHelper.openCustomizeViewPanel();
+        DataRegionTable dataSetTable = new DataRegionTable("Dataset", getDriver());
+        dataSetTable.openCustomizeGrid();
         _customizeViewsHelper.removeColumn(R_REMCOL);
         _customizeViewsHelper.addFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
         _customizeViewsHelper.addSort(R_SORT, "2.What is your sex?", SortDirection.DESC);

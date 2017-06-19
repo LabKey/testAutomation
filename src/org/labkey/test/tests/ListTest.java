@@ -204,9 +204,10 @@ public class ListTest extends BaseWebDriverTest
     {
         // delete existing rows
         log("Test deleting rows");
+        DataRegionTable table = new DataRegionTable("query", getDriver());
         checkCheckbox(Locator.checkboxByName(".toggle"));
         doAndWaitForPageToLoad(() -> {
-            clickButton("Delete", 0);
+            table.clickHeaderButton("Delete");
             assertAlert("Are you sure you want to delete the selected rows?");
         });
         // load test data
@@ -265,16 +266,16 @@ public class ListTest extends BaseWebDriverTest
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
         assertEquals(1, table.getRowIndex(TEST_DATA[0][1]));
-        clickAndWait(Locator.linkWithText("edit").index(1));
+        clickAndWait(table.updateLink(1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
-        submit();
+        clickButton("Submit");
         // Third row (Red)
         assertEquals(2, table.getRowIndex(TEST_DATA[0][2]));
-        clickAndWait(Locator.linkWithText("edit").index(2));
+        clickAndWait(table.updateLink(2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
-        submit();
+        clickButton("Submit");
 
         table = new DataRegionTable("query", getDriver());
         assertEquals(TEST_DATA[2][0], table.getDataAsText(table.getRowIndex(TEST_DATA[0][0]), _listCol3.getLabel()));
@@ -338,7 +339,8 @@ public class ListTest extends BaseWebDriverTest
                 TEST_DATA[5][2]);
 
         log("Check that hidden column is hidden.");
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable regionTable = new DataRegionTable("query", getDriver());
+        clickAndWait(regionTable.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Edit");
@@ -347,7 +349,8 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         log("Test inserting new row");
-        _extHelper.clickInsertNewRow();
+        regionTable = new DataRegionTable("query", getDriver());
+        regionTable.clickInsertNewRowButton();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
@@ -357,13 +360,13 @@ public class ListTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_" + _listCol2.getName()), "wrong type");
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
         setFormElement(Locator.name("quf_" + _listCol4.getName()), TEST_DATA[4][3]);
-        submit();
+        clickButton("Submit");
         assertTextPresent("This field is required");
         setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[0][3]);
-        submit();
+        clickButton("Submit");
         assertTextPresent("Could not convert");
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[3]);
-        submit();
+        clickButton("Submit");
 
         log("Check new row was added");
         assertTextPresent(
@@ -387,14 +390,23 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that hidden column is hidden.");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
-        clickAndWait(Locator.linkWithText("details"));
+        table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
-        _extHelper.clickInsertNewRow();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table = new DataRegionTable("query", getDriver());
+            table.clickInsertNewRowButton();
+        }
+        else
+        {
+            _extHelper.clickInsertNewRow();
+        }
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Cancel");
@@ -408,12 +420,21 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickAndWait(Locator.linkWithText("details"));
+        table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickInsertNewRow();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table = new DataRegionTable("query", getDriver());
+            table.clickInsertNewRowButton();
+        }
+        else
+        {
+            _extHelper.clickInsertNewRow();
+        }
         assertTextPresent(HIDDEN_TEXT); // Not hidden from insert view.
         clickButton("Cancel");
 
@@ -426,12 +447,20 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickAndWait(Locator.linkWithText("details"));
+        table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickInsertNewRow();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table = new DataRegionTable("query", getDriver());
+            table.clickInsertNewRowButton();
+        }else
+        {
+            _extHelper.clickInsertNewRow();
+        }
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
 
@@ -444,12 +473,21 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickAndWait(Locator.linkWithText("details"));
+        table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
         clickButton("Cancel");
-        _extHelper.clickInsertNewRow();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table = new DataRegionTable("query", getDriver());
+            table.clickInsertNewRowButton();
+        }
+        else
+        {
+            _extHelper.clickInsertNewRow();
+        }
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         clickButton("Cancel");
     }

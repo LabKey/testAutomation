@@ -263,19 +263,19 @@ public class PortalHelper extends WebDriverWrapper
     public void enterAdminMode()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            new SiteNavBar(getDriver()).enterAdminMode();
+            new SiteNavBar(getDriver()).enterPageAdminMode();
     }
 
     public void exitAdminMode()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            new SiteNavBar(getDriver()).exitAdminMode();
+            new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public boolean isInAdminMode()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            return new SiteNavBar(getDriver()).isInAdminMode();
+            return new SiteNavBar(getDriver()).isInPageAdminMode();
         return false;
     }
 
@@ -293,8 +293,10 @@ public class PortalHelper extends WebDriverWrapper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
+            SiteNavBar navBar =new SiteNavBar(getDriver()).enterPageAdminMode();
             WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
             webPart.remove();
+            navBar.exitPageAdminMode();
         }
         else
         {

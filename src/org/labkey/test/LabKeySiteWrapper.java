@@ -416,7 +416,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         link.click();
 
         // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
+        Locator.XPathLocator emailRegion = DataRegionTable.Locators.table("EmailRecord");
         WebElement resetLink = emailRegion.append(Locator.tagWithText("a", emailSubject).append("/..//a[contains(@href, 'setPassword.view')]")).findElement(this.getDriver());
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
