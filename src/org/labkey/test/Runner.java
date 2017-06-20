@@ -477,7 +477,8 @@ public class Runner extends TestSuite
                         System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
                     }
                 }
-                else if(interfaces.contains(DevModeOnlyTest.class) && !"true".equals(System.getProperty("devMode")))
+
+                if(interfaces.contains(DevModeOnlyTest.class) && !"true".equals(System.getProperty("devMode")))
                 {
                     illegalTest = true;
                     System.out.println("** Skipping " + testClass.getSimpleName() + ": server must be in dev mode");
