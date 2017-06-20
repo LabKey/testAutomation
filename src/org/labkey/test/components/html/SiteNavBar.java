@@ -68,6 +68,21 @@ public class SiteNavBar extends Component
         return this;
     }
 
+    public SiteNavBar stopImpersonating()
+    {
+        if (isImpersonating())
+        {
+            Locators.stopImpersonatingBtn.findElement(getDriver()).click();
+            _driver.waitFor(()-> !isImpersonating(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+        return this;
+    }
+
+    public boolean isImpersonating()
+    {
+        return _driver.isImpersonating();
+    }
+
     public boolean isInPageAdminMode()
     {
         return Locators.exitAdminBtn.findElementOrNull(getDriver()) != null;
@@ -131,6 +146,7 @@ public class SiteNavBar extends Component
     public static class Locators
     {
         public static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
+        public static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
         public static Locator.XPathLocator searchMenuToggle = Locator.xpath("//li/a[@id='global-search-trigger']");
         public static Locator.XPathLocator userMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-user']]");
         public static Locator.XPathLocator adminMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-cog']]");
