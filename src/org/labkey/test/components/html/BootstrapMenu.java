@@ -101,7 +101,7 @@ public class BootstrapMenu extends Component
     {
         public static Locator.XPathLocator bootstrapMenuItem(String text)
         {
-            return Locator.xpath("//li/a[normalize-space()='"+text+"']").notHidden();
+            return Locator.tag("li").childTag("a").withText(text).notHidden();
         }
     }
 }
