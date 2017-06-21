@@ -125,26 +125,26 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
 
         Locator.XPathLocator getOuterCellLocator(Locator.XPathLocator table, String column, int rowIndex)
         {
-            Locator.XPathLocator tableLoc = table.append(baseElements().tableRowLoc);
-            return tableLoc.append(baseElements().cellValueLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
+            Locator.XPathLocator tableLoc = table.append(tableRowLoc);
+            return tableLoc.append(cellValueLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
         }
 
         Locator.XPathLocator getOutergridAddNewRowLocator(Locator.XPathLocator table)
         {
-            return table.append(baseElements().outerAddRowIconLoc);
+            return table.append(outerAddRowIconLoc);
         }
 
         Locator.XPathLocator getSubgridTableLocator(Locator.XPathLocator table, String column, int rowIndex)
         {
-            Locator.XPathLocator tableLoc = table.append(baseElements().tableRowLoc);
-            Locator.XPathLocator cellLoc = tableLoc.append(baseElements().cellDisplayLoc.withAttribute("outer-index", rowIndex+""));
+            Locator.XPathLocator tableLoc = table.append(tableRowLoc);
+            Locator.XPathLocator cellLoc = tableLoc.append(cellDisplayLoc.withAttribute("outer-index", rowIndex+""));
             return cellLoc.append(Locator.tagWithClass("table", "subgrid-" + column));
         }
 
         Locator.XPathLocator getSubgridAddNewRowLocator(Locator.XPathLocator table, String column, int rowIndex)
         {
             Locator.XPathLocator subgridTable = getSubgridTableLocator(table, column, rowIndex);
-            return subgridTable.append(baseElements().addRowIconLoc);
+            return subgridTable.append(addRowIconLoc);
         }
 
         WebElement saveButton = ext4Button("Save").findWhenNeeded(getDriver()).withTimeout(wait);

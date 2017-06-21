@@ -143,7 +143,6 @@ public class ManageTreatmentsSingleTablePage extends LabKeyPage<ManageTreatments
             _webDriverWrapper.log("***** You are trying to open a treatment dialog froma  column that is not a treatment value. ******");
             return null;
         }
-
     }
 
     public void save()
@@ -168,8 +167,8 @@ public class ManageTreatmentsSingleTablePage extends LabKeyPage<ManageTreatments
         Locator.XPathLocator addNewRow = Locator.xpath("//i[contains(@class, 'fa-plus-circle')][contains(text(), 'Add new row')]");
         Locator.XPathLocator addNewVisit = Locator.xpath("//i[contains(@class, 'fa-plus-circle')][contains(text(), 'Add new visit')]");
 
-        WebElement saveButton = ext4Button("Save").findWhenNeeded(getDriver()).withTimeout(_webDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        WebElement cancelButton = ext4Button("Cancel").findWhenNeeded(getDriver()).withTimeout(_webDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton = ext4Button("Save").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement cancelButton = ext4Button("Cancel").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
 }

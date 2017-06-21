@@ -74,7 +74,7 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
 
         Locator.XPathLocator getCohortTableLocator()
         {
-            return cohortsLoc.append(elementCache().tableOuterLoc);
+            return cohortsLoc.append(tableOuterLoc);
         }
 
         WebElement cohortsTable = cohortsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
@@ -82,20 +82,20 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
 
         WebElement getCohortCell(String column, int rowIndex)
         {
-            Locator.XPathLocator rowLoc = elementCache().cohortsLoc.append(elementCache().tableRowLoc.withAttribute("outer-index", rowIndex+""));
-            Locator.XPathLocator cellLoc = rowLoc.append(elementCache().cellDisplayLoc.withAttribute("data-index", column));
+            Locator.XPathLocator rowLoc = cohortsLoc.append(tableRowLoc.withAttribute("outer-index", rowIndex+""));
+            Locator.XPathLocator cellLoc = rowLoc.append(cellDisplayLoc.withAttribute("data-index", column));
             return cellLoc.findElement(getDriver());
         }
 
         int getCohortRowCount()
         {
-            return cohortsLoc.append(elementCache().tableRowLoc).findElements(getDriver()).size();
+            return cohortsLoc.append(tableRowLoc).findElements(getDriver()).size();
         }
 
         boolean isCohortTableEmpty()
         {
-            cohortsTable.findElement(By.xpath(elementCache().tableOuterLoc.getLoc()));
-            return getWrapper().isElementPresent(elementCache().cohortsLoc.append(elementCache().tableOuterLoc).append(elementCache().emptyLoc));
+            tableOuterLoc.findElement(cohortsTable);
+            return getWrapper().isElementPresent(cohortsLoc.append(tableOuterLoc).append(emptyLoc));
         }
     }
 }

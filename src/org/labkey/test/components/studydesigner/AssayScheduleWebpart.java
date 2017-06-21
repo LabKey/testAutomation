@@ -85,7 +85,7 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
 
         Locator.XPathLocator getAssayTableLocator()
         {
-            return assaysLoc.append(elementCache().tableOuterLoc);
+            return assaysLoc.append(tableOuterLoc);
         }
 
         WebElement assaysTable = assaysLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
@@ -94,8 +94,8 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
 
         WebElement getAssayCell(String column, int rowIndex, String dataFilterValue)
         {
-            Locator.XPathLocator rowLoc = elementCache().assaysLoc.append(elementCache().tableRowLoc);
-            Locator.XPathLocator cellLoc = rowLoc.append(elementCache().cellDisplayLoc.withAttribute("outer-index", rowIndex+"").withAttribute("data-index", column));
+            Locator.XPathLocator rowLoc = assaysLoc.append(tableRowLoc);
+            Locator.XPathLocator cellLoc = rowLoc.append(cellDisplayLoc.withAttribute("outer-index", rowIndex+"").withAttribute("data-index", column));
             if (dataFilterValue != null)
                 cellLoc = cellLoc.withAttribute("data-filter-value", dataFilterValue);
 
@@ -104,13 +104,13 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
 
         int getAssayRowCount()
         {
-            return assaysLoc.append(elementCache().tableRowLoc).findElements(getDriver()).size();
+            return assaysLoc.append(tableRowLoc).findElements(getDriver()).size();
         }
 
         boolean isAssayTableEmpty()
         {
-            assaysTable.findElement(By.xpath(elementCache().tableOuterLoc.getLoc()));
-            return getWrapper().isElementPresent(elementCache().assaysLoc.append(elementCache().tableOuterLoc).append(elementCache().emptyLoc));
+            tableOuterLoc.findElement(assaysTable);
+            return getWrapper().isElementPresent(assaysLoc.append(tableOuterLoc).append(emptyLoc));
         }
     }
 }

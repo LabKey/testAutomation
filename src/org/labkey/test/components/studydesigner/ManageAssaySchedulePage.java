@@ -128,14 +128,14 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
 
         WebElement getVisitCheckbox(Visit visit, int rowIndex)
         {
-            Locator.XPathLocator cellLoc = elements().getOuterCellLocator(elements().assaysLoc, "VisitMap", rowIndex);
+            Locator.XPathLocator cellLoc = getOuterCellLocator(assaysLoc, "VisitMap", rowIndex);
             cellLoc = cellLoc.withAttribute("data-filter-value", visit.getRowId().toString());
-            return cellLoc.append(elements().checkbox).findElement(getDriver());
+            return cellLoc.append(checkbox).findElement(getDriver());
         }
 
         int getAssayTableRowCount()
         {
-            return assaysLoc.append(elements().tableRowLoc).findElements(getDriver()).size();
+            return assaysLoc.append(tableRowLoc).findElements(getDriver()).size();
         }
     }
 }
