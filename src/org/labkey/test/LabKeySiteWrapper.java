@@ -44,6 +44,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
@@ -51,7 +52,6 @@ import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -415,9 +415,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         String emailSubject = link.getText();
         link.click();
 
-        // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        Locator.XPathLocator emailRegion = DataRegionTable.Locators.table("EmailRecord");
-        WebElement resetLink = emailRegion.append(Locator.tagWithText("a", emailSubject).append("/..//a[contains(@href, 'setPassword.view')]")).findElement(this.getDriver());
+        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
+        WebElement resetLink = Locator.tagWithText("a", emailSubject).append("/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
         clickAndWait(resetLink, WAIT_FOR_PAGE);
 
         setFormElement(Locator.id("password"), password);
@@ -432,12 +431,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         goToModule("Dumbster");
         String emailSubject = "Reset Password Notification";
 
-        // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        Locator.XPathLocator emailRegion = DataRegionTable.Locators.dataRegion("EmailRecord");
-        WebElement email = emailRegion.append("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(this.getDriver());
+        EmailRecordTable emailRecordTable = new EmailRecordTable(getDriver());
+        WebElement email = Locator.xpath("//td[text() = '" + username + "']/..//a[starts-with(text(), '" + emailSubject + "')]").findElement(emailRecordTable);
         email.click();
 
-        WebElement resetLink = emailRegion.append("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(this.getDriver());
+        WebElement resetLink = Locator.xpath("//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]").findElement(emailRecordTable);
         shortWait().until(ExpectedConditions.elementToBeClickable(resetLink));
         return resetLink.getText();
     }

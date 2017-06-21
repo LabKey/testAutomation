@@ -24,13 +24,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIUserHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        deleteUsersIfPresent(ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
+        _userHelper.deleteUsers(false, ADMIN_USER_TEMPLATE, NORMAL_USER_TEMPLATE, PROJECT_ADMIN_USER, NORMAL_USER, SITE_ADMIN_USER, TO_BE_DELETED_USER);
     }
 
     @Test
@@ -107,9 +107,8 @@ public class SecurityTest extends BaseWebDriverTest
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
 
-        // This points to a "faked up" Data Region -- cannot use DataRegionTable
-        WebElement table = DataRegionTable.Locators.dataRegion("EmailRecord").findElement(this.getDriver());
-        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount(table.getAttribute("id")));
+        EmailRecordTable table = new EmailRecordTable(this);
+        assertEquals("Notification emails.", 12, table.getEmailCount());
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 
@@ -156,9 +155,6 @@ public class SecurityTest extends BaseWebDriverTest
      */
     @LogMethod protected void cantReachAdminToolFromUserAccount(boolean longForm)
     {
-        //just in case, create user
-//        createUserAndNotify(NORMAL_USER, null);
-
         //verify that you can see the text "history" in the appropriate area as admin.  If this fails, the
         //check below is worthless
 
@@ -354,7 +350,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String newPassword = password +"1";
         goToSiteUsers();
-        clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
+        clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
         doAndWaitForPageToLoad(() ->
         {
             clickButtonContainingText("Reset Password", 0);
@@ -363,7 +359,6 @@ public class SecurityTest extends BaseWebDriverTest
         clickButton("Done");
 
         String url = getPasswordResetUrl(username);
-
 
         //make sure user can't log in with current password
         signOut();
@@ -712,7 +707,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         // prep: ensure that user does not currently exist in labkey and  self register is enabled
         String selfRegUserEmail = "selfreg@test.labkey.local";
-        deleteUsersIfPresent(selfRegUserEmail);
+        _userHelper.deleteUsers(false, selfRegUserEmail);
         int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true").getResponseCode();
         assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
         signOut();
