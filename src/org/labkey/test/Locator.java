@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
@@ -45,6 +46,7 @@ public abstract class Locator
     protected final Integer _index;
     protected final String _contains;
     protected final String _text;
+    private String _description;
 
     // XPATH fragments
     public static final String HIDDEN = "ancestor-or-self::*[" +
@@ -74,6 +76,8 @@ public abstract class Locator
 
     /**
      * Wait for a single element located by any one of the provided Locators
+     * Note: Not redundant with {@link #waitForElements(FluentWait, Locator...)}.
+     * This will short-circuit as soon as a single element is found
      * @return The first element found
      */
     public static WebElement waitForAnyElement(FluentWait<? extends SearchContext> wait, final Locator... locators)
@@ -98,10 +102,10 @@ public abstract class Locator
             {
                 List<String> locDescriptions = new ArrayList<>();
                 Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                return String.join("\n--or--\n", locDescriptions);
+                SearchContext searchContext = extractInputFromFluentWait(wait);
+                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
             }
         });
-
     }
 
     /**
@@ -127,7 +131,8 @@ public abstract class Locator
             {
                 List<String> locDescriptions = new ArrayList<>();
                 Arrays.stream(locators).forEach(loc -> locDescriptions.add(loc.getLoggableDescription()));
-                return String.join("\n--or--\n", locDescriptions);
+                SearchContext searchContext = extractInputFromFluentWait(wait);
+                return String.join("\n--OR--\n", locDescriptions) + (searchContext instanceof WebDriver ? "" : "\nIN: " + searchContext.toString());
             }
         });
 
@@ -168,23 +173,51 @@ public abstract class Locator
 
     public abstract String toString();
 
+    public Locator describedAs(String description)
+    {
+        _description = description;
+        return this;
+    }
+
     public String getLoc()
     {
         return _loc;
     }
 
-    @Deprecated
-    public String getLocatorString()
-    {
-        return getLoc();
-    }
-
     public String getLoggableDescription()
     {
-        return toString() +
+        return (_description == null ? "" : _description + "\n") +
+            toString() +
             (_index == null ? "" : "\nIndex: " + _index) +
             (_contains == null ? "" : "\nContaining: " + _contains) +
             (_text == null ? "" : "\nWith Text: " + _text);
+    }
+
+    protected final String getFindDescription(SearchContext searchContext)
+    {
+        return getLoggableDescription() + (searchContext instanceof WebDriver ? "" : "\nwithin: " + searchContext.toString());
+    }
+
+    protected final String getWaitDescription(FluentWait<? extends SearchContext> wait)
+    {
+        final SearchContext searchContext = extractInputFromFluentWait(wait);
+        return getFindDescription(searchContext);
+    }
+
+    protected static <T> T extractInputFromFluentWait(FluentWait<T> wait)
+    {
+        MutableObject<T> wrappedContext = new MutableObject<>();
+        wait.until(new Function<T, Boolean>()
+        {
+            @Override
+            public Boolean apply(T context)
+            {
+                wrappedContext.setValue(context);
+                return true;
+            }
+
+        });
+        return wrappedContext.getValue();
     }
 
     /**
@@ -208,7 +241,7 @@ public abstract class Locator
     {
         WebElement element = findElementOrNull(context);
         if (null == element)
-            throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
+            throw new NoSuchElementException("Unable to find element: " + getFindDescription(context));
         return element;
     }
 
@@ -290,13 +323,13 @@ public abstract class Locator
                 @Override
                 public String toString()
                 {
-                    return Locator.this.getLoggableDescription();
+                    return getWaitDescription(wait);
                 }
             });
         }
         catch (TimeoutException notFound)
         {
-            throw new NoSuchElementException(getLoggableDescription(), notFound);
+            throw new NoSuchElementException(notFound.getMessage(), notFound);
         }
     }
 
@@ -322,13 +355,13 @@ public abstract class Locator
                 @Override
                 public String toString()
                 {
-                    return Locator.this.getLoggableDescription();
+                    return getWaitDescription(wait);
                 }
             });
         }
         catch (TimeoutException notFound)
         {
-            throw new NoSuchElementException(getLoggableDescription(), notFound);
+            throw new NoSuchElementException(notFound.getMessage(), notFound);
         }
     }
 
@@ -352,7 +385,7 @@ public abstract class Locator
             @Override
             public String toString()
             {
-                return "element to disappear: " + getLoggableDescription();
+                return "element to disappear: " + getWaitDescription(wait);
             }
         });
     }
@@ -1200,11 +1233,6 @@ public abstract class Locator
             return getLoc();
         }
 
-        public String getLoggableDescription()
-        {
-            return toString();
-        }
-
         @Override
         public WebElement findElement(SearchContext context)
         {
@@ -1448,8 +1476,8 @@ public abstract class Locator
         public List<WebElement> findElements(SearchContext context)
         {
             List<WebElement> elements = super.findElements(context);
-            if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
-                return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
+            if (elements.isEmpty())
+                return new XPathLocator(toXpath()).findElements(context);
             else
                 return elements;
         }
