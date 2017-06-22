@@ -1119,6 +1119,11 @@ public abstract class Locator
             return this.append("[not(" + getRelativeXPath(predicate) + ")]");
         }
 
+        public XPathLocator withoutPredicate(XPathLocator predicate)
+        {
+            return this.append("[not(" + getRelativeXPath(predicate.toXpath()) + ")]");
+        }
+
         public XPathLocator attributeStartsWith(String attribute, String text)
         {
             return this.withPredicate(String.format("starts-with(@%s, "+xq(text)+")", attribute));
