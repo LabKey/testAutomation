@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
@@ -552,11 +553,21 @@ public class FilterTest extends BaseWebDriverTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            region.clickHeaderMenu("Reports", R_VIEW);
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                region.clickHeaderMenu("Charts / Reports", R_VIEW);
+            }
+            else
+            {
+                region.clickHeaderMenu("Reports", R_VIEW);
+            }
             Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
-            _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
+            if (IS_BOOTSTRAP_LAYOUT)
+                region.clickHeaderMenu("Grid views", "default");
+            else
+                _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
 
             log("** Checking filter values in filter dialog");
             region = new DataRegionTable(TABLE_NAME, this);
