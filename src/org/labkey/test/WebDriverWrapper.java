@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.selenium.EphemeralWebElement;
@@ -141,7 +143,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         WebDriver driver = getWrappedDriver();
         while (driver instanceof WrapsDriver)
-            driver = ((WrapsDriver)driver).getWrappedDriver();
+            driver = ((WrapsDriver) driver).getWrappedDriver();
         if (driver == null)
             throw new NullPointerException("WebDriver has not been initialized yet");
         return driver;
@@ -167,12 +169,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case IE: //experimental
             {
-                if(oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
+                if (oldWebDriver != null && !(oldWebDriver instanceof InternetExplorerDriver))
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
                 }
-                if(oldWebDriver == null)
+                if (oldWebDriver == null)
                 {
                     newWebDriver = new InternetExplorerDriver();
                 }
@@ -180,12 +182,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case CHROME:
             {
-                if(oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
+                if (oldWebDriver != null && !(oldWebDriver instanceof ChromeDriver))
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
                 }
-                if(oldWebDriver == null)
+                if (oldWebDriver == null)
                 {
                     TestProperties.ensureChromedriverExeProperty();
                     if (downloadDir.getParentFile().exists() || downloadDir.getParentFile().mkdirs())
@@ -224,7 +226,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             case FIREFOX:
             {
-                if(oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
+                if (oldWebDriver != null && !(oldWebDriver instanceof FirefoxDriver))
                 {
                     oldWebDriver.quit();
                     oldWebDriver = null;
@@ -242,7 +244,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     profile.setPreference("browser.download.downloadDir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.dir", downloadDir.getAbsolutePath());
                     profile.setPreference("browser.download.manager.showAlertOnComplete", false);
-                    profile.setPreference("browser.download.manager.showWhenStarting",false);
+                    profile.setPreference("browser.download.manager.showWhenStarting", false);
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
@@ -445,7 +447,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                         "};" +
                         "return getLinkAddresses();";
         @SuppressWarnings("unchecked")
-        List<String> linkArray = (ArrayList<String>)executeScript(js);
+        List<String> linkArray = (ArrayList<String>) executeScript(js);
         ArrayList<String> links = new ArrayList<>();
         for (String link : linkArray)
         {
@@ -563,9 +565,16 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
     {
-        final WebElement userMenu = waitForElement(Locators.USER_MENU);
-        scrollIntoView(userMenu);
-        _ext4Helper.clickExt4MenuButton(wait, userMenu, onlyOpen, items);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            new SiteNavBar(getDriver()).clickUserMenuItem(wait, onlyOpen, items);
+        }
+        else
+        {
+            final WebElement userMenu = waitForElement(Locators.USER_MENU);
+            scrollIntoView(userMenu);
+            _ext4Helper.clickExt4MenuButton(wait,userMenu,onlyOpen,items);
+        }
     }
 
     @LogMethod(quiet = true)
@@ -574,22 +583,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         menu.click();
         try
         {
-            waitForElement(Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+            waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
         }
         catch (NoSuchElementException retry)
         {
             menu.click(); // Sometimes ext4 menus don't open on the first try
-            waitForElement(Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+            waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
         }
         if (onlyOpen && subMenuLabels.length == 0)
             return null;
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            WebElement subMenuItem = waitForElement(Locators.bootstrapMenuItem(subMenuLabels[i]).notHidden(), 2000);
+            WebElement subMenuItem = waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[i]).notHidden(), 2000);
             clickAndWait(subMenuItem, 0);
         }
-        WebElement item = waitForElement(Locators.bootstrapMenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
+        WebElement item = waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
         if (onlyOpen)
         {
             mouseOver(item);
@@ -1323,21 +1332,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void assertFilterTextPresent(String column, String type, String value)
     {
         String desc = type + value;
+        String closeParenthesis = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? ")" : "))";
         if(type.contains("Equals One Of"))
         {
-            desc = column + " IS ONE OF (" + value.replace(";", ", ") + "))";
+            desc = column + " IS ONE OF (" + value.replace(";", ", ") + closeParenthesis;
         }
         else if(type.contains("Contains One Of"))
         {
-            desc = column + " CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
+            desc = column + " CONTAINS ONE OF (" + value.replace(";", ", ") + closeParenthesis;
         }
         else if(type.contains("Does Not Equal Any Of"))
         {
-            desc = column + " IS NOT ANY OF (" + value.replace(";", ", ") + "))";
+            desc = column + " IS NOT ANY OF (" + value.replace(";", ", ") + closeParenthesis;
         }
         else if(type.contains("Does Not Contain Any Of"))
         {
-            desc = column + " DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + "))";
+            desc = column + " DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + closeParenthesis;
         }
         else if(type.equals("Equals"))
         {
