@@ -210,9 +210,9 @@ public abstract class Locator
         wait.until(new Function<T, Boolean>()
         {
             @Override
-            public Boolean apply(T context)
+            public Boolean apply(T input)
             {
-                wrappedContext.setValue(context);
+                wrappedContext.setValue(input);
                 return true;
             }
 
@@ -1476,8 +1476,8 @@ public abstract class Locator
         public List<WebElement> findElements(SearchContext context)
         {
             List<WebElement> elements = super.findElements(context);
-            if (elements.isEmpty())
-                return new XPathLocator(toXpath()).findElements(context);
+            if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
+                return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
                 return elements;
         }
