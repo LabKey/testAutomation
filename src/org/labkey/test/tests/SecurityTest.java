@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.reader.Readers;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
@@ -435,7 +436,10 @@ public class SecurityTest extends BaseWebDriverTest
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
         //nav trail check
-        assertElementPresent(Locator.xpath("//div[@class='labkey-crumb-trail']/span[@id='navTrailAncestors']/a[text()='Site Users']"));
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            assertElementPresent(Locator.tagWithClass("ol", "breadcrumb").child("li").child(Locator.tagContainingText("a", "Site Users")));
+        else
+            assertElementPresent(Locator.xpath("//div[@class='labkey-crumb-trail']/span[@id='navTrailAncestors']/a[text()='Site Users']"));
         assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user.");//here to see this user's profile and history.");
 
         // create the project and set permissions
