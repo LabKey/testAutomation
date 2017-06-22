@@ -350,7 +350,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test inserting new row");
         regionTable = new DataRegionTable("query", getDriver());
-        regionTable.clickInsertNewRowButton();
+        regionTable.clickInsertNewRowDropdown();
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
