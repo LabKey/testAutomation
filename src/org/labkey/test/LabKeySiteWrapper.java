@@ -45,6 +45,8 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.dumbster.EmailRecordTable;
+import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
@@ -525,25 +527,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (isImpersonating())
                 simpleSignOut();
         }
-        if (IS_BOOTSTRAP_LAYOUT)
+        Locator projectMenu = IS_BOOTSTRAP_LAYOUT ? null : Locators.projectBar;
+        if (!isElementPresent(projectMenu))
         {
-            if (!isElementPresent(Locators.UX_PROJECT_LIST_CONTAINER))
-            {
-                goToHome();
-                if (Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(Locators.UX_PAGE_NAV.waitForElement(getDriver(), WAIT_FOR_PAGE))==null)
-                {   // toggle the menu flyout
-                    click(Locators.UX_FOLDER_TAB);
-                }
-                waitForElement(Locators.UX_PROJECT_LIST_CONTAINER, WAIT_FOR_PAGE);
-            }
-        }
-        else
-        {
-            if (!isElementPresent(Locators.projectBar))
-            {
-                goToHome();
-                waitForElement(Locators.projectBar, WAIT_FOR_PAGE);
-            }
+            goToHome();
+            waitForElement(projectMenu, WAIT_FOR_PAGE);
         }
         assertTrue("Test user '" + getCurrentUser() + "' is not an admin", isUserAdmin());
     }
@@ -1179,18 +1167,9 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            WebElement projectListContainer = Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(getDriver());
-            if (projectListContainer==null || !projectListContainer.isDisplayed() )
-                Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
-            return shortWait().until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver driver)
-                {
-                    click(Locators.UX_FOLDER_TAB);
-                    return ExpectedConditions.visibilityOfElementLocated(Locators.UX_PROJECT_LIST_CONTAINER.toBy()).apply(driver);
-                }
-            });
+            ProjectMenu menu= new ProjectMenu(getDriver());
+            menu.open();
+            return menu.getMenuToggle();
         }
         else
         {
@@ -1214,9 +1193,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickProject(String project, boolean assertDestination)
     {
-        final WebElement projectMenu = openProjectMenu();
-        WebElement projectLink = Locator.linkWithText(project).waitForElement(projectMenu, WAIT_FOR_JAVASCRIPT);
-        clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new ProjectMenu(getDriver()).navigateToProject(project);
+        }
+        else
+        {
+            final WebElement projectMenu = openProjectMenu();
+            WebElement projectLink = Locator.linkWithText(project).waitForElement(projectMenu, WAIT_FOR_JAVASCRIPT);
+            clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
+        }
         if (assertDestination)
         {
             acceptTermsOfUse(null, true);
@@ -1369,7 +1355,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (!isImpersonating())
             throw new IllegalStateException("Not currently impersonating");
-        clickUserMenuItem("Stop Impersonating");
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            new SiteNavBar(getDriver()).stopImpersonating();
+        }
+        else
+        {
+            clickUserMenuItem("Stop Impersonating");
+        }
         assertSignedInNotImpersonating();
         if (goHome)
             goToHome();
