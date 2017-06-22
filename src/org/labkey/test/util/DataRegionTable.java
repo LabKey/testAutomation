@@ -16,10 +16,10 @@
 package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebDriverWrapper;
@@ -64,8 +64,6 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  */
 public class DataRegionTable extends WebDriverComponent implements WebDriverWrapper.PageLoadListener
 {
-    public static final boolean isNewDataRegion = true; // TODO: Remove flag once conversion is complete
-
     @Deprecated // TODO: Make private and scope to a specific DataRegion
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
@@ -74,8 +72,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected final String _regionName;
     protected final WebDriverWrapper _driver;
-    private final WebElement _formElement;
-    private final WebElement _tableElement;
+    private final WebElement _el;
     protected final boolean _selectors;
     protected final boolean _floatingHeaders;
 
@@ -89,26 +86,27 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     private String _tableId;
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
-    private DataRegionTable(WebElement form, String name, WebDriverWrapper driverWrapper)
+    private DataRegionTable(WebElement el, String name, WebDriverWrapper driverWrapper)
     {
         _driver = driverWrapper;
-        if ((form == null) == (name == null))
+        if ((el == null) == (name == null))
             throw new IllegalArgumentException("Specify either a table element or data region name");
 
-        if (form == null)
+        if (el == null)
         {
             _driver.waitForElement(org.labkey.test.Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
-            _formElement = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
+            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
             _regionName = name;
         }
         else
         {
-            _formElement = form;
-            _regionName = form.getAttribute("lk-region-form");
+            _el = el;
+            String regionName = el.getAttribute("lk-region-form");
+            _regionName = regionName!=null ? regionName : el.getAttribute("lk-region-name");
         }
-        if (_formElement instanceof RefindingWebElement)
+        if (_el instanceof RefindingWebElement)
         {
-            ((RefindingWebElement) _formElement).
+            ((RefindingWebElement) _el).
                     withRefindListener(element ->
                     {
                         clearCache();
@@ -116,11 +114,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                     });
         }
 
-        _tableElement = Locators.table(_regionName)
-                .refindWhenNeeded(_formElement).withTimeout(WAIT_FOR_JAVASCRIPT);
-        _tableId = _tableElement.getAttribute("id");
-        _selectors = !Locator.css(".labkey-selectors").findElements(_formElement).isEmpty();
-        _floatingHeaders = !Locator.xpath("tbody/tr").withClass("dataregion_column_header_row_spacer").findElements(_formElement).isEmpty();
+        _selectors = !Locator.css(".labkey-selectors").findElements(_el).isEmpty();
+        _floatingHeaders = !Locator.xpath("tbody/tr").withClass("dataregion_column_header_row_spacer").findElements(_el).isEmpty();
 
         _driver.addPageLoadListener(this);
     }
@@ -157,7 +152,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @Override
     public WebElement getComponentElement()
     {
-        return _formElement;
+        return _el;
     }
 
     protected Elements elements()
@@ -337,7 +332,13 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     private String getTableId()
     {
         if (_tableId == null)
-            _tableId = Locators.table(_regionName).findElement(getComponentElement()).getAttribute("id");
+        {
+            String id = _el.getAttribute("id");
+            if (id.endsWith("-form"))
+                _tableId = id.replace("-form", "");
+            else
+                _tableId=id;
+        }
         return _tableId;
     }
 
@@ -1471,15 +1472,33 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public static class Locators
     {
+        public static Locator.XPathLocator dataRegionForm()
+        {
+            return Locator.tag("form").withAttribute("lk-region-form");
+        }
+
         public static Locator.XPathLocator dataRegion()
         {
-            return Locator.tag("form").attributeStartsWith("id", "lk-region-")
-                    .withAttribute("lk-region-form");
+            return dataRegionForm().append("|").append(table()
+                    .withoutPredicate(Locator.xpath("./ancestor-or-self::form")
+                            .withAttribute("lk-region-form")));
+        }
+
+        public static Locator.XPathLocator dataRegionForm(String regionName)
+        {
+            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
         }
 
         public static Locator.XPathLocator dataRegion(String regionName)
         {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
+            return dataRegionForm(regionName).append("|").append(table(regionName)
+                    .withoutPredicate(Locator.xpath("./ancestor-or-self::form")
+                            .withAttribute("lk-region-form", regionName)));
+        }
+
+        public static Locator.XPathLocator table()
+        {
+            return Locator.tag("table").withAttribute("lk-region-name");
         }
 
         public static Locator.XPathLocator table(String regionName)
@@ -1487,6 +1506,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             return Locator.tagWithAttribute("table", "lk-region-name", regionName);
         }
 
+        @Deprecated
         public static Locator.XPathLocator headerMenuButton(String regionName, String text)
         {
             return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button")
@@ -1514,7 +1534,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected class Elements extends Component.ElementCache
     {
-        private final WebElement header = Locator.id(getTableId() + "-header").findWhenNeeded(this);
         private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private final WebElement UX_ButtonBar = Locator.tagWithClass("div", "lk-region-bar").findWhenNeeded(this);
         private final WebElement UX_PaginationContainer = Locator.xpath("//div[contains(@class,'labkey-pagination')]")
@@ -1524,7 +1543,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private final WebElement UX_PagePrev_Button = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]")
                 .findWhenNeeded(UX_PaginationContainer);
 
-        private final WebElement tableElement = Locators.table(_regionName).refindWhenNeeded(this);
+        private final WebElement tableElement = Locators.table(_regionName).findWhenNeeded(this);
 
         private List<WebElement> allHeaderButtons;
         private Map<String, WebElement> headerButtons;
@@ -1649,15 +1668,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         protected WebElement getHeaderButton(String text)
         {
             if (headerButtons == null)
-                headerButtons = new TreeMap<>();
+                headerButtons = new CaseInsensitiveHashMap<>();
 
             if (!headerButtons.containsKey(text))
             {
+                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
                 headerButtons.put(text, Locator.findAnyElement(
-                        "Button with text or data-original-title " + text,
+                        "Button with title or text: " + text,
                         buttonBar,
+                        Locator.lkButton().withAttribute("title", title),
                         Locator.lkButton(text),
-                        Locator.xpath("//a[@data-original-title='"+text+"']")));
+                        Locator.tagWithAttribute("a", "data-original-title", title)));
             }
             return headerButtons.get(text);
         }
@@ -1669,7 +1690,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
             if (!headerMenus.containsKey(text))
             {
-                headerMenus.put(text,Locator.findAnyElement(
+                headerMenus.put(text, Locator.findAnyElement(
                         "menu with data-original-title " + text,
                         buttonBar,
                         Locator.tagWithClassContaining("span", "lk-menu-drop")
