@@ -644,7 +644,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This is another issue -- let's say B"));
         String issueIdB = getIssueId();
 
-        clickAndWait(Locator.linkWithText("Resolve"));
+        clickAndWait(Locator.linkWithText("resolve"));
         selectOptionByText(Locator.name("resolution"), "Duplicate");
         setFormElement(Locator.name("duplicate"), issueIdA);
         clickButton("Save");
@@ -678,7 +678,7 @@ public class IssuesTest extends BaseWebDriverTest
         // move the created issue
         goToModule("Issues");
         clickAndWait(Locator.linkWithText(issueTitle));
-        click(Locator.linkWithText("move"));
+        click(Locator.linkWithText("Move"));
 
         // handle move dialog
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
@@ -705,7 +705,7 @@ public class IssuesTest extends BaseWebDriverTest
         DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
         issuesTable.checkCheckboxByPrimaryKey(issueIdA);
         issuesTable.checkCheckboxByPrimaryKey(issueIdB);
-        click(Locator.linkWithText("move"));
+        click(Locator.linkWithText("Move"));
 
         // handle move dialog (copy pasta)
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
