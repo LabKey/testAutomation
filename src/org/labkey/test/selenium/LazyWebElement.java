@@ -28,9 +28,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
 {
+    private final Locator _locator;
+    private final SearchContext _searchContext;
     protected WebElement _wrappedElement;
-    private Locator _locator;
-    private SearchContext _searchContext;
     private Long _waitMs;
 
     public LazyWebElement(@NotNull Locator locator, @NotNull SearchContext searchContext)
@@ -79,7 +79,10 @@ public class LazyWebElement<T extends LazyWebElement> extends WebElementWrapper
     @Override
     public String toString()
     {
-        return super.toString() + ":" + String.valueOf(_wrappedElement);
+        if (_wrappedElement == null)
+            return getSearchContext().toString() + " -> " + getClass().getSimpleName() + "{" + getLocator().toString() + "}";
+        else
+            return _wrappedElement.toString();
     }
 }
 
