@@ -72,7 +72,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
-        WebElement menuContainer = Locators.container.refindWhenNeeded(getComponentElement());
+        WebElement menuContainer = Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
         WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer);
         WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer);
 
@@ -91,9 +91,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public static class Locators
     {
         public static final Locator lableyPageNavbar = Locator.xpath("//nav[@class='labkey-page-nav']")
-                .withChild(Locator.tagWithClass("div", "container")
-                .withChild(Locator.tagWithClass("div", "navbar-header")));
-        public static final Locator container = Locator.tagWithClassContaining("li", "dropdown")
+                .withChild(Locator.tagWithClass("div", "container").childTag("div").withClass("navbar-header"));
+        public static final Locator menuProjectNav = Locator.tagWithClassContaining("li", "dropdown")
                 .withAttribute("data-name", "MenuProjectNav");
         public static final Locator containerMobile = Locator.tagWithId("li", "project-mobile");
     }
