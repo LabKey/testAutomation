@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
@@ -34,6 +35,7 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 public class RReportHelper
 {
@@ -426,7 +428,13 @@ public class RReportHelper
     public void createRReport(String name, boolean shareView)
     {
         _test.waitForText(("Reports"));
-        _test._extHelper.clickMenuButton("Reports", "Create R Report");
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            DataRegion(_test.getDriver()).find().clickHeaderMenu("Charts / Reports", "Create R Report");
+        }else
+        {
+            _test._extHelper.clickMenuButton("Reports", "Create R Report");
+        }
 
         if (shareView)
             selectOption(RReportHelper.ReportOption.shareReport);
