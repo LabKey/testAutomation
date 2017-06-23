@@ -966,6 +966,6 @@ public class ETLHelper
 
     private static class Locators
     {
-        static Locator qwp180columnSource = new Locator.LinkLocator(TITLE_180_COLUMN_SOURCE);
+        static Locator qwp180columnSource = Locator.linkWithText(TITLE_180_COLUMN_SOURCE);
     }
 }

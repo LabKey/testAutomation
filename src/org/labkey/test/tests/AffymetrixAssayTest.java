@@ -91,9 +91,9 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         log("Create Affymetrix Assay");
         goToManageAssays();
         clickButton("New Assay Design");
-        checkCheckbox(new Locator.XPathLocator("//input[@id='providerName_Affymetrix']"));
+        checkCheckbox(Locator.tagWithId("input", "providerName_Affymetrix"));
         clickButton("Next");
-        Locator nameLocator = Locator.xpath("//input[@id='AssayDesignerName']");
+        Locator nameLocator = Locator.tagWithId("input", "AssayDesignerName");
         waitForElement(nameLocator);
         setFormElement(nameLocator, ASSAY_NAME);
         _listHelper.addField("Data Fields", EXTRA_RUN_DATA_FIELD_NAME, EXTRA_RUN_DATA_FIELD_LABEL, ListHelper.ListColumnType.Integer);
