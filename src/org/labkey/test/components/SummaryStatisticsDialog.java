@@ -111,14 +111,14 @@ public class SummaryStatisticsDialog extends Window<SummaryStatisticsDialog.Elem
     protected class ElementCache extends Window.ElementCache
     {
         Locator.XPathLocator statTableLoc = Locator.tagWithClass("table", "stat-table");
-        Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "row"));
-        Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "label"));
-        Locator.XPathLocator statCellIndentLoc = statCellLoc.append(Locator.tagWithClass("div", "indent"));
-        Locator.XPathLocator statCellIndentValueLoc = statRowLoc.append(Locator.tagWithClass("td", "value")).append(Locator.tag("div"));
+        Locator.XPathLocator statRowLoc = statTableLoc.append(Locator.tagWithClassContaining("tr", "lk-stats-row"));
+        Locator.XPathLocator statCellLoc = statRowLoc.append(Locator.tagWithClass("td", "lk-stats-label"));
+        Locator.XPathLocator statCellIndentLoc = statCellLoc.append(Locator.tagWithClass("div", "lk-stats-indent"));
+        Locator.XPathLocator statCellIndentValueLoc = statRowLoc.append(Locator.tagWithClass("td", "lk-stats-value")).append(Locator.tag("div"));
         Locator.XPathLocator statRowSelectedLoc = statRowLoc.withClass("x4-item-selected");
 
-        Locator.XPathLocator statValueLoc = Locator.tagWithClass("td", "value");
-        Locator.XPathLocator statCheckLoc = Locator.tagWithClass("td", "check");
+        Locator.XPathLocator statValueLoc = Locator.tagWithClass("td", "lk-stats-value");
+        Locator.XPathLocator statCheckLoc = Locator.tagWithClass("td", "lk-stats-check");
 
         public WebElement checkbox(String statLabel)
         {
