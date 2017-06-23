@@ -101,8 +101,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         else
         {
             _el = el;
-            String regionName = el.getAttribute("lk-region-form");
-            _regionName = regionName!=null ? regionName : el.getAttribute("lk-region-name");
+            String regionName = StringUtils.trimToNull(el.getAttribute("lk-region-form")); // new UI
+            _regionName = regionName != null ? regionName : el.getAttribute("lk-region-name"); // old UI
         }
         if (_el instanceof RefindingWebElement)
         {
@@ -337,7 +337,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             if (id.endsWith("-form"))
                 _tableId = id.replace("-form", "");
             else
-                _tableId=id;
+                _tableId = id;
         }
         return _tableId;
     }
@@ -1472,28 +1472,30 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public static class Locators
     {
-        public static Locator.XPathLocator dataRegionForm()
-        {
-            return Locator.tag("form").withAttribute("lk-region-form");
-        }
-
         public static Locator.XPathLocator dataRegion()
         {
-            return dataRegionForm().append("|").append(table()
-                    .withoutPredicate(Locator.xpath("./ancestor-or-self::form")
-                            .withAttribute("lk-region-form")));
-        }
-
-        public static Locator.XPathLocator dataRegionForm(String regionName)
-        {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
+            if (IS_BOOTSTRAP_LAYOUT)
+                return form();
+            else
+                return table();
         }
 
         public static Locator.XPathLocator dataRegion(String regionName)
         {
-            return dataRegionForm(regionName).append("|").append(table(regionName)
-                    .withoutPredicate(Locator.xpath("./ancestor-or-self::form")
-                            .withAttribute("lk-region-form", regionName)));
+            if (IS_BOOTSTRAP_LAYOUT)
+                return form(regionName);
+            else
+                return table(regionName);
+        }
+
+        public static Locator.XPathLocator form()
+        {
+            return Locator.tag("form").withAttribute("lk-region-form");
+        }
+
+        public static Locator.XPathLocator form(String regionName)
+        {
+            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
         }
 
         public static Locator.XPathLocator table()
@@ -1543,7 +1545,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private final WebElement UX_PagePrev_Button = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]")
                 .findWhenNeeded(UX_PaginationContainer);
 
-        private final WebElement tableElement = Locators.table(_regionName).findWhenNeeded(this);
+        private final WebElement tableElement = IS_BOOTSTRAP_LAYOUT ? Locators.table(_regionName).findWhenNeeded(this) : getComponentElement();
 
         private List<WebElement> allHeaderButtons;
         private Map<String, WebElement> headerButtons;
