@@ -218,7 +218,8 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Reports", QUERY_REPORT_NAME_2);
 
-        DataRegionTable region = DataRegion(getDriver()).find();
+        DataRegionTable outerDataRegion = DataRegion(getDriver()).withName("Dataset").find();
+        DataRegionTable region = DataRegion(getDriver()).find(outerDataRegion);
 
         Map<String, Integer> counts = new HashMap<>();
         for (String value : region.getColumnDataAsText("MouseId"))
