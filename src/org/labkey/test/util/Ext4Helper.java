@@ -325,26 +325,28 @@ public class Ext4Helper
         _test.waitAndClickAndWait(loc);
     }
 
-    public void clearGridSelection(String markerCls)
+    public void clearGridSelection(WebElement gridEl)
     {
         String script =
-                "selectExt4GridItem = function (markerCls) {\n" +
-                "    var el = Ext4.DomQuery.selectNode(\".\"+markerCls);\n" +
-                "    if (el)\n" +
+                "selectExt4GridItem = function (selector) {\n" +
+                "    var grid = Ext4.getCmp(el.id);\n" +
+                "    if (grid)\n" +
                 "    {\n" +
-                "        var grid = Ext4.getCmp(el.id);\n" +
-                "        if (grid)\n" +
-                "        {\n" +
-                "            grid.getSelectionModel().deselectAll();\n" +
-                "        }\n" +
+                "        grid.getSelectionModel().deselectAll();\n" +
                 "    }\n" +
                 "    else\n" +
                 "    {\n" +
-                "        throw 'Unable to locate grid: ' + markerCls;\n" +
+                "        throw 'Element not an Ext4 component: ' + el.id;\n" +
                 "    }\n" +
                 "};" +
                 "selectExt4GridItem(arguments[0]);";
-        _test.executeScript(script, markerCls);
+        _test.executeScript(script, gridEl);
+    }
+
+    @Deprecated
+    public void clearGridSelection(String markerCls)
+    {
+        clearGridSelection(Locator.css("." + markerCls).findElement(_test.getDriver()));
     }
 
     public boolean isGridRowSelected(String cellText, int index) {
@@ -366,35 +368,34 @@ public class Ext4Helper
         }
     }
 
-    public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
+    public void selectGridItem(String columnName, String columnVal, int idx, WebElement gridEl, boolean keepExisting)
     {
         String script =
-                "selectExt4GridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {\n" +
-                "    var el = Ext4.DomQuery.selectNode(\".\"+markerCls);\n" +
-                "    if (el)\n" +
+                "selectExt4GridItem = function (columnName, columnVal, idx, el, keepExisting) {\n" +
+                "    var grid = Ext4.getCmp(el.id);\n" +
+                "    if (grid)\n" +
                 "    {\n" +
-                "        var grid = Ext4.getCmp(el.id);\n" +
-                "        if (grid)\n" +
-                "        {\n" +
-                "            if (idx == -1)\n" +
-                "                idx = grid.getStore().find(columnName, columnVal);\n" +
-
-                "            if (idx == -1)\n" +
-                "                throw 'Unable to locate ' + columnName + ': ' + columnVal;\n" +
-
-                "            if (idx >= grid.getStore().getCount())\n" +
-                "                throw 'No such row: ' + idx;\n" +
-
-                "            grid.getSelectionModel().select(idx, keepExisting);\n" +
-                "        }\n" +
+                "        if (idx == -1)\n" +
+                "            idx = grid.getStore().find(columnName, columnVal);\n" +
+                "        if (idx == -1)\n" +
+                "            throw 'Unable to locate ' + columnName + ': ' + columnVal;\n" +
+                "        if (idx >= grid.getStore().getCount())\n" +
+                "            throw 'No such row: ' + idx;\n" +
+                "        grid.getSelectionModel().select(idx, keepExisting);\n" +
                 "    }\n" +
                 "    else\n" +
                 "    {\n" +
-                "        throw 'Unable to locate grid: ' + markerCls;\n" +
+                "        throw 'Element not an Ext4 component: ' + el.id;\n" +
                 "    }\n" +
                 "};" +
                 "selectExt4GridItem(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);";
-        _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
+        _test.executeScript(script, columnName, columnVal, idx, gridEl, keepExisting);
+    }
+
+    public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
+    {
+        WebElement grid = Locator.css("." + markerCls).findElement(_test.getDriver());
+        selectGridItem(columnName, columnVal, idx, grid, keepExisting);
     }
 
     public void checkCheckbox(Locator.XPathLocator checkboxLocator)
