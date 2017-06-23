@@ -741,6 +741,7 @@ public class ListTest extends BaseWebDriverTest
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
         final String lookupTable = listName;
+        final String keyCol = "Key &%<+";
 
         log("Issue 6883: test list self join");
 
@@ -748,11 +749,24 @@ public class ListTest extends BaseWebDriverTest
                 new ListHelper.ListColumn(dummyCol, dummyCol, ListHelper.ListColumnType.String, ""),
                 new ListHelper.ListColumn(lookupField, lookupField, ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, lookupSchema, lookupTable))
         };
-        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, keyCol, columns);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(listName));
         assertTextPresent(dummyBase);
         assertTextNotPresent("An unexpected error");
+        Map<String, String> row = new HashMap<>();
+        row.put(dummyCol, "dummy one");
+        _listHelper.insertNewRow(row);
+
+        DataRegionTable regionTable = new DataRegionTable("query", getDriver());
+        clickAndWait(regionTable.detailsLink(0));
+        assertTextPresent("dummy one");
+        clickButton("Edit");
+        assertTextPresent("dummy one");
+        clickButton("Cancel");
+        clickAndWait(regionTable.updateLink(0));
+        assertTextPresent("dummy one");
+        clickButton("Cancel");
     }
 
     String crossContainerLookupList = "CCLL";
