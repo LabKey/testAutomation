@@ -15,8 +15,6 @@
  */
 package org.labkey.test;
 
-import org.openqa.selenium.SearchContext;
-
 public abstract class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
@@ -42,14 +40,14 @@ public abstract class Locators
 
     public static Locator.XPathLocator bootstrapMenuItem(String text)
     {
-        return Locator.xpath("//li/a[contains(text(), '"+text+"')]");
+        return Locator.xpath("//li/a[contains(text(), " + Locator.xq(text) + ")]");
     }
     public static Locator pageSignal(String signalName)
     {
-        return Locator.css("#testSignals > div[name=" + signalName + "]");
+        return Locator.css("#testSignals > div[name=" + Locator.cq(signalName) + "]");
     }
     public static Locator pageSignal(String signalName, String value)
     {
-        return Locator.css("#testSignals > div[name=" + signalName + "][value=" + value + "]");
+        return Locator.css("#testSignals > div[name=" + Locator.cq(signalName) + "][value=" + Locator.cq(value) + "]");
     }
 }
