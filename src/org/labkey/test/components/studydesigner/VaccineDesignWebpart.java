@@ -32,8 +32,8 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
     @Override
     protected void waitForReady()
     {
-        getWrapper().waitForElement(elementCache().getImmunogensTableLocator());
-        getWrapper().waitForElement(elementCache().getAdjuvantsTableLocator());
+        elementCache().immunogensTable.isDisplayed();
+        elementCache().adjuvantsTable.isDisplayed();
     }
 
     public boolean isEmpty()
@@ -115,16 +115,6 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         private Locator.XPathLocator adjuvantsLoc = Locator.tagWithClass("div", "vaccine-design-adjuvants");
         private Locator.XPathLocator challengesLoc = Locator.tagWithClass("div", "vaccine-design-challenges");
 
-        Locator.XPathLocator getImmunogensTableLocator()
-        {
-            return immunogensLoc.append(tableOuterLoc);
-        }
-
-        Locator.XPathLocator getAdjuvantsTableLocator()
-        {
-            return adjuvantsLoc.append(tableOuterLoc);
-        }
-
         WebElement immunogensTable = immunogensLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement adjuvantsTable = adjuvantsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement manageLink = manageLoc.findWhenNeeded(this).withTimeout(wait);
@@ -132,7 +122,7 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
         WebElement getImmunogensCell(String column, int rowIndex)
         {
             Locator.XPathLocator cellLoc = immunogensLoc.append(cellDisplayLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
-            return cellLoc.findElement(getDriver());
+            return cellLoc.findElement(this);
         }
 
         WebElement getImmunogensAntigenCell(String column, int outerRowIndex, int subgridRowIndex)
@@ -140,7 +130,7 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             Locator.XPathLocator cellLoc = immunogensLoc.append(cellDisplayLoc.withAttribute("outer-index", outerRowIndex+""));
             Locator.XPathLocator subgridTableLoc = cellLoc.append(Locator.tagWithClass("table", "subgrid-Antigens"));
             Locator.XPathLocator subgridCellLoc = subgridTableLoc.append(cellDisplayLoc.withAttribute("data-index", column).withAttribute("subgrid-index", subgridRowIndex+""));
-            return subgridCellLoc.findElement(getDriver());
+            return subgridCellLoc.findElement(this);
         }
 
         WebElement getImmunogensDoseAndRouteCell(String column, int outerRowIndex, int subgridRowIndex)
@@ -148,23 +138,23 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             Locator.XPathLocator cellLoc = immunogensLoc.append(cellDisplayLoc.withAttribute("outer-index", outerRowIndex+""));
             Locator.XPathLocator subgridTableLoc = cellLoc.append(Locator.tagWithClass("table", "subgrid-DoseAndRoute"));
             Locator.XPathLocator subgridCellLoc = subgridTableLoc.append(cellDisplayLoc.withAttribute("data-index", column).withAttribute("subgrid-index", subgridRowIndex+""));
-            return subgridCellLoc.findElement(getDriver());
+            return subgridCellLoc.findElement(this);
         }
 
         WebElement getAdjuvantsCell(String column, int rowIndex)
         {
             Locator.XPathLocator cellLoc = adjuvantsLoc.append(cellDisplayLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
-            return cellLoc.findElement(getDriver());
+            return cellLoc.findElement(this);
         }
 
         int getImmunogensRowCount()
         {
-            return immunogensLoc.append(tableRowLoc).findElements(getDriver()).size();
+            return immunogensLoc.append(tableRowLoc).findElements(this).size();
         }
 
         int getAdjuvantsRowCount()
         {
-            return adjuvantsLoc.append(tableRowLoc).findElements(getDriver()).size();
+            return adjuvantsLoc.append(tableRowLoc).findElements(this).size();
         }
 
         int getImmunogenAdjuvantRowCount(int rowIndex)
@@ -174,7 +164,7 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             if (!getWrapper().isElementPresent(subgridTableLoc))
                 return 0;
             else
-                return subgridTableLoc.append(subgridRowLoc).findElements(getDriver()).size();
+                return subgridTableLoc.append(subgridRowLoc).findElements(this).size();
         }
 
         int getImmunogenDoseAndRouteRowCount(int rowIndex)
@@ -184,30 +174,28 @@ public class VaccineDesignWebpart extends BodyWebPart<VaccineDesignWebpart.Eleme
             if (!getWrapper().isElementPresent(subgridTableLoc))
                 return 0;
             else
-                return subgridTableLoc.append(subgridRowLoc).findElements(getDriver()).size();
+                return subgridTableLoc.append(subgridRowLoc).findElements(this).size();
         }
 
         boolean isImmunogensTableEmpty()
         {
-            tableOuterLoc.findElement(immunogensTable);
-            return getWrapper().isElementPresent(immunogensLoc.append(tableOuterLoc).append(emptyLoc));
+            return emptyLoc.findElementOrNull(immunogensTable) != null;
         }
 
         boolean isAdjuvantsTableEmpty()
         {
-            tableOuterLoc.findElement(adjuvantsTable);
-            return getWrapper().isElementPresent(adjuvantsLoc.append(tableOuterLoc).append(emptyLoc));
+            return emptyLoc.findElementOrNull(adjuvantsTable) != null;
         }
 
         int getChallengesRowCount()
         {
-            return challengesLoc.append(tableRowLoc).findElements(getDriver()).size();
+            return challengesLoc.append(tableRowLoc).findElements(this).size();
         }
 
         WebElement getChallengesCell(String column, int rowIndex)
         {
             Locator.XPathLocator cellLoc = challengesLoc.append(cellDisplayLoc.withAttribute("data-index", column).withAttribute("outer-index", rowIndex+""));
-            return cellLoc.findElement(getDriver());
+            return cellLoc.findElement(this);
         }
     }
 }

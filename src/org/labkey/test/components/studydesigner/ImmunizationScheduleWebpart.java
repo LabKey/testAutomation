@@ -33,7 +33,7 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
     @Override
     protected void waitForReady()
     {
-        getWrapper().waitForElement(elementCache().getCohortTableLocator());
+        elementCache().cohortsTable.isDisplayed();
     }
 
     public boolean isEmpty()
@@ -72,11 +72,6 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
         private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Treatments");
         private Locator.XPathLocator cohortsLoc = Locator.tagWithClass("div", "immunization-schedule-cohorts");
 
-        Locator.XPathLocator getCohortTableLocator()
-        {
-            return cohortsLoc.append(tableOuterLoc);
-        }
-
         WebElement cohortsTable = cohortsLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement manageLink = manageLoc.findWhenNeeded(this).withTimeout(wait);
 
@@ -84,18 +79,17 @@ public class ImmunizationScheduleWebpart extends BodyWebPart<ImmunizationSchedul
         {
             Locator.XPathLocator rowLoc = cohortsLoc.append(tableRowLoc.withAttribute("outer-index", rowIndex+""));
             Locator.XPathLocator cellLoc = rowLoc.append(cellDisplayLoc.withAttribute("data-index", column));
-            return cellLoc.findElement(getDriver());
+            return cellLoc.findElement(this);
         }
 
         int getCohortRowCount()
         {
-            return cohortsLoc.append(tableRowLoc).findElements(getDriver()).size();
+            return cohortsLoc.append(tableRowLoc).findElements(this).size();
         }
 
         boolean isCohortTableEmpty()
         {
-            tableOuterLoc.findElement(cohortsTable);
-            return getWrapper().isElementPresent(cohortsLoc.append(tableOuterLoc).append(emptyLoc));
+            return emptyLoc.findElementOrNull(cohortsTable) != null;
         }
     }
 }

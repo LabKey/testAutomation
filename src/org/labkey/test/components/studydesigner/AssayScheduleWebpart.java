@@ -19,7 +19,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -33,7 +32,7 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
     @Override
     protected void waitForReady()
     {
-        getWrapper().waitForElement(elementCache().getAssayTableLocator());
+        elementCache().assaysTable.isDisplayed();
     }
 
     public boolean isEmpty()
@@ -75,7 +74,6 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
     public class ElementCache extends WebPart.ElementCache
     {
         private int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
-        private Locator.XPathLocator manageLoc = Locator.linkWithText("Manage Assay Schedule");
         private Locator.XPathLocator tableOuterLoc = Locator.tagWithClass("table", "outer");
         private Locator.XPathLocator tableRowLoc = Locator.tagWithClass("tr", "row-outer");
         private Locator.XPathLocator cellDisplayLoc = Locator.tagWithClass("td", "cell-display");
@@ -83,14 +81,9 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
         private Locator.XPathLocator assaysLoc = Locator.tagWithClass("div", "vaccine-design-assays");
         private Locator.XPathLocator assayPlanLoc = Locator.tag("p").withAttribute("data-index", "AssayPlan");
 
-        Locator.XPathLocator getAssayTableLocator()
-        {
-            return assaysLoc.append(tableOuterLoc);
-        }
-
         WebElement assaysTable = assaysLoc.append(tableOuterLoc).findWhenNeeded(this).withTimeout(wait);
         WebElement assayPlan = assayPlanLoc.findWhenNeeded(this).withTimeout(wait);
-        WebElement manageLink = manageLoc.findWhenNeeded(this).withTimeout(wait);
+        WebElement manageLink = Locator.linkWithText("Manage Assay Schedule").findWhenNeeded(this).withTimeout(wait);
 
         WebElement getAssayCell(String column, int rowIndex, String dataFilterValue)
         {
@@ -99,18 +92,17 @@ public class AssayScheduleWebpart extends BodyWebPart<AssayScheduleWebpart.Eleme
             if (dataFilterValue != null)
                 cellLoc = cellLoc.withAttribute("data-filter-value", dataFilterValue);
 
-            return cellLoc.findElement(getDriver());
+            return cellLoc.findElement(this);
         }
 
         int getAssayRowCount()
         {
-            return assaysLoc.append(tableRowLoc).findElements(getDriver()).size();
+            return assaysLoc.append(tableRowLoc).findElements(this).size();
         }
 
         boolean isAssayTableEmpty()
         {
-            tableOuterLoc.findElement(assaysTable);
-            return getWrapper().isElementPresent(assaysLoc.append(tableOuterLoc).append(emptyLoc));
+            return emptyLoc.findElementOrNull(assaysTable) != null;
         }
     }
 }
