@@ -23,10 +23,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.html.Table;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -76,8 +77,8 @@ public class GroupTest extends BaseWebDriverTest
         _permissionsHelper.deleteGroup(CHILD_GROUP);
         _permissionsHelper.deleteGroup(SITE_USER_GROUP);
         _permissionsHelper.deleteGroup(API_SITE_GROUP);
-        deleteUsersIfPresent(TEST_USERS_FOR_GROUP);
-        deleteUsersIfPresent(SITE_USER_EMAILS);
+        _userHelper.deleteUsers(false, TEST_USERS_FOR_GROUP);
+        _userHelper.deleteUsers(false, SITE_USER_EMAILS);
         _containerHelper.deleteProject(getProjectName(), afterTest);
         _containerHelper.deleteProject(getProject2Name(), afterTest);
     }
@@ -149,36 +150,37 @@ public class GroupTest extends BaseWebDriverTest
     private void permissionsReportTest()
     {
         clickAndWait(Locator.linkWithText("view permissions report"));
-        DataRegionTable drt = new DataRegionTable("access", getDriver()); // TODO: This faked up region doesn't work as a real region -- see securityAccess.jsp
+        Table access = new Table(this, DataRegionTable.Locators.table("access").findElement(getDriver()));
 
         waitForText("Access Modification History For This Folder");
         assertTextPresent("Folder Access Details");
 
-        //this table isn't quite a real Labkey Table Region, so we can't use column names
-        int userColumn = 1;
-        int accessColumn = 2;
+        int userColumn = 2;
+        int accessColumn = 3;
+        int headerIndex = 2;
 
-        int rowIndex = drt.getRowIndex(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0])); // TODO: off by two, but internally consistent
+        String displayName = _userHelper.getDisplayNameForEmail(TEST_USERS_FOR_GROUP[0]);
+        int rowIndex = access.getRowIndex(userColumn, displayName) - headerIndex;
+        assertTrue("Unable to find user: " + displayName, rowIndex >= 0);
         List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
-        List<String> groupsForUser = Arrays.asList(drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(","));
+        List<String> groupsForUser = Arrays.asList(access.getDataAsText(rowIndex + headerIndex, accessColumn).replace(" ", "").split(","));
 
         //confirm correct perms
         assertEquals("Unexpected groups", new HashSet<>(expectedGroups), new HashSet<>(groupsForUser));
 
         //expand plus to check specific groups
-        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex)); // TODO: (+2) in new DataRegion
+        click(Locator.tag("img").withAttributeContaining("src", "/labkey/_images/plus.gif").index(rowIndex));
 
         //confirm details link leads to right user, page
-        clickAndWait(Locator.linkContainingText("details").index(rowIndex)); // TODO: (+2) in new DataRegion
+        clickAndWait(Locator.linkContainingText("details").index(rowIndex - 1)); // TODO: Table component uses one-based indexing
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
         assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();
 
         //confirm username link leads to right user, page
-        clickAndWait(Locator.linkWithText(displayNameFromEmail(TEST_USERS_FOR_GROUP[0])));
+        clickAndWait(Locator.linkWithText(displayName));
         assertTextPresent("User Access Details: "  + TEST_USERS_FOR_GROUP[0]);
         goBack();
-
     }
 
     @LogMethod
@@ -204,20 +206,20 @@ public class GroupTest extends BaseWebDriverTest
         //impersonate simple group, they should have full editor permissions
         impersonateGroup(SIMPLE_GROUP, true);
         verifyEditorPermission(nameTitleBody);
-        stopImpersonatingGroup();
+        stopImpersonating();
 
         //impersonate compound group, should only have author permissions
         impersonateGroup(COMPOUND_GROUP, true);
         verifyAuthorPermission(nameTitleBody);
-        stopImpersonatingGroup();
+        stopImpersonating();
 
         impersonateRoles("Author");
         verifyAuthorPermission(nameTitleBody);
-        stopImpersonatingRole();
+        stopImpersonating();
 
         impersonateRoles("Editor");
         verifyEditorPermission(nameTitleBody);
-        stopImpersonatingRole();
+        stopImpersonating();
 
         //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages
         _permissionsHelper.createGlobalPermissionsGroup(CHILD_GROUP, "");
@@ -225,7 +227,7 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         impersonateGroup(CHILD_GROUP, true);
         verifyEditorPermission(nameTitleBody);
-        stopImpersonatingGroup();
+        stopImpersonating();
     }
 
     private void verifyAuthorPermission(String[][] nameTitleBody)
@@ -292,7 +294,7 @@ public class GroupTest extends BaseWebDriverTest
     private void verifyCantAddSystemGroupToUserGroup()
     {
         _permissionsHelper.startCreateGlobalPermissionsGroup(BAD_GROUP, true);
-        _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(BAD_GROUP + " Information") + "//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
+        _ext4Helper.selectComboBoxItem(ExtHelper.Locators.window(BAD_GROUP + " Information").append("//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
 
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
