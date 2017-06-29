@@ -44,6 +44,12 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _userHelper.deleteUsers(afterTest, AUTHOR_USER, EDITOR_USER);
     }
 
+    @Override
+    protected String getFolderName()
+    {
+        return "My Study Data Views";
+    }
+
     protected void doCreateSteps()
     {
         importStudy();
