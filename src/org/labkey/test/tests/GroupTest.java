@@ -27,7 +27,7 @@ import org.labkey.test.components.html.Table;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -294,7 +294,7 @@ public class GroupTest extends BaseWebDriverTest
     private void verifyCantAddSystemGroupToUserGroup()
     {
         _permissionsHelper.startCreateGlobalPermissionsGroup(BAD_GROUP, true);
-        _ext4Helper.selectComboBoxItem(ExtHelper.Locators.window(BAD_GROUP + " Information").append("//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.window(BAD_GROUP + " Information").append("//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
 
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
