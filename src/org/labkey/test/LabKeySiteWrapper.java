@@ -177,7 +177,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                     errors = getUrlParam("message", true);
 
                 if (errors.contains("The email address and password you entered did not match any accounts on file."))
-                    throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                    throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'gradlew :server:test:setPassword'");
                 else if (errors.contains("Your password does not meet the complexity requirements; please choose a new password."))
                     throw new IllegalStateException("Password complexity requirement was left on by a previous test");
                 else if (errors.contains("log in and approve the terms of use."))

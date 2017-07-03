@@ -224,7 +224,7 @@ public class PasswordUtil
         catch (IOException e)
         {
             System.out.flush(); // Make sure log is readable
-            throw new IOException("Do an 'ant setPassword' from the server/test directory.", e);
+            throw new IOException("Run the command 'gradlew :server:test:setPassword'.", e);
         }
     }
 }
