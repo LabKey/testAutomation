@@ -47,6 +47,8 @@ public class AssayAPITest extends BaseWebDriverTest
     protected final static File CREST_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
     protected final static File FOO_XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
+    protected final static File HELP_ICON_FILE = TestFileUtils.getSampleData("InlineImages/help.jpg");
+    protected final static File CREST_2_FILE =  TestFileUtils.getSampleData("InlineImages/crest-2.png");
 
     @Override
     protected String getProjectName()
@@ -209,6 +211,23 @@ public class AssayAPITest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + FOO_XLS_FILE.getName() + " from the runs.", Locator.xpath("//a[contains(text(), '" + FOO_XLS_FILE.getName() + "')]"), 2);
+
+        log("verify files can be resolved after the run is imported");
+        String runName = "file resolution run";
+
+        dataRows = Arrays.asList(
+                Maps.of("ptid", "p03", "date", "2017-05-10", "DataFileField", "crest-2.png")
+        );
+
+        // import the file using a relative path
+        resp = assayHelper.importAssay(assayId, runName, dataRows, getProjectName(), Collections.singletonMap("RunFileField", "crest-2.png"), Collections.emptyMap());
+        beginAt(resp.getSuccessURL());
+        assertElementNotPresent("File should not exist for " + CREST_2_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"));
+
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(CREST_2_FILE);
+        beginAt(resp.getSuccessURL());
+        assertElementPresent("Did not find the expected number of icons for " + CREST_2_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_2_FILE.getName() + "')]"), 2);
     }
 
 
@@ -249,6 +268,24 @@ public class AssayAPITest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + SCREENSHOT_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + SCREENSHOT_FILE.getName() + "')]"), 1);
         assertElementPresent("Did not find the expected number of icons for images for " + FOO_XLS_FILE.getName() + " from the runs.", Locator.xpath("//a[contains(text(), '" + FOO_XLS_FILE.getName() + "')]"), 2);
+
+        log("verify files can be resolved after the run is imported");
+        resultRows.clear();
+        resultRows.add(Maps.of("ptid", "188438419", "SpecimenID", "K770K3VY-20", "DataFileField", "help.jpg"));
+
+        runName = "file resolution run";
+        ((APIAssayHelper)_assayHelper).saveBatch(assayName, runName, Collections.singletonMap("RunFileField", "help.jpg"), resultRows, getProjectName());
+        goToManageAssays();
+        clickAndWait(Locator.linkContainingText(assayName));
+        clickAndWait(Locator.linkContainingText(runName));
+        assertElementNotPresent("File should not exist for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"));
+
+        goToModule("FileContent");
+        _fileBrowserHelper.uploadFile(HELP_ICON_FILE);
+        goToManageAssays();
+        clickAndWait(Locator.linkContainingText(assayName));
+        clickAndWait(Locator.linkContainingText(runName));
+        assertElementPresent("Did not find the expected number of icons for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"), 2);
     }
 
     @Override
