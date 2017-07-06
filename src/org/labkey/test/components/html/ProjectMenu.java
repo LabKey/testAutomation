@@ -108,7 +108,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         public static final Locator lableyPageNavbar = Locator.xpath("//nav[@class='labkey-page-nav']")
                 .withChild(Locator.tagWithClass("div", "container").childTag("div").withClass("navbar-header"));
         public static final Locator menuProjectNav = Locator.tagWithClassContaining("li", "dropdown")
-                .withAttribute("data-name", "MenuProjectNav");
+                .withAttribute("data-name", "BetaNav");
         public static final Locator containerMobile = Locator.tagWithId("li", "project-mobile");
     }
 }
