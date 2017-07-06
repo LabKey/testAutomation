@@ -615,7 +615,15 @@ public abstract class WebDriverWrapper implements WrapsDriver
     // Click on a module listed on the admin menu
     public void goToModule(String moduleName)
     {
-        clickAdminMenuItem("Go To Module", "More Modules", moduleName);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            clickAdminMenuItem("Go To Module", moduleName);
+            // may need to update tests to follow new menu layout
+        }
+        else
+        {
+            clickAdminMenuItem("Go To Module", "More Modules", moduleName);
+        }
     }
 
     public void goToSchemaBrowser()

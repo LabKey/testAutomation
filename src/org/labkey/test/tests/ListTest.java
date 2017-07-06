@@ -149,6 +149,8 @@ public class ListTest extends BaseWebDriverTest
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(false); // whitelist me before constructor time
+
     public List<java.lang.String> getAssociatedModules()
     {
         return Arrays.asList("list");

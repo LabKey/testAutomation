@@ -101,6 +101,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public static boolean IS_BOOTSTRAP_LAYOUT = true; // use to toggle between ux refresh UI and standard labkey
+    protected boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = false; // tests to be run with the new UI should set this value
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()
@@ -128,6 +129,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "useExperimentalCoreUI");
         IS_BOOTSTRAP_LAYOUT = true;
+    }
+
+    protected boolean setIsBootstrapWhitelisted(boolean addMeToWhitelist)
+    {
+        IS_BOOTSTRAP_LAYOUT_WHITELISTED = addMeToWhitelist;
+        return  IS_BOOTSTRAP_LAYOUT_WHITELISTED;
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -527,7 +534,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             if (isImpersonating())
                 simpleSignOut();
         }
-        Locator projectMenu = IS_BOOTSTRAP_LAYOUT ? null : Locators.projectBar;
+        Locator projectMenu = IS_BOOTSTRAP_LAYOUT ? ProjectMenu.Locators.menuProjectNav : Locators.projectBar;
         if (!isElementPresent(projectMenu))
         {
             goToHome();
@@ -573,6 +580,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 getDriver().get(buildURL("login", "logout"));
                 WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
                 IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
+
+                if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
+                {
+                    ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
+                    IS_BOOTSTRAP_LAYOUT = false;
+                }
+                if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
+                {
+                    ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
+                    IS_BOOTSTRAP_LAYOUT = true;
+                }
 
                 if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {

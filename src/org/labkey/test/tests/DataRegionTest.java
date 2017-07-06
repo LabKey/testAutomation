@@ -45,6 +45,7 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(false); // set true to whitelist me before constructor time
     private static final String FIRST_LINK = "First Page";
     private static final String PREV_LINK = "Previous Page";
     private static final String NEXT_LINK = "Next Page";

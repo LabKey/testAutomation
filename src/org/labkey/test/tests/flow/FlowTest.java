@@ -27,6 +27,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.flow.FlowReportsWebpart;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.util.DataRegionTable;
@@ -52,6 +53,7 @@ import static org.junit.Assert.assertTrue;
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(false); // set true to whitelist me before constructor time
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
@@ -147,7 +149,9 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("1 run"));
         setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[]{"Flag", "Name", "ProtocolStep", "AnalysisScript", "CompensationMatrix", "WellCount", "Created", "RowId", "FilePathRoot"});
 
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable queryTable = new DataRegionTable("query", getDriver());
+        clickAndWait(queryTable.detailsLink(0));
+        //clickAndWait(Locator.linkWithText("details"));
         setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[]{"Keyword/ExperimentName", "Keyword/Stim", "Keyword/Comp", "Keyword/PLATE NAME", "Flag", "Name", "RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
@@ -226,7 +230,8 @@ public class FlowTest extends BaseFlowTest
         }
 
         beginAt(urlCompensation.getFile());
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable queryTable = new DataRegionTable("query", getDriver());
+        clickAndWait(queryTable.detailsLink(0));
 
         setSelectedFields(getContainerPath(), "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
 
@@ -240,7 +245,8 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         beginAt(urlAnalysis.getFile());
 
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
 
         clickAndWait(Locator.linkWithText("91918.fcs"));
         clickAndWait(Locator.linkWithText("More Graphs"));
@@ -257,7 +263,8 @@ public class FlowTest extends BaseFlowTest
         clickButton("Set names");
 
         beginAt(urlAnalysis.getFile());
-        clickAndWait(Locator.linkWithText("details"));
+        table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         clickAndWait(Locator.linkWithText("91918.fcs-" + FCS_FILE_1));
         assertTextPresent("91918.fcs-" + FCS_FILE_1);
 
@@ -291,14 +298,28 @@ public class FlowTest extends BaseFlowTest
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
-        _extHelper.clickMenuButton("Query", query1);
+        table = new DataRegionTable("query", getDriver());
+        table.clickHeaderMenu("Query", query1);
+        //_extHelper.clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
         setSelectedFields(getContainerPath(), "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
         setSelectedFields(getContainerPath(), "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
-        _extHelper.clickMenuButton("Grid Views", "MostColumns");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table.clickHeaderMenu("Grid views", "MostColumns");
+        }else
+        {
+            _extHelper.clickMenuButton("Grid Views", "MostColumns");
+        }
         assertTextNotPresent("File Path Root");
-        _extHelper.clickMenuButton("Grid Views", "AllColumns");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            table.clickHeaderMenu("Grid views", "AllColumns");
+        }else
+        {
+            _extHelper.clickMenuButton("Grid Views", "AllColumns");
+        }
         assertTextPresent("File Path Root");
     }
 
@@ -326,7 +347,7 @@ public class FlowTest extends BaseFlowTest
         List<String> columnHeaders = fcsAnalysisTable.getColumnLabels();
         List<String> actualMeasures = columnHeaders.subList(columnHeaders.size() - 4, columnHeaders.size());
         assertEquals("Expected measure columns are missing", expectedMeasures, actualMeasures);
-        fcsAnalysisTable.clickHeaderMenu("Charts", "Create Chart");
+        fcsAnalysisTable.clickHeaderMenu( IS_BOOTSTRAP_LAYOUT ? "Charts / Reports" : "Charts", "Create Chart");
 
         // The new plot dialog shows all values from the grid that could be used in any aspect of a plot. So need to add these two values.
         expectedMeasures.add("Compensation Matrix");
@@ -367,7 +388,15 @@ public class FlowTest extends BaseFlowTest
         // verify sample set and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(true, false, "Inline");
+        }else
+        {
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
+        }
         waitForElement(Locator.css(".labkey-flow-graph"));
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
@@ -402,7 +431,15 @@ public class FlowTest extends BaseFlowTest
         String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(true, false, "Thumbnail");
+        }else
+        {
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        }
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
@@ -439,7 +476,15 @@ public class FlowTest extends BaseFlowTest
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+                    .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(true, false, "Thumbnail");
+        }else
+        {
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        }
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
     }
