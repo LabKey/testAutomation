@@ -1978,7 +1978,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitForElement(Locator.name("ff_newQueryName"));
         setFormElement(Locator.name("ff_newQueryName"), name);
         clickButton("Create and Edit Source", 0);
-        waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            waitForElement(Locator.tag("h3").withText("Edit " + name));
+        }
+        else
+        {
+            waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
+        }
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {
