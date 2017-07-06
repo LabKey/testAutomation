@@ -168,7 +168,7 @@ public class WikiHelper
     /**
      * Converts the current wiki page being edited to the specified format.
      * If the page is already in that format, it will no-op.
-     * @param format The desired format ("RADEOX", "HTML", or "TEXT_WITH_LINKS")
+     * @param format The desired format ("RADEOX", "HTML", "MARKDOWN", or "TEXT_WITH_LINKS")
      * 
      */
     public void convertWikiFormat(String format)
@@ -262,6 +262,7 @@ public class WikiHelper
     {
         RADEOX ("Wiki Page"),
         HTML ("HTML"),
+        MARKDOWN ("Markdown"),
         TEXT_WITH_LINKS ("Plain Text");
 
         final String _displayName;

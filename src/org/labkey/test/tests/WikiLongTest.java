@@ -54,6 +54,8 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE5_TITLE = "Malformed JavaScript Elements Should Work";
     private static final String WIKI_PAGE6_NAME = "Index";
     private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test";
+    private static final String WIKI_PAGE7_TITLE = "Page 7 Title For Markdown Test";
+    private static final String WIKI_PAGE7_NAME= "Page 7 Name For Markdown Test";
 
     private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
     private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
@@ -105,6 +107,11 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE6_CONTENT =
             "The " + WIKI_SEARCH_TERM +
             " was called the African unicorn by Europeans and wasn't widely known to exist until 1901.\n";
+
+    private static final String WIKI_PAGE7_CONTENT =
+            "# Title MD\n" +
+            "## Subtitle MD\n" +
+            "*italic text MD*\n";
 
     private static final String NAVBAR1_CONTENT =
             "{labkey:tree|name=core.currentProject}";
@@ -191,6 +198,23 @@ public class WikiLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
 
         searchFor(PROJECT_NAME, "\"Page AAA\"", 1, WIKI_PAGE2_TITLE);
+
+        log("Test new wiki page using markdown");
+        _wikiHelper.createNewWikiPage("MARKDOWN");
+        setFormElement(Locator.name("name"), WIKI_PAGE7_NAME);
+        setFormElement(Locator.name("title"), WIKI_PAGE7_TITLE);
+        setFormElement(Locator.name("body"), WIKI_PAGE7_CONTENT);
+        _wikiHelper.saveWikiPage();
+        // verify that after saving the markdown that it is rendered as html that does not include the markdown symbols
+        assertTextPresent("Title MD");
+        assertTextNotPresent("# Title MD");
+        clickAndWait(Locator.linkWithText("Edit"));
+        _wikiHelper.convertWikiFormat("HTML");
+        // verify that after converting the markdown to html that it is rendered as html that does not include the markdown symbols
+        _wikiHelper.saveWikiPage();
+        assertTextPresent("Title MD");
+        assertTextNotPresent("# Title MD");
+        searchFor(PROJECT_NAME, "italic text MD", 1, WIKI_PAGE7_TITLE);
 
         log("test html wiki containing malformed javascript entities... we should allow this, see #12268");
         _wikiHelper.createNewWikiPage();
