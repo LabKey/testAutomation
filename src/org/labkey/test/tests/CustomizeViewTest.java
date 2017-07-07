@@ -312,7 +312,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addCustomizeViewFilter(new String[] { fieldKey }, fieldKey, op, value);
+            _customizeViewsHelper.addFilter(new String[] { fieldKey }, fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 

@@ -52,7 +52,7 @@ import static org.labkey.test.components.ext4.Window.Window;
 
 public class CustomizeView extends Component
 {
-    protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".customize-grid-panel");
+    protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".labkey-customize-grid-panel");
 
     protected final WebDriverWrapper _driver;
     protected final DataRegionTable _dataRegion;
@@ -495,9 +495,8 @@ public class CustomizeView extends Component
         {
             _driver.setFormElement(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), filter);
             _driver.fireEvent(newClauseXPath.append("//input[contains(@id, 'filterValue')]"), BaseWebDriverTest.SeleniumEvent.blur);
-//            itemXPath.append("//tr").findElement(this).click(); // Filter doesn't stick without this
         }
-        _driver.click(Locator.xpath("//div[contains(@class, 'x4-panel-header')]"));
+        _driver.click(Locator.xpath("//div[contains(@class, 'labkey-customview-title')]"));
     }
 
     private Locator.XPathLocator tabContentXPath(ViewItemType type)
