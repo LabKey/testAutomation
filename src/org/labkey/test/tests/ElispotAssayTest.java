@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
@@ -205,7 +206,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
 
         clickAndWait(Locator.linkContainingText("AID_fluoro2"));
 
-        verifyDataRegion(new DataRegionTable("Data", this), "Ascending",
+        verifyDataRegion(new DataRegionTable("Data", this), SortDirection.ASC,
                 Arrays.asList("0.0", "1.0", "0.0", "1.0", "0.0", "0.0", "0.0", "2.0",  "0.0", "0.0"),       // spot count
                 Arrays.asList("0.0", "25.0", "0.0", "22.0", "0.0", "0.0", "0.0", "48.0",  "0.0", "0.0"),    // activity
                 Arrays.asList("0.0", "84.0", "0.0", "68.0", "0.0", "0.0", "0.0", "74.0",  "0.0", "0.0"),   // intensity
@@ -215,7 +216,7 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText("AID_fluoro5"));
 
-        verifyDataRegion(new DataRegionTable("Data", this), "Descending",
+        verifyDataRegion(new DataRegionTable("Data", this), SortDirection.DESC,
                 Arrays.asList("0.0", "1.0", "0.0", "0.0", "2.0", "0.0", "0.0", "3.0", "3.0", "0.0"),        // spot count
                 Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),                            // activity
                 Arrays.asList(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),                           // intensity
@@ -244,20 +245,21 @@ public class ElispotAssayTest extends AbstractQCAssayTest
         assertTextPresent(STUDY_FOLDER);
 }
 
-    private void verifyDataRegion(DataRegionTable table, String sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
+    private void verifyDataRegion(DataRegionTable table, SortDirection sortDir, List<String> expectedSpotCount, List<String> expectedActivity, List<String> expectedIntensity, List<String> expectedCytokine)
     {
         log("add the analyte field to the table and adding sorts");
         CustomizeView cvHelper = table.getCustomizeView();
         cvHelper.openCustomizeViewPanel();
-        cvHelper.addCustomizeViewColumn("Analyte");
+        cvHelper.showHiddenItems();
+        cvHelper.addColumn("Analyte");
 
-        cvHelper.removeCustomizeViewSort("AntigenLsid/AntigenName");
-        cvHelper.removeCustomizeViewSort("Analyte");
-        cvHelper.removeCustomizeViewSort("WellgroupLocation");
+        cvHelper.removeSort("AntigenLsid/AntigenName");
+        cvHelper.removeSort("Analyte");
+        cvHelper.removeSort("WellgroupLocation");
 
-        cvHelper.addCustomizeViewSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
-        cvHelper.addCustomizeViewSort("Analyte", "Analyte", sortDir);
-        cvHelper.addCustomizeViewSort("WellgroupLocation", "WellgroupLocation", sortDir);
+        cvHelper.addSort("AntigenLsid/AntigenName", "AntigenName", sortDir);
+        cvHelper.addSort("Analyte", "Analyte", sortDir);
+        cvHelper.addSort("WellgroupLocation", "WellgroupLocation", sortDir);
         cvHelper.applyCustomView();
 
         pushLocation();

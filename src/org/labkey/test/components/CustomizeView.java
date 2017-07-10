@@ -114,7 +114,7 @@ public class CustomizeView extends Component
         if (isPanelExpanded())
         {
             _driver.doAndWaitForPageSignal(() ->
-                    Locator.css(".x4-panel-header .x4-tool-after-title").findElement(this).click(),
+                    Locator.css(".labkey-customview-close").findElement(this).click(),
                     DataRegionTable.PANEL_HIDE_SIGNAL);
         }
     }
