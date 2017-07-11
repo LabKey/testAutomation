@@ -33,6 +33,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Git;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
@@ -57,7 +58,6 @@ public class BasicTest extends BaseWebDriverTest
     public BasicTest()
     {
         super();
-        _containerHelper = new UIContainerHelper(this);
     }
 
     protected String getProjectName()
