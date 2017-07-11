@@ -366,7 +366,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
     void addFilter(String fieldKey, String op, String value)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewFilter(new String[] { fieldKey }, fieldKey, op, value);
+        _customizeViewsHelper.addFilter(new String[] { fieldKey }, fieldKey, op, value);
         _customizeViewsHelper.applyCustomView();
     }
 

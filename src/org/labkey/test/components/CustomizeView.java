@@ -478,7 +478,7 @@ public class CustomizeView extends Component
         else
         {
             // Add new clause
-            _driver.click(itemXPath.append("//a[text() = 'Add']"));
+            _driver.click(itemXPath.append("//i[contains(@class, 'labkey-tool-add')]"));
         }
 
         // XXX: why doesn't 'clauseIndex' work?
@@ -728,55 +728,6 @@ public class CustomizeView extends Component
         _driver._ext4Helper.selectComboBoxItem(Locator.id(folderFilterCombo.getAttribute("id")), folderFilter);
     }
 
-    private void setFolderFilterClip(boolean clip)
-    {
-        changeTab(ViewItemType.Filter);
-        WebElement clipEl = Locator.css("a.labkey-folder-filter-paperclip").findElement(getComponentElement());
-        boolean clipped = clipEl.getAttribute("class").contains("x4-btn-pressed");
-        if (clip != clipped)
-            clipEl.click();
-    }
-
-    @LogMethod(quiet = true)
-    public void clipFolderFilter()
-    {
-        setFolderFilterClip(true);
-    }
-
-    @LogMethod(quiet = true)
-    public void unclipFolderFilter()
-    {
-        setFolderFilterClip(false);
-    }
-
-    public void clipFilter(String fieldkey)
-    {
-        changeTab(ViewItemType.Filter);
-        SelectedFilterRow filterRow = new SelectedFilterRow(fieldkey);
-        filterRow.clip();
-    }
-
-    public void unclipFilter(String fieldkey)
-    {
-        changeTab(ViewItemType.Filter);
-        SelectedFilterRow filterRow = new SelectedFilterRow(fieldkey);
-        filterRow.unclip();
-    }
-
-    public void clipSort(String fieldkey)
-    {
-        changeTab(ViewItemType.Sort);
-        SelectedSortRow sortRow = new SelectedSortRow(fieldkey);
-        sortRow.clip();
-    }
-
-    public void unclipSort(String fieldkey)
-    {
-        changeTab(ViewItemType.Sort);
-        SelectedSortRow sortRow = new SelectedSortRow(fieldkey);
-        sortRow.unclip();
-    }
-
     public void moveColumn(String fieldKey, boolean moveUp)
     {
         _driver.log("Moving filter, " + fieldKey + " " + (moveUp ? "up." : "down."));
@@ -924,7 +875,6 @@ public class CustomizeView extends Component
     private class SelectedItemRow extends Component
     {
         private WebElement _element;
-        private WebElement _clip = new LazyWebElement(Locator.css("div.item-paperclip > a"), this);
         private String _fieldKey;
 
         protected SelectedItemRow(ViewItemType itemType, String fieldkey)
@@ -948,27 +898,6 @@ public class CustomizeView extends Component
         {
             Locator.css("div.labkey-tool-close").findElement(getComponentElement()).click();
             WebDriverWrapper.waitFor(() -> ExpectedConditions.stalenessOf(getComponentElement()).apply(null), 1000);
-        }
-
-        public boolean isClipped()
-        {
-            return _clip.getAttribute("class").contains("pressed");
-        }
-
-        public void clip()
-        {
-            setClip(true);
-        }
-
-        public void unclip()
-        {
-            setClip(false);
-        }
-
-        public void setClip(boolean isClipped)
-        {
-            if (isClipped() != isClipped)
-                _clip.click();
         }
     }
 
