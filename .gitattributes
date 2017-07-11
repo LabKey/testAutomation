@@ -487,6 +487,7 @@ src/org/labkey/test/components/html/EnumSelect.java -text
 src/org/labkey/test/components/html/FileInput.java -text
 src/org/labkey/test/components/html/FormItem.java -text
 src/org/labkey/test/components/html/Input.java -text
+src/org/labkey/test/components/html/ModalDialog.java -text
 src/org/labkey/test/components/html/OptionSelect.java -text
 src/org/labkey/test/components/html/ProjectMenu.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
