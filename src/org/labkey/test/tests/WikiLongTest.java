@@ -56,6 +56,8 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_PAGE6_TITLE = "Indexed Wiki Page Test";
     private static final String WIKI_PAGE7_TITLE = "Page 7 Title For Markdown Test";
     private static final String WIKI_PAGE7_NAME= "Page 7 Name For Markdown Test";
+    private static final String WIKI_PAGE8_TITLE = "Page 8 Title For Delete Subtree Test";
+    private static final String WIKI_PAGE8_NAME= "Page 8 Name For Delete Subtree Test";
 
     private static final String WIKI_PAGE1_TITLE_LINK = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name";
     private static final String WIKI_PAGE1_TITLE_LINK_COPY = "/labkey/wiki/WikiCopied/page.view?name=Page%201%20Wiki%20Name1";
@@ -73,6 +75,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_SEARCH_TERM = "okapi";
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
+    private static final String WIKI_DELETE_SUBTREE_CHECKBOX = "isDeletingSubtree";
     private final PortalHelper _portalHelper = new PortalHelper(this);
     private WikiHelper _wikiHelper = new WikiHelper(this);
 
@@ -352,7 +355,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         //test deleting via edit page
         clickAndWait(Locator.linkWithText("Edit"));
-        deleteWikiPage();
+        deleteWikiPage(false);
         assertElementNotPresent(Locator.linkWithText(WIKI_NAVTREE_TITLE));
 
         _wikiHelper.createNewWikiPage("HTML");
@@ -364,7 +367,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Header"));
         assertTextPresent(HEADER_CONTENT);
         clickAndWait(Locator.linkWithText("Edit").index(0));
-        deleteWikiPage();
+        deleteWikiPage(false);
         assertTextNotPresent(HEADER_CONTENT);
 
         log("Return to where we were...");
@@ -534,11 +537,27 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test delete");
         clickAndWait(Locator.linkWithText(WIKI_PAGE2_TITLE));
         clickAndWait(Locator.linkWithText("Edit"));
-        deleteWikiPage();
+        deleteWikiPage(false);
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         assertElementPresent(Locator.linkWithText(WIKI_PAGE2_NAME), 1);
 
         indexTest();
+
+        log("test delete subtree");
+        // create child first
+        _wikiHelper.createNewWikiPage();
+        setFormElement(Locator.name("name"), WIKI_PAGE8_NAME);
+        setFormElement(Locator.name("title"), WIKI_PAGE8_TITLE);
+        selectOptionByText(Locator.name("parent"), "  " + WIKI_PAGE3_ALTTITLE + " (" + WIKI_PAGE3_NAME_TITLE + ")");
+        _wikiHelper.saveWikiPage();
+
+        clickAndWait(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
+        clickAndWait(Locator.linkWithText("Edit"));
+        deleteWikiPage(true);
+        clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE1_TITLE), 1);
+        assertElementNotPresent(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
+        assertElementNotPresent(Locator.linkWithText(WIKI_PAGE8_TITLE));
 
         //extended wiki test -- generate 2000 pages
 //        clickProject(PROJECT_NAME);
@@ -561,10 +580,12 @@ public class WikiLongTest extends BaseWebDriverTest
 //        }
     }
 
-    private void deleteWikiPage()
+    private void deleteWikiPage(boolean isDeletingSubtree)
     {
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'disabled')]/span[text()='Delete Page']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Delete Page");
+        if(isDeletingSubtree)
+            checkCheckbox(Locator.id(WIKI_DELETE_SUBTREE_CHECKBOX));
         clickButton("Delete");
     }
 
@@ -702,7 +723,7 @@ public class WikiLongTest extends BaseWebDriverTest
     {
         clickAndWait(Locator.linkWithText(WIKI_PAGE6_TITLE));
         clickAndWait(Locator.linkWithText("Edit"));
-        deleteWikiPage();
+        deleteWikiPage(false);
     }
 
     protected void selectRenderType(String renderType)
