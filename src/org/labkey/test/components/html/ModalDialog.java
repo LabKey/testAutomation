@@ -16,6 +16,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         _el = element;
         _driver = driver;
+        waitForReady();
     }
 
     public static ModalDialog find(WebDriver driver)
@@ -23,6 +24,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return new ModalDialog(Locators.component.waitForElement(driver, WAIT_FOR_JAVASCRIPT), driver);
     }
 
+    public void waitForReady()
+    {
+        getWrapper().waitFor(()-> Locators.title.findElementOrNull(this ) != null &&
+                newElementCache().title.getText().length() > 0, 2000);
+    }
 
     @Override
     public WebElement getComponentElement()
