@@ -1919,7 +1919,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         waitAndClick(loc);
         // NOTE: consider abstracting this.
         waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]"));
-        waitForElement(Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."), 30000);
+        waitForElement(IS_BOOTSTRAP_LAYOUT ?
+                Locator.xpath("//div[contains(./@class,'lk-qd-name')]//a[contains(text(), '" + schemaName + "." + queryName + "')]/..") :
+                Locator.xpath("//div[contains(./@class,'lk-qd-name')]/a[contains(text(), '" + schemaName + "." + queryName + "')]/.."),
+                30000);
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
@@ -1936,7 +1939,9 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public DataRegionTable viewQueryData(String schemaName, String queryName, @Nullable String moduleName)
     {
         selectQuery(schemaName, queryName);
-        Locator loc = Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
+        Locator loc = IS_BOOTSTRAP_LAYOUT ?
+                Locator.xpath("//div[contains(@class,'lk-qd-name')]//a[contains(text(),'" + schemaName + "." + queryName + "')]") :
+                Locator.xpath("//div[contains(@class,'lk-qd-name')]/a[contains(text(),'" + schemaName + "." + queryName + "')]");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(loc, "href");
         if (moduleName != null) // 12474
