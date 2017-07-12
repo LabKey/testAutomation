@@ -21,6 +21,8 @@ import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 
 /**
  * Wraps the project/folder menu nav in labkey pages
@@ -33,7 +35,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public ProjectMenu(WebDriver driver)
     {
         _driver = driver;
-        _el = Locators.lableyPageNavbar.refindWhenNeeded(driver).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        _el = Locators.lableyPageNavbar.refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -74,6 +76,14 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getMenuItem(projectName).click());
     }
 
+    public void navigateToSubFolder(String projectName, String subFolder)
+    {
+        open();
+        getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
+        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderPageLink(subFolder).click());
+    }
+
+
     @Override
     public WebDriver getDriver()
     {
@@ -90,6 +100,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement menuContainer = Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
         WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer);
         WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer);
+        WebElement folderListContainer = Locator.tagWithClass("div", "folder-list-container").refindWhenNeeded(menuContainer);
 
         WebElement projectNavTrail = Locator.tagWithClass("div", "lk-project-nav-trail").refindWhenNeeded(menu);
         WebElement projectNavBtnContainer = Locator.tagWithClass("div", "lk-project-nav-buttons").refindWhenNeeded(menu);
@@ -100,6 +111,10 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement getMenuItem(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden().findElement(menu);
+        }
+        WebElement getFolderPageLink(String text)
+        {
+            return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer, WAIT_FOR_JAVASCRIPT);
         }
     }
 
