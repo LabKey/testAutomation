@@ -188,7 +188,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     protected static class Locators
     {
         public static final Locator.XPathLocator leftTitle = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//h3/a[ ./span[@class='labkey-wp-title-text']]") :
+                Locator.xpath("//h3[./a[ ./span[@class='labkey-wp-title-text']]]") :
                 Locator.tag("tbody/tr/th");
         public static final Locator.XPathLocator webPart = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
                 Locator.tag("div").withAttribute("name", "webpart") :
