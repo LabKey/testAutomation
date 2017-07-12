@@ -51,7 +51,7 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            return locator().withDescendant(leftTitle.withAttribute("name", title))
+            return locator().withDescendant(leftTitle.withAttribute("title", title))
                     .waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
         else
@@ -81,7 +81,7 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
     private static Locator.XPathLocator locator()
     {
         return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//div[@class='container']").append(webPart) :
+                webPart :
                 Locator.id("bodypanel").append(webPart);
     }
 }
