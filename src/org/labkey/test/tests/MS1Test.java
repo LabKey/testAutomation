@@ -223,7 +223,7 @@ public class MS1Test extends BaseWebDriverTest
 
         //test measure filtering
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
+        _customizeViewsHelper.addFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
         _customizeViewsHelper.applyCustomView();
         assertElementNotPresent(Locator.linkWithText("1"));
 
@@ -235,7 +235,7 @@ public class MS1Test extends BaseWebDriverTest
 
         //test fk table column filtering
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
+        _customizeViewsHelper.addFilter("CTAGG_MIN_FeatureId/MZ", "First Feature MZ", "Is Greater Than", "500");
         _customizeViewsHelper.applyCustomView();
         assertTextNotPresent("461.7480"); //mz value
 
@@ -332,6 +332,7 @@ public class MS1Test extends BaseWebDriverTest
         DataRegionTable featuresRegion = new DataRegionTable(DATAREGION_FEATURES, this);
         featuresRegion.setFilter("MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         featuresRegion.setFilter("TotalIntensity", "Is Greater Than or Equal To", "40000");
+        assertEquals("Unexpected number of filtered data region rows", 2, featuresRegion.getDataRowCount());
 
         //test sort
         log("Testing sort...");
@@ -341,9 +342,9 @@ public class MS1Test extends BaseWebDriverTest
         //test customize view
         log("Testing customize view...");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn("RelatedPeptide");
-        _customizeViewsHelper.removeCustomizeViewColumn("RelatedPeptide/Fraction/Run/Description");
-        _customizeViewsHelper.addCustomizeViewColumn("KL");
+        _customizeViewsHelper.removeColumn("RelatedPeptide");
+        _customizeViewsHelper.removeColumn("RelatedPeptide/Fraction/Run/Description");
+        _customizeViewsHelper.addColumn("KL");
         _customizeViewsHelper.applyCustomView();
 
         assertTextPresent("KL");
@@ -356,10 +357,10 @@ public class MS1Test extends BaseWebDriverTest
         //add other columns from peptide data
         //and test saving under a name
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("RelatedPeptide/PeptideProphet", "PepProphet");
-        _customizeViewsHelper.addCustomizeViewColumn("RelatedPeptide/Protein", "Protein");
-        _customizeViewsHelper.addCustomizeViewSort("RelatedPeptide/PeptideProphet", "PepProphet", "Ascending");
-        _customizeViewsHelper.moveCustomizeViewSort("RelatedPeptide/PeptideProphet", true);
+        _customizeViewsHelper.addColumn("RelatedPeptide/PeptideProphet", "PepProphet");
+        _customizeViewsHelper.addColumn("RelatedPeptide/Protein", "Protein");
+        _customizeViewsHelper.addSort("RelatedPeptide/PeptideProphet", "PepProphet", SortDirection.ASC);
+        _customizeViewsHelper.moveSort("RelatedPeptide/PeptideProphet", true);
         _customizeViewsHelper.saveCustomView("My View");
 
         assertTextPresent("PepProphet", "Protein", "18protmix|P46406|G3P_RABIT");

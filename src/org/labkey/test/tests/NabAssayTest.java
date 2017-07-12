@@ -447,7 +447,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         // test creating a custom details view via a "magic" named run-level view:
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewColumn("VirusName");
+        _customizeViewsHelper.removeColumn("VirusName");
         _customizeViewsHelper.saveCustomView("CustomDetailsView");
 
         clickAndWait(Locator.linkContainingText("details").index(1));
@@ -704,18 +704,18 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl", "AUC 4pl");
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl", "AUC 5pl");
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly", "AUC Poly");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl", "Curve IC50 4pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_5pl", "Curve IC50 5pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", "Curve IC50 Poly");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_4pl", "Curve IC70 4pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_5pl", "Curve IC70 5pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", "Curve IC70 Poly");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl", "Curve IC80 4pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_5pl", "Curve IC80 5pl");
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_Poly", "Curve IC80 Poly");
+        _customizeViewsHelper.addColumn("AUC_4pl", "AUC 4pl");
+        _customizeViewsHelper.addColumn("AUC_5pl", "AUC 5pl");
+        _customizeViewsHelper.addColumn("AUC_Poly", "AUC Poly");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl", "Curve IC50 4pl");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_5pl", "Curve IC50 5pl");
+        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", "Curve IC50 Poly");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_4pl", "Curve IC70 4pl");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_5pl", "Curve IC70 5pl");
+        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", "Curve IC70 Poly");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl", "Curve IC80 4pl");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_5pl", "Curve IC80 5pl");
+        _customizeViewsHelper.addColumn("Cutoff80/IC_Poly", "Curve IC80 Poly");
         _customizeViewsHelper.applyCustomView();
     }
 
@@ -754,13 +754,13 @@ public class NabAssayTest extends AbstractQCAssayTest
         // check copied AUC data.
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.addColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
+        _customizeViewsHelper.addColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
+        _customizeViewsHelper.addColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
