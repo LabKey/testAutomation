@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -392,7 +393,11 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         openGroupPermissionsDisplay(groupName);
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
-        _driver.waitForElement(Locator.name("names"));
+        Locator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.xpath("//div[contains(@class, 'lk-body-title')]")
+                        .withDescendant(Locator.tagWithText("*", groupName + " Group")) :
+                Locator.name("names");
+        _driver.waitForElement(loc);
     }
 
     public void clickManageSiteGroup(String groupName, BaseWebDriverTest _test)
