@@ -352,7 +352,7 @@ public class MS1Test extends BaseWebDriverTest
 
         //reset view
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.revertUnsavedView();
+        _customizeViewsHelper.revertUnsavedView();  // this should revert the column removes/adds but not the url filters
 
         //add other columns from peptide data
         //and test saving under a name
