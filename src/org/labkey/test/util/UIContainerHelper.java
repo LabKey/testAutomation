@@ -16,7 +16,9 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.ProjectMenu;
 
 import static org.junit.Assert.*;
 
@@ -113,13 +115,29 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Starting delete of project '" + project + "'...");
         _test.clickButton("Delete", wait);
 
-        if (_test.isElementPresent(Locator.linkWithText(project)))
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            _test.log("Wait extra long for folder to finish deleting.");
-            while (_test.isElementPresent(Locator.linkWithText(project)) && System.currentTimeMillis() - startTime < wait)
+            ProjectMenu menu = new ProjectMenu(_test.getDriver());
+            if (menu.projectLinkExists(project))
             {
-                _test.sleep(5000);
-                _test.refresh();
+                _test.log("Wait extra long for folder to finish deleting.");
+                while (menu.projectLinkExists(project) && System.currentTimeMillis() - startTime < wait)
+                {
+                    _test.sleep(5000);
+                    _test.refresh();
+                }
+            }
+        }
+        else
+        {
+            if (_test.isElementPresent(Locator.linkWithText(project)))
+            {
+                _test.log("Wait extra long for folder to finish deleting.");
+                while (_test.isElementPresent(Locator.linkWithText(project)) && System.currentTimeMillis() - startTime < wait)
+                {
+                    _test.sleep(5000);
+                    _test.refresh();
+                }
             }
         }
 

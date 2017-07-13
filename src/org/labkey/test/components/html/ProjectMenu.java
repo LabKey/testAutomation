@@ -83,6 +83,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderPageLink(subFolder).click());
     }
 
+    public boolean projectLinkExists(String projectName)
+    {
+        open();
+        return Locator.tag("li").childTag("a").withText(projectName).notHidden()
+                .findElementOrNull(newElementCache().menu) != null;
+    }
 
     @Override
     public WebDriver getDriver()

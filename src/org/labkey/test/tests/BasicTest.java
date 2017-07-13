@@ -58,6 +58,7 @@ public class BasicTest extends BaseWebDriverTest
     public BasicTest()
     {
         super();
+        _containerHelper = new UIContainerHelper(this);
     }
 
     protected String getProjectName()
