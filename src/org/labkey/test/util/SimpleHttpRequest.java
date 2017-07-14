@@ -23,6 +23,8 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,7 +101,18 @@ public class SimpleHttpRequest
             con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod(_requestMethod);
             con.setReadTimeout(_timeout);
-            useCopiedSession(con);
+
+            if (!_cookies.isEmpty())
+            {
+                useCopiedSession(con);
+            }
+            else
+            {
+                // Authenticator.setDefault() call above doesn't seem to work (I don't know why), so add the basic auth header explicitly
+                String encoded = Base64.getEncoder().encodeToString((_username + ":" + _password).getBytes(StandardCharsets.UTF_8));
+                con.setRequestProperty("Authorization", "Basic " + encoded);
+            }
+
             con.connect();
             return SimpleHttpResponse.readResponse(con);
         }

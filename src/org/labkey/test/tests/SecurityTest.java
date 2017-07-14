@@ -712,7 +712,9 @@ public class SecurityTest extends BaseWebDriverTest
         // prep: ensure that user does not currently exist in labkey and  self register is enabled
         String selfRegUserEmail = "selfreg@test.labkey.local";
         _userHelper.deleteUsers(false, selfRegUserEmail);
-        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true").getResponseCode();
+
+        // TODO: Add a helper to set authentication parameters (and check response, etc.)
+        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=true", PasswordUtil.getUsername(), PasswordUtil.getPassword()).getResponseCode();
         assertEquals("failed to set authentication param to enable self register via http get", 200, getResponse );
         signOut();
 
@@ -739,7 +741,7 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod public void loginSelfRegistrationDisabledTest()
     {
         // prep: ensure self register is disabled
-        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false").getResponseCode();
+        int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false", PasswordUtil.getUsername(), PasswordUtil.getPassword()).getResponseCode();
         assertEquals("failed to set authentication param to disable self register via http get", 200, getResponse);
         signOut();
 

@@ -901,7 +901,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected String getServerErrors()
     {
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"));
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "showErrorsSinceMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         assertEquals("Failed to fetch server errors: " + httpResponse.getResponseMessage(), HttpStatus.SC_OK, httpResponse.getResponseCode());
         return httpResponse.getResponseBody();
     }
