@@ -166,7 +166,9 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _driver.log(new Date().toString());
         _driver.goToSiteAdmins();
-        _driver.clickAndWait(Locator.linkContainingText("Permissions"));
+        _driver.clickAndWait(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?    // navigates to security-group.view?group=Administrators
+                Locator.tag("ol").append(Locator.linkContainingText("Permissions")) :
+                Locator.linkContainingText("Permissions")); // link in
         _driver._ext4Helper.clickTabContainingText("Permissions");
         _selectPermission(userName, userName, permissionString);
         _driver.log(new Date().toString());
@@ -242,7 +244,7 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public void addUserToProjGroup(String userName, String projectName, String groupName)
     {
-        if (!_driver.getCurrentContainerPath().startsWith("/" + projectName + "/"))
+        if (!_driver.getCurrentContainerPath().startsWith("/" + projectName))
         {
             _test.goToProjectHome(projectName);
         }
@@ -393,10 +395,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         openGroupPermissionsDisplay(groupName);
         _driver.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
-        Locator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//div[contains(@class, 'lk-body-title')]")
-                        .withDescendant(Locator.tagWithText("*", groupName + " Group")) :
-                Locator.name("names");
+        Locator loc = Locator.name("names");
         _driver.waitForElement(loc);
     }
 

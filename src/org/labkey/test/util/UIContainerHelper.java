@@ -43,7 +43,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
-        if (_test.isElementPresent(Locator.linkWithText(projectName)))
+        if (projectLinkExists(projectName))
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
@@ -70,6 +70,15 @@ public class UIContainerHelper extends AbstractContainerHelper
             // There may be additional steps based on
             _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
         }
+
+        // block until the project exists
+        long startTime = System.currentTimeMillis();
+        _test.log("Wait extra long for folder to finish deleting.");
+        while (!projectLinkExists(projectName) && System.currentTimeMillis() - startTime < LabKeySiteWrapper.WAIT_FOR_JAVASCRIPT)
+        {
+            _test.sleep(5000);
+            _test.refresh();
+        }
     }
 
     @Override //TODO :  this will be necessary for full interconversion between UIcontainer and APIContainer,
@@ -85,7 +94,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     {
         _test.openProjectMenu();
 
-        if (!_test.isElementPresent(Locator.linkWithText(project)))
+        if (!projectLinkExists(project))
         {
             if (failIfNotFound)
             {
@@ -115,39 +124,35 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Starting delete of project '" + project + "'...");
         _test.clickButton("Delete", wait);
 
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (projectLinkExists( project))
         {
-            ProjectMenu menu = new ProjectMenu(_test.getDriver());
-            if (menu.projectLinkExists(project))
+            _test.log("Wait extra long for folder to finish deleting.");
+            while (projectLinkExists(project) && System.currentTimeMillis() - startTime < wait)
             {
-                _test.log("Wait extra long for folder to finish deleting.");
-                while (menu.projectLinkExists(project) && System.currentTimeMillis() - startTime < wait)
-                {
-                    _test.sleep(5000);
-                    _test.refresh();
-                }
-            }
-        }
-        else
-        {
-            if (_test.isElementPresent(Locator.linkWithText(project)))
-            {
-                _test.log("Wait extra long for folder to finish deleting.");
-                while (_test.isElementPresent(Locator.linkWithText(project)) && System.currentTimeMillis() - startTime < wait)
-                {
-                    _test.sleep(5000);
-                    _test.refresh();
-                }
+                _test.sleep(5000);
+                _test.refresh();
             }
         }
 
-        if (!_test.isElementPresent(Locator.linkWithText(project)))
+        if (!projectLinkExists(project))
             _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
         else
             fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
         _test.openProjectMenu();
-        _test.assertElementNotPresent(Locator.linkWithText(project));
+       assertFalse(projectLinkExists(project));
+    }
+
+    private boolean projectLinkExists(String project) // use the presence of start-menu links to know
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            return new ProjectMenu(_test.getDriver()).projectLinkExists(project);
+        }
+        else
+        {
+            return _test.isElementPresent(Locator.linkWithText(project));
+        }
     }
 }
