@@ -133,6 +133,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected boolean setIsBootstrapWhitelisted(boolean addMeToWhitelist)
     {
+        String isWhitelisted = addMeToWhitelist ? "whitelisted" : "not whitelisted";
+        log("setting current class [" + this.getClass().toString() + "] as " + isWhitelisted);
         IS_BOOTSTRAP_LAYOUT_WHITELISTED = addMeToWhitelist;
         return  IS_BOOTSTRAP_LAYOUT_WHITELISTED;
     }
@@ -394,7 +396,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         attemptSignIn(email, password);
         String errorText = waitForElement(Locator.id("errors").withText()).getText();
-        assertTitleEquals("Sign In");
+        assertTitleContains("Sign In"); // UX refresh UI appends /home to title
         assertElementPresent(Locator.tagWithName("form", "login"));
 
         List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
@@ -583,11 +585,13 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
                 if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
                 {
+                    log("turning off the new UI for class " + this.getClass().toString());
                     ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
                     IS_BOOTSTRAP_LAYOUT = false;
                 }
                 if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
                 {
+                    log("turning on the new UI for class " + this.getClass().toString());
                     ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
                     IS_BOOTSTRAP_LAYOUT = true;
                 }
