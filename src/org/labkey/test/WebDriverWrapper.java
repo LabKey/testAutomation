@@ -617,8 +617,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            clickAdminMenuItem("Go To Module", moduleName);
-            // may need to update tests to follow new menu layout
+            SiteNavBar navBar = new SiteNavBar(getDriver()).goToModule(moduleName);
         }
         else
         {
