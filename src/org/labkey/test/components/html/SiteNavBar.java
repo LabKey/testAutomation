@@ -20,8 +20,12 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
 import org.labkey.test.pages.search.SearchResultsPage;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.util.concurrent.TimeUnit;
 
 /* Wraps the new site/admin nav menus and site search */
 public class SiteNavBar extends Component
@@ -56,6 +60,34 @@ public class SiteNavBar extends Component
         BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().adminMenuContainer);
         menu.clickMenuButton(wait, onlyOpen, subMenuLabels);
         return this;
+    }
+
+    public SiteNavBar goToModule(String moduleName)
+    {
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().adminMenuContainer);
+        menu.clickMenuButton(false, false, "Go To Module");
+
+        Locator.waitForAnyElement(new FluentWait<SearchContext>(menu.getComponentElement())
+            .withTimeout(2000, TimeUnit.MILLISECONDS),
+                BootstrapMenu.Locators.bootstrapMenuItem("More Modules").notHidden(),
+                BootstrapMenu.Locators.bootstrapMenuItem(moduleName).notHidden());
+
+        WebElement moduleLinkElement = BootstrapMenu.Locators.bootstrapMenuItem(moduleName).notHidden()
+                .findElementOrNull(menu.getComponentElement());
+        if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
+        {
+            _driver.scrollIntoView(moduleLinkElement);
+            _driver.doAndWaitForPageToLoad(()-> moduleLinkElement.click());
+            return this;
+        }
+        else
+        {
+            BootstrapMenu.Locators.bootstrapMenuItem("More Modules")
+                    .findElement(menu.getComponentElement()).click();
+            BootstrapMenu.Locators.bootstrapMenuItem(moduleName)
+                    .waitForElement(menu.getComponentElement(), 2000).click();
+            return this;
+        }
     }
 
     public SiteNavBar clickUserMenuItem(boolean wait, boolean onlyOpen, String ... subMenuLabels)
