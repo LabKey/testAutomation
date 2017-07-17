@@ -363,6 +363,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return elements().getAllHeaderButtons();
     }
 
+    public WebElement getHeaderButton(String buttonText)
+    {
+        return elements().getHeaderButton(buttonText);
+    }
+
     /**
      *
      * @return The count of rows being displayed

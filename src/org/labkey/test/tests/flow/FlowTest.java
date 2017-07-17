@@ -95,6 +95,7 @@ public class FlowTest extends BaseFlowTest
         removeAnalysisFilter();
         verifyDiscoverableFCSFiles();
         verifyExperimentRunGraphLinks();
+        testBulkKeywordEdit();
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
@@ -112,6 +113,126 @@ public class FlowTest extends BaseFlowTest
 
         clickButton("Execute Query", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "No data to show.");
+    }
+
+    @Test
+    public void testBulkKeywordEdit()
+    {
+        goToProjectHome();
+        beginAtFCSFileQueryView();
+
+        DataRegionTable result = new DataRegionTable("query", getDriver());
+//TODO Find a way to confirm a button is present and disabled
+//        WebElement button = findButton("Edit Keywords");
+//        assertEquals("Edit Keywords button not disabled", "labkey-disabled-button", button.getClass());
+        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+
+        result = new DataRegionTable("query", getDriver());
+        WebElement editKeywordsButton = result.getHeaderButton("Edit Keywords");
+        editKeywordsButton.click();
+        assertEquals("Expected ","Selected Files:", getTableCellText(new Locator.IdLocator("keywordTable"),3,0 ));
+        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(new Locator.IdLocator("keywordTable"),3,1 ));
+
+        Locator locTubeName = Locator.xpath("//td/input[@type='hidden' and @value='TUBE NAME']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locTubeName, "FlowTest Keyword Tube Name");
+        clickButton("update");
+
+        clickAndWait(Locator.linkWithText("91745.fcs"));
+        assertTextPresent(FCS_FILE_1); // "experiment name" keyword
+
+        clickButton("edit");
+        confirmKeywordValue("TUBE NAME", "FlowTest Keyword Tube Name");
+
+        beginAtFCSFileQueryView();
+
+        clickAndWait(Locator.linkWithText("91747.fcs"));
+        assertTextPresent(FCS_FILE_1); // "experiment name" keyword
+
+        clickButton("edit");
+        confirmKeywordValue("TUBE NAME", "FlowTest Keyword Tube Name");
+
+        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+
+        Locator locNewName = Locator.xpath("//td/input[@type='text' and @value='']");
+        String newKeywordName = "new keyword name for 91747";
+        String newKeywordValue = "new keyword value for 91747";
+        setFormElement(locNewName, newKeywordName);
+        Locator locNewValue = Locator.xpath("//td/input[@type='text' and @value='']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locNewValue, newKeywordValue);
+        clickButton("update");
+        waitForText("FCS File '91747.fcs'");
+
+        String keywordName = newKeywordName ;
+        String expectedKeywordValue = newKeywordValue;
+
+        clickButton("edit");
+        confirmKeywordValue(keywordName, expectedKeywordValue);
+
+        //Test validation of creating keyword without name
+        newKeywordValue="No name";
+        beginAtFCSFileQueryView();
+        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+        editKeywordsButton = result.getHeaderButton("Edit Keywords");
+        editKeywordsButton.click();
+        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locNewValue, newKeywordValue);
+        clickButton("update");
+        assertTextPresent("Missing name for value 'No name'");
+        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
+        String newKeywordTestName = "New Name Test";
+        setFormElement(locNewValue, newKeywordTestName);
+        clickButton("update");
+        assertTextPresent("FCSFiles");
+
+        //Test validation of creating duplicate keyword
+        newKeywordValue="No dup";
+        beginAtFCSFileQueryView();
+        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+        editKeywordsButton = result.getHeaderButton("Edit Keywords");
+        editKeywordsButton.click();
+        click(Locator.tagWithClassContaining("i", "add-new-keyword"));
+        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locNewValue, newKeywordValue);
+        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
+        setFormElement(locNewValue, newKeywordTestName);
+        clickButton("update");
+        locNewValue = Locator.xpath("//td/input[@type='text' and @value='New Name Test' and @name='ff_keywordName']");
+        String newNameTestDup = "New Name Test Dup";
+        setFormElement(locNewValue, newNameTestDup);
+        clickButton("update");
+        assertTextPresent("FCSFiles");
+
+        //Confirm new keyword added to both files
+        beginAtFCSFileQueryView();
+        clickAndWait(Locator.linkWithText("91745.fcs"));
+        assertTextPresent(FCS_FILE_1); // "experiment name" keyword
+
+        clickButton("edit");
+        confirmKeywordValue(newNameTestDup, newKeywordValue);
+
+        beginAtFCSFileQueryView();
+
+        clickAndWait(Locator.linkWithText("91747.fcs"));
+        assertTextPresent(FCS_FILE_1); // "experiment name" keyword
+
+        clickButton("edit");
+        confirmKeywordValue(newNameTestDup, newKeywordValue);
+
+    }
+
+    private void beginAtFCSFileQueryView()
+    {
+        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSFiles");
+    }
+
+    private void confirmKeywordValue(String keywordName, String expectedKeywordValue)
+    {
+        String keywordValue =  getFormElement(Locator.xpath("//td/input[@type='hidden' and @value='" + keywordName +"']/../../td/input[@name='ff_keywordValue']"));
+        assertEquals("Wrong keyword value", expectedKeywordValue, keywordValue);
     }
 
     @LogMethod
