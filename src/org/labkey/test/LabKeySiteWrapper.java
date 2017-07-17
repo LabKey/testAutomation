@@ -911,7 +911,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (isGuestModeTest() || !isLocalServer())
             return;
 
-        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"));
+        SimpleHttpResponse httpResponse = WebTestHelper.getHttpResponse(buildURL("admin", "resetErrorMark"), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         assertEquals("Failed to reset server errors: [" + httpResponse.getResponseBody().split("\n")[0] + "].", HttpStatus.SC_OK, httpResponse.getResponseCode());
     }
 
