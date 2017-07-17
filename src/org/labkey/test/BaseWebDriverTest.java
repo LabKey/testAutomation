@@ -1413,7 +1413,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            String expectedNavTrail = String.join(" /  ", links) + " / ";
+            String expectedNavTrail = String.join("", links);
             String navTrail = Locator.tagWithClass("ol", "breadcrumb").findElement(getDriver()).getText();
             assertEquals("Wrong nav trail", expectedNavTrail, navTrail);
         }
