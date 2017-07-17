@@ -821,7 +821,13 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void updateRow(int id, Map<String, String> data, boolean validateText)
     {
-        _driver.clickAndWait(updateLink(id - 1));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            _driver.clickAndWait(updateLink(id));
+        }else
+        {
+            _driver.clickAndWait(updateLink(id - 1));
+        }
         setRowData(data, validateText);
     }
 
@@ -1227,8 +1233,27 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void checkAll()
     {
         WebElement toggle = elements().toggleAll;
-        if (!toggle.isSelected())
-            doAndWaitForUpdate(toggle::click);
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            if (!getTableName().contains("'") && !getTableName().contains(">") &&!getTableName().contains("<"))
+            {   // use API unless the table name contains illegal chars for script
+                new DataRegionApiExpectingRefresh().executeScript("selectAll()");
+            }
+            else
+            {
+                // find the flyout menu toggle in the first column header
+                WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
+                WebElement toggleSpan = Locator.xpath("./div/span").findElement(firstColumnHeader);
+                toggleSpan.click();
+                // now click the 'select all' menu item; it should appear at the bottom of the dom
+                Locator.xpath("//ul/li/a[contains(@onclick,'selectAll()')]").waitForElement(getDriver(), 2000).click();
+            }   // there should only exist one of these on a given page... right?
+        }
+        else
+        {
+            if (!toggle.isSelected())
+                doAndWaitForUpdate(toggle::click);
+        }
     }
 
     public void uncheckAll()
@@ -1447,7 +1472,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void clickInsertNewRowDropdown()
     {
-        clickHeaderMenu("Insert", "Insert New Row");
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", "Insert New Row");
     }
 
     public void clickImportBulkDataDropdown()
