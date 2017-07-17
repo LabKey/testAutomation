@@ -32,6 +32,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
@@ -1016,10 +1017,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         if (errorExpected)
         {
-            Window removeError = new Window("Error", _driver.getDriver());
-            assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
-            removeError.clickButton("OK", 0);
-            removeError.waitForClose();
+            if (IS_BOOTSTRAP_LAYOUT)
+            {
+                ModalDialog removeError = ModalDialog.find(_driver.getDriver());
+                assertTrue(removeError.getBodyText().contains("You must select at least one field to display in the grid."));
+                removeError.close();
+            }
+            else
+            {
+                Window removeError = new Window("Error", _driver.getDriver());
+                assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
+                removeError.clickButton("OK", 0);
+                removeError.waitForClose();
+            }
         }
     }
 
@@ -1387,7 +1397,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
-        _driver._ext4Helper.clickExt4MenuButton(false, elements().getHeaderButton(buttonText), true, subMenuLabels);
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
+                    .clickMenuButton(false, true, subMenuLabels);
+        }
+        else
+        {
+            _driver._ext4Helper.clickExt4MenuButton(false, elements().getHeaderButton(buttonText), true, subMenuLabels);
+        }
     }
 
     public void clickHeaderMenu(String buttonText, String ... subMenuLabels)
@@ -1401,7 +1419,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
                     .clickMenuButton(wait, false, subMenuLabels);
-        }else
+        }
+        else
         {
             _driver._ext4Helper.clickExt4MenuButton(wait, elements().getHeaderButton(buttonText), false, subMenuLabels);
         }

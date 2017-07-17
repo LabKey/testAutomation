@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DataRegionTable;
@@ -37,6 +38,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class CustomizeViewTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
@@ -264,7 +266,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
 
         log("** Add sort by Age");
         assertTextBefore("Billson", "Johnson");
-        addSort(AGE_COLUMN, "Ascending");
+        addSort(AGE_COLUMN, SortDirection.ASC);
         assertTextBefore("Johnson", "Billson");
 
         log("** Remove sort");
@@ -312,16 +314,19 @@ public class CustomizeViewTest extends BaseWebDriverTest
         for(String name : viewNames)
         {
             _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addFilter(new String[] { fieldKey }, fieldKey, op, value);
+            _customizeViewsHelper.addFilter(fieldKey, fieldKey, op, value);
             _customizeViewsHelper.saveCustomView(name);
         }
 
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "default");
-        DataRegionTable.findDataRegion(this).openHeaderMenu("Grid Views", "default");
+        DataRegionTable drt = new DataRegionTable("query", getDriver());
+        drt.clickHeaderMenu("Grid views", "default");
+
+        drt = new DataRegionTable("query", getDriver());
+        drt.openHeaderMenu("Grid views");
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }
 
-    private  void createList()
+    private void createList()
     {
         _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_COLUMN, LIST_COLUMNS);
 
@@ -353,45 +358,45 @@ public class CustomizeViewTest extends BaseWebDriverTest
         }
     }
 
-    void setColumns(String... fieldKeys)
+    private void setColumns(String... fieldKeys)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.clearCustomizeViewColumns();
+        _customizeViewsHelper.clearColumns();
         for (String fieldKey : fieldKeys)
-            _customizeViewsHelper.addCustomizeViewColumn(new String[] { fieldKey });
+            _customizeViewsHelper.addColumn(fieldKey);
         _customizeViewsHelper.applyCustomView();
     }
 
-    void addFilter(String fieldKey, String op, String value)
+    private void addFilter(String fieldKey, String op, String value)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addFilter(new String[] { fieldKey }, fieldKey, op, value);
+        _customizeViewsHelper.addFilter(fieldKey, fieldKey, op, value);
         _customizeViewsHelper.applyCustomView();
     }
 
-    void addSort(String fieldKey, String order)
+    private void addSort(String fieldKey, SortDirection order)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewSort(new String[] { fieldKey }, fieldKey, order);
+        _customizeViewsHelper.addSort(fieldKey, order);
         _customizeViewsHelper.applyCustomView();
     }
 
-    void removeFilter(String fieldKey)
+    private void removeFilter(String fieldKey)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewFilter(fieldKey);
+        _customizeViewsHelper.removeFilter(fieldKey);
         _customizeViewsHelper.applyCustomView();
     }
 
-    void removeSort(String fieldKey)
+    private void removeSort(String fieldKey)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.removeCustomizeViewSort(fieldKey);
+        _customizeViewsHelper.removeSort(fieldKey);
         _customizeViewsHelper.applyCustomView();
     }
 
-    void setColumnTitle(String fieldKey, String columnTitle)
+    private void setColumnTitle(String fieldKey, String columnTitle)
     {
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.setColumnTitle(fieldKey, columnTitle);
