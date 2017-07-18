@@ -16,10 +16,13 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.labkey.test.components.WebPart.Locators.*;
 
@@ -49,17 +52,9 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     static public WebElement find(WebDriver test, String title, int index)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            return locator().withDescendant(leftTitle.withAttribute("title", title))
-                    .waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        }
-        else
-        {
-            return locator().withDescendant(leftTitle.withAttribute("title", title))
-                    .index(index)
-                    .waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        }
+        return Locator.waitForAnyElement(new FluentWait<SearchContext>(test).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
+                locator().withDescendant(leftTitle.withAttribute("title", title)).index(index),
+                Locator.tag("tbody/tr/th"));
     }
 
 
@@ -80,8 +75,6 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     private static Locator.XPathLocator locator()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                webPart :
-                Locator.id("bodypanel").append(webPart);
+        return webPart ;
     }
 }
