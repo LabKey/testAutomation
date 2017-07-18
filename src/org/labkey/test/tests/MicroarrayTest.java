@@ -23,6 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
@@ -33,6 +34,7 @@ import java.util.List;
 @Category(BVT.class)
 public class MicroarrayTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true); // whitelist me before constructor time
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Agilent mRNA 1-Color Microarray v10.";
@@ -95,7 +97,7 @@ public class MicroarrayTest extends BaseWebDriverTest
 
         setPipelineRoot(TestFileUtils.getLabKeyRoot() + "/sampledata/Microarray");
         assertTextPresent("The pipeline root was set to");
-        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        goToDashboard();
 
         log("Create Sample Set");
         PortalHelper portalHelper = new PortalHelper(this);
@@ -109,7 +111,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         DataRegionTable.waitForDataRegion(this, "Material");
 
         // First try importing the runs individually
-        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        goToDashboard();
         clickButton("Process and Import Data");
 
         _fileBrowserHelper.checkFileBrowserFileCheckbox(MAGEML_FILE1);
@@ -215,7 +217,9 @@ public class MicroarrayTest extends BaseWebDriverTest
         String name = "unneeded view";
         _customizeViewsHelper.saveCustomView(name);
         assertElementNotPresent(Locator.tagWithClass("*", "labkey-error").withPredicate("string-length() > 0"));
-        assertElementPresent(Locator.css(".labkey-dataregion-msg").withText("View: " + name));
+        assertElementPresent(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClassContaining("div", "lk-region-context-action").withDescendant(Locator.tagWithText("span", name)) :
+                Locator.css(".labkey-dataregion-msg").withText("View: " + name));
 
         //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -232,7 +236,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         assertTextNotPresent(MAGEML_FILE2);
 
         log("Test run outputs/ data files");
-        clickTab("Microarray Dashboard");
+        goToDashboard();
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(MAGEML_FILE2));
         assertTextPresent("115468002");
@@ -244,7 +248,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         assertTextPresent(DATA_FIELD_TEST_NAME);
 
         log("Test graph views");
-        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        goToDashboard();
         clickAndWait(Locator.linkWithText(MAGEML_FILE1));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
         clickAndWait(Locator.linkWithText("Graph Detail View"));
@@ -252,10 +256,22 @@ public class MicroarrayTest extends BaseWebDriverTest
         log("Test assay view");
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent(ASSAY_NAME + " Protocol");
-        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        goToDashboard();
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent("Agilent Feature Extraction Software");
+    }
+
+    private void goToDashboard()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new ProjectMenu(getDriver()).navigateToSubFolder(getProjectName(), PROJECT_NAME);
+        }
+        else
+        {
+            clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        }
     }
 
     @Override
