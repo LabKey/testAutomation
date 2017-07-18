@@ -39,6 +39,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class})
 public class PivotQueryTest extends ReportTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
 
     @Override
@@ -87,10 +88,31 @@ public class PivotQueryTest extends ReportTest
         Locator.XPathLocator region = Locator.tagWithAttribute("table", "lk-region-name", "query");
 
         log("** Verifying pivot table headers");
-        Locator AnalyteName_header = region.append("/tbody/tr[2]/td[2]");
+        Locator AnalyteName_header;
+        Locator IL_10_header;
+        Locator Participant_cell;
+        Locator ParticipantCount_cell;
+        Locator ConcInRange_MIN_cell;
+        Locator ConcInRange_CONCAT_cell;
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            AnalyteName_header = region.append("/tbody/tr[1]/td[2]");
+            IL_10_header = region.append("/tbody/tr[2]/td[1]");
+            Participant_cell = region.append("/tbody[2]/tr[1]/td[1]");
+            ParticipantCount_cell = region.append("/tbody[2]/tr[1]/td[2]");
+            ConcInRange_MIN_cell = region.append("/tbody[2]/tr[1]/td[3]");
+            ConcInRange_CONCAT_cell = region.append("/tbody[2]/tr[1]/td[6]");
+        }
+        else
+        {
+            AnalyteName_header = region.append("/tbody/tr[2]/td[2]");
+            IL_10_header = region.append("/tbody/tr[3]/td[1]");
+            Participant_cell = region.append("/tbody/tr[5]/td[1]");
+            ParticipantCount_cell = region.append("/tbody/tr[5]/td[2]");
+            ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[3]");
+            ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[6]");
+        }
         assertElementContains(AnalyteName_header, "Analyte Name");
-
-        Locator IL_10_header = region.append("/tbody/tr[3]/td[1]");
         assertElementContains(IL_10_header, "IL-10 (23)");
 
         Locator ConcInRange_MIN_header = DataRegionTable.Locators.columnHeader("query", "IL-10 (23)::ConcInRange_MIN");
@@ -98,19 +120,15 @@ public class PivotQueryTest extends ReportTest
 
         log("** Verifying pivot table contents");
         // First "Participant" data cell
-        Locator Participant_cell = region.append("/tbody/tr[5]/td[1]");
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell
-        Locator ParticipantCount_cell = region.append("/tbody/tr[5]/td[2]");
-        assertElementContains(ParticipantCount_cell, "5");
+        assertElementContains(ParticipantCount_cell, "15");
 
         // First "ConcInRange_MIN" data cell
-        Locator ConcInRange_MIN_cell = region.append("/tbody/tr[5]/td[3]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // First "ConcInRange_CONCAT" data cell
-        Locator ConcInRange_CONCAT_cell = region.append("/tbody/tr[5]/td[6]");
         String contents = getText(ConcInRange_CONCAT_cell);
         assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
