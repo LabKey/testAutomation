@@ -125,6 +125,7 @@ public class Crawler
             new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
             new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("admin", "queryStackTraces"),
+            new ControllerActionId("admin", "shortURLAdmin"),
             new ControllerActionId("admin-sql", "saveReorderedScript"),
             new ControllerActionId("announcements", "download"),
             new ControllerActionId("assay", "assayDetailRedirect"),
