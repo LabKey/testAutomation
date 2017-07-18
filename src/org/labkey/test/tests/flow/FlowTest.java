@@ -115,7 +115,6 @@ public class FlowTest extends BaseFlowTest
         waitForText(WAIT_FOR_JAVASCRIPT, "No data to show.");
     }
 
-    @Test
     public void testBulkKeywordEdit()
     {
         goToProjectHome();
