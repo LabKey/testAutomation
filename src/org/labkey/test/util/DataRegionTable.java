@@ -33,6 +33,7 @@ import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.ModalDialog;
+import org.labkey.test.components.html.TextSelect;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
@@ -828,11 +829,14 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
+            WebElement updateLink = updateLink(id);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
+            _driver.fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
             _driver.clickAndWait(updateLink(id));
         }else
         {
             _driver.clickAndWait(updateLink(id - 1));
         }
+
         setRowData(data, validateText);
     }
 
@@ -857,6 +861,21 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                     break;
                 case "file":
                     _driver.setFormElement(field, new File(data.get(key)));
+                    break;
+                case "select-one":
+                    {
+                        TextSelect select = new TextSelect(field);  // probably want to refactor this into a select-wrapper and call it 'selectByLabel'
+                        List<WebElement> els = select.getOptions(); // now find the index of options with attribute 'label' matching data.get(key)
+                        for (int i=0; i < els.size(); i++)
+                        {
+                            String elementLabel = els.get(i).getAttribute("label");
+                            if (elementLabel != null && elementLabel.equalsIgnoreCase(data.get(key)))
+                            {
+                                select.selectByIndex(i);
+                                break;
+                            }
+                        }
+                    }
                     break;
                 default:
                     _driver.setFormElement(field, data.get(key));
