@@ -468,8 +468,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         if(!isElementPresent(Locator.id("userMenuPopupLink")))
         {
-            clickButtonContainingText("Submit", defaultWaitForPage*3);
-            clickButton("Done");
+            if (isButtonPresent("Submit"))
+                    clickButtonContainingText("Submit", defaultWaitForPage*3);
+            if (isButtonPresent("Done"))
+                clickButton("Done");
 
             signOut();
             signIn(username, newPassword);
