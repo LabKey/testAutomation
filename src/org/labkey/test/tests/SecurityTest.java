@@ -49,6 +49,7 @@ import static org.labkey.test.WebTestHelper.getHttpResponse;
 @Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
 {
+    private boolean foo = setIsBootstrapWhitelisted(true);
     protected static final String PROJECT_NAME = "SecurityVerifyProject";
     protected static final String ADMIN_USER_TEMPLATE = "_admin.template@security.test";
     protected static final String NORMAL_USER_TEMPLATE = "_user.template@security.test";
@@ -723,11 +724,11 @@ public class SecurityTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText("Sign In"));
         }
-        assertTitleEquals("Sign In");
+        assertTitleContains("Sign In");
         assertElementPresent(Locator.tagWithName("form", "login"));
         clickAndWait(Locator.linkWithText("Register for a new account"));
 
-        assertTitleEquals("Register");
+        assertTitleContains("Register");
         assertElementPresent(Locator.tagWithName("form", "register"));
         setFormElement(Locator.id("email"), selfRegUserEmail);
         setFormElement(Locator.id("emailConfirmation"), selfRegUserEmail);
@@ -750,7 +751,7 @@ public class SecurityTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText("Sign In"));
         }
-        assertTitleEquals("Sign In");
+        assertTitleContains("Sign In");
         assertElementNotPresent(Locator.linkWithText("Register for a new account"));
 
         // cleanup: sign admin back in
