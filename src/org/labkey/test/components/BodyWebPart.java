@@ -54,7 +54,8 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
     {
         return Locator.waitForAnyElement(new FluentWait<SearchContext>(test).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
                 locator().withDescendant(leftTitle.withAttribute("title", title)).index(index),
-                Locator.tag("tbody/tr/th"));
+                Locator.tagWithAttribute("table", "name", "webpart")
+                        .withDescendant(Locator.tag("tbody/tr/th").withAttribute("title", title).index(index)));
     }
 
 
