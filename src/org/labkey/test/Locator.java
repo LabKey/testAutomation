@@ -485,7 +485,7 @@ public abstract class Locator
 
     public static XPathLocator lkButton()
     {
-        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')");
+        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button' or contains(@class, 'labkey-disabled-button'))");
     }
 
     public static XPathLocator lkLabel(String text)
