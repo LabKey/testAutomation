@@ -527,6 +527,7 @@ public class PropertiesEditor extends WebPartPanel
             }
             public final Input importAliasesInput = Input(Locator.id("importAliases"), getDriver()).findWhenNeeded(this);
             public final Checkbox protectedCheckbox = Checkbox(Locator.tagWithName("input", "protected")).findWhenNeeded(this);
+            public final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), PhiSelectType.class).findWhenNeeded(this);
             public final Checkbox excludeFromShiftingCheckbox = Checkbox(Locator.tagWithName("input", "excludeFromShifting")).findWhenNeeded(this);
             public final Checkbox maxTextCheckbox = Checkbox(Locator.tagWithName("input", "isMaxText")).findWhenNeeded(this);
             public final Input maxTextInput = Input(Locator.name("scale"), getDriver()).findWhenNeeded(this);
@@ -679,6 +680,31 @@ public class PropertiesEditor extends WebPartPanel
         String _text;
 
         DefaultType(String text)
+        {
+            _text = text;
+        }
+
+        public String getValue()
+        {
+            return name();
+        }
+
+        public String getText()
+        {
+            return _text;
+        }
+    }
+
+    public enum PhiSelectType
+    {
+        NotPHI("Not Phi"),
+        Limited("Limited Phi"),
+        PHI("Full Phi"),
+        Restricted("Restricted");
+
+        String _text;
+
+        PhiSelectType(String text)
         {
             _text = text;
         }
