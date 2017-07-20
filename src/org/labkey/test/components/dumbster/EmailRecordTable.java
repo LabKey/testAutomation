@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+
 public class EmailRecordTable extends Table
 {
     private static final String RECORDER_CHECKBOX_NAME = "emailRecordOn";
@@ -38,7 +40,7 @@ public class EmailRecordTable extends Table
 
     public EmailRecordTable(WebDriver driver)
     {
-        super(driver, new RefindingWebElement(emailLocator(), driver));
+        super(driver, new RefindingWebElement(emailLocator(), driver).withTimeout(WAIT_FOR_JAVASCRIPT));
     }
 
     public EmailRecordTable(BaseWebDriverTest test)
