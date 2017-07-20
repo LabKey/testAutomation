@@ -331,15 +331,11 @@ public abstract class AbstractContainerHelper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            _test.beginAt("/"+ project + "/admin-folderManagement.view?");
-            FolderManagementFolderTree folderTree = new FolderManagementFolderTree(_test, project);
-            // assume the project is selected by virtue of the URL here
-            _test.waitFor(()->
-            {
-                WebElement elem = Locator.button("Create Subfolder").findElementOrNull(_test.getDriver());
-                return elem != null && elem.isEnabled();
-            }, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-            _test.clickButton("Create Subfolder");
+            if (!parent.equals(project))
+                _test.beginAt("/" + project + "/" + parent + "/admin-createFolder.view");
+            else
+                _test.beginAt("/"+ project + "/admin-createFolder.view");
+
             _test.setFormElement(Locator.input("name"), child);
         }
         else
