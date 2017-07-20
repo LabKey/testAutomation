@@ -517,8 +517,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         // Not available in production mode
         if (isDevModeEnabled())
         {
-            goToAdminConsole();
-            clickAndWait(Locator.linkWithText("system maintenance"));
+            goToAdminConsole().clickSystemMaintenance();
 
             if (enable)
                 checkCheckbox(Locator.name("enableSystemMaintenance"));
@@ -551,17 +550,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         clickAdminMenuItem("Site", "Admin Console");
         return new ShowAdminPage(getDriver());
-    }
-
-    public CustomizeSitePage goToSiteSettings()
-    {
-        return goToAdminConsole().clickSiteSettings();
-    }
-
-    public void goToAuditLog()
-    {
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("audit log"));
     }
 
     protected void createDefaultStudy()
@@ -1176,7 +1164,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void disableLoginAttemptLimit()
     {
-        goToAdminConsole();
+        goToAdminConsole().goToAdminConsoleLinksSection();
         if(isElementPresent(Locator.linkWithText("Compliance Settings")))
         {
             log("Compliance module present, ensuring login attempt limit is off");

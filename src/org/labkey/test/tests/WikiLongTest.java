@@ -159,8 +159,7 @@ public class WikiLongTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("full-text search"));
+        goToAdminConsole().clickFullTextSearch();
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
         beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);

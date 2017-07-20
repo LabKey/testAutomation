@@ -83,8 +83,7 @@ public class WikiTest extends BaseWebDriverTest
 
         _containerHelper.enableModule(PROJECT_NAME, "MS2");
 
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("full-text search"));
+        goToAdminConsole().clickFullTextSearch();
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
         beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);

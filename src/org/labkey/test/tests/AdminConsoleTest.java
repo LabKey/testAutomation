@@ -23,12 +23,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
-import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PermissionsHelper;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.net.URL;
@@ -41,6 +38,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class AdminConsoleTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     protected static final String APP_ADMIN_USER = "app_admin_test_user@adminconsole.test";
     protected static final String APP_ADMIN_USER_PASS = PasswordUtil.getPassword();
 
@@ -52,12 +50,9 @@ public class AdminConsoleTest extends BaseWebDriverTest
     @Test
     public void testRibbonBar()
     {
-        goToAdminConsole();
-        waitAndClick(Locator.linkContainingText("site settings"));
+        goToAdminConsole().clickSiteSettings();
         waitForElement(Locator.name("showRibbonMessage"));
-
-        WebElement el = Locator.name("ribbonMessageHtml").findElement(getDriver());
-        el.clear();
+        Locator.name("ribbonMessageHtml").findElement(getDriver()).clear();
 
         WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
 
@@ -80,35 +75,25 @@ public class AdminConsoleTest extends BaseWebDriverTest
         setFormElement(Locator.name("ribbonMessageHtml"), html);
         clickButton("Save");
 
-        waitForElement(Locator.linkContainingText("site settings"));
+        Locator ribbon = Locator.tagWithClass("div", "default-template-alert").containing("READ ME!!!");
+        waitForElement(ribbon);
 
-        Locator ribbon = Locator.xpath("//div[contains(@class, 'labkey-warning-messages')]//li[contains(text(), 'READ ME!!!')]");
-        Locator ribbonLink = Locator.xpath("//div[contains(@class, 'labkey-warning-messages')]//li[contains(text(), 'READ ME!!!')]//..//a");
-
-        assertElementPresent(ribbon);
+        Locator ribbonLink = Locator.tagWithClass("div", "default-template-alert").append(Locator.linkContainingText("and also click this..."));
         assertElementPresent(ribbonLink);
-
-        el = getDriver().findElement(By.xpath("//div[contains(@class, 'labkey-warning-messages')]//..//a"));
-        assertNotNull("Link not present in ribbon bar", el);
-
-        String href = el.getAttribute("href");
+        String href = ribbonLink.findElement(getDriver()).getAttribute("href");
         String expected = WebTestHelper.getBaseURL() + "/project/home/begin.view";
         assertEquals("Incorrect URL", expected, href);
 
         goToHome();
         impersonateRole("Reader");
-
         assertElementPresent(ribbon);
         assertElementPresent(ribbonLink);
+        stopImpersonating();
 
-        stopImpersonatingRole();
-
-        goToAdminConsole();
-        waitAndClick(Locator.linkContainingText("site settings"));
+        goToAdminConsole().clickSiteSettings();
         waitForElement(Locator.name("showRibbonMessage"));
         click(Locator.checkboxByName("showRibbonMessage"));
         clickButton("Save");
-        waitForElement(Locator.linkContainingText("site settings"));
         assertElementNotPresent(ribbon);
         assertElementNotPresent(ribbonLink);
     }
@@ -121,9 +106,8 @@ public class AdminConsoleTest extends BaseWebDriverTest
         signIn(APP_ADMIN_USER, APP_ADMIN_USER_PASS);
         clickButton("Submit");
 
-        ShowAdminPage adminPage = goToAdminConsole();
-
         // verify that all of the following links are visible to AppAdmin:
+        goToAdminConsole().goToAdminConsoleLinksSection();
         List<String> actualLinkTexts = new ArrayList<>();
         List<String> expectedLinkTexts = Arrays.asList("change user properties",
                 "folder types",
@@ -173,37 +157,39 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         //analytics settings
         URL url = getURL(); // will capture with redirect url
-        clickAndWait(Locator.linkWithText("analytics settings"));
+        goToAdminConsole().clickAnalyticsSettings();
         assertElementNotPresent(Locator.button("submit"));
         clickButton("done");
-        assertTrue("expect to return to admin console" ,url.toString().startsWith(getURL().toString()));
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
         url = getURL(); // will capture without redirect url
 
         //authentication
-        clickAndWait(Locator.linkWithText("authentication"));
+        goToAdminConsole().clickAuthentication();
         assertElementNotPresent("expect 'enable' links to be disabled for appAdmin", Locator.linkWithText("enable"));
         assertElementNotPresent("expect 'configure' links to be disabled for appAdmin", Locator.linkWithText("configure"));
-        clickAndWait(Locator.tagWithClass("a", "labkey-button").withChild(Locator.tagWithText("span", "Done")));
-        assertEquals("expect to return to admin console" ,url, getURL());
+        clickButton("Done");
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
 
         //email customization
-        clickAndWait(Locator.linkWithText("email customization"), WAIT_FOR_PAGE);
-        clickAndWait(Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(), 'Cancel')]]"));
-        assertEquals(url, getURL());
+        goToAdminConsole().clickEmailCustomization();
+        clickButton("Cancel");
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
 
         //site settings
-        CustomizeSitePage customizeSitePage = adminPage.clickSiteSettings();
-        Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(),'Done')]]").findElement(getDriver()).click();
+        goToAdminConsole().clickSiteSettings();
+        clickButton("Done");
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
 
         //system maintenance
-        clickAndWait(Locator.linkWithText("system maintenance"), WAIT_FOR_PAGE);
-        Locator.xpath("//a[@class='labkey-button' and ./span[contains(text(),'Done')]]").findElement(getDriver()).click();
+        goToAdminConsole().clickSystemMaintenance();
+        clickButton("Done");
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
 
         // views and scripting
-        clickAndWait(Locator.linkWithText("system maintenance"), WAIT_FOR_PAGE);
+        goToAdminConsole().clickViewsAndScripting();
         assertNull(Locator.buttonContainingText("Edit").findElementOrNull(getDriver()));
-        goBack();
-        assertEquals(url, getURL());
+        clickButton("Done");
+        assertTrue("expect to return to admin console" , url.toString().startsWith(getURL().toString()));
     }
 
     public List<String> getAssociatedModules()
@@ -243,5 +229,11 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         ApiPermissionsHelper apiPermissionsHelper = new ApiPermissionsHelper(this);
         apiPermissionsHelper.addMemberToRole(APP_ADMIN_USER, "Application Admin", PermissionsHelper.MemberType.user, "/");
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

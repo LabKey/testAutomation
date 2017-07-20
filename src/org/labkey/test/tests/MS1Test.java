@@ -480,7 +480,7 @@ public class MS1Test extends BaseWebDriverTest
 
     protected void purgeFiles()
     {
-        goToAdminConsole();
+        goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("ms1"));
         if(isButtonPresent("Purge Deleted MS1 Data Now"))
         {

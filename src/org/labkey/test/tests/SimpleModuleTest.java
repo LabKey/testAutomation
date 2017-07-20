@@ -1076,7 +1076,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     protected void assertModuleDeployed(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is deployed");
-        goToAdminConsole();
+        goToAdminConsole().goToModuleInformationSection();
         assertTextPresent(moduleName);
     }
 

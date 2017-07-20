@@ -133,8 +133,8 @@ public class FolderExportTest extends BaseWebDriverTest
     private void doSetup()
     {
         // we are using the simpletest module to test Container Tab import/export
-        goToAdminConsole();
-        assertElementPresent(Locator.tagWithClass("tr", "labkey-header").containing("simpletest"));
+        goToAdminConsole().goToModuleInformationSection();
+        assertTextPresent("simpletest");
 
         RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();

@@ -69,6 +69,7 @@ public abstract class AbstractUserHelper
             getWrapper().goToSiteUsers();
 
             DataRegionTable users = new DataRegionTable("Users", getWrapper().getDriver());
+            users.setFilter("Email", "Equals", email);
             int userRow = users.getRowIndex("Email", email);
             assertFalse("No such user: " + email, userRow == -1);
             getWrapper().clickAndWait(users.detailsLink(userRow));

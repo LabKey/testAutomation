@@ -37,8 +37,7 @@ public class PerlHelper
     @LogMethod
     public void ensurePerlConfig()
     {
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
         _test.log("Check if Perl already is configured");
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);

@@ -84,10 +84,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public void createTermsAdminConsoleLinkTest()
     {
         deleteSiteWideTermsOfUsePage();
-        goToAdminConsole();
-        Locator.XPathLocator link = Locator.linkContainingText("site-wide terms of use");
-        assertElementPresent(link);
-        clickAndWait(link);
+        goToAdminConsole().clickSiteWideTerms();
         Locator.CssLocator button = Locator.css(".labkey-disabled-button");
         assertElementContains(button, "DELETE PAGE");
     }
@@ -96,8 +93,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Test
     public void editTermsAdminConsoleLinkTest()
     {
-        goToAdminConsole();
-        clickAndWait(Locator.linkContainingText("site-wide terms of use"));
+        goToAdminConsole().clickSiteWideTerms();
         assertElementContains(Locator.id("labkey-nav-trail-current-page"), "Edit");
     }
 

@@ -59,7 +59,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         log("Starting UniprotAnnotationTest");
 
         ensureAdminMode();
-        goToAdminConsole();
+        goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("protein databases"));
 
         boolean alreadyLoaded = isTextPresent(UNIPROT_FILENAME);

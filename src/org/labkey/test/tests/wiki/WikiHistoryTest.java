@@ -70,8 +70,7 @@ public class WikiHistoryTest extends BaseWebDriverTest
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("full-text search"));
+        goToAdminConsole().clickFullTextSearch();
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
         beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);

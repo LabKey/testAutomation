@@ -78,16 +78,15 @@ public class BasicTest extends BaseWebDriverTest
         // Disable scheduled system maintenance
         setSystemMaintenance(false);
 
-        goToAdminConsole();
-
-        WebElement modeElement = Locator.tagWithClass("td", "labkey-form-label").withText("Mode").append("/../td[2]").findElement(getDriver());
+        goToAdminConsole().goToServerInformationSection();
+        WebElement modeElement = Locator.tagWithText("td", "Mode").append("/../td[2]").findElement(getDriver());
         String mode = modeElement.getText();
         if (TestProperties.isDevModeEnabled())
             Assert.assertEquals("Development", mode); // Verify that we're running in dev mode
         else
             Assert.assertEquals("Production", mode); // Unless we're not supposed to be.
 
-        goToSiteSettings();
+        goToAdminConsole().clickSiteSettings();
         checkRadioButton(Locator.radioButtonByNameAndValue("usageReportingLevel", "NONE"));     // Don't report usage to labkey.org
         checkRadioButton(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "NONE"));   // Don't report exceptions to labkey.org - we leave the self-report setting unchanged
         clickButton("Save");
@@ -95,8 +94,7 @@ public class BasicTest extends BaseWebDriverTest
         // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
         if (TestProperties.isDevModeEnabled())
         {
-            goToAdminConsole();
-            clickAndWait(Locator.linkWithText("running threads"));
+            goToAdminConsole().clickRunningThreads();
             assertTextNotPresent("SystemMaintenance");
         }
     }

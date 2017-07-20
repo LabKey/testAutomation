@@ -49,8 +49,7 @@ public class PythonHelper
     {
         _test.ensureAdminMode();
 
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
 
         _test.log("Check if Python already is configured");
 

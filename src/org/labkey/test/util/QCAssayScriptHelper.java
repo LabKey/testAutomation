@@ -40,8 +40,7 @@ public class QCAssayScriptHelper
     @LogMethod
     public void ensureEngineConfig()
     {
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
         _test.log("setup a java engine");
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
@@ -73,8 +72,7 @@ public class QCAssayScriptHelper
     @LogMethod
     public void deleteEngine()
     {
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 

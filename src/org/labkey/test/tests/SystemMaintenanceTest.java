@@ -58,8 +58,7 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
         waitForSystemMaintenanceCompletion();
 
         // Verify scheduled system maintenance is disabled.
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("running threads"));
+        goToAdminConsole().clickRunningThreads();
         assertTextNotPresent("SystemMaintenance");
     }
 

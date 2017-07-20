@@ -186,8 +186,7 @@ public class RReportHelper
     {
         _test.ensureAdminMode();
 
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
 
         _test.log("Check if R already is configured");
 
@@ -222,8 +221,7 @@ public class RReportHelper
     {
         _test.ensureAdminMode();
 
-        _test.goToAdminConsole();
-        _test.clickAndWait(Locator.linkWithText("views and scripting"));
+        _test.goToAdminConsole().clickViewsAndScripting();
 
         _test.log("Check if R already is configured");
 

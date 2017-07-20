@@ -352,6 +352,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String newPassword = password +"1";
         goToSiteUsers();
+        filterUsersForEmail(username);
         clickAndWait(Locator.linkContainingText(_userHelper.getDisplayNameForEmail(username)));
         doAndWaitForPageToLoad(() ->
         {
@@ -374,6 +375,12 @@ public class SecurityTest extends BaseWebDriverTest
         signInShouldFail(username, password, wrongPasswordEntered);
         
         return newPassword;
+    }
+
+    private void filterUsersForEmail(String email)
+    {
+        DataRegionTable users = new DataRegionTable("Users", getDriver());
+        users.setFilter("Email", "Equals", email);
     }
 
     @LogMethod protected void addRemoveSiteAdminTest()
@@ -478,11 +485,10 @@ public class SecurityTest extends BaseWebDriverTest
         Locator userAccessLink = Locator.xpath("//td[text()='" + userName + "']/..//td/a[contains(@href,'userAccess.view')]");
         boolean isPresent = isElementPresent(userAccessLink);
 
-        // If user is not found but paging indicators are, then show all 
-        if (!isPresent && isElementPresent(Locator.linkContainingText("Next")) && isElementPresent(Locator.linkContainingText("Last")))
+        // If user is not found, filter (in case the user is on the next page)
+        if (!isPresent)
         {
-            clickButton("Page Size", 0);
-            clickAndWait(Locator.linkWithText("Show All"));
+            filterUsersForEmail(userName);
             isPresent = isElementPresent(userAccessLink);
         }
 
@@ -626,8 +632,7 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
 
         ensureAdminMode();
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("audit log"));
+        goToAdminConsole().clickAuditLog();
 
         doAndWaitForPageToLoad(() -> selectOptionByText(Locator.name("view"), "User events"));
 

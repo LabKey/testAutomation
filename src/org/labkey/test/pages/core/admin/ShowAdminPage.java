@@ -24,6 +24,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+
 // TODO: Missing lots of functionality
 public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 {
@@ -38,21 +40,136 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
         return new ShowAdminPage(driver.getDriver());
     }
 
+    public ShowAdminPage goToServerInformationSection()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            click(elementCache().sectionServerInfo);
+        return this;
+    }
+
+    public ShowAdminPage goToAdminConsoleLinksSection()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            click(elementCache().sectionAdminConsoleLinks);
+        return this;
+    }
+
+    public ShowAdminPage goToModuleInformationSection()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            click(elementCache().sectionModuleInfo);
+        return this;
+    }
+
+    public ShowAdminPage goToActiveUsersSection()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            click(elementCache().sectionActiveUsers);
+        return this;
+    }
+
     public List<String> getActiveUsers()
     {
+        goToActiveUsersSection();
         return getTexts(elementCache().findActiveUsers());
     }
 
-    public CustomizeSitePage clickSiteSettings()
+    public void clickAnalyticsSettings()
     {
-        clickAndWait(elementCache().siteSettingsLink);
-        return new CustomizeSitePage(getDriver());
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().analyticsSettingsLink);
+    }
+
+    public void clickAuditLog()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().auditLogLink);
+    }
+
+    public void clickAuthentication()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().authenticationLink);
+    }
+
+    public void clickConfigureFooter()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().configureFooterLink);
+    }
+
+    public void clickConfigureHeader()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().configureHeaderLink);
+    }
+
+    public void clickEmailCustomization()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().emailCustomizationLink);
     }
 
     public ConfigureFileSystemAccessPage clickFiles()
     {
+        goToAdminConsoleLinksSection();
         clickAndWait(elementCache().filesLink);
         return new ConfigureFileSystemAccessPage(getDriver());
+    }
+
+    public void clickFullTextSearch()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().fullTextSearchLink);
+    }
+
+    public void clickLookAndFeelSettings()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().lookAndFeelSettingsLink);
+    }
+
+    public void clickProfiler()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().profilerLink);
+    }
+
+    public void clickRunningThreads()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().runningThreadsLink);
+    }
+
+    public CustomizeSitePage clickSiteSettings()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().siteSettingsLink);
+        return new CustomizeSitePage(getDriver());
+    }
+
+    public void clickSiteWideTerms()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().siteWideTermsLink);
+    }
+
+    public void clickSystemMaintenance()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().systemMaintenanceLink);
+    }
+
+    public void clickSystemProperties()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().systemPropertiesLink);
+    }
+
+    public void clickViewsAndScripting()
+    {
+        goToAdminConsoleLinksSection();
+        clickAndWait(elementCache().viewsAndScriptingLink);
     }
 
     protected ElementCache newElementCache()
@@ -62,8 +179,27 @@ public class ShowAdminPage extends LabKeyPage<ShowAdminPage.ElementCache>
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
+        protected WebElement sectionServerInfo = Locator.linkWithText("Server Information").findWhenNeeded(this);
+        protected WebElement sectionAdminConsoleLinks = Locator.linkWithText("Admin Console Links").findWhenNeeded(this);
+        protected WebElement sectionModuleInfo = Locator.linkWithText("Module Information").findWhenNeeded(this);
+        protected WebElement sectionActiveUsers = Locator.linkWithText("Active Users").findWhenNeeded(this);
+
+        protected WebElement analyticsSettingsLink = Locator.linkWithText("analytics settings").findWhenNeeded(this);
+        protected WebElement auditLogLink = Locator.linkWithText("audit log").findWhenNeeded(this);
+        protected WebElement authenticationLink = Locator.linkWithText("authentication").findWhenNeeded(this);
+        protected WebElement configureFooterLink = Locator.linkWithText("configure footer").findWhenNeeded(this);
+        protected WebElement configureHeaderLink = Locator.linkWithText("configure header").findWhenNeeded(this);
+        protected WebElement emailCustomizationLink = Locator.linkWithText("email customization").findWhenNeeded(this);
         protected WebElement filesLink = Locator.linkWithText("files").findWhenNeeded(this);
+        protected WebElement fullTextSearchLink = Locator.linkWithText("full-text search").findWhenNeeded(this);
+        protected WebElement lookAndFeelSettingsLink = Locator.linkWithText("look and feel settings").findWhenNeeded(this);
+        protected WebElement profilerLink = Locator.linkWithText("profiler").findWhenNeeded(this);
+        protected WebElement runningThreadsLink = Locator.linkWithText("running threads").findWhenNeeded(this);
+        protected WebElement siteSettingsLink = Locator.linkWithText("site settings").findWhenNeeded(this);
+        protected WebElement siteWideTermsLink = Locator.linkContainingText("site-wide terms of use").findWhenNeeded(this);
+        protected WebElement systemMaintenanceLink = Locator.linkWithText("system maintenance").findWhenNeeded(this);
+        protected WebElement systemPropertiesLink = Locator.linkContainingText("system properties").findWhenNeeded(this);
+        protected WebElement viewsAndScriptingLink = Locator.linkWithText("views and scripting").findWhenNeeded(this);
 
         protected List<WebElement> findActiveUsers()
         {

@@ -673,8 +673,7 @@ public class MessagesLongTest extends BaseWebDriverTest
     private void modifyTemplate(boolean modify)
     {
         String emailTemplate;
-        goToAdminConsole();
-        clickAndWait(Locator.linkWithText("email customization"));
+        goToAdminConsole().clickEmailCustomization();
         selectOptionByText(Locator.css("select[id='templateClass']"), "Message board notification");
         if(modify)
         {
