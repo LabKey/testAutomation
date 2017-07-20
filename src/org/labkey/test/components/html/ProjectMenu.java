@@ -73,14 +73,34 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public void navigateToProject(String projectName)
     {
         open();
-        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getMenuItem(projectName).click());
+        getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
+        getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
+        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getNavigationLink(projectName).click());
     }
 
-    public void navigateToSubFolder(String projectName, String subFolder)
+    public void navigateToFolder(String projectName, String folder)
     {
         open();
+        getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
         getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
-        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderPageLink(subFolder).click());
+
+        getWrapper().waitFor(()-> newElementCache().folderListContainer.isDisplayed(), 1000);
+
+        getWrapper().waitFor(()-> {
+            if (folderLinkIsVisible(projectName, folder))
+                return true;
+            else    // expand any collapsed expandos
+            {
+                WebElement expando = Locator.tagWithClass("li", "clbl collapse-folder")
+                        .child(Locator.tagWithClass("span", "marked"))         // expandos are 'clbl expand-folder' when opened
+                        .findElementOrNull(newElementCache().folderListContainer);
+                if (expando != null)
+                    expando.click();
+            }
+            return false;
+        }, WAIT_FOR_JAVASCRIPT);
+
+        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getNavigationLink(folder).click());
     }
 
     public boolean projectLinkExists(String projectName)
@@ -88,6 +108,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         open();
         return Locator.tag("li").childTag("a").withText(projectName).notHidden()
                 .findElementOrNull(newElementCache().menu) != null;
+    }
+
+    public boolean folderLinkIsVisible(String projectName, String folderName)
+    {
+        return Locator.tag("li").childTag("a").withText(folderName).notHidden()
+                .findElementOrNull(newElementCache().folderListContainer) != null;
     }
 
     @Override
@@ -116,9 +142,9 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
         WebElement getMenuItem(String text)
         {
-            return Locator.tag("li").childTag("a").withText(text).notHidden().findElement(menu);
+            return Locator.tag("li").childTag("a").withAttribute("data-field", text).notHidden().waitForElement(menu, WAIT_FOR_JAVASCRIPT);
         }
-        WebElement getFolderPageLink(String text)
+        WebElement getNavigationLink(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer, WAIT_FOR_JAVASCRIPT);
         }
