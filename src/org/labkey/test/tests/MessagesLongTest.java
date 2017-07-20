@@ -27,6 +27,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.util.Ext4Helper;
@@ -45,6 +46,7 @@ import static org.labkey.test.Locator.NBSP;
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
     private static final String MSG1_BODY = "this is a test message to Banana";
@@ -385,8 +387,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         waitForElementToDisappear(Ext4Helper.Locators.window("Update complete"));
         new DataRegionTable(usersDataRegion, getDriver()).checkCheckboxByPrimaryKey(_messageUserId);
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
-        click(Locator.lkButton(USERS_UPDATE_BUTTON));
-        waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+                    .withDescendant(Locator.lkButton(USERS_UPDATE_BUTTON)).findElement(getDriver())
+                    ).clickMenuButton(false, false,"For Messages");
+        }else
+        {
+            click(Locator.lkButton(USERS_UPDATE_BUTTON));
+            waitAndClick(Locator.menuItem(MESSAGES_MENU_ITEM));
+        }
         _ext4Helper.selectComboBoxItem(NEW_SETTING_LABEL, userSettingNew);
         clickButton(POPUP_UPDATE_BUTTON, 0);
         waitForText("Are you sure");
@@ -435,7 +445,9 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
         verifyMemberList();
-        assertElementPresent(Locator.tagWithName("table", "webpart").append(Locator.tag("td").withText("Assigned" + NBSP + "To: " + displayNameFromEmail(USER3))));
+        assertElementPresent(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithName("div", "webpart").withDescendant(Locator.tag("td").withText("Assigned" + NBSP + "To: " + displayNameFromEmail(USER3))) :
+                Locator.tagWithName("table", "webpart").append(Locator.tag("td").withText("Assigned" + NBSP + "To: " + displayNameFromEmail(USER3))));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
 
@@ -601,12 +613,16 @@ public class MessagesLongTest extends BaseWebDriverTest
         Locator subscribeButton = Locator.tagWithText("span", "subscribe");
         assertElementPresent(subscribeButton);
         click(subscribeButton);
-        clickAndWait(Locator.tagWithText("span", "thread"));
+        clickAndWait(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithText("a", "thread") :
+                Locator.tagWithText("span", "thread"));
         clickAndWait(Locator.linkWithText("unsubscribe"));
         assertElementPresent(subscribeButton);
 
         click(subscribeButton);
-        clickAndWait(Locator.tagWithText("span", "forum"));
+        clickAndWait(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithText("a", "forum") :
+                Locator.tagWithText("span", "forum"));
         clickButton("Update");
         clickButton("Done");
 
