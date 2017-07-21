@@ -1847,18 +1847,13 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
         try
         {
-            longWait().until(new Predicate<WebDriver>()
+            longWait().until((Predicate<WebDriver>) webDriver ->
             {
-                @Override
-                public boolean apply(@Nullable WebDriver webDriver)
-                {
-                    if (titleName == null && searchResults.getResultCount().equals(expectedResults) ||
-                            titleName != null && isElementPresent(Locator.linkContainingText(titleName)))
-                        return true;
-                    else
-                        refresh();
-                    return false;
-                }
+                if (titleName == null && searchResults.getResultCount().equals(expectedResults) ||
+                        titleName != null && isElementPresent(Locator.linkContainingText(titleName)))
+                    return true;
+                refresh();
+                return false;
             });
         }
         catch (TimeoutException ignore) {}

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pages.search;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ComponentElements;
 import org.labkey.test.components.search.SearchForm;
@@ -66,12 +65,12 @@ public class SearchResultsPage extends LabKeyPage
 
         WebElement resultsCount()
         {
-            return Locator.css("table.labkey-search-results-counts td").index(0).findElement(this);
+            return Locator.css(".labkey-search-results-counts div").index(0).findElement(this);
         }
 
         WebElement pageCount()
         {
-            return Locator.css("table.labkey-search-results-counts td").index(1).findElement(this);
+            return Locator.css(".labkey-search-results-counts div").index(1).findElement(this);
         }
     }
 }
