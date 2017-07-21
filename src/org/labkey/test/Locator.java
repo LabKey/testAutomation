@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import com.google.common.base.Function;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
@@ -158,6 +159,19 @@ public abstract class Locator
                 return els.get(0);
         }
         throw new NoSuchElementException(description + " not found");
+    }
+
+    @Nullable
+    public static WebElement findAnyElementOrNull(String description, SearchContext context, final Locator... locators)
+    {
+        List<WebElement> els;
+        for (Locator loc : locators)
+        {
+            els = loc.findElements(context);
+            if (!els.isEmpty())
+                return els.get(0);
+        }
+        return null;
     }
 
     public abstract Locator containing(String contains);
