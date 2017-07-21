@@ -78,18 +78,17 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getNavigationLink(projectName).click());
     }
 
+    /* Will navigate to a folder or subfolder of the specified project */
     public void navigateToFolder(String projectName, String folder)
     {
-        open();
+        open();                                     // selecting the project (menu item) will reveal the nav link in the right pane
         getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
         getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
 
-        getWrapper().waitFor(()-> newElementCache().folderListContainer.isDisplayed(), 1000);
-
         getWrapper().waitFor(()-> {
-            if (folderLinkIsVisible(projectName, folder))
+            if (navigationLinkIsVisible(folder))
                 return true;
-            else    // expand any collapsed expandos
+            else    // expand any collapsed expandos until the navigation link becomes clickable
             {
                 WebElement expando = Locator.tagWithClass("li", "clbl collapse-folder")
                         .child(Locator.tagWithClass("span", "marked"))         // expandos are 'clbl expand-folder' when opened
@@ -103,6 +102,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         getWrapper().doAndWaitForPageToLoad(()->newElementCache().getNavigationLink(folder).click());
     }
 
+    /* This is a way to discover via the UI if the specified project exists (or did the last time the
+        * UI refreshed). */
     public boolean projectLinkExists(String projectName)
     {
         open();
@@ -110,10 +111,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
                 .findElementOrNull(newElementCache().menu) != null;
     }
 
-    public boolean folderLinkIsVisible(String projectName, String folderName)
+    /* real-time check to see if the destination nav-link (folder or project) is present and visible*/
+    public boolean navigationLinkIsVisible(String navigationLinkText)
     {
-        return Locator.tag("li").childTag("a").withText(folderName).notHidden()
-                .findElementOrNull(newElementCache().folderListContainer) != null;
+        WebElement linkElement = Locator.tag("li").childTag("a").withText(navigationLinkText).notHidden()
+                .findElementOrNull(newElementCache().folderListContainer);
+        return linkElement != null && linkElement.isDisplayed();
     }
 
     @Override
