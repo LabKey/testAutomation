@@ -32,6 +32,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 @Category({DailyA.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
@@ -177,8 +180,12 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _extHelper.clickMenuButton(false, "JavaScript Menu Button", "JavaScript Menu2", "JavaScript Fly Out");
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT3_TEXT);
 
-        assertButtonNotPresent(METADATA_GET_BUTTON);
-        assertButtonNotPresent(METADATA_LINK_BUTTON);
+        assertEquals("expect get button to be disabled",
+                "labkey-disabled-button",
+                Locator.lkButton(METADATA_GET_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("class"));    // it's there, just not enabled
+        assertEquals("expect get button to be disabled",
+                "labkey-disabled-button",
+                Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("class"));
 
         buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
         // wait for the button to enable:
