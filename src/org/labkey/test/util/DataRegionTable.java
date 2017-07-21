@@ -1494,6 +1494,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return false;
     }
 
+    @Deprecated
     public void clickInsertNewRowDropdown()
     {
         clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", "Insert New Row");
@@ -1504,6 +1505,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         clickHeaderMenu("Insert", "Import Bulk Data");
     }
 
+    @Deprecated
     public void clickInsertNewRowButton()
     {
         if (IS_BOOTSTRAP_LAYOUT)
@@ -1514,6 +1516,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             elements().getHeaderButton("Insert New Row").click();
         }
+    }
+
+    /* sometimes 'insert new row' is a top-level button, other times it's a dropdown
+    *  under an 'insert data' top-level button. This handles either case. */
+    public void clickInsertNewRow()
+    {
+        String insertNewRowText =  "Insert New Row";
+        if (elements().getAllHeaderButtons().contains(insertNewRowText))
+            elements().getHeaderButton("Insert New Row").click();
+        else
+            clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", insertNewRowText);
     }
 
     public void clickDeleteAllButton()
