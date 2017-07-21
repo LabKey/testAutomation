@@ -1523,7 +1523,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void clickInsertNewRow()
     {
         String insertNewRowText =  "Insert New Row";
-        if (elements().getAllHeaderButtons().contains(insertNewRowText))
+        if (elements().getHeaderButtonOrNull(insertNewRowText) != null)
             elements().getHeaderButton("Insert New Row").click();
         else
             clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", insertNewRowText);
@@ -1757,6 +1757,24 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             {
                 String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
                 headerButtons.put(text, Locator.findAnyElement(
+                        "Button with title or text: " + text,
+                        buttonBar,
+                        Locator.lkButton().withAttribute("title", title),
+                        Locator.lkButton(text),
+                        Locator.tagWithAttribute("a", "data-original-title", title)));
+            }
+            return headerButtons.get(text);
+        }
+
+        protected WebElement getHeaderButtonOrNull(String text)
+        {
+            if (headerButtons == null)
+                headerButtons = new CaseInsensitiveHashMap<>();
+
+            if (!headerButtons.containsKey(text) || headerButtons.containsKey(text) && headerButtons.get(text) != null)
+            {
+                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
+                headerButtons.put(text, Locator.findAnyElementOrNull(
                         "Button with title or text: " + text,
                         buttonBar,
                         Locator.lkButton().withAttribute("title", title),
