@@ -519,6 +519,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             goToAdminConsole().clickSystemMaintenance();
 
+            waitFor(()-> Locator.name("enableSystemMaintenance").findElementOrNull(getDriver()) != null, WAIT_FOR_JAVASCRIPT );
             if (enable)
                 checkCheckbox(Locator.name("enableSystemMaintenance"));
             else
