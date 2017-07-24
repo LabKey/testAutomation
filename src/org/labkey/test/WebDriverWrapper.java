@@ -542,7 +542,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
             longWait().until(ExpectedConditions.elementToBeClickable(Locators.UX_ADMIN_MENU_TOGGLE.toBy()));
-            clickMenuButton(true, Locators.UX_ADMIN_MENU_TOGGLE.waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), false, items);
+            new SiteNavBar(getDriver()).clickAdminMenuItem(true, false, items);
         }
         else
         {
@@ -612,7 +612,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return null;
     }
 
-    // Click on a module listed on the admin menu
+    // Click on a module listed on the admin menu;
+    /**
+     * @deprecated Use {@link SiteNavBar#goToModule(String)} when using bootstrap layout
+     */
+    @Deprecated
     public void goToModule(String moduleName)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
