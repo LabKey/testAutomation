@@ -21,20 +21,24 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyC;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Category({InDevelopment.class})
+@Category({DailyC.class})
 public class AnnouncementsPermissionTest extends BaseWebDriverTest
 {
+
     PortalHelper portalHelper = new PortalHelper(this);
     public static final String NOT_CONTRIBUTOR_ONLY_TITLE = "Not-Contributor-only title";
     public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
     private static final String CONTRIBUTOR = "contributor@messages.test";
     private static final String MSG5_TITLE = "test message 5";
+    private String TEST_GROUP = "contributorTestGroup";
+    private String PERMISSION = "Message Board Contributor";
 
     @BeforeClass
     public static void setupProject()
@@ -59,8 +63,9 @@ public class AnnouncementsPermissionTest extends BaseWebDriverTest
     public void doTestMessageContributorRole()
     {
         clickProject(getProjectName());
-        createUserWithPermissions(CONTRIBUTOR, getProjectName(), "Message Board Contributor");
-        clickButton("Save and Finish");
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
+        permissionsHelper.createPermissionsGroup(TEST_GROUP, CONTRIBUTOR);
+        permissionsHelper.setPermissions(TEST_GROUP, PERMISSION);
 
         //As other role add a message
         clickProject(getProjectName());
