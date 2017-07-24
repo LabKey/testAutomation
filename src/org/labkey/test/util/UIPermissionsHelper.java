@@ -19,7 +19,6 @@ import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.PermissionsEditor;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
@@ -27,7 +26,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -53,9 +51,9 @@ public class UIPermissionsHelper extends PermissionsHelper
     {
         _test.goToHome();
         _driver.goToSiteGroups();
-        if(_driver.isElementPresent(Locator.tagWithText("div", groupName)))
+        if (_driver.isElementPresent(Locator.tagWithText("div", groupName)))
         {
-            if(failIfAlreadyExists)
+            if (failIfAlreadyExists)
                 throw new IllegalArgumentException("Group already exists: " + groupName);
             else
                 return;
@@ -298,7 +296,7 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public void removeUserFromGroup(String groupName, String userName)
     {
-        if(!_driver.isTextPresent("Group " + groupName))
+        if (!_driver.isTextPresent("Group " + groupName))
             selectGroup(groupName);
 
         Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
@@ -308,7 +306,7 @@ public class UIPermissionsHelper extends PermissionsHelper
 
     public boolean selectGroup(String groupName, boolean failIfNotFound)
     {
-        if(!_driver.isElementPresent(Locator.css(".x4-tab-active").withText("Site Groups")))
+        if (!_driver.isElementPresent(Locator.css(".x4-tab-active").withText("Site Groups")))
             _driver.goToSiteGroups();
 
         _driver.waitForElement(Locator.css(".groupPicker .x4-grid-body"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -368,7 +366,7 @@ public class UIPermissionsHelper extends PermissionsHelper
         clickManageGroup(groupName);
 
         StringBuilder namesList = new StringBuilder();
-        for(String member : memberNames)
+        for (String member : memberNames)
         {
             namesList.append(member).append("\n");
         }
@@ -383,7 +381,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     public void openGroupPermissionsDisplay(String groupName)
     {
         _driver._ext4Helper.clickTabContainingText("Project Groups");
-        // warning Adminstrators can apper multiple times
+        // warning Administrators can appear multiple times
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
         Ext4CmpRef ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
@@ -402,7 +400,7 @@ public class UIPermissionsHelper extends PermissionsHelper
     public void clickManageSiteGroup(String groupName, BaseWebDriverTest _test)
     {
         _driver._ext4Helper.clickTabContainingText("Site Groups");
-        // warning Adminstrators can apper multiple times
+        // warning Administrators can appear multiple times
         List<Ext4CmpRef> refs = _driver._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
         Ext4CmpRef ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");

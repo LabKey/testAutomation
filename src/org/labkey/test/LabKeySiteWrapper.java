@@ -50,7 +50,6 @@ import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.components.internal.ImpersonateGroupWindow;
 import org.labkey.test.components.internal.ImpersonateRoleWindow;
 import org.labkey.test.components.internal.ImpersonateUserWindow;
-import org.labkey.test.pages.core.admin.CustomizeSitePage;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
@@ -456,7 +455,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (PasswordUtil.getUsername().equals(username))
             throw new IllegalArgumentException("Don't change the primary site admin user's password");
 
-        if(resetUrl!=null)
+        if (resetUrl != null)
             beginAt(resetUrl);
 
         assertTextPresent(username, "Choose a password you'll use to access this server", "six non-whitespace characters or more, cannot match email address");
@@ -466,7 +465,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         clickButton("Set Password");
 
-        if(!isElementPresent(Locator.id("userMenuPopupLink")))
+        if (!isElementPresent(Locator.id("userMenuPopupLink")))
         {
             if (isButtonPresent("Submit"))
                     clickButtonContainingText("Submit", defaultWaitForPage*3);
@@ -499,7 +498,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     protected void changeUserEmail(String userEmail, String newUserEmail)
     {
         log("Attempting to change user email from " + userEmail + " to " + newUserEmail);
-
 
         goToSiteUsers();
         clickAndWait(Locator.linkContainingText(displayNameFromEmail(userEmail)));
@@ -886,7 +884,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         {
             beginAt(buildURL("admin", "showErrorsSinceMark"));
             resetErrors();
-            if(serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
+            if (serverErrors.toLowerCase().contains(CLIENT_SIDE_ERROR.toLowerCase()))
                 fail("There were client-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
             else
                 fail("There were server-side errors during the test run. Check labkey.log and/or labkey-errors.log for details.");
@@ -1001,6 +999,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     private PasswordRule oldStrength = null;
     private PasswordExpiration oldExpiration = null;
+
     protected void setDbLoginConfig(PasswordRule strength, PasswordExpiration expiration)
     {
         PasswordRule curStrength = null;
@@ -1124,7 +1123,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    @LogMethod (quiet = true)
+    @LogMethod(quiet = true)
     public void enableEmailRecorder()
     {
         assertEquals("Failed to enable email recording", HttpStatus.SC_OK, getHttpResponse(WebTestHelper.buildURL("dumbster", "setRecordEmail", Maps.of("record", "true"))).getResponseCode());
@@ -1166,7 +1165,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void disableLoginAttemptLimit()
     {
         goToAdminConsole().goToAdminConsoleLinksSection();
-        if(isElementPresent(Locator.linkWithText("Compliance Settings")))
+        if (isElementPresent(Locator.linkWithText("Compliance Settings")))
         {
             log("Compliance module present, ensuring login attempt limit is off");
             clickAndWait(Locator.linkWithText("Compliance Settings"));

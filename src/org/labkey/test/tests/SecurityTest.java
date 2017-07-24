@@ -19,6 +19,9 @@ package org.labkey.test.tests;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.reader.Readers;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -39,7 +42,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -123,6 +128,7 @@ public class SecurityTest extends BaseWebDriverTest
             loginSelfRegistrationDisabledTest();
         }
         passwordResetTest();
+        passwordParameterTest();
     }
 
     protected static final String HISTORY_TAB_TITLE = "History:";
@@ -155,7 +161,8 @@ public class SecurityTest extends BaseWebDriverTest
      * @param longForm if and only if longFrom = true, test against the extended list of admin urls.
      * if longForm = false, test against only a few high priority URLs.
      */
-    @LogMethod protected void cantReachAdminToolFromUserAccount(boolean longForm)
+    @LogMethod
+    protected void cantReachAdminToolFromUserAccount(boolean longForm)
     {
         //verify that you can see the text "history" in the appropriate area as admin.  If this fails, the
         //check below is worthless
@@ -171,18 +178,13 @@ public class SecurityTest extends BaseWebDriverTest
 
         //can't reach admin urls directly either
 
-        for(String url : unreachableUrlsShortList)
-        {
-                assertUrlUnreachableDueToPermissions(url);
-        }
+        for (String url : unreachableUrlsShortList)
+            assertUrlUnreachableDueToPermissions(url);
 
-        if(longForm)
+        if (longForm)
         {
-
-            for(String url : unreachableUrlsExtendedList)
-            {
+            for (String url : unreachableUrlsExtendedList)
                 assertUrlUnreachableDueToPermissions(url);
-            }
         }
 
         ///user/showUsers.view?
@@ -195,7 +197,8 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    @LogMethod public void assertUrlUnreachableDueToPermissions(String url)
+    @LogMethod
+    public void assertUrlUnreachableDueToPermissions(String url)
     {
         log("Attempting to reach URL user does not have permission for:  " + url);
         beginAt(url);
@@ -207,7 +210,8 @@ public class SecurityTest extends BaseWebDriverTest
      * preconditions:  NORMAL_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
      * post conditions
      */
-    @LogMethod public void passwordResetTest()
+    @LogMethod
+    public void passwordResetTest()
     {
         //get user a password
         String username = NORMAL_USER;
@@ -222,13 +226,47 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedInAsPrimaryTestUser();
     }
 
-    @LogMethod private void dumbsterTest()
+    @LogMethod
+    public void passwordParameterTest()
+    {
+        // 31000: fail login actions if parameters present on URL
+        PostCommand command = new PostCommand("login", "loginAPI");
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("email", NORMAL_USER);
+        params.put("password", NORMAL_USER_PASSWORD);
+        params.put("foo", "bar");
+
+        command.setParameters(params);
+        boolean rejectedProperly = false;
+
+        try
+        {
+            Connection cn = createDefaultConnection(false);
+            command.execute(cn, null);
+        }
+        catch (CommandException e)
+        {
+            if ("Invalid request. email and/or password are not allowed on the URL.".equalsIgnoreCase(e.getMessage()))
+                rejectedProperly = true;
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to connect to login-loginAPI.api action.", e);
+        }
+
+        assertTrue("Expected email/password in URL to be rejected.", rejectedProperly);
+    }
+
+    @LogMethod
+    private void dumbsterTest()
     {
         assertNoDumbsterPermission(PROJECT_ADMIN_USER);
         assertNoDumbsterPermission(NORMAL_USER);
     }
 
-    @LogMethod private void assertNoDumbsterPermission(@LoggedParam String user)
+    @LogMethod
+    private void assertNoDumbsterPermission(@LoggedParam String user)
     {
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
@@ -242,9 +280,10 @@ public class SecurityTest extends BaseWebDriverTest
     protected enum PasswordAlterType {RESET_PASSWORD, CHANGE_PASSWORD}
 
     /**
-     * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode
+     * Preconditions: able to reset user's password at resetUrl, db in weak-password mode
      */
-    @LogMethod protected void userPasswordResetTest(String resetUrl)
+    @LogMethod
+    protected void userPasswordResetTest(String resetUrl)
     {
         ensureSignedOut();
 
@@ -257,9 +296,6 @@ public class SecurityTest extends BaseWebDriverTest
         resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
     }
 
-//    protected static final int RESET_PASSWORD = 1;
-//    protected static final int CHANGE_PASSWORD = 2;
-
     /**RESET_PASSWORD means user or admin initiated password change that
      * involves visiting a webpage specified in an email to change the password,
      * without knowing the past password.
@@ -267,7 +303,8 @@ public class SecurityTest extends BaseWebDriverTest
      * selecting "change password".  This requires the old password to work.
       */
 
-    @LogMethod protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
+    @LogMethod
+    protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
     {
         //if reset, should already be at reset Url
         for (int i = 0; i < errors.length; i++)
@@ -280,7 +317,8 @@ public class SecurityTest extends BaseWebDriverTest
         }
     }
 
-    @LogMethod protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
+    @LogMethod
+    protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
     {
         switch (changeType)
         {
@@ -290,7 +328,8 @@ public class SecurityTest extends BaseWebDriverTest
             case RESET_PASSWORD:
                 setFormElement(Locator.id("password"), passwords[0]);
                 String password2 = passwords[1];
-                if(password2==null) password2 = passwords[0];
+                if (password2 == null)
+                    password2 = passwords[0];
                 setFormElement(Locator.id("password2"), password2);
                 clickButton("Set Password");
                 assertTextPresent(errors);
@@ -306,7 +345,8 @@ public class SecurityTest extends BaseWebDriverTest
      * @return URL to use to reset user password
      */
     //issue 3876
-    @LogMethod private String userForgotPasswordWorkflowTest(String username, String password)
+    @LogMethod
+    private String userForgotPasswordWorkflowTest(String username, String password)
     {
         ensureSignedOut();
 
@@ -321,7 +361,8 @@ public class SecurityTest extends BaseWebDriverTest
         return resetUrl;
     }
 
-    @LogMethod public String userInitiatePasswordReset(String username)
+    @LogMethod
+    public String userInitiatePasswordReset(String username)
     {
         goToHome();
         ensureSignedOut();
@@ -348,7 +389,8 @@ public class SecurityTest extends BaseWebDriverTest
      * @param password user's current password (before test starts)
      * @return user's new password
      */
-    @LogMethod private String adminPasswordResetTest(String username, String password)
+    @LogMethod
+    private String adminPasswordResetTest(String username, String password)
     {
         String newPassword = password +"1";
         goToSiteUsers();
@@ -383,7 +425,8 @@ public class SecurityTest extends BaseWebDriverTest
         users.setFilter("Email", "Equals", email);
     }
 
-    @LogMethod protected void addRemoveSiteAdminTest()
+    @LogMethod
+    protected void addRemoveSiteAdminTest()
     {
         // test for issue 13921
         goToSiteAdmins();
@@ -399,7 +442,8 @@ public class SecurityTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-    @LogMethod protected void guestTest()
+    @LogMethod
+    protected void guestTest()
     {
         goToProjectHome();
         _permissionsHelper.enterPermissionsUI();
@@ -424,7 +468,8 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    @LogMethod protected void displayNameTest()
+    @LogMethod
+    protected void displayNameTest()
     {
         String newDisplayName = "changeDisplayTest";
 
@@ -438,7 +483,8 @@ public class SecurityTest extends BaseWebDriverTest
         assertTextNotPresent(newDisplayName);
     }
 
-    @LogMethod protected void clonePermissionsTest()
+    @LogMethod
+    protected void clonePermissionsTest()
     {
         // create admin templates, plus test bogus & duplicate email addresses
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
@@ -478,7 +524,8 @@ public class SecurityTest extends BaseWebDriverTest
         assertNavTrail("Site Users", "User Details", "Permissions");
     }
 
-    @LogMethod protected void checkGroupMembership(String userName, String groupName, int expectedCount)
+    @LogMethod
+    protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
         goToSiteUsers();
 
@@ -504,7 +551,8 @@ public class SecurityTest extends BaseWebDriverTest
         fail("Unable to verify group membership of cloned user privileges");
     }
 
-    @LogMethod protected void tokenAuthenticationTest()
+    @LogMethod
+    protected void tokenAuthenticationTest()
     {
         beginAt("/project/SecurityVerifyProject/begin.view?");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
@@ -611,12 +659,12 @@ public class SecurityTest extends BaseWebDriverTest
 
         if (-1 == index)
             return url;
-        else
-            return url.substring(0, index);
+        return url.substring(0, index);
     }
 
 
-    @LogMethod protected void impersonationTest()
+    @LogMethod
+    protected void impersonationTest()
     {
         String testUserDisplayName = getDisplayName();
 
@@ -659,7 +707,8 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
 
-    @LogMethod protected void passwordStrengthTest()
+    @LogMethod
+    protected void passwordStrengthTest()
     {
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
@@ -713,7 +762,8 @@ public class SecurityTest extends BaseWebDriverTest
         resetDbLoginConfig();
     }
 
-    @LogMethod public void loginSelfRegistrationEnabledTest()
+    @LogMethod
+    public void loginSelfRegistrationEnabledTest()
     {
         // prep: ensure that user does not currently exist in labkey and  self register is enabled
         String selfRegUserEmail = "selfreg@test.labkey.local";
@@ -744,7 +794,8 @@ public class SecurityTest extends BaseWebDriverTest
         signIn();
     }
 
-    @LogMethod public void loginSelfRegistrationDisabledTest()
+    @LogMethod
+    public void loginSelfRegistrationDisabledTest()
     {
         // prep: ensure self register is disabled
         int getResponse = getHttpResponse(WebTestHelper.getBaseURL() + "/login/setAuthenticationParameter.view?parameter=SelfRegistration&enabled=false", PasswordUtil.getUsername(), PasswordUtil.getPassword()).getResponseCode();
