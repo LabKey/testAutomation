@@ -83,7 +83,7 @@ public class DeleteMultipleVisitsPage extends LabKeyPage<DeleteMultipleVisitsPag
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        Locator.XPathLocator visitsTableLoc = Locator.tagWithClass("table", "labkey-data-region");
+        Locator.XPathLocator visitsTableLoc = Locator.tagWithClass("table", "labkey-data-region-legacy");
 
         WebElement errorMsg = Locator.tagWithClass("div", "labkey-error").findWhenNeeded(this);
         WebElement deleteSelectedBtn = Locator.lkButton("Delete Selected").findWhenNeeded(this);
