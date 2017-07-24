@@ -132,6 +132,9 @@ public class DataRegionTest extends BaseWebDriverTest
     {
         createList();
 
+        // Make sure it works with Compliance on (which enables Elec Sign control)
+        _containerHelper.enableModule("Compliance");
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         URL url = getURL();
         dataRegionTest(url, INJECT_CHARS_1);
         dataRegionTest(url, INJECT_CHARS_2);
