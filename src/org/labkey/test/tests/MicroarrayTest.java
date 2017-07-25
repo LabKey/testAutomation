@@ -232,6 +232,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(MAGEML_FILE1));
         assertTextPresent("115468001");
         clickAndWait(Locator.linkWithText("First"));
+        waitForElement(Locator.linkWithText(MAGEML_FILE1));
         assertTextPresent(MAGEML_FILE1, SAMPLE_SET);
         assertTextNotPresent(MAGEML_FILE2);
 
