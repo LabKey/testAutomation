@@ -180,7 +180,7 @@ public class PipelineAnalysisHelper
         _test.waitForRunningPipelineJobs(BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
-    protected void analyzeOrRetry(boolean allowRetry)
+    public void analyzeOrRetry(boolean allowRetry)
     {
         Locator retryButton = Locator.lkButton("Retry");
         if (allowRetry && _test.isElementPresent(retryButton))
