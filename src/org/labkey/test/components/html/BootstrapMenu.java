@@ -55,12 +55,25 @@ public class BootstrapMenu extends Component
         return expandedAttribute != null && expandedAttribute.equals("true");
     }
 
+    public void expand()
+    {
+        if (!isExpanded())
+            elements().toggleAnchor.click();
+        _driver.waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void collapse()
+    {
+        if (isExpanded())
+            elements().toggleAnchor.click();
+        _driver.waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+    }
+
     @LogMethod(quiet = true)
     public WebElement clickMenuButton(boolean wait, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
-        if (!isExpanded())
-        getComponentElement().click();
-        _driver.waitFor(()-> isExpanded(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        expand();
+
         if (onlyOpen && subMenuLabels.length == 0)
             return null;
 
