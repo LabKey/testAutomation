@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.search;
 
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -24,7 +25,6 @@ import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.SearchHelper;
-import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -37,7 +37,9 @@ public class SearchForm extends Component
     public SearchForm(WebDriver driver, SearchContext parent)
     {
         _driver = new WebDriverWrapperImpl(driver);
-        _componentElement = parent.findElement(By.cssSelector(".labkey-search-form"));
+        _componentElement = Locator.xpath(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                "//*[@class=' lk-search-form']" :
+                "//*[@class='labkey-search-form']").findElement(parent);
     }
 
     @Override
@@ -72,12 +74,18 @@ public class SearchForm extends Component
 
         private WebElement searchBox()
         {
-            return Locator.id("query").findElement(getContext());
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+                return Locator.input("q").findElement(getContext());
+            else
+                return Locator.id("query").findElement(getContext());
         }
 
         private WebElement searchButton()
         {
-            return Locator.lkButton("Search").findElement(getContext());
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+                return Locator.tagWithClass("a", "search-overlay fa fa-search").findElement(getContext());
+            else
+                return Locator.lkButton("Search").findElement(getContext());
         }
 
         private WebElement helpLink()
