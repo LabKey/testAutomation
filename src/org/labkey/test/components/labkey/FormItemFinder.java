@@ -16,6 +16,7 @@
 package org.labkey.test.components.labkey;
 
 import org.jetbrains.annotations.NotNull;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.html.FormItem;
@@ -74,7 +75,7 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
     @Override
     protected Locator locator()
     {
-        Locator.XPathLocator itemTd = labelLoc().followingSibling("td").position(1);
+        Locator.XPathLocator itemTd = labelLoc().followingSibling(LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? "div" : "td").position(1);
         if (name != null && !name.isEmpty())
             return itemTd.child(Locator.tagWithName(itemTag(), name));
         else
@@ -83,7 +84,9 @@ public abstract class FormItemFinder<C> extends Component.ComponentFinder<Search
 
     protected Locator.XPathLocator labelLoc()
     {
-        Locator.XPathLocator loc = Locator.tag("td").withAttributeContaining("class", "labkey-form-label"); // Includes 'labkey-form-label-nowrap'
+        Locator.XPathLocator loc = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClass("label", "control-label") :
+                Locator.tag("td").withAttributeContaining("class", "labkey-form-label"); // Includes 'labkey-form-label-nowrap'
         if (partialText) // Don't match nested elements (e.g. '?' for help)
         {
             if (labelText.isEmpty())
