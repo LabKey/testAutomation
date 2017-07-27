@@ -235,7 +235,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _exportHelper;
     }
 
-    public DataRegionExportHelper expandExportPanel()
+    public AbstractDataRegionExportOrSignHelper expandExportPanel()
     {
         return _exportHelper.expandExportPanel();
     }

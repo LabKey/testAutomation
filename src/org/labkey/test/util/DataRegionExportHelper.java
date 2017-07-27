@@ -18,47 +18,17 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
-import org.labkey.test.components.Component;
-import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.selenium.LazyWebElement;
-import org.labkey.test.selenium.RefindingWebElement;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.function.Consumer;
 
-public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportHelper.Elements>
+public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 {
-    private final WebElement panelEl;
-    private final DataRegionTable _drt;
-    private int _expectedFileCount;
-
     public DataRegionExportHelper(DataRegionTable drt)
     {
-        panelEl = new RefindingWebElement(Locator.name("Export-panel"), drt.getComponentElement())
-                .withRefindListener(el -> clearElementCache());
-        _drt = drt;
-        _expectedFileCount = 1;
-    }
-
-    @Override
-    public WebElement getComponentElement()
-    {
-        return panelEl;
-    }
-
-    @Override
-    protected WebDriver getDriver()
-    {
-        return _drt.getDriver();
-    }
-
-    public void setExpectedFileCount(int count)
-    {
-        _expectedFileCount = count;
+        super(drt, Locator.name("Export-panel"));
     }
 
     public File exportExcel(ExcelFileType type)
@@ -68,13 +38,8 @@ public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportH
 
     public File exportExcel(ColumnHeaderType exportHeaderType, ExcelFileType type, @Nullable Boolean exportSelected)
     {
-        expandExportPanel();
-        elementCache().excelTab.click();
-        if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        getWrapper().checkRadioButton(type.getRadioLocator());
-        getWrapper().selectOptionByValue(Locator.name("xls_header_type"), exportHeaderType.name());
-        getWrapper().scrollIntoView(Locator.lkButton("Export to Excel"));
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
+        exportOrSignExcel(exportHeaderType, type, exportSelected);
+        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getExcelActionButtonText()), _expectedFileCount)[0];
     }
 
     public File exportText()
@@ -94,13 +59,8 @@ public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportH
 
     public File exportText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
-        expandExportPanel();
-        elementCache().textTab.click();
-        if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        getWrapper().selectOptionByValue(Locator.name("delim"), delim.toString());
-        getWrapper().selectOptionByValue(Locator.name("quote"), quote.toString());
-        getWrapper().selectOptionByValue(Locator.name("txt_header_type"), exportHeaderType.name());
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton("Export to Text"), _expectedFileCount)[0];
+        exportOrSignText(exportHeaderType, delim, quote, exportSelected);
+        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getTextActionButtonText()), _expectedFileCount)[0];
     }
 
     public String exportScript(ScriptExportType type)
@@ -125,90 +85,9 @@ public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportH
         return scriptText;
     }
 
-    public DataRegionExportHelper expandExportPanel()
+    public AbstractDataRegionExportOrSignHelper expandExportPanel()
     {
-        if (!isExportPanelExpanded())
-        {
-            getWrapper().doAndWaitForPageSignal(() ->
-                    _drt.clickHeaderButtonByText("Export"),
-                    DataRegionTable.PANEL_SHOW_SIGNAL);
-        }
-        return this;
-    }
-
-    private boolean isExportPanelExpanded()
-    {
-        try
-        {
-            return getComponentElement().isDisplayed();
-        }
-        catch (NoSuchElementException notCreated)
-        {
-            return false;
-        }
-    }
-
-    private void chooseExportSelectedRows(boolean exportSelected)
-    {
-        if (exportSelected)
-            getWrapper().checkCheckbox(elementCache().exportSelectedCheckbox);
-        else
-            getWrapper().uncheckCheckbox(elementCache().exportSelectedCheckbox);
-    }
-
-    protected DataRegionTable getDataRegionTable()
-    {
-        return _drt;
-    }
-
-    public enum ExcelFileType
-    {
-        XLSX(0),
-        XLS(1),
-        IQY(2);
-
-        private Locator fileTypeRadio;
-
-        ExcelFileType(int radioIndex)
-        {
-            fileTypeRadio = Locator.radioButtonByName("excelExportType").index(radioIndex);
-        }
-
-        public Locator getRadioLocator()
-        {
-            return fileTypeRadio;
-        }
-
-        public String getFileExtension()
-        {
-            return name().toLowerCase();
-        }
-    }
-
-    public enum TextSeparator
-    {
-        TAB("tsv"),
-        COMMA("csv"),
-        COLON("csv"),
-        SEMICOLON("csv");
-
-        private String fileExtension;
-
-        TextSeparator(String ext)
-        {
-            fileExtension = ext;
-        }
-
-        public String getFileExtension()
-        {
-            return fileExtension;
-        }
-    }
-
-    public enum TextQuote
-    {
-        DOUBLE,
-        SINGLE
+        return expandExportOrSignPanel();
     }
 
     public enum ScriptExportType
@@ -237,15 +116,45 @@ public class DataRegionExportHelper extends WebDriverComponent<DataRegionExportH
     @Override
     protected Elements newElementCache()
     {
-        return new Elements();
+        Elements elements = new Elements();
+        elements.navTabs = new LazyWebElement(Locator.css("ul.nav-tabs"), this);
+        elements.excelTab = new LazyWebElement(Locator.linkWithText("Excel"), elements.navTabs);
+        elements.textTab = new LazyWebElement(Locator.linkWithText("Text"), elements.navTabs);
+        elements.scriptTab = new LazyWebElement(Locator.linkWithText("Script"), elements.navTabs);
+        elements.exportSelectedCheckbox = new EphemeralWebElement(Locator.css("div.tab-pane.active input[value=exportSelected]"), this);
+        return elements;
     }
 
-    protected class Elements extends Component.ElementCache
+    protected String getMainButtonText()
     {
-        public WebElement navTabs = new LazyWebElement(Locator.css("ul.nav-tabs"), this);
-        public WebElement excelTab = new LazyWebElement(Locator.linkWithText("Excel"), navTabs);
-        public WebElement textTab = new LazyWebElement(Locator.linkWithText("Text"), navTabs);
-        public WebElement scriptTab = new LazyWebElement(Locator.linkWithText("Script"), navTabs);
-        public WebElement exportSelectedCheckbox = new EphemeralWebElement(Locator.css("div.tab-pane.active input[value=exportSelected]"), this);
+        return "Export";
+    }
+    protected String getExcelActionButtonText()
+    {
+        return "Export to Excel";
+    }
+    protected String getTextActionButtonText()
+    {
+        return "Export to Text";
+    }
+    protected String getXlsHeaderTypeName()
+    {
+        return "xls_header_type";
+    }
+    protected String getTextHeaderTypeName()
+    {
+        return "txt_header_type";
+    }
+    protected String getXlsFileTypeRadioName()
+    {
+        return "excelExportType";
+    }
+    protected String getDelimName()
+    {
+        return "delim";
+    }
+    protected String getQuoteName()
+    {
+        return "quote";
     }
 }

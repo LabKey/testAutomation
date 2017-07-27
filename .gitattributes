@@ -791,6 +791,7 @@ src/org/labkey/test/util/APITestHelper.java -text
 src/org/labkey/test/util/APIUserHelper.java -text
 src/org/labkey/test/util/AbstractAssayHelper.java -text
 src/org/labkey/test/util/AbstractContainerHelper.java -text
+src/org/labkey/test/util/AbstractDataRegionExportOrSignHelper.java -text
 src/org/labkey/test/util/AbstractUserHelper.java -text
 src/org/labkey/test/util/AdvancedSqlTest.java -text
 src/org/labkey/test/util/ApiPermissionsHelper.java -text
@@ -802,6 +803,7 @@ src/org/labkey/test/util/ChartHelper.java -text
 src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
+src/org/labkey/test/util/DataRegionElecSignHelper.java -text
 src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DatasetDesignerPage.java -text
