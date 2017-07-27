@@ -54,7 +54,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     {
         importStudy();
 
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         portalHelper.addWebPart("Data Views");
         BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), "Data Views");
         dataViewsWebPart.moveUp();
@@ -71,38 +71,38 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
         _permissionsHelper.setPermissions("Editor Group", "Editor");
         createUserInProjectForGroup(EDITOR_USER, "StudyVerifyProject", "Editor Group", false);
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Author Group");
         _permissionsHelper.assertPermissionSetting("Author Group", "No Permissions");
         _permissionsHelper.setPermissions("Author Group", "Author");
         createUserInProjectForGroup(AUTHOR_USER, "StudyVerifyProject", "Author Group", false);
 
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 1");
         clickButton("Create View", defaultWaitForPage);
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 2");
         clickButton("Create View", defaultWaitForPage);
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 3");
         clickButton("Create View", defaultWaitForPage);
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 4");
         clickButton("Create View", defaultWaitForPage);
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         portalHelper.removeWebPart("Views");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 1");
@@ -111,7 +111,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 1","Save",0,0);
         _ext4Helper.waitForMaskToDisappear();
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 2");
         _ext4Helper.selectComboBoxItem("Author","author");
@@ -119,7 +119,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         sleep(1000);
         _ext4Helper.clickWindowButton("Report 2","Save",0,0);
         _ext4Helper.waitForMaskToDisappear();
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 3");
         _ext4Helper.selectComboBoxItem("Author","editor");
@@ -140,7 +140,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         stopImpersonating();
 
         clickProject("StudyVerifyProject");
-        clickFolder("My Study");
+        clickFolder(getFolderName());
         sleep(500);
         impersonate(AUTHOR_USER);
         PortalHelper portalHelper1 = new PortalHelper(this);
