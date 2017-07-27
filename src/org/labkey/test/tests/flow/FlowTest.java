@@ -130,8 +130,8 @@ public class FlowTest extends BaseFlowTest
         result = new DataRegionTable("query", getDriver());
         WebElement editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
-        assertEquals("Expected ","Selected Files:", getTableCellText(new Locator.IdLocator("keywordTable"),3,0 ));
-        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(new Locator.IdLocator("keywordTable"),3,1 ));
+        assertEquals("Expected ","Selected Files:", getTableCellText(new Locator.IdLocator("keywordTable"),2,0 ));
+        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(new Locator.IdLocator("keywordTable"),2,1 ));
 
         Locator locTubeName = Locator.xpath("//td/input[@type='hidden' and @value='TUBE NAME']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locTubeName, "FlowTest Keyword Tube Name");
@@ -179,10 +179,11 @@ public class FlowTest extends BaseFlowTest
         locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locNewValue, newKeywordValue);
         clickButton("update");
+
         assertTextPresent("Missing name for value 'No name'");
-        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
+        locNewName = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
         String newKeywordTestName = "New Name Test";
-        setFormElement(locNewValue, newKeywordTestName);
+        setFormElement(locNewName, newKeywordTestName);
         clickButton("update");
         assertTextPresent("FCSFiles");
 
@@ -193,12 +194,17 @@ public class FlowTest extends BaseFlowTest
         result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
         editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
+
+        Locator locNewNameTestValue = Locator.xpath("//td/input[@type='hidden' and @value='New Name Test' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
+        setFormElement(locNewNameTestValue, "original");
+
         click(Locator.tagWithClassContaining("i", "add-new-keyword"));
         locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locNewValue, newKeywordValue);
-        locNewValue = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
-        setFormElement(locNewValue, newKeywordTestName);
+        locNewName = Locator.xpath("//td/input[@type='text' and @value='' and @name='ff_keywordName']");
+        setFormElement(locNewName, newKeywordTestName);
         clickButton("update");
+
         locNewValue = Locator.xpath("//td/input[@type='text' and @value='New Name Test' and @name='ff_keywordName']");
         String newNameTestDup = "New Name Test Dup";
         setFormElement(locNewValue, newNameTestDup);
@@ -211,7 +217,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
-        confirmKeywordValue(newNameTestDup, newKeywordValue);
+        confirmKeywordValue(newNameTestDup, "original");
 
         beginAtFCSFileQueryView();
 
@@ -219,7 +225,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
-        confirmKeywordValue(newNameTestDup, newKeywordValue);
+        confirmKeywordValue(newNameTestDup, "original");
 
     }
 
