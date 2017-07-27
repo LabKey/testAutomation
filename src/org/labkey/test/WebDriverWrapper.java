@@ -2734,7 +2734,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // check for Ext button:
                 Locator.extButton(text).index(index),
                 // check for normal html button:
-                Locator.button(text).index(index)
+                Locator.button(text).index(index),
+                // check for bootstrap button
+                Locator.bootstrapButton("button", text).index(index),
+                // check for bootstrap anchor
+                Locator.bootstrapButton("a", text).index(index),
+                //check for bootstrap input
+                Locator.bootstrapButton("input", text).index(index)
+
         };
 
         try
@@ -2759,7 +2766,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // normal HTML button:
                 Locator.button(text),
                 // GWT button:
-                Locator.gwtButton(text)
+                Locator.gwtButton(text),
+                // bootstrap button
+                Locator.bootstrapButton("button", text),
+                // bootstrap anchor
+                Locator.bootstrapButton("a", text),
+                // bootstrap input
+                Locator.bootstrapButton("input", text)
         };
 
         try
@@ -2777,7 +2790,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 }
                 catch (NoSuchElementException capsFailed) {}
             }
-            throw new NoSuchElementException("No button found with test " + text, tryCaps);
+            throw new NoSuchElementException("No button found with text " + text, tryCaps);
         }
     }
 
@@ -2791,7 +2804,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // Ext 3 button:
                 Locator.extButtonContainingText(text),
                 // normal HTML button:
-                Locator.buttonContainingText(text)
+                Locator.buttonContainingText(text),
+                // check for bootstrap button
+                Locator.bootstrapButtonContainingText("button", text),
+                // check for bootstrap anchor
+                Locator.bootstrapButtonContainingText("a", text),
+                //check for bootstrap input
+                Locator.bootstrapButtonContainingText("input", text)
         };
 
         try

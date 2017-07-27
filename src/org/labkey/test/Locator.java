@@ -487,6 +487,30 @@ public abstract class Locator
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").withText(text);
     }
 
+    public static XPathLocator bootstrapButton(String tag, String text)
+    {
+        return tag(tag).notHidden().withPredicate("contains(@class, 'btn btn-default') " +
+                "or contains(@class, 'btn btn-primary') " +
+                "or contains(@class, 'btn btn-success') " +
+                "or contains(@class, 'btn btn-info') " +
+                "or contains(@class, 'btn btn-warning') " +
+                "or contains(@class, 'btn btn-danger') " +
+                "or contains(@class, 'btn btn-link')")
+                .withText(text);
+    }
+
+    public static XPathLocator bootstrapButtonContainingText(String tag, String text)
+    {
+        return tag(tag).notHidden().withPredicate("contains(@class, 'btn btn-default') " +
+                "or contains(@class, 'btn btn-primary') " +
+                "or contains(@class, 'btn btn-success') " +
+                "or contains(@class, 'btn btn-info') " +
+                "or contains(@class, 'btn btn-warning') " +
+                "or contains(@class, 'btn btn-danger') " +
+                "or contains(@class, 'btn btn-link')")
+                .containing(text);
+    }
+
     public static XPathLocator buttonContainingText(String text)
     {
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").containing(text);
