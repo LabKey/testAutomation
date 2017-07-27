@@ -28,9 +28,8 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.pages.FolderManagementFolderTree;
+import org.labkey.test.components.html.ProjectMenu;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -243,6 +242,7 @@ public abstract class AbstractContainerHelper
     @LogMethod
     public void createSubfolder(@LoggedParam String project, String parent, @LoggedParam String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
+        // TODO: Convert this to use the CreateSubFolderPage
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
@@ -327,16 +327,19 @@ public abstract class AbstractContainerHelper
         }
     }
 
-    private  void startCreateFolder(String project, String parent, String child)
+    private void startCreateFolder(String project, String parent, String child)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
+            _test.goToHome();
+            ProjectMenu menu = new ProjectMenu(_test.getDriver());
             if (!parent.equals(project))
-                _test.beginAt("/" + project + "/" + parent + "/admin-createFolder.view");
+                menu.navigateToFolder(project, parent);
             else
-                _test.beginAt("/"+ project + "/admin-createFolder.view");
+                menu.navigateToProject(project);
 
-            _test.setFormElement(Locator.input("name"), child);
+            menu.navigateToCreateSubFolderPage()
+                    .setFolderName(child);
         }
         else
         {

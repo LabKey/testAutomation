@@ -556,6 +556,8 @@ src/org/labkey/test/pages/StartImportPage.java -text
 src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pages/ViewDatasetDataPage.java -text
+src/org/labkey/test/pages/admin/CreateSubFolderPage.java -text
+src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
 src/org/labkey/test/pages/announcements/BaseUpdatePage.java -text
 src/org/labkey/test/pages/announcements/InsertPage.java -text
 src/org/labkey/test/pages/announcements/RespondPage.java -text

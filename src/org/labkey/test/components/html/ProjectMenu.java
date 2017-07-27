@@ -18,6 +18,7 @@ package org.labkey.test.components.html;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -119,6 +120,16 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return linkElement != null && linkElement.isDisplayed();
     }
 
+    /**
+     * Creates a subfolder from the context you are already in (e.g. project/folder)
+     */
+    public CreateSubFolderPage navigateToCreateSubFolderPage()
+    {
+        open();
+        getWrapper().doAndWaitForPageToLoad(() -> newElementCache().newSubFolderButton.click());
+        return new CreateSubFolderPage(getDriver());
+    }
+
     @Override
     public WebDriver getDriver()
     {
@@ -138,10 +149,10 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement folderListContainer = Locator.tagWithClass("div", "folder-list-container").refindWhenNeeded(menuContainer);
 
         WebElement projectNavTrail = Locator.tagWithClass("div", "lk-project-nav-trail").refindWhenNeeded(menu);
-        WebElement projectNavBtnContainer = Locator.tagWithClass("div", "lk-project-nav-buttons").refindWhenNeeded(menu);
+        WebElement projectNavBtnContainer = Locator.tagWithClass("div", "beta-nav-buttons").refindWhenNeeded(menu);
 
-        WebElement newProjectButton = Locator.xpath("//div/span/a[@title='New Project']").refindWhenNeeded(projectNavBtnContainer);
-        WebElement newSubFolderButton = Locator.xpath("//div/span/a[@title='New Subfolder']").refindWhenNeeded(projectNavBtnContainer);
+        WebElement newProjectButton = Locator.xpath("//span/a[@title='New Project']").refindWhenNeeded(projectNavBtnContainer);
+        WebElement newSubFolderButton = Locator.xpath("//span/a[@title='New Subfolder']").refindWhenNeeded(projectNavBtnContainer);
 
         WebElement getMenuItem(String text)
         {

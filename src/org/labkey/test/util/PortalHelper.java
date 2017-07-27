@@ -279,7 +279,8 @@ public class PortalHelper extends WebDriverWrapper
         return false;
     }
 
-    @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
+    @LogMethod(quiet = true)
+    public void addWebPart(@LoggedParam String webPartName)
     {
         enterAdminMode();
         waitForElement(Locator.xpath("//option").withText(webPartName));
@@ -289,7 +290,8 @@ public class PortalHelper extends WebDriverWrapper
         exitAdminMode();
     }
 
-    @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
+    @LogMethod(quiet = true)
+    public void removeWebPart(@LoggedParam String webPartTitle)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
@@ -312,12 +314,14 @@ public class PortalHelper extends WebDriverWrapper
         addQueryWebPart(null, schemaName, null, null);
     }
 
-    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
+    @LogMethod(quiet = true)
+    public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
         addQueryWebPart(title, schemaName, queryName, viewName, WAIT_FOR_JAVASCRIPT);
     }
 
-    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName, int wait)
+    @LogMethod(quiet = true)
+    public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName, int wait)
     {
         addWebPart("Query");
 
@@ -357,7 +361,8 @@ public class PortalHelper extends WebDriverWrapper
         addReportWebPart(null, reportId, null);
     }
 
-    @LogMethod(quiet = true)public void addReportWebPart(@LoggedParam @Nullable String title, @LoggedParam @NotNull String reportId, @Nullable Boolean showTabs, String... visibleSections)
+    @LogMethod(quiet = true)
+    public void addReportWebPart(@LoggedParam @Nullable String title, @LoggedParam @NotNull String reportId, @Nullable Boolean showTabs, String... visibleSections)
     {
         addWebPart("Report");
 
@@ -386,7 +391,8 @@ public class PortalHelper extends WebDriverWrapper
         waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title != null ? title : "Reports"));
     }
 
-    @LogMethod(quiet = true)public void moveWebPart(@LoggedParam String webPartTitle, @LoggedParam Direction direction)
+    @LogMethod(quiet = true)
+    public void moveWebPart(@LoggedParam String webPartTitle, @LoggedParam Direction direction)
     {
         if (direction.isHorizontal())
             throw new IllegalArgumentException("Can't move webpart horizontally.");
@@ -532,6 +538,5 @@ public class PortalHelper extends WebDriverWrapper
         }
 
         public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");
-
     }
 }

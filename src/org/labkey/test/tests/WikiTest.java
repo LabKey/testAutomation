@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,8 +25,8 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.WikiHelper;
+import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
@@ -36,6 +37,7 @@ import java.util.List;
 @Category({BVT.class, Wiki.class})
 public class WikiTest extends BaseWebDriverTest
 {
+    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
@@ -43,13 +45,23 @@ public class WikiTest extends BaseWebDriverTest
     private static final String WIKI_PAGE_TITLE = "_Test Wiki";
     private static final String WIKI_PAGE_CONTENT =
             "<b>Some HTML content</b>\n" +
-                    "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
-                    "queryName='Sequences', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
+                    "<b>${labkey.webPart(partName='Query', title='My Users', schemaName='core', " +
+                    "queryName='Users', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
 
-    public WikiTest()
+    @BeforeClass
+    public static void setupProject()
     {
-        setContainerHelper(new UIContainerHelper(this));
+        WikiTest init = (WikiTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.enableModules(Arrays.asList("Wiki"));
+
+        SearchAdminAPIHelper.pauseCrawler(getDriver());
     }
 
     public List<String> getAssociatedModules()
@@ -74,21 +86,7 @@ public class WikiTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
-        log("Create Project");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.checkboxByTitle("Wiki"));
-        submit();
-
-        _containerHelper.enableModule(PROJECT_NAME, "MS2");
-
-        goToAdminConsole().clickFullTextSearch();
-        if (isTextPresent("pause crawler"))
-            clickButton("pause crawler");
-        beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10 * defaultWaitForPage);
-
-        clickProject(PROJECT_NAME);
+        goToProjectHome();
         portalHelper.addWebPart("Wiki");
         portalHelper.addWebPart("Search");
         portalHelper.addWebPart("Wiki Table of Contents");
@@ -141,7 +139,8 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test delete wiki");
         goToProjectHome();
-        _extHelper.clickExtMenuButton(true, Locator.tagWithAttribute("span", "title", "More"), "Edit");
+        clickAndWait(Locator.linkWithText(WIKI_PAGE_ALTTITLE));
+        clickAndWait(Locator.linkWithText("Edit"));
         clickButton("Delete Page");
         clickButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
@@ -230,7 +229,8 @@ public class WikiTest extends BaseWebDriverTest
         getDriver().switchTo().defaultContent();
     }
 
-    @Override public BrowserType bestBrowser()
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }
