@@ -29,6 +29,7 @@ import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -132,8 +133,7 @@ public class DataRegionTest extends BaseWebDriverTest
     {
         createList();
 
-        // Make sure it works with Compliance on (which enables Elec Sign control)
-        _containerHelper.enableModule("Compliance");
+        enableComplianceIfInstalled();
         clickAndWait(Locator.linkWithText(LIST_NAME));
         URL url = getURL();
         dataRegionTest(url, INJECT_CHARS_1);
@@ -399,6 +399,26 @@ public class DataRegionTest extends BaseWebDriverTest
             assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
             assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
         }
+    }
+
+    private void enableComplianceIfInstalled()
+    {
+        // Make sure it works with Compliance on (which enables Elec Sign control)
+        // Have to do what enableModule does in order to check if it's installed
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Folder Type"));
+
+        try
+        {
+            scrollIntoView(Locator.checkboxByTitle("Compliance"));
+            checkCheckbox(Locator.checkboxByTitle("Compliance"));
+            clickButton("Update Folder");
+        }
+        catch (NoSuchElementException missingModule)
+        {
+            log("Compliance module not found; ignoring");
+        }
+        goToProjectHome();
     }
 
     @Override
