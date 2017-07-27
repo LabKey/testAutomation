@@ -61,6 +61,7 @@ import static org.junit.Assert.fail;
 @Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     public WikiHelper _wikiHelper = new WikiHelper(this);
 
     private static final String PROJECT_NAME = "ClientAPITestProject";
@@ -108,7 +109,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final int PAGE_SIZE = 4;
 
     public static final String SRC_PREFIX = "<script type=\"text/javascript\">\n" +
-            "    LABKEY.requiresClientAPI(true /* left on purpose to test old signature */, function() {\n" +
+            "    LABKEY.requiresExt3ClientAPI(true /* left on purpose to test old signature */, function() {\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
             "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
             "        return {\n" +
@@ -279,7 +280,7 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.submitImportTsv_success();
 
         // Create lists for cross-folder query test.
-        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();

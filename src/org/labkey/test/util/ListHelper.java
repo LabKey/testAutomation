@@ -23,6 +23,7 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -245,10 +246,15 @@ public class ListHelper extends LabKeySiteWrapper
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
-    @LogMethod
     public void createList(String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        beginCreateList(folderName, listName);
+        createList(getCurrentProject(), folderName, listName, listKeyType, listKeyName, cols);
+    }
+
+    @LogMethod
+    public void createList(String project, String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    {
+        beginCreateList(project, folderName, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
@@ -374,13 +380,24 @@ public class ListHelper extends LabKeySiteWrapper
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
-        try
+        beginCreateList(getCurrentProject(), folderName, listName);
+    }
+
+    public void beginCreateList(String project, String folderName, String listName)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            clickFolder(folderName);
-        }
-        catch (WebDriverException ex)
+            new ProjectMenu(getDriver()).navigateToFolder(project, folderName);
+        }else
         {
-            clickProject(folderName);
+            try
+            {
+                clickFolder(folderName);
+            }
+            catch (WebDriverException ex)
+            {
+                clickProject(folderName);
+            }
         }
 
         beginCreateListHelper(listName);

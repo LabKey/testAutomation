@@ -1,8 +1,6 @@
 <div id="testDiv"></div>
 <script type="text/javascript">
-    LABKEY.requiresExt4Sandbox();
-
-    Ext4.onReady(function(){
+    LABKEY.requiresExt4Sandbox(true, function(){
         window.generateData = function(n, floor){
             var data = [],
                     p = (Math.random() *  11) + 1,

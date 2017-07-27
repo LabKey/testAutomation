@@ -50,6 +50,7 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
@@ -1044,9 +1045,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             if(!checked.contains(folder))
             {
-                if (!getText(Locator.id("folderBar")).equals(project))
-                    clickProject(project);
-                clickFolder(folder);
+                if (IS_BOOTSTRAP_LAYOUT)
+                {
+                    new ProjectMenu(getDriver()).navigateToFolder(project, folder);
+                }
+                else
+                {
+                    if (!getText(Locator.id("folderBar")).equals(project))
+                        clickProject(project);
+                    clickFolder(folder);
+                }
 
                 doViewCheck(folder);
                 checked.add(folder);
