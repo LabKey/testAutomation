@@ -30,6 +30,7 @@ public abstract class Locators
     public static final Locator.XPathLocator UX_FOLDER_LIST = Locator.xpath("//div[@class='folder-tree_wrap']");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
+    public static final Locator.XPathLocator alertWarning = Locator.tagWithClass("*", "alert alert-warning");
     public static final Locator UX_SIGNIN_LINK = Locator.xpath("//a[contains(text(),'Sign In')]");
     public static final Locator signInButtonOrLink = Locator.tag("a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("*", "labkey-folder-header").append(Locator.tagWithClass("ul", "tab-nav")).childTag("li");

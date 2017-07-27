@@ -22,6 +22,8 @@ import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.tests.AdminConsoleTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriverException;
@@ -83,6 +85,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     private void init()
     {
         beginAt("/admin/begin.view");
+        goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("flow cytometry"));
         getPipelineWorkDirectory().mkdir();
         setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
@@ -226,9 +229,14 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             }
             else
             {
-                // If we are elsewhere, get back to the current test folder
-                clickProject(getProjectName());
-                clickFolder(getFolderName());
+                if (IS_BOOTSTRAP_LAYOUT)
+                {   // single tab doesn't appear in new ui; navigating to the subfolder gets you there
+                    new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), "FlowTest");
+                }else
+                {
+                   clickProject(getProjectName());
+                   clickFolder(getFolderName());
+                }
             }
         }
     }
@@ -251,7 +259,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("** Join sample set with FCSFile keywords");
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {   // single tab doesn't appear in new ui; navigating to the subfolder gets you there
+            new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), "FlowTest");
+        }else
+        {
+            clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        }
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("ff_samplePropertyURI").index(i), idCols[i]);

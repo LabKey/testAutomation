@@ -28,6 +28,8 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.components.html.TextSelect;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.util.DataRegionTable;
@@ -48,12 +50,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(false); // set true to whitelist me before constructor time
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);//set true to whitelist me before constructor time
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
@@ -121,12 +124,13 @@ public class FlowTest extends BaseFlowTest
         beginAtFCSFileQueryView();
 
         DataRegionTable result = new DataRegionTable("query", getDriver());
-//TODO Find a way to confirm a button is present and disabled
-//        WebElement button = findButton("Edit Keywords");
-//        assertEquals("Edit Keywords button not disabled", "labkey-disabled-button", button.getClass());
+        // confirm the edit keywords button is present and disabled
+        WebElement button = result.getHeaderButton("Edit Keywords");
+        assertTrue("Edit Keywords button is not disabled",
+                button.getAttribute("class").contains("labkey-disabled-button"));
+        // select a couple rows, then click the edit keywords button
         result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
         result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
-
         result = new DataRegionTable("query", getDriver());
         WebElement editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
@@ -270,7 +274,8 @@ public class FlowTest extends BaseFlowTest
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
+
         // Drill into the run, and see that it was uploaded, and keywords were read.
         clickAndWait(Locator.linkWithText("1 run"));
         setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[]{"Flag", "Name", "ProtocolStep", "AnalysisScript", "CompensationMatrix", "WellCount", "Created", "RowId", "FilePathRoot"});
@@ -298,7 +303,7 @@ public class FlowTest extends BaseFlowTest
         assertElementPresent(Locator.linkWithText("FlowTest New Name"));
         assertTextPresent("FlowTest Keyword Plate Name");
 
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Create a new Analysis script"));
         setFormElement(Locator.id("ff_name"), "FlowTestAnalysis");
         clickButton("Create Analysis Script");
@@ -317,7 +322,7 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.tagWithAttribute("input", "value", "Submit"));
         assertTextPresent("compensation calculation may be edited in a number");
 
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Create a new Analysis script"));
         setFormElement(Locator.id("ff_name"), QUV_ANALYSIS_NAME);
         clickButton("Create Analysis Script");
@@ -331,7 +336,7 @@ public class FlowTest extends BaseFlowTest
     {
         setFlowFilter(new String[] {"Keyword/Stim"}, new String[] {"isnonblank"}, new String[] {""});
 
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         clickAndWait(Locator.linkWithText("Analyze some runs"));
 
@@ -340,7 +345,7 @@ public class FlowTest extends BaseFlowTest
         setFormElement(Locator.name("ff_analysisName"), "FlowExperiment2");
         clickButton("Analyze runs");
         waitForPipeline(getContainerPath());
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         URL urlBase = getURL();
         URL urlCompensation;
@@ -382,7 +387,7 @@ public class FlowTest extends BaseFlowTest
         clickButtonWithText("Show Graph");
 
         // change the name of an analysis
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Other settings"));
         clickAndWait(Locator.linkWithText("Change FCS Analyses Names"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_keyword']").index(1), "Keyword/EXPERIMENT NAME");
@@ -395,7 +400,7 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("91918.fcs-" + FCS_FILE_1);
 
         // Now, let's add another run:
-         clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
 
         _fileBrowserHelper.selectFileBrowserItem("8color/");
@@ -406,7 +411,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
 
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText(QUV_ANALYSIS_NAME));
         click(Locator.linkWithText("Analyze some runs"));
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
@@ -422,7 +427,7 @@ public class FlowTest extends BaseFlowTest
         clickButton("Analyze selected runs");
         waitForPipeline(getContainerPath());
 
-        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
         table = new DataRegionTable("query", getDriver());
         table.clickHeaderMenu("Query", query1);
@@ -675,7 +680,7 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     private void removeAnalysisFilter()
     {
-        clickTab("Flow Dashboard");
+        goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("Other settings"));
         clickAndWait(Locator.linkContainingText("Edit FCS Analysis Filter"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0), "");
@@ -699,11 +704,24 @@ public class FlowTest extends BaseFlowTest
 
         assertTextPresent("Matched 0 of 59 samples.");
 
-        DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", getDriver());
-        Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
-                .findElement(samplesConfirm.getComponentElement())
-                .click();
-        WebElement matchedFileInput = samplesConfirm.findCell(0, "MatchedFile").findElement(By.cssSelector("select"));
+        WebElement matchedFileInput;
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            WebElement container = Locator.tagWithClassContaining("div", "lk-region-header-bar")
+                    .parent().findElement(getDriver());
+            Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
+                    .findElement(container).click();
+            matchedFileInput = Locator.xpath("//select[@name='selectedSamples.rows[0.0.1].matchedFile']").findElement(container);
+        }
+        else
+        {
+            DataRegionTable samplesConfirm = new DataRegionTable("SamplesConfirm", getDriver());
+            // select the checkbox at row 1
+            Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
+                    .findElement(samplesConfirm.getComponentElement())
+                    .click();
+            matchedFileInput = samplesConfirm.findCell(0, "MatchedFile").findElement(By.cssSelector("select"));
+        }
         selectOptionByText(matchedFileInput,"91745.fcs (L02-060120-QUV-JS)" );
         clickButton("Next");
         waitForText("Import Analysis: Analysis Engine");
@@ -712,7 +730,9 @@ public class FlowTest extends BaseFlowTest
         clickButton("Next");
         waitForText("Import Analysis: Confirm");
         clickButton("Finish");
-        waitForElement(Locators.labkeyError.containing("Ignoring filter/sort"), defaultWaitForPage);
+        waitForElement(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClass("div", "alert alert-warning").containing("Ignoring filter/sort") :
+                Locators.labkeyError.containing("Ignoring filter/sort"), defaultWaitForPage);
         DataRegionTable query = new DataRegionTable("query", getDriver());
         List<String> names = query.getColumnDataAsText("Name");
         assertEquals("Wrong name for data row", Arrays.asList("88436.fcs-050112-8ColorQualitative-ET"), names);
@@ -763,7 +783,15 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClass("span", "lk-menu-drop")
+                .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(true, false, "Edit");
+        }else
+        {
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Edit");
+        }
         setFormElement(Locator.name("filter[2].value"), "100");
         clickButton("Save");
     }
@@ -819,7 +847,15 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Delete");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(getDriver(), Locator.tagWithClass("span", "lk-menu-drop")
+                    .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(true, false, "Delete");
+        }else
+        {
+            _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='manage']"), "Delete");
+        }
         clickButton("OK");
     }
 
@@ -828,7 +864,11 @@ public class FlowTest extends BaseFlowTest
     {
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         DataRegionTable drt = new DataRegionTable("query", getDriver());
-        String error = Locators.labkeyError.findElement(drt.getComponentElement()).getText();
+        String error;
+        if (IS_BOOTSTRAP_LAYOUT)
+            error = Locators.alertWarning.findElement(drt.getComponentElement()).getText();
+        else
+            error = Locators.labkeyError.findElement(drt.getComponentElement()).getText();
         assertEquals("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.", error);
     }
 
