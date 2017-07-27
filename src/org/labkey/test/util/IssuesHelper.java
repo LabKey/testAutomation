@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.WebTestHelper.buildURL;
 
 public class IssuesHelper extends WebDriverWrapper
@@ -110,7 +111,11 @@ public class IssuesHelper extends WebDriverWrapper
         portalHelper.addWebPart("Issues Summary");
         clickAndWait(Locator.linkWithText("Submit"));
         portalHelper.addWebPart("Search");
-        assertTextPresent("Open");
+
+        if (IS_BOOTSTRAP_LAYOUT)
+            assertElementPresent(Locator.tagWithText("div", "There are no issues in this list."));
+        else
+            assertTextPresent("Open");
     }
 
     public void deleteIssueLists(String projectName, LabKeySiteWrapper test)
@@ -124,10 +129,12 @@ public class IssuesHelper extends WebDriverWrapper
             if (table.getDataRowCount() > 0)
             {
                 table.checkAll();
-                clickButton("Delete");
+                table.clickHeaderButton("Delete");
+                // delete confirmation for issues-deleteIssueList action
                 clickButton("Delete");
             }
 
+            test.clickProject(projectName);
             portalHelper.removeWebPart("Issue Definitions");
         }
 
