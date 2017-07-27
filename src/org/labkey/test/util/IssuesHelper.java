@@ -116,19 +116,25 @@ public class IssuesHelper extends WebDriverWrapper
     public void deleteIssueLists(String projectName, LabKeySiteWrapper test)
     {
         test.clickProject(projectName);
+        PortalHelper portalHelper = new PortalHelper(getDriver());
+
         if (isElementPresent(PortalHelper.Locators.webPartTitle("Issue Definitions")))
         {
-            PortalHelper portalHelper = new PortalHelper(getDriver());
             DataRegionTable table = new DataRegionTable("IssueListDef", getDriver());
-            table.checkAll();
-            clickButton("Delete");
-            clickButton("Delete");
-            test.clickProject(projectName);
+            if (table.getDataRowCount() > 0)
+            {
+                table.checkAll();
+                clickButton("Delete");
+                clickButton("Delete");
+            }
 
             portalHelper.removeWebPart("Issue Definitions");
-            portalHelper.removeWebPart("Issues Summary");
-            portalHelper.removeWebPart("Search");
         }
+
+        if (isElementPresent(PortalHelper.Locators.webPartTitle("Issues Summary")))
+            portalHelper.removeWebPart("Issues Summary");
+        if (isElementPresent(PortalHelper.Locators.webPartTitle("Search")))
+            portalHelper.removeWebPart("Search");
     }
 
     public int getHighestIssueId(String containerPath, String issuesQuery)
