@@ -1461,6 +1461,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
+    public boolean hasHeaderMenu(String buttonText)
+    {
+        try
+        {
+            elements().getHeaderButton(buttonText);
+            return true;
+        }
+        catch(NoSuchElementException e)
+        {
+            return false;
+        }
+    }
+
     public List<String> getHeaderMenuOptions(String buttonText)
     {
         List<WebElement> menuItems = _driver._ext4Helper.getMenuItems(elements().getHeaderButton(buttonText));
@@ -1508,11 +1521,20 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     *  under an 'insert data' top-level button. This handles either case. */
     public void clickInsertNewRow()
     {
-        String insertNewRowText =  "Insert New Row";
-        if (elements().getHeaderButtonOrNull(insertNewRowText) != null)
-            elements().getHeaderButton("Insert New Row").click();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            if (hasHeaderMenu("Insert data"))
+                clickHeaderMenu("Insert data", "Insert New Row");
+            else
+                clickHeaderButton("Insert new row");
+        }
         else
-            clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", insertNewRowText);
+        {
+            if (elements().getHeaderButtonOrNull("Insert New Row") != null)
+                elements().getHeaderButton("Insert New Row").click();
+            else
+                clickHeaderMenu("Insert", "Insert New Row");
+        }
     }
 
     public void clickDeleteAllButton()
