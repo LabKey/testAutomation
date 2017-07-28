@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages.issues;
 
+import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -98,10 +99,15 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
         WebElement jumpToForm = Locator.tagWithName("form", "jumpToIssue").findWhenNeeded(this);
         WebElement newIssueButton = Locator.lkButton().startsWith("New ").findWhenNeeded(jumpToForm);
         Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
-        WebElement issueJumpButton = Locator.lkButton().startsWith("Jump to ").findWhenNeeded(jumpToForm);
-
-        Input searchInput = Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
-        WebElement searchButton = Locator.lkButton("Search").findWhenNeeded(bodyBlock);
+        WebElement issueJumpButton = PageFlowUtil.useExperimentalCoreUI()
+                ? Locator.lkButton("Search").findWhenNeeded(bodyBlock)
+                : Locator.lkButton().startsWith("Jump to ").findWhenNeeded(jumpToForm);
+        Input searchInput = PageFlowUtil.useExperimentalCoreUI()
+                ? issueJumpInput
+                : Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
+        WebElement searchButton = PageFlowUtil.useExperimentalCoreUI()
+                ? issueJumpButton
+                : Locator.lkButton("Search").findWhenNeeded(bodyBlock);
         DataRegionTable issuesList = DataRegionTable.findDataRegion(ListPage.this);
     }
 }

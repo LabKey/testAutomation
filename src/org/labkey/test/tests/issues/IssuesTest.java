@@ -32,6 +32,8 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.categories.Issues;
 import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -64,6 +66,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 @Category({Issues.class, DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String USER1 = "user1_issuetest@issues.test";
@@ -158,7 +161,7 @@ public class IssuesTest extends BaseWebDriverTest
         issuesTable.clearAllFilters("IssueId");
 
         // reset folder filter
-        _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder");
+        issuesTable.clickHeaderMenu("Grid views", true, "Folder Filter", "Current folder");
     }
 
     public void validateQueries()
@@ -171,7 +174,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String issueTitle = "A general issue";
 
-        Locator newIssueButton = Locator.lkButton("New Issue");
+        Locator newIssueButton = Locator.bootstrapButtonContainingText("a", "New Issue");
         assertElementPresent(newIssueButton);
 
         // quick security test
@@ -179,7 +182,6 @@ public class IssuesTest extends BaseWebDriverTest
         signOut();
         recallLocation();                          // try open issues as guest
         assertElementNotPresent(newIssueButton);
-        assertElementPresent(Locator.tagWithName("form", "login"));
         signIn();
         recallLocation();                          // and logged in again
         assertElementPresent(newIssueButton);
@@ -263,7 +265,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText("http://www.issues.test"));
 
         // ListAction
-        clickAndWait(Locator.linkWithText("return to grid"));
+        clickAndWait(Locator.linkWithText("Issues List"));
 
         // Click the issue id based on the text issue title
         clickAndWait(Locator.linkWithText("" + issueId));
@@ -275,30 +277,30 @@ public class IssuesTest extends BaseWebDriverTest
         searchFor(getProjectName(), "hype", 1, issueTitle);
 
         // ResolveAction
-        clickAndWait(Locator.linkWithText("resolve"));
+        clickButton("Resolve");
         clickButton("Save");
 
         // ReopenAction
-        clickAndWait(Locator.linkWithText("reopen"));
+        clickButton("Reopen");
         clickButton("Save");
 
         // ResolveAction
-        clickAndWait(Locator.linkWithText("resolve"));
+        clickButton("Resolve");
         clickButton("Save");
 
         // CloseAction
-        clickAndWait(Locator.linkWithText("close"));
+        clickButton("Close");
         clickButton("Save");
         assertTextPresent("Issues List"); //we should be back at the issues list now
 
         // JumpToIssueAction
         setFormElement(Locator.name("issueId"), "" + issueId);
-        clickButton("Jump to Issue");
+        clickAndWait(Locator.tagWithAttribute("a", "data-original-title", "Search"));
         assertTextPresent(issueTitle);
         assertTextNotPresent("Invalid");
 
         // SearchAction
-        clickAndWait(Locator.linkWithText("return to grid"));
+        clickAndWait(Locator.linkWithText("Issues List"));
         pushLocation();
         String index = WebTestHelper.getContextPath() + "/search/" + getProjectName() + "/index.view?wait=1";
         log(index);
@@ -408,7 +410,7 @@ public class IssuesTest extends BaseWebDriverTest
     public void testEmailTemplate()
     {
         // CustomizeEmailAction
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
         clickButton("Admin");
         clickButton("Customize Email Template");
         String subject = getFormElement(Locator.name("emailSubject"));
@@ -424,7 +426,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
         clickButton("Save");
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
 
         // EmailPrefsAction
         EmailPrefsPage emailPrefsPage = new ListPage(getDriver()).clickEmailPreferences();
@@ -440,15 +442,15 @@ public class IssuesTest extends BaseWebDriverTest
         stopImpersonating();
 
         clickProject(getProjectName());
-        _issuesHelper.addIssue(ISSUE)
-                .clickReturnToGrid();
+        _issuesHelper.addIssue(ISSUE);
+        clickAndWait(Locator.linkWithText("Issues List"));
 
         // need to make change that will message current admin
         clickAndWait(Locator.linkWithText(ISSUE.get("title")));
         updateIssue();
         setFormElement(Locator.name("comment"), "Sup with this issue!");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("return to grid"));
+        clickAndWait(Locator.linkWithText("Issues List"));
 
         //Issue 16238: From close issue screen: "Save" goes back to issue, "cancel" goes to issue list. This is the opposite of what I want
         log("verify cancelling returns to the same issue page");
@@ -457,7 +459,8 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Cancel");
         assertTitleContains(ISSUE.get("title"));
 
-        goToModule("Dumbster");
+        //("Dumbster");
+        new SiteNavBar(getDriver()).goToModule("Dumbster");
         pushLocation();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);
@@ -476,7 +479,7 @@ public class IssuesTest extends BaseWebDriverTest
 
     private void updateIssue()
     {
-        clickAndWait(Locator.linkWithText("update"));
+        clickButton("Update");
     }
 
     @Test
@@ -543,7 +546,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent(
                 ISSUE_0.get("comment"),
                 ISSUE_1.get("comment"));
-        clickAndWait(Locator.linkWithText("view grid"));
+        clickAndWait(Locator.linkWithText("Issues List"));
     }
 
     @Test
@@ -564,7 +567,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_0));
 
         // assert .lastFilter is applied
-        clickAndWait(Locator.linkWithText("return to grid"));
+        clickAndWait(Locator.linkWithText("Issues List"));
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 
@@ -622,7 +625,9 @@ public class IssuesTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         // Set the container filter to include subfolders
-        _extHelper.clickMenuButton(true, "Grid Views", "Folder Filter", "Current folder and subfolders");
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+                .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
+                .findElement(getDriver())).clickMenuButton(true, false, "Folder Filter", "Current folder and subfolders");
 
         // Verify the URL of issueTitles[0] goes to getProjectName()
         String href = getAttribute(Locator.linkContainingText(issue0.get("title")), "href");
@@ -644,7 +649,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(Maps.of("assignedTo", NAME, "title", "This is another issue -- let's say B"));
         String issueIdB = getIssueId();
 
-        clickAndWait(Locator.linkWithText("resolve"));
+        clickButton("Resolve");
         selectOptionByText(Locator.name("resolution"), "Duplicate");
         setFormElement(Locator.name("duplicate"), issueIdA);
         clickButton("Save");
@@ -670,15 +675,16 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
 
         goToProjectHome();
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
 
         // create a new issue to be moved
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
 
         // move the created issue
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
         clickAndWait(Locator.linkWithText(issueTitle));
-        click(Locator.linkWithText("Move"));
+        new BootstrapMenu(getDriver(), Locator.tagWithId("span" ,"moreMenuToggle").findElement(getDriver()))
+                .clickMenuButton(false, false, "Move");
 
         // handle move dialog
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
@@ -690,7 +696,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // perform multi-issue move
         returnToProject();
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
 
         String issueTitleA = "Multi-Issue Move A";
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
@@ -700,13 +706,12 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleB));
         String issueIdB = getIssueId();
 
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
 
         DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
         issuesTable.checkCheckboxByPrimaryKey(issueIdA);
         issuesTable.checkCheckboxByPrimaryKey(issueIdB);
-        click(Locator.linkWithText("Move"));
-
+        click(Locator.tagWithText("span", "Move").parent());
         // handle move dialog (copy pasta)
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
         _ext4Helper.selectComboBoxItem("Target folder:", path);
@@ -761,7 +766,7 @@ public class IssuesTest extends BaseWebDriverTest
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
         clickButton("Save");
-        goToModule("Issues");
+        new SiteNavBar(getDriver()).goToModule("Issues");
 
         // check for no default
         clickButton("New Issue");

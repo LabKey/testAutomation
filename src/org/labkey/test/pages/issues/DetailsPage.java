@@ -96,13 +96,14 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 
     protected class ElementCache extends BaseIssuePage.ElementCache
     {
-        protected WebElement newIssueLink = Locator.linkWithText("new issue").findWhenNeeded(this);
-        protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this);
-        protected WebElement updateLink = Locator.linkWithText("update").findWhenNeeded(this);
-        protected WebElement resolveLink = Locator.linkWithText("resolve").findWhenNeeded(this);
-        protected WebElement closeLink = Locator.linkWithText("close").findWhenNeeded(this);
-        protected WebElement reopenLink = Locator.linkWithText("reopen").findWhenNeeded(this);
-        protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this);
-        protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this);
+        protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
+        protected WebElement newIssueLink = Locator.bootstrapButton("a", "New Issue").findWhenNeeded(this);
+        protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI
+        protected WebElement updateLink = Locator.bootstrapButton("a", "Update").findWhenNeeded(this);
+        protected WebElement resolveLink = Locator.bootstrapButton("a", "Resolve").findWhenNeeded(this);
+        protected WebElement closeLink = Locator.bootstrapButton("a", "Close").findWhenNeeded(this);
+        protected WebElement reopenLink = Locator.bootstrapButton("a", "Reopen").findWhenNeeded(this);
+        protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
+        protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this); //in menu in newUI
     }
 }

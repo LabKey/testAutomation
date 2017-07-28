@@ -71,12 +71,6 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
         return (OptionSelect) super.priority();
     }
 
-    public EmailPrefsPage clickEmailPrefs()
-    {
-        clickAndWait(elementCache().emailPrefsLink);
-        return new EmailPrefsPage(getDriver());
-    }
-
     public void addAttachment(File file)
     {
         elementCache().filePicker.addAttachment(file);
@@ -126,10 +120,7 @@ public abstract class BaseUpdatePage<EC extends BaseUpdatePage.ElementCache> ext
 
         protected FilePicker filePicker = new FilePicker(getDriver());
 
-        protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this);
         protected WebElement saveButton = Locator.lkButton("Save").findWhenNeeded(this);
         protected WebElement cancelButton = Locator.lkButton("Cancel").findWhenNeeded(this);
-        protected WebElement bottomSaveButton = Locator.lkButton("Save").index(1).findWhenNeeded(this);
-        protected WebElement bottomCancelButton = Locator.lkButton("Cancel").index(1).findWhenNeeded(this);
     }
 }
