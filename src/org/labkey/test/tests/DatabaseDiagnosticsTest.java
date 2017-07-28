@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, DailyB.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     @Override
     protected String getProjectName()
     {
@@ -46,7 +47,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void validateDomainsTest()
     {
-        goToAdmin();
+        goToAdminConsole().goToAdminConsoleLinksSection();
 
         clickAndWait(Locator.linkWithText("Check Database"));
 
@@ -62,7 +63,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     @Test
     public void databaseCheckTest()
     {
-        goToAdmin();
+        goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("Check Database"));
         clickAndWait(Locator.linkWithText("Do Database Check"), 120000);
         waitForText(60000, "Database Consistency checker complete");
