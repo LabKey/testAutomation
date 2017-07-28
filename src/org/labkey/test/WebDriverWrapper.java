@@ -25,6 +25,7 @@ import org.labkey.api.util.FileUtil;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
@@ -1093,6 +1094,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String actual = _extHelper.getExtMsgBoxText(title);
         assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
+    }
+
+    public String acceptModalAlert()
+    {
+        ModalDialog alert = ModalDialog.find(getDriver());
+        String bodyText = alert.getBodyText();
+        alert.close();
+        return bodyText;
     }
 
     public enum SeleniumEvent

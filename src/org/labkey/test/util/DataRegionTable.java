@@ -946,13 +946,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @LogMethod
     public ColumnChartRegion createColumnChart(String columnName, String chartType)
     {
-        final WebElement menu = elements().getColumnHeader(columnName);
-
         Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-part-plotanalyticsprovider svg");
         int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
-        _driver._ext4Helper.clickExt4MenuButton(false, menu, false, chartType);
-
+        this.clickColumnMenu(columnName, false, chartType);
         cssPlotLocator.index(initialNumOfPlots).waitForElement(this, 60000);
 
         return new ColumnChartRegion(_driver, this);
@@ -1026,9 +1023,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             if (IS_BOOTSTRAP_LAYOUT)
             {
-                ModalDialog removeError = ModalDialog.find(_driver.getDriver());
-                assertTrue(removeError.getBodyText().contains("You must select at least one field to display in the grid."));
-                removeError.close();
+                String alertMsg = _driver.acceptModalAlert();
+                assertTrue("Unexpected alert message", alertMsg.contains("You must select at least one field to display in the grid."));
             }
             else
             {

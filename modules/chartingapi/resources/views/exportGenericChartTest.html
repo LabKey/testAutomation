@@ -113,14 +113,8 @@
         var chartConfig = charts[chartIdx];
         renderChart(data, chartConfig);
     };
-    LABKEY.requiresScript(
-            '/vis/genericChart/genericChartHelper.js',
-            function(){
-                LABKEY.vis.GenericChartHelper.loadVisDependencies(function(){
-                    renderChart(data, charts[chartIdx]);
-                });
-            },
-            null,
-            true
-    );
+
+    Ext4.onReady(function() {
+        renderChart(data, charts[chartIdx]);
+    });
 </script>

@@ -52,6 +52,7 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Charting.class})
 public class ChartingAPITest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
 
     @Override
     public BrowserType bestBrowser()
@@ -361,12 +362,10 @@ public class ChartingAPITest extends BaseWebDriverTest
         click(nextBtn);
         waitForSvgWithTitle(SCATTER_HOVER_CLICK);
         click(Locator.css("svg g a path"));
-        waitForElement(Locator.css(".x4-window div").withText("Look a click handler!"));
-        clickButton("OK", 0);
+        assertEquals("Unexpected alert message for point click handler", "Look a click handler!", acceptModalAlert());
         click(setAesBtn);
         click(Locator.css("svg g a path"));
-        waitForElement(Locator.css(".x4-window div").withText("The click handler has changed!"));
-        clickButton("OK", 0);
+        assertEquals("Unexpected alert message for point click handler", "The click handler has changed!", acceptModalAlert());
 
         click(nextBtn);
         waitForSvgWithTitle(LINE_ERROR_COLOR_Y);

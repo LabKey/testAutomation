@@ -109,7 +109,7 @@
                 x: function(d){return d.CD4.value;},
                 yLeft: function(d){return d.Lymphocytes.value;},
                 hoverText: function(d){return "HOVER TEXT"},
-                pointClickFn: function(d){Ext4.MessageBox.alert('Click Handler', 'Look a click handler!');}
+                pointClickFn: function(d){LABKEY.Utils.alert('Click Handler', 'Look a click handler!');}
             },
             scales: {
                 x: {scaleType: 'continuous', trans: 'linear'},
@@ -119,7 +119,7 @@
         charts.push(scatterPlotWithHoverAndClick);
         aesthetics.push({idx: -1, aes: {
             hoverText: null,
-            pointClickFn: function(d){Ext4.MessageBox.alert('New Click Handler', 'The click handler has changed!');}
+            pointClickFn: function(d){LABKEY.Utils.alert('New Click Handler', 'The click handler has changed!');}
         }});
 
         // Here we add a color aesthetic to the line layer, and change the yLeft aesthetic function. The errorbar layer

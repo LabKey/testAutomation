@@ -1,0 +1,6 @@
+<view xmlns="http://labkey.org/data/xml/view" title="Custom Plot Wrappers">
+    <dependencies>
+        <dependency path="Ext4"/>
+        <dependency path="vis/vis"/>
+    </dependencies>
+</view>
