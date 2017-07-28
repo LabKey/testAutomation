@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.AssayDesignerPage;
 
 import java.io.File;
@@ -27,9 +27,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public abstract class AbstractAssayHelper
 {
+    private static final String MANAGE_LINK_TEXT = "Manage assay design";
+    
     protected BaseWebDriverTest _test;
 
     public AbstractAssayHelper(BaseWebDriverTest test)
@@ -128,7 +132,16 @@ public abstract class AbstractAssayHelper
     {
         _test.doAndWaitForPageToLoad(() ->
         {
-            _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "edit assay design");
+            if (IS_BOOTSTRAP_LAYOUT)
+            {
+                new BootstrapMenu(_test.getDriver(),
+                        Locator.tagWithClass("span", "lk-menu-drop")
+                                .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
+                                .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
+                        .clickMenuButton(false, false, "Edit assay design");
+            }
+            else
+                _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Edit assay design");
             if (confirmEditInOtherContainer)
             {
                 String alertText = _test.acceptAlert();
@@ -150,7 +163,7 @@ public abstract class AbstractAssayHelper
 
     public AssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "copy assay design");
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Copy assay design");
 
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
@@ -162,19 +175,19 @@ public abstract class AbstractAssayHelper
 
     public void deleteAssayDesign()
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "delete assay design");
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Delete assay design");
         _test.clickButton("Confirm Delete");
     }
 
     public File exportAssayDesign()
     {
         return _test.doAndWaitForDownload(() ->
-                _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "export assay design"));
+                _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Export assay design"));
     }
 
     public void setDefaultValues(final String assayName, final AssayDefaultAreas defaults)
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("MANAGE ASSAY DESIGN"), false, "set default values", defaults.getMenuText(assayName));
+        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Set default values", defaults.getMenuText(assayName));
     }
 
     public enum AssayDefaultAreas

@@ -350,11 +350,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return elements().getColumnHeaders().size() - (_selectors ? 1 : 0);
     }
 
-    private boolean bottomBarPresent()
-    {
-        return _driver.isElementPresent(Locator.tagWithId("table", getTableId() + "-footer"));
-    }
-
     public boolean hasSummaryStatisticRow()
     {
         return Locator.css("tr.labkey-col-total").findElements(getComponentElement()).size() > 0;
@@ -495,19 +490,20 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
-    public WebElement updateLink(int row)
+    public static Locator.XPathLocator updateLinkLocator()
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             return Locator.xpath("td").withClass("labkey-selectors")
-                    .child("a").withAttribute("data-original-title", "edit")
-                    .findElement(elements().getDataRow(row));
+                    .child("a").withAttribute("data-original-title", "edit");
         }
-        else
-        {
-            return Locator.xpath("td").withClass("labkey-update").child("a")
-                    .findElement(elements().getDataRow(row));
-        }
+
+        return Locator.xpath("td").withClass("labkey-update").child("a");
+    }
+
+    public WebElement updateLink(int row)
+    {
+        return updateLinkLocator().findElement(elements().getDataRow(row));
     }
 
     public WebElement link(int row, int col)

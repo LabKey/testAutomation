@@ -17,10 +17,11 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
-import org.labkey.api.util.FileUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -76,7 +77,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //make sure it was set
         assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'");
-    } //setupPipeline
+    }
 
     /**
      * Sets up the users, groups, folders and permissions for the security tests.
@@ -103,27 +104,33 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
     @LogMethod
     protected void setupEnvironment()
     {
+        log("Creating assay test users");
+        _userHelper.createUser(TEST_ASSAY_USR_PI1, true);
+        _userHelper.createUser(TEST_ASSAY_USR_TECH1, true);
+
         //create a new project for the security tests
         log("Creating security test project");
         _containerHelper.createProject(TEST_ASSAY_PRJ_SECURITY, null);
+        goToProjectHome(TEST_ASSAY_PRJ_SECURITY);
 
         log("Setting up groups, users and initial permissions");
+        ApiPermissionsHelper permissionsHelper = new ApiPermissionsHelper(this);
 
         //we should now be sitting on the new project security page
         //create a group in the project for PIs and make them readers by default
-        _permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_PIS);
-        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
+        permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_PIS);
+        permissionsHelper.setPermissions(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
 
         //set Users group to be Readers by default
-        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
+        permissionsHelper.setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
 
         //add a PI user to that group
-        _permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
+        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_PIS);
         // give the PI user "CanSeeAuditLog" permission
-        _permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+        permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
-        _permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
+        permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
 
         //add folder structure
         log("Setting up folder structure and folder permissions");
@@ -171,10 +178,9 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
-        clickProject(TEST_ASSAY_PRJ_SECURITY);
-        clickFolder(TEST_ASSAY_FLDR_LAB1);
+        navigateToFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1);
         portalHelper.addWebPart("Assay List");
-    } //setupEnvironment()
+    }
 
     /**
      * Sets the permissions for an existing group on an existing subfolder
@@ -190,8 +196,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
         if (isElementPresent(Locator.permissionRendered()) && isButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickProject(project);
-        clickFolder(subfolder);
+        navigateToFolder(project, subfolder);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save", 0);
@@ -204,7 +209,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         }
         else
             _securityHelper.setProjectPerm(group, perms);
-    } //setSubFolderSecurity()
+    }
 
     /**
      * Sets up study-level permissions on a given folder within a given project for a given group
@@ -229,14 +234,13 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
         clickAndWait(Locator.id("groupUpdateButton"));
-    } //setStudyPerms
+    }
 
     @LogMethod
     private void setStudyQCStates(String project, String folder)
     {
         log("Setting QC states in study " + folder + ".");
-        clickProject(project);
-        clickFolder(folder);
+        navigateToFolder(project, folder);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement(Locator.name("newLabel"), "Approved");
@@ -262,7 +266,20 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
     {
         _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
-        clickButton("Study Security", defaultWaitForPage);
+        clickButton("Study Security");
+    }
+
+    protected void navigateToFolder(String project, String folder)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new ProjectMenu(getDriver()).navigateToFolder(project, folder);
+        }
+        else
+        {
+            clickProject(project);
+            clickFolder(folder);
+        }
     }
 
     @Override

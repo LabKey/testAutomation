@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
@@ -33,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.fail;
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 
 /**
  * TODO: Move appropriate functionality into {@link org.labkey.test.pages.PortalBodyPanel} and {@link org.labkey.test.components.WebPart}
@@ -249,7 +249,7 @@ public class PortalHelper extends WebDriverWrapper
 
     public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (IS_BOOTSTRAP_LAYOUT)
         {
             WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
             webPart.clickMenuItem(wait, items);
@@ -262,19 +262,19 @@ public class PortalHelper extends WebDriverWrapper
 
     public void enterAdminMode()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (IS_BOOTSTRAP_LAYOUT)
             new SiteNavBar(getDriver()).enterPageAdminMode();
     }
 
     public void exitAdminMode()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (IS_BOOTSTRAP_LAYOUT)
             new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public boolean isInAdminMode()
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (IS_BOOTSTRAP_LAYOUT)
             return new SiteNavBar(getDriver()).isInPageAdminMode();
         return false;
     }
@@ -293,7 +293,7 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        if (IS_BOOTSTRAP_LAYOUT)
         {
             SiteNavBar navBar =new SiteNavBar(getDriver()).enterPageAdminMode();
             WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
@@ -471,7 +471,7 @@ public class PortalHelper extends WebDriverWrapper
         _ext4Helper.waitForMaskToDisappear();
     }
 
-    public static enum Direction
+    public enum Direction
     {
         UP("Up", Axis.VERTICAL),
         DOWN("Down", Axis.VERTICAL),
@@ -481,7 +481,7 @@ public class PortalHelper extends WebDriverWrapper
         private String _dir;
         private Axis _axis;
 
-        private Direction (String dir, Axis axis)
+        Direction (String dir, Axis axis)
         {
             _dir = dir;
             _axis = axis;
@@ -502,7 +502,7 @@ public class PortalHelper extends WebDriverWrapper
             return _axis == Axis.VERTICAL;
         }
 
-        public static enum Axis
+        public enum Axis
         {
             HORIZONTAL,
             VERTICAL
@@ -511,8 +511,15 @@ public class PortalHelper extends WebDriverWrapper
 
     public static class Locators
     {
-        public static Locator.XPathLocator webPartTitle = Locator.xpath("//span").withClass("labkey-wp-title-text");
-        public static final Locator.XPathLocator webPart = Locator.tagWithName("table", "webpart");
+        private static Locator.XPathLocator webPartTitleContainer = IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClass("*", "panel-title") :
+                Locator.xpath("tbody/tr/th");
+
+        public static Locator.XPathLocator webPartTitle = Locator.tagWithClass("span", "labkey-wp-title-text");
+
+        public static final Locator.XPathLocator webPart = IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithName("div", "webpart") :
+                Locator.tagWithName("table", "webpart");
 
         public static Locator.XPathLocator webPartTitle(String title)
         {
@@ -529,12 +536,12 @@ public class PortalHelper extends WebDriverWrapper
 
         public static Locator.XPathLocator webPart(String title)
         {
-            return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
+            return webPart.withPredicate(webPartTitleContainer.withAttribute("title", title));
         }
 
         public static Locator.XPathLocator webPartWithTitleContaining(String partialTitle)
         {
-            return webPart.withPredicate(Locator.xpath("tbody/tr/th").withAttributeContaining("title", partialTitle));
+            return webPart.withPredicate(webPartTitleContainer.withAttributeContaining("title", partialTitle));
         }
 
         public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");

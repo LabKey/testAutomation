@@ -17,24 +17,17 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.labkey.api.security.PrincipalType;
-import org.labkey.remoteapi.Command;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.GetRolesCommand;
 import org.labkey.remoteapi.security.GetRolesResponse;
-import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,6 +36,7 @@ import static org.junit.Assert.fail;
  */
 public abstract class PermissionsHelper
 {
+    private static final String permissionClassPkg = "org.labkey.api.security.roles.";
     protected WebDriverWrapper _driver;
 
     public PermissionsHelper(WebDriverWrapper driver)
@@ -56,7 +50,7 @@ public abstract class PermissionsHelper
             return perm;
 
         Map<String, String> specialRoleClasses = new HashMap<>();
-        specialRoleClasses.put("See Audit Log Events", "CanSeeAuditLogRole");
+        specialRoleClasses.put("See Audit Log Events", permissionClassPkg + "CanSeeAuditLogRole");
 
         String roleClassName = perm.replaceAll("[- ]", "").replace("Administrator", "Admin") + "Role";
 
@@ -64,7 +58,7 @@ public abstract class PermissionsHelper
                 specialRoleClasses.get(perm),
                 getRoles().get(perm),
                 getRoles().get(roleClassName),
-                "org.labkey.api.security.roles." + roleClassName);
+                permissionClassPkg + roleClassName);
     }
 
     private Map<String, String> _roles;

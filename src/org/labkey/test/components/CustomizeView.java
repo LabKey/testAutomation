@@ -272,33 +272,12 @@ public class CustomizeView extends Component
      */
     public void saveUnsavedViewGridClosed(String name)
     {
-//        Actions builder = new Actions(_test._driver);
-//        WebElement msg = _test._driver.findElement(By.cssSelector(".labkey-dataregion-msg"));
-//        WebElement btn = _test._driver.findElement(By.cssSelector(".unsavedview-save"));
-//        builder.moveToElement(msg).moveToElement(btn).click().build().perform();
-//
-//        _test.waitForText("Save Custom View");
-//
-//        if(name!=null)
-//        {
-//              _test.click(Locator.tagContainingText("label", "Named"));
-//        }
-//
-//        _test.clickButton("Save");
-        // WORKAROUND: Not working with closed panel
-
         openCustomizeViewPanel();
         saveCustomView(name);
     }
 
     public void revertUnsavedViewGridClosed()
     {
-//        Locator revertButton = Locator.tagContainingText("span", "Revert");
-//
-//        _test.mouseOver(Locator.css(".labkey-dataregion-msg"));
-//        _test.click(revertButton);
-        // WORKAROUND: Not working with closed panel
-
         openCustomizeViewPanel();
         revertUnsavedView();
     }
@@ -587,15 +566,6 @@ public class CustomizeView extends Component
     {
         _driver.click(Locator.tagWithText("Label", "Show Hidden Fields"));
         BaseWebDriverTest.sleep(250); // wait for columns to display
-    }
-
-    private void removeItem(int item_index, ViewItemType type)
-    {
-        changeTab(type);
-
-        String fieldKey = itemXPath(type, item_index).findElement(this).getAttribute("fieldkey");
-
-        removeItem(fieldKey, type); // Need to remove by key to avoid unintentional removals
     }
 
     @Deprecated
