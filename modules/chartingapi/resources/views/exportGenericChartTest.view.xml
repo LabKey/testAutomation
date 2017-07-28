@@ -1,7 +1,0 @@
-<view xmlns="http://labkey.org/data/xml/view" title="Export Generic Chart Test">
-    <dependencies>
-        <dependency path="Ext4"/>
-        <dependency path="vis/vis"/>
-        <dependency path="vis/genericChart/genericChartHelper.js"/>
-    </dependencies>
-</view>

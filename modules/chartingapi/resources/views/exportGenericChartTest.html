@@ -114,7 +114,9 @@
         renderChart(data, chartConfig);
     };
 
-    Ext4.onReady(function() {
-        renderChart(data, charts[chartIdx]);
-    });
+    LABKEY.requiresScript('/vis/genericChart/genericChartHelper.js', function(){
+        LABKEY.vis.GenericChartHelper.loadVisDependencies(function(){
+            renderChart(data, charts[chartIdx]);
+        });
+    }, null, true);
 </script>

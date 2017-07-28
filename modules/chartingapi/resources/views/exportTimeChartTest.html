@@ -175,8 +175,10 @@
         var chartConfig = charts[chartIdx];
         renderChart(chartConfig);
     };
-    
-    Ext4.onReady(function() {
-        renderChart(charts[chartIdx]);
-    });
+
+    LABKEY.requiresScript('/vis/timeChart/timeChartHelper.js', function(){
+        LABKEY.vis.TimeChartHelper.loadVisDependencies(function(){
+            renderChart(charts[chartIdx]);
+        });
+    }, null, true);
 </script>

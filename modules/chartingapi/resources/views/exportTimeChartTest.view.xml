@@ -1,7 +1,0 @@
-<view xmlns="http://labkey.org/data/xml/view" title="Export Time Chart Test">
-    <dependencies>
-        <dependency path="Ext4"/>
-        <dependency path="vis/vis"/>
-        <dependency path="vis/timeChart/timeChartHelper.js"/>
-    </dependencies>
-</view>

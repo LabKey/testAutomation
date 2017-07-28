@@ -122,9 +122,7 @@ modules/chartingapi/resources/views/chartTest2.view.xml -text
 modules/chartingapi/resources/views/customPlotWrappers.html -text
 modules/chartingapi/resources/views/customPlotWrappers.view.xml -text
 modules/chartingapi/resources/views/exportGenericChartTest.html -text
-modules/chartingapi/resources/views/exportGenericChartTest.view.xml -text
 modules/chartingapi/resources/views/exportTimeChartTest.html -text
-modules/chartingapi/resources/views/exportTimeChartTest.view.xml -text
 modules/chartingapi/resources/views/interactivityTest.html -text
 modules/chartingapi/resources/views/setAesTest.html -text
 modules/footerTest/module.properties -text
