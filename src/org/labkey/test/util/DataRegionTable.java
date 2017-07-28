@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
@@ -32,7 +33,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Checkbox;
-import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.study.DatasetFacetPanel;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
@@ -599,6 +599,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return ImmutableList.copyOf(_columnNames);
     }
 
+    @NotNull
     public List<String> getColumnDataAsText(int col)
     {
         int rowCount = getDataRowCount();
@@ -607,19 +608,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (col >= 0)
         {
             for (int row = 0; row < rowCount; row++)
-            {
                 columnText.add(getDataAsText(row, col));
-            }
-            return columnText;
         }
-        else
-            return null;
+
+        return columnText;
     }
 
     public List<String> getColumnDataAsText(String name)
     {
-        int col = getColumnIndex(name);
-        return getColumnDataAsText(col);
+        return getColumnDataAsText(getColumnIndex(name));
     }
 
     public Map<String, String> getRowDataAsMap(String colName, String value)

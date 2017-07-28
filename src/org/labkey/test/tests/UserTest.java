@@ -50,6 +50,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class UserTest extends BaseWebDriverTest
 {
+    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile"};
     private static final String TEST_PASSWORD = "0asdfgh!";
 
@@ -181,10 +182,6 @@ public class UserTest extends BaseWebDriverTest
     {
         final String AFFIRM_CHANGE_MSG = "Email change from @1 to @2 was successful.";
 
-        String tempStr;
-        URL resetUrl;
-        boolean hitExpectedError;
-
         log("Make sure we are recording sent emails to dumpster");
         enableEmailRecorder();
 
@@ -192,10 +189,11 @@ public class UserTest extends BaseWebDriverTest
         try
         {
             int getResponse = WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL()+"/login/setAuthenticationParameter.view?parameter=SelfServiceEmailChanges&enabled=true");
-            assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse );
+            assertEquals("Failed to set authentication param to enable self service email via http get", 200, getResponse);
         }
-        catch (IOException ioe){
-            throw (new RuntimeException("Failed to enable 'user self service email' feature.", ioe));
+        catch (IOException ioe)
+        {
+            throw new RuntimeException("Failed to enable 'user self service email' feature.", ioe);
         }
 
         log("Create a new user.");
@@ -216,7 +214,7 @@ public class UserTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Go to dumpster, make sure the expected email is there and get the url from the message.");
-        resetUrl = getUrlFromEmail("Verification .* Web Site email change.*");
+        URL resetUrl = getUrlFromEmail("Verification .* Web Site email change.*");
 
         goToHome();
 
@@ -230,7 +228,7 @@ public class UserTest extends BaseWebDriverTest
 
         goToURL(resetUrl, 30000);
 
-        tempStr = AFFIRM_CHANGE_MSG.replace("@1", SELF_SERVICE_EMAIL_USER);
+        String tempStr = AFFIRM_CHANGE_MSG.replace("@1", SELF_SERVICE_EMAIL_USER);
         tempStr = tempStr.replace("@2", SELF_SERVICE_EMAIL_USER_CHANGED);
         assertTextPresent(tempStr);
 
@@ -273,7 +271,6 @@ public class UserTest extends BaseWebDriverTest
 
         setFormElement(Locator.css("#password"), password);
         clickButton("Submit");
-
     }
 
     private String getEmailChangeMsgBody(String subjectRegex)
@@ -297,7 +294,7 @@ public class UserTest extends BaseWebDriverTest
 
         String bdy = getEmailChangeMsgBody(subjectRegEx);
 
-        if(bdy.contains(URL_PART))
+        if (bdy.contains(URL_PART))
         {
             msgLines = bdy.split("\n");
 
@@ -320,11 +317,10 @@ public class UserTest extends BaseWebDriverTest
         }
         catch (MalformedURLException mue)
         {
-            throw (new RuntimeException("The string returned: '" + urlString + "' resulted in a malformed url.", mue));
+            throw new RuntimeException("The string returned: '" + urlString + "' resulted in a malformed url.", mue);
         }
 
         return resetUrl;
-
     }
 
     @Test
@@ -478,11 +474,10 @@ public class UserTest extends BaseWebDriverTest
         assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
     }
 
-    private void navigateToUserDetails(String userName)
+    private void navigateToUserDetails(String userEmail)
     {
-        Locator details = Locator.xpath("//td[.='" + userName + "']/..//td[contains(@class, 'labkey-details')]/a");
-        waitForElement(details);
-        clickAndWait(details);
+        DataRegionTable table = new DataRegionTable("Users", this);
+        doAndWaitForPageToLoad(() -> table.detailsLink(table.getRowIndex("Email", userEmail)).click());
     }
 
     @Test
@@ -492,22 +487,18 @@ public class UserTest extends BaseWebDriverTest
         navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
 
-        StringBuilder illegalLongProperty = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         final int maxFieldLength = 64;
         for (int i = 0; i < maxFieldLength + 1; i++)
-            illegalLongProperty.append("X");
-
-        StringBuilder illegalLongDescription = new StringBuilder();
-        final int maxDescriptionLength = 255;
-        for (int i = 0; i < maxDescriptionLength + 1; i++)
-            illegalLongDescription.append("X");
+            sb.append("X");
+        String illegalLongProperty = sb.toString();
 
         log("Set illegal properties");
-        setFormElement(Locator.name("quf_DisplayName"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_FirstName"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_LastName"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_Phone"), illegalLongProperty.toString());
-        setFormElement(Locator.name("quf_Mobile"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_DisplayName"), illegalLongProperty);
+        setFormElement(Locator.name("quf_FirstName"), illegalLongProperty);
+        setFormElement(Locator.name("quf_LastName"), illegalLongProperty);
+        setFormElement(Locator.name("quf_Phone"), illegalLongProperty);
+        setFormElement(Locator.name("quf_Mobile"), illegalLongProperty);
 
         log("Check error messages");
         clickButton("Submit");
@@ -539,7 +530,7 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
-        final int count = Locator.tagWithClass("td", "labkey-form-label").followingSibling("td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES).findElements(table).size();
+        final int count = Locator.tagWithClass("p", "form-control-static").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES).findElements(table).size();
         assertEquals("Didn't find special characters for user first and last name", 2, count);
     }
 
@@ -556,7 +547,7 @@ public class UserTest extends BaseWebDriverTest
         clickButton("Submit");
 
         WebElement table = DataRegionTable.Locators.dataRegion("SiteUsers").findElement(this.getDriver());
-        final int count = Locator.tagWithClass("td", "labkey-form-label").followingSibling("td").withText(INJECT_CHARS_1).findElements(table).size();
+        final int count = Locator.tagWithClass("p", "form-control-static").withText(INJECT_CHARS_1).findElements(table).size();
         assertEquals("Didn't find injection string for user first and last name", 2, count);
     }
 
