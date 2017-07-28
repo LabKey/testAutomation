@@ -231,7 +231,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             {
                 if (IS_BOOTSTRAP_LAYOUT)
                 {   // single tab doesn't appear in new ui; navigating to the subfolder gets you there
-                    new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), "FlowTest");
+                    new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), getFolderName());
                 }else
                 {
                    clickProject(getProjectName());

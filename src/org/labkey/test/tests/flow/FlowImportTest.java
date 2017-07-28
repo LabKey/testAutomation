@@ -34,6 +34,8 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class, FileBrowser.class})
 public class FlowImportTest extends BaseFlowTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+
     @Test
     public void importTest()
     {
