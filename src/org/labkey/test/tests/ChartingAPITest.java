@@ -100,6 +100,7 @@ public class ChartingAPITest extends BaseWebDriverTest
     private String goToChartingTestPage(String linkText)
     {
         goToModule("chartingapi");
+        waitForElement(Locator.linkWithText(linkText));
         clickAndWait(Locator.linkWithText(linkText));
         return waitForWikiDivPopulation("testDiv", 30);
     }
