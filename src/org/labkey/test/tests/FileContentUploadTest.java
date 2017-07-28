@@ -47,12 +47,12 @@ import static org.junit.Assert.assertEquals;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
-import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.util.FileBrowserHelper.BrowserAction;
 
 @Category({BVT.class, FileBrowser.class})
 public class FileContentUploadTest extends BaseWebDriverTest
 {
+    private boolean foo = setIsBootstrapWhitelisted(true);
     private final SearchHelper _searchHelper = new SearchHelper(this);
 
     private static final String FILE_DESCRIPTION = "FileContentTestFile";
@@ -198,11 +198,11 @@ public class FileContentUploadTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("Users", this);
         table.checkCheckbox(table.getRowIndex("Email", TEST_USER));
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON)));
-        _ext4Helper.clickExt4MenuButton(false, Locator.lkButton(MessagesLongTest.USERS_UPDATE_BUTTON), false, MessagesLongTest.FILES_MENU_ITEM);
-        final Window window = Window(getDriver()).withTitle("Update User Settings For Files").waitFor();
+        table.clickHeaderMenu(MessagesLongTest.USERS_UPDATE_BUTTON, false, MessagesLongTest.FILES_MENU_ITEM);
+        final Window window = Window(getDriver()).withTitle("Update user settings for files").waitFor();
         ComboBox.ComboBox(getDriver()).withLabel(MessagesLongTest.NEW_SETTING_LABEL).find(window).selectComboBoxItem("No Email");
         window.clickButton(MessagesLongTest.POPUP_UPDATE_BUTTON, true);
-        table.doAndWaitForUpdate(() -> Window(getDriver()).withTitle("Update Selected Users").waitFor().
+        table.doAndWaitForUpdate(() -> Window(getDriver()).withTitle("Update selected users").waitFor().
                 clickButton("Yes"));
 
         assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRowIndex("Email", TEST_USER), "File Settings"));
@@ -234,7 +234,8 @@ public class FileContentUploadTest extends BaseWebDriverTest
         clickButton("Save & Close");
     }
 
-    @Override public BrowserType bestBrowser()
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }

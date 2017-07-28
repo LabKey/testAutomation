@@ -73,13 +73,13 @@ public class MessagesLongTest extends BaseWebDriverTest
     private static final String USER = "message_user@messages.test";
     private static final String GROUP = "Message group";
 
-    public static final String FILES_DEFAULT_COMBO = "Default Setting For Files:";
-    public static final String MESSAGES_DEFAULT_COMBO = "Default Setting For Messages:";
-    public static final String USERS_UPDATE_BUTTON = "Update User Settings";
-    public static final String NEW_SETTING_LABEL = "New Setting:";
-    public static final String POPUP_UPDATE_BUTTON = "Update Settings For 1 User";
-    public static final String FILES_MENU_ITEM = "For Files";
-    public static final String MESSAGES_MENU_ITEM = "For Messages";
+    public static final String FILES_DEFAULT_COMBO = "Default setting for files:";
+    public static final String MESSAGES_DEFAULT_COMBO = "Default setting for messages:";
+    public static final String USERS_UPDATE_BUTTON = "Update user settings";
+    public static final String NEW_SETTING_LABEL = "New setting:";
+    public static final String POPUP_UPDATE_BUTTON = "Update settings for 1 user";
+    public static final String FILES_MENU_ITEM = "For files";
+    public static final String MESSAGES_MENU_ITEM = "For messages";
 
     private final PortalHelper _portalHelper = new PortalHelper(this);
     private String _messageUserId;
