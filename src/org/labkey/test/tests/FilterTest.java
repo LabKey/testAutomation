@@ -18,22 +18,22 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.PageFlowUtil;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.tests.issues.IssuesTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -49,7 +49,7 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Data.class})
 public class FilterTest extends BaseWebDriverTest
 {
-    protected final static String PROJECT_NAME = "FilterVerifyProject";
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R report";
     protected final static String FACET_TEST_LIST = "FacetList";
 
@@ -77,8 +77,6 @@ public class FilterTest extends BaseWebDriverTest
 
     protected final ListHelper.ListColumn _list2Col1 = new ListHelper.ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new ListHelper.LookupInfo(null, "lists", LIST_NAME_COLORS));
 
-    protected String listUrl = "";
-
     @Override
     protected BrowserType bestBrowser()
     {
@@ -87,19 +85,25 @@ public class FilterTest extends BaseWebDriverTest
 
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "FilterVerifyProject";
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    @BeforeClass
+    public static void setupProject()
     {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
+        FilterTest init = (FilterTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        new RReportHelper(this).ensureRConfig();
+        _containerHelper.createProject(getProjectName(), null);
     }
 
     @Test
     public void testSteps()
     {
-        setupProject();
-
         createList();
         filterTest();
 
@@ -108,15 +112,6 @@ public class FilterTest extends BaseWebDriverTest
         maskedFacetTest();
         containerFilterFacetTest();
         searchFilterTest();
-    }
-
-    @LogMethod
-    private void setupProject()
-    {
-        RReportHelper _RReportHelper = new RReportHelper(this);
-        _RReportHelper.ensureRConfig();
-
-        _containerHelper.createProject(PROJECT_NAME, null);
     }
 
     @LogMethod
@@ -139,14 +134,13 @@ public class FilterTest extends BaseWebDriverTest
         }
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
+        _listHelper.createList(getProjectName(), LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
         _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         _listHelper.clickSave();
         _listHelper.clickImportData();
         _listHelper.submitTsvData(testDataFull.toString());
-        listUrl = getCurrentRelativeURL();
 
         new RReportHelper(this).createRReport(R_VIEW);
     }
@@ -155,7 +149,7 @@ public class FilterTest extends BaseWebDriverTest
     protected void createList2()
     {
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
-        _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
+        _listHelper.createList(getProjectName(), FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
         clickButton("Import Data");
         setFormElement(Locator.name("text"), "Car\tColor\tyear\n" +
                 "1\tBlue\t1980\n" +
@@ -163,7 +157,7 @@ public class FilterTest extends BaseWebDriverTest
                 "3\tYellow\t1990\n");
 
         clickButton("Submit", 0);
-        waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
+        waitForElement(Locator.css(".lk-body-title h3").withText(FACET_TEST_LIST));
     }
 
     @LogMethod
@@ -268,9 +262,9 @@ public class FilterTest extends BaseWebDriverTest
         IssuesHelper issuesHelper = new IssuesHelper(this);
         issuesHelper.createNewIssuesList("issues", getContainerHelper());
         goToModule("Issues");
-        issuesHelper.goToAdmin();
-        issuesHelper.setIssueAssignmentList("Site:Administrators");
-        clickButton("Save");
+        issuesHelper.goToAdmin()
+                .setIssueAssignmentList("Site:Administrators")
+                .save();
         IssuesTest.addLookupValues(this, "issues", "Type", Arrays.asList("typea", "typeb"));
 
         HashMap<String, String> projectIssue = new HashMap<>();
@@ -315,7 +309,7 @@ public class FilterTest extends BaseWebDriverTest
         subfolderIssue2.put("priority", "4");
         issuesHelper.addIssue(subfolderIssue2);
 
-        clickProject(getProjectName());
+        goToProjectHome();
         goToModule("Issues");
 
         assertElementPresent(Locator.linkWithText(projectIssue.get("title")));
@@ -323,13 +317,13 @@ public class FilterTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        _extHelper.clickMenuButton("Grid Views", "Folder Filter", "Current folder and subfolders");
+        DataRegionTable region = new DataRegionTable("issues-issues", this);
+        region.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
         assertElementPresent(Locator.linkWithText(projectIssue.get("title")));
         assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
         assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
 
-        DataRegionTable region = new DataRegionTable("issues-issues", this);
         verifyFacetOptions(region, "Type",
                 projectIssue.get("type"),
                 projectIssue2.get("type"),
@@ -565,10 +559,15 @@ public class FilterTest extends BaseWebDriverTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             if (IS_BOOTSTRAP_LAYOUT)
-                region.clickHeaderMenu("Grid views", "default");
+            {
+                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+                        .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
+                        .findElement(getDriver())).clickMenuButton(true, false, "default");
+            }
             else
+            {
                 _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
-
+            }
             log("** Checking filter values in filter dialog");
             region = new DataRegionTable(TABLE_NAME, this);
             region.openFilterDialog(fieldKey);

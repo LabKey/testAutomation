@@ -171,7 +171,4 @@ public class LabKeyJDBCTest
         assertTrue("Didn't find Name column", foundName);
         assertTrue("Didn't find RowId column", foundRowId);
     }
-
-
-
 }

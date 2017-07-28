@@ -70,6 +70,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
     private static final int DEFAULT_WAIT = 30000;
+    
+    private static final String INSERT_ROW_TEXT = "Insert new row";
 
     protected final String _regionName;
     protected final WebDriverWrapper _driver;
@@ -770,11 +772,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return -1;
     }
 
-    private boolean hasNoDataToShow()
-    {
-        return Locator.tagWithText("tr", "No data to show.").findElements(getComponentElement()).size() == 1;
-    }
-
     public WebElement findCell(int row, String column)
     {
         if (getColumnIndex(column) < 0)
@@ -833,7 +830,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             WebElement updateLink = updateLink(getRowIndex(key));     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
             _driver.fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
             _driver.clickAndWait(updateLink(getRowIndex(key)));
-        }else
+        }
+        else
         {
             _driver.clickAndWait(updateLink(getRowIndex(key)));
         }
@@ -851,14 +849,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             switch (inputType)
             {
                 case "checkbox":
-                    if(data.get(key).toLowerCase().equals("true"))
-                    {
-                        _driver.setCheckbox(field, true);
-                    }
-                    else
-                    {
-                        _driver.setCheckbox(field, false);
-                    }
+                    _driver.setCheckbox(field, data.get(key).toLowerCase().equals("true"));
                     break;
                 case "file":
                     _driver.setFormElement(field, new File(data.get(key)));
@@ -869,7 +860,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
         _driver.clickButton("Submit");
 
-        if(validateText)
+        if (validateText)
         {
             _driver.assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
         }
@@ -1055,7 +1046,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             BootstrapMenu headerMenu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
             headerMenu.clickMenuButton(true, false, "Clear Sort");
-        }else
+        }
+        else
         {
             _driver.clearSort(_regionName, columnName);
         }
@@ -1311,7 +1303,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             doAndWaitForUpdate(()-> elements().UX_PageNext_Button.click());
-        }else
+        }
+        else
         {
             clickDataRegionPageLink("Next Page");
         }
@@ -1323,7 +1316,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             doAndWaitForUpdate(()-> elements().UX_PagePrev_Button.click());
-        }else
+        }
+        else
         {
             clickDataRegionPageLink("Previous Page");
         }
@@ -1352,7 +1346,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void setContainerFilter(ContainerFilterType filterType)
     {
-        clickHeaderMenu("Grid Views", true, "Folder Filter", filterType.getLabel());
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", true, "Folder Filter", filterType.getLabel());
     }
 
     /**
@@ -1496,7 +1490,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @Deprecated
     public void clickInsertNewRowDropdown()
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", "Insert New Row");
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", INSERT_ROW_TEXT);
     }
 
     public void clickImportBulkDataDropdown()
@@ -1510,10 +1504,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Insert data"));
-            menu.clickMenuButton(true, false, "Insert New Row");
-        }else
+            menu.clickMenuButton(true, false, INSERT_ROW_TEXT);
+        }
+        else
         {
-            elements().getHeaderButton("Insert New Row").click();
+            elements().getHeaderButton(INSERT_ROW_TEXT).click();
         }
     }
 
@@ -1524,16 +1519,16 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             if (hasHeaderMenu("Insert data"))
-                clickHeaderMenu("Insert data", "Insert New Row");
+                clickHeaderMenu("Insert data", INSERT_ROW_TEXT);
             else
-                clickHeaderButton("Insert new row");
+                clickHeaderButton(INSERT_ROW_TEXT);
         }
         else
         {
-            if (elements().getHeaderButtonOrNull("Insert New Row") != null)
-                elements().getHeaderButton("Insert New Row").click();
+            if (elements().getHeaderButtonOrNull(INSERT_ROW_TEXT) != null)
+                elements().getHeaderButton(INSERT_ROW_TEXT).click();
             else
-                clickHeaderMenu("Insert", "Insert New Row");
+                clickHeaderMenu("Insert", INSERT_ROW_TEXT);
         }
     }
 
@@ -1551,7 +1546,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public static String getInsertNewButtonText()
     {
-        return "Insert New Row";
+        return INSERT_ROW_TEXT;
     }
 
     public static String getImportBulkDataText()

@@ -56,6 +56,12 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         return new AdminPage(driver.getDriver());
     }
 
+    public ListPage cancel()
+    {
+        clickButton("Cancel");
+        return new ListPage(getDriver());
+    }
+
     public LabKeyPage clickEmailTemplate()
     {
         clickAndWait(elementCache().customizeEmailButton);
@@ -93,21 +99,23 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
     }
 
     @LogMethod
-    public void setIssueAssignmentList(@Nullable @LoggedParam String group)
+    public AdminPage setIssueAssignmentList(@Nullable @LoggedParam String group)
     {
         if (group != null)
             assignToList().set(AssignToListOption.specificGroup(group));
         else
             assignToList().set(AssignToListOption.allProjectUsers());
+        return this;
     }
 
     @LogMethod
-    public void setIssueAssignmentUser(@Nullable @LoggedParam String user)
+    public AdminPage setIssueAssignmentUser(@Nullable @LoggedParam String user)
     {
         if (user != null)
             defaultAssignedTo().set(DefaultAssignToOption.specificUser(user));
         else
             defaultAssignedTo().set(DefaultAssignToOption.noDefault());
+        return this;
     }
 
     @Override
@@ -146,12 +154,6 @@ public class AdminPage extends BaseDesignerPage<AdminPage.ElementCache>
         {
             return _text;
         }
-    }
-
-    public ListPage cancel()
-    {
-        clickButton("Cancel");
-        return new ListPage(getDriver());
     }
 
     @Override

@@ -158,6 +158,7 @@ public class ListHelper extends LabKeySiteWrapper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
+            // TODO: Switch to using getDataRegion().clickInsertNewRow();
             clickMenuButton(true,
                     Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
                     false,
