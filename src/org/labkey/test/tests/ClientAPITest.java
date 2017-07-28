@@ -246,6 +246,7 @@ public class ClientAPITest extends BaseWebDriverTest
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
         goToModule("List");
+        waitForElement(Locator.linkWithText(LIST_NAME));
         clickAndWait(Locator.linkWithText(LIST_NAME));
         final DataRegionTable list = new DataRegionTable("query", this);
         list.checkAll();
