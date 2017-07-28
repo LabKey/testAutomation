@@ -21,7 +21,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.ListHelper;
@@ -34,7 +33,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class HTTPApiTest extends BaseWebDriverTest
 {
-    private static final String PROJECT_NAME = "HTTPApiVerifyProject";
+    private boolean foo = setIsBootstrapWhitelisted(true);
     private static final String LIST_NAME = "Test List";
 
     private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
@@ -54,7 +53,7 @@ public class HTTPApiTest extends BaseWebDriverTest
 
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "HTTPApiVerifyProject";
     }
 
     protected File[] getTestFiles()
@@ -73,12 +72,6 @@ public class HTTPApiTest extends BaseWebDriverTest
         return Arrays.asList("query");
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-    }
-
     @BeforeClass
     public static void initTest() throws Exception
     {
@@ -86,17 +79,17 @@ public class HTTPApiTest extends BaseWebDriverTest
         init.createTestData();
     }
 
-    public void createTestData(){
-
+    public void createTestData()
+    {
         log("Create Project");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        clickProject(PROJECT_NAME);
+        _containerHelper.createProject(getProjectName(), null);
+        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
 
         log("Create List");
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
-        clickButton("Edit Design", 0);
+        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
+        _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Like");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Save", 0);
         waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
@@ -105,7 +98,6 @@ public class HTTPApiTest extends BaseWebDriverTest
         log("Upload data");
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
-
     }
 
     @Test
@@ -115,5 +107,4 @@ public class HTTPApiTest extends BaseWebDriverTest
         apiTester.setTestFiles(getTestFiles());
         apiTester.runApiTests();
     }
-
 }
