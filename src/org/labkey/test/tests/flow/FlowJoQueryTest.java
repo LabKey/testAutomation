@@ -42,6 +42,8 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class})
 public class FlowJoQueryTest extends BaseFlowTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+
     @Test
     public void _doTestSteps()
     {
@@ -79,7 +81,13 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
-        _extHelper.clickMenuButton("Query", "PassFail");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "PassFail");
+        }else
+        {
+            _extHelper.clickMenuButton("Query", "PassFail");
+        }
 
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -109,7 +117,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement(Locator.name("name"), "LabKeyScript");
         checkCheckbox(Locator.name("copyAnalysis"));
-        submit();
+        submit(Locator.tag("form").withAttributeContaining("action", "flow-editscript-copy.view"));    //
 
         // Only run LabKeyScript on sample wells
         // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
@@ -128,11 +136,23 @@ public class FlowJoQueryTest extends BaseFlowTest
         waitForPipeline(getContainerPath());
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
-        _extHelper.clickMenuButton("Query", "Comparison");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new DataRegionTable("query", getDriver()).clickHeaderMenu("Query", "Comparison");
+        }else
+        {
+            _extHelper.clickMenuButton("Query", "Comparison");
+        }
         // Custom queries are filtered by analysis folder (Issue 18332)
         assertTextPresent("No data to show");
 
-        _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Analysis Folder"), false, "All Analysis Folders");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new DataRegionTable("query", getDriver()).clickHeaderMenu("Analysis Folder", "All Analysis Folders");
+        }else
+        {
+            _ext4Helper.clickExt4MenuButton(true, Locator.lkButton("Analysis Folder"), false, "All Analysis Folders");
+        }
         assertTextNotPresent("No data to show");
         DataRegionTable region = new DataRegionTable("query", this);
         region.setFilter("AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
