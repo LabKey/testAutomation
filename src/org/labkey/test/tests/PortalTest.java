@@ -25,6 +25,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -35,11 +38,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @Category({BVT.class})
 public class PortalTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String WIKI_WEBPART_TEXT = "The Wiki web part displays a single wiki page.";
     private static final String MESSAGES_WEBPART_TEXT = "all messages";
     private final PortalHelper portalHelper = new PortalHelper(this);
@@ -144,24 +149,35 @@ public class PortalTest extends BaseWebDriverTest
     @LogMethod
     public void assertWebparts(List<String> requiredWebparts, List<String> preferredWebparts)
     {
-        log(requiredWebparts.size() > 0 ? "Assert that required webparts can't be deleted" : "No required webparts");
+        log(requiredWebparts.size() > 0 ? "Assert that required webparts can't be removed" : "No required webparts");
+        SiteNavBar navBar = new SiteNavBar(getDriver());
+        navBar.enterPageAdminMode();
         for (String webpartTitle : requiredWebparts)
         {
             log("Check required webpart: " + webpartTitle);
-            click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-            waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
-            assertElementNotPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
-            click(Locator.id("search-input")); // dismiss menu
+            BodyWebPart webPart = new BodyWebPart(getDriver(), webpartTitle);
+            BootstrapMenu titleMenu = webPart.getTitleMenu();
+            titleMenu.expand();
+            waitFor(()-> Locator.linkContainingText("Permissions").findElementOrNull(titleMenu.getComponentElement()) != null, 2000);
+            assertTrue("WebPart should not be removable",
+                    Locator.linkContainingText("Remove From Page").findElementOrNull(titleMenu.getComponentElement()) == null);
+            titleMenu.collapse();
         }
 
-        log(preferredWebparts.size() > 0 ? "Assert that preferred webparts can't be deleted" : "No preferred webparts");
+        log(preferredWebparts.size() > 0 ? "Assert that preferred webparts can be removed" : "No preferred webparts");
         for (String webpartTitle : preferredWebparts)
         {
             log("Check preferred webpart: " + webpartTitle);
-            click(PortalHelper.Locators.webPartTitleMenu(webpartTitle));
-            waitForElement(Ext4Helper.Locators.menuItem("Permissions").notHidden());
-            assertElementPresent(Ext4Helper.Locators.menuItem("Remove From Page").notHidden());
-            click(Locator.id("search-input")); // dismiss menu
+            BodyWebPart webPart = new BodyWebPart(getDriver(), webpartTitle);
+            BootstrapMenu titleMenu = webPart.getTitleMenu();
+            titleMenu.expand();
+            waitFor(()-> Locator.linkContainingText("Permissions").findElementOrNull(titleMenu.getComponentElement()) != null, 2000);
+            assertTrue("WebPart should be removable",
+                    Locator.linkContainingText("Remove From Page")
+                            .notHidden().
+                            findElementOrNull(titleMenu.getComponentElement()) != null);
+
+            titleMenu.collapse();
          }
 
         List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(getDriver());
@@ -187,6 +203,7 @@ public class PortalTest extends BaseWebDriverTest
 
             fail("Should be unreachable. Something went wrong in the test. Make sure you are looking for the correct webparts.");
         }
+        navBar.exitPageAdminMode();
     }
 
     @Override
@@ -204,10 +221,7 @@ public class PortalTest extends BaseWebDriverTest
     @Test
     public void testSearch()
     {
-        final Locator.IdLocator headerSearch = Locator.id("search-input");
-        waitForElement(headerSearch);
-        setFormElement(headerSearch, "labkey");
-        doAndWaitForPageToLoad(() -> pressEnter(headerSearch));
-        assertElementPresent(Locator.id("searchResults")); // just make sure we get the results page
+        SearchResultsPage resultsPage = new SiteNavBar(getDriver()).search("labkey");
+        assertTrue("At least one searchresult is expected", resultsPage.getResultCount() > -1); // just make sure we get to the results page
     }
 }

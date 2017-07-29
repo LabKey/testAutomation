@@ -397,25 +397,34 @@ public class PortalHelper extends WebDriverWrapper
         if (direction.isHorizontal())
             throw new IllegalArgumentException("Can't move webpart horizontally.");
 
-        Locator.XPathLocator webPartLoc = Locator.xpath("//table[@name='webpart']").withPredicate(Locator.tagWithClass("span", "labkey-wp-title-text").withText(webPartTitle));
-        final WebElement webPart = webPartLoc.findElement(getDriver());
-
-        int initialIndex = (getElementIndex(webPart) / 2); // Each webpart has an adjacent <br>
-
-        Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()="+Locator.xq(webPartTitle)+"]]");
-        String panelClass = portalPanel.findElement(getDriver()).getAttribute("class");
-        if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel"))
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            clickWebpartMenuItem(webPartTitle, false, "Move " + direction.toString());
-        }
-        else
+            SiteNavBar navBar = new SiteNavBar(getDriver());
+            navBar.enterPageAdminMode();
+            new BodyWebPart<>(getDriver(), webPartTitle).moveWebPart(direction==Direction.DOWN);
+            navBar.exitPageAdminMode();
+        }else
         {
-            fail("Unable to analyze webpart type. PortalHelper.java needs updating.");
-        }
+            Locator.XPathLocator webPartLoc = Locator.xpath("//table[@name='webpart']").withPredicate(Locator.tagWithClass("span", "labkey-wp-title-text").withText(webPartTitle));
+            final WebElement webPart = webPartLoc.findElement(getDriver());
 
-        final int expectedIndex = initialIndex + (direction == Direction.DOWN ? 1 : -1);
-        waitFor(() -> (getElementIndex(webPart) / 2) == expectedIndex,
-                "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            int initialIndex = (getElementIndex(webPart) / 2); // Each webpart has an adjacent <br>
+
+            Locator.XPathLocator portalPanel = Locator.xpath("//td[./table[@name='webpart']//span[contains(@class, 'labkey-wp-title-text') and text()=" + Locator.xq(webPartTitle) + "]]");
+            String panelClass = portalPanel.findElement(getDriver()).getAttribute("class");
+            if (panelClass.contains("labkey-side-panel") || panelClass.contains("labkey-body-panel"))
+            {
+                clickWebpartMenuItem(webPartTitle, false, "Move " + direction.toString());
+            }
+            else
+            {
+                fail("Unable to analyze webpart type. PortalHelper.java needs updating.");
+            }
+
+            final int expectedIndex = initialIndex + (direction == Direction.DOWN ? 1 : -1);
+            waitFor(() -> (getElementIndex(webPart) / 2) == expectedIndex,
+                    "Move WebPart failed", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     public void openWebpartPermissionWindow(String webpart)
@@ -528,10 +537,15 @@ public class PortalHelper extends WebDriverWrapper
 
         public static Locator.XPathLocator webPartTitleMenu(String title)
         {
+            if (IS_BOOTSTRAP_LAYOUT)
+                return Locator.tagWithAttribute("h3", "title", title)
+                        .withChild(Locator.tagWithAttribute("a", "name", title));
             return Locator.xpath("//span[@id='more-" + title.toLowerCase() + "']");
         }
 
-        public static Locator.CssLocator bodyWebpartTitle = Locator.css("#bodypanel .labkey-wp-title-text");
+        public static Locator.CssLocator bodyWebpartTitle = Locator.css(IS_BOOTSTRAP_LAYOUT ?
+                "h3.panel-title" :
+                "#bodypanel .labkey-wp-title-text");
         public static Locator.CssLocator sideWebpartTitle = Locator.css(".labkey-side-panel .labkey-wp-title-text");
 
         public static Locator.XPathLocator webPart(String title)

@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.LogMethod;
@@ -104,8 +105,11 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public void remove()
     {
+        SiteNavBar navBar = new SiteNavBar(getDriver());
+        navBar.enterPageAdminMode();
         clickMenuItem(false, "Remove From Page");
         waitForStale();
+        navBar.exitPageAdminMode();
     }
 
     public void moveUp()
@@ -155,6 +159,21 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
         {
             getWrapper()._ext4Helper.clickExt4MenuButton(wait, elementCache().moreMenu, false, items);
         }
+    }
+
+    public BootstrapMenu getTitleMenu()
+    {
+        return  new BootstrapMenu(getDriver(), elementCache().UX_MENU);
+    }
+
+    public void openTitleMenu()
+    {
+        new BootstrapMenu(getDriver(), elementCache().UX_MENU).expand();
+    }
+
+    public void closeTitleMenu()
+    {
+        new BootstrapMenu(getDriver(), elementCache().UX_MENU).collapse();
     }
 
     @Deprecated // Use elementCache()
