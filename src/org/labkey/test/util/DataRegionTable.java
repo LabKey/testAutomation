@@ -40,6 +40,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.File;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -622,7 +622,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public Map<String, String> getRowDataAsMap(int row)
     {
-        Map<String, String> rowMap = new LinkedHashMap<>();
+        Map<String, String> rowMap = new LinkedCaseInsensitiveMap<>();
         for (String colName : getColumnNames())
         {
             rowMap.put(colName, getDataAsText(row, colName));
