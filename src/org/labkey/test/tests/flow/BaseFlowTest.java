@@ -114,6 +114,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     public void setFlowFilter(String[] fields, String[] ops, String[] values)
     {
         goToFlowDashboard();
+        waitForElement(Locator.linkWithText("Other settings"));
         clickAndWait(Locator.linkWithText("Other settings"));
         clickAndWait(Locator.linkWithText("Edit FCS Analysis Filter"));
 
