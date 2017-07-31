@@ -44,6 +44,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Data.class})
 public class ListImportFieldsTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String PROJECT_NAME = "List Import Fields Test";
     private static final File LIST_FIELD_IMPORT = TestFileUtils.getSampleData("lists/ListImportFields.txt");
     private static final String LIST_NAME = "Test List";

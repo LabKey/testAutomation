@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.TourEditor;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.util.List;
@@ -51,6 +52,12 @@ public class TourTest extends BaseWebDriverTest
         return null;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     @BeforeClass
     @LogMethod
     public static void setup() throws Exception
@@ -67,7 +74,8 @@ public class TourTest extends BaseWebDriverTest
     {
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER1 + "/begin.view");
         waitForText("Tours");
-        _extHelper.clickInsertNewRow(true);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
         waitForText("Tour Builder");
         TourEditor tourEditor = new TourEditor(getDriver());
         tourEditor.setTitle("Test Tour");
@@ -136,7 +144,8 @@ public class TourTest extends BaseWebDriverTest
         String tourJSON = tourEditor.export();
         beginAt("/tours/" + getProjectName() + "/" + SUBFOLDER2 + "/begin.view");
         waitForText("Tours");
-        _extHelper.clickInsertNewRow(true);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
         waitForText("Tour Builder");
         tourEditor = new TourEditor(getDriver());
         tourEditor.importTour(tourJSON);
