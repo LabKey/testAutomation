@@ -134,8 +134,8 @@ public class FlowTest extends BaseFlowTest
         result = new DataRegionTable("query", getDriver());
         WebElement editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
-        assertEquals("Expected ","Selected Files:", getTableCellText(new Locator.IdLocator("keywordTable"),2,0 ));
-        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(new Locator.IdLocator("keywordTable"),2,1 ));
+        assertEquals("Expected ","Selected Files:", getTableCellText(Locator.id("keywordTable"),2,0 ));
+        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(Locator.id("keywordTable"),2,1 ));
 
         Locator locTubeName = Locator.xpath("//td/input[@type='hidden' and @value='TUBE NAME']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locTubeName, "FlowTest Keyword Tube Name");
