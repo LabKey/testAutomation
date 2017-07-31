@@ -38,6 +38,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLTaskRefTaskTest extends ETLAbstractTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist this test
     private static final String PROJECT_NAME = "ETLTaskRefTaskProject";
     private static final String ETL = "{ETLtest}/TaskRefTask";
     public static final String LOG_MESSAGE = "Log from test task";

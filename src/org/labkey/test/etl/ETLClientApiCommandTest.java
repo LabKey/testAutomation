@@ -50,6 +50,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLClientApiCommandTest extends ETLAbstractTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist this test
     private static final String TRANSFORM_NOTFOUND = "{ETLtest}/notfound";
 
     @Override

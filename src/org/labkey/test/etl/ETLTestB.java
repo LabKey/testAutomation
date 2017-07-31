@@ -44,6 +44,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLTestB extends ETLAbstractTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist this test
     private static final int DEFAULT_OUTPUT_ROWS = 3;
 
     @Nullable

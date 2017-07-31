@@ -43,6 +43,7 @@ import java.util.List;
 @Category({DailyB.class, Data.class, ETL.class})
 public class ETLRemoteSourceTest extends ETLAbstractTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist this test
     private static final String TRANSFORM_REMOTE = "{ETLtest}/remote";
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
