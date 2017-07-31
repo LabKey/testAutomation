@@ -44,6 +44,7 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class})
 public class AssayAPITest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist this test
     protected final static File CREST_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File SCREENSHOT_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
     protected final static File FOO_XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
@@ -79,14 +80,28 @@ public class AssayAPITest extends BaseWebDriverTest
                 TestFileUtils.getSampleData("GPAT/" + runName), runName, new String[]{"K770K3VY-19"});
         // verify images are resolved and rendered properly
         assertElementPresent("Did not find the expected number of icons for images for " + CREST_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + CREST_FILE.getName() + "')]"), 100);
-        waitForElement(Locator.paginationText(1, 100, 201));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            waitForElement(Locator.tagWithClass("div", "labkey-pagination")     // todo: implement this in a component wrapping the pager widget
+                .withChild(Locator.tagContainingText("span", "1 - 100 of 201")));
+        }else
+        {
+            waitForElement(Locator.paginationText(1, 100, 201));
+        }
 
         goToProjectHome();
 
         //Issue 16073
         importAssayAndRun(TestFileUtils.getSampleData("AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
                 TestFileUtils.getSampleData("GPAT/" + runName), "trial01-1.xls", new String[]{"K770K3VY-19"});
-        waitForElement(Locator.paginationText(1, 100, 201));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            waitForElement(Locator.tagWithClass("div", "labkey-pagination")     // todo: implement this in a component wrapping the pager widget
+                    .withChild(Locator.tagContainingText("span", "1 - 100 of 201")));
+        }else
+        {
+            waitForElement(Locator.paginationText(1, 100, 201));
+        }
     }
 
     protected void importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
