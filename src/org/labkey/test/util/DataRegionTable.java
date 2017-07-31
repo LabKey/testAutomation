@@ -71,8 +71,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
     private static final int DEFAULT_WAIT = 30000;
     
-    private static final String INSERT_ROW_TEXT = "Insert new row";
-
     protected final String _regionName;
     protected final WebDriverWrapper _driver;
     private final WebElement _el;
@@ -1479,7 +1477,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @Deprecated
     public void clickInsertNewRowDropdown()
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", INSERT_ROW_TEXT);
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", getInsertNewButtonText());
     }
 
     public void clickImportBulkDataDropdown()
@@ -1493,11 +1491,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Insert data"));
-            menu.clickMenuButton(true, false, INSERT_ROW_TEXT);
+            menu.clickMenuButton(true, false, getInsertNewButtonText());
         }
         else
         {
-            elements().getHeaderButton(INSERT_ROW_TEXT).click();
+            elements().getHeaderButton(getInsertNewButtonText()).click();
         }
     }
 
@@ -1508,16 +1506,16 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             if (hasHeaderMenu("Insert data"))
-                clickHeaderMenu("Insert data", INSERT_ROW_TEXT);
+                clickHeaderMenu("Insert data", getInsertNewButtonText());
             else
-                clickHeaderButton(INSERT_ROW_TEXT);
+                clickHeaderButton(getInsertNewButtonText());
         }
         else
         {
-            if (elements().getHeaderButtonOrNull(INSERT_ROW_TEXT) != null)
-                elements().getHeaderButton(INSERT_ROW_TEXT).click();
+            if (elements().getHeaderButtonOrNull(getInsertNewButtonText()) != null)
+                elements().getHeaderButton(getInsertNewButtonText()).click();
             else
-                clickHeaderMenu("Insert", INSERT_ROW_TEXT);
+                clickHeaderMenu("Insert", getInsertNewButtonText());
         }
     }
 
@@ -1535,12 +1533,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public static String getInsertNewButtonText()
     {
-        return INSERT_ROW_TEXT;
+        return IS_BOOTSTRAP_LAYOUT ? "Insert new row" : "Insert New Row";
     }
 
     public static String getImportBulkDataText()
     {
-        return "Import Bulk Data";
+        return IS_BOOTSTRAP_LAYOUT ? "Import bulk data" : "Import Bulk Data";
     }
 
     public static class Locators
