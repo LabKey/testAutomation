@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pages.issues;
 
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -25,6 +26,7 @@ import org.openqa.selenium.WebElement;
 
 public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 {
+    private boolean IS_BOOTSTRAP_LAYOUT = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
     public DetailsPage(WebDriver driver)
     {
         super(driver);
@@ -99,11 +101,21 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
         protected WebElement newIssueLink = Locator.bootstrapButton("a", "New Issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI
-        protected WebElement updateLink = Locator.bootstrapButton("a", "Update").findWhenNeeded(this);
-        protected WebElement resolveLink = Locator.bootstrapButton("a", "Resolve").findWhenNeeded(this);
-        protected WebElement closeLink = Locator.bootstrapButton("a", "Close").findWhenNeeded(this);
-        protected WebElement reopenLink = Locator.bootstrapButton("a", "Reopen").findWhenNeeded(this);
-        protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
+        protected WebElement updateLink = IS_BOOTSTRAP_LAYOUT ?
+                Locator.bootstrapButton("a", "Update").findWhenNeeded(this)
+                : Locator.linkWithText("update").findWhenNeeded(this);
+        protected WebElement resolveLink = IS_BOOTSTRAP_LAYOUT ?
+                Locator.bootstrapButton("a", "Resolve").findWhenNeeded(this)
+                : Locator.linkWithText("resolve").findWhenNeeded(this);
+        protected WebElement closeLink = IS_BOOTSTRAP_LAYOUT ?
+                Locator.bootstrapButton("a", "Close").findWhenNeeded(this)
+                : Locator.linkWithText("close").findWhenNeeded(this);
+        protected WebElement reopenLink = IS_BOOTSTRAP_LAYOUT ?
+                Locator.bootstrapButton("a", "Reopen").findWhenNeeded(this)
+                : Locator.linkWithText("reopen").findWhenNeeded(this);
+        protected WebElement printLink = IS_BOOTSTRAP_LAYOUT ?
+                Locator.bootstrapButton("a", "Print").findWhenNeeded(this)
+                : Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
         protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this); //in menu in newUI
     }
 }
