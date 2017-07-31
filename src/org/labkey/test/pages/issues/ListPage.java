@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pages.issues;
 
-import org.labkey.api.util.PageFlowUtil;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
@@ -31,6 +31,7 @@ import static org.labkey.test.components.html.Input.Input;
 
 public class ListPage extends LabKeyPage<ListPage.ElementCache>
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
     public ListPage(WebDriver driver)
     {
         super(driver);
@@ -99,13 +100,13 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
         WebElement jumpToForm = Locator.tagWithName("form", "jumpToIssue").findWhenNeeded(this);
         WebElement newIssueButton = Locator.lkButton().startsWith("New ").findWhenNeeded(jumpToForm);
         Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
-        WebElement issueJumpButton = PageFlowUtil.useExperimentalCoreUI()
+        WebElement issueJumpButton = IS_BOOTSTRAP_LAYOUT
                 ? Locator.lkButton("Search").findWhenNeeded(bodyBlock)
                 : Locator.lkButton().startsWith("Jump to ").findWhenNeeded(jumpToForm);
-        Input searchInput = PageFlowUtil.useExperimentalCoreUI()
+        Input searchInput = IS_BOOTSTRAP_LAYOUT
                 ? issueJumpInput
                 : Input(Locator.name("q"), getDriver()).findWhenNeeded(bodyBlock);
-        WebElement searchButton = PageFlowUtil.useExperimentalCoreUI()
+        WebElement searchButton = IS_BOOTSTRAP_LAYOUT
                 ? issueJumpButton
                 : Locator.lkButton("Search").findWhenNeeded(bodyBlock);
         DataRegionTable issuesList = DataRegionTable.findDataRegion(ListPage.this);
