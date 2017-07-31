@@ -22,7 +22,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsListPage;
 import org.labkey.test.pages.issues.DetailsPage;
@@ -41,7 +41,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 
-@Category({InDevelopment.class})
+@Category({DailyC.class})
 public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {
     private static final File FILES_ARCHIVE = TestFileUtils.getSampleData("filenames/illegal_chars.tar.gz");
