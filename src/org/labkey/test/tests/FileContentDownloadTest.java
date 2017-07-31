@@ -45,6 +45,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, FileBrowser.class})
 public class FileContentDownloadTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);} // whitelist me
     @BeforeClass
     public static void doSetup() throws Exception
     {
@@ -188,7 +189,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
         signOut();
         // Test that renderAs can be observed through a login
         beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/%40files/" + EscapeUtil.encode(folderName) + "/" + textFile.getName() + "?renderAs=INLINE");
-        assertTitleEquals("Sign In");
+        assertTitleContains("Sign In");
 
         log("Test renderAs through login and ensure that page is rendered inside of server UI");
         // If this succeeds, then page has been rendered in frame

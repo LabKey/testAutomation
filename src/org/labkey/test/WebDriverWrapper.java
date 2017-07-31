@@ -1783,7 +1783,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return doAndWaitForDownload(func, 1)[0];
     }
 
-    private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[a-zA-Z0-9]{4,}\\.tmp");
+    // Pattern matcher for UUID
+    // https://stackoverflow.com/questions/136505/searching-for-uuids-in-text-with-regex
+    private static final Pattern TEMP_FILE_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.tmp");
 
     public File[] doAndWaitForDownload(Runnable func, final int expectedFileCount)
     {
@@ -1798,24 +1800,13 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         func.run();
 
-        final FileFilter tempFilesFilter = new FileFilter()
-        {
-            @Override
-            public boolean accept(File file)
-            {
-                return file.getName().contains(".part") ||
-                        file.getName().contains(".com.google.Chrome") ||
-                        file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
-            }
-        };
-        final FileFilter newFileFilter = new FileFilter()
-        {
-            @Override
-            public boolean accept(File file)
-            {
-                return !existingFiles.contains(file) && !tempFilesFilter.accept(file) && file.length() > 0;
-            }
-        };
+        final FileFilter tempFilesFilter = file -> file.getName().contains(".part") ||
+                file.getName().contains(".com.google.Chrome") ||
+                file.getName().contains(".crdownload") || TEMP_FILE_PATTERN.matcher(file.getName()).matches();
+
+        final FileFilter newFileFilter = file -> !existingFiles.contains(file) &&
+                !tempFilesFilter.accept(file) &&
+                file.length() > 0;
 
         waitFor(() ->{
                     final File[] files = downloadDir.listFiles(newFileFilter);
