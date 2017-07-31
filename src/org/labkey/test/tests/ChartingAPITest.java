@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Charting.class})
 public class ChartingAPITest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+    {setIsBootstrapWhitelisted(true);}
 
     @Override
     public BrowserType bestBrowser()
