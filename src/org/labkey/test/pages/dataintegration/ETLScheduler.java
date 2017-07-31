@@ -17,10 +17,12 @@ package org.labkey.test.pages.dataintegration;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.ComponentElements;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
@@ -186,7 +188,15 @@ public class ETLScheduler extends LabKeyPage
 
         public LabKeyPage reset()
         {
-            _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Reset");
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+                        .withChild(Locator.lkButton("Reset State...")).findElement(this))
+                        .clickMenuButton(true, false,"Reset");
+            }else
+            {
+                _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Reset");
+            }
 
             return new LabKeyPage(_test);
         }
@@ -194,7 +204,15 @@ public class ETLScheduler extends LabKeyPage
         @LogMethod(quiet = true)
         public Confirm truncateAndReset()
         {
-            _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Truncate and Reset");
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+                    .withChild(Locator.lkButton("Reset State...")).findElement(this))
+                        .clickMenuButton(false, false,"Truncate and Reset");    // don't wait for page; need to dismiss alert first
+            }else
+            {
+                _test._ext4Helper.clickExt4MenuButton(false, elements().resetStateButton, false, "Truncate and Reset");
+            }
 
             return new Confirm();
         }

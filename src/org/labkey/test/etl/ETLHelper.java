@@ -20,10 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -347,9 +350,17 @@ public class ETLHelper
         if (null == subFolder)
             _test.clickTab("Portal");
         else
-            _test.clickFolder(subFolder);
+        {
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                new ProjectMenu(_test.getDriver()).navigateToFolder(_test.getCurrentProject(), subFolder);
+            }else
+            {
+                _test.clickFolder(subFolder);
+            }
+        }
         _test.clickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
-        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
+        DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_id"));
         _test.setFormElement(Locator.name("quf_id"), id);
         _test.setFormElement(Locator.name("quf_name"), name);
@@ -403,7 +414,8 @@ public class ETLHelper
         _test.log("updating source row " + 0);
         _test.clickTab("Portal");
         _test.clickAndWait(Locator.linkWithText("Source"));
-        _test.clickAndWait(Locator.linkWithText("edit").index(0));
+        DataRegionTable sourceTable = new DataRegionTable("query", _test.getDriver());
+        _test.doAndWaitForPageToLoad(()-> sourceTable.updateLink(0).click(), WebDriverWrapper.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.name("quf_name"));
         _test.setFormElement(Locator.name("quf_name"), name);
         _test.clickButton("Submit");
@@ -439,7 +451,8 @@ public class ETLHelper
         _test.log("updating row 0 in 180 column table");
         _test.clickTab("Portal");
         _test.clickAndWait(Locators.qwp180columnSource);
-        _test.waitAndClickAndWait(Locator.linkWithText("edit").index(0));
+        DataRegionTable sourceTable = new DataRegionTable("query", _test.getDriver());
+        _test.doAndWaitForPageToLoad(()-> sourceTable.updateLink(0).click(), WebDriverWrapper.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
@@ -544,6 +557,14 @@ public class ETLHelper
                     else if (_test.isElementPresent(Locator.tag("tr")
                             .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
                             .withPredicate(Locator.xpath("td").withText(COMPLETE))))
+                        return true;
+                    else if (_test.isElementPresent(Locator.tag("div").withClass("form-group")      // ux refresh UI
+                            .withPredicate(Locator.xpath("label").withText("Status"))
+                            .withPredicate(Locator.xpath("*").withText("ERROR"))))
+                        return true;
+                    else if (_test.isElementPresent(Locator.tag("div").withClass("form-group")
+                            .withPredicate(Locator.xpath("label").withText("Status"))
+                            .withPredicate(Locator.xpath("*").withText(COMPLETE))))
                         return true;
                     else
                         _test.refresh();
