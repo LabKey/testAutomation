@@ -162,7 +162,7 @@ public class ListHelper extends LabKeySiteWrapper
             clickMenuButton(true,
                     Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
                     false,
-                    "Insert New Row");
+                    "Insert new row");
         }
         else
         {
