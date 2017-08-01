@@ -553,6 +553,8 @@ public abstract class Locator
 
     public static XPathLocator lkButtonDisabled(String text)
     {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return tag("span").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
         return tag("a").withPredicate("normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button'").withText(text);
     }
 

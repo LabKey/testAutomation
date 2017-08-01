@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class MS1Test extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues
     public static final String MS1_FOLDER_TYPE = "MS1";
     public static final String X_PROTOCOL = "X Search";
@@ -195,7 +196,8 @@ public class MS1Test extends BaseWebDriverTest
 
         assertTextNotPresent("No data to show");
         assertTextPresent("1,432.8550");
-        assertElementPresent(Locator.paginationText(1, 100, 183));
+        assertElementPresent(Locator.tagWithClass("div", "labkey-pagination")   // todo: replace with use of new component
+            .withChild(Locator.tagContainingText("span", "1 - 100 of 183")));
 
         log("Features rendered OK");
     }
@@ -367,7 +369,9 @@ public class MS1Test extends BaseWebDriverTest
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
-        _extHelper.clickMenuButton("Grid Views", "default");
+        DataRegionTable fvTable = new DataRegionTable("fv", getDriver());
+        fvTable.goToView("default");
+
         assertTextNotPresent("PepProphet", "Protein", "18protmix|P46406|G3P_RABIT");
 
         //test export
@@ -435,14 +439,14 @@ public class MS1Test extends BaseWebDriverTest
 
         assertCharts();
         assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
-        assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
+        assertElementPresent(Locator.lkButton("<< Previous Feature").withClass("labkey-disabled-button"));
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickButton("Next Feature >>");
-        assertElementPresent(Locator.lkButtonDisabled("Next Feature >>"));
+        assertElementPresent(Locator.lkButton("Next Feature >>").withClass("labkey-disabled-button"));
         assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
         clickButton("<< Previous Feature");
-        assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
+        assertElementPresent(Locator.lkButton("<< Previous Feature").withClass("labkey-disabled-button"));
         assertChartRendered(Locator.tag("img").withAttributeContaining("src", "type=bubble"));
 
         log("showFeatureDetails.view OK");

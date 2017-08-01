@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1539,6 +1540,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public static String getImportBulkDataText()
     {
         return IS_BOOTSTRAP_LAYOUT ? "Import bulk data" : "Import Bulk Data";
+    }
+
+    public void goToView(String viewName)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Grid views"));
+            menu.clickMenuButton(true, false, viewName);
+        }else
+        {
+            throw new NotImplementedException("This is only implemented in the new UI");
+        }
     }
 
     public static class Locators
