@@ -1520,6 +1520,24 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
+    public void clickImportBulkData()
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            if (hasHeaderMenu("Insert data"))
+                clickHeaderMenu("Insert data", getImportBulkDataText());
+            else
+                clickHeaderButton(getInsertNewButtonText());
+        }
+        else
+        {
+            if (elements().getHeaderButtonOrNull(getImportBulkDataText()) != null)
+                elements().getHeaderButton(getInsertNewButtonText()).click();
+            else
+                clickHeaderMenu("Insert", getImportBulkDataText());
+        }
+    }
+
     public void clickDeleteAllButton()
     {
         elements().getHeaderButton("Delete All Rows").click();

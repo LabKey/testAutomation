@@ -36,6 +36,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -176,13 +177,12 @@ public class ClientAPITest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        clickProject(getProjectName());
-        clickFolder(FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), FOLDER_NAME);
 
         if (dirtyList)
         {
             refreshPeopleList();
-            clickFolder(FOLDER_NAME);
+            new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), FOLDER_NAME);
         }
     }
 
@@ -257,7 +257,7 @@ public class ClientAPITest extends BaseWebDriverTest
             assertAlertContains("Are you sure you want to delete the selected rows?");
         });
 
-        _listHelper.clickImportData();
+        list.clickImportBulkData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
     }
