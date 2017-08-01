@@ -27,6 +27,13 @@ public class CreateSubFolderPage extends LabKeyPage
         super(test);
     }
 
+
+    @Override
+    public void waitForPage()
+    {
+        waitFor(()-> Locator.input("name").findElementOrNull(getDriver()) != null, WAIT_FOR_JAVASCRIPT);
+    }
+
     public SetFolderPermissionsPage clickNext()
     {
         doAndWaitForPageToLoad(() -> newElementCache().nextButton.click());
@@ -47,8 +54,8 @@ public class CreateSubFolderPage extends LabKeyPage
 
     private class Elements extends LabKeyPage.ElementCache
     {
-        final WebElement nameInput = Locator.input("name").findWhenNeeded(this);
-        final WebElement nextButton = Locator.button("Next").findWhenNeeded(this);
+        final WebElement nameInput = Locator.input("name").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final WebElement nextButton = Locator.button("Next").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         // TODO: Add support for "Use name as title" setting
         // TODO: Add support for configuring the "Folder Type" settings
