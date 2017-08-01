@@ -177,10 +177,10 @@ public class ManageTreatmentsSingleTablePage extends LabKeyPage<ManageTreatments
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        Locator.XPathLocator treatmentScheduleTable = Locator.xpath("//div[contains(@class, 'study-vaccine-design')]//table[@class='outer']");
+        Locator.XPathLocator treatmentScheduleTable = Locator.tagWithClass("div", "study-vaccine-design").append(Locator.tagWithClass("table", "outer"));
 
-        Locator.XPathLocator addNewRow = Locator.xpath("//i[contains(@class, 'fa-plus-circle')][contains(text(), 'Add new row')]");
-        Locator.XPathLocator addNewVisit = Locator.xpath("//i[contains(@class, 'fa-plus-circle')][contains(text(), 'Add new visit')]");
+        Locator.XPathLocator addNewRow = Locator.tagWithClass("i", "fa-plus-circle").containing("Add new row");
+        Locator.XPathLocator addNewVisit = Locator.tagWithClass("i", "fa-plus-circle").containing("Add new visit");
 
         WebElement saveButton = ext4Button("Save").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement cancelButton = ext4Button("Cancel").findWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
