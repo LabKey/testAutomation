@@ -31,6 +31,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.components.WebPart.Locators.webPart;
 
 /**
@@ -105,11 +106,10 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public void remove()
     {
-        SiteNavBar navBar = new SiteNavBar(getDriver());
-        navBar.enterPageAdminMode();
+        if (IS_BOOTSTRAP_LAYOUT) new SiteNavBar(getDriver()).enterPageAdminMode();
         clickMenuItem(false, "Remove From Page");
         waitForStale();
-        navBar.exitPageAdminMode();
+        if (IS_BOOTSTRAP_LAYOUT) new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public void moveUp()
