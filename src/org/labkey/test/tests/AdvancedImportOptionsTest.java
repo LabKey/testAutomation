@@ -335,7 +335,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         importPage.setApplyToMultipleFoldersCheckBox(true);
 
         Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
-        waitFor(() -> Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).findElement(getDriver()).isDisplayed(), 5000);
+        Locator.tagWithClass("span", "x4-tree-node-text").notHidden().withText(IMPORT_FOLDER_MULTI01).waitForElement(shortWait());
 
         log("Select sub folders to import into");
         Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
