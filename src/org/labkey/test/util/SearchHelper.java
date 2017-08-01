@@ -19,9 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
 import org.openqa.selenium.WebElement;
 
@@ -213,16 +215,22 @@ public class SearchHelper
             waitForIndexer();
 
         _test.log("Searching for: '" + searchTerm + "'.");
-        if ( _test.isElementPresent(Locator.id("query")) )
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            _test.setFormElement(Locator.id("query"), searchTerm);
-            _test.clickButton("Search");
-        }
-        else
+            new SiteNavBar(_test.getDriver()).search(searchTerm);
+        }else
         {
-            _test.setFormElement(Locator.id("search-input"), searchTerm);
-            _test.pressEnter(Locator.id("search-input"));
-            _test.waitForElement(Locator.id("query"));
+            if (_test.isElementPresent(Locator.id("query")))
+            {
+                _test.setFormElement(Locator.id("query"), searchTerm);
+                _test.clickButton("Search");
+            }
+            else
+            {
+                _test.setFormElement(Locator.id("search-input"), searchTerm);
+                _test.pressEnter(Locator.id("search-input"));
+                _test.waitForElement(Locator.id("query"));
+            }
         }
     }
 
