@@ -112,30 +112,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
      * Don't use me.
      */
     @Deprecated
-    private boolean isExperimentalUXEnabled()
+    protected boolean isExperimentalUXEnabled()
     {
         Boolean useExperimentalCoreUI = (Boolean) executeScript("return LABKEY.experimental.useExperimentalCoreUI;");
         if (useExperimentalCoreUI == null)
             useExperimentalCoreUI = true; // In the future, absence of this flag means new UX is finalized.
         return useExperimentalCoreUI ;
-    }
-
-    /**
-     * Don't use me.
-     */
-    @Deprecated
-    private void enableExperimentalUX()
-    {
-        ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "useExperimentalCoreUI");
-        IS_BOOTSTRAP_LAYOUT = true;
-    }
-
-    protected boolean setIsBootstrapWhitelisted(boolean addMeToWhitelist)
-    {
-        String isWhitelisted = addMeToWhitelist ? "whitelisted" : "not whitelisted";
-        log("setting current class [" + this.getClass().toString() + "] as " + isWhitelisted);
-        IS_BOOTSTRAP_LAYOUT_WHITELISTED = addMeToWhitelist;
-        return  IS_BOOTSTRAP_LAYOUT_WHITELISTED;
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -609,24 +591,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         log("Server is running.");
         WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
-
-        { // TODO: Remove after bootstrap UI is finalized
-            IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
-            if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
-            {
-                log("turning off the new UI for class " + this.getClass().toString());
-                ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
-                refresh(); // refresh the UI after toggling the feature to ensure the test starts with the right UI for it
-                IS_BOOTSTRAP_LAYOUT = false;
-            }
-            if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
-            {
-                log("turning on the new UI for class " + this.getClass().toString());
-                ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
-                refresh();
-                IS_BOOTSTRAP_LAYOUT = true;
-            }
-        }
+        IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
     }
 
     @LogMethod
@@ -747,8 +712,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 webPart.remove();
             if (bootstrapped)
                 _userHelper.setDisplayName(PasswordUtil.getUsername(), AbstractUserHelper.getDefaultDisplayName(PasswordUtil.getUsername()) + BaseWebDriverTest.INJECT_CHARS_1);
-            if (false)
-                enableExperimentalUX(); // Flip flag to test new UX
         }
     }
 
