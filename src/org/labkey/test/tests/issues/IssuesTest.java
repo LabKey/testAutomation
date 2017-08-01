@@ -366,12 +366,12 @@ public class IssuesTest extends BaseWebDriverTest
     @LogMethod
     public static void addLookupValues(BaseWebDriverTest test, String issueDefName, String fieldName, Collection<String> values)
     {
-        if (!test.isElementPresent(Locator.lkButton("Import Data")))
+        if (!test.isElementPresent(Locator.tagWithText("h3", getLookupTableName(issueDefName, fieldName))))
         {
             test.goToSchemaBrowser();
-            test.selectQuery("lists", getLookupTableName(issueDefName, fieldName));
-            test.clickAndWait(Locator.linkWithText("view data"));
+            test.viewQueryData("lists", getLookupTableName(issueDefName, fieldName));
         }
+
         StringBuilder tsv = new StringBuilder();
         tsv.append("value");
         for (String value : values)

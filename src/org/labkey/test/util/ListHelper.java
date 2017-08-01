@@ -489,7 +489,7 @@ public class ListHelper extends LabKeySiteWrapper
                 clickMenuButton(true,
                         Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
                         false,
-                        "Import Bulk Data");
+                        "Import bulk data");
             }
             else
             {
