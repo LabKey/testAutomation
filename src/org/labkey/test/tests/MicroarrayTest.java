@@ -31,6 +31,8 @@ import org.labkey.test.util.PortalHelper;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.labkey.test.util.DataRegionTable.DataRegion;
+
 @Category(BVT.class)
 public class MicroarrayTest extends BaseWebDriverTest
 {
@@ -273,6 +275,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         {
             clickAndWait(Locator.linkWithText("Microarray Dashboard"));
         }
+        DataRegion(getDriver()).withName("AssayList").waitFor();
     }
 
     @Override
