@@ -596,7 +596,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
         log("verify notification default settings as expected");
         clickAndWait(Locator.linkWithText("Notifications"));
-        waitForText("Default Settings");
+        waitForText("Default settings");
 
         _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.FILES_DEFAULT_COMBO));
         isElementPresent(Locator.xpath("//li[text()='Daily digest' and contains(@class, 'x4-boundlist-selected')]"));
