@@ -410,11 +410,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("View Runs"));
         assertElementNotPresent(Locator.linkWithText("edit"));
         click(Locator.linkWithText("manage assay design"));
-        doAndWaitForPageToLoad(() ->
-        {
-            click(Locator.linkWithText("edit assay design"));
-            assertAlert("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
-        });
+        _assayHelper.clickEditAssayDesign(true);
 
         waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
