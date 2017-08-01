@@ -88,7 +88,7 @@ public class PropertiesEditor extends WebPartPanel
             elementCache().findFieldRows().get(elementCache().findFieldRows().size() - 1).select();
     }
 
-    public void addField(FieldDefinition col)
+    public FieldRow addField(FieldDefinition col)
     {
         selectLastField(); // So that new field appears at the bottom
         FieldRow newFieldRow = addField();
@@ -141,11 +141,16 @@ public class PropertiesEditor extends WebPartPanel
         {
             fieldProperties().selectAdvancedTab().maxTextInput.set(col.getScale().toString());
         }
+
+        return newFieldRow;
     }
 
     public FieldRow addField()
     {
+        int initialRowCount = elementCache().findFieldRows().size();
         elementCache().addFieldButton.click();
+        getWrapper().waitFor(() -> initialRowCount + 1 == elementCache().findFieldRows().size(),
+                "Failed to add field", 4000 );
         return getSelectedField();
     }
 
@@ -238,9 +243,10 @@ public class PropertiesEditor extends WebPartPanel
         }
 
         @Override
-        protected Locator.XPathLocator locator()
+        protected Locator.XPathLocator locator()//todo
         {
-            return super.locator().withDescendant(Locator.tagWithClass("tr", "editor-field-row"));
+            return super.locator().withDescendant(Locator.tagContainingText("div", "No fields have been defined."));
+            // "No fields" message is always there, just hidden sometimes. See org/labkey/api/gwt/client/ui/PropertiesEditor.java
         }
 
         @Override

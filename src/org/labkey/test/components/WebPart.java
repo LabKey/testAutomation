@@ -32,7 +32,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Arrays;
 
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.components.WebPart.Locators.webPart;
 
 /**
  * Base class for Portal WebParts (can be moved, renamed, and removed)
@@ -136,7 +135,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     public int getWebPartIndex()
     {
         // Each webpart has an adjacent <br>
-        return Locator.xpath(webPart.getLoc().replaceFirst("//", "preceding-sibling::")).findElements(getComponentElement()).size();
+        return Locator.xpath(webPartLoc().getLoc().replaceFirst("//", "preceding-sibling::")).findElements(getComponentElement()).size();
     }
 
     public void goToPermissions()
@@ -190,7 +189,7 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
 
     public class ElementCache extends Component.ElementCache
     {
-        public WebElement webPartTitle = new LazyWebElement(Locators.leftTitle, this);
+        public WebElement webPartTitle = new LazyWebElement(leftTitleLoc(), this);
         public WebElement UX_MENU = new LazyWebElement(
                 Locator.xpath("//span[contains(@class,'dropdown') and ./a[@data-toggle='dropdown']]"), this);
         public WebElement moreMenu = new LazyWebElement(Locator.css("span[title=More]"), webPartTitle);
@@ -204,12 +203,15 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     {
     }
 
-    protected static class Locators
+    protected static Locator.XPathLocator leftTitleLoc()
     {
-        public static Locator.XPathLocator leftTitle = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
                 Locator.xpath("//h3[./a[ ./span[@class='labkey-wp-title-text']]]") :
                 Locator.tag("tbody/tr/th");
-        public static Locator.XPathLocator webPart = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+    }
+    protected static Locator.XPathLocator webPartLoc()
+    {
+        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
                 Locator.tag("div").withAttribute("name", "webpart") :
                 Locator.tag("table").withAttribute("name", "webpart");
     }

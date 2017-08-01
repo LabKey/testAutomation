@@ -24,8 +24,6 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.labkey.test.components.WebPart.Locators.*;
-
 public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 {
     public BodyWebPart(WebDriver driver, WebElement webPartElement)
@@ -47,17 +45,15 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     public BodyWebPart(WebDriver test, int index)
     {
-        this(test, locator().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, webPartLoc().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
     static public WebElement find(WebDriver test, String title, int index)
     {
         return Locator.waitForAnyElement(new FluentWait<SearchContext>(test).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
-                locator().withDescendant(leftTitle.withAttribute("title", title)).index(index),
-                Locator.tagWithAttribute("table", "name", "webpart")
-                        .withDescendant(Locator.tag("tbody/tr/th").withAttribute("title", title).index(index)));
+                webPartLoc().withDescendant(leftTitleLoc().withAttribute("title", title)).index(index),
+                webPartLoc().withDescendant(Locator.tag("tbody/tr/th").withAttribute("title", title).index(index)));
     }
-
 
     @Deprecated
     public BodyWebPart(BaseWebDriverTest test, String title, int index)
@@ -73,9 +69,4 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     @Override
     protected void waitForReady() {}
-
-    private static Locator.XPathLocator locator()
-    {
-        return webPart ;
-    }
 }

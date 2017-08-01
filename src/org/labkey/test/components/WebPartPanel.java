@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components;
 
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -88,6 +89,8 @@ public class WebPartPanel extends WebDriverComponent
 
         protected Locator.XPathLocator titleLocator()
         {
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+                return Locator.xpath("tbody/tr/td").withClass("labkey-wp-title-left");
             return Locator.xpath("tbody/tr/th/a/span").withClass("labkey-wp-title-text");
         }
     }

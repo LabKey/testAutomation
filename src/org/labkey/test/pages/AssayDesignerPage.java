@@ -22,6 +22,7 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -177,71 +178,38 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         return PropertiesEditor(getDriver()).withTitle(domainTitle).findWhenNeeded();
     }
 
-    @Deprecated
-    public void addBatchField(String name, @Nullable String label, @Nullable String type)
+    public AssayDesignerPage addBatchField(String name, @Nullable String label, @Nullable String type)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        addField(xpathSection, name, label, type);
+        batchFields().addField(new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type)));
+        return this;
     }
 
-    @Deprecated
     public void removeBatchField(String name)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Batch Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        removeField(xpathSection, name);
+        batchFields().selectField(name).markForDeletion();
     }
 
-    @Deprecated
-    public void addRunField(String name, @Nullable String label, @Nullable String type)
+    public AssayDesignerPage addRunField(String name, @Nullable String label, @Nullable String type)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        addField(xpathSection, name, label, type);
+        FieldDefinition fieldDef = new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type));
+        runFields().addField(fieldDef);
+        return this;
     }
 
-    @Deprecated
     public void removeRunField(String name)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Run Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        removeField(xpathSection, name);
+        runFields().selectField(name).markForDeletion();
     }
 
-    @Deprecated
-    public void addDataField(String name, @Nullable String label, @Nullable String type)
+    public AssayDesignerPage addDataField(String name, @Nullable String label, @Nullable String type)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        addField(xpathSection, name, label, type);
+        dataFields().addField(new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type)));
+        return this;
     }
 
-    @Deprecated
     public void removeDataField(String name)
     {
-        final String xpathSection = "//tbody//td[contains(text(), 'Data Fields')]/./parent::tr/./following-sibling::tr/./descendant::";
-        removeField(xpathSection, name);
-    }
-
-    @Deprecated
-    private void addField(String xpathSection, String name, @Nullable String label, @Nullable String type)
-    {
-        List<WebElement> inputBoxes;
-
-        Locator.xpath(xpathSection + "span[contains(@id, 'button_Add Field')]").findElement(getDriver()).click();
-
-        inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name')]").findElements(getDriver());
-        setFormElement(inputBoxes.get(inputBoxes.size() - 1), name);
-
-        if(label != null)
-        {
-            inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'label')]").findElements(getDriver());
-            setFormElement(inputBoxes.get(inputBoxes.size() - 1), label);
-        }
-
-        if(type != null)
-        {
-            inputBoxes = Locator.xpath(xpathSection + "input[starts-with(@name, 'ff_type')]/./following-sibling::div").findElements(getDriver());
-            inputBoxes.get(inputBoxes.size() - 1).click();
-            click(Locator.xpath("//div[contains(@class, 'x-window')]//div[contains(@class, 'x-window-bwrap')]//table//tr//label[contains(text(), '" + type + "')]"));
-            click(Locator.xpath("//button[contains(@class, 'x-btn-text')][contains(text(), 'Apply')]"));
-        }
+        dataFields().selectField(name).markForDeletion();
     }
 
     @Deprecated
@@ -323,8 +291,8 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         final Checkbox backgroundUploadCheckbox = Checkbox(Locator.checkboxByName("backgroundUpload")).findWhenNeeded(this);
 
 
-        final PropertiesEditor batchFieldsPanel = PropertiesEditor(getDriver()).withTitle("Batch Fields").findWhenNeeded();
-        final PropertiesEditor runFieldsPanel = PropertiesEditor(getDriver()).withTitle("Run Fields").findWhenNeeded();
-        final PropertiesEditor dataFieldsPanel = PropertiesEditor(getDriver()).withTitle("Data Fields").findWhenNeeded();
+        final PropertiesEditor batchFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Batch Fields").findWhenNeeded();
+        final PropertiesEditor runFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Run Fields").findWhenNeeded();
+        final PropertiesEditor dataFieldsPanel = PropertiesEditor(getDriver()).withTitleContaining("Data Fields").findWhenNeeded();
     }
 }
