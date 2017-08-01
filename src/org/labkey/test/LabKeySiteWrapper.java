@@ -569,23 +569,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 WebTestHelper.getHttpResponse(buildURL("login", "logout"));
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
-                WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
-                IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
-
-                if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
-                {
-                    log("turning off the new UI for class " + this.getClass().toString());
-                    ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
-                    refresh(); // refresh the UI after toggling the feature to ensure the test starts with the right UI for it
-                    IS_BOOTSTRAP_LAYOUT = false;
-                }
-                if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
-                {
-                    log("turning on the new UI for class " + this.getClass().toString());
-                    ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
-                    refresh();
-                    IS_BOOTSTRAP_LAYOUT = true;
-                }
 
                 if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
                 {
@@ -625,6 +608,25 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
             throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
+        WebTestHelper.setUseContainerRelativeUrl((Boolean)executeScript("return LABKEY.experimental.containerRelativeURL;"));
+
+        { // TODO: Remove after bootstrap UI is finalized
+            IS_BOOTSTRAP_LAYOUT = isExperimentalUXEnabled();
+            if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
+            {
+                log("turning off the new UI for class " + this.getClass().toString());
+                ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
+                refresh(); // refresh the UI after toggling the feature to ensure the test starts with the right UI for it
+                IS_BOOTSTRAP_LAYOUT = false;
+            }
+            if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
+            {
+                log("turning on the new UI for class " + this.getClass().toString());
+                ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
+                refresh();
+                IS_BOOTSTRAP_LAYOUT = true;
+            }
+        }
     }
 
     @LogMethod
