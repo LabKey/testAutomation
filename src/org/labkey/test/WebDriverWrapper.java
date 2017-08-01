@@ -649,6 +649,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void goToFolderManagement()
     {
         clickAdminMenuItem("Folder", "Management");
+        waitForElement(Locator.id("tabfolderTree")); // TODO: Create page class for FolderManagementAction
     }
 
     public void goToFolderPermissions()
