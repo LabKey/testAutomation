@@ -331,12 +331,10 @@ public abstract class AbstractContainerHelper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            _test.goToHome();
+            _test.clickProject(project);
             ProjectMenu menu = new ProjectMenu(_test.getDriver());
             if (!parent.equals(project))
                 menu.navigateToFolder(project, parent);
-            else
-                menu.navigateToProject(project);
 
             menu.navigateToCreateSubFolderPage()
                     .setFolderName(child);
