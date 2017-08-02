@@ -24,6 +24,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+
 public class ColumnChartRegion//<EC extends Component.ElementCache> extends Component<EC>
 {
     WebDriverWrapper _driver;
@@ -40,7 +42,10 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
         WebElement webElement;
         try
         {
-            webElement = _dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-plotanalyticsprovider"));
+            if (IS_BOOTSTRAP_LAYOUT)
+                webElement = _dataRegionTable.findElement(By.cssSelector(" div.lk-region-bar"));
+            else
+                webElement = _dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-plotanalyticsprovider"));
         }
         catch(org.openqa.selenium.NoSuchElementException nse)
         {
@@ -52,7 +57,7 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
 
     public List<WebElement> getPlots()
     {
-        return getComponentElement().findElements(By.cssSelector(" div.labkey-dataregion-msg-plot-analytic"));
+        return _dataRegionTable.findElements(By.cssSelector(" div.labkey-dataregion-msg-plot-analytic"));
     }
 
     // Use getPlots to get the list of plot element, then pass one of those to this function.
@@ -72,6 +77,11 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
     public void toggleRegion()
     {
         _dataRegionTable.findElement(By.cssSelector(" span.labkey-dataregion-msg-toggle")).click();
+    }
+
+    public boolean isViewModified()
+    {
+        return _dataRegionTable.findElements(Locator.tagWithText("span", "This grid view has been modified.")).size() > 0;
     }
 
     public void revertView()

@@ -47,6 +47,8 @@ import static org.labkey.test.components.ext4.Window.Window;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+    
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
     public static final String APXHEENT = "APXheent";
     public static final String APXPULSE = "APXpulse";
@@ -85,7 +87,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         click(Locator.linkWithText("view data"));
         DataRegionTable table = new DataRegionTable("Dataset", this);
-        table.clickInsertNewRowDropdown();
+        table.clickInsertNewRow();
         waitForElement(Locator.name("quf_MouseId"));
         setFormElement(Locator.name("quf_MouseId"), "MID_Float");
         setFormElement(Locator.name("quf_SequenceNum"), "3");
@@ -94,8 +96,7 @@ public class ScatterPlotTest extends GenericChartsTest
         setFormElement(Locator.name("quf_APXpulse"), "98");
         clickButton("Submit");
 
-
-        table.clickInsertNewRowDropdown();
+        table.clickInsertNewRow();
         waitForElement(Locator.name("quf_MouseId"));
         setFormElement(Locator.name("quf_MouseId"), "MID_Negative");
         setFormElement(Locator.name("quf_SequenceNum"), "4");
@@ -104,7 +105,7 @@ public class ScatterPlotTest extends GenericChartsTest
         setFormElement(Locator.name("quf_APXpulse"), "80");
         clickButton("Submit");
 
-        table.clickInsertNewRowDropdown();
+        table.clickInsertNewRow();
         waitForElement(Locator.name("quf_MouseId"));
         setFormElement(Locator.name("quf_MouseId"), "MID_Lessthan");
         setFormElement(Locator.name("quf_SequenceNum"), "5");
@@ -141,13 +142,9 @@ public class ScatterPlotTest extends GenericChartsTest
             waitForText("APX-1: Abbreviated Physical Exam Dataset Properties");
         });
 
-        ChartTypeDialog chartTypeDialog;
-        LookAndFeelScatterPlot lookAndFeelDialog;
-        SaveChartDialog saveChartDialog;
-
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        chartTypeDialog = clickAddChart("study", QUERY_APX_1);
+        ChartTypeDialog chartTypeDialog = clickAddChart("study", QUERY_APX_1);
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
                 .setYAxis(MEASURE_6_HEENT)
                 .setXAxis(MEASURE_4_PULSE)
@@ -256,7 +253,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("APXpulse", "Is Less Than", "100");
-        datasetTable.clickHeaderMenu("Charts", "Create Chart");
+        datasetTable.clickHeaderMenu("Charts / Reports", "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Scatter)
@@ -668,7 +665,7 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
         savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn", true);
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc.waitForElement(shortWait()), SeleniumEvent.click));
-        waitForElement(Locator.tagWithClass("span", "labkey-nav-page-header").withText("APX-1: Abbreviated Physical Exam"));
+        waitForElement(Locator.tagWithText("h3", "APX-1: Abbreviated Physical Exam"));
         // verify that only developers can see the button to add point click function
         createUser(DEVELOPER_USER, null);
         clickProject(getProjectName());
@@ -716,7 +713,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.clickHeaderMenu("Charts", "Create Chart");
+        drt.clickHeaderMenu("Charts / Reports", "Create Chart");
 
         // create scatter lot with point geom
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());

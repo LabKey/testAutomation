@@ -34,6 +34,8 @@ import java.util.List;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class BoxPlotTest extends GenericChartsTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+
     @LogMethod
     protected void testPlots()
     {
@@ -120,7 +122,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
         datasetTable.setFilter("RCHtempc", "Is Less Than", "39");
-        datasetTable.clickHeaderMenu("Charts", "Create Chart");
+        datasetTable.clickHeaderMenu("Charts / Reports", "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box)

@@ -938,7 +938,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @LogMethod
     public ColumnChartRegion createColumnChart(String columnName, String chartType)
     {
-        Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-part-plotanalyticsprovider svg");
+        Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-plot-analytic svg");
         int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
         this.clickColumnMenu(columnName, false, chartType);

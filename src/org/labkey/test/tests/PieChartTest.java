@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelPieChart;
@@ -35,6 +34,8 @@ import java.net.URL;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class PieChartTest extends GenericChartsTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+
     // TODO add test case for view base filters and user filters applied on create chart
 
     private final String PIE_CHART_SAVE_NAME = "Simple Pie Chart Test";
@@ -60,7 +61,6 @@ public class PieChartTest extends GenericChartsTest
         final String COLOR_BLACK = "000000";
         final String PIE_CHART_SAVE_DESC = "Pie chart created with the simple test.";
 
-        ChartQueryDialog queryDialog;
         ChartTypeDialog chartTypeDialog;
         LookAndFeelPieChart pieChartLookAndFeel;
         String svgText, strTemp;
@@ -107,7 +107,7 @@ public class PieChartTest extends GenericChartsTest
         sleep(3000);  // TODO Is there a better trigger?
 
         // Move mouse to make sure it is not over a pie wedge (and would generate a % in a pop-up text).
-        mouseOver(Locator.linkWithText("Study 001"));
+        mouseOver(Locator.tagWithText("h3", "Chart Wizard"));
 
         svgText = getSVGText();
         log("svg text: '" + svgText + "'");

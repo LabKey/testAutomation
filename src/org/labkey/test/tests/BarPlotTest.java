@@ -22,7 +22,6 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartLayoutDialog;
-import org.labkey.test.components.ChartQueryDialog;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.LookAndFeelBarPlot;
@@ -37,6 +36,7 @@ import java.net.URL;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class BarPlotTest extends GenericChartsTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
 
     private final String PREG_TEST_RESULTS = "17a. Preg. test result";
     private final String SKIN = "14. Skin";
@@ -80,7 +80,6 @@ public class BarPlotTest extends GenericChartsTest
         final String COLOR_BLUE = "0000FF";
         final String COLOR_GREEN = "00FF00";
 
-        ChartQueryDialog queryDialog;
         ChartTypeDialog chartTypeDialog;
         LookAndFeelBarPlot lookAndFeelDialog;
 
@@ -241,7 +240,7 @@ public class BarPlotTest extends GenericChartsTest
         plotRegion = dataRegionTable.getColumnPlotRegion();
 
         log("If the plot view is visible, revert it.");
-        if(plotRegion.isRegionVisible())
+        if(plotRegion.isViewModified())
             plotRegion.revertView();
 
         log("Create a bar plot.");
