@@ -625,7 +625,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         // Set the container filter to include subfolders
-        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
                 .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
                 .findElement(getDriver())).clickMenuButton(true, false, "Folder Filter", "Current folder and subfolders");
 

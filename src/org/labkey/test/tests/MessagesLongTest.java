@@ -389,7 +389,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.lkButton(USERS_UPDATE_BUTTON)));
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
                     .withDescendant(Locator.lkButton(USERS_UPDATE_BUTTON)).findElement(getDriver())
                     ).clickMenuButton(false, false,"For messages");
         }else

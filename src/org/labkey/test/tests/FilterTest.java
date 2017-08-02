@@ -560,7 +560,7 @@ public class FilterTest extends BaseWebDriverTest
 
             if (IS_BOOTSTRAP_LAYOUT)
             {
-                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span", "lk-menu-drop")
+                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
                         .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
                         .findElement(getDriver())).clickMenuButton(true, false, "default");
             }

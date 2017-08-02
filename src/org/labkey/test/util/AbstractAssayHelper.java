@@ -135,7 +135,7 @@ public abstract class AbstractAssayHelper
             if (IS_BOOTSTRAP_LAYOUT)
             {
                 new BootstrapMenu(_test.getDriver(),
-                        Locator.tagWithClass("span", "lk-menu-drop")
+                        Locator.tagWithClass("div", "lk-menu-drop")
                                 .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
                                 .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
                         .clickMenuButton(false, false, "Edit assay design");

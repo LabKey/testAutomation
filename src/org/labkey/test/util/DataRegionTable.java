@@ -1815,9 +1815,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                 headerMenus.put(text, Locator.findAnyElement(
                         "menu with data-original-title " + text,
                         buttonBar,
-                        Locator.tagWithClassContaining("span", "lk-menu-drop")
+                        Locator.tagWithClassContaining("div", "lk-menu-drop")
                                 .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text)),
-                        Locator.tagWithClassContaining("span", "lk-menu-drop")
+                        Locator.tagWithClassContaining("div", "lk-menu-drop")
                                 .withChild(Locator.tagWithAttribute("a", "data-original-title", text))));
             }
             return headerMenus.get(text);

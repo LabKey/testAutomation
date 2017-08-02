@@ -524,7 +524,7 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("29 FCS files"));
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
                     .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
                     .clickMenuButton(true, false, "Inline");
         }else
@@ -567,7 +567,7 @@ public class FlowTest extends BaseFlowTest
 
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
                     .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
                     .clickMenuButton(true, false, "Thumbnail");
         }else
@@ -612,7 +612,7 @@ public class FlowTest extends BaseFlowTest
 
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("span","lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div","lk-menu-drop")
                     .withDescendant(Locator.id("PopupText").withText("Show Graphs")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
                     .clickMenuButton(true, false, "Thumbnail");
         }else
@@ -788,7 +788,7 @@ public class FlowTest extends BaseFlowTest
         // Should only be one 'manage' menu since we've only created one flow report.
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClass("span", "lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
                 .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
                     .clickMenuButton(true, false, "Edit");
         }else
@@ -852,7 +852,7 @@ public class FlowTest extends BaseFlowTest
         // Should only be one 'manage' menu since we've only created one flow report.
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), Locator.tagWithClass("span", "lk-menu-drop")
+            new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
                     .withChild(Locator.xpath("//a/span[text()='manage']")).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT))
                     .clickMenuButton(true, false, "Delete");
         }else
