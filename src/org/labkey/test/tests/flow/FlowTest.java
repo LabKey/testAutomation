@@ -120,6 +120,9 @@ public class FlowTest extends BaseFlowTest
 
     public void testBulkKeywordEdit()
     {
+        String filename1 = "91745.fcs";
+        String filename2 = "91747.fcs";
+
         goToProjectHome();
         beginAtFCSFileQueryView();
 
@@ -129,19 +132,19 @@ public class FlowTest extends BaseFlowTest
         assertTrue("Edit Keywords button is not disabled",
                 button.getAttribute("class").contains("labkey-disabled-button"));
         // select a couple rows, then click the edit keywords button
-        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
-        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name", filename1));
+        result.checkCheckbox(result.getRowIndex("Name", filename2));
         result = new DataRegionTable("query", getDriver());
         WebElement editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
         assertEquals("Expected ","Selected Files:", getTableCellText(Locator.id("keywordTable"),2,0 ));
-        assertEquals("Expected ","91745.fcs , 91747.fcs", getTableCellText(Locator.id("keywordTable"),2,1 ));
+        assertEquals("Expected ", new HashSet<>(Arrays.asList(filename1, filename2)), new HashSet<>(Arrays.asList(getTableCellText(Locator.id("keywordTable"),2,1 ).split("[ ,]+"))));
 
         Locator locTubeName = Locator.xpath("//td/input[@type='hidden' and @value='TUBE NAME']/../../td/input[@name='ff_keywordValue']");
         setFormElement(locTubeName, "FlowTest Keyword Tube Name");
         clickButton("update");
 
-        clickAndWait(Locator.linkWithText("91745.fcs"));
+        clickAndWait(Locator.linkWithText(filename1));
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
@@ -149,7 +152,7 @@ public class FlowTest extends BaseFlowTest
 
         beginAtFCSFileQueryView();
 
-        clickAndWait(Locator.linkWithText("91747.fcs"));
+        clickAndWait(Locator.linkWithText(filename2));
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
@@ -175,8 +178,8 @@ public class FlowTest extends BaseFlowTest
         //Test validation of creating keyword without name
         newKeywordValue="No name";
         beginAtFCSFileQueryView();
-        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
-        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name", filename1));
+        result.checkCheckbox(result.getRowIndex("Name", filename2));
         editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
         click(Locator.tagWithClassContaining("i", "add-new-keyword"));
@@ -194,8 +197,8 @@ public class FlowTest extends BaseFlowTest
         //Test validation of creating duplicate keyword
         newKeywordValue="No dup";
         beginAtFCSFileQueryView();
-        result.checkCheckbox(result.getRowIndex("Name","91745.fcs"));
-        result.checkCheckbox(result.getRowIndex("Name","91747.fcs"));
+        result.checkCheckbox(result.getRowIndex("Name", filename1));
+        result.checkCheckbox(result.getRowIndex("Name", filename2));
         editKeywordsButton = result.getHeaderButton("Edit Keywords");
         editKeywordsButton.click();
 
@@ -217,7 +220,7 @@ public class FlowTest extends BaseFlowTest
 
         //Confirm new keyword added to both files
         beginAtFCSFileQueryView();
-        clickAndWait(Locator.linkWithText("91745.fcs"));
+        clickAndWait(Locator.linkWithText(filename1));
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
@@ -225,7 +228,7 @@ public class FlowTest extends BaseFlowTest
 
         beginAtFCSFileQueryView();
 
-        clickAndWait(Locator.linkWithText("91747.fcs"));
+        clickAndWait(Locator.linkWithText(filename2));
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
