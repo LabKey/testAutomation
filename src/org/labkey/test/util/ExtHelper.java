@@ -33,6 +33,8 @@ import static org.junit.Assert.*;
 public class ExtHelper
 {
     WebDriverWrapper _test;
+    public String insertNewRowText = DataRegionTable.getInsertNewButtonText();
+    public String importBulkDataText = DataRegionTable.getImportBulkDataText();
 
     public ExtHelper(WebDriverWrapper test)
     {
@@ -41,22 +43,22 @@ public class ExtHelper
 
     public void clickInsertNewRow()
     {
-        clickMenuButton(true, "Insert", "Insert New Row");
+        clickMenuButton(true, "Insert", insertNewRowText);
     }
 
     public void clickInsertNewRow(boolean wait)
     {
-        clickMenuButton(wait, "Insert", "Insert New Row");
+        clickMenuButton(wait, "Insert", insertNewRowText);
     }
 
     public void clickImportBulkData()
     {
-        clickMenuButton(true, "Insert", "Import Bulk Data");
+        clickMenuButton(true, "Insert", importBulkDataText);
     }
 
     public void clickImportBulkData(boolean wait)
     {
-        clickMenuButton(wait, "Insert", "Import Bulk Data");
+        clickMenuButton(wait, "Insert", importBulkDataText);
     }
 
     public void clickMenuButton(String menusLabel, String... subMenuLabels)
