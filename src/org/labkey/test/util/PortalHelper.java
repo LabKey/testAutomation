@@ -465,6 +465,8 @@ public class PortalHelper extends WebDriverWrapper
      */
     public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
     {
+        if (IS_BOOTSTRAP_LAYOUT)
+            new SiteNavBar(getDriver()).enterPageAdminMode();
         openWebpartPermissionWindow(webpart);
 
         assertFormElementEquals(Locator.name("permission"), expectedPermission);
@@ -480,6 +482,8 @@ public class PortalHelper extends WebDriverWrapper
 
         click(Locator.tagWithText("span", "Cancel"));
         _ext4Helper.waitForMaskToDisappear();
+        if (IS_BOOTSTRAP_LAYOUT)
+            new SiteNavBar(getDriver()).exitPageAdminMode();
     }
 
     public enum Direction
