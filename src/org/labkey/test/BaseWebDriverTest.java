@@ -1384,13 +1384,18 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void goToModuleProperties()
     {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Module Properties"));
-        waitForElement(Ext4Helper.Locators.ext4Button("Save Changes"));
-        waitForElementToDisappear(Locator.tag("div").withText("Loading..."));
+        if (IS_BOOTSTRAP_LAYOUT)
+            goToFolderManagement().goToModulePropertiesPane();
+        else
+        {
+            goToFolderManagement();
+            clickAndWait(Locator.linkWithText("Module Properties"));
+            waitForElement(Ext4Helper.Locators.ext4Button("Save Changes"));
+            waitForElementToDisappear(Locator.tag("div").withText("Loading..."));
+        }
     }
 
-    protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)
+    protected Ext4FieldRef getModulePropertyFieldRef(ModulePropertyValue property)  //TODO: refactor this into FolderManagementPage.modulePropertyPane
     {
         Map<String, String> map = new HashMap<>();
         map.put("moduleName", property.getModuleName());
@@ -2189,7 +2194,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             log("Waiting for completion of specimen archives");
 
-            clickFolder(_studyFolderName);
+            if (IS_BOOTSTRAP_LAYOUT)
+                new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), _studyFolderName); // maybe just refresh the page instead?
+            else
+                clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
             if (_expectError)

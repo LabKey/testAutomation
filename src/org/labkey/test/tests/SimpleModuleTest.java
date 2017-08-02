@@ -38,6 +38,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -47,6 +49,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +74,7 @@ import static org.junit.Assert.fail;
 @Category({DailyA.class})
 public class SimpleModuleTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml
     public static final String TABBED_FOLDER_TYPE = "My XML-defined Tabbed Folder Type";
     public static final String MODULE_NAME = "simpletest";
@@ -250,7 +254,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        clickAndWait(table.detailsLink(0));
         assertTextPresent("Name", "Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
@@ -403,7 +408,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing vehicle.Vehicles details url link...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
-        clickAndWait(Locator.linkWithText("details"));
+        DataRegionTable vehicles = new DataRegionTable("query", getDriver());
+        clickAndWait(vehicles.detailsLink(0));
         assertTextPresent("Hooray!");
         rowidStr = getText(Locator.id("vehicle.rowid"));
         rowid = Integer.parseInt(rowidStr);
@@ -481,7 +487,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertFalse("should not be able to select default view", saveWindow.defaultViewRadio.isEnabled());
         saveWindow.cancel();
 
-        dr.clickHeaderMenu("Grid Views", "EditableFileBasedView");
+        dr.goToView("EditableFileBasedView");
 
         log("** Try to edit overridable file-based view");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -497,7 +503,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         saveWindow.namedViewRadio.check();
         saveWindow.save();
 
-        assertEquals("column not found", 4, dr.getColumnIndex("Color"));
+        assertEquals("column not found", 2, dr.getColumnIndex("Color"));
     }
 
     @LogMethod
@@ -532,12 +538,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // click the details link
         pushLocation();
         clickAndWait(table.detailsLink(1));
-        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
+                .child(Locator.tagWithText("*", "Audit Details")));
 
         popLocation();
         table = new DataRegionTable("query", this);
         clickAndWait(table.detailsLink(5));
-        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
+                .child(Locator.tagWithText("*", "Audit Details")));
         assertElementPresent(Locator.xpath("//i[text() = 'A row was inserted.']"));
 
         // check the row level audit details
@@ -550,14 +558,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
         table = new DataRegionTable("query", this);
         clickAndWait(table.detailsLink(0));
 
-        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
+        assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
+                .child(Locator.tagWithText("*", "Details")));
         table = new DataRegionTable("query", this);
         assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
         // click the details link
         clickAndWait(table.detailsLink(0));
-        assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Audit Details']"));
+        assertElementPresent(Locator.tagWithClass("div", "lk-body-title")
+                .child(Locator.tagWithText("*", "Audit Details")));
         assertElementPresent(Locator.xpath("//td[contains(text(), 'Prius C') and contains(text(), 'Prius')]"));
 
         goToSchemaBrowser();
@@ -724,7 +734,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
-        _extHelper.clickMenuButton("Grid Views", "Crazy People");
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.goToView("Crazy People");
         assertTextPresent("Adam", "Dave", "Josh");
         assertTextNotPresent("Britt");
 
@@ -736,7 +747,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _customizeViewsHelper.addCustomizeViewColumn("CreatedBy");
         _customizeViewsHelper.applyCustomView();
         // Wait for the save button to appear
-        waitForElement(Locator.xpath("//table//div[contains(@class, 'labkey-dataregion-msg')]/span[contains(@class, 'unsavedview-save')]"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'lk-region-context-bar')]//span[contains(@class, 'unsavedview-save')]"));
+                    //todo: move this to dataregion or customizeViewsHelper, perhaps
         _customizeViewsHelper.saveUnsavedViewGridClosed(null);
         waitForText("Crazy People Copy");
     }
@@ -752,7 +764,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing module-based JS reports...");
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        _extHelper.clickMenuButton("Reports", "Want To Be Cool");
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.goToReport("Want To Be Cool");
         waitForText(WAIT_FOR_JAVASCRIPT, "Less cool than expected. Loaded dependent scripts.");
 
         clickProject(getProjectName());
@@ -776,7 +789,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        _extHelper.clickMenuButton("Reports", "Super Cool R Report");
+        table.goToReport( "Super Cool R Report");
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         assertTextPresent("\"name\"", "\"age\"", "\"crazy\"");
     }
@@ -790,7 +803,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
-        _extHelper.clickMenuButton("Insert", "Import Bulk Data");
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickImportBulkData();
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
@@ -891,12 +905,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
-        setFormElement(Locator.id("search-input"), MODULE_NAME);
+        SiteNavBar bar = new SiteNavBar(getDriver());
+        WebElement searchInput = bar.expandSearchBar();
+        setFormElement(searchInput, MODULE_NAME);
         waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
         clickButton("Submit", 0);
         waitForText("Manufacturer");
-        assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("search-input")));
+        assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(searchInput));
         waitForText(WAIT_FOR_JAVASCRIPT, "Pinto");
         assertTextNotPresent("Prius");
     }
@@ -1009,8 +1025,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestDatasetsAndFileBasedQueries()
     {
-        clickProject(getProjectName());
-        clickFolder(FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), FOLDER_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Study Overview");
         waitForText("Create Study");
@@ -1083,9 +1098,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
     protected void assertModuleEnabledByDefault(String moduleName)
     {
         log("Ensuring that that '" + moduleName + "' module is enabled");
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
+        goToFolderManagement()
+                .goToFolderTypePane()
+                .assertModuleEnabled(moduleName);
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
