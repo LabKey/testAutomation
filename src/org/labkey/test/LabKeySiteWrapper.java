@@ -100,7 +100,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     private static final String CLIENT_SIDE_ERROR = "Client exception detected";
     public static boolean IS_BOOTSTRAP_LAYOUT = true; // use to toggle between ux refresh UI and standard labkey
-    protected boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = false; // tests to be run with the new UI should set this value
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
 
     public boolean isGuestModeTest()

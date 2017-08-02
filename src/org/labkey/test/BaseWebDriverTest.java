@@ -482,6 +482,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return RuleChain.outerRule(loggingClassWatcher).around(classTimeout).around(classFailWatcher).around(innerClassWatcher);
     }
 
+    private boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = false; // tests to be run with the new UI should set this value
     protected boolean setIsBootstrapWhitelisted(boolean addMeToWhitelist)
     {
         String isWhitelisted = addMeToWhitelist ? "whitelisted" : "not whitelisted";
@@ -493,7 +494,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     // TODO: Remove after bootstrap UI is finalized
     private void configureExperimentalUX()
     {
-        if (!IS_BOOTSTRAP_LAYOUT_WHITELISTED && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
+        boolean wantBootstrapUi = IS_BOOTSTRAP_LAYOUT_WHITELISTED;
+        if (!wantBootstrapUi && IS_BOOTSTRAP_LAYOUT) // turn off the new UI
         {
             log("turning off the new UI for class " + this.getClass().toString());
             ExperimentalFeaturesHelper.disableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
@@ -501,7 +503,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             assertFalse(isExperimentalUXEnabled());
             IS_BOOTSTRAP_LAYOUT = false;
         }
-        else if (IS_BOOTSTRAP_LAYOUT_WHITELISTED && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
+        else if (wantBootstrapUi && !IS_BOOTSTRAP_LAYOUT) // turn on the new UI
         {
             log("turning on the new UI for class " + this.getClass().toString());
             ExperimentalFeaturesHelper.enableExperimentalFeature(createDefaultConnection(true), "migrate-core-ui");
