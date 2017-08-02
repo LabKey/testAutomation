@@ -137,11 +137,7 @@ public class SiteNavBar extends Component
 
     public SearchResultsPage search(String searchTerm)
     {
-        if (!isSearchBarExpanded())
-        {
-            elements().searchToggle.click();
-            _driver.waitFor(()-> isSearchBarExpanded(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        }
+        expandSearchBar();
         _driver.setFormElement(elements().searchInputElement, searchTerm);
         _driver.doAndWaitForPageToLoad(()-> elements().searchSubmitInput.click(), WebDriverWrapper.WAIT_FOR_PAGE);
         return new SearchResultsPage(getDriver());
@@ -151,6 +147,17 @@ public class SiteNavBar extends Component
     {
         String searchBarContainerClass = elements().searchContainer.getAttribute("class");
         return searchBarContainerClass.contains("active");
+    }
+
+    /* toggles the search form open and returns the search input element */
+    public WebElement expandSearchBar()
+    {
+        if (!isSearchBarExpanded())
+        {
+            elements().searchToggle.click();
+            _driver.waitFor(()-> isSearchBarExpanded(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        }
+        return elements().searchInput;
     }
 
     protected Elements elements()
@@ -171,6 +178,8 @@ public class SiteNavBar extends Component
         public WebElement searchContainer = Locators.searchMenuToggle.parent()
                 .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchToggle = Locators.searchMenuToggle
+                .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        public WebElement searchInput = Locators.searchInput
                 .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchInputElement = Locator.xpath("//div[@id='global-search']//input[@type='text']")
                 .refindWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
@@ -195,6 +204,7 @@ public class SiteNavBar extends Component
         public static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
         public static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
         public static Locator.XPathLocator searchMenuToggle = Locator.xpath("//li/a[@id='global-search-trigger']");
+        public static Locator.XPathLocator searchInput = Locator.tagWithClass("input", "search-box").withAttribute("name", "q");
         public static Locator.XPathLocator userMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-user']]");
         public static Locator.XPathLocator adminMenuToggle = Locator.xpath("//li/a[@class='dropdown-toggle' and ./i[@class='fa fa-cog']]");
     }
