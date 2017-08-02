@@ -1572,6 +1572,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
+    public void goToReport(String reportName)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
+            menu.clickMenuButton(true, false, reportName);
+        }else
+        {
+            throw new NotImplementedException("This is only implemented in the new UI");
+        }
+    }
+
     public static class Locators
     {
         public static Locator.XPathLocator dataRegion()
