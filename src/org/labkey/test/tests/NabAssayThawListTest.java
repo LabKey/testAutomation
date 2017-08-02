@@ -23,9 +23,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.AbstractAssayHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DilutionAssayHelper;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -120,9 +120,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         log("Set folder level override of PVR default to thaw list.");
-        click(Locator.linkWithText("manage assay design"));
-        mouseOver(Locator.linkWithText("set default values"));
-        waitAndClickAndWait(Ext4Helper.Locators.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
 
         // Are we seeing the default set in the parent project?
         Assert.assertEquals("Default participant visit resolver not inherited from project",
@@ -173,9 +171,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-        click(Locator.linkWithText("manage assay design"));
-        mouseOver(Locator.linkWithText("set default values"));
-        waitAndClickAndWait(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
         // If we don't blow up hitting this next link, the fix for 20441 is good.
         waitAndClickAndWait(Locator.linkContainingText("edit default values for this table in"));
 
@@ -250,7 +246,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        _ext4Helper.clickExt4MenuButton(true, Locator.linkWithText("manage assay design"), false, "set default values", TEST_ASSAY_NAB + " Batch Fields");
+        _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
         waitForElement(Locator.css(".query-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), listName);
         clickButton("Save Defaults");
