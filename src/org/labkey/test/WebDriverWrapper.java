@@ -27,6 +27,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.selenium.EphemeralWebElement;
@@ -646,10 +647,10 @@ public abstract class WebDriverWrapper implements WrapsDriver
         waitForElement(Locators.pageSignal("queryTreeRendered"), waitMilSec);
     }
 
-    public void goToFolderManagement()
+    public FolderManagementPage goToFolderManagement()
     {
         clickAdminMenuItem("Folder", "Management");
-        waitForElement(Locator.id("tabfolderTree")); // TODO: Create page class for FolderManagementAction
+        return new FolderManagementPage(getDriver());
     }
 
     public void goToFolderPermissions()
