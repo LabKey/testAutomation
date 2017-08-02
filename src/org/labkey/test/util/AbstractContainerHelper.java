@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public abstract class AbstractContainerHelper
@@ -392,7 +393,10 @@ public abstract class AbstractContainerHelper
         // confirm delete:
         _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
-        _test.assertElementPresent(Locators.folderMenu.withText(project));
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            assertTrue( new ProjectMenu(_test.getDriver()).projectLinkExists(project));
+        else
+            _test.assertElementPresent(Locators.folderMenu.withText(project));
         _test.openFolderMenu();
         _test.assertElementNotPresent(Locator.linkWithText(folderName));
     }
