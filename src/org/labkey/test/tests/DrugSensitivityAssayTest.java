@@ -36,6 +36,8 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class DrugSensitivityAssayTest extends AbstractQCAssayTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private final static String TEST_ASSAY_PROJECT = "Drug Sensitivity Test Verify Project";
     private static final String PLATE_TEMPLATE_NAME = "DrugSensitivityAssayTest Template";
 

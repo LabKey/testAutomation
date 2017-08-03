@@ -36,6 +36,8 @@ import java.util.List;
 @Category({DailyB.class, Reports.class, Charting.class})
 public class RaphaelRendererTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String MULTI_FOLDER_ZIP = "/sampledata/vis/RaphaelRendererTest.folder.zip";
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";

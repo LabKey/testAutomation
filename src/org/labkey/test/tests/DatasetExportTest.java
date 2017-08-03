@@ -27,6 +27,8 @@ import java.util.List;
 @Category({DailyB.class})
 public class DatasetExportTest extends AssayResultsExportTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     @Override
     protected String getProjectName()
     {

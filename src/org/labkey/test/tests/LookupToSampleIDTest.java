@@ -37,6 +37,8 @@ import java.util.List;
 @Category({DailyB.class})
 public class LookupToSampleIDTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String FOLDER_NAME = "TestingGPATAssay";
     private static final String FOLDER_TYPE_STUDY = "Study" ;
     private static final File SAMPLE_SET = TestFileUtils.getSampleData("GPAT/SampleIDLookupSampleSetData.xlsx");

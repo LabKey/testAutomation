@@ -31,6 +31,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Assays.class})
 public class ElisaAssayTest extends AbstractQCAssayTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private final static String TEST_ASSAY_PRJ_ELISA = "ELISA Test Verify Project";
     private final static String TEST_ASSAY_FLDR_NAB = "ELISA";
 

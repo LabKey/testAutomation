@@ -38,6 +38,8 @@ import static org.junit.Assert.*;
 @Category({DailyB.class, FileBrowser.class})
 public class ExpTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String PROJECT_NAME = "ExpVerifyProject";
     private static final String FOLDER_NAME = "verifyfldr";
     private static final String EXPERIMENT_NAME = "Tutorial Examples";

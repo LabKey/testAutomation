@@ -53,6 +53,8 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class, Data.class})
 public class ScriptValidationTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     public static final String MODULE_NAME = "simpletest";
     public static final String VEHICLE_SCHEMA = "vehicle";
 

@@ -38,6 +38,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class})
 public class SampleSetNameExpressionTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String PROJECT_NAME = "SampleSetNameExprTest";
 
     @Override

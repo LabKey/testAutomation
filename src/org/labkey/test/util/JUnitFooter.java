@@ -23,6 +23,8 @@ import java.util.List;
 
 public class JUnitFooter extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     @Override
     public List<String> getAssociatedModules()
     {

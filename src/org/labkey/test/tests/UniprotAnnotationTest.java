@@ -32,6 +32,8 @@ import java.util.List;
 @Category({DailyA.class})
 public class UniprotAnnotationTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String UNIPROT_FILENAME = "tinyuniprot.xml";
     private static final String PROJECT_NAME = "ProteinAnnotationVerifier";
 

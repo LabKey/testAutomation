@@ -35,6 +35,8 @@ import java.util.List;
 @Category({DailyA.class, Assays.class, FileBrowser.class})
 public class AffymetrixAssayTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String PROJECT_NAME = "AffymetrixAssayVerifyProject";
     private static final String PIPELINE_ROOT = "/sampledata/Affymetrix";
     private static final String ASSAY_NAME = "Affy Test Assay";

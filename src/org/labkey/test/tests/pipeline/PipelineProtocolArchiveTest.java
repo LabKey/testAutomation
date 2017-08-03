@@ -39,6 +39,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class PipelineProtocolArchiveTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     public static final String WEB_PART_NAME_PIPELINE_PROTOCOLS = "Pipeline Protocols";
     public static final String PROTOCOL_NAME_B_R = "brainRadio";
     public static final String PROTOCOL_NAME_A_M = "toBeArchived";
