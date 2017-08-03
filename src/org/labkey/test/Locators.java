@@ -46,6 +46,11 @@ public abstract class Locators
                 Locator.id("bodypanel");
     }
 
+    public static Locator footerPanel()
+    {
+        return Locator.css(".footer-block");
+    }
+
     public static Locator.XPathLocator bootstrapMenuItem(String text)
     {
         return Locator.xpath("//li/a[contains(text(), " + Locator.xq(text) + ")]");
