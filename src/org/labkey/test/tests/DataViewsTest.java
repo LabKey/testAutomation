@@ -26,6 +26,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -70,7 +71,9 @@ public class DataViewsTest extends ParticipantListTest
         log("Create report for data view webpart test.");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R Report");
+        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("*","lk-menu-drop")
+                .withPredicate(Locator.xpath("//a/span[contains(text(),'Add Report')]"))
+                .findElement(getDriver())).clickMenuButton(true, false,"R Report");
         clickButton("Save", "Please enter a report name:");
 
         Locator locator = Ext4Helper.Locators.window("Save Report").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
@@ -202,7 +205,8 @@ public class DataViewsTest extends ParticipantListTest
         log("Testing status settings for datasets");
         clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(CATEGORIES[3]);
-        assertTextPresent("Data Views", "Name", "Type", "Access");
+        if (!IS_BOOTSTRAP_LAYOUT)
+            assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _ext4Helper.checkCheckbox("Status");
@@ -225,7 +229,8 @@ public class DataViewsTest extends ParticipantListTest
             beginAt(Locator.linkWithText(entry[0]).findElement(getDriver()).getAttribute("href"), WAIT_FOR_JAVASCRIPT);
 
             refresh();
-            waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"),
+            if (!IS_BOOTSTRAP_LAYOUT)
+                waitForElement(Locator.xpath("//table[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"),
                     WAIT_FOR_PAGE);
             clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         }
@@ -462,7 +467,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Data Cut Date:");
+        waitForText("Data Cut Date");
         assertTextPresent(REFRESH_DATE);
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(REFRESH_DATE);
