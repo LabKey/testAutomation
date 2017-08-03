@@ -85,7 +85,7 @@ public class ScatterPlotTest extends GenericChartsTest
         goToSchemaBrowser();
         selectQuery("study", "APX-1");
 
-        click(Locator.linkWithText("view data"));
+        clickAndWait(Locator.linkWithText("view data"));
         DataRegionTable table = new DataRegionTable("Dataset", this);
         table.clickInsertNewRow();
         waitForElement(Locator.name("quf_MouseId"));
@@ -116,7 +116,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         log("Go and edit the column definition to be a measure");
         table.clickHeaderButtonAndWait("Manage");
-        click(Locator.linkWithText("edit definition"));
+        clickAndWait(Locator.linkWithText("edit definition"));
 
         final PropertiesEditor datasetFieldsPanel = PropertiesEditor(getDriver()).withTitle("Dataset Fields").findWhenNeeded();
         waitForElement(Locator.lkButton("Export Fields"));
@@ -548,7 +548,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Save");
 
         log("Verify missing measure error message.");
-        click(Locator.linkContainingText("Clinical and Assay Data"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(SCATTER_PLOT_NAME_DR + " Colored");
         clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
         _ext4Helper.waitForMaskToDisappear();
@@ -596,7 +596,7 @@ public class ScatterPlotTest extends GenericChartsTest
         });
         waitForText("The study schedule defines"); // text on the Manage Datasets page
 
-        click(Locator.linkContainingText("Clinical and Assay Data"));
+        clickAndWait(Locator.linkContainingText("Clinical and Assay Data"));
         waitForText(SCATTER_PLOT_NAME_DR + " Colored");
         clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
         _ext4Helper.waitForMaskToDisappear();
