@@ -132,10 +132,6 @@ public class FolderExportTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        // we are using the simpletest module to test Container Tab import/export
-        goToAdminConsole().goToModuleInformationSection();
-        assertTextPresent("simpletest");
-
         RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
@@ -598,13 +594,11 @@ public class FolderExportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Default settings");
 
-        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.FILES_DEFAULT_COMBO));
-        isElementPresent(Locator.xpath("//li[text()='Daily digest' and contains(@class, 'x4-boundlist-selected')]"));
-        click(Locator.tagWithText("span", "Default Settings"));
-
         _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.MESSAGES_DEFAULT_COMBO));
         isElementPresent(Locator.xpath("//li[text()='All conversations' and contains(@class, 'x4-boundlist-selected')]"));
-        click(Locator.tagWithText("span", "Default Settings"));
+
+        _ext4Helper.openComboList(Ext4Helper.Locators.formItemWithLabel(MessagesLongTest.FILES_DEFAULT_COMBO));
+        isElementPresent(Locator.xpath("//li[text()='Daily digest' and contains(@class, 'x4-boundlist-selected')]"));
 
         verifySubfolderImport(subfolderIndex, false);
     }
@@ -654,7 +648,8 @@ public class FolderExportTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("core");
+        // we are using the simpletest module to test Container Tab import/export
+        return Arrays.asList("core", "simpletest");
     }
 
     @Override
