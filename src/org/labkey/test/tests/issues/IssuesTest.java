@@ -66,7 +66,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
 @Category({Issues.class, DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+    {setIsBootstrapWhitelisted(true);}
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String USER1 = "user1_issuetest@issues.test";
@@ -114,7 +114,7 @@ public class IssuesTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsersIfPresent(USER1, USER2);
+        _userHelper.deleteUsers(false, USER1, USER2);
         _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
@@ -162,7 +162,7 @@ public class IssuesTest extends BaseWebDriverTest
         issuesTable.clearAllFilters("IssueId");
 
         // reset folder filter
-        issuesTable.clickHeaderMenu("Grid views", true, "Folder Filter", "Current folder");
+        issuesTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);
     }
 
     public void validateQueries()
@@ -422,7 +422,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void emailTest()
     {
-        Map<String, String> ISSUE = Maps.of("assignedTo", displayNameFromEmail(USER1), "title", "A not so serious issue", "priority", "4", "comment", "No big whup", "notifyList", USER2);
+        Map<String, String> ISSUE = Maps.of("assignedTo", _userHelper.getDisplayNameForEmail(USER1), "title", "A not so serious issue", "priority", "4", "comment", "No big whup", "notifyList", USER2);
 
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
@@ -465,7 +465,7 @@ public class IssuesTest extends BaseWebDriverTest
         pushLocation();
 
         EmailRecordTable emailTable = new EmailRecordTable(this);
-        EmailMessage message = emailTable.getMessage(ISSUE.get("title") + ",\" has been opened and assigned to " + displayNameFromEmail(USER1));
+        EmailMessage message = emailTable.getMessage(ISSUE.get("title") + ",\" has been opened and assigned to " + _userHelper.getDisplayNameForEmail(USER1));
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
@@ -761,7 +761,7 @@ public class IssuesTest extends BaseWebDriverTest
         _permissionsHelper.createPermissionsGroup("Readers", user);
         _permissionsHelper.setPermissions("Readers", "Reader");
 
-        String user1DisplayName = displayNameFromEmail(USER1);
+        String user1DisplayName = _userHelper.getDisplayNameForEmail(USER1);
 
         _issuesHelper.goToAdmin();
         _issuesHelper.setIssueAssignmentList(null);
@@ -816,7 +816,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
         _issuesHelper.goToAdmin();
-        _issuesHelper.setIssueAssignmentUser(displayNameFromEmail(deletedUser));
+        _issuesHelper.setIssueAssignmentUser(_userHelper.getDisplayNameForEmail(deletedUser));
         clickButton("Save");
 
         // taking care of some clean-up while here for the test.
@@ -836,8 +836,8 @@ public class IssuesTest extends BaseWebDriverTest
     public void testAssignedToOnResolveAndClose() throws Exception
     {
         final String title = "assignmentTest";
-        final String openTo = displayNameFromEmail(USER1);
-        final String updateTo = displayNameFromEmail(USER3);
+        final String openTo = _userHelper.getDisplayNameForEmail(USER1);
+        final String updateTo = _userHelper.getDisplayNameForEmail(USER3);
         final String resolveTo = NAME;
         final String closeTo = "Guest";
 
@@ -866,7 +866,6 @@ public class IssuesTest extends BaseWebDriverTest
     {
         URL url = getURL();
         Map<String, String> urlParameters = WebTestHelper.parseUrlQuery(url);
-        String id = urlParameters.get("issueId");
-        return id;
+        return urlParameters.get("issueId");
     }
 }
