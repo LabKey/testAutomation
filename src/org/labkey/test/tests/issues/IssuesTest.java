@@ -683,7 +683,7 @@ public class IssuesTest extends BaseWebDriverTest
         // move the created issue
         new SiteNavBar(getDriver()).goToModule("Issues");
         clickAndWait(Locator.linkWithText(issueTitle));
-        new BootstrapMenu(getDriver(), Locator.tagWithId("span" ,"moreMenuToggle").findElement(getDriver()))
+        new BootstrapMenu(getDriver(), Locator.bootstrapButton("button", "More").parent().findElement(getDriver()))
                 .clickMenuButton(false, false, "Move");
 
         // handle move dialog
