@@ -2304,8 +2304,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         int tableJobRow = table.getJobRow(jobDescription, descriptionStartsWith);
         assertNotEquals("Failed to find job rowid", -1, tableJobRow);
         table.checkCheckbox(tableJobRow);
-
-        clickButton("Delete");
+        table.clickHeaderButton("Delete");
         assertElementPresent(Locator.linkContainingText(jobDescription));
         if (deleteRuns && isElementPresent(Locator.id("deleteRuns")))
             checkCheckbox(Locator.id("deleteRuns"));
