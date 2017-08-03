@@ -249,7 +249,7 @@ public class ETLHelper
     private void waitForTransformPage(String linkText, String title, String status)
     {
         _test.log("clicking link with text " + linkText + " and status " + status);
-        if(_test.isElementPresent(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']")))
+        if (_test.isElementPresent(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']")))
         {
             _test.click(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']"));
         }
@@ -354,7 +354,8 @@ public class ETLHelper
             if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
             {
                 new ProjectMenu(_test.getDriver()).navigateToFolder(_test.getCurrentProject(), subFolder);
-            }else
+            }
+            else
             {
                 _test.clickFolder(subFolder);
             }
@@ -613,7 +614,7 @@ public class ETLHelper
         do
         {
             currentStatus = _diHelper.getTransformStatusByTransformId(ensureFullIdString(transformId));
-            if(status.equalsIgnoreCase(currentStatus))
+            if (status.equalsIgnoreCase(currentStatus))
                 return;
             else
                 _diHelper.sleep(500);
@@ -643,13 +644,13 @@ public class ETLHelper
         _test.goToProjectHome();
         _test.clickAndWait(Locator.xpath("//span[text()='Source']"));
         DataRegionTable query = new DataRegionTable("query", _test.getDriver());
-        for(String id : ids)
+        for (String id : ids)
         {
             query.checkCheckbox(query.getRowIndex("Id", id));
         }
         _test.doAndWaitForPageToLoad(() ->
         {
-            query.clickHeaderButtonByText("Delete");
+            query.clickHeaderButton("Delete");
             // eat the alert without spewing to the log file
             _test.acceptAlert();
         });
@@ -767,9 +768,8 @@ public class ETLHelper
 
     protected String getDate()
     {
-        Calendar calendar = Calendar.getInstance();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return format.format(calendar.getTime());
+        return format.format(Calendar.getInstance().getTime());
     }
 
     protected void verifyErrorLog(String transformName, List<String> errors)
@@ -782,15 +782,13 @@ public class ETLHelper
     void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
     {
         runETLNoNav(ETLName, hasWork, hasCheckerError);
-        if(!hasCheckerError)
+        if (hasCheckerError)
+            _test.goToProjectHome();
+        else
         {
             _test.refresh(); // log webpart may not yet be present
             _test.waitAndClickAndWait(Locator.linkWithText("Show full log file"));
             _test.waitForElement(Locator.linkWithText("Show summary"));
-        }
-        else
-        {
-            _test.goToProjectHome();
         }
         _test.assertTextPresentCaseInsensitive(errors);
     }

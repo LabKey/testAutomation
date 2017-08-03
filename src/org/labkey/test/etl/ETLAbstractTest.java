@@ -25,7 +25,6 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.tests.SimpleModuleTest;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -67,13 +66,6 @@ public abstract class ETLAbstractTest extends BaseWebDriverTest
     {
         return Collections.singletonList("dataintegration");
     }
-
-//    @Override
-//    public void checkQueries()
-//    {
-//        log("Skipping query check. Some tables used by queries in simpletest module are not created in this test");
-//        log("Query check from " + SimpleModuleTest.class.getSimpleName() + " should cover anything this would check");
-//    }
 
     protected void doSetup()
     {

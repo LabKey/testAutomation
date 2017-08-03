@@ -108,7 +108,7 @@ public class ETLTest extends ETLAbstractTest
     }
 
     @Test
-    public void testErrors() // Migrated from ETLErrorTest
+    public void testErrors()
     {
         final String TRANSFORM_KEYCONSTRAINT_ERROR = "{ETLtest}/SimpleETLCausesKeyConstraintViolation";
         final String TRANSFORM_QUERY_ERROR = "{ETLtest}/SimpleETLqueryDoesNotExist";
@@ -216,9 +216,9 @@ public class ETLTest extends ETLAbstractTest
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
         _etlHelper.incrementExpectedErrorCount(false);
 
-        // test mode 4, parameter persistance. Run twice. First time, the value of the in/out parameter supplied in the xml file
+        // test mode 4, parameter persistence. Run twice. First time, the value of the in/out parameter supplied in the xml file
         // is changed in the sproc, which should be persisted into the transformConfiguration.state variable map.
-        // The second time, the proc doublechecks the changed value was persisted and passed in; errors if not.
+        // The second time, the proc double checks the changed value was persisted and passed in; errors if not.
         _etlHelper.runETL_API(TRANSFORM_PERSISTED_PARAMETER_SP);
         rtr = _etlHelper.runETL_API(TRANSFORM_PERSISTED_PARAMETER_SP);
         assertEquals(ETLHelper.COMPLETE, _diHelper.getTransformStatus(rtr.getJobId()));
@@ -284,6 +284,7 @@ public class ETLTest extends ETLAbstractTest
 
     private final String INSERTED_ID1 = "id1";
     private final String INSERTED_NAME1 = "name1";
+
     @Test
     public void testColumnMapping()
     {
@@ -405,7 +406,10 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.runETL_API(MERGE_ETL);
         // Check the ETL works at all
         _etlHelper.assertInTarget2(PREFIX + "1");
-        verifyCreatedMatchesSource();
+
+        Object target2created = executeSelectRowCommand("etltest", "target2").getRows().get(0).get("Created");
+        Object sourceCreated = executeSelectRowCommand("etltest", "source").getRows().get(0).get("Created");
+        assertEquals("Created field in target2 did not match source", sourceCreated, target2created);
 
         _etlHelper.insertSourceRow("610", PREFIX + "2", null);
         final String newNameForRow1 = "newNameForRow1";
@@ -416,13 +420,6 @@ public class ETLTest extends ETLAbstractTest
         _etlHelper.assertInTarget2(PREFIX + "2", newNameForRow1);
         // Check we really did UPDATE and not insert a new one
         _etlHelper.assertNotInTarget2(PREFIX + "1");
-    }
-
-    private void verifyCreatedMatchesSource()
-    {
-        Object target2created = executeSelectRowCommand("etltest", "target2").getRows().get(0).get("Created");
-        Object sourceCreated = executeSelectRowCommand("etltest", "source").getRows().get(0).get("Created");
-        assertEquals("Created field in target2 did not match source", sourceCreated, target2created);
     }
 
     @Test
