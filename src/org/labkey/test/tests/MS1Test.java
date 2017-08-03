@@ -196,8 +196,7 @@ public class MS1Test extends BaseWebDriverTest
 
         assertTextNotPresent("No data to show");
         assertTextPresent("1,432.8550");
-        assertElementPresent(Locator.tagWithClass("div", "labkey-pagination")   // todo: replace with use of new component
-            .withChild(Locator.tagContainingText("span", "1 - 100 of 183")));
+        assertElementPresent(Locator.paginationText(1, 100, 183));
 
         log("Features rendered OK");
     }

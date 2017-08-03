@@ -783,12 +783,19 @@ public abstract class Locator
         boolean hasLastLink = currentPage < pageCount - 1;
 
         StringBuilder paginationText = new StringBuilder();
-        if (hasFirstLink) paginationText.append("\u00AB First ");
-        if (hasPrevLink) paginationText.append("\u2039 Prev ");
-        paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
-        if (hasNextLink) paginationText.append(" Next \u203A");
-        if (hasLastLink) paginationText.append(" Last \u00BB");
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
+        else
+        {
+            if (hasFirstLink) paginationText.append("\u00AB First ");
+            if (hasPrevLink) paginationText.append("\u2039 Prev ");
+            paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
+            if (hasNextLink) paginationText.append(" Next \u203A");
+            if (hasLastLink) paginationText.append(" Last \u00BB");
+        }
 
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return paginationText().child(Locator.tagWithText("a", paginationText.toString()));
         return paginationText().withText(paginationText.toString());
     }
 
@@ -802,6 +809,8 @@ public abstract class Locator
 
     public static XPathLocator paginationText()
     {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return tagWithClassContaining("div", "paging-widget");
         return tagWithClass("div", "labkey-pagination");
     }
 
