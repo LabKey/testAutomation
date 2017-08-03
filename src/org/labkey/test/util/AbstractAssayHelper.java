@@ -132,16 +132,7 @@ public abstract class AbstractAssayHelper
     {
         _test.doAndWaitForPageToLoad(() ->
         {
-            if (IS_BOOTSTRAP_LAYOUT)
-            {
-                new BootstrapMenu(_test.getDriver(),
-                        Locator.tagWithClass("div", "lk-menu-drop")
-                                .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
-                                .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
-                        .clickMenuButton(false, false, "Edit assay design");
-            }
-            else
-                _test._ext4Helper.clickExt4MenuButton(false, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Edit assay design");
+            clickManageOption(false, "Edit assay design");
             if (confirmEditInOtherContainer)
             {
                 String alertText = _test.acceptAlert();
@@ -163,7 +154,7 @@ public abstract class AbstractAssayHelper
 
     public AssayDesignerPage copyAssayDesign(@Nullable String destinationFolder)
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Copy assay design");
+        clickManageOption(true, "Copy assay design");
 
         if (destinationFolder == null)
             _test.clickButton("Copy to Current Folder");
@@ -175,19 +166,32 @@ public abstract class AbstractAssayHelper
 
     public void deleteAssayDesign()
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Delete assay design");
+        clickManageOption(true, "Delete assay design");
         _test.clickButton("Confirm Delete");
     }
 
     public File exportAssayDesign()
     {
-        return _test.doAndWaitForDownload(() ->
-                _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Export assay design"));
+        return _test.doAndWaitForDownload(() -> clickManageOption(true, "Export assay design"));
     }
 
-    public void setDefaultValues(final String assayName, final AssayDefaultAreas defaults)
+    public void setDefaultValues(String assayName, AssayDefaultAreas defaults)
     {
-        _test._ext4Helper.clickExt4MenuButton(true, Locator.linkWithText(MANAGE_LINK_TEXT), false, "Set default values", defaults.getMenuText(assayName));
+        clickManageOption(true, "Set default values", defaults.getMenuText(assayName));
+    }
+
+    private void clickManageOption(boolean wait, String ... subMenuLabels)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new BootstrapMenu(_test.getDriver(),
+                    Locator.tagWithClass("div", "lk-menu-drop")
+                            .withChild(Locator.linkWithText(MANAGE_LINK_TEXT))
+                            .waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(wait, false, subMenuLabels);
+        }
+        else
+            _test._ext4Helper.clickExt4MenuButton(wait, Locator.linkWithText(MANAGE_LINK_TEXT), false, subMenuLabels);
     }
 
     public enum AssayDefaultAreas

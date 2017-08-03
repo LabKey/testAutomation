@@ -585,22 +585,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
         menu.click();
         try
         {
-            waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+            waitForElement(BootstrapMenu.Locators.menuItem(subMenuLabels[0]).notHidden(), 1000);
         }
         catch (NoSuchElementException retry)
         {
             menu.click(); // Sometimes ext4 menus don't open on the first try
-            waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[0]).notHidden(), 1000);
+            waitForElement(BootstrapMenu.Locators.menuItem(subMenuLabels[0]).notHidden(), 1000);
         }
         if (onlyOpen && subMenuLabels.length == 0)
             return null;
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            WebElement subMenuItem = waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[i]).notHidden(), 2000);
+            WebElement subMenuItem = waitForElement(BootstrapMenu.Locators.menuItem(subMenuLabels[i]).notHidden(), 2000);
             clickAndWait(subMenuItem, 0);
         }
-        WebElement item = waitForElement(BootstrapMenu.Locators.bootstrapMenuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
+        WebElement item = waitForElement(BootstrapMenu.Locators.menuItem(subMenuLabels[subMenuLabels.length - 1]).notHidden());
         if (onlyOpen)
         {
             mouseOver(item);

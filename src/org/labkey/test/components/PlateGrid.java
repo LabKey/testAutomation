@@ -127,9 +127,9 @@ public class PlateGrid
     public List<String> getExcludedValues()
     {
         List<String> values = new ArrayList<>();
-        List<WebElement> excludeCells =  getExcludedCells();
+        List<WebElement> excludeCells = getExcludedCells();
 
-        for(WebElement we : excludeCells)
+        for (WebElement we : excludeCells)
         {
             values.add(we.getText());
         }

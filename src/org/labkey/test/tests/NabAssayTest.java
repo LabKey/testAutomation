@@ -16,18 +16,19 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.PlateGrid;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.pages.assay.RunQCPage;
-import org.labkey.test.components.PlateGrid;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
@@ -42,11 +43,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Assays.class})
 public class NabAssayTest extends AbstractQCAssayTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
     private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
@@ -156,21 +160,6 @@ public class NabAssayTest extends AbstractQCAssayTest
             "</script>\n";
 
     private static final String TEST_DIV_NAME = "testDiv";
-    protected String setWikiSource(String srcFragment)
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-        WikiHelper wikiHelper = new WikiHelper(this);
-
-        assertElementPresent(Locator.linkWithText(WIKIPAGE_NAME));
-        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
-
-        String fullSource = NABJS_INCLUDE + ClientAPITest.getFullSource(srcFragment);
-        log("Setting wiki page source:");
-        log(fullSource);
-        wikiHelper.setWikiBody(fullSource);
-        wikiHelper.saveWikiPage();
-        return waitForWikiDivPopulation(TEST_DIV_NAME, 30);
-    }
 
     @Override
     public List<String> getAssociatedModules()
@@ -190,38 +179,27 @@ public class NabAssayTest extends AbstractQCAssayTest
         return BrowserType.CHROME;
     }
 
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    @BeforeClass
+    public static void setupProject() throws Exception
     {
-        deleteProject(getProjectName(), afterTest);
-        try{deleteEngine();}
-        catch(Throwable ignore) {}
-    } //doCleanup()
+        NabAssayTest init = (NabAssayTest)getCurrentTest();
+        init.doSetup();
+    }
 
-    /**
-     * Performs Nab designer/upload/publish.
-     */
-    @Test
-    public void runUITests() throws Exception
+    private void doSetup() throws Exception
     {
-        log("Starting Assay BVT Test");
-        //revert to the admin user
         ensureSignedInAsPrimaryTestUser();
-
-        log("Testing NAb Assay Designer");
 
         // set up a scripting engine to run a java transform script
         prepareProgrammaticQC();
 
-        //create a new test project
-        _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
+        _containerHelper.createProject(getProjectName(), null);
 
-        //setup a pipeline for it
-        setupPipeline(TEST_ASSAY_PRJ_NAB);
+        //setup a pipeline for the project
+        setupPipeline(getProjectName());
 
         // create a study so we can test copy-to-study later:
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1);
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Study Overview");
@@ -230,27 +208,44 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickButton("Create Study");
 
         //add the Assay List web part so we can create a new nab assay
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+    }
 
-        clickProject(TEST_ASSAY_PRJ_NAB);
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+
+        try
+        {
+            deleteEngine();
+        }
+        catch(Throwable ignore) {}
+    }
+
+    /**
+     * Performs Nab designer/upload/publish.
+     */
+    @Test
+    public void runUITests() throws Exception
+    {
+        log("Testing NAb Assay Designer");
+
+        goToProjectHome();
+
+        PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Assay List");
 
         //create a new nab assay
-        clickButton("Manage Assays");
-        startCreateNabAssay(TEST_ASSAY_NAB);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_NAB_DESC);
-
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
+                .setDescription(TEST_ASSAY_NAB_DESC)
+                .save();
 
         clickAndWait(Locator.linkWithText("configure templates"));
 
         clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
-        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement(Locator.id("templateName"), PLATE_TEMPLATE_NAME);
+        setFormElement(Locator.inputById("templateName"), PLATE_TEMPLATE_NAME);
 
         // select the specimen wellgroup tab
         click(Locator.tagWithText("div", "SPECIMEN"));
@@ -258,20 +253,19 @@ public class NabAssayTest extends AbstractQCAssayTest
         // select the first specimen group
         click(Locator.tagWithText("label", "Specimen 1"));
         // set reversed dilution direction to true:
-        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "true");
+        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "true");
 
         // select the second specimen group
         click(Locator.tagWithText("label", "Specimen 2"));
         // set reversed dilution direction to false:
-        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "false");
+        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "false");
 
         // select the third specimen group
         click(Locator.tagWithText("label", "Specimen 3"));
         // set reversed dilution direction to a nonsense value:
-        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "invalid boolean value");
+        setFormElement(Locator.inputById("property-ReverseDilutionDirection"), "invalid boolean value");
 
         // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
-
         clickButton("Save & Close");
 
         assertTextPresent(PLATE_TEMPLATE_NAME, "NAb: 5 specimens in duplicate");
@@ -279,15 +273,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-        _assayHelper.clickEditAssayDesign();
-        waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
+        _assayHelper.clickEditAssayDesign()
+                .setPlateTemplate(PLATE_TEMPLATE_NAME)
+                .save();
 
-        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
-
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
-
-        clickAndWait(Locator.linkWithText("configure templates"));
+        clickAndWait(Locator.lkButton("configure templates"));
 
         doAndWaitForPageToLoad(() ->
         {
@@ -298,8 +288,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
         assertTextNotPresent("NAb: 5 specimens in duplicate");
 
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -408,18 +397,18 @@ public class NabAssayTest extends AbstractQCAssayTest
         // Test editing runs
         // Set the design to allow editing
         clickAndWait(Locator.linkWithText("View Runs"));
-        assertElementNotPresent(Locator.linkWithText("edit"));
-        click(Locator.linkWithText("manage assay design"));
-        _assayHelper.clickEditAssayDesign(true);
-
-        waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
-        checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
-        clickButton("Save & Close");
+        DataRegionTable table = new DataRegionTable("Runs", this);
+        assertEquals("No rows should be editable", 0, DataRegionTable.updateLinkLocator().findElements(table.getComponentElement()).size());
+        _assayHelper.clickEditAssayDesign(true)
+                .setEditableRuns(true)
+                .saveAndClose();
 
         // Edit the first run
-        clickFolder(TEST_ASSAY_FLDR_NAB);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickAndWait(Locator.linkWithText("edit"));
+        doAndWaitForPageToLoad(() ->
+        {
+            table.updateLink(table.getRowIndex("Assay Id", "ptid + visit + specimenid")).click();
+        });
+
         // Make sure that the properties that affect calculations aren't shown
         assertTextNotPresent("Cutoff", "Curve Fit Method");
         setFormElement(Locator.name("quf_Name"), "NameEdited.xlsx");
@@ -430,7 +419,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent("EditedHostCell", "EditedPlateNumber");
 
         // Verify that the edit was audited
-        goToModule("Query");
+        goToSchemaBrowser();
         viewQueryData("auditLog", "ExperimentAuditEvent");
         assertTextPresent("Run edited",
                 "Plate Number changed from blank to 'EditedPlateNumber'",
@@ -438,7 +427,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                 "Name changed from 'ptid + visit + specimenid' to 'NameEdited.xlsx'");
 
         // Return to the run list
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         // test creating a custom details view via a "magic" named run-level view:
@@ -447,7 +436,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.saveCustomView("CustomDetailsView");
 
         clickAndWait(Locator.linkContainingText("details").index(1));
-        assertNabData(true);
+        assertNabData();
 
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("View Results"));
@@ -461,30 +450,33 @@ public class NabAssayTest extends AbstractQCAssayTest
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
+        // TODO: Cant get it to scroll to this filter option...
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals One Of (example usage: a;b;c)", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
         assertTextPresent("ptid 1 A", "ptid 1 B");
         assertTextNotPresent("ptid 1 C", "ptid 5");
         region.checkAllOnPage();
-        clickButton("Copy to Study");
+        region.clickHeaderButton("Copy to Study");
 
         selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
         clickButton("Next");
-        clickButton("Copy to Study");
+
+        region = new DataRegionTable("Data", this);
+        region.clickHeaderButton("Copy to Study");
         assertStudyData(4);
 
         assertAliasedAUCStudyData();
 
         clickAndWait(Locator.linkWithText("assay"));
-        assertNabData(true);
+        assertNabData();
 
         // Delete a single run (regression test for issue 24487)
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("View Runs"));
 
-        DataRegionTable dataRegionTable = new DataRegionTable("Runs", this);
-        dataRegionTable.checkCheckbox(0);
-        clickButton("Delete", "Confirm Delete");
+        region = new DataRegionTable("Runs", this);
+        region.checkCheckbox(0);
+        region.clickHeaderButton("Delete");
         clickButton("Confirm Delete");
 
         doSchemaBrowserTest();
@@ -492,8 +484,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         doResolverTypeTest();
 
         // create user with read permissions to study and dataset, but no permissions to source assay
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_STUDY1);
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
         pushLocation();  // Save our location because impersonated user won't have permission to project
         _permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
         setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
@@ -509,13 +500,14 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("2"));
         assertStudyData(1);
         clickAndWait(Locator.linkWithText("assay"));
-        assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
+        assertNabData();
 
         // no permission to details page for "ptid 1 C"; it wasn't copied to the study
         beginAt(ptid1c_detailsURL);
         assertEquals(getResponseCode(), 403);
 
-        beginAt("/login/logout.view");  // stop impersonating
+        clickAndWait(Locator.lkButton("Home"));
+        stopImpersonating();
 
         doNabApiTest();
 
@@ -528,9 +520,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         directBrowserQueryTest();
 
         runNabQCTest();
-
-    } //doTestSteps()
-
+    }
 
     //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
     private void directBrowserQueryTest()
@@ -555,10 +545,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent("Description for NAb assay");
     }
 
-    private static String QUERY_NAME = "Data";
     private void doSchemaBrowserTest()
     {
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        final String QUERY_NAME = "Data";
+
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
@@ -598,24 +589,22 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickButton("Cancel");
     }
 
-    private static String WIKIPAGE_NAME = "Nab API Wiki";
-
     @LogMethod
     private void doNabApiTest()
     {
+        final String WIKIPAGE_NAME = "Nab API Wiki";
+
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        wikiHelper.setWikiBody("placeholder text");
+        wikiHelper.setWikiBody(NABJS_INCLUDE + ClientAPITest.getFullSource("runNabAssayTest({renderTo : 'testDiv'})"));
         wikiHelper.saveWikiPage();
-
-        setWikiSource("runNabAssayTest({renderTo : 'testDiv'})");
+        waitForWikiDivPopulation(TEST_DIV_NAME, 30);
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
 
@@ -668,22 +657,9 @@ public class NabAssayTest extends AbstractQCAssayTest
         }
     }
 
-    private void assertNabData(boolean hasCustomView)
+    private void assertNabData()
     {
         assertTextPresent("Cutoff Dilutions", "ptid 1", "ptid 2", "ptid 3", "ptid 4", "ptid 5");
-/*
-        assertTextPresent("Virus ID");
-        if (hasCustomView)
-        {
-            assertTextNotPresent("Virus Name");
-            assertTextNotPresent("Nasty Virus");
-        }
-        else
-        {
-            assertTextPresent("Virus Name");
-            assertTextPresent("Nasty Virus");
-        }
-*/
     }
 
     private void assertAUCColumnsHidden()
@@ -724,19 +700,19 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertEquals(" ", table.getDataAsText(0, CURVE_IC80_COL_TITLE)); //ptid 1 A, Curve IC 80. Should be blank.
         assertEquals(" ", table.getDataAsText(5, CURVE_IC70_COL_TITLE)); //ptid 1 B, Curve IC 70. Should be blank.
 
-        for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_POLY_COL_TITLE));        //AUC = AUC_poly
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_POLY_COL_TITLE)); //Curve IC50 = Curve_IC50_poly
             assertEquals(table.getDataAsText(i, CURVE_IC70_COL_TITLE), table.getDataAsText(i, CURVE_IC70_POLY_COL_TITLE)); //Curve IC70 = Curve_IC70_poly
         }
-        for(int i = 10; i < 15; i++)
+        for (int i = 10; i < 15; i++)
         {
             assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_4PL_COL_TITLE));        //AUC = AUC_4pl
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_4PL_COL_TITLE)); //Curve IC50 = Curve_IC50_4pl
             assertEquals(table.getDataAsText(i, CURVE_IC80_COL_TITLE), table.getDataAsText(i, CURVE_IC80_4PL_COL_TITLE)); //Curve IC80 = Curve_IC80_4pl
         }
-        for(int i = 5; i < 10; i++)
+        for (int i = 5; i < 10; i++)
         {
             assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_5PL_COL_TITLE));        //AUC = AUC_5pl
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_5PL_COL_TITLE)); //Curve IC50 = Curve_IC50_5pl
@@ -748,7 +724,8 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("Checking data in aliased AUC columns in Study");
         // check copied AUC data.
-        setSort("Dataset", "ParticipantId", SortDirection.ASC);
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+        table.setSort("ParticipantId", SortDirection.ASC);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
         _customizeViewsHelper.addColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
@@ -759,7 +736,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         _customizeViewsHelper.addColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
         _customizeViewsHelper.saveCustomView();
 
-        DataRegionTable table = new DataRegionTable("Dataset", this);
+        table = new DataRegionTable("Dataset", this);
         assertEquals(table.getDataAsText(0, AUC_STUDY_COL_TITLE),        table.getDataAsText(0, AUC_POLY_STUDY_COL_TITLE));        //AUC = AUC_poly
         assertEquals(table.getDataAsText(1, AUC_STUDY_COL_TITLE),        table.getDataAsText(1, AUC_4PL_STUDY_COL_TITLE));         //AUC = AUC_4pl
         assertEquals(table.getDataAsText(0, CURVE_IC50_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC50_POLY_STUDY_COL_TITLE)); //CurveIC50 = CurveIC50_poly
@@ -784,7 +761,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
 
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         importData(
                 new AssayImportOptions.ImportOptionsBuilder().
@@ -810,13 +787,13 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(ASSAY_ID_TRANSFORM));
 
         DataRegionTable table = new DataRegionTable("Data", this);
-        for(int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             assertEquals("0.0", table.getDataAsText(i, "Fit Error"));
         }
     }
 
-    protected void verifyRunDetails()
+    private void verifyRunDetails()
     {
         clickAndWait(Locator.linkWithText("View Runs"));
         DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
@@ -825,26 +802,26 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("ptid + visit + date"));
         clickAndWait(Locator.linkWithText("run details"));
 
-        //assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 B, Vst 1.0");
         assertTextPresent("&lt; 20", 10);
 
-        String nabData = getText(Locator.id("bodypanel"));
+        Locator.XPathLocator body = Locator.tagWithClass("div", "lk-body-ct");
+        String nabData = getText(body);
         assertTrue(nabData.contains("461"));      // Four parameter IC50
         assertTrue(nabData.contains("0.043"));    // 4PL AUC/PosAUC
         assertFalse(nabData.contains("561"));      // Five Parameter IC50
         assertFalse(nabData.contains("503"));      // Polynomial IC50
         assertFalse(nabData.contains("0.077"));    // Five PL AUC
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Five Parameter");
-        nabData = getText(Locator.id("bodypanel"));
+        assayHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Five Parameter");
+        nabData = getText(body);
         assertTrue(nabData.contains("561"));      // Five Parameter IC50
         assertTrue(nabData.contains("0.077"));    // Five PL AUC
         assertTrue(nabData.contains("0.081"));    // Five PL posAUC
         assertFalse(nabData.contains("503"));      // Polynomial IC50
         assertFalse(nabData.contains("461"));      // Four parameter IC50
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
-        nabData = getText(Locator.id("bodypanel"));
+        assayHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Polynomial");
+        nabData = getText(body);
         assertTrue(nabData.contains("503"));      // Polynomial IC50:
         assertTrue(nabData.contains("0.054"));    // Polynomial AUC:
         assertTrue(nabData.contains("0.055"));    // Polynomial posAUC:
@@ -859,15 +836,15 @@ public class NabAssayTest extends AbstractQCAssayTest
         Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+        assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Large");
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+        assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Medium");
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+        assayHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Small");
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
@@ -905,11 +882,9 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected void testWellAndDilutionData()
     {
         log("Test WellData and DilutionData tables");
-        clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         goToSchemaBrowser();
-        selectQuery("assay.NAb.TestAssayNab", "WellData");
-        waitAndClickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = viewQueryData("assay.NAb.TestAssayNab", "WellData");
         List<String> row11 = table.getRowDataAsText(11);
         assertEquals("Row size did not match", expectedRow11.size(), row11.size());
         assertEquals("WellData row did not match.", expectedRow11, row11.subList(0, expectedRow11.size()));
@@ -918,13 +893,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertEquals("WellData row did not match.", expectedRow12, row12.subList(0, expectedRow12.size()));
 
         goToSchemaBrowser();
-        selectQuery("assay.NAb.TestAssayNab", "DilutionData");
-        waitAndClickAndWait(Locator.linkContainingText("view data"));
-        DataRegionTable dilutionTable = new DataRegionTable("query", this);
-        List<String> row10 = dilutionTable.getRowDataAsText(10);
+        table = viewQueryData("assay.NAb.TestAssayNab", "DilutionData");
+        List<String> row10 = table.getRowDataAsText(10);
         assertEquals("Row size did not match", expectedDilRow10.size(), row10.size());
         assertEquals("DilutionData row did not match.", expectedDilRow10, row10.subList(0, expectedDilRow10.size()));
-        List<String> row40 = dilutionTable.getRowDataAsText(40);
+        List<String> row40 = table.getRowDataAsText(40);
         assertEquals("Row size did not match", expectedDilRow40.size(), row40.size());
         assertEquals("DilutionData row did not match.", expectedDilRow40, row40.subList(0, expectedDilRow40.size()));
 
@@ -932,7 +905,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);
         boolean deleteSuccess = assayFile.delete();
         assertTrue("Failed to delete file: " + NAB_FILENAME2, deleteSuccess);
-        clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("ptid + date"));
         clickAndWait(Locator.linkWithText("run details"));
@@ -946,17 +919,16 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     protected void runNabQCTest()
     {
-        log("Go to the project home.");
         goToProjectHome();
-        clickFolder(TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         DataRegionTable dataRegionTable = new DataRegionTable("Runs", this);
         dataRegionTable.findCell(0, 0).click();
 
         log("Got to the QC page.");
-        click(Locator.linkWithText("View QC"));
-        clickAndWait(Locator.linkWithText("Review/QC Data"));
+        DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
+        detailHelper.clickDetailsLink("View QC", "Review/QC Data");
         RunQCPage runQCPage = new RunQCPage(getDriver());
 
         log("Select a few values to remove from 'Plate 1'.");
@@ -988,7 +960,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Check that all of the selected values to be ignored are marked as such in the excluded grid.");
         List<String> excludedValues = plateGrid.getExcludedValues();
-        for(String value : allIgnoredValues)
+        for (String value : allIgnoredValues)
         {
             assertTrue("Did not find value " + value + " in the excluded grid.", excludedValues.contains(value));
         }
@@ -1003,7 +975,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Validated that the excluded grid no longer shows the element as being excluded.");
         excludedValues = plateGrid.getExcludedValues();
-        for(String value : allIgnoredValues)
+        for (String value : allIgnoredValues)
         {
             assertTrue("Did not find value " + value + " in the excluded grid.", excludedValues.contains(value));
         }
@@ -1027,7 +999,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Check that all of the previously selected values and the new values to be ignored are marked as such in the excluded grid.");
         excludedValues = plateGrid.getExcludedValues();
-        for(String value : allIgnoredValues)
+        for (String value : allIgnoredValues)
         {
             assertTrue("Did not find value " + value + " in the excluded grid.", excludedValues.contains(value));
         }
@@ -1038,7 +1010,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Now validate that the plate grid shows the expected data.");
         PlateGrid summaryPlateGrid = new PlateGrid(getDriver());
         excludedValues = summaryPlateGrid.getExcludedValues();
-        for(String value : allIgnoredValues)
+        for (String value : allIgnoredValues)
         {
             assertTrue("Did not find value " + value + " in the excluded grid.", excludedValues.contains(value));
         }
@@ -1048,9 +1020,5 @@ public class NabAssayTest extends AbstractQCAssayTest
         sleep(500); // Wait for a moment to allow the tool tip to show up.
         String tipText = getText(Locator.xpath("//div[contains(@class, 'x4-tip-body')]//span//div"));
         assertTrue("Tool tip comment not as expected. Expected: '" + COMMENT + "' Found: '" + tipText + "'.", tipText.equals(COMMENT));
-
-        log("Looks good, all done.");
-
     }
-
 }

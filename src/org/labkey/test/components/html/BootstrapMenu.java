@@ -79,11 +79,11 @@ public class BootstrapMenu extends Component
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            WebElement subMenuItem = Locators.bootstrapMenuItem(subMenuLabels[i])
+            WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
                     .waitForElement(elements().findMenuList(), 2000);
             _driver.clickAndWait(subMenuItem, 0);
         }
-        WebElement item = Locators.bootstrapMenuItem(subMenuLabels[subMenuLabels.length - 1])
+        WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
                 .notHidden()
                 .waitForElement(elements().findMenuList(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         if (onlyOpen)
@@ -127,9 +127,14 @@ public class BootstrapMenu extends Component
 
     static public class Locators
     {
-        public static Locator.XPathLocator bootstrapMenuItem(String text)
+        public static Locator.XPathLocator menuItem(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden();
+        }
+
+        public static Locator.XPathLocator menuItemDisabled(String text)
+        {
+            return Locator.tagWithClass("li", "disabled").childTag("a").withText(text).notHidden();
         }
     }
 }

@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.BootstrapMenu;
 
 /**
  * Created by klum on 3/3/14.
@@ -41,49 +42,48 @@ public class DilutionAssayHelper
             case ParticipantDate:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Participant ID / Visit"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Participant ID / Date"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
-                _test.click(Ext4Helper.Locators.menuItem("Participant ID / Date"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Participant ID / Date"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.click(BootstrapMenu.Locators.menuItem("Participant ID / Date"));
                 verifyDataIdentifierText(type, ptidSuffix);
                 break;
             case ParticipantVisit:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Participant ID / Visit"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Participant ID / Date"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
-                _test.click(Ext4Helper.Locators.menuItem("Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Participant ID / Date"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.click(BootstrapMenu.Locators.menuItem("Participant ID / Visit"));
                 verifyDataIdentifierText(type, ptidSuffix);
                 break;
             case ParticipantVisitDate:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Participant ID / Visit"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Participant ID / Date"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Participant ID / Date"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Specimen ID / Participant ID / Visit"));
 
                 // click and verify the identifiers on the page
-                _test.click(Ext4Helper.Locators.menuItem("Participant ID / Date"));
+                _test.click(BootstrapMenu.Locators.menuItem("Participant ID / Date"));
                 verifyDataIdentifierText(AssayImportOptions.VisitResolverType.ParticipantDate, ptidSuffix);
                 break;
             case SpecimenIDParticipantVisit:
                 openDataIdentifierMenu();
 
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Specimen ID"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Participant ID / Visit"));
-                _test.waitForElement(Ext4Helper.Locators.menuItemDisabled("Participant ID / Date"));
-                _test.waitForElement(Ext4Helper.Locators.menuItem("Specimen ID / Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Specimen ID"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Participant ID / Visit"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItemDisabled("Participant ID / Date"));
+                _test.waitForElement(BootstrapMenu.Locators.menuItem("Specimen ID / Participant ID / Visit"));
 
                 // click and verify the identifiers on the page
-                _test.click(Ext4Helper.Locators.menuItem("Specimen ID / Participant ID / Visit"));
+                _test.click(BootstrapMenu.Locators.menuItem("Specimen ID / Participant ID / Visit"));
                 verifyDataIdentifierText(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, ptidSuffix);
                 break;
         }
-
     }
 
     /**
@@ -91,13 +91,9 @@ public class DilutionAssayHelper
      */
     private void openDataIdentifierMenu()
     {
-        Locator menu = Locator.linkContainingText("Change Graph Options");
-        _test.mouseOver(menu);
-        _test.click(menu);
-
-        Locator parentLocator = Locator.menuItem("Data Identifiers");
-        _test.waitForElement(parentLocator, _test.WAIT_FOR_JAVASCRIPT);
-        _test.mouseOver(parentLocator);
+        new BootstrapMenu(_test.getDriver(), detailMenu("Change Graph Options")
+                .waitForElement(_test.getDriver(), _test.WAIT_FOR_JAVASCRIPT))
+                .clickMenuButton(false, true, "Data Identifiers", "Data Identifiers");
     }
 
     private void verifyDataIdentifierText(AssayImportOptions.VisitResolverType type, @Nullable String ptidSuffix)
@@ -130,5 +126,24 @@ public class DilutionAssayHelper
             // dilution
             _test.assertElementPresent(Locator.xpath("//table").withClass("labkey-data-region").append("//td").withClass("labkey-data-region-header-container").withText(text));
         }
+    }
+
+    public void clickDetailsLink(String text, String ... subMenuLabels)
+    {
+        if (subMenuLabels == null || subMenuLabels.length == 0)
+        {
+            _test.clickAndWait(Locator.linkWithText(text));
+        }
+        else
+        {
+            new BootstrapMenu(_test.getDriver(), detailMenu(text).waitForElement(_test.getDriver(), _test.WAIT_FOR_JAVASCRIPT))
+                    .clickMenuButton(false, false, subMenuLabels);
+        }
+    }
+
+    private Locator.XPathLocator detailMenu(String text)
+    {
+        return Locator.tagWithClassContaining("div", "lk-menu-drop")
+                .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text));
     }
 }

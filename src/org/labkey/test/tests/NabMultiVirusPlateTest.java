@@ -40,23 +40,16 @@ import java.util.List;
 @Category({DailyA.class, Assays.class})
 public class NabMultiVirusPlateTest extends BaseWebDriverTest
 {
-    private final static String TEST_ASSAY_FLDR_NAB = "nabmvassay";
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private static final String PLATE_TEMPLATE_NAME = "NabMultiVirusTest Template";
-    private static final String TARGET_STUDY = "NAb multi virus study";
-    private static final String TARGET_STUDY_DESC = "";
 
     protected static final String MULTI_VIRUS_ASSAY_NAB = "MultiVirusNab";
     protected static final String MULTI_VIRUS_ASSAY_NAB_DESC = "Description for Multi Virus NAb assay";
 
     protected final File TEST_ASSAY_NAB_MV_FILE1 = TestFileUtils.getSampleData("Nab/SpectraMax/20140612_0588.txt");
-    //    protected final String TEST_ASSAY_NAB_MV_FILE2 = getLabKeyRoot() + "/sampledata/Nab/Envision/4 plate data set _001.csv";
-    //    protected final String TEST_ASSAY_NAB_MV_FILE3 = getLabKeyRoot() + "/sampledata/Nab/Envision/4 plate data set _002.csv";
-    //    protected final String TEST_ASSAY_NAB_MV_FILE4 = getLabKeyRoot() + "/sampledata/Nab/16AUG11 KK CD3-1-1.8.xls";
     protected final File FILEMAKER_ASSAY_METADATA = TestFileUtils.getSampleData("Nab/SpectraMax/metadata_success.xls");
     protected final File FILEMAKER_ASSAY_INCOMPLETE_METADATA = TestFileUtils.getSampleData("Nab/SpectraMax/metadata_incomplete.xls");
     protected final File FILEMAKER_ASSAY_EXTRA_METADATA = TestFileUtils.getSampleData("Nab/SpectraMax/metadata_extra.xls");
-
-    protected final List<String> VIRUS_NAMES = Arrays.asList("Virus 1", "Virus 2");
 
     protected final List<String> WELLGROUP_NAMES = Arrays.asList(
         "Specimen 01:Virus 2",
@@ -120,9 +113,12 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
 
         clickButton("Save & Close");
 
-        clickProject(getProjectName());
+        goToProjectHome();
 
-        createAssay(MULTI_VIRUS_ASSAY_NAB, MULTI_VIRUS_ASSAY_NAB_DESC);
+        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", MULTI_VIRUS_ASSAY_NAB)
+                .setDescription(MULTI_VIRUS_ASSAY_NAB_DESC)
+                .setPlateTemplate(PLATE_TEMPLATE_NAME)
+                .saveAndClose();
     }
 
     @Before
@@ -226,21 +222,6 @@ public class NabMultiVirusPlateTest extends BaseWebDriverTest
         }
 
         return fileBasedMetadataAssay;
-    }
-
-    private void createAssay(String name, String description)
-    {
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
-        clickButton("Next");
-
-        log("Setting up NAb MV assay");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), name);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), description);
-        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
-        sleep(1000);
-        clickButton("Save & Close");
     }
 
     private void importPlateData(File dataFile, String curveFitMethod)

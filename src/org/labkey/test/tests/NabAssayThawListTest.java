@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -36,8 +37,10 @@ import java.util.List;
 @Category({DailyA.class, Assays.class})
 public class NabAssayThawListTest extends AbstractQCAssayTest
 {
-    private final static String TEST_ASSAY_PRJ_NAB = "Nab Thaw ListTest Verify Project";            //project for nab test
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
+
+    private final String ASSAY_BACKGROUND_IMPORT_PROJECT = "Background Import Assay Data From List Project";
 
     protected static final String TEST_ASSAY_NAB = "TestAssayNab";
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
@@ -65,13 +68,31 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     @Override
     protected String getProjectName()
     {
-        return TEST_ASSAY_PRJ_NAB;
+        return "Nab Thaw ListTest Verify Project";
     }
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    @BeforeClass
+    public static void setupProject() throws Exception
+    {
+        NabAssayThawListTest init = (NabAssayThawListTest)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup() throws Exception
+    {
+        // default project
+        _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+
+        // project for validateBackgroundImporting
+        _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
+        _containerHelper.createProject(ASSAY_BACKGROUND_IMPORT_PROJECT, null);
     }
 
     /**
@@ -81,24 +102,17 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     public void runUITests()
     {
         log("Testing NAb Assay Designer with Thaw List default");
-         _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
 
         PortalHelper portalHelper = new PortalHelper(this);
-
-
-        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
-
-        clickProject(TEST_ASSAY_PRJ_NAB);
+        goToProjectHome();
 
         log("Create new Nab assay");
         portalHelper.addWebPart("Assay List");
-        //create a new nab assay
-        clickButton("Manage Assays");
-        startCreateNabAssay(TEST_ASSAY_NAB);
-        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_NAB_DESC);
 
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
+        //create a new nab assay
+        _assayHelper.createAssayAndEdit("TZM-bl Neutralization (NAb)", TEST_ASSAY_NAB)
+                .setDescription(TEST_ASSAY_NAB_DESC)
+                .save();
 
         log("Set default for ParticipantVisitResolver at Project level");
         // We'll override it later at the folder level.
@@ -112,8 +126,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         // Add the list we'll use for the thaw list lookup
         new ListHelper(this).importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE);
 
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -134,7 +147,6 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
 
         // 20998 as part of that fix, the List option should already be checked
-
         waitForElement(Locator.css(".schema-loaded-marker"));
         _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
         waitForElement(Locator.css(".query-loaded-marker"));
@@ -153,14 +165,11 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
                 virusName("Nasty Virus").
                 virusId("5433211").
                 curveFitMethod("Polynomial").
-                //ptids(new String[]{"ptid 1 A", "ptid 2 A", "ptid 3 A", "ptid 4 A", "ptid 5 A"}).
-                        //visits(new String[]{"1", "2", "3", "4", "5"}).
-                        sampleIds(new String[]{"1", "2", "3", "4", "5"}).
+                sampleIds(new String[]{"1", "2", "3", "4", "5"}).
                 initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                 dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                 methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
                 runFile(TEST_ASSAY_NAB_FILE1);
-
 
         importData(iob.build());
 
@@ -168,7 +177,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         // Verify fix for 20441.
         log("Verify links to default values in parent folder work");
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
@@ -190,18 +199,16 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
                 "List", Locator.checkedRadioInGroup("ThawListType").findElement(getDriver()).getAttribute("value"));
         waitForFormElementToEqual(Locator.tagWithName("input", "ThawListList-QueryName"), "NabThawList");
         clickButton("Next");
-        assertElementPresent(Locator.input("specimen1_SpecimenID").withAttribute("value", ""));
-        // Let's make sure *some* of the last enetered values did get auto-filled.
+        assertElementPresent(Locator.input("specimen1_SpecimenID").withoutAttribute("value", ""));
+        // Let's make sure *some* of the last entered values did get auto-filled.
         assertElementPresent(Locator.input("specimen1_InitialDilution").withAttribute("value", "20.0"));
 
         verifyValidation(iob);
-
     }
 
     protected void navToRunDetails()
     {
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("run details"));
     }
@@ -243,8 +250,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
     private void setDefaultThawList(String listName)
     {
-        clickProject(TEST_ASSAY_PRJ_NAB);
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
         waitForElement(Locator.css(".query-loaded-marker"));
@@ -255,7 +261,6 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     @Test
     public void validateBackgroundImporting()
     {
-        final String ASSAY_BACKGROUND_IMPORT_PROJECT = "Background Import Assay Data From List Project";
         final String ASSAY_NAME = "Issue26774Assay";
         final String LIST_NAME = "DataList";
         final File STUDY_ZIP = TestFileUtils.getSampleData("AssayBackgroundImport/assayTestList.xls");
@@ -264,10 +269,6 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         log("Test a General assay background importing data from a list.");
 
-        log("Create a project, delete it if it already exist.");
-        _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
-        _containerHelper.createProject(ASSAY_BACKGROUND_IMPORT_PROJECT, null);
-
         PortalHelper portalHelper = new PortalHelper(this);
 
         clickProject(ASSAY_BACKGROUND_IMPORT_PROJECT);
@@ -275,33 +276,17 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         log("Create new General assay");
         portalHelper.addWebPart("Assay List");
 
-        portalHelper.clickButton("New Assay Design");
-        portalHelper.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
-        portalHelper.clickButton("Next");
-
-        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
-        portalHelper.waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
-        portalHelper.setFormElement(assayName, ASSAY_NAME);
-
-        portalHelper.setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "Validating fix for issue 26774.");
-
-        portalHelper.checkCheckbox(Locator.checkboxByName("backgroundUpload"));
-        portalHelper.clickButton("Save & Close", "<Select Web Part>");
+        _assayHelper.createAssayAndEdit("General", ASSAY_NAME)
+                .setDescription("Validating fix for issue 26774.")
+                .setBackgroundImport(true)
+                .saveAndClose();
 
         log("Create a list with data coming from the test file.");
 
         portalHelper.addWebPart("Lists");
         portalHelper.clickAndWait(Locator.linkWithText("Manage Lists"));
 
-        portalHelper.clickButton("Create New List");
-        portalHelper.waitForElement(Locator.inputById("ff_name"));
-        portalHelper.setFormElement(Locator.inputById("ff_name"), LIST_NAME);
-        portalHelper.checkCheckbox(Locator.css("span#fileImport input[type='checkbox']"));
-        portalHelper.clickButton("Create List", "Import from TSV or Excel file.");
-        portalHelper.setFormElement(Locator.xpath("//input[@name='uploadFormElement']"), STUDY_ZIP.getPath());
-
-        portalHelper.waitForElement(Locator.xpath("//span[text()='Import']"));
-        portalHelper.clickButton("Import", "Grid Views");
+        _listHelper.createListFromFile(ASSAY_BACKGROUND_IMPORT_PROJECT, LIST_NAME, STUDY_ZIP);
 
         log("go back to home.");
         goToProjectHome(ASSAY_BACKGROUND_IMPORT_PROJECT);
@@ -327,12 +312,11 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         portalHelper.clickButton("Save and Finish", "Data Pipeline");
 
-        log("Validate that the pipeline job completed successfuly.");
+        log("Validate that the pipeline job completed successfully.");
         waitForPipelineJobsToComplete(1, "Assay import job", false);
 
         log("Looks like pipeline job completed. Let's go home and clean up.");
         goToHome();
         _containerHelper.deleteProject(ASSAY_BACKGROUND_IMPORT_PROJECT, false);
     }
-
 }

@@ -69,10 +69,10 @@ public class SiteNavBar extends Component
 
         Locator.waitForAnyElement(new FluentWait<SearchContext>(menu.getComponentElement())
             .withTimeout(2000, TimeUnit.MILLISECONDS),
-                BootstrapMenu.Locators.bootstrapMenuItem("More Modules").notHidden(),
-                BootstrapMenu.Locators.bootstrapMenuItem(moduleName).notHidden());
+                BootstrapMenu.Locators.menuItem("More Modules").notHidden(),
+                BootstrapMenu.Locators.menuItem(moduleName).notHidden());
 
-        WebElement moduleLinkElement = BootstrapMenu.Locators.bootstrapMenuItem(moduleName).notHidden()
+        WebElement moduleLinkElement = BootstrapMenu.Locators.menuItem(moduleName).notHidden()
                 .findElementOrNull(menu.getComponentElement());
         if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
         {
@@ -82,9 +82,9 @@ public class SiteNavBar extends Component
         }
         else
         {
-            BootstrapMenu.Locators.bootstrapMenuItem("More Modules")
+            BootstrapMenu.Locators.menuItem("More Modules")
                     .findElement(menu.getComponentElement()).click();
-            BootstrapMenu.Locators.bootstrapMenuItem(moduleName)
+            BootstrapMenu.Locators.menuItem(moduleName)
                     .waitForElement(menu.getComponentElement(), 2000).click();
             return this;
         }

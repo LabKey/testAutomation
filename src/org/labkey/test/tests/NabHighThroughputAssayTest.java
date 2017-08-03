@@ -23,9 +23,9 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
@@ -43,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Assays.class})
 public class NabHighThroughputAssayTest extends BaseWebDriverTest
 {
+    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
     private static final String PLATE_TEMPLATE_NAME = "NabHighThroughputAssayTest Template";
     private static final String CPD_PLATE_TEMPLATE_NAME = "NabHighThroughputAssayTest Template CPD";
@@ -111,13 +112,12 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
                 "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)" :
                 "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)";
 
-        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit(type, name);
-        designerPage.setPlateTemplate(templateName);
+        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit(type, name)
+                .setDescription(description)
+                .setPlateTemplate(templateName);
+
         if (singleFile)
-        {
             designerPage.setMetaDataInputFormat(AssayDesignerPage.MetadataInputFormat.COMBINED);
-        }
-        designerPage.setDescription(description);
 
         designerPage.saveAndClose();
     }
@@ -125,8 +125,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        clickProject(getProjectName());
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
     }
 
     @Test
@@ -182,8 +181,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @LogMethod
     private void doNAbTest(String assayName, File dataFile, @Nullable File metadataFile, List<String> expectedText, int expectedRowCount)
     {
-        clickProject(getProjectName());
-        clickFolder(TEST_ASSAY_FLDR_NAB);
+        new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(assayName));
@@ -196,7 +194,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         setFormElement(Locator.name("cutoff2"), "70");
         selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
 
-        if(metadataFile != null)
+        if (metadataFile != null)
         {
             setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile__']"), metadataFile);
         }
@@ -218,30 +216,32 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("run details"));
 
         log("Verify different curve types");
+        DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
+
         // Imported with polynomial curve fit
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC PositiveAUC"));
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
+        detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Polynomial");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_poly PositiveAUC_poly"));
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
+        detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Four Parameter");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_4pl PositiveAUC_4pl"));
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Five Parameter");
+        detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Five Parameter");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
 
         log("Verify different graph sizes");
         Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+        detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Large");
         Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+        detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Medium");
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+        detailHelper.clickDetailsLink("Change Graph Options", "Graph Size", "Small");
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
@@ -251,16 +251,16 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
             // Defaults to 20 samples per graph
             assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 3);
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "20");
+            detailHelper.clickDetailsLink("Change Graph Options", "Samples per Graph", "20");
             assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 3);
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "15");
+            detailHelper.clickDetailsLink("Change Graph Options", "Samples per Graph", "15");
             assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 4);
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "10");
+            detailHelper.clickDetailsLink("Change Graph Options", "Samples per Graph", "10");
             assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 6);
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "5");
+            detailHelper.clickDetailsLink("Change Graph Options", "Samples per Graph", "5");
             assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
 
             log("Verify different graphs per row");
@@ -268,19 +268,19 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
             assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 1); // Correct number of graphs in first row
             assertElementNotPresent(Locator.xpath("//td[position()>1]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "One");
+            detailHelper.clickDetailsLink("Change Graph Options", "Graphs per Row", "One");
             assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 1); // Correct number of graphs in first row
             assertElementNotPresent(Locator.xpath("//td[position()>1]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Two");
+            detailHelper.clickDetailsLink("Change Graph Options", "Graphs per Row", "Two");
             assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 2); // Correct number of graphs in first row
             assertElementNotPresent(Locator.xpath("//td[position()>2]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Three");
+            detailHelper.clickDetailsLink("Change Graph Options", "Graphs per Row", "Three");
             assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 3); // Correct number of graphs in first row
             assertElementNotPresent(Locator.xpath("//td[position()>3]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Four");
+            detailHelper.clickDetailsLink("Change Graph Options", "Graphs per Row", "Four");
             assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
             assertElementNotPresent(Locator.xpath("//td[position()>4]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
         }
@@ -302,8 +302,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         if (verifyDataIdentifiers)
         {
             log("Verify data identifiers");
-            DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
-            assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
+            detailHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
         }
     }
 
@@ -319,12 +318,6 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return "Nab High Throughput Test Verify Project";
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
     }
 
     @Override
