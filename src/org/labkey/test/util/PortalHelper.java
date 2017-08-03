@@ -222,8 +222,7 @@ public class PortalHelper extends WebDriverWrapper
 
     public BodyWebPart getBodyWebPart(String partName)
     {
-        WebElement el = Locator.css("#bodypanel > table[name=webpart]").containing(partName).findElement(getDriver());
-        return new BodyWebPart(getDriver(), el);
+        return new BodyWebPart(getDriver(), partName);
     }
 
     public List<SideWebPart> getSideWebParts()

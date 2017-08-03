@@ -39,7 +39,6 @@ public class UserNotificationsPage extends LabKeyPage
     private void waitForReady()
     {
         waitForText(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, "User Notifications");
-        waitForElement(Locator.tagWithId("td", "bodypanel"));
         waitForElement(Locators.allNotificationsPanel);
     }
 

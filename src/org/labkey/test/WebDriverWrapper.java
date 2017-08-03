@@ -3043,9 +3043,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         for (int i = 0; i < values.length; i++)
         {
-            //  (//td[@id='bodypanel']//form[1]//.[@name='inputs'])[2] BROKEN?
-            //  //td[@id='bodypanel']//form[1]//descendant::textarea[@name='inputs'][1]
-            setFormElement(Locator.xpath("//descendant::" + tagName + "[@name='" + formElementName + "'][" + (i+1) + "]"), values[i]);
+            setFormElement(Locator.tagWithName(tagName, formElementName).index(i), values[i]);
         }
     }
 

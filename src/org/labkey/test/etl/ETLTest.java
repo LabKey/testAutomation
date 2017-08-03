@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
-import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
@@ -147,7 +147,7 @@ public class ETLTest extends ETLAbstractTest
         errors.clear();
 
         errors.add("Table not found:");
-        waitForElement(Locator.xpath(".//*[@id='bodypanel']"));
+        waitForElement(Locators.bodyPanel());
         _etlHelper.runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
         errors.clear();
 

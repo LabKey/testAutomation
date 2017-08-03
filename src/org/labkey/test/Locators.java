@@ -39,6 +39,13 @@ public abstract class Locators
     public static final Locator.CssLocator labkeyHeader = Locator.css(".labkey-main .header-block");
     public static final Locator.CssLocator labkeyBody = Locator.css(".labkey-main .body-block");
 
+    public static Locator.XPathLocator bodyPanel()
+    {
+        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClass("div", "lk-body-ct") :
+                Locator.id("bodypanel");
+    }
+
     public static Locator.XPathLocator bootstrapMenuItem(String text)
     {
         return Locator.xpath("//li/a[contains(text(), " + Locator.xq(text) + ")]");
