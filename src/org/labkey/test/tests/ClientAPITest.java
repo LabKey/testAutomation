@@ -679,6 +679,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         setSourceFromFile("extIntegrationTest.html", true);
         Locator loc = Locator.id(TEST_DIV_NAME);
+        waitForText("Month of the Year");
         assertElementContains(loc, "Month of the Year");
     }
 
