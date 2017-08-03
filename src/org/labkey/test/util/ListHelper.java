@@ -156,18 +156,8 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void insertNewRow(Map<String, String> data, boolean validateText)
     {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            // TODO: Switch to using getDataRegion().clickInsertNewRow();
-            clickMenuButton(true,
-                    Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
-                    false,
-                    "Insert new row");
-        }
-        else
-        {
-            _extHelper.clickInsertNewRow(true);
-        }
+        DataRegionTable list = new DataRegionTable("query", getDriver());
+        list.clickInsertNewRow();
         setRowData(data, validateText);
     }
 
@@ -484,17 +474,8 @@ public class ListHelper extends LabKeySiteWrapper
         else
         {
             log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                clickMenuButton(true,
-                        Locator.xpath("//span/a[@data-original-title='Insert data']").findElement(getDriver()),
-                        false,
-                        "Import bulk data");
-            }
-            else
-            {
-                _extHelper.clickMenuButton(true, "Insert", "Import Bulk Data");
-            }
+            DataRegionTable list = new DataRegionTable("query", getDriver());
+            list.clickImportBulkData();
         }
         waitForElement(Locator.id("tsv3"));
     }

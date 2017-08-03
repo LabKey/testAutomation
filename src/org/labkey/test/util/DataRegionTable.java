@@ -1475,18 +1475,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return false;
     }
 
-    @Deprecated
+    @Deprecated // use clickInsertNewRow()
     public void clickInsertNewRowDropdown()
     {
         clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", getInsertNewButtonText());
     }
 
+    @Deprecated // use clickImportBulkData()
     public void clickImportBulkDataDropdown()
     {
         clickHeaderMenu("Insert", "Import Bulk Data");
     }
 
-    @Deprecated
+    @Deprecated // use clickInsertNewRow()
     public void clickInsertNewRowButton()
     {
         if (IS_BOOTSTRAP_LAYOUT)
