@@ -148,8 +148,10 @@ public class PropertiesEditor extends WebPartPanel
     public FieldRow addField()
     {
         int initialRowCount = elementCache().findFieldRows().size();
-        elementCache().addFieldButton.click();
-        getWrapper().waitFor(() -> initialRowCount + 1 == elementCache().findFieldRows().size(),
+        getWrapper().waitFor(() -> {
+                    elementCache().addFieldButton.click();
+                    return initialRowCount + 1 == elementCache().findFieldRows().size();
+                },
                 "Failed to add field", 4000 );
         return getSelectedField();
     }
