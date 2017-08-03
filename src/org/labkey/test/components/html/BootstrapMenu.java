@@ -81,6 +81,7 @@ public class BootstrapMenu extends Component
         {
             WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
                     .waitForElement(elements().findMenuList(), 2000);
+            _driver.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
             _driver.clickAndWait(subMenuItem, 0);
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
@@ -92,6 +93,7 @@ public class BootstrapMenu extends Component
             return item;
         }
 
+        _driver.log("attempting to click menu item with text [" + item.getText() + "]");
         if (wait)
             _driver.clickAndWait(item);
         else
@@ -106,8 +108,7 @@ public class BootstrapMenu extends Component
 
     protected class Elements extends ElementCache
     {
-        public WebElement toggleAnchor = Locator.xpath("//*[@data-toggle='dropdown']")
-                .findWhenNeeded(getComponentElement());
+        public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
 
         public WebElement findMenuList()
         {
@@ -127,6 +128,11 @@ public class BootstrapMenu extends Component
 
     static public class Locators
     {
+        public static Locator.XPathLocator toggleAnchor()
+        {
+            return Locator.tagWithAttribute("*", "data-toggle", "dropdown");
+        }
+
         public static Locator.XPathLocator menuItem(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden();
@@ -135,6 +141,13 @@ public class BootstrapMenu extends Component
         public static Locator.XPathLocator menuItemDisabled(String text)
         {
             return Locator.tagWithClass("li", "disabled").childTag("a").withText(text).notHidden();
+        }
+
+        public static Locator.XPathLocator bootstrapMenuContainer()
+        {
+            return Locator.tag("*")
+                    .withPredicate(toggleAnchor()
+                    .followingSibling("ul"));
         }
     }
 }
