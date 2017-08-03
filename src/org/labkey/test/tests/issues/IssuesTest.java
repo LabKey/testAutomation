@@ -77,6 +77,7 @@ public class IssuesTest extends BaseWebDriverTest
     private final Map<String, String> ISSUE_0 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
     private final Map<String, String> ISSUE_1 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
+    private static final String ISSUE_LIST_REGION_NAME = "issues-issues";
 
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
@@ -154,7 +155,7 @@ public class IssuesTest extends BaseWebDriverTest
         enableEmailRecorder();
         clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         // clear region selection and filters
         issuesTable.uncheckAll();
@@ -538,7 +539,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void viewSelectedDetailsTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         issuesTable.setFilter("Status", "Has Any Value", null);
         issuesTable.checkAll();
@@ -552,7 +553,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void lastFilterTest()
     {
-        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
 
         // assert both issues are present
         issuesTable.clearAllFilters("IssueId");
@@ -624,10 +625,9 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        // Set the container filter to include subfolders
-        new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
-                .findElement(getDriver())).clickMenuButton(true, false, "Folder Filter", "Current folder and subfolders");
+
+        DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
+        issuesTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
 
         // Verify the URL of issueTitles[0] goes to getProjectName()
         String href = getAttribute(Locator.linkContainingText(issue0.get("title")), "href");
@@ -708,7 +708,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         new SiteNavBar(getDriver()).goToModule("Issues");
 
-        DataRegionTable issuesTable = new DataRegionTable("issues-issues", getDriver());
+        DataRegionTable issuesTable = new DataRegionTable(ISSUE_LIST_REGION_NAME, getDriver());
         issuesTable.checkCheckboxByPrimaryKey(issueIdA);
         issuesTable.checkCheckboxByPrimaryKey(issueIdB);
         click(Locator.tagWithText("span", "Move").parent());

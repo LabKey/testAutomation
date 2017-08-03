@@ -833,7 +833,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected void setRowData(Map<String, String> data, boolean validateText)
     {
-        for(String key : data.keySet())
+        for (String key : data.keySet())
         {
             _driver.waitForElement(Locator.name("quf_" + key));
             WebElement field = Locator.name("quf_" + key).findElement(getDriver());
@@ -1562,14 +1562,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void goToView(String viewName)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Grid views"));
-            menu.clickMenuButton(true, false, viewName);
-        }else
-        {
-            throw new NotImplementedException("This is only implemented in the new UI");
-        }
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", viewName);
     }
 
     public void goToReport(String reportName)
@@ -1819,7 +1812,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         protected WebElement getHeaderMenu(String text)
         {
-            if (headerMenus==null)
+            if (headerMenus == null)
                 headerMenus = new TreeMap<>();
 
             if (!headerMenus.containsKey(text))

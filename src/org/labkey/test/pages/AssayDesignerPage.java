@@ -222,7 +222,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         int index = 1;
 
         inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(getDriver());
-        for(WebElement we : inputBoxes)
+        for (WebElement we : inputBoxes)
         {
             if(we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
             {
@@ -235,7 +235,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
             }
         }
 
-        if(theBox != null)
+        if (theBox != null)
         {
             Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(getDriver()).click();
             clickButton("OK", 0);

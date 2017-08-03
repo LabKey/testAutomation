@@ -500,7 +500,6 @@ public class FilterTest extends BaseWebDriverTest
                     createFilterArgs(_listCol3.getName(), "Does Not Equal", "false", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][2]}, new String[]{TEST_DATA[1][1], TEST_DATA[1][3]}),
                     //filter is case insensitive
                     createFilterArgs(_listCol6.getName(), "Contains", "e", "Contains", "r", new String[]{TEST_DATA[5][2], TEST_DATA[5][0], TEST_DATA[5][1]}, new String[]{TEST_DATA[1][3]}),
-    //                createFilterArgs(_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}),
                     createFilterArgs(_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}),
                     createFilterArgs(_listCol4.getName(), "Is Greater Than", "9", null, null, new String[]{TEST_DATA[1][0]}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1]}),
                     createFilterArgs(_listCol4.getName(), "Is Blank", null, null, null, new String[]{}, new String[]{TEST_DATA[1][2], TEST_DATA[1][3], TEST_DATA[1][1], TEST_DATA[1][0]}),
@@ -557,17 +556,8 @@ public class FilterTest extends BaseWebDriverTest
             }
             Locator.tagWithClass("table", "labkey-r-tsvout").waitForElement(getDriver(), 10000);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
+            region.goToView("default");
 
-            if (IS_BOOTSTRAP_LAYOUT)
-            {
-                new BootstrapMenu(getDriver(), Locator.tagWithClassContaining("div", "lk-menu-drop")
-                        .withChild(Locator.tagWithAttribute("a", "data-original-title", "Grid views"))
-                        .findElement(getDriver())).clickMenuButton(true, false, "default");
-            }
-            else
-            {
-                _ext4Helper.clickExt4MenuButton(true, DataRegionTable.Locators.headerMenuButton(TABLE_NAME, "Grid Views"), false, "default");
-            }
             log("** Checking filter values in filter dialog");
             region = new DataRegionTable(TABLE_NAME, this);
             region.openFilterDialog(fieldKey);
