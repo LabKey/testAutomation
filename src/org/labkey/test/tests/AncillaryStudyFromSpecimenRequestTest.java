@@ -18,12 +18,15 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
 
 @Category({DailyC.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     protected String ANCILLARY_STUDY_DESC = "Study description";
@@ -52,7 +55,9 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void verifyStudy(String name, String description)
     {
-        clickFolder(name);
+
+        new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), name);
+        //clickFolder(name);
         assertTextPresent(description);
         clickTab("Mice");
         waitForText("Found " + specimensToSelect.length + " mice of " + specimensToSelect.length);
@@ -95,7 +100,9 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void createRequest()
     {
-        _extHelper.clickMenuButton("Request Options", "Create New Request");
+        new BootstrapMenu(getDriver(), Locator.tagWithClass("div", "lk-menu-drop")
+                    .withDescendant(Locator.tag("span").withText("Request Options")).findElement(getDriver())
+            ).clickMenuButton(true, false,"Create New Request");
 
         selectOptionByText(Locator.name("destinationLocation"), "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
         setFormElement(Locator.id("input0"), "Assay Plan");

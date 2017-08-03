@@ -42,6 +42,7 @@ import static org.labkey.test.util.PermissionsHelper.MemberType;
 @Category({DailyC.class})
 public class CustomizeGridPermissionsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String READER = "gp_reader@gridpermissions.test";
     private static final String EDITOR = "gp_editor@gridpermissions.test";
     private static final String VIEW_EDITOR = "gp_view_editor@gridpermissions.test";

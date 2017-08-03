@@ -32,6 +32,7 @@ import java.util.List;
 public class AnnouncementsPermissionTest extends BaseWebDriverTest
 {
 
+    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
     public static final String NOT_CONTRIBUTOR_ONLY_TITLE = "Not-Contributor-only title";
     public static final String NOT_CONTRIBUTOR_ONLY_MESSAGE = "Not-Contributor-only message";
