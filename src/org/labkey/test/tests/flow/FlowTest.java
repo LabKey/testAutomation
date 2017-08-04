@@ -56,7 +56,8 @@ import static org.junit.Assert.assertTrue;
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);//set true to whitelist me before constructor time
+    {setIsBootstrapWhitelisted(true);}
+    
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
     private static final String FCS_FILE_1 = "L02-060120-QUV-JS";
