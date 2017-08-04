@@ -22,6 +22,8 @@ import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 
@@ -120,6 +122,11 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return linkElement != null && linkElement.isDisplayed();
     }
 
+    public List<WebElement> projectMenuLinks()
+    {
+        return newElementCache().getProjectMenuLinks();
+    }
+
     /**
      * Creates a subfolder from the context you are already in (e.g. project/folder)
      */
@@ -157,6 +164,10 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement getMenuItem(String text)
         {
             return Locator.tag("li").childTag("a").withAttribute("data-field", text).notHidden().waitForElement(menu, WAIT_FOR_JAVASCRIPT);
+        }
+        List<WebElement> getProjectMenuLinks()
+        {
+            return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer);
         }
         WebElement getNavigationLink(String text)
         {

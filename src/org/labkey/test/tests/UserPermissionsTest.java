@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -29,9 +30,14 @@ import org.labkey.test.util.PortalHelper;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 @Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
     protected static final String PERM_PROJECT_NAME = "PermissionCheckProject";
     protected static final String DENIED_SUB_FOLDER_NAME = "UnlinkedFolder";
@@ -139,8 +145,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
-        clickProject(PERM_PROJECT_NAME);
-        clickFolder(GAMMA_SUB_FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -155,8 +160,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Author can read as well, edit his own but not edit the Edtiors
         impersonate(GAMMA_AUTHOR_USER);
-        clickProject(PERM_PROJECT_NAME);
-        clickFolder(GAMMA_SUB_FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -176,8 +180,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Reader can read but not edit
         impersonate(GAMMA_READER_USER);
-        clickProject(PERM_PROJECT_NAME);
-        clickFolder(GAMMA_SUB_FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
 
         clickAndWait(Locator.linkContainingText("view message").index(0));
         assertTextPresent(GAMMA_AUTHOR_PAGE_TITLE);
@@ -191,8 +194,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //switch back to Editor and edit
         impersonate(GAMMA_EDITOR_USER);
-        clickProject(PERM_PROJECT_NAME);
-        clickFolder(GAMMA_SUB_FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         //Go back and Edit
         clickAndWait(Locator.linkContainingText("view message").index(1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
@@ -202,8 +204,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Remove permission from folder to verify unviewability
         log("Check for disallowed folder links");
         stopImpersonating();
-        clickProject(PERM_PROJECT_NAME);
-        clickFolder(GAMMA_SUB_FOLDER_NAME);
+        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save and Finish", defaultWaitForPage);
@@ -230,12 +231,11 @@ public class UserPermissionsTest extends BaseWebDriverTest
         impersonate(GAMMA_READER_USER);
         clickProject(PERM_PROJECT_NAME);
         openFolderMenu();
-        expandFolderTree(GAMMA_SUB_FOLDER_NAME);
-        assertElementPresent(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
-        assertElementNotPresent(Locator.linkWithText(DENIED_SUB_FOLDER_NAME));
+        ProjectMenu projectMenu = new ProjectMenu(getDriver());
+        assertTrue(projectMenu.projectLinkExists(GAMMA_SUB_FOLDER_NAME));
+        assertFalse(projectMenu.projectLinkExists(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
-        openProjectMenu();
-        assertElementPresent(Locator.css("#projectBar_menu .project-nav li"), 1);
+        assertEquals("Only one project should be visible while impersonating", 1, projectMenu.projectMenuLinks().size());
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();
