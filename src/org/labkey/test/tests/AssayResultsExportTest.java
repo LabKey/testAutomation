@@ -133,7 +133,7 @@ public class AssayResultsExportTest extends AbstractExportTest
     {
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
-        clickAndWait(Locator.linkWithText(ASSAY_RUN_FILE.getName()));
+        waitAndClickAndWait(Locator.linkWithText(ASSAY_RUN_FILE.getName()));
     }
 
     @Override
