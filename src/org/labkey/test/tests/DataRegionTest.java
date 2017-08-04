@@ -258,8 +258,10 @@ public class DataRegionTest extends BaseWebDriverTest
 
         if (IS_BOOTSTRAP_LAYOUT)
         {
-
-        }else
+            assertElementNotPresent(Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]"));
+            assertElementNotPresent(Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]"));
+        }
+        else
         {
             assertElementPresent(Locator.lkButton("Paging"));
             assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
@@ -270,7 +272,12 @@ public class DataRegionTest extends BaseWebDriverTest
         table.setMaxRows(3);
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            // todo: open 'more' menu, confirm paging options
+            table.getPagingWidget().viewPagingOptions();
+            assertElementPresent(Locator.linkContainingText("3 per page"));
+            assertElementPresent(Locator.linkContainingText("20 per page"));
+            assertElementPresent(Locator.linkContainingText("40 per page"));
+            assertElementPresent(Locator.linkContainingText("100 per page"));
+            assertElementPresent(Locator.linkContainingText("250 per page"));
         }
         else
         {
@@ -295,7 +302,10 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals("aqua", table.getDataAsText(0, "Name"));
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            //todo: validate paging links/controls
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), false);
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), false);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
         }
         else
         {
@@ -312,7 +322,10 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals("grey", table.getDataAsText(0, "Name"));
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            //todo: validate paging links/controls
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
         }
         else
         {
@@ -325,7 +338,25 @@ public class DataRegionTest extends BaseWebDriverTest
 
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            //todo: validate paging links/controls
+            log("Last Page");
+            table.pageLast();
+            table.assertPaginationText(16, 16, 16);
+            assertEquals(1, table.getDataRowCount());
+            assertEquals("yellow", table.getDataAsText(0, "Name"));
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), false);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), false);
+
+            log("Previous Page");
+            table.pagePrev();
+            table.assertPaginationText(11, 15, 16);
+            assertEquals(5, table.getDataRowCount());
+            assertEquals("purple", table.getDataAsText(0, "Name"));
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
+            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
+            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
         }
         else
         {
@@ -358,7 +389,20 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show Selected");
         table.checkAllOnPage();
-        if (IS_BOOTSTRAP_LAYOUT){}
+        if (IS_BOOTSTRAP_LAYOUT){
+            waitForElement(Locator.tagWithAttribute("div", "data-msgpart", "selection"));
+            WebElement msgDiv = Locator.tagWithAttribute("div", "data-msgpart", "selection").findElement(getDriver());
+            assertEquals(msgDiv.getText().contains("Selected 5 of 15 rows."), true);
+
+            table.showSelected();
+            assertEquals(5, table.getDataRowCount());
+            assertElementPresent(Locator.xpath("//div[contains(@class,'labkey-pagination')]"));
+
+            table.showAll();
+            assertEquals(15, table.getDataRowCount());
+            assertElementPresent(Locator.xpath("//div[contains(@class,'labkey-pagination')]"));
+
+        }
         else
         {
             waitForElements(Locator.css(".labkey-dataregion-msg"), 3);

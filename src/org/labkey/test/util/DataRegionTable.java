@@ -29,6 +29,7 @@ import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.PagingWidget;
 import org.labkey.test.components.SummaryStatisticsDialog;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.ext4.Window;
@@ -81,6 +82,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     // Cached items
     private CustomizeView _customizeView;
     private DataRegionExportHelper _exportHelper;
+    private PagingWidget _pagingWidget;
     protected final List<String> _columnLabels = new ArrayList<>();
     protected final List<String> _columnNames = new ArrayList<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
@@ -190,6 +192,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         _elements = null;
         _customizeView = null;
         _exportHelper = null;
+        _pagingWidget = null;
         _tableId = null;
         _columnLabels.clear();
         _columnNames.clear();
@@ -209,6 +212,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             _customizeView = new CustomizeView(this);
         }
         return _customizeView;
+    }
+
+    public PagingWidget getPagingWidget()
+    {
+        if (_pagingWidget == null)
+        {
+            _pagingWidget = new PagingWidget(elements().UX_PaginationContainer, getDriver());
+        }
+        return _pagingWidget;
     }
 
     public CustomizeView openCustomizeGrid()
@@ -1210,9 +1222,30 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
+    public void openSelectionMenu()
+    {
+        WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
+        WebElement toggleSpan = Locator.xpath("./div/span").findElement(firstColumnHeader);
+        toggleSpan.click();
+    }
+
+    public void showSelected()
+    {
+        if (!getTableName().contains("'") && !getTableName().contains(">") &&!getTableName().contains("<"))
+        {   // use API unless the table name contains illegal chars for script
+            new DataRegionApiExpectingRefresh().executeScript("showSelected()");
+        }
+        else
+        {
+            // find the flyout menu toggle in the first column header
+            openSelectionMenu();
+            Locator.linkContainingText("Show Selected").waitForElement(getDriver(), 2000).click();
+        }
+    }
+
     public void checkAllOnPage()
     {
-        checkAll();
+        Locator.checkboxByTitle("Select/unselect all on current page").findElement(getDriver()).click();
     }
 
     public void uncheckAllOnPage()
@@ -1232,9 +1265,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             else
             {
                 // find the flyout menu toggle in the first column header
-                WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
-                WebElement toggleSpan = Locator.xpath("./div/span").findElement(firstColumnHeader);
-                toggleSpan.click();
+                openSelectionMenu();
                 // now click the 'select all' menu item; it should appear at the bottom of the dom
                 Locator.xpath("//ul/li/a[contains(@onclick,'selectAll()')]").waitForElement(getDriver(), 2000).click();
             }   // there should only exist one of these on a given page... right?
@@ -1276,39 +1307,38 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void pageFirst()
     {
         TestLogger.log("Clicking page first on data region '" + _regionName + "'");
-        clickDataRegionPageLink("First Page");
+        if (IS_BOOTSTRAP_LAYOUT)
+            getPagingWidget().clickGoToFirst();
+        else
+            clickDataRegionPageLink("First Page");
     }
 
     public void pageLast()
     {
         TestLogger.log("Clicking page last on data region '" + _regionName + "'");
-        clickDataRegionPageLink("Last Page");
+        if (IS_BOOTSTRAP_LAYOUT)
+            getPagingWidget().clickGoToLast();
+        else
+            clickDataRegionPageLink("Last Page");
     }
 
     public void pageNext()
     {
         TestLogger.log("Clicking page next on data region '" + _regionName + "'");
         if (IS_BOOTSTRAP_LAYOUT)
-        {
-            doAndWaitForUpdate(()-> elements().UX_PageNext_Button.click());
-        }
+            doAndWaitForUpdate(getPagingWidget()::clickNextPage);
         else
-        {
             clickDataRegionPageLink("Next Page");
-        }
     }
 
     public void pagePrev()
     {
         TestLogger.log("Clicking page previous on data region '" + _regionName + "'");
         if (IS_BOOTSTRAP_LAYOUT)
-        {
-            doAndWaitForUpdate(()-> elements().UX_PagePrev_Button.click());
-        }
+            doAndWaitForUpdate(getPagingWidget()::clickPreviousPage);
         else
-        {
             clickDataRegionPageLink("Previous Page");
-        }
+
     }
 
     public void clickDataRegionPageLink(String title)
@@ -1319,7 +1349,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void showAll()
     {
-        clickHeaderMenu("Paging", "Show All");
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            openSelectionMenu();
+            Locator.linkContainingText("Show All").waitForElement(getDriver(), 2000).click();
+        }
+        else
+        {
+            clickHeaderMenu("Paging", "Show All");
+        }
     }
 
     public void setPageSize(int size)
@@ -1329,7 +1367,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void setPageSize(int size, boolean wait)
     {
-        clickHeaderMenu("Paging", wait, size + " per page");
+        if (IS_BOOTSTRAP_LAYOUT)
+            getPagingWidget().setPageSize(size, wait);
+        else
+            clickHeaderMenu("Paging", wait, size + " per page");
     }
 
     public void setContainerFilter(ContainerFilterType filterType)
