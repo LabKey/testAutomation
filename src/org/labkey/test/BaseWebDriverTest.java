@@ -1838,8 +1838,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs, boolean expectErrors, int wait)
     {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Import"));
+        goToFolderManagement().goToImportPane();
         waitForElement(Locator.name("folderZip"));
         setFormElement(Locator.name("folderZip"), folderFile);
         if (!validateQueries)
@@ -1963,7 +1962,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         String queryLabel = schemaName + "." + queryName;
-        click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            click(Locator.tagWithClass("img", "lk-qd-expando").withAttribute("lkqdfieldkey", columnName)); // do we really need queryLabel?
+        else
+            click(Locator.xpath("//div/a[text()='" + queryLabel + "']/../../../table/tbody/tr/td/img[(contains(@src, 'plus.gif') or contains(@src, 'minus.gif')) and ../../td[text()='" + columnName + "']]"));
     }
 
     public DataRegionTable viewQueryData(String schemaName, String queryName)

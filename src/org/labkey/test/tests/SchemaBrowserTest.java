@@ -29,6 +29,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class SchemaBrowserTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String PROJECT_NAME = "Schema Browser Test Project";
     public static final String TEST_DESC_BOOKS = "This is a test description on books";
     public static final String TEST_DESC_AUTHORS = "This is a test description on authors";
@@ -68,7 +69,9 @@ public class SchemaBrowserTest extends BaseWebDriverTest
 
         // test home page links
         waitAndClick(Locator.tagWithClass("span", "labkey-link").withText("core"));
-        waitForElement(Locator.tagWithClass("div", "lk-qd-name").withText("core Schema"));
+        waitForElement(IS_BOOTSTRAP_LAYOUT ?
+                Locator.tagWithClass("h2", "x4-component x4-component-default").withText("core Schema") :
+                Locator.tagWithClass("div", "lk-qd-name").withText("core Schema"));
 
         selectQuery("lists", BOOKS_LIST);
 
