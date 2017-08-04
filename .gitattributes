@@ -338,7 +338,6 @@ modules/simpletest/resources/views/webpart.html -text
 modules/simpletest/resources/web/simpletest/alert.png -text
 modules/simpletest/resources/web/simpletest/testfile.js -text
 modules/simpletest/resources/web/simpletest/testfile2.js -text
-modules/simpletest/webapp/WEB-INF/simpletest/simpletestContext.xml -text
 modules/triggerTestModule/module.properties -text
 modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
 modules/triggerTestModule/resources/queries/lists/Employees.js -text
