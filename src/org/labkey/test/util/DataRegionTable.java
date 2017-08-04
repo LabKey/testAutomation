@@ -486,19 +486,21 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return allData.indexOf(data);
     }
 
-    public WebElement detailsLink(int row)
+    public static Locator.XPathLocator detailsLinkLocator()
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             return Locator.xpath("td").withClass("labkey-selectors")
-                    .child("a").withAttribute("data-original-title", "details")
-                    .findElement(elements().getDataRow(row));
+                    .child("a").withAttribute("data-original-title", "details");
         }
-        else
-        {
-            return Locator.xpath("td").withClass("labkey-details")
-                    .child("a").findElement(elements().getDataRow(row));
-        }
+
+        return Locator.xpath("td").withClass("labkey-details")
+                    .child("a");
+    }
+
+    public WebElement detailsLink(int row)
+    {
+        return detailsLinkLocator().findElement(elements().getDataRow(row));
     }
 
     public static Locator.XPathLocator updateLinkLocator()
