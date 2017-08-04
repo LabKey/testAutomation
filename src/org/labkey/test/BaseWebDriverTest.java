@@ -1751,19 +1751,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
      */
     public void changeCohortStatus(DataRegionTable cohortTable, String cohort, boolean enroll)
     {
-        int row = getCohortRow(cohortTable, cohort);
         // if the row does not exist then most likely the cohort passed in is incorrect
-        clickAndWait(cohortTable.link(row, 0));
+        int rowIndex = getCohortRow(cohortTable, cohort);
+        clickAndWait(cohortTable.updateLink(rowIndex));
 
         if (!enroll)
-        {
             uncheckCheckbox(Locator.name("quf_enrolled"));
-        }
         else
-        {
             checkCheckbox(Locator.name("quf_enrolled"));
-        }
-
         clickButton("Submit");
     }
 

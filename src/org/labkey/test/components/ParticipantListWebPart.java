@@ -18,6 +18,7 @@ package org.labkey.test.components;
 import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebElement;
 
@@ -38,7 +39,7 @@ public class ParticipantListWebPart extends BodyWebPart
 
     public ParticipantListWebPart(BaseWebDriverTest test, String participantNounSingular, String participantNounPlural)
     {
-        super(test, participantNounSingular + " List");
+        super(test.getDriver(), participantNounSingular + " List");
         _participantNounSingular = participantNounSingular;
         _participantNounPlural = participantNounPlural;
         _participantNounRegex = String.format("(%s|%s)", _participantNounSingular.toLowerCase(), _participantNounPlural.toLowerCase());
@@ -47,12 +48,12 @@ public class ParticipantListWebPart extends BodyWebPart
 
     protected void waitForBody()
     {
-        _test.waitForAnyElement(
-                Locator.id("participantsDiv1")
-                        .withText(String.format("No %s were found in this study. %s IDs will appear here after specimens or datasets are imported.",
-                                _participantNounPlural.toLowerCase(), _participantNounSingular)),
-                Locator.id("participantsDiv1").append(Locator.tagWithClass("div", "lk-filter-panel-label").withText("All")));
-        _test.sleep(500);
+        getWrapper().waitForAnyElement(
+                elements().statusMessageLoc.withText(String.format("No %s were found in this study. %s IDs will appear here after specimens or datasets are imported.",
+                        _participantNounPlural.toLowerCase(), _participantNounSingular)),
+                elements().statusMessageLoc.startsWith("Found "),
+                elements().tableLoc.append(Locator.tagWithClass("div", "lk-filter-panel-label").withText("All")));
+        WebDriverWrapper.sleep(500);
     }
 
     public List<String> getParticipants()
@@ -77,7 +78,7 @@ public class ParticipantListWebPart extends BodyWebPart
      */
     public Pair<Integer, Integer> getFilteredParticipantCount()
     {
-        String message = elements().statusMessage.getText();
+        String message = getStatusMessage();
 
         if (message.equals(String.format("No matching %s.", _participantNounPlural))||
                 message.startsWith(String.format("No %s IDs contain", _participantNounSingular)))
@@ -96,6 +97,11 @@ public class ParticipantListWebPart extends BodyWebPart
         throw new IllegalStateException("Unable to parse participant count: \n" + message);
     }
 
+    public String getStatusMessage()
+    {
+        return elements().statusMessage.getText();
+    }
+
     public Elements elements()
     {
         return new Elements();
@@ -103,6 +109,8 @@ public class ParticipantListWebPart extends BodyWebPart
 
     protected class Elements extends WebPart.Elements
     {
-        public WebElement statusMessage = new LazyWebElement(Locator.tag("span").attributeEndsWith("id", ".status"), this);
+        public Locator.XPathLocator tableLoc = Locator.tagWithText("table", "lk-participants-list-table");
+        public Locator.XPathLocator statusMessageLoc = Locator.tag("span").attributeEndsWith("id", ".status");
+        public WebElement statusMessage = new LazyWebElement(statusMessageLoc, this);
     }
 }
