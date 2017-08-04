@@ -114,8 +114,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     protected String[] specimensToSelect = {"999320812", "999320396", "999320885", "999320746", "999320190", "999320466"};
     private void selectSpecimens()
     {
-        clickTab("Specimen Data");
-        sleep(2000); // the link moves while the specimen search form finishes layout
+        goToSpecimenData();
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
 
         DataRegionTable specimenDetail = new DataRegionTable("SpecimenDetail", this);

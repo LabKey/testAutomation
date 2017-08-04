@@ -25,6 +25,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.evaluationContent.ProjectStudyPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -368,6 +369,12 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickFolder(studyName);
         waitAndClick(Locator.linkWithText("Manage Study"));
         waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
+    }
+
+    protected void goToSpecimenData()
+    {
+        ProjectStudyPage page = new ProjectStudyPage(getDriver());
+        page.goToSpecimenDataTab();
     }
 
     //must be in folder whose designation you wish to change.
