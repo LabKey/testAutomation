@@ -525,44 +525,45 @@ public class PortalHelper extends WebDriverWrapper
 
     public static class Locators
     {
-        private static Locator.XPathLocator webPartTitleContainer = IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClass("*", "panel-title") :
-                Locator.xpath("tbody/tr/th");
-
-        public static Locator.XPathLocator webPartTitle = Locator.tagWithClass("span", "labkey-wp-title-text");
-
-        public static final Locator.XPathLocator webPart = IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithName("div", "webpart") :
-                Locator.tagWithName("table", "webpart");
+        public static Locator.XPathLocator webPartTitle()
+        {
+            return webPart().append(webPartTitleContainer());
+        }
 
         public static Locator.XPathLocator webPartTitle(String title)
         {
-            return webPartTitle.withText(title);
+            return webPart().append(webPartTitleContainer().withText(title));
         }
-
-        public static Locator.XPathLocator webPartTitleMenu(String title)
-        {
-            if (IS_BOOTSTRAP_LAYOUT)
-                return Locator.tagWithAttribute("h3", "title", title)
-                        .withChild(Locator.tagWithAttribute("a", "name", title));
-            return Locator.xpath("//span[@id='more-" + title.toLowerCase() + "']");
-        }
-
-        public static Locator.CssLocator bodyWebpartTitle = Locator.css(IS_BOOTSTRAP_LAYOUT ?
-                "h3.panel-title" :
-                "#bodypanel .labkey-wp-title-text");
-        public static Locator.CssLocator sideWebpartTitle = Locator.css(".labkey-side-panel .labkey-wp-title-text");
 
         public static Locator.XPathLocator webPart(String title)
         {
-            return webPart.withPredicate(webPartTitleContainer.withAttribute("title", title));
+            return webPart().withPredicate(webPartTitleContainer().withAttribute("title", title));
         }
 
         public static Locator.XPathLocator webPartWithTitleContaining(String partialTitle)
         {
-            return webPart.withPredicate(webPartTitleContainer.withAttributeContaining("title", partialTitle));
+            return webPart().withPredicate(webPartTitleContainer().withAttributeContaining("title", partialTitle));
         }
 
-        public static Locator.CssLocator activeTab = Locator.css(".tab-nav-active");
+        public static Locator.CssLocator activeTab()
+        {
+            return IS_BOOTSTRAP_LAYOUT ?
+                    Locator.css(".lk-nav-tabs-ct > .nav > .active") :
+                    Locator.css(".tab-nav-active");
+        }
+
+        private static Locator.XPathLocator webPartTitleContainer()
+        {
+            return IS_BOOTSTRAP_LAYOUT ?
+                    Locator.tagWithClass("*", "panel-title") :
+                    Locator.tagWithClass("span", "labkey-wp-title-text");
+        }
+
+        public static Locator.XPathLocator webPart()
+        {
+            return IS_BOOTSTRAP_LAYOUT ?
+                    Locator.tagWithName("div", "webpart") :
+                    Locator.tagWithName("table", "webpart");
+        }
     }
 }

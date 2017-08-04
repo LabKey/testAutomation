@@ -115,7 +115,7 @@ public class TabTest extends SimpleModuleTest
         portalHelper.deleteTab("Test Tab 2");
         List<BodyWebPart> bodyparts = portalHelper.getBodyWebParts();
         assertTrue("Webparts failed to load after tab delete while on page", bodyparts != null && bodyparts.size() > 0);
-        assertNotNull(getText(PortalHelper.Locators.activeTab.containing(tab2Delete)));
+        assertEquals("Wrong tab selected after tab deletion", tab2Delete, getText(PortalHelper.Locators.activeTab().containing(tab2Delete)).replace(Locator.NBSP, " ").trim());
 
         //Delete tab while on the Tab
         portalHelper.deleteTab(tab2Delete);
