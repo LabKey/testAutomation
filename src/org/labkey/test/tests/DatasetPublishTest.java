@@ -33,6 +33,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class DatasetPublishTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String SUBFOLDER_NAME = "TargetDatasets";
 
     @Override
@@ -77,7 +78,8 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        waitAndClick(Locator.linkWithText("edit"));
+        DataRegionTable table = new DataRegionTable("Dataset", getDriver());
+        clickAndWait(table.updateLink(0));
         waitForElement(Locator.name("quf_Comments"));
         setFormElement(Locator.name("quf_Comments"), "Comment on modified participant");
         clickButton("Submit");
@@ -88,7 +90,8 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         goToProjectHome();
         goToDataset("Demographics");
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        waitForElement(Locator.name("quf_ParticipantId"));
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "addedParticipant67676");
         setFormElement(Locator.name("quf_date"), "1/1/2001");
         setFormElement(Locator.name("quf_Comments"), "Comment on added participant");
@@ -124,7 +127,8 @@ public class DatasetPublishTest extends BaseWebDriverTest
     public void refreshDataset(@LoggedParam String datasetName)
     {
         goToDataset(datasetName);
-        _extHelper.clickMenuButton("Grid Views", "Edit Snapshot");
+        new DataRegionTable("Dataset", getDriver())
+                .clickHeaderMenu("Grid views",true, "Edit Snapshot");
         doAndWaitForPageToLoad(() ->
         {
             clickButton("Update Snapshot", 0);
