@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class FieldValidatorTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ValidatorVerifyProject";
     private static final String LIST_NAME = "QCList";
 
@@ -76,7 +78,8 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // ID regex validation
         log("Test inserting new row");
-        _extHelper.clickInsertNewRow(true);
+        DataRegionTable table = new DataRegionTable("query", getDriver());
+        table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "id:123abc:001");
         setFormElement(Locator.name("quf_name"), "Sid");
         setFormElement(Locator.name("quf_sex"), "male");
@@ -92,7 +95,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // age range validation
         log("Test inserting new row");
-        _extHelper.clickInsertNewRow(true);
+        table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "ID:123abc:001");
         setFormElement(Locator.name("quf_name"), "Mikey");
         setFormElement(Locator.name("quf_sex"), "male");
@@ -105,7 +108,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
 
         // sex validation
         log("Test inserting new row");
-        _extHelper.clickInsertNewRow(true);
+        table.clickInsertNewRow();
         setFormElement(Locator.name("quf_id"), "ID:123abc:001");
         setFormElement(Locator.name("quf_name"), "Kim");
         setFormElement(Locator.name("quf_sex"), "Female");
