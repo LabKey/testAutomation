@@ -414,14 +414,12 @@ public class ETLHelper
     {
         _test.log("updating source row " + 0);
         _test.clickTab("Portal");
-        _test.clickAndWait(Locator.linkWithText("Source"));
+        _test.waitAndClickAndWait(Locator.linkWithText("Source"));
         DataRegionTable sourceTable = new DataRegionTable("query", _test.getDriver());
         _test.doAndWaitForPageToLoad(()-> sourceTable.updateLink(0).click(), WebDriverWrapper.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.name("quf_name"));
         _test.setFormElement(Locator.name("quf_name"), name);
         _test.clickButton("Submit");
-        _test.log("returning to project home or folder");
-        _test.clickTab("Portal");
         assertInSource(name);
     }
 
@@ -434,7 +432,7 @@ public class ETLHelper
     {
         _test.log("inserting row to 180 column table");
         _test.clickTab("Portal");
-        _test.clickAndWait(Locators.qwp180columnSource);
+        _test.waitAndClickAndWait(Locators.qwp180columnSource);
         DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRowDropdown();
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
@@ -451,7 +449,7 @@ public class ETLHelper
     {
         _test.log("updating row 0 in 180 column table");
         _test.clickTab("Portal");
-        _test.clickAndWait(Locators.qwp180columnSource);
+        _test.waitAndClickAndWait(Locators.qwp180columnSource);
         DataRegionTable sourceTable = new DataRegionTable("query", _test.getDriver());
         _test.doAndWaitForPageToLoad(()-> sourceTable.updateLink(0).click(), WebDriverWrapper.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.name("quf_field180"));
@@ -702,7 +700,7 @@ public class ETLHelper
     void gotoDataset(String name)
     {
         _test.clickTab("Study");
-        _test.clickAndWait(Locator.linkContainingText("2 datasets"));
+        _test.waitAndClickAndWait(Locator.linkContainingText("2 datasets"));
         _test.clickAndWait(Locator.linkContainingText(name));
     }
 
@@ -721,7 +719,7 @@ public class ETLHelper
     private void gotoQueryWebPart(String webpartName, String queryName)
     {
         _test.clickTab("Portal");
-        _test.clickAndWait(Locator.xpath("//span[text()='" + queryName + "']"));
+        _test.waitAndClickAndWait(Locator.xpath("//span[text()='" + queryName + "']"));
         _test.waitForText(webpartName);
     }
 
