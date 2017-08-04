@@ -28,10 +28,8 @@ import org.labkey.test.components.WebPart;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.search.SearchResultsPage;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,16 +178,17 @@ public class PortalTest extends BaseWebDriverTest
             titleMenu.collapse();
          }
 
-        List<WebElement> webparts = PortalHelper.Locators.bodyWebpartTitle.findElements(getDriver());
-        webparts.addAll(PortalHelper.Locators.sideWebpartTitle.findElements(getDriver()));
+        List<WebPart> webparts = new ArrayList<>();
+        webparts.addAll(portalHelper.getBodyWebParts());
+        webparts.addAll(portalHelper.getSideWebParts());
 
         if (requiredWebparts.size() + preferredWebparts.size() != webparts.size())
         {
             List<String> webpartTitles = new ArrayList<>();
 
-            for (WebElement el : webparts)
+            for (WebPart el : webparts)
             {
-                webpartTitles.add(el.getText());
+                webpartTitles.add(el.getTitle());
             }
 
             List<String> allExpectedWebparts = new ArrayList<>(requiredWebparts);
