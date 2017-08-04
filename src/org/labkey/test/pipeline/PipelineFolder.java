@@ -17,6 +17,7 @@ package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
@@ -103,7 +104,8 @@ public class PipelineFolder
         _test.log("Set pipeline root.");
         _test.setPipelineRoot(_pipelinePath);
 
-        _test.submit();
+        _test.log("Set file permissions."); // totally guessing the prior 'submit' was hitting the permissionsForm- there are 3 on the page
+        _test.submit(Locators.bodyPanel().append("//form[@id='permissionsForm']"));
 
         if (_mailSettings != null)
             _mailSettings.setup();

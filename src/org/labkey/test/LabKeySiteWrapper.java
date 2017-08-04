@@ -1378,7 +1378,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @Deprecated
     public void submit()
     {
-        WebElement form = Locators.bodyPanel().childTag("form").findElement(getDriver());
+        WebElement form = Locators.bodyPanel().append("//form").findElement(getDriver());
         doAndWaitForPageToLoad(form::submit);
     }
 
