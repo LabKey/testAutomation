@@ -137,7 +137,7 @@ public class DilutionAssayHelper
         else
         {
             new BootstrapMenu(_test.getDriver(), detailMenu(text).waitForElement(_test.getDriver(), _test.WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(false, false, subMenuLabels);
+                    .clickMenuButton(true, false, subMenuLabels);
         }
     }
 
