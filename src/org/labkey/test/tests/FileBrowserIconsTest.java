@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class FileBrowserIconsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
 
     protected final static String SAMPLE_DATA_LOC =  "/sampledata/fileTypes/";
 

@@ -40,6 +40,8 @@ import java.util.Map;
 @Category({DailyC.class})
 public class FileAttachmentColumnTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private final String FOLDER_NAME = "TestFolder";
     private final String LIST_NAME = "TestList";
     private final String LIST_KEY = "TestListId";

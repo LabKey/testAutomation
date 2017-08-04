@@ -38,6 +38,8 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, FileBrowser.class})
 public class FileContentActionButtonsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     @BeforeClass
     public static void doSetup() throws Exception
     {

@@ -40,6 +40,8 @@ import java.util.List;
 @Category({DailyB.class})
 public class ResourceEncodingTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     @Nullable
     @Override
     protected String getProjectName()
