@@ -200,7 +200,7 @@ public class ListHelper extends LabKeySiteWrapper
      * From the list data grid, edit an existing row
      *
      * @param id the row number (1 based)
-     * @deprecated use {@link DataRegionTable#updateRow(int, Map)}
+     * @deprecated use {@link DataRegionTable#updateRow(String, Map)}
      */
     @Deprecated
     public void updateRow(int id, Map<String, String> data)
@@ -210,7 +210,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     /**
      *
-     * @deprecated use {@link DataRegionTable#updateRow(int, Map, boolean)}
+     * @deprecated use {@link DataRegionTable#updateRow(String, Map, boolean)}
      */
     @Deprecated
     public void updateRow(int id, Map<String, String> data, boolean validateText)
@@ -474,7 +474,7 @@ public class ListHelper extends LabKeySiteWrapper
         else
         {
             log("Was not able to find the 'Import Data' button on the menu, trying the 'Insert/Import Data' menu item.");
-            DataRegionTable list = new DataRegionTable("query", getDriver());
+            DataRegionTable list = DataRegionTable.DataRegion(getDriver()).find();
             list.clickImportBulkData();
         }
         waitForElement(Locator.id("tsv3"));
