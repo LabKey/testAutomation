@@ -22,6 +22,7 @@ import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebElement;
 
+import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
 import static org.labkey.test.util.Ext4Helper.Locators.ext4Button;
 
 public class BaseManageVaccineDesignPage extends LabKeyPage
@@ -97,8 +98,12 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
 
     protected void removeFocusAndWait()
     {
-        Locator.tagWithClass("span", "labkey-nav-page-header").findElement(getDriver()).click(); // click outside field to remove focus
-        sleep(1000); // give the store a half second to update
+        Locator loc = Locator.tagWithClass("span", "labkey-nav-page-header");
+        if (IS_BOOTSTRAP_LAYOUT)
+            loc = Locator.tagWithClass("div", "lk-body-title");
+
+        loc.findElement(getDriver()).click(); // click outside field to remove focus
+        sleep(1000); // give the store a second to update
     }
 
     public void cancel()
