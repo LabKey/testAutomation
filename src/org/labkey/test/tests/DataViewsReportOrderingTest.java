@@ -37,6 +37,7 @@ import java.util.List;
 @Category({DailyA.class})
 public class DataViewsReportOrderingTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String ORIGINAL_WEBPART_TITLE = "Data Views";
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
