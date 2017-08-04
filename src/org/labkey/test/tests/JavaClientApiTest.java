@@ -47,6 +47,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class})
 public class JavaClientApiTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
     public static final String USER_NAME = "user1@javaclientapi.test";
