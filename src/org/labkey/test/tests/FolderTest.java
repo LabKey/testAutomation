@@ -25,6 +25,8 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.FolderManagementFolderTree;
+import org.labkey.test.pages.admin.FolderManagementPage;
+import org.labkey.test.pages.admin.ReorderFoldersPage;
 import org.labkey.test.pages.list.BeginPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -36,9 +38,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.Assert.assertNotNull;
+
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static String secondProject = "FolderTestProject2";
 
     @Override
@@ -78,27 +83,27 @@ public class FolderTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void moveTestProjectToTop()
+    private void moveTestProjectToTop()     // todo: use FolderManagementPage, ReorderFoldersPage
     {
         clickProject(getProjectName());
-        goToFolderManagement();
+        FolderManagementPage managePage = goToFolderManagement();
         waitForElement(Ext4Helper.Locators.folderManagementTreeSelectedNode(getProjectName()));
 
         log("Ensure folders will be visible");
 
-        clickButton("Change Display Order");
+        ReorderFoldersPage reorderPage = managePage.clickChangeDisplayOrder();
         checkCheckbox(Locator.radioButtonByNameAndValue("resetToAlphabetical", "false"));
         selectOptionByText(Locator.name("items"), getProjectName());
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+ getProjectName() +"']")) > 0; i++)
             clickButton("Move Up", 0);
-        clickButton("Save");
+        managePage = reorderPage.clickSave();
 
-        clickButton("Change Display Order");
+        reorderPage = managePage.clickChangeDisplayOrder();
         checkCheckbox(Locator.radioButtonByNameAndValue("resetToAlphabetical", "false"));
         selectOptionByText(Locator.name("items"), secondProject);
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+ secondProject +"']")) > 0; i++)
             clickButton("Move Up", 0);
-        clickButton("Save");
+        reorderPage.clickSave();
     }
 
     @Before
@@ -228,12 +233,11 @@ public class FolderTest extends BaseWebDriverTest
         for (String href : hrefs)
         {
             beginAt(href);
-            waitForElement(Locator.tagWithText("span", "Grid Views"));
-            assertElementPresent(Locator.tagWithText("span", "Reports"));
-            assertElementPresent(Locator.tagWithText("span", "Charts"));
-            assertElementPresent(Locator.tagWithText("span", "Design"));
-            assertElementPresent(Locator.linkWithText("edit"));
-            assertElementPresent(Locator.linkWithText("details"));
+            waitForElement(Locator.tagWithAttribute("a", "data-original-title", "Grid views"));
+            assertNotNull(Locator.tagWithAttribute("a", "data-original-title","Charts / Reports"));
+            assertElementPresent(Locator.lkButton("Design"));
+            assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","edit"));
+            assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","details"));
         }
     }
 

@@ -88,6 +88,21 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 
+    /* activates the 'import' pane */
+    public FolderManagementPage goToImportPane()
+    {
+        URL url = getURL();
+        String newUrl = url.getPath() + "?tabId=import";
+        beginAt(newUrl);
+        return new FolderManagementPage(getDriver());
+    }
+
+    public ReorderFoldersPage clickChangeDisplayOrder()
+    {
+        beginAt(WebTestHelper.buildRelativeUrl("admin", getCurrentContainerPath(), "reorderFolders"));
+        return new ReorderFoldersPage(getDriver());
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();

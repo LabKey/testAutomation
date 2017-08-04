@@ -1233,9 +1233,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void clickFolder(String folder)
     {
-        final WebElement folderMenu = openFolderMenu();
-        expandFolderTree(folder);
-        clickAndWait(Locator.linkWithText(folder).waitForElement(folderMenu, WAIT_FOR_JAVASCRIPT));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new ProjectMenu(getDriver()).navigateToFolder(getCurrentProject(), folder);
+        }
+        else
+        {
+            final WebElement folderMenu = openFolderMenu();
+            expandFolderTree(folder);
+            clickAndWait(Locator.linkWithText(folder).waitForElement(folderMenu, WAIT_FOR_JAVASCRIPT));
+        }
     }
 
     public String getCurrentContainer()

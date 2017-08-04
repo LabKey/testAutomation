@@ -21,6 +21,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -103,6 +104,14 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         }, WAIT_FOR_JAVASCRIPT);
 
         getWrapper().doAndWaitForPageToLoad(()->newElementCache().getNavigationLink(folder).click());
+    }
+
+    public void navigateToContainer(String project, String... subfolders)
+    {
+        if (subfolders.length == 0)
+            navigateToProject(project);
+        else
+            throw new NotImplementedException(); // TODO
     }
 
     /* This is a way to discover via the UI if the specified project exists (or did the last time the
