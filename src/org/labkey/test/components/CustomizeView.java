@@ -366,10 +366,10 @@ public class CustomizeView extends Component
         return _driver.scrollIntoView(tr, false);
     }
 
-    private void addItem(String[] fieldKeyParts, String column_name, ViewItemType type)
+    private void addItem(String[] fieldKeyParts, String columnName, ViewItemType type)
     {
         // fieldKey is the value contained in @fieldkey
-        _driver.log("Adding " + column_name + " " + type.toString());
+        _driver.log("Adding " + columnName + " " + type.toString());
 
         changeTab(type);
 
@@ -518,8 +518,18 @@ public class CustomizeView extends Component
 
         for (WebElement el : elements)
         {
-            builder.moveToElement(el).click().build().perform();
-            try {el.click();} catch (StaleElementReferenceException ignore) {}
+            _driver.fireEvent(el, WebDriverWrapper.SeleniumEvent.blur);
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    builder.moveToElement(el).click().build().perform();
+                }
+                catch (StaleElementReferenceException ignore)
+                {
+                    continue;
+                }
+            }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
     }
@@ -686,7 +696,18 @@ public class CustomizeView extends Component
         List<WebElement> closeButtons = tabContentXPath(type).append(Locator.tagWithClass("*", "labkey-tool-close")).findElements(this);
         for (WebElement closeButton : closeButtons)
         {
-            closeButton.click();
+            _driver.fireEvent(closeButton, WebDriverWrapper.SeleniumEvent.blur);
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    closeButton.click();
+                }
+                catch (StaleElementReferenceException ignore)
+                {
+                    continue;
+                }
+            }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
         }
     }

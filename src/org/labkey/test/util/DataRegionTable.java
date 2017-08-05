@@ -1204,6 +1204,13 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     }
 
+    public void clearAllFilters()
+    {
+        // TODO: This should be updated to use the UI once the UX Refresh configures a "Clear all" mechanism again
+        TestLogger.log("Clearing all filters in " + _regionName);
+        api().expectingRefresh().executeScript("clearAllFilters()");
+    }
+
     public void clearAllFilters(String columnName)
     {
         TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
@@ -1257,31 +1264,14 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void checkAll()
     {
-        WebElement toggle = elements().toggleAll;
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            if (!getTableName().contains("'") && !getTableName().contains(">") &&!getTableName().contains("<"))
-            {   // use API unless the table name contains illegal chars for script
-                new DataRegionApiExpectingRefresh().executeScript("selectAll()");
-            }
-            else
-            {
-                // find the flyout menu toggle in the first column header
-                openSelectionMenu();
-                // now click the 'select all' menu item; it should appear at the bottom of the dom
-                Locator.xpath("//ul/li/a[contains(@onclick,'selectAll()')]").waitForElement(getDriver(), 2000).click();
-            }   // there should only exist one of these on a given page... right?
-        }
-        else
-        {
-            if (!toggle.isSelected())
-                doAndWaitForUpdate(toggle::click);
-        }
+        WebElement toggle = elements().toggleAllOnPage;
+        if (!toggle.isSelected())
+            doAndWaitForUpdate(toggle::click);
     }
 
     public void uncheckAll()
     {
-        WebElement toggle = elements().toggleAll;
+        WebElement toggle = elements().toggleAllOnPage;
         if (null != doAndWaitForUpdate(toggle::click))
             doAndWaitForUpdate(toggle::click);
     }
@@ -1527,7 +1517,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @Deprecated // use clickImportBulkData()
     public void clickImportBulkDataDropdown()
     {
-        clickHeaderMenu("Insert", "Import Bulk Data");
+        clickHeaderMenu("Insert", getImportBulkDataText());
     }
 
     @Deprecated // use clickInsertNewRow()
@@ -1591,7 +1581,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void clickImportBulkDataButton()
     {
-        elements().getHeaderButton("Import Bulk Data").click();
+        elements().getHeaderButton(getImportBulkDataText()).click();
     }
 
     public static String getInsertNewButtonText()
@@ -1615,10 +1605,16 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
             menu.clickMenuButton(true, false, reportName);
-        }else
+        }
+        else
         {
             throw new NotImplementedException("This is only implemented in the new UI");
         }
+    }
+
+    public void clickApplyGridFilter()
+    {
+        goToView("Apply Grid Filter");
     }
 
     public static class Locators
@@ -1708,7 +1704,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private Map<Integer, List<WebElement>> cells;
         private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(_driver.getDriver());
         private List<WebElement> summaryStatCells;
-        private final WebElement toggleAll = Locator.tagWithAttribute("input", "name", ".toggle").findWhenNeeded(this); // tri-state checkbox
+        private final WebElement toggleAllOnPage = Locator.tagWithAttribute("input", "name", ".toggle").findWhenNeeded(this); // tri-state checkbox
 
         protected List<WebElement> getDataRows()
         {
