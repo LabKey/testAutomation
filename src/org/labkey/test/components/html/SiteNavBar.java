@@ -160,6 +160,16 @@ public class SiteNavBar extends Component
         return elements().searchInput;
     }
 
+    public BootstrapMenu adminMenu()
+    {
+        return new BootstrapMenu(getDriver(), elements().adminMenuContainer);
+    }
+
+    public BootstrapMenu userMenu()
+    {
+        return new BootstrapMenu(getDriver(), elements().userMenuContainer);
+    }
+
     protected Elements elements()
     {
         return new Elements();

@@ -23,6 +23,8 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.components.html.SiteNavBar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,8 +34,13 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
-    private static final Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
-    private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
+    {setIsBootstrapWhitelisted(true);}
+    private static final Locator supportLink = IS_BOOTSTRAP_LAYOUT ?
+            Locator.tagWithAttributeContaining("a", "href", "support" ).withText("Support") :
+            Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
+    private static final Locator helpLink = IS_BOOTSTRAP_LAYOUT ?
+            Locator.xpath("//a[@target='labkeyHelp' and contains(text(),'LabKey Documentation')]") :
+            Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
@@ -47,8 +54,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
     protected void goToSiteLookAndFeel()
     {
-        goToAdmin();
-        clickAndWait(Locator.linkContainingText("look and feel settings"));
+        goToAdminConsole().goToAdminConsoleLinksSection().clickLookAndFeelSettings();
     }
 
     //this project's properties will be altered and so should not copy site properties
@@ -61,9 +67,18 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     {
         if(projectName!=null)
             clickProject(projectName);
-        click(helpMenuLink);
-        assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
-        assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new SiteNavBar(getDriver()).userMenu().expand();    // the support and help links are now on the user menu
+            assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
+            assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
+        }
+        else
+        {
+            click(helpMenuLink);
+            assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
+            assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
+        }
     }
 
     protected void setUpTest()
@@ -90,7 +105,6 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
         //assert both locators are present in clone project
         goToProjectHome();
-        click(helpMenuLink);
         checkHelpLinks(null, true, true);
 
         //change global settings to exclude help link
