@@ -27,6 +27,7 @@ import org.labkey.test.util.Maps;
 @Category({DailyB.class})
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 {
+    {setIsBootstrapWhitelisted(true);}
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
