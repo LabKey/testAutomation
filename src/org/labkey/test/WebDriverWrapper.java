@@ -664,10 +664,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         return new ProjectSettingsPage(getDriver());
     }
 
-    public void goToSiteUsers()
+    public DataRegionTable goToSiteUsers()
     {
         if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
             clickAdminMenuItem("Site", "Site Users");
+        return new DataRegionTable("Users", this);
     }
 
     public void goToSiteGroups()
