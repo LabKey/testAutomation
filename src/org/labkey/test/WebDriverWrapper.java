@@ -1724,6 +1724,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
      * @param wait milliseconds
      * @return false if Supplier.get() doesn't return true within 'wait' ms
      */
+    @Contract(pure = true)
     public static boolean waitFor(Supplier<Boolean> checker, int wait)
     {
         long startTime = System.currentTimeMillis();
