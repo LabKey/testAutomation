@@ -46,6 +46,7 @@ import static org.junit.Assert.assertEquals;
 @Category({Issues.class, DailyA.class})
 public class IssueDomainSharingTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String USER = "project_user@issuessharing.test";
     private static final String USER2 = "shared_user@issuessharing.test";
     private static final String PROJECT2 = "IssuesDomain OtherProject";
