@@ -350,17 +350,8 @@ public class ETLHelper
         if (null == subFolder)
             _test.clickTab("Portal");
         else
-        {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                new ProjectMenu(_test.getDriver()).navigateToFolder(_test.getCurrentProject(), subFolder);
-            }
-            else
-            {
-                _test.clickFolder(subFolder);
-            }
-        }
-        _test.clickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
+            _test.clickFolder(subFolder);
+        _test.waitAndClickAndWait(Locator.linkWithText(StringUtils.capitalize(query)));
         DataRegionTable.DataRegion(_test.getDriver()).waitFor().clickInsertNewRow();
         _test.waitForElement(Locator.name("quf_id"));
         _test.setFormElement(Locator.name("quf_id"), id);
@@ -455,7 +446,6 @@ public class ETLHelper
         _test.waitForElement(Locator.name("quf_field180"));
         fieldValues.forEach((key, value) -> {_test.setFormElement(Locator.name("quf_field" + key), value);});
         _test.clickButton("Submit");
-        _test.clickTab("Portal");
         assertIn180ColumnSource(fieldValues.values().toArray(new String[fieldValues.size()]));
     }
 
