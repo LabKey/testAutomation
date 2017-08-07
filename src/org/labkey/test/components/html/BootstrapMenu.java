@@ -19,17 +19,18 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 
-public class BootstrapMenu extends Component
+public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 {
-    protected WebDriverWrapper _driver;
-    protected WebElement _componentElement;
-    protected BootstrapMenu.Elements _elements;
+    protected final WebDriver _driver;
+    protected final WebElement _componentElement;
 
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
@@ -37,10 +38,10 @@ public class BootstrapMenu extends Component
         this(new WebDriverWrapperImpl(driver), componentElement);
     }
 
-    public BootstrapMenu(WebDriverWrapper driver, WebElement componentElement)
+    public BootstrapMenu(WebDriverWrapper wrapper, WebElement componentElement)
     {
         _componentElement = componentElement;
-        _driver = driver;
+        _driver = wrapper.getDriver();
     }
 
     static public BootstrapMenu find(WebDriver driver, String menuToggleText)
@@ -51,6 +52,12 @@ public class BootstrapMenu extends Component
     }
 
     @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
+    }
+
+    @Override
     public WebElement getComponentElement()
     {
         return _componentElement;
@@ -58,22 +65,22 @@ public class BootstrapMenu extends Component
 
     public boolean isExpanded()
     {
-        String expandedAttribute = elements().toggleAnchor.getAttribute("aria-expanded");
+        String expandedAttribute = elementCache().toggleAnchor.getAttribute("aria-expanded");
         return expandedAttribute != null && expandedAttribute.equals("true");
     }
 
     public void expand()
     {
         if (!isExpanded())
-            elements().toggleAnchor.click();
-        _driver.waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            elementCache().toggleAnchor.click();
+        getWrapper().waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void collapse()
     {
         if (isExpanded())
-            elements().toggleAnchor.click();
-        _driver.waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            elementCache().toggleAnchor.click();
+        getWrapper().waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
@@ -87,14 +94,14 @@ public class BootstrapMenu extends Component
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
-                    .waitForElement(elements().findMenuList(), 2000);
-            _driver.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
-            _driver.clickAndWait(subMenuItem, 0);
+                    .waitForElement(elementCache().findMenuList(), 2000);
+            TestLogger.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
+            getWrapper().click(subMenuItem);
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
                 .notHidden()
-                .waitForElement(elements().findMenuList(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        _driver.mouseOver(item);
+                .waitForElement(elementCache().findMenuList(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        getWrapper().mouseOver(item);
         return item;
     }
 
@@ -105,12 +112,12 @@ public class BootstrapMenu extends Component
             throw new IllegalArgumentException("Specify menu item(s)");
 
         WebElement item = openMenuTo(subMenuLabels);
-        _driver.log("attempting to click menu item with text [" + item.getText() + "]");
+        TestLogger.log("attempting to click menu item with text [" + item.getText() + "]");
 
         if (wait)
-            _driver.clickAndWait(item);
+            getWrapper().clickAndWait(item);
         else
-            _driver.clickAndWait(item, 0);
+            getWrapper().clickAndWait(item, 0);
     }
 
     /**
@@ -126,12 +133,20 @@ public class BootstrapMenu extends Component
         return null;
     }
 
-    protected Elements elements()
+    @Override
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    protected class Elements extends ElementCache
+    // TODO: Remove and verify that elements in cache won't go stale
+    @Override
+    protected Elements elementCache()
+    {
+        return newElementCache();
+    }
+
+    protected class Elements extends Component.ElementCache
     {
         public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
 
@@ -147,7 +162,7 @@ public class BootstrapMenu extends Component
             return Locator.tagWithClassContaining("ul", "dropdown-menu")
                     .notHidden()
                     .withAttributeContaining("style", "display: block")
-                    .findElement(_driver.getDriver());
+                    .findElement(getDriver());
         }
     }
 

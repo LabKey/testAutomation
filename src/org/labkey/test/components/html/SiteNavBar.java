@@ -17,8 +17,8 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
@@ -28,43 +28,41 @@ import org.openqa.selenium.support.ui.FluentWait;
 import java.util.concurrent.TimeUnit;
 
 /* Wraps the new site/admin nav menus and site search */
-public class SiteNavBar extends Component
+public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 {
-    protected WebDriverWrapper _driver;
+    protected final WebDriver _driver;
     protected WebElement _componentElement;
 
     public SiteNavBar(WebDriver driver)
     {
-        this(new WebDriverWrapperImpl(driver));
+        _driver = driver;
     }
 
-    public SiteNavBar(WebDriverWrapper driver)
+    public SiteNavBar(WebDriverWrapper wrapper)
     {
-        _driver = driver;
+        this(wrapper.getDriver());
     }
 
     @Override
     public WebElement getComponentElement()
     {
-        if (null == _componentElement)
-            _componentElement= elements().navbarNavBlock;
-        return _componentElement;
+        return elementCache().navbarNavBlock;
     }
     protected WebDriver getDriver()
     {
-        return _driver.getDriver();
+        return _driver;
     }
 
     public SiteNavBar clickAdminMenuItem(boolean wait, boolean onlyOpen, String ... subMenuLabels)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().adminMenuContainer);
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
         menu.clickMenuButton(wait, onlyOpen, subMenuLabels);
         return this;
     }
 
     public SiteNavBar goToModule(String moduleName)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().adminMenuContainer);
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
         menu.clickMenuButton(false, false, "Go To Module");
 
         Locator.waitForAnyElement(new FluentWait<SearchContext>(menu.getComponentElement())
@@ -76,8 +74,8 @@ public class SiteNavBar extends Component
                 .findElementOrNull(menu.getComponentElement());
         if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
         {
-            _driver.scrollIntoView(moduleLinkElement);
-            _driver.doAndWaitForPageToLoad(()-> moduleLinkElement.click());
+            getWrapper().scrollIntoView(moduleLinkElement);
+            getWrapper().doAndWaitForPageToLoad(()-> moduleLinkElement.click());
             return this;
         }
         else
@@ -92,7 +90,7 @@ public class SiteNavBar extends Component
 
     public SiteNavBar clickUserMenuItem(boolean wait, boolean onlyOpen, String ... subMenuLabels)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().userMenuContainer);
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().userMenuContainer);
         menu.clickMenuButton(wait, onlyOpen, subMenuLabels);
         return this;
     }
@@ -101,7 +99,7 @@ public class SiteNavBar extends Component
     {
         if (isInPageAdminMode())
             return this;
-        clickAdminMenuItem(true, false, "Page Admin Mode");
+        adminMenu().clickSubMenu(true, "Page Admin Mode");
         return this;
     }
 
@@ -110,24 +108,19 @@ public class SiteNavBar extends Component
         if (isInPageAdminMode())
         {
             Locators.exitAdminBtn.findElement(getDriver()).click();
-            _driver.waitFor(()-> !isInPageAdminMode(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            getWrapper().waitFor(()-> !isInPageAdminMode(), "Failed to exit page admin mode", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return this;
     }
 
     public SiteNavBar stopImpersonating()
     {
-        if (isImpersonating())
+        if (getWrapper().isImpersonating())
         {
             Locators.stopImpersonatingBtn.findElement(getDriver()).click();
-            _driver.waitFor(()-> !isImpersonating(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            getWrapper().waitFor(() -> !getWrapper().isImpersonating(), "Failed to stop impersonating", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return this;
-    }
-
-    public boolean isImpersonating()
-    {
-        return _driver.isImpersonating();
     }
 
     public boolean isInPageAdminMode()
@@ -138,14 +131,14 @@ public class SiteNavBar extends Component
     public SearchResultsPage search(String searchTerm)
     {
         expandSearchBar();
-        _driver.setFormElement(elements().searchInputElement, searchTerm);
-        _driver.doAndWaitForPageToLoad(()-> elements().searchSubmitInput.click(), WebDriverWrapper.WAIT_FOR_PAGE);
+        getWrapper().setFormElement(elementCache().searchInputElement, searchTerm);
+        getWrapper().doAndWaitForPageToLoad(() -> elementCache().searchSubmitInput.click(), WebDriverWrapper.WAIT_FOR_PAGE);
         return new SearchResultsPage(getDriver());
     }
 
     public boolean isSearchBarExpanded()
     {
-        String searchBarContainerClass = elements().searchContainer.getAttribute("class");
+        String searchBarContainerClass = elementCache().searchContainer.getAttribute("class");
         return searchBarContainerClass.contains("active");
     }
 
@@ -154,28 +147,36 @@ public class SiteNavBar extends Component
     {
         if (!isSearchBarExpanded())
         {
-            elements().searchToggle.click();
-            _driver.waitFor(()-> isSearchBarExpanded(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            elementCache().searchToggle.click();
+            getWrapper().waitFor(()-> isSearchBarExpanded(), "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
-        return elements().searchInput;
+        return elementCache().searchInput;
     }
 
     public BootstrapMenu adminMenu()
     {
-        return new BootstrapMenu(getDriver(), elements().adminMenuContainer);
+        return new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
     }
 
     public BootstrapMenu userMenu()
     {
-        return new BootstrapMenu(getDriver(), elements().userMenuContainer);
+        return new BootstrapMenu(getDriver(), elementCache().userMenuContainer);
     }
 
-    protected Elements elements()
+    @Override
+    protected SiteNavBar.Elements newElementCache()
     {
-        return new Elements();
+        return new SiteNavBar.Elements();
     }
 
-    protected class Elements extends ElementCache
+    // TODO: Remove and verify that elements in cache won't go stale
+    @Override
+    protected SiteNavBar.Elements elementCache()
+    {
+        return newElementCache();
+    }
+
+    protected class Elements extends Component.ElementCache
     {
         public WebElement headerBlock = Locator.xpath("//div[@class='labkey-page-header']")
                 .findWhenNeeded(getDriver())
@@ -198,18 +199,12 @@ public class SiteNavBar extends Component
         public WebElement userMenuContainer = Locators.userMenuToggle.parent()
                 .refindWhenNeeded(headerBlock)
                 .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement userMenuToggle = Locators.userMenuToggle
-                .refindWhenNeeded(headerBlock)
-                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement adminMenuContainer = Locators.adminMenuToggle.parent()
-                .refindWhenNeeded(navbarNavBlock)
-                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement adminMenuToggle = Locators.adminMenuToggle
                 .refindWhenNeeded(navbarNavBlock)
                 .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
-    public static class Locators
+    private static class Locators
     {
         public static Locator.XPathLocator exitAdminBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Exit Admin Mode']");
         public static Locator.XPathLocator stopImpersonatingBtn = Locator.xpath("//a[@class='btn btn-primary' and text()='Stop impersonating']");
