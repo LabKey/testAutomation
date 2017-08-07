@@ -68,7 +68,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         StringBuilder fullPath = new StringBuilder();
         for (String container : splitPath)
         {
-            fullPath.append(EscapeUtil.encode(container)).append("/");
+            fullPath.append(container).append("/");
         }
         fullPath.append(folderName);
 
