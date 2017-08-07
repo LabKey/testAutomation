@@ -556,7 +556,7 @@ public class PortalHelper extends WebDriverWrapper
         {
             return IS_BOOTSTRAP_LAYOUT ?
                     Locator.tagWithClass("*", "panel-title") :
-                    Locator.tagWithClass("span", "labkey-wp-title-text");
+                    Locator.tagWithClass("th", "labkey-wp-title-left");
         }
 
         public static Locator.XPathLocator webPart()
