@@ -21,7 +21,6 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -111,7 +110,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         if (subfolders.length == 0)
             navigateToProject(project);
         else
-            throw new NotImplementedException(); // TODO
+            throw new IllegalArgumentException("Navigating a specific subfolder path is not yet supported"); // TODO
     }
 
     /* This is a way to discover via the UI if the specified project exists (or did the last time the
