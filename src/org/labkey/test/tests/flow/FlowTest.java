@@ -727,6 +727,7 @@ public class FlowTest extends BaseFlowTest
             matchedFileInput = samplesConfirm.findCell(0, "MatchedFile").findElement(By.cssSelector("select"));
         }
         selectOptionByText(matchedFileInput,"91745.fcs (L02-060120-QUV-JS)" );
+        fireEvent(matchedFileInput, SeleniumEvent.blur);
         clickButton("Next");
         waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");
