@@ -77,11 +77,11 @@ public class BootstrapMenu extends Component
     }
 
     @LogMethod(quiet = true)
-    public WebElement clickMenuButton(boolean wait, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    public WebElement openMenuTo(@LoggedParam String ... subMenuLabels)
     {
         expand();
 
-        if (onlyOpen && subMenuLabels.length == 0)
+        if (subMenuLabels.length == 0)
             return null;
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
@@ -94,17 +94,35 @@ public class BootstrapMenu extends Component
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
                 .notHidden()
                 .waitForElement(elements().findMenuList(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        if (onlyOpen)
-        {
-            _driver.mouseOver(item);
-            return item;
-        }
+        _driver.mouseOver(item);
+        return item;
+    }
 
+    @LogMethod(quiet = true)
+    public void clickSubMenu(boolean wait, @LoggedParam String ... subMenuLabels)
+    {
+        if (subMenuLabels.length < 1)
+            throw new IllegalArgumentException("Specify menu item(s)");
+
+        WebElement item = openMenuTo(subMenuLabels);
         _driver.log("attempting to click menu item with text [" + item.getText() + "]");
+
         if (wait)
             _driver.clickAndWait(item);
         else
             _driver.clickAndWait(item, 0);
+    }
+
+    /**
+     * @deprecated Use {@link #clickSubMenu(boolean, String...)} or {@link #openMenuTo(String...)}
+     */
+    @Deprecated
+    public WebElement clickMenuButton(boolean wait, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
+    {
+        if (onlyOpen)
+            return openMenuTo(subMenuLabels);
+        else
+            clickSubMenu(wait, subMenuLabels);
         return null;
     }
 
