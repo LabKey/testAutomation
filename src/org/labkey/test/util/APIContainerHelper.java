@@ -27,6 +27,7 @@ import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -64,18 +65,18 @@ public class APIContainerHelper extends AbstractContainerHelper
         doCreateContainer(path, folderName, null, folderType, false);
 
         String[] splitPath = path.split("/");
-        path = "";
+        StringBuilder fullPath = new StringBuilder();
         for (String container : splitPath)
         {
-            path = path + "/" + EscapeUtil.encode(container);
+            fullPath.append("/").append(EscapeUtil.encode(container));
         }
 
-        _test.beginAt("/project" + path + "/" + EscapeUtil.encode(folderName) +  "/begin.view?");
+        _test.beginAt(WebTestHelper.buildURL("project", fullPath.toString(), "begin"));
     }
 
     public CreateContainerResponse doCreateContainer(String parentPath, @Nullable String name, String title, String folderType, boolean isWorkbook)
     {
-        Connection connection = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         CreateContainerCommand command = new CreateContainerCommand(name);
 
         if (isWorkbook)
@@ -153,7 +154,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     @Override
     public void moveFolder(@LoggedParam String projectName, @LoggedParam String folderName, @LoggedParam String newParent, final boolean createAlias) throws CommandException
     {
-        Connection connection = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection connection = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
         if (!projectName.startsWith("/"))
             projectName = "/" + projectName;
