@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.135")
+                print("Latest Rlabkey version: 2.1.136")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.135"
-                [1] "Found Rlabkey version: 2.1.135"
+                [1] "Latest Rlabkey version: 2.1.136"
+                [1] "Found Rlabkey version: 2.1.136"
             ]]>
         </response>
     </test>

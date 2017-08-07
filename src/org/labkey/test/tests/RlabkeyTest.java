@@ -42,6 +42,8 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class RlabkeyTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     RReportHelper _rReportHelper = new RReportHelper(this);
     //private static final String PROJECT_NAME = "RlabkeyTest Project\u2603";
     private static final String PROJECT_NAME = "RlabkeyTest Project";
@@ -135,7 +137,8 @@ public class RlabkeyTest extends BaseWebDriverTest
             {
                 clickProject(getProjectName());
                 clickAndWait(Locator.linkWithText(LIST_NAME));
-                DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", "Create R Report");
+                DataRegionTable table = new DataRegionTable("query", getDriver());
+                table.clickHeaderMenu("Charts / Reports", "Create R Report");
 
                 // we want to load the Rlabkey package from the override location
                 File libPath = new File(TestFileUtils.getLabKeyRoot() + "/sampledata/rlabkey");
