@@ -44,6 +44,7 @@ import static org.junit.Assert.assertEquals;
 @Category({Issues.class, DailyA.class})
 public class IssuesAdminTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String USER = "admin_user@issuesadmin.test";
     private static final String DEFAULT_NAME = "issues";
     private static final String LIST_NAME = "otherIssues";
@@ -108,7 +109,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
                 .clickInsert()
                 .setLabel("noModule")
                 .clickSubmitError()
-                .clickOk();
+                .clickClose();
         IssueListDefDataRegion listDefDataRegion = _issuesHelper.goToIssueListDefinitions(PROJECT2);
         assertEquals("Issue list definition present with module disabled", 0, listDefDataRegion.getDataRowCount());
     }
@@ -136,10 +137,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         log("Verify issues-list action respects custom noun");
         assertTextPresent(plural + " List", singular + " ID");
         assertTextNotPresent(defaultPlural + " List", defaultSingular + " ID");
-        assertElementPresent(Locator.lkButton("New " + singular));
-        assertElementPresent(Locator.lkButton("Jump to " + singular));
-        assertElementNotPresent(Locator.lkButton("New " + defaultSingular));
-        assertElementNotPresent(Locator.lkButton("Jump to " + defaultSingular));
+        assertElementPresent(Locator.bootstrapButton("a", "New " + singular));
 
         clickAndWait(Locator.lkButton("Admin"));
         assertTextPresent(plural + " Admin Page");
@@ -150,16 +148,13 @@ public class IssuesAdminTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(_issuesHelper.getDriver());
         portalHelper.addWebPart("Issues Summary");
         clickAndWait(Locator.linkWithText("Submit"));
-        assertElementPresent(Locator.linkWithText("view open " + plural));
-        assertElementPresent(Locator.linkWithText("submit new " + singular));
+        assertElementPresent(Locator.bootstrapButton("a", "new " + singular.toLowerCase()));
 
         portalHelper.addWebPart("Issues List");
         clickAndWait(Locator.linkWithText("Submit"));
         assertEquals("Wrong title for ID column", singular + " ID", new DataRegionTable("issues-issues", getDriver()).getColumnLabels().get(0));
-        assertElementPresent(Locator.lkButton("New " + singular));
-        assertElementPresent(Locator.lkButton("Jump to " + singular));
-        assertElementNotPresent(Locator.lkButton("New " + defaultSingular));
-        assertElementNotPresent(Locator.lkButton("Jump to " + defaultSingular));
+        assertElementPresent(Locator.bootstrapButton("a", "New " + singular));
+        assertElementNotPresent(Locator.bootstrapButton("a","New " + defaultSingular));
     }
 
     @Test @Ignore //TODO

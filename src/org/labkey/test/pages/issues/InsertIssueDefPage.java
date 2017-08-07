@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Input;
+import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
@@ -105,16 +106,16 @@ public class InsertIssueDefPage extends LabKeyPage
         }
     }
 
-    public class CreateListDefError extends Window
+    public class CreateListDefError extends ModalDialog
     {
         private CreateListDefError(WebDriver driver)
         {
-            super("Error", driver);
+            super(ModalDialog.find(driver).getComponentElement(), driver);
         }
 
-        public InsertIssueDefPage clickOk()
+        public InsertIssueDefPage clickClose()
         {
-            clickButton("OK", true);
+            super.close();
             return InsertIssueDefPage.this;
         }
     }
