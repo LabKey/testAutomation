@@ -39,6 +39,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class, Reports.class, Charting.class})
 public class TimeChartDateBasedTest extends TimeChartTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final String REPORT_NAME_1 = "TimeChartTest Report";
     private static final String REPORT_NAME_2 = "TimeChartTest 2Report";
     private static final String REPORT_NAME_3 = "TimeChartTest Multi-Measure Report";
@@ -234,13 +236,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.paginationText(31));
 
         // verify column headers for date based plotting option
-        Locator.XPathLocator colHeaderLoc = Locator.tagWithClass("td", "labkey-column-header");
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Participant ID")));
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Visit Date")));
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Visit")));
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Viral Load Quantified")));
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Start Date")));
-        assertElementPresent(colHeaderLoc.child(Locator.tag("div").containing("Days")));
+        Locator.XPathLocator colHeaderLoc = Locator.tagWithClass("tr", "labkey-col-header-row");
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Participant ID")));
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Visit Date")));
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Visit")));
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Viral Load Quantified")));
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Start Date")));
+        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Days")));
         assertElementNotPresent(colHeaderLoc.child(Locator.tag("div").containing("sequencenum")));
 
         log("Test X-Axis default axis label on interval change");
@@ -347,7 +349,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
         assertElementPresent(Ext4Helper.Locators.ext4Button("Save As"));
-        clickFolder(getFolderName());
+        clickTab("Clinical and Assay Data");
         assertTextNotPresent(REPORT_NAME_2);
         stopImpersonating();
         signOut();
@@ -754,7 +756,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         region.setFilter("ParticipantId", "Equals", ptid);
         assertTextPresent(ptid);
 
-        _extHelper.clickMenuButton("Charts", "Create Chart");
+        region.clickHeaderMenu("Charts / Reports", "Create Chart");
         ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Time)
                 .setYAxis("Pulse")
