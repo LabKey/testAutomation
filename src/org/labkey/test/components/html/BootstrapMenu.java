@@ -43,6 +43,13 @@ public class BootstrapMenu extends Component
         _driver = driver;
     }
 
+    static public BootstrapMenu find(WebDriver driver, String menuToggleText)
+    {
+        WebElement container = Locators.bootstrapMenuContainer()
+                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(driver);
+        return new BootstrapMenu(driver, container);
+    }
+
     @Override
     public WebElement getComponentElement()
     {
