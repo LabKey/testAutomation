@@ -21,10 +21,12 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.util.search.SearchAdminAPIHelper;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class SearchHelper
     {
         _test = test;
     }
-    private static final Locator noResultsLocator = Locator.css("table.labkey-search-results-counts").withText("Found 0 results");
+    private static final Locator noResultsLocator = Locator.css(".labkey-search-results-counts").withText("Found 0 results");
     private static final String unsearchableValue = "UNSEARCHABLE";
 
     public void initialize()
@@ -215,15 +217,18 @@ public class SearchHelper
             waitForIndexer();
 
         _test.log("Searching for: '" + searchTerm + "'.");
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+
+        WebElement searchInput = Locator.input("q").findElementOrNull(Locators.bodyPanel().findElement(_test.getDriver()));
+        if (searchInput != null) // Search results page or search webpart
         {
-            new SiteNavBar(_test.getDriver()).search(searchTerm);
-        }else
+            _test.setFormElement(searchInput, searchTerm);
+            _test.doAndWaitForPageToLoad(() -> searchInput.sendKeys(Keys.ENTER));
+        }
+        else // Use header search
         {
-            if (_test.isElementPresent(Locator.id("query")))
+            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
             {
-                _test.setFormElement(Locator.id("query"), searchTerm);
-                _test.clickButton("Search");
+                new SiteNavBar(_test.getDriver()).search(searchTerm);
             }
             else
             {
