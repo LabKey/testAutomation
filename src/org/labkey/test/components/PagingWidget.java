@@ -31,7 +31,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
     public PagingWidget collapseMenu()
     {
         if (elementCache().paginationMenu.isExpanded())
-            Locator.tagWithClass("div", "dropdown-backdrop").findElement(elementCache().paginationMenu.getComponentElement()).click();
+           elementCache().paginationMenu.collapse();
         return this;
     }
 
@@ -51,32 +51,32 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
 
     public PagingWidget clickGoToFirst()
     {
-        elementCache().paginationMenu.clickMenuButton(false, false, "Show first");
+        elementCache().paginationMenu.clickSubMenu(false,  "Show first");
         return this;
     }
 
     public PagingWidget clickGoToLast()
     {
-        elementCache().paginationMenu.clickMenuButton(false, false, "Show last");
+        elementCache().paginationMenu.clickSubMenu(false,  "Show last");
         return this;
     }
 
     public PagingWidget setPageSize(int pageSize, boolean wait)
     {
         String menuText = String.valueOf(pageSize) + " per page";
-        elementCache().paginationMenu.clickMenuButton(wait, false, "Paging", menuText);
+        elementCache().paginationMenu.clickSubMenu(wait, "Paging", menuText);
         return this;
     }
 
     public PagingWidget viewPagingOptions()
     {
-        elementCache().paginationMenu.clickMenuButton(false, true, "Paging");
+        elementCache().paginationMenu.openMenuTo( "Paging");
         return this;
     }
 
     public boolean menuOptionEnabled(String menuItemText, String... options)
     {
-        elementCache().paginationMenu.clickMenuButton(false, true, options);
+        elementCache().paginationMenu.openMenuTo( options);
         boolean result = !Locator.linkContainingText(menuItemText)
                 .parent().findElement(this)
                 .getAttribute("class").contains("disabled");
