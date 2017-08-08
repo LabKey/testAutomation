@@ -816,6 +816,8 @@ public abstract class Locator
 
     public static XPathLocator pageHeader(String headerText)
     {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return Locator.tagWithClass("div", "lk-body-title").append(Locator.tagWithText("h3", headerText));
         return id("labkey-nav-trail-current-page").withText(headerText);
     }
 

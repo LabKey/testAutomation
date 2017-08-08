@@ -107,7 +107,7 @@ public class PieChartTest extends GenericChartsTest
         sleep(3000);  // TODO Is there a better trigger?
 
         // Move mouse to make sure it is not over a pie wedge (and would generate a % in a pop-up text).
-        mouseOver(Locator.tagWithText("h3", "Chart Wizard"));
+        mouseOver(Locator.pageHeader("Chart Wizard"));
 
         svgText = getSVGText();
         log("svg text: '" + svgText + "'");

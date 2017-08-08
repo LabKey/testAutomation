@@ -665,7 +665,7 @@ public class ScatterPlotTest extends GenericChartsTest
                 .clickApply();
         savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn", true);
         doAndWaitForPageToLoad(() -> fireEvent(svgCircleLoc.waitForElement(shortWait()), SeleniumEvent.click));
-        waitForElement(Locator.tagWithText("h3", "APX-1: Abbreviated Physical Exam"));
+        waitForElement(Locator.pageHeader("APX-1: Abbreviated Physical Exam"));
         // verify that only developers can see the button to add point click function
         createUser(DEVELOPER_USER, null);
         clickProject(getProjectName());
