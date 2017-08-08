@@ -96,13 +96,13 @@ public class ETLHelper
     }
 
     /**
-     *  Increment the expected error count to the correct number of occurances in the log file
+     *  Increment the expected error count to the correct number of occurrences in the log file
      *  of the string "ERROR" which correspond to the individual error.
      *  <p/>
      *  This can depend on the source of an expected error, and at the moment all errors generate
-     *  at least two occurances anyway.
+     *  at least two occurrences anyway.
      *
-     * @param twoErrors true when a given error generates two occurances of the string "ERROR" in the log.
+     * @param twoErrors true when a given error generates two occurrences of the string "ERROR" in the log.
      */
     void incrementExpectedErrorCount(boolean twoErrors)
     {
@@ -113,7 +113,7 @@ public class ETLHelper
 
     void incrementExpectedErrorCount()
     {
-        // ETL log files usually have two occurances of the string "ERROR" for every error that occurs.
+        // ETL log files usually have two occurrences of the string "ERROR" for every error that occurs.
         incrementExpectedErrorCount(true);
     }
 
@@ -147,7 +147,7 @@ public class ETLHelper
         _test.uncheckCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Enabled')]"));
     }
 
-    //sets 'verbose' checbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
+    //sets 'verbose' checkbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
     protected void enableVerbose(String transformName)
     {
         _test.checkCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Verbose')]"));

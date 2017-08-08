@@ -281,7 +281,8 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.submitImportTsv_success();
 
         // Create lists for cross-folder query test.
-        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        clickProject(OTHER_PROJECT);
+        _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();

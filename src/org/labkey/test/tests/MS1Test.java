@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -27,7 +28,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.TextSearcher;
-import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -66,10 +66,25 @@ public class MS1Test extends BaseWebDriverTest
 
     private static final File _pipelinePathMain = new File(TestFileUtils.getLabKeyRoot(), "/sampledata/ms1/bvt");
 
-    public MS1Test()
+    @BeforeClass
+    public static void setupProject()
     {
-        super();
-        _containerHelper = new UIContainerHelper(this);
+        MS1Test init = (MS1Test)getCurrentTest();
+        init.doSetup();
+    }
+
+    private void doSetup()
+    {
+        //for now, just create a main project with standard permissions
+        //in the future, we should expand this to include multiple
+        //projects and a more complex security scenario to ensure that
+        //users can't view MS1 data they are not supposed to see
+        _containerHelper.createProject(getProjectName(), MS1_FOLDER_TYPE);
+
+        //setup the pipeline
+        setupPipeline();
+
+        importData(X_PROTOCOL, FEATURES_PROTOCOL);
     }
 
     @Override
@@ -81,32 +96,24 @@ public class MS1Test extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
-        log("Starting MS1 BVT");
-        setupEnvironment();
+        String project = getProjectName();
 
-        importData(PROJ_MAIN, X_PROTOCOL, FEATURES_PROTOCOL);
-
-        testViews(PROJ_MAIN);
+        log("Testing views...");
+        testFeaturesView(project);
+        testSimilarSearchView(project);
+        testPepSearchView(project);
+        testCompareView(project);
+        verifyFeaturesRendered(project);
+        log("Finished Testing views.");
     }
 
-    protected void setupEnvironment()
+    private void setupPipeline()
     {
-        //for now, just create a main project with standard permissions
-        //in the future, we should expand this to include multiple
-        //projects and a more complex security scenario to ensure that
-        //users can't view MS1 data they are not supposed to see
-        _containerHelper.createProject(PROJ_MAIN, MS1_FOLDER_TYPE);
-
-        //setup the pipeline
-        setupPipeline(PROJ_MAIN, _pipelinePathMain.getAbsolutePath());
-    }
-
-    protected void setupPipeline(String project, String path)
-    {
-        log("Setting up pipeline for project " + project + "...");
-        clickProject(project);
+        log("Setting up pipeline for project " + getProjectName() + "...");
+        goToProjectHome();
 
         //test invalid path
+        String path = _pipelinePathMain.getAbsolutePath();
         setPipelineRoot(path + "-invalid");
         assertTextPresent("-invalid' does not exist");
 
@@ -117,9 +124,11 @@ public class MS1Test extends BaseWebDriverTest
         log("Pipeline successfully setup.");
     }
 
-    protected void importData(String project, String xProtocol, String featuresProtocol)
+    protected void importData(String xProtocol, String featuresProtocol)
     {
         log("Importing sample data...");
+
+        String project = getProjectName();
 
         //two x-tandem peptide experiments
         importXtandemExps(project, xProtocol);
@@ -144,7 +153,6 @@ public class MS1Test extends BaseWebDriverTest
         startSystemMaintenance();
         waitForSystemMaintenanceCompletion();
         log("System maintenance task complete.");
-        goToProjectHome();
     }
 
     protected void importXtandemExps(String project, String xProtocol)
@@ -174,19 +182,8 @@ public class MS1Test extends BaseWebDriverTest
         _fileBrowserHelper.importFile(PIPELINE_INSPECT_DIR + "/" + protocol + "/", PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
-    protected void testViews(String project)
-    {
-        log("Testing views...");
-        testFeaturesView(project);
-        testSimilarSearchView(project);
-        testPepSearchView(project);
-        testCompareView(project);
-        verifyFeaturesRendered(project);
-        log("Finished Testing views.");
-    }
-
     //verifies that the features file with no peptide associations actually
-    //displayes the features properly.
+    //displays the features properly.
     protected void verifyFeaturesRendered(String folder)
     {
         log("Verifying features view rendered in folder " + folder + "...");
@@ -205,8 +202,9 @@ public class MS1Test extends BaseWebDriverTest
     {
         log("Testing Compare Runs view");
         clickProject(project);
-        checkAllOnPage("MSInspectFeatureRuns");
-        clickButton("Compare", 60000);
+        DataRegionTable table = new DataRegionTable("MSInspectFeatureRuns", getDriver());
+        table.checkAllOnPage();
+        table.clickHeaderButton("Compare");
         assertTextPresent("-.TMITDSLAVVLQR.R", "236.9828");
 
         //test links
@@ -485,13 +483,13 @@ public class MS1Test extends BaseWebDriverTest
     {
         goToAdminConsole().goToAdminConsoleLinksSection();
         clickAndWait(Locator.linkWithText("ms1"));
-        if(isButtonPresent("Purge Deleted MS1 Data Now"))
+        if (isButtonPresent("Purge Deleted MS1 Data Now"))
         {
             log("Purging MS1 Test data files...");
             clickButton("Purge Deleted MS1 Data Now");
 
             int iters = 0;
-            while(isTextPresent("MS1 data is currently being purged"))
+            while (isTextPresent("MS1 data is currently being purged"))
             {
                 log("Wating for purge to complete...");
                 sleep(3000);
@@ -499,7 +497,7 @@ public class MS1Test extends BaseWebDriverTest
                 refresh();
             }
 
-            if(iters > 100)
+            if (iters > 100)
                 log("WARNING: Purging of MS1 BVT data took more than 5 minutes. Consider using smaller files.");
 
             log("MS1 data successfully purged.");

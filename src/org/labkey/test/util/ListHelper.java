@@ -23,7 +23,6 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -163,7 +162,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     protected void setRowData(Map<String, String> data, boolean validateText)
     {
-        for(String key : data.keySet())
+        for (String key : data.keySet())
         {
             waitForElement(Locator.name("quf_" + key));
             WebElement field = Locator.name("quf_" + key).findElement(getDriver());
@@ -189,7 +188,7 @@ public class ListHelper extends LabKeySiteWrapper
         }
         clickButton("Submit");
 
-        if(validateText)
+        if (validateText)
         {
             assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
         }
@@ -237,15 +236,11 @@ public class ListHelper extends LabKeySiteWrapper
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
+    // TODO: This currently accepts either a project or a folder as the first argument (bad!). Refactor this to be more explicit possibly using Path?
+    @LogMethod
     public void createList(String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        createList(getCurrentProject(), folderName, listName, listKeyType, listKeyName, cols);
-    }
-
-    @LogMethod
-    public void createList(String project, String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
-    {
-        beginCreateList(project, folderName, listName);
+        beginCreateList(folderName, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
@@ -371,24 +366,13 @@ public class ListHelper extends LabKeySiteWrapper
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
-        beginCreateList(getCurrentProject(), folderName, listName);
-    }
-
-    public void beginCreateList(String project, String folderName, String listName)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
+        try
         {
-            new ProjectMenu(getDriver()).navigateToFolder(project, folderName);
-        }else
+            clickFolder(folderName);
+        }
+        catch (WebDriverException ex)
         {
-            try
-            {
-                clickFolder(folderName);
-            }
-            catch (WebDriverException ex)
-            {
-                clickProject(folderName);
-            }
+            clickProject(folderName);
         }
 
         beginCreateListHelper(listName);

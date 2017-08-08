@@ -52,7 +52,6 @@ public class DataRegionTest extends BaseWebDriverTest
     private static final String NEXT_LINK = "Next Page";
     private static final String LAST_LINK = "Last Page";
 
-    private static final String PROJECT_NAME = "DataRegionProject";
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
     private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
@@ -125,7 +124,7 @@ public class DataRegionTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return PROJECT_NAME;
+        return "DataRegionProject";
     }
 
     @Test
@@ -171,17 +170,16 @@ public class DataRegionTest extends BaseWebDriverTest
     }
 
     // check every 500ms for specified wait amount for either alert or successSignal
-    private boolean pageHasAlert(long wait, String successSignal) {
+    private boolean pageHasAlert(long wait, String successSignal)
+    {
         long t= System.currentTimeMillis();
         long end = t + wait;
-        while(System.currentTimeMillis() < end) {
+        while (System.currentTimeMillis() < end)
+        {
             if (null != getAlertIfPresent())
-            {
                 return true;
-            }
-            if (isElementPresent(Locators.pageSignal(successSignal))) {
+            if (isElementPresent(Locators.pageSignal(successSignal)))
                 return false;
-            }
             sleep(500);
         }
         return false;
@@ -212,18 +210,20 @@ public class DataRegionTest extends BaseWebDriverTest
 
         DataRegionTable auditTable =  new DataRegionTable("query", getDriver());
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
-                {"Project", PROJECT_NAME}, {"Container", PROJECT_NAME}, {"SchemaName", "lists"},
+                {"Project", getProjectName()}, {"Container", getProjectName()}, {"SchemaName", "lists"},
                 {"QueryName", LIST_NAME}, {"Comment", "Exported to TSV"}};
-        for(String[] columnAndValue : columnAndValues)
+        for (String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);
             assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
+
         if (IS_BOOTSTRAP_LAYOUT)
         {
             list = new DataRegionTable("query", getDriver());
             list.detailsLink(list.getRowIndex("Project", getProjectName())).click();
-        }else
+        }
+        else
         {
             clickAndWait(Locator.linkContainingText("details"));
         }
@@ -232,11 +232,10 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private void createList()
     {
-        log("Create project: " + PROJECT_NAME);
-        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(getProjectName(), null);
 
         log("Define list");
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
+        _listHelper.createList(getProjectName(), LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, NAME_COLUMN, HEX_COLUMN);
 
         log("Upload data");
         _listHelper.uploadData(LIST_DATA);
@@ -389,7 +388,8 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show Selected");
         table.checkAllOnPage();
-        if (IS_BOOTSTRAP_LAYOUT){
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
             waitForElement(Locator.tagWithAttribute("div", "data-msgpart", "selection"));
             WebElement msgDiv = Locator.tagWithAttribute("div", "data-msgpart", "selection").findElement(getDriver());
             assertEquals(msgDiv.getText().contains("Selected 5 of 15 rows."), true);
