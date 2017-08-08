@@ -615,10 +615,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     // Click on a module listed on the admin menu;
-    /**
-     * @deprecated Use {@link SiteNavBar#goToModule(String)} when using bootstrap layout
-     */
-    @Deprecated
     public void goToModule(String moduleName)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
@@ -1753,12 +1749,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertNotEquals(message, expected.get(), actual.get());
     }
 
-    public void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
+    public static void waitFor(Supplier<Boolean> checker, String failMessage, int wait)
     {
         if (!waitFor(checker, wait))
         {
-            _testTimeout = true;
-            fail(failMessage + " [" + wait + "ms]");
+            throw new TimeoutException(failMessage + " [" + wait + "ms]");
         }
     }
 
