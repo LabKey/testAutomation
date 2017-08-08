@@ -39,7 +39,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
     public File exportExcel(ColumnHeaderType exportHeaderType, ExcelFileType type, @Nullable Boolean exportSelected)
     {
         exportOrSignExcel(exportHeaderType, type, exportSelected);
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getExcelActionButtonText()), _expectedFileCount)[0];
+        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getActionButtonText()).index(0), _expectedFileCount)[0];
     }
 
     public File exportText()
@@ -60,7 +60,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
     public File exportText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
         exportOrSignText(exportHeaderType, delim, quote, exportSelected);
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getTextActionButtonText()), _expectedFileCount)[0];
+        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getActionButtonText()).index(1), _expectedFileCount)[0];
     }
 
     public String exportScript(ScriptExportType type)
@@ -125,36 +125,9 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         return elements;
     }
 
-    protected String getMainButtonText()
+    @Override
+    protected String getActionButtonText()
     {
         return "Export";
-    }
-    protected String getExcelActionButtonText()
-    {
-        return "Export to Excel";
-    }
-    protected String getTextActionButtonText()
-    {
-        return "Export to Text";
-    }
-    protected String getXlsHeaderTypeName()
-    {
-        return "xls_header_type";
-    }
-    protected String getTextHeaderTypeName()
-    {
-        return "txt_header_type";
-    }
-    protected String getXlsFileTypeRadioName()
-    {
-        return "excelExportType";
-    }
-    protected String getDelimName()
-    {
-        return "delim";
-    }
-    protected String getQuoteName()
-    {
-        return "quote";
     }
 }

@@ -27,14 +27,31 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
         _expectedFileCount = 1;
     }
 
-    protected abstract String getMainButtonText();
-    protected abstract String getExcelActionButtonText();
-    protected abstract String getTextActionButtonText();
-    protected abstract String getXlsHeaderTypeName();
-    protected abstract String getTextHeaderTypeName();
-    protected abstract String getXlsFileTypeRadioName();
-    protected abstract String getDelimName();
-    protected abstract String getQuoteName();
+    protected abstract String getActionButtonText();
+    protected String getMainButtonText()
+    {
+        return "Export";
+    }
+    protected String getXlsHeaderTypeName()
+    {
+        return "xls_header_type";
+    }
+    protected String getTextHeaderTypeName()
+    {
+        return "txt_header_type";
+    }
+    protected String getXlsFileTypeRadioName()
+    {
+        return "excelExportType";
+    }
+    protected String getDelimName()
+    {
+        return "delim";
+    }
+    protected String getQuoteName()
+    {
+        return "quote";
+    }
 
     @Override
     public WebElement getComponentElement()
@@ -77,7 +94,7 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         getWrapper().checkRadioButton(type.getRadioLocator(getXlsFileTypeRadioName()));
         getWrapper().selectOptionByValue(Locator.name(getXlsHeaderTypeName()), exportHeaderType.name());
-        getWrapper().scrollIntoView(Locator.lkButton(getExcelActionButtonText()));
+        getWrapper().scrollIntoView(Locator.lkButton(getActionButtonText()));
     }
 
     public void exportOrSignText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)

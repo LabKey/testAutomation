@@ -13,26 +13,30 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
 {
     public DataRegionElecSignHelper(DataRegionTable drt)
     {
-        super(drt, Locator.name("Electronically Sign-panel"));
+        super(drt, Locator.name("Export-panel"));
     }
 
     public void signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
     {
         exportOrSignExcel(headerType, type, selected);
-        getWrapper().click(Locator.lkButton(getExcelActionButtonText()));
+        getWrapper().click(Locator.lkButton(getActionButtonText()).index(0));
         Locator submit = Locator.linkWithText("Submit");
         getWrapper().waitForElement(submit);
         getWrapper().setFormElement(Locator.input("reason"), reason);
+        getWrapper().setFormElement(Locator.input("email"), PasswordUtil.getUsername());
+        getWrapper().setFormElement(Locator.input("password"), PasswordUtil.getPassword());
         getWrapper().click(submit);
     }
 
     public void signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
     {
         exportOrSignText(headerType, delim, quote, exportSelected);
-        getWrapper().click(Locator.lkButton(getTextActionButtonText()));
+        getWrapper().click(Locator.lkButton(getActionButtonText()).index(1));
         Locator submit = Locator.linkWithText("Submit");
         getWrapper().waitForElement(submit);
         getWrapper().setFormElement(Locator.input("reason"), reason);
+        getWrapper().setFormElement(Locator.input("email"), PasswordUtil.getUsername());
+        getWrapper().setFormElement(Locator.input("password"), PasswordUtil.getPassword());
         getWrapper().click(submit);
     }
 
@@ -47,36 +51,9 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
         return elements;
     }
 
-    protected String getMainButtonText()
+    @Override
+    protected String getActionButtonText()
     {
-        return "Electronically Sign";
-    }
-    protected String getExcelActionButtonText()
-    {
-        return "Sign Excel Snapshot";
-    }
-    protected String getTextActionButtonText()
-    {
-        return "Sign Text Snapshot";
-    }
-    protected String getXlsHeaderTypeName()
-    {
-        return "xls_header_type_sign";
-    }
-    protected String getTextHeaderTypeName()
-    {
-        return "txt_header_type_sign";
-    }
-    protected String getXlsFileTypeRadioName()
-    {
-        return "excelSignType";
-    }
-    protected String getDelimName()
-    {
-        return "delim_sign";
-    }
-    protected String getQuoteName()
-    {
-        return "quote_sign";
+        return "Sign Data";
     }
 }
