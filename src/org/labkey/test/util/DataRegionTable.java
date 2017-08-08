@@ -159,7 +159,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _el;
     }
 
-    protected Elements elements()
+    public Elements elements()
     {
         getComponentElement().isDisplayed(); // Trigger cache reset
         if (_elements == null)
@@ -218,7 +218,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (_pagingWidget == null)
         {
-            _pagingWidget = new PagingWidget(elements().UX_PaginationContainer, getDriver());
+            _pagingWidget = new PagingWidget(this);
         }
         return _pagingWidget;
     }
@@ -490,11 +490,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            return Locator.xpath("td").withClass("labkey-selectors")
+            return Locator.tagWithClass("td", "labkey-selectors")
                     .child("a").withAttribute("data-original-title", "details");
         }
 
-        return Locator.xpath("td").withClass("labkey-details")
+        return Locator.tagWithClass("td","labkey-details")
                     .child("a");
     }
 
@@ -507,13 +507,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            return Locator.xpath("td").withClass("labkey-selectors")
+            return Locator.tagWithClass("td","labkey-selectors")
                     .child("a").withAttribute("data-original-title", "edit");
         }
 
-        return Locator.xpath("td").withClass("labkey-update").child("a");
+        return Locator.tag("td").withClass("labkey-update").child("a");
     }
 
+    /**
+     * @deprecated Use {@link #clickEditRow(String)} or {@link #clickEditRow(int)}
+     */
+    @Deprecated
     public WebElement updateLink(int row)
     {
         return updateLinkLocator().findElement(elements().getDataRow(row));
@@ -831,18 +835,30 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
     public void updateRow(String key, Map<String, String> data, boolean validateText)
     {
+        clickEditRow(key);
+
+        setRowData(data, validateText);
+    }
+
+    //todo: return edit page
+    public void clickEditRow(int rowIndex)
+    {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            WebElement updateLink = updateLink(getRowIndex(key));     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
+            WebElement updateLink = updateLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
             _driver.fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
-            _driver.clickAndWait(updateLink(getRowIndex(key)));
+            _driver.clickAndWait(updateLink(rowIndex));
         }
         else
         {
-            _driver.clickAndWait(updateLink(getRowIndex(key)));
+            _driver.clickAndWait(updateLink(rowIndex));
         }
+    }
 
-        setRowData(data, validateText);
+    //todo: return edit page
+    public void clickEditRow(String key)
+    {
+        clickEditRow(getRowIndex(key));
     }
 
     protected void setRowData(Map<String, String> data, boolean validateText)
@@ -1681,16 +1697,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
     }
 
-    protected class Elements extends Component.ElementCache
+    public class Elements extends Component.ElementCache
     {
         private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private final WebElement UX_ButtonBar = Locator.tagWithClass("div", "lk-region-bar").findWhenNeeded(this);
-        private final WebElement UX_PaginationContainer = Locator.xpath("//div[contains(@class,'labkey-pagination')]")
-                .findWhenNeeded(UX_ButtonBar);
-        private final WebElement UX_PageNext_Button = Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]")
-                .findWhenNeeded(UX_PaginationContainer);
-        private final WebElement UX_PagePrev_Button = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]")
-                .findWhenNeeded(UX_PaginationContainer);
+
+        public WebElement getButtonBar()
+        {
+            return IS_BOOTSTRAP_LAYOUT ? UX_ButtonBar : buttonBar;
+        }
 
         private final WebElement tableElement = IS_BOOTSTRAP_LAYOUT ? Locators.table(_regionName).findWhenNeeded(this) : getComponentElement();
 

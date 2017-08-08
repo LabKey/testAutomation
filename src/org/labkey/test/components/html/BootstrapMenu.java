@@ -26,6 +26,8 @@ import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 
 public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 {
@@ -83,6 +85,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         getWrapper().waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
+    public List<WebElement> findVisibleMenuItems()
+    {
+        return elementCache().findVisibleMenuItems();
+    }
+
     @LogMethod(quiet = true)
     public WebElement openMenuTo(@LoggedParam String ... subMenuLabels)
     {
@@ -94,13 +101,13 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
-                    .waitForElement(elementCache().findMenuList(), 2000);
+                    .waitForElement(elementCache().findOpenMenu(), 2000);
             TestLogger.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
             getWrapper().click(subMenuItem);
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
                 .notHidden()
-                .waitForElement(elementCache().findMenuList(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .waitForElement(elementCache().findOpenMenu(), WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         getWrapper().mouseOver(item);
         return item;
     }
@@ -150,11 +157,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     {
         public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
 
-        public WebElement findMenuList()
+        public WebElement findOpenMenu()
         {
             WebElement insideContainerList = Locator.tagWithClassContaining("ul", "dropdown-menu")
                     .findElementOrNull(getComponentElement());
-            if (insideContainerList!=null)
+            if (insideContainerList != null)
                 return insideContainerList;
 
             // outside the container, require it to be block-display,
@@ -163,6 +170,20 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
                     .notHidden()
                     .withAttributeContaining("style", "display: block")
                     .findElement(getDriver());
+        }
+
+        public WebElement findVisibleMenuPanel()
+        {
+            WebElement menuList = findOpenMenu();
+            List<WebElement> submenus = Locator.css("ul.dropdown-layer-menu.open").findElements(menuList);
+            if (!submenus.isEmpty())
+                return submenus.get(submenus.size() - 1);   /* if one or more submenus are open, use the last open one */
+            return menuList;
+        }
+
+        public List<WebElement> findVisibleMenuItems()
+        {
+            return Locator.xpath("./li/a").findElements(findVisibleMenuPanel()); /* direct children of the currently-open menu or submenu */
         }
     }
 

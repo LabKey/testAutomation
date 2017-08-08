@@ -2,18 +2,22 @@ package org.labkey.test.components;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
 {
-    final WebElement _el;
-    final WebDriver _driver;
+    private final WebElement _el;
+    private final DataRegionTable _dataRegionTable;
 
-    public PagingWidget(WebElement element, WebDriver driver)
+    public PagingWidget(DataRegionTable table)
     {
-        _el = element;
-        _driver = driver;
+        _dataRegionTable = table;
+        _el = Locator.xpath("//div[contains(@class,'labkey-pagination')]")
+                .findWhenNeeded(_dataRegionTable.elements().getButtonBar());
     }
 
     @Override
@@ -25,7 +29,12 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
     @Override
     public WebDriver getDriver()
     {
-        return _driver;
+        return _dataRegionTable.getDriver();
+    }
+
+    public DataRegionTable getDataRegionTable()
+    {
+        return _dataRegionTable;
     }
 
     public PagingWidget collapseMenu()
@@ -38,26 +47,30 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
     public PagingWidget clickPreviousPage()
     {
         collapseMenu();
-        elementCache().previousPageButton.click();
+        getDataRegionTable().doAndWaitForUpdate(() ->
+                elementCache().previousPageButton.click());
         return this;
     }
 
     public PagingWidget clickNextPage()
     {
         collapseMenu();
-        elementCache().nextPageButton.click();
+        getDataRegionTable().doAndWaitForUpdate(() ->
+                elementCache().nextPageButton.click());
         return this;
     }
 
     public PagingWidget clickGoToFirst()
     {
-        elementCache().paginationMenu.clickSubMenu(false,  "Show first");
+        getDataRegionTable().doAndWaitForUpdate(() ->
+                elementCache().paginationMenu.clickSubMenu(false,  "Show first"));
         return this;
     }
 
     public PagingWidget clickGoToLast()
     {
-        elementCache().paginationMenu.clickSubMenu(false,  "Show last");
+        getDataRegionTable().doAndWaitForUpdate(() ->
+                elementCache().paginationMenu.clickSubMenu(false,  "Show last"));
         return this;
     }
 
@@ -68,10 +81,15 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
         return this;
     }
 
-    public PagingWidget viewPagingOptions()
+    public List<WebElement> viewPagingOptions()
     {
         elementCache().paginationMenu.openMenuTo( "Paging");
-        return this;
+        return elementCache().paginationMenu.findVisibleMenuItems();
+    }
+
+    public BootstrapMenu getMenu()
+    {
+        return elementCache().paginationMenu;
     }
 
     public boolean menuOptionEnabled(String menuItemText, String... options)
