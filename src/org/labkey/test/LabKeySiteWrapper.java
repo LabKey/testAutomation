@@ -1141,13 +1141,17 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    public ProjectMenu projectMenu()
+    {
+        return new ProjectMenu(getDriver());
+    }
+
     public WebElement openProjectMenu()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            ProjectMenu menu= new ProjectMenu(getDriver());
-            menu.open();
-            return menu.getMenuToggle();
+            projectMenu().open();
+            return projectMenu().getMenuToggle();
         }
         else
         {
@@ -1173,7 +1177,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new ProjectMenu(getDriver()).navigateToProject(project);
+            projectMenu().navigateToProject(project);
         }
         else
         {
@@ -1235,7 +1239,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new ProjectMenu(getDriver()).navigateToFolder(getCurrentProject(), folder);
+            projectMenu().navigateToFolder(getCurrentProject(), folder);
         }
         else
         {
