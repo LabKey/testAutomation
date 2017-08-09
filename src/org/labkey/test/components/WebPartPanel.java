@@ -85,16 +85,12 @@ public class WebPartPanel extends WebDriverComponent
             Locator.XPathLocator webPartTitle = titleLocator();
             webPartTitle = _partialTitle ? webPartTitle.containing(_title) : webPartTitle.withText(_title);
 
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-                return Locator.tagWithClass("div", "labkey-portal-container").withDescendant(webPartTitle);
             return Locator.tagWithClass("table", "labkey-wp").withDescendant(webPartTitle);
         }
 
         protected Locator.XPathLocator titleLocator()
         {
-            if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-                return Locator.tagWithClass("span", "labkey-wp-title-text");
-            return Locator.xpath("tbody/tr/th/a/span").withClass("labkey-wp-title-text");
+            return Locator.tag("tbody/tr/*"/*td or th*/).withClass("labkey-wp-title-left");
         }
     }
 }
