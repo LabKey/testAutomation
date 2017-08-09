@@ -2857,6 +2857,17 @@ public abstract class WebDriverWrapper implements WrapsDriver
         clickAndWait(findButton(text, which), waitMillis);
     }
 
+    /**
+     * @deprecated Avoid me please. I am bad and hacky
+     * Mash button until it goes stale and page loads
+     */
+    @Deprecated
+    public void mashButton(final String text)
+    {
+        WebElement button = findButton(text);
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(button)));
+    }
+
     public void clickButtonContainingText(String text)
     {
         clickButtonContainingText(text, defaultWaitForPage);

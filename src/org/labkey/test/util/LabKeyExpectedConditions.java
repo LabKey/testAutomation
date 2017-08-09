@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.labkey.test.Locator;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
@@ -25,8 +24,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import java.util.List;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public abstract class LabKeyExpectedConditions
 {
@@ -157,6 +155,34 @@ public abstract class LabKeyExpectedConditions
             {
                 return "element '" + loc.getLoggableDescription() + "'" +
                         "to be present in context: " + context.toString();
+            }
+        };
+    }
+
+    public static ExpectedCondition<Boolean> clickUntilStale(final WebElement element)
+    {
+        return new ExpectedCondition<Boolean>()
+        {
+            ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(element);
+
+            @Override
+            public Boolean apply(WebDriver ignored)
+            {
+                try
+                {
+                    element.click();
+                    return staleCheck.apply(ignored);
+                }
+                catch (StaleElementReferenceException success)
+                {
+                    return true;
+                }
+            }
+
+            @Override
+            public String toString()
+            {
+                return staleCheck.toString() + " after clicking";
             }
         };
     }
