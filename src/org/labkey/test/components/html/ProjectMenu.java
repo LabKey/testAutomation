@@ -61,7 +61,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         if (!isExpanded())
             newElementCache().menuToggle.click();
-        getWrapper().waitFor(()-> isExpanded(), 1000);
+        WebDriverWrapper.waitFor(()-> isExpanded(), "Menu didn't open", 1000);
         return this;
     }
 
@@ -69,7 +69,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         if (isExpanded())
             newElementCache().menuToggle.click();
-        getWrapper().waitFor(()-> !isExpanded(), 1000);
+        WebDriverWrapper.waitFor(()-> !isExpanded(), "Menu didn't close", 1000);
         return this;
     }
 
@@ -78,7 +78,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         open();
         getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
         getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
-        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getNavigationLink(projectName).click());
+        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getFolderLink(projectName).click());
     }
 
     /* Will navigate to a folder or subfolder of the specified project */
@@ -89,7 +89,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
 
         getWrapper().waitFor(()-> {
-            if (navigationLinkIsVisible(folder))
+            if (folderLinkIsPresent(folder))
                 return true;
             else    // expand any collapsed expandos until the navigation link becomes clickable
             {
@@ -102,7 +102,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             return false;
         }, WAIT_FOR_JAVASCRIPT);
 
-        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getNavigationLink(folder).click());
+        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderLink(folder).click());
     }
 
     public void navigateToContainer(String project, String... subfolders)
@@ -118,12 +118,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public boolean projectLinkExists(String projectName)
     {
         open();
-        return Locator.tag("li").childTag("a").withText(projectName).notHidden()
-                .findElementOrNull(newElementCache().menu) != null;
+        return Locator.tag("li").childTag("a").withAttribute("data-field", projectName).notHidden()
+                .findElementOrNull(elementCache().menu) != null;
     }
 
     /* real-time check to see if the destination nav-link (folder or project) is present and visible*/
-    public boolean navigationLinkIsVisible(String navigationLinkText)
+    public boolean folderLinkIsPresent(String navigationLinkText)
     {
         WebElement linkElement = Locator.tag("li").childTag("a").withText(navigationLinkText).notHidden()
                 .findElementOrNull(newElementCache().folderListContainer);
@@ -177,7 +177,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         {
             return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer);
         }
-        WebElement getNavigationLink(String text)
+        WebElement getFolderLink(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer, WAIT_FOR_JAVASCRIPT);
         }
