@@ -32,25 +32,25 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
         waitForReady();
     }
 
-    public BodyWebPart(WebDriver test, String title, int index)
+    public BodyWebPart(WebDriver driver, String title, int index)
     {
-        this(test, find(test, title, index));
+        this(driver, find(driver, title, index));
         _title = title;
     }
 
-    public BodyWebPart(WebDriver test, String title)
+    public BodyWebPart(WebDriver driver, String title)
     {
-        this(test, title, 0);
+        this(driver, title, 0);
     }
 
-    public BodyWebPart(WebDriver test, int index)
+    public BodyWebPart(WebDriver driver, int index)
     {
-        this(test, webPartLoc().index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(driver, webPartLoc().index(index).waitForElement(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
     }
 
-    static public WebElement find(WebDriver test, String title, int index)
+    static public WebElement find(WebDriver driver, String title, int index)
     {
-        return Locator.waitForAnyElement(new FluentWait<SearchContext>(test).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
+        return Locator.waitForAnyElement(new FluentWait<SearchContext>(driver).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
                 webPartLoc().withDescendant(leftTitleLoc().withAttribute("title", title)).index(index),
                 webPartLoc().withDescendant(Locator.tag("tbody/tr/th").withAttribute("title", title).index(index)));
     }
