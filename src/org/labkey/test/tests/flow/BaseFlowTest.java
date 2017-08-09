@@ -22,8 +22,8 @@ import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.html.ProjectMenu;
-import org.labkey.test.tests.AdminConsoleTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebDriverException;
@@ -240,6 +240,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 }
             }
         }
+        BodyWebPart.find(getDriver(), "Flow Experiment Management", 0);
     }
 
     protected void createQuery(String container, String name, String sql, String xml, boolean inheritable)
