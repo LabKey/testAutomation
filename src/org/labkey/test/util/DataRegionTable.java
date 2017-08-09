@@ -1270,26 +1270,27 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void checkAllOnPage()
     {
-        Locator.checkboxByTitle("Select/unselect all on current page").findElement(getDriver()).click();
-    }
-
-    public void uncheckAllOnPage()
-    {
-        uncheckAll();
-    }
-
-    public void checkAll()
-    {
         WebElement toggle = elements().toggleAllOnPage;
         if (!toggle.isSelected())
             doAndWaitForUpdate(toggle::click);
     }
 
-    public void uncheckAll()
+    public void uncheckAllOnPage()
     {
         WebElement toggle = elements().toggleAllOnPage;
         if (null != doAndWaitForUpdate(toggle::click))
             doAndWaitForUpdate(toggle::click);
+    }
+
+    // TODO: Inline usages so that check/uncheckAll can select all rows on paged data region
+    public void checkAll()
+    {
+        checkAllOnPage();
+    }
+
+    public void uncheckAll()
+    {
+        uncheckAllOnPage();
     }
 
     public void checkCheckboxByPrimaryKey(Object value)
