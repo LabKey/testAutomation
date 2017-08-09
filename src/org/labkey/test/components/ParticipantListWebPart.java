@@ -52,7 +52,7 @@ public class ParticipantListWebPart extends BodyWebPart
                 elements().statusMessageLoc.withText(String.format("No %s were found in this study. %s IDs will appear here after specimens or datasets are imported.",
                         _participantNounPlural.toLowerCase(), _participantNounSingular)),
                 elements().statusMessageLoc.startsWith("Found "),
-                elements().tableLoc.append(Locator.tagWithClass("div", "lk-filter-panel-label").withText("All")));
+                elements().statusMessageLoc.startsWith("Showing all "));
         WebDriverWrapper.sleep(500);
     }
 
