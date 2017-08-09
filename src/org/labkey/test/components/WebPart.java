@@ -38,11 +38,8 @@ import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
  */
 public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriverComponent<EC> implements WebDriverWrapper.PageLoadListener
 {
-    @Deprecated // Use #getWrapper()
-    protected final WebDriverWrapper _test;
     private final WebDriverWrapper _wDriver;
-
-    protected final WebElement _componentElement;
+    private final WebElement _componentElement;
     protected String _title;
 
     public WebPart(WebDriver driver, WebElement componentElement)
@@ -54,7 +51,6 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     {
         _componentElement = new RefindingWebElement(componentElement, driverWrapper.getDriver())
                 .withRefindListener(e -> clearCache());
-        _test = driverWrapper;
         _wDriver = driverWrapper;
 
         driverWrapper.addPageLoadListener(this);

@@ -58,7 +58,7 @@ public class ParticipantListWebPart extends BodyWebPart
 
     public List<String> getParticipants()
     {
-        return _test.getTexts(Locator.css("li.ptid").findElements(getComponentElement()));
+        return getWrapper().getTexts(Locator.css("li.ptid").findElements(getComponentElement()));
     }
 
     public Integer getParticipantCount()
