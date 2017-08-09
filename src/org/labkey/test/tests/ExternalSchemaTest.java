@@ -49,6 +49,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Data.class})
 public class ExternalSchemaTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ExternalSchemaProject";
     private static final String FOLDER_NAME = "SubFolder";
 
@@ -514,7 +515,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Delete", 0);
+            new DataRegionTable("query", getDriver()).clickHeaderButton("Delete");
             assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
         });
     }
