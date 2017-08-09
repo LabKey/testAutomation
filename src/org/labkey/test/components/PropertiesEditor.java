@@ -527,7 +527,7 @@ public class PropertiesEditor extends WebPartPanel
             }
 
             public final Checkbox mvEnabledCheckbox = Checkbox(Locator.tagWithName("input", "mvEnabled")).findWhenNeeded(this);
-            public final EnumSelect<DefaultType> defaultTypeSelect = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), DefaultType.class).findWhenNeeded(this);
+            public final EnumSelect<DefaultType> defaultTypeSelect = EnumSelect(Locator.tagWithName("select", "defaultValue"), DefaultType.class).findWhenNeeded(this);
             public SetDefaultValuesListPage clickSelectDefaultValue()
             {
                 new WebDriverWrapperImpl(getDriver()).clickAndWait(Locator.linkWithText("set value"));
@@ -535,7 +535,7 @@ public class PropertiesEditor extends WebPartPanel
             }
             public final Input importAliasesInput = Input(Locator.id("importAliases"), getDriver()).findWhenNeeded(this);
             public final Checkbox protectedCheckbox = Checkbox(Locator.tagWithName("input", "protected")).findWhenNeeded(this);
-            public final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "gwt-ListBox"), PhiSelectType.class).findWhenNeeded(this);
+            public final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "phiLevel"), PhiSelectType.class).findWhenNeeded(this);
             public final Checkbox excludeFromShiftingCheckbox = Checkbox(Locator.tagWithName("input", "excludeFromShifting")).findWhenNeeded(this);
             public final Checkbox maxTextCheckbox = Checkbox(Locator.tagWithName("input", "isMaxText")).findWhenNeeded(this);
             public final Input maxTextInput = Input(Locator.name("scale"), getDriver()).findWhenNeeded(this);

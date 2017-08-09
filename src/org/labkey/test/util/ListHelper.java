@@ -23,6 +23,7 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -68,6 +69,11 @@ public class ListHelper extends LabKeySiteWrapper
         setFormElement(Locator.id("tsv3"), listData);
         _extHelper.selectComboBoxItem("Format:", "Comma-separated text (csv)");
         submitImportTsv_success();
+    }
+
+    public PropertiesEditor getListFieldEditor()
+    {
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle("List Fields").find();
     }
 
     public void uploadData(String listData)

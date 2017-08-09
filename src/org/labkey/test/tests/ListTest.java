@@ -30,6 +30,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -1060,6 +1061,74 @@ public class ListTest extends BaseWebDriverTest
         assertTrue("Unprotected column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
         assertTrue("Unprotected column attachment should be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
+    }
+
+    @Test
+    public void exportPhiFileColumn() throws Exception
+    {
+        goToProjectHome(PROJECT_VERIFY);
+        String listName = "phiFileColumnList";
+        String notPhiColumn = "NotPhiColumn";
+        String limitedPhiColumn = "LimitedPhiColumn";
+        String phiColumn = "PhiColumn";
+        String restrictedPhiColumn = "RestrictedPhiColumn";
+        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "key",
+                new ListColumn("FileName", "FileName", ListHelper.ListColumnType.String, "name of the file"),
+                new ListColumn("FileExtension", "ext", ListHelper.ListColumnType.String, "the file extension"),
+                new ListColumn(notPhiColumn, "NotPhiFile", Attachment, "the file itself"),
+                new ListColumn(limitedPhiColumn, "LimitedPhiFile", Attachment, "the file itself"),
+                new ListColumn(phiColumn, "PhiFile", Attachment, "the file itself"),
+                new ListColumn(restrictedPhiColumn, "RestrictedFile", Attachment, "the file itself"));
+        _listHelper.clickEditDesign();
+
+        // set phi levels
+        PropertiesEditor listFieldEditor = _listHelper.getListFieldEditor();
+        listFieldEditor.selectField("NotPhiColumn");
+        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.NotPHI);
+        listFieldEditor.selectField("LimitedPhiColumn");
+        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.Limited);
+        listFieldEditor.selectField("PhiColumn");
+        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.PHI);
+        listFieldEditor.selectField("RestrictedPhiColumn");
+        listFieldEditor.fieldProperties().selectAdvancedTab().phi.set(PropertiesEditor.PhiSelectType.Restricted);
+
+        _listHelper.clickSave();
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+
+        // add rows to list
+        Map<String, String> xlsRow = new HashMap<>();
+        xlsRow.put(notPhiColumn, EXCEL_APILIST_FILE.getAbsolutePath());
+        xlsRow.put("FileName", EXCEL_DATA_FILE.getName());
+        xlsRow.put("FileExtension", ".xls");
+        xlsRow.put(limitedPhiColumn, EXCEL_DATA_FILE.getAbsolutePath());
+        _listHelper.insertNewRow(xlsRow, false);
+
+        Map<String, String> tsvRow = new HashMap<>();
+        tsvRow.put(phiColumn, TSV_SAMPLE_FILE.getAbsolutePath());
+        tsvRow.put("FileName", TSV_DATA_FILE.getName());
+        tsvRow.put("FileExtension", ".tsv");
+        tsvRow.put(restrictedPhiColumn, TSV_DATA_FILE.getAbsolutePath());
+        _listHelper.insertNewRow(tsvRow, false);
+
+        // go to admin/folder/management, click 'export'
+        clickAdminMenuItem("Folder", "Management");
+        click(Locator.linkContainingText("Export"));
+        // select 'remove all columns tagged as protected'
+        checkCheckbox(Locator.checkboxByName("removePhi").waitForElement(getDriver(), 2000));
+        setFormElementJS(Locator.input("exportPhiLevel"), "Limited");
+
+        // click 'export', capture the zip archive download
+        File projectZipArchive = clickAndWaitForDownload(Locator.buttonContainingText("Export").waitForElement(getDriver(), 2000));
+
+        assertFalse("Restricted PHI column attachment should not be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_DATA_FILE.getName()));
+        assertFalse("Limited PHI column attachment should not be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_DATA_FILE.getName()));
+        assertTrue("Not PHI column attachment should be included in export",
+                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
+        assertFalse("PHI column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
     }
 
