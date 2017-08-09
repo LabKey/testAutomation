@@ -743,6 +743,10 @@ public class ListHelper extends LabKeySiteWrapper
 
         // click the add field button
         click(addField);
+
+        // if there were no fields before, clicking 'add field' will cause the field-edit form to render.
+        // don't look for the new field index until at least one input row field exists
+        waitForElement(Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]"));
         int newFieldIndex = findNewFieldIndex(prefix);
 
         // set the field values
