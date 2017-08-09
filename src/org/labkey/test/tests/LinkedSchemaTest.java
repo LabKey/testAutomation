@@ -86,6 +86,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Data.class})
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";
@@ -712,7 +713,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             waitForElement(DataRegionTable.Locators.columnHeader("query", name));
         }
 
-        click(Locator.xpath("//a[text()='TargetFolder']"));
+        clickFolder("TargetFolder");
 
     }
 
