@@ -503,6 +503,7 @@ src/org/labkey/test/components/internal/ImpersonateUserWindow.java -text
 src/org/labkey/test/components/internal/ImpersonateWindow.java -text
 src/org/labkey/test/components/labkey/FormItemFinder.java -text
 src/org/labkey/test/components/labkey/GenericFormItem.java -text
+src/org/labkey/test/components/labkey/PortalTab.java -text
 src/org/labkey/test/components/labkey/ReadOnlyFormItem.java -text
 src/org/labkey/test/components/list/ManageListsGrid.java -text
 src/org/labkey/test/components/search/SearchBodyWebPart.java -text
