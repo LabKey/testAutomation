@@ -37,6 +37,7 @@ import static org.junit.Assert.assertNotEquals;
 @Category({DailyB.class})
 public class ProteinExpressionMatrixAssayTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String ASSAY_NAME = "Test Protein Expression Matrix";
     private static final String FOLDER_TYPE_MS2 = "MS2";
     private static final String FOLDER_NAME = "ProteinExpressionMatrixFolder";
