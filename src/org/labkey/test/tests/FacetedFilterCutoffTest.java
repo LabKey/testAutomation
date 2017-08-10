@@ -32,6 +32,7 @@ import java.util.List;
 @Category(DailyA.class)
 public class FacetedFilterCutoffTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final int MAX_FACETS = 250;
     private static final String LIST_NAME = "LongTestList";
     private static final String OVER_CUTOFF = "TooMany";
