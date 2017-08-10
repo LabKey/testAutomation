@@ -1062,6 +1062,10 @@ public class ListTest extends BaseWebDriverTest
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
         assertTrue("Unprotected column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.deleteList();
     }
 
     @Test
@@ -1130,6 +1134,10 @@ public class ListTest extends BaseWebDriverTest
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
         assertFalse("PHI column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
+
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText(listName));
+        _listHelper.deleteList();
     }
 
     @Test
