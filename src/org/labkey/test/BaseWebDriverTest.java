@@ -1327,35 +1327,20 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickButton("Export to Text");
     }
 
-    protected void selectSecurityGroupsExport()
-    {
-        Locator checkbox = Locator.checkboxByNameAndValue("types", "Project-level groups and members");
-        waitForElement(checkbox);
-        checkCheckbox(checkbox);
-    }
-
-    protected void selectRoleAssignmentsExport()
-    {
-        Locator checkbox = Locator.checkboxByNameAndValue("types", "Role assignments for users and groups");
-        waitForElement(checkbox);
-        checkCheckbox(checkbox);
-    }
-
     @LogMethod
     protected void prepareForFolderExport(@Nullable String folderName, boolean exportSecurityGroups, boolean exportRoleAssignments, boolean includeSubfolders, int locationIndex)
     {
-
         if (folderName != null)
             clickFolder(folderName);
         goToFolderManagement().goToExportPane();
         waitForElement(Locator.name("location"));
 
         if (exportSecurityGroups)
-            selectSecurityGroupsExport();
+            checkCheckbox(waitForElement(Locator.checkboxByNameAndValue("types", "Project-level groups and members")));
         if (exportRoleAssignments)
-            selectRoleAssignmentsExport();
+            checkCheckbox(waitForElement(Locator.checkboxByNameAndValue("types", "Role assignments for users and groups")));
         if (includeSubfolders)
-            click(Locator.name("includeSubfolders"));
+            checkCheckbox(waitForElement(Locator.name("includeSubfolders")));
         checkRadioButton(Locator.name("location").index(locationIndex)); // first locator with this name is "Pipeline root export directory, as individual files
     }
 
