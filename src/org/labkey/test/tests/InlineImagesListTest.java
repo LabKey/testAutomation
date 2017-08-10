@@ -49,6 +49,7 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class InlineImagesListTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected final static String LIST_NAME = "InlineImagesList";
     protected final static String LIST_KEY_NAME = "Key";
     protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
@@ -145,7 +146,8 @@ public class InlineImagesListTest extends BaseWebDriverTest
 
         Map<String, String> newValues = new HashMap<>();
 
-        clickAndWait(Locator.bodyLinkContainingText(LIST_NAME));
+        list=new DataRegionTable("query", getDriver());
+        clickAndWait(Locator.linkWithText(LIST_NAME).waitForElement(list.getComponentElement(), WAIT_FOR_JAVASCRIPT));
 
         log("Add a \"large\" png as an attachment.");
         newValues.put(LIST_KEY_NAME, "1");

@@ -47,6 +47,7 @@ import static org.junit.Assert.assertTrue;
 @Category(DailyB.class)
 public class InlineImagesAssayTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected DataRegionTable dataRegion;
 
     protected final static File XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
@@ -151,11 +152,11 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Set the 'File' column on the runs.");
 
         clickAndWait(Locator.linkWithText("view runs"));
-        clickAndWait(Locator.linkWithText("edit"));
+        new DataRegionTable("Runs", getDriver()).clickEditRow(0);
 
         setFormElement(Locator.name("quf_RunFileField"), PNG01_FILE);
         clickButton("Submit");
-        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been renedered.
+        waitForElement(DataRegionTable.updateLinkLocator()); // Wait to make sure the grid has been renedered.
 
         log("Verify inline image is present as expected.");
         assertElementPresent("Did not find expected inline image for " + PNG01_FILE.getName() + " in grid.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 1);
@@ -177,12 +178,12 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assertElementPresent("Did not find the expected number of icons for images for " + LRG_PNG_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + LRG_PNG_FILE.getName() + "')]"), 1);
 
         log("Add the image to one of the result's 'File' column.");
-        List<WebElement> editLinks = Locator.linkWithText("edit").findElements(getDriver());
+        List<WebElement> editLinks = DataRegionTable.updateLinkLocator().findElements(getDriver());
         clickAndWait(editLinks.get(2));
 
         setFormElement(Locator.name("quf_DataFileField"), HELP_JPG_FILE);
         clickButton("Submit");
-        waitForElement(Locator.linkWithText("edit")); // Wait to make sure the grid has been rendered.
+        waitForElement(DataRegionTable.updateLinkLocator()); // Wait to make sure the grid has been rendered.
 
         log("Validate that two links to this image file are now present.");
         assertElementPresent("Did not find the expected number of icons for images for " + PNG01_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + PNG01_FILE.getName() + "')]"), 3);

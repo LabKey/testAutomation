@@ -111,7 +111,7 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
     {
         if (!isPanelExpanded())
         {
-            getWrapper().doAndWaitForPageSignal(() -> _drt.clickHeaderButtonByText(getMainButtonText()), DataRegionTable.PANEL_SHOW_SIGNAL);
+            getWrapper().doAndWaitForPageSignal(() -> _drt.clickHeaderButton(getMainButtonText()), DataRegionTable.PANEL_SHOW_SIGNAL);
         }
         return this;
     }
