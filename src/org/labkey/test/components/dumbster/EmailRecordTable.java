@@ -57,12 +57,12 @@ public class EmailRecordTable extends Table
 
     public void startRecording()
     {
-        _driver.checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
+        getWrapper().checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     public void stopRecording()
     {
-        _driver.uncheckCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
+        getWrapper().uncheckCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     /**
@@ -71,12 +71,12 @@ public class EmailRecordTable extends Table
      */
     public void clickSubject(String subject)
     {
-        _driver.click(Locator.linkWithText(subject));
+        getWrapper().click(Locator.linkWithText(subject));
     }
 
     public void clickSubjectAtIndex(String subject, int index)
     {
-        _driver.click(Locator.linkWithText(subject).index(index));
+        getWrapper().click(Locator.linkWithText(subject).index(index));
     }
 
     public void clickSubjectTo(String subject, List<String> recipient)
@@ -96,10 +96,10 @@ public class EmailRecordTable extends Table
                     if(getDataAsText(i, colMsg).contains(subject)){clickSubjectAtIndex(subject, i); return;}
                 }
             }
-            _driver.log("unable to find message with subject " + subject + "addressed to recipient " + recipient);
+            getWrapper().log("unable to find message with subject " + subject + "addressed to recipient " + recipient);
             return;
         }
-        _driver.log("no rows in mail record table");
+        getWrapper().log("no rows in mail record table");
     }
 
     public void clickMessage(EmailMessage message)
