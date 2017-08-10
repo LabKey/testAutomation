@@ -735,24 +735,8 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
-        String prefix = getPropertyXPath(areaTitle);
-        Locator addField = Locator.xpath(prefix + "//span" + Locator.lkButton("Add Field").getPath());
-        waitForElement(addField);
-
-        clickLastFieldIfExists(prefix);
-
-        // click the add field button
-        click(addField);
-
-        // if there were no fields before, clicking 'add field' will cause the field-edit form to render.
-        // don't look for the new field index until at least one input row field exists
-        waitForElement(Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]"));
-        int newFieldIndex = findNewFieldIndex(prefix);
-
-        // set the field values
-        setColumnName(prefix, newFieldIndex, name);
-        setColumnLabel(prefix, newFieldIndex, label);
-        setColumnType(prefix, newFieldIndex, type);
+        PropertiesEditor propertiesEditor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle(areaTitle).find();
+        propertiesEditor.addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
     /*
