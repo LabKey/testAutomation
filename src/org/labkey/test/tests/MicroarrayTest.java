@@ -250,7 +250,7 @@ public class MicroarrayTest extends BaseWebDriverTest
 
         log("Test assay view");
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
-        assertTextPresent(ASSAY_NAME + " Protocol");
+        waitForText(ASSAY_NAME + " Protocol"); // Protocol parameters: XarTemplate.ApplicationName
         goToDashboard();
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
