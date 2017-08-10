@@ -1679,15 +1679,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         _userHelper.deleteUsers(failIfNotFound, userEmails);
     }
 
-    public void assertUserExists(String email)
-    {
-        log("asserting that user " + email + " exists...");
-        ensureAdminMode();
-        goToSiteUsers();
-        assertTextPresent(email);
-        log("user " + email + " exists.");
-    }
-
     /**
      * Used by CohortTest and StudyCohortExportTest
      * Returns the data region for the the cohort table to enable setting

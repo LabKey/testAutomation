@@ -25,6 +25,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -300,6 +301,19 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertEquals("Too many rows when maxrows=0", 0, resp.getRows().size());
 
         log("Completed test of maxrows=0");
+    }
+
+    public void assertUserExists(String email)
+    {
+        log("asserting that user " + email + " exists...");
+        Integer userId = new APIUserHelper(this).getUserId(email);
+        if (userId == null || userId < 1)
+        {
+            // Go to site users page for better failure screenshot
+            goToSiteUsers();
+            assertTextPresent(email);
+        }
+        log("user " + email + " exists.");
     }
 
     @Override
