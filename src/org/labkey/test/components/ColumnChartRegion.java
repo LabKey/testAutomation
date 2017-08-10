@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 public class ColumnChartRegion//<EC extends Component.ElementCache> extends Component<EC>
 {
@@ -84,14 +85,22 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
         return _dataRegionTable.findElements(Locator.tagWithText("span", "This grid view has been modified.")).size() > 0;
     }
 
-    public void revertView()
+    public void revertView()    // TODO: implement 'revert view' on dataRegion
     {
-        WebElement revertButton = _dataRegionTable.findElement(By.cssSelector(" span.unsavedview-revert"));
-        if(!revertButton.isDisplayed())
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            _driver.mouseOver(_dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-customizeview")));
+            _dataRegionTable.openCustomizeGrid();
+            _driver.clickButton("Revert");
         }
-        revertButton.click();
+        else
+        {
+            WebElement revertButton = _dataRegionTable.findElement(By.cssSelector(" span.unsavedview-revert"));
+            if (!revertButton.isDisplayed())
+            {
+                _driver.mouseOver(_dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-customizeview")));
+            }
+            revertButton.click();
+        }
     }
 
     public void saveView(boolean makeDefault, @Nullable String name, boolean availableToAll)

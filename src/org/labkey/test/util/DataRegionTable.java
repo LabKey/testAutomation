@@ -1257,9 +1257,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void clickColumnMenu(String columnName, boolean pageLoad, String... menuItems)
     {
         final WebElement menu = elements().getColumnHeader(columnName);
+        _driver.scrollIntoView(menu);   // some columns will be scrolled out of view;
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), menu).clickMenuButton(pageLoad, false, menuItems);
+            new BootstrapMenu(getDriver(), menu).clickSubMenu(pageLoad,  menuItems);
         }
         else
         {
@@ -1534,15 +1535,27 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public boolean columnHasChartOption(String columnName, String chartType)
     {
-        WebElement menu = elements().getColumnHeader(columnName);
-        List<String> items = getWrapper().getTexts(_driver._ext4Helper.getMenuItems(menu));
-        for (String item : items)
+        if (IS_BOOTSTRAP_LAYOUT)
         {
-            if (item.toLowerCase().contains(chartType.toLowerCase())) {
-                return true;
-            }
+            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
+            menu.expand();
+            return menu.findVisibleMenuItems()
+                    .stream()
+                    .anyMatch((m)-> m.getText().equalsIgnoreCase(chartType));
         }
-        return false;
+        else
+        {
+            WebElement menu = elements().getColumnHeader(columnName);
+            List<String> items = getWrapper().getTexts(_driver._ext4Helper.getMenuItems(menu));
+            for (String item : items)
+            {
+                if (item.toLowerCase().contains(chartType.toLowerCase()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     @Deprecated // use clickInsertNewRow()
