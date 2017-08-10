@@ -38,6 +38,7 @@ import java.util.List;
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     @BeforeClass
     public static void beforeTestClass()
     {
@@ -165,7 +166,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteListData(1);
 
         log("Test separate MVIndicator column");
-        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
+        DataRegionTable.findDataRegion(this).clickImportBulkData();
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
         assertLabKeyErrorPresent();
@@ -177,10 +178,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void deleteListData(int rowCount)
     {
+        DataRegionTable dt = new DataRegionTable("query", getDriver());
         checkCheckbox(Locator.checkboxByName(".toggle"));
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Delete", 0);
+            dt.clickHeaderButton("Delete");
             assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
         });
     }
@@ -237,7 +239,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
         clickButton("View Data");
-        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
+        DataRegionTable.findDataRegion(this).clickImportBulkData();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error(null);
@@ -249,7 +251,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(3);
 
         log("Test inserting a single row");
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_ParticipantId"), "Sid");
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        setFormElement(Locator.name("quf_ParticipantId"), "Sid");
         setFormElement(Locator.name("quf_SequenceNum"), "1");
         selectOptionByValue(Locator.name("quf_AgeMVIndicator"), "Z");
         setFormElement(Locator.name("quf_Sex"), "male");
@@ -260,7 +263,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
-        DataRegionTable.findDataRegion(this).clickImportBulkDataDropdown();
+        DataRegionTable.findDataRegion(this).clickImportBulkData();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
@@ -269,7 +272,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("Dataset", "ParticipantId");
 
         log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
+        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
         Assert.assertEquals("There should not be a devault missing value indicator selection", "", getSelectedOptionText(mvSeletor));
         String mvSelection = "Z";
         selectOptionByValue(mvSeletor, mvSelection);
@@ -434,7 +438,9 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void assertMvIndicatorPresent()
     {
-        // We'd better have some 
+        // We'd better have some
+        Locator loc = Locator.xpath("//img[@class='labkey-mv-indicator']");
+        waitForElement(loc);
         assertElementPresent(Locator.xpath("//img[@class='labkey-mv-indicator']"));
     }
 
@@ -474,7 +480,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByName(".toggle"));
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Delete", 0);
+            new DataRegionTable("Dataset", getDriver()).clickHeaderButton("Delete");
             assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
         });
     }

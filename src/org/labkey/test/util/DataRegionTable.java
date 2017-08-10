@@ -1505,7 +1505,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
-                    .clickMenuButton(wait, false, subMenuLabels);
+                    .clickSubMenu(wait,  subMenuLabels);
         }
         else
         {
