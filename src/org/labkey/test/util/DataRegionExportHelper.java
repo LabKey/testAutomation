@@ -18,8 +18,6 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
-import org.labkey.test.selenium.EphemeralWebElement;
-import org.labkey.test.selenium.LazyWebElement;
 
 import java.io.File;
 import java.util.function.Consumer;
@@ -28,7 +26,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 {
     public DataRegionExportHelper(DataRegionTable drt)
     {
-        super(drt, Locator.name("Export-panel"));
+        super(drt);
     }
 
     public File exportExcel(ExcelFileType type)
@@ -38,8 +36,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 
     public File exportExcel(ColumnHeaderType exportHeaderType, ExcelFileType type, @Nullable Boolean exportSelected)
     {
-        exportOrSignExcel(exportHeaderType, type, exportSelected);
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getActionButtonText()).index(0), _expectedFileCount)[0];
+        return getWrapper().doAndWaitForDownload(() -> startExcelExport(exportHeaderType, type, exportSelected), getExpectedFileCount())[0];
     }
 
     public File exportText()
@@ -59,8 +56,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 
     public File exportText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
-        exportOrSignText(exportHeaderType, delim, quote, exportSelected);
-        return getWrapper().clickAndWaitForDownload(Locator.lkButton(getActionButtonText()).index(1), _expectedFileCount)[0];
+        return getWrapper().doAndWaitForDownload(() -> startTextExport(exportHeaderType, delim, quote, exportSelected), getExpectedFileCount())[0];
     }
 
     public String exportScript(ScriptExportType type)
@@ -87,7 +83,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
 
     public AbstractDataRegionExportOrSignHelper expandExportPanel()
     {
-        return expandExportOrSignPanel();
+        return expandPanel();
     }
 
     public enum ScriptExportType
@@ -111,23 +107,5 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         {
             return fileTypeRadio;
         }
-    }
-
-    @Override
-    protected Elements newElementCache()
-    {
-        Elements elements = new Elements();
-        elements.navTabs = new LazyWebElement(Locator.css("ul.nav-tabs"), this);
-        elements.excelTab = new LazyWebElement(Locator.linkWithText("Excel"), elements.navTabs);
-        elements.textTab = new LazyWebElement(Locator.linkWithText("Text"), elements.navTabs);
-        elements.scriptTab = new LazyWebElement(Locator.linkWithText("Script"), elements.navTabs);
-        elements.exportSelectedCheckbox = new EphemeralWebElement(Locator.css("div.tab-pane.active input[value=exportSelected]"), this);
-        return elements;
-    }
-
-    @Override
-    protected String getActionButtonText()
-    {
-        return "Export";
     }
 }

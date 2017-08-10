@@ -5,52 +5,49 @@ import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
+import org.labkey.test.components.html.Checkbox;
+import org.labkey.test.components.html.EnumSelect;
+import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-/**
- * Created by davebradlee on 7/24/17.
- */
-public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDataRegionExportOrSignHelper.Elements> extends WebDriverComponent<EC>
-{
-    protected final WebElement _panelEl;
-    protected final DataRegionTable _drt;
-    protected int _expectedFileCount;
+import static org.labkey.test.components.html.EnumSelect.EnumSelect;
 
-    public AbstractDataRegionExportOrSignHelper(DataRegionTable drt, Locator locator)
+public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComponent<AbstractDataRegionExportOrSignHelper.Elements>
+{
+    private final WebElement _panelEl;
+    private final DataRegionTable _drt;
+    private int _expectedFileCount;
+
+    public AbstractDataRegionExportOrSignHelper(DataRegionTable drt)
     {
-        _panelEl = new RefindingWebElement(locator, drt.getComponentElement())
+        _panelEl = new RefindingWebElement(getPanelLocator(), drt.getComponentElement())
                 .withRefindListener(el -> clearElementCache());
         _drt = drt;
         _expectedFileCount = 1;
     }
 
-    protected abstract String getActionButtonText();
-    protected String getMainButtonText()
+    protected String getShowPanelButtonText()
     {
         return "Export";
     }
-    protected String getXlsHeaderTypeName()
+
+    protected Locator getPanelLocator()
     {
-        return "xls_header_type";
+        return Locator.name("Export-panel");
     }
-    protected String getTextHeaderTypeName()
+
+    protected String getExcelActionButtonText()
     {
-        return "txt_header_type";
+        return "Export";
     }
-    protected String getXlsFileTypeRadioName()
+
+    protected String getTextActionButtonText()
     {
-        return "excelExportType";
-    }
-    protected String getDelimName()
-    {
-        return "delim";
-    }
-    protected String getQuoteName()
-    {
-        return "quote";
+        return "Export";
     }
 
     @Override
@@ -65,9 +62,15 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
         return _drt.getDriver();
     }
 
-    public void setExpectedFileCount(int count)
+    protected int getExpectedFileCount()
+    {
+        return _expectedFileCount;
+    }
+
+    public AbstractDataRegionExportOrSignHelper setExpectedFileCount(int count)
     {
         _expectedFileCount = count;
+        return this;
     }
 
     protected boolean isPanelExpanded()
@@ -87,41 +90,36 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
         return _drt;
     }
 
-    public void exportOrSignExcel(ColumnHeaderType exportHeaderType, DataRegionExportHelper.ExcelFileType type, @Nullable Boolean exportSelected)
+    protected void startExcelExport(ColumnHeaderType exportHeaderType, DataRegionExportHelper.ExcelFileType type, @Nullable Boolean exportSelected)
     {
-        expandExportOrSignPanel();
+        expandPanel();
         elementCache().excelTab.click();
-        if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        getWrapper().checkRadioButton(type.getRadioLocator(getXlsFileTypeRadioName()));
-        getWrapper().selectOptionByValue(Locator.name(getXlsHeaderTypeName()), exportHeaderType.name());
-        getWrapper().scrollIntoView(Locator.lkButton(getActionButtonText()));
+        if (exportSelected != null)
+            elementCache().exportSelectedCheckbox().set(exportSelected);
+        elementCache().findExcelFileTypeRadio(type).check();
+        elementCache().excelFileTypeSelect.set(exportHeaderType);
+        elementCache().findExportButton(getExcelActionButtonText()).click();
     }
 
-    public void exportOrSignText(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
+    protected void startTextExport(ColumnHeaderType exportHeaderType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected)
     {
-        expandExportOrSignPanel();
+        expandPanel();
         elementCache().textTab.click();
-        if (exportSelected != null) chooseExportSelectedRows(exportSelected);
-        getWrapper().selectOptionByValue(Locator.name(getDelimName()), delim.toString());
-        getWrapper().selectOptionByValue(Locator.name(getQuoteName()), quote.toString());
-        getWrapper().selectOptionByValue(Locator.name(getTextHeaderTypeName()), exportHeaderType.name());
+        if (exportSelected != null)
+            elementCache().exportSelectedCheckbox().set(exportSelected);
+        elementCache().delimiterSelect.set(delim);
+        elementCache().quoteSelect.set(quote);
+        elementCache().columnHeaderSelect.set(exportHeaderType);
+        elementCache().findExportButton(getTextActionButtonText()).click();
     }
 
-    public AbstractDataRegionExportOrSignHelper expandExportOrSignPanel()
+    public AbstractDataRegionExportOrSignHelper expandPanel()
     {
         if (!isPanelExpanded())
         {
-            getWrapper().doAndWaitForPageSignal(() -> _drt.clickHeaderButton(getMainButtonText()), DataRegionTable.PANEL_SHOW_SIGNAL);
+            getWrapper().doAndWaitForPageSignal(() -> getDataRegionTable().clickHeaderButton(getShowPanelButtonText()), DataRegionTable.PANEL_SHOW_SIGNAL);
         }
         return this;
-    }
-
-    protected void chooseExportSelectedRows(boolean exportSelected)
-    {
-        if (exportSelected)
-            getWrapper().checkCheckbox(elementCache().exportSelectedCheckbox);
-        else
-            getWrapper().uncheckCheckbox(elementCache().exportSelectedCheckbox);
     }
 
     public enum ExcelFileType
@@ -137,9 +135,9 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
             _radioIndex = radioIndex;
         }
 
-        public Locator getRadioLocator(String fileTypeRadio)
+        public Locator getRadioLocator()
         {
-            return Locator.radioButtonByName(fileTypeRadio).index(_radioIndex);
+            return Locator.radioButtonByName("excelExportType").index(_radioIndex);
         }
 
         public String getFileExtension()
@@ -174,17 +172,41 @@ public abstract class AbstractDataRegionExportOrSignHelper<EC extends AbstractDa
         SINGLE
     }
 
-    protected EC elementCache()
+    protected Elements newElementCache()
     {
-        return super.elementCache();
+        return new Elements();
     }
 
     protected class Elements extends Component.ElementCache
     {
-        public WebElement navTabs;
-        public WebElement excelTab;
-        public WebElement textTab;
-        public WebElement scriptTab;
-        public WebElement exportSelectedCheckbox;
+        protected final WebElement navTabs = new LazyWebElement(Locator.css("ul.nav-tabs"), this);
+        protected final WebElement excelTab = new LazyWebElement(Locator.linkWithText("Excel"), navTabs);
+        protected RadioButton findExcelFileTypeRadio(ExcelFileType type)
+        {
+            return new RadioButton(type.getRadioLocator().findElement(this));
+        }
+        protected EnumSelect<ColumnHeaderType> excelFileTypeSelect = EnumSelect(Locator.name("xls_header_type"), ColumnHeaderType.class).findWhenNeeded(this);
+
+        protected final WebElement textTab = new LazyWebElement(Locator.linkWithText("Text"), navTabs);
+        protected EnumSelect<TextSeparator> delimiterSelect = EnumSelect(Locator.name("delim"), TextSeparator.class).findWhenNeeded(this);
+        protected EnumSelect<TextQuote> quoteSelect = EnumSelect(Locator.name("quote"), TextQuote.class).findWhenNeeded(this);
+        protected EnumSelect<ColumnHeaderType> columnHeaderSelect = EnumSelect(Locator.name("txt_header_type"), ColumnHeaderType.class).findWhenNeeded(this);
+
+        protected final WebElement scriptTab = new LazyWebElement(Locator.linkWithText("Script"), navTabs);
+
+        private WebElement findActiveTab()
+        {
+            return Locator.css("div.tab-pane.active").findElement(this);
+        }
+
+        Checkbox exportSelectedCheckbox()
+        {
+            return new Checkbox(Locator.css("input[value=exportSelected]").findElement(findActiveTab()));
+        }
+
+        protected WebElement findExportButton(String buttonText)
+        {
+            return Locator.lkButton(buttonText).findElement(findActiveTab());
+        }
     }
 }
