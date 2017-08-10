@@ -527,22 +527,22 @@ public class PortalHelper extends WebDriverWrapper
     {
         public static Locator.XPathLocator webPartTitle()
         {
-            return webPart().append(webPartTitleContainer());
+            return webPart().child(webPartTitleContainer());
         }
 
         public static Locator.XPathLocator webPartTitle(String title)
         {
-            return webPart().append(webPartTitleContainer().withText(title));
+            return webPart().child(webPartTitleContainer().withText(title));
         }
 
         public static Locator.XPathLocator webPart(String title)
         {
-            return webPart().withPredicate(webPartTitleContainer().withAttribute("title", title));
+            return webPart().withChild(webPartTitleContainer().withAttribute("title", title));
         }
 
         public static Locator.XPathLocator webPartWithTitleContaining(String partialTitle)
         {
-            return webPart().withPredicate(webPartTitleContainer().withAttributeContaining("title", partialTitle));
+            return webPart().withChild(webPartTitleContainer().withAttributeContaining("title", partialTitle));
         }
 
         public static Locator.CssLocator activeTab()
@@ -555,8 +555,8 @@ public class PortalHelper extends WebDriverWrapper
         private static Locator.XPathLocator webPartTitleContainer()
         {
             return IS_BOOTSTRAP_LAYOUT ?
-                    Locator.tagWithClass("*", "panel-title") :
-                    Locator.tagWithClass("th", "labkey-wp-title-left");
+                    Locator.xpath("div/div/*").withClass("panel-title") :
+                    Locator.xpath("tbody/tr/th").withClass("labkey-wp-title-left");
         }
 
         public static Locator.XPathLocator webPart()

@@ -16,13 +16,8 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.FluentWait;
-
-import java.util.concurrent.TimeUnit;
 
 public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 {
@@ -50,9 +45,7 @@ public class  BodyWebPart<EC extends WebPart.ElementCache> extends WebPart<EC>
 
     static public WebElement find(WebDriver driver, String title, int index)
     {
-        return Locator.waitForAnyElement(new FluentWait<SearchContext>(driver).withTimeout(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS),
-                webPartLoc().withDescendant(leftTitleLoc().withAttribute("title", title)).index(index),
-                webPartLoc().withDescendant(Locator.tag("tbody/tr/th").withAttribute("title", title).index(index)));
+        return webPartLoc(title).index(index).waitForElement(driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @Deprecated

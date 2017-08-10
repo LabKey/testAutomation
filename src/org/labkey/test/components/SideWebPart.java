@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -30,7 +31,7 @@ public class SideWebPart extends WebPart
 
     public SideWebPart(WebDriver test, String title, int index)
     {
-        this(test, locator().withDescendant(leftTitleLoc().withText(title)).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
+        this(test, locator(title).index(index).waitForElement(test, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT));
         _title = title;
     }
 
@@ -49,6 +50,17 @@ public class SideWebPart extends WebPart
 
     private static Locator.XPathLocator locator()
     {
-        return Locator.tagWithClass("*", "labkey-side-panel").child(webPartLoc());
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return webPartLoc();
+        else
+            return Locator.tagWithClass("*", "labkey-side-panel").child(webPartLoc());
+    }
+
+    private static Locator.XPathLocator locator(String title)
+    {
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            return webPartLoc(title);
+        else
+            return Locator.tagWithClass("*", "labkey-side-panel").child(webPartLoc(title));
     }
 }

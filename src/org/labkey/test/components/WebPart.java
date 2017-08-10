@@ -199,12 +199,23 @@ public abstract class WebPart<EC extends WebPart.ElementCache> extends WebDriver
     {
     }
 
-    protected static Locator.XPathLocator leftTitleLoc()
+    private static Locator.XPathLocator leftTitleLoc(String title)
+    {
+        return leftTitleLoc().withAttribute("title", title);
+    }
+
+    private static Locator.XPathLocator leftTitleLoc()
     {
         return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.xpath("//h3[./a[ ./span[@class='labkey-wp-title-text']]]") :
-                Locator.tag("tbody/tr/th");
+                Locator.xpath("div/div/*").withClass("panel-title") :
+                Locator.xpath("tbody/tr/th").withClass("labkey-wp-title-left");
     }
+
+    protected static Locator.XPathLocator webPartLoc(String title)
+    {
+        return webPartLoc().withDescendant(leftTitleLoc(title));
+    }
+
     protected static Locator.XPathLocator webPartLoc()
     {
         return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
