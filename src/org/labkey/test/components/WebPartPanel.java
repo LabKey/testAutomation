@@ -15,7 +15,6 @@
  */
 package org.labkey.test.components;
 
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -63,6 +62,16 @@ public class WebPartPanel extends WebDriverComponent
         public WebPartFinder(WebDriver driver)
         {
             super(driver);
+        }
+
+        public String getTitle()
+        {
+            return _title;
+        }
+
+        public boolean isPartialTitle()
+        {
+            return _partialTitle;
         }
 
         public F withTitle(String title)
