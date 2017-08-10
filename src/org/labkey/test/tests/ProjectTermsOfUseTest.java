@@ -91,12 +91,16 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 
         log("Attempt to bypass terms with saved URLs");
         popLocation();
+        waitForText(PROJECT_TERMS_SNIPPET);
         assertTextPresent(PROJECT_TERMS_SNIPPET); // PROJECT_NAME
         popLocation();
+        waitForText(PROJECT_TERMS_SNIPPET);
         assertTextPresent(PROJECT_TERMS_SNIPPET); // PUBLIC_TERMS_PROJECT_NAME
         popLocation();
+        waitForText(PROJECT_TERMS_SNIPPET);
         assertTextPresent(PROJECT_TERMS_SNIPPET); // NON_PUBLIC_TERMS_PROJECT_NAME
         popLocation();
+        waitForText(PROJECT_TERMS_SNIPPET);
         assertTextPresent(PROJECT_TERMS_SNIPPET); // NON_PUBLIC_TERMS_PROJECT_NAME/subfolder
 
         goToHome();
