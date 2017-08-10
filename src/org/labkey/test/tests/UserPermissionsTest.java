@@ -232,8 +232,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickProject(PERM_PROJECT_NAME);
         openFolderMenu();
         ProjectMenu projectMenu = new ProjectMenu(getDriver());
-        assertTrue(projectMenu.projectLinkExists(GAMMA_SUB_FOLDER_NAME));
-        assertFalse(projectMenu.projectLinkExists(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
+        assertTrue(projectMenu.folderLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
+        assertFalse(projectMenu.folderLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
         assertEquals("Only one project should be visible while impersonating", 1, projectMenu.projectMenuLinks().size());
 
