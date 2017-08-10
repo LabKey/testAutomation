@@ -39,6 +39,7 @@ import java.util.Map;
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(false);} // TODO: whitelist after issue #31171 is addressed
     public static final String DATA_SOURCE_1 = "Physical Exam";
     public static final List<String> DATA_SOURCE_1_COLNAMES = Arrays.asList(
         "ParticipantId", "date", "Weight_kg", "Temp_C",
@@ -572,7 +573,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(dataSource));
         click(Locator.linkWithText(dataSource));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.clickHeaderMenu("Grid Views", viewName);
+        drt.goToView( viewName);
     }
 
     private void validateSavedViewColumnCharts(List<Map<String, String>> columnChartProps)
