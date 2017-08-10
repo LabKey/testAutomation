@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 @Category({DailyB.class, Flow.class})
 public class FlowAnalysisResolverTest extends BaseFlowTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private final String FCS_FILE = "118795.fcs";
 
     @Before
@@ -40,7 +41,7 @@ public class FlowAnalysisResolverTest extends BaseFlowTest
     public void _doTestSteps()
     {
         //import set 1
-        click(Locator.linkWithText("FlowAnalysisResolverTest"));
+        clickFolder("FlowAnalysisResolverTest");
         importFCSFiles();
 
         //import set 2

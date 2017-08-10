@@ -861,6 +861,26 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         clickEditRow(getRowIndex(key));
     }
 
+    public void clickRowDetails(int rowIndex)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            WebElement updateLink = detailsLink(rowIndex);     // see if mousing over the link gets automation past the idea it's not clickable in the new UI
+            _driver.fireEvent(updateLink, WebDriverWrapper.SeleniumEvent.mouseover);
+            _driver.clickAndWait(detailsLink(rowIndex));
+        }
+        else
+        {
+            _driver.clickAndWait(detailsLink(rowIndex));
+        }
+    }
+
+    public void clickRowDetails(String key)
+    {
+        clickRowDetails(getRowIndex(key));
+    }
+
+
     protected void setRowData(Map<String, String> data, boolean validateText)
     {
         for (String key : data.keySet())

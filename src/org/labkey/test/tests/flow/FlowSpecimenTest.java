@@ -34,6 +34,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Flow.class})
 public class FlowSpecimenTest extends BaseFlowTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String STUDY_FOLDER = "KoStudy";
 
     public static final String PTID = "P5216";
@@ -106,7 +107,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         beginAt("/flow-run/" + getContainerPath() + "/showRuns.view");
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals(STUDY_FOLDER + " Study", table.getDataAsText(0, "Target Study"));
-        clickAndWait(Locator.linkWithText("details"));
+        table.clickRowDetails(0);
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER + " Study"));
 
         log("** Set ICS protocol metadata");

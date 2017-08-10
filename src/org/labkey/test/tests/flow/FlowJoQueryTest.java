@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Flow.class})
 public class FlowJoQueryTest extends BaseFlowTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
+    {setIsBootstrapWhitelisted(true);}
 
     @Test
     public void _doTestSteps()
