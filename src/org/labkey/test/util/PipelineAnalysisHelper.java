@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.openqa.selenium.WebElement;
@@ -127,7 +128,10 @@ public class PipelineAnalysisHelper
         // Go to the run details graph page
         PipelineStatusTable jobStatus = new PipelineStatusTable(_test);
         jobStatus.clickStatusLink(0);
-        _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            _test.assertElementContains(Locator.xpath("//div/label[contains(text(), 'Status')]/../div/p"), "COMPLETE");
+        else
+            _test.assertElementContains(Locator.xpath("//tr/td[contains(text(), 'Status')]/../td[2]"), "COMPLETE");
 
         if (runName != null)
         {

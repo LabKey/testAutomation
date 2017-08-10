@@ -48,6 +48,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Assays.class})
 public class ExpressionMatrixAssayTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PIPELINE_NAME = "create-matrix";
     private static final String SAMPLE_SET = "ExpressionMatrix SampleSet";
     private static final String ASSAY_NAME = "Test Expression Matrix";
