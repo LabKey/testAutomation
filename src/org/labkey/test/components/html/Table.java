@@ -18,36 +18,30 @@ package org.labkey.test.components.html;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.WebDriverWrapperImpl;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.ComponentElements;
+import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by RyanS on 3/8/2016.
- */
-public class Table extends Component
+public class Table extends WebDriverComponent<Table.Elements>
 {
-    protected WebDriverWrapper _driver;
-    protected WebElement _componentElement;
-    protected Elements _elements;
+    private final WebDriver _driver;
+    private final WebElement _componentElement;
 
     public Table(WebDriver driver, WebElement componentElement)
     {
-        this(new WebDriverWrapperImpl(driver), componentElement);
-    }
-
-    public Table(WebDriverWrapper driver, WebElement componentElement)
-    {
         _componentElement = componentElement;
         _driver = driver;
+    }
+
+    public Table(WebDriverWrapper driverWrapper, WebElement componentElement)
+    {
+        this(driverWrapper.getDriver(), componentElement);
     }
 
     @Override
@@ -56,40 +50,33 @@ public class Table extends Component
         return _componentElement;
     }
 
-    protected Elements elements()
+    @Override
+    protected WebDriver getDriver()
     {
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return _driver;
     }
 
-    protected class Elements extends ComponentElements
+    @Override
+    protected Elements newElementCache()
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
+        return new Elements();
+    }
 
+    protected class Elements extends Component.ElementCache
+    {
         List<WebElement> rows;
 
         public List<WebElement> getRows()
         {
             if (rows == null)
-                rows = Locator.css("tr").findElements(this);
+                rows = Locator.xpath("./tbody/tr").findElements(this);
             return rows;
         }
     }
 
-    public String getTableId()
-    {
-        return getComponentElement().getAttribute("id");
-    }
-
     public int getRowCount()
     {
-        //return _driver.getTableRowCount(getTableId());
-        return getComponentElement().findElements(By.xpath("./tbody/tr")).size();
+        return elementCache().getRows().size();
     }
 
     public List<String> getColumnHeaders(int headerRow)
