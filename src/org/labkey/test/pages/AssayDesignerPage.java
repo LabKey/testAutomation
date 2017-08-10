@@ -224,7 +224,7 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
         inputBoxes = Locator.xpath(xpathSection + "input[contains(@id, '-input') and starts-with(@id, 'name') and contains(@value, '')]").findElements(getDriver());
         for (WebElement we : inputBoxes)
         {
-            if(we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
+            if (we.getAttribute("value").trim().toLowerCase().equals(name.trim().toLowerCase()))
             {
                 theBox = we;
                 break;

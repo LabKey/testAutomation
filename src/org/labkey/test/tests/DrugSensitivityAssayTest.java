@@ -23,12 +23,12 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -79,28 +79,19 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         click(Locator.radioButtonById("dateTimepointType"));
         clickButton("Create Study");
 
-        clickProject(getProjectName());
+        goToProjectHome();
         portalHelper.addWebPart("Assay List");
         createTemplate();
 
         //create a new assay
-        clickProject(getProjectName());
-        clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "Drug Sensitivity"));
-        clickButton("Next");
-
         log("Setting up Drug Sensitivity assay");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_NAME);
+        goToProjectHome();
+        _assayHelper.createAssayAndEdit("Drug Sensitivity", TEST_ASSAY_NAME)
+                .setDescription(TEST_ASSAY_DESC)
+                .setPlateTemplate(PLATE_TEMPLATE_NAME)
+                .save();
 
-        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
-        setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_DESC);
-
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
-
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAME));
 
@@ -178,11 +169,11 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
 
         if (checkRequired)
         {
-        // validate required field
-        assertTextPresent("Initial Parasitemia Percent is required");
-        setFormElement(Locator.name("initialParasitemia"), "1.60");
+            // validate required field
+            assertTextPresent("Initial Parasitemia Percent is required");
+            setFormElement(Locator.name("initialParasitemia"), "1.60");
 
-        clickButton("Save and Finish");
+            clickButton("Save and Finish");
         }
     }
 
@@ -205,29 +196,31 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
         waitForText(PLATE_TEMPLATE_NAME);
     }
 
-    @Override public BrowserType bestBrowser()
+    @Override
+    public List<String> getAssociatedModules()
+    {
+        return Arrays.asList("icemr");
+    }
+
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }
 
     private void testCopyToStudy()
     {
-        checkAllOnPage("Data");
-        clickButton("Copy to Study");
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.checkAllOnPage();
+        table.clickHeaderButtonAndWait("Copy to Study");
 
-        WebElement studySelect = Locator.name("targetStudy").findElement(getDriver());
-        selectOptionByText(studySelect, "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-        try
-        {
-            clickButton("Next", 1000);
-        }
-        catch (TimeoutException ignore) {} // WebDriver getting stuck on this click on TeamCity
-        new DataRegionTable("Data", this).
-                clickHeaderButtonAndWait("Copy to Study");
+        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+        clickButton("Next");
+        table.clickHeaderButtonAndWait("Copy to Study");
 
-        DataRegionTable table = new DataRegionTable("Dataset", this);
+        DataRegionTable dataset = new DataRegionTable("Dataset", this);
 
-        assertEquals("Wrong number of rows", 3, table.getDataRowCount());
+        assertEquals("Wrong number of rows", 3, dataset.getDataRowCount());
 
         // verify cutoff properties are pulled through
         Set<String> cutoffColumns = new HashSet<>(Arrays.asList(
@@ -238,7 +231,7 @@ public class DrugSensitivityAssayTest extends AbstractQCAssayTest
                 "Point IC75",
                 "Curve IC99",
                 "Point IC99"));
-        Set<String> columnHeaders = new HashSet<>(table.getColumnHeaders());
+        Set<String> columnHeaders = new HashSet<>(dataset.getColumnLabels());
 
         assertEquals("Cutoff properties not present", cutoffColumns, new HashSet<>(CollectionUtils.intersection(cutoffColumns, columnHeaders)));
     }

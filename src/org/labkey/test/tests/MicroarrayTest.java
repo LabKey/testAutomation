@@ -21,11 +21,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.Arrays;
@@ -36,7 +35,7 @@ import static org.labkey.test.util.DataRegionTable.DataRegion;
 @Category(BVT.class)
 public class MicroarrayTest extends BaseWebDriverTest
 {
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true); // whitelist me before constructor time
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
     private static final String ASSAY_NAME = "Agilent mRNA 1-Color Microarray v10.";
@@ -67,33 +66,25 @@ public class MicroarrayTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
     @Test
     public void testSteps()
     {
         log("Create Project");
-        _containerHelper.createProject(PROJECT_NAME, "Microarray");
+        _containerHelper.createProject(getProjectName(), "Microarray");
 
         log("Create an assay");
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Microarray"));
-        clickButton("Next");
-        waitForElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
-        setFormElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
-        setFormElement(Locator.xpath("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        _listHelper.addField("Batch Fields", BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
-        _listHelper.addField("Run Fields", RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
+        AssayDesignerPage designerPage = _assayHelper.createAssayAndEdit("Microarray", ASSAY_NAME)
+                .setDescription(ASSAY_DESCRIPTION)
+                .addBatchField(BATCH_STRING_FIELD, BATCH_STRING_FIELD, "String")
+                .addRunField(RUN_STRING_FIELD, RUN_STRING_FIELD, "String");
+
+        // Set description for RUN_STRING_FIELD
         setFormElement(Locator.xpath("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']"), XPATH_TEST);
-        _listHelper.addField("Run Fields", RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Data Properties", DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
-        clickButton("Save", 0);
-        waitForText(20000, "Save successful.");
-        clickButton("Save & Close");
+
+        designerPage.addRunField(RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, "Integer")
+                .addRunField(DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "String")
+                .saveAndClose();
 
         log("Setup the pipeline");
 
@@ -142,8 +133,9 @@ public class MicroarrayTest extends BaseWebDriverTest
         validateRuns();
 
         // Now try doing the runs in bulk, so delete the existing runs
-        checkAllOnPage("Runs");
-        clickButton("Delete");
+        DataRegionTable runsTable = new DataRegionTable("Runs", this);
+        runsTable.checkAllOnPage();
+        runsTable.clickHeaderButton("Delete");
         clickButton("Confirm Delete");
 
         // Start the upload wizard again
