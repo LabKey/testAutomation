@@ -23,6 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -39,6 +40,7 @@ import static org.labkey.test.Locator.NBSP;
 @Category({DailyC.class, Reports.class})
 public class ReportAndDatasetNotificationTest extends StudyBaseTest
 {
+   {setIsBootstrapWhitelisted(true);}
     private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
@@ -150,7 +152,9 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
         // Add attachment report
         goToManageViews();
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Attachment Report");
+        BootstrapMenu.find(getDriver(),"Add Report")
+                .clickSubMenu(true,"Attachment Report");
+
         setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT_NAME);
         setFormElement(Locator.name("description"), ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
@@ -341,7 +345,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
 
     private void enableEditMode()
     {
-        waitAndClick(Locator.css("tr.labkey-wp-header a>span.fa-pencil"));
+        waitAndClick(Locator.tag("span").withAttribute("title","Edit"));
         waitForText("Choose Measures");
     }
 

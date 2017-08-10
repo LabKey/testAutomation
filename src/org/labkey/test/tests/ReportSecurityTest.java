@@ -20,11 +20,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 @Category({DailyC.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String TEST_GRID_VIEW = "Test Grid View";
 
     protected static final String TEST_GROUP = "firstGroup";
@@ -103,7 +106,9 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        _extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
+        //_extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
+        DataRegionTable dt = new DataRegionTable("Dataset", getDriver());
+        dt.goToReport("Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText(Locator.name("columnsX"), "1. Weight");
         selectOptionByText(Locator.name("columnsY"), "4. Pulse");
@@ -115,11 +120,13 @@ public class ReportSecurityTest extends ReportTest
         setFormElement(Locator.name("reportName"), "participant chart");
         clickButton("OK", 0);
 
-        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
+       // waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
-        _extHelper.clickMenuButton("Grid Views", "default");
-        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
+        //_extHelper.clickMenuButton("Grid Views", "default");
+        dt.goToView("default");
+        //waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
+        //_extHelper.clickMenuButton("Charts", "Create Chart View (deprecated)");
+        dt.goToReport("Create Chart View (deprecated)");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart
@@ -134,13 +141,16 @@ public class ReportSecurityTest extends ReportTest
         checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
 
-        waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
+        //waitForElement(Locator.lkButton("Grid Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
         clickFolder(getFolderName());
         goToManageViews();
 
-        clickAddReport("Grid View");
+        BootstrapMenu.find(getDriver(),"Add Report")
+                .clickSubMenu(true,"Grid View");
+
+        //clickAddReport("Grid View");
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
@@ -173,7 +183,8 @@ public class ReportSecurityTest extends ReportTest
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
-        _extHelper.clickMenuButton("Grid Views", "default");
+       // _extHelper.clickMenuButton("Grid Views", "default");
+        dt.goToView("default");
         assertTextPresent("User does not have read permission on this dataset.");
 /*
         no longer showing the query button by default.
