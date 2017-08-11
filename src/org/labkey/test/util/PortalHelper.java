@@ -556,14 +556,14 @@ public class PortalHelper extends WebDriverWrapper
         {
             return IS_BOOTSTRAP_LAYOUT ?
                     Locator.xpath("div/div/*").withClass("panel-title") :
-                    Locator.xpath("tbody/tr/th").withClass("labkey-wp-title-left");
+                    Locator.xpath("tbody/tr/*"/*td|th*/).withClass("labkey-wp-title-left");
         }
 
         public static Locator.XPathLocator webPart()
         {
             return IS_BOOTSTRAP_LAYOUT ?
                     Locator.tagWithName("div", "webpart") :
-                    Locator.tagWithName("table", "webpart");
+                    Locator.tagWithClass("table", "labkey-wp");
         }
     }
 }

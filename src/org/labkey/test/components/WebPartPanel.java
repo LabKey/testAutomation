@@ -16,6 +16,7 @@
 package org.labkey.test.components;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -64,16 +65,6 @@ public class WebPartPanel extends WebDriverComponent
             super(driver);
         }
 
-        public String getTitle()
-        {
-            return _title;
-        }
-
-        public boolean isPartialTitle()
-        {
-            return _partialTitle;
-        }
-
         public F withTitle(String title)
         {
             _title = title;
@@ -91,15 +82,12 @@ public class WebPartPanel extends WebDriverComponent
         @Override
         protected Locator.XPathLocator locator()
         {
-            Locator.XPathLocator webPartTitle = titleLocator();
-            webPartTitle = _partialTitle ? webPartTitle.containing(_title) : webPartTitle.withText(_title);
-
-            return Locator.tagWithClass("table", "labkey-wp").withDescendant(webPartTitle);
-        }
-
-        protected Locator.XPathLocator titleLocator()
-        {
-            return Locator.tag("tbody/tr/*"/*td or th*/).withClass("labkey-wp-title-left");
+            if (_title == null)
+                return PortalHelper.Locators.webPart();
+            else if (_partialTitle)
+                return PortalHelper.Locators.webPartWithTitleContaining(_title);
+            else
+                return PortalHelper.Locators.webPart(_title);
         }
     }
 }

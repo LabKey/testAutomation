@@ -17,6 +17,7 @@ package org.labkey.test.components;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -29,7 +30,6 @@ import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.list.SetDefaultValuesListPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.selenium.WebElementWrapper;
-import org.labkey.test.util.DebugUtils;
 import org.labkey.test.util.ExtHelper;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -245,16 +245,20 @@ public class PropertiesEditor extends WebPartPanel
         }
 
         @Override
-        protected Locator.XPathLocator locator()//todo
+        protected Locator.XPathLocator locator()
         {
-            return super.locator().withDescendant(Locator.tagContainingText("div", "No fields have been defined."));
-            // "No fields" message is always there, just hidden sometimes. See org/labkey/api/gwt/client/ui/PropertiesEditor.java
-        }
 
-        @Override
-        protected Locator.XPathLocator titleLocator()
-        {
-            return Locator.xpath("tbody/tr/td").withClass("labkey-wp-title-left");
+            boolean prevSetting = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+            try
+            {
+                // TODO: properties editor uses hard-coded old UX. Remove try/catch once that is fixed (in org.labkey.api.gwt.client.ui.WebPartPanel)
+                return super.locator().withDescendant(Locator.tagContainingText("div", "No fields have been defined."));
+                // "No fields" message is always there, just hidden sometimes. See org/labkey/api/gwt/client/ui/PropertiesEditor.java
+            }
+            finally
+            {
+                LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT = prevSetting;
+            }
         }
     }
 
