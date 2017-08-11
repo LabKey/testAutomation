@@ -136,7 +136,7 @@ public class RlabkeyTest extends BaseWebDriverTest
             if (!tests.isEmpty())
             {
                 clickProject(getProjectName());
-                clickAndWait(Locator.linkWithText(LIST_NAME));
+                waitAndClickAndWait(Locator.linkWithText(LIST_NAME));
                 DataRegionTable table = new DataRegionTable("query", getDriver());
                 table.clickHeaderMenu("Charts / Reports", "Create R Report");
 
