@@ -55,7 +55,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     public void close()
     {
         newElementCache().closeButton.click();
-        getWrapper().waitFor(()-> Locators.component.findElementOrNull(this)==null, 2000);
+        getWrapper().waitFor(()-> !Locators.component.findElementOrNull(getDriver()).isDisplayed(), 2000);
+        getWrapper().waitFor(()-> Locators.modalFade.findElementOrNull(getDriver())==null, 2000);
     }
 
     protected ElementCache newElementCache()
@@ -73,6 +74,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public static class Locators
     {
+        public static final Locator modalFade = Locator.tagWithClass("div", "modal fade")
+                .withAttribute("style", "display:block;");
         public static final Locator component = Locator.tagWithClass("div", "modal-dialog");
         public static final Locator contents = Locator.tagWithClass("div","modal-content");
         public static final Locator header = Locator.tagWithClass("div","modal-header");
