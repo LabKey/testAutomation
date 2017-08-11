@@ -15,11 +15,20 @@
  */
 package org.labkey.test.components.studydesigner;
 
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.WebElement;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPage
 {
@@ -35,12 +44,17 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
 
     public void addExistingVisitColumn(Locator.XPathLocator table, String visitLabel)
     {
+        addExistingVisitColumn(table, true, visitLabel);
+    }
+
+    public void addExistingVisitColumn(Locator.XPathLocator table, boolean isVisitBased, String visitLabel)
+    {
         clickOuterAddNewVisit(table);
 
         waitForElement(visitElements().existingVisitLoc);
         _ext4Helper.selectComboBoxItem(visitElements().existingVisitLoc, visitLabel);
 
-        Window addVisitWindow = new Window("Add Visit", getDriver());
+        Window addVisitWindow = new Window(isVisitBased ? "Add Visit" : "Add Timepoint", getDriver());
         doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Select", 0), visitElements().addVisitIconLoc, shortWait());
         removeFocusAndWait();
     }
@@ -59,6 +73,27 @@ public class BaseManageVaccineDesignVisitPage extends BaseManageVaccineDesignPag
         Window addVisitWindow = new Window("Add Visit", getDriver());
         doAndWaitForElementToRefresh(() -> addVisitWindow.clickButton("Submit", 0), visitElements().addVisitIconLoc, shortWait());
         removeFocusAndWait();
+    }
+
+    public static Integer queryVisitRowId(BaseWebDriverTest test, String folderPath, Visit visit)
+    {
+        SelectRowsCommand command = new SelectRowsCommand("study", "Visit");
+        command.setFilters(Arrays.asList(new Filter("Label", visit.getLabel())));
+        SelectRowsResponse response;
+        try
+        {
+            response = command.execute(test.createDefaultConnection(true), folderPath);
+        }
+        catch (IOException | CommandException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        List<Map<String, Object>> rows = response.getRows();
+        if (rows.size() == 1)
+            return Integer.parseInt(rows.get(0).get("RowId").toString());
+
+        return null;
     }
 
     protected void clickOuterAddNewVisit(Locator.XPathLocator table)

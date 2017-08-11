@@ -51,7 +51,7 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
             setOuterTextFieldValue(elements().assaysLoc, "Description", description, rowIndex);
     }
 
-    public void setBaseProperties(String lab, String sampleType, Integer sampleQuantity, String sampleUnits, int rowIndex)
+    public void setBaseProperties(String lab, String sampleType, Integer sampleQuantity, String sampleUnits, String dataset, int rowIndex)
     {
         if (lab != null)
             setOuterComboFieldValue(elements().assaysLoc, "Lab", lab, rowIndex);
@@ -61,6 +61,8 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
             setOuterTextFieldValue(elements().assaysLoc, "SampleQuantity", sampleQuantity+"", rowIndex);
         if (sampleUnits != null)
             setOuterComboFieldValue(elements().assaysLoc, "SampleUnits", sampleUnits, rowIndex);
+        if (dataset != null)
+            setOuterComboFieldValue(elements().assaysLoc, "DataSet", dataset, rowIndex);
     }
 
     public void setComboFieldValue(String column, String value, int rowIndex)
@@ -97,9 +99,9 @@ public class ManageAssaySchedulePage extends BaseManageVaccineDesignVisitPage
         addAllExistingVisitColumns(elements().assaysLoc);
     }
 
-    public void addExistingVisitColumn(String visitLabel)
+    public void addExistingVisitColumn(String visitLabel, boolean isVisitBased)
     {
-        addExistingVisitColumn(elements().assaysLoc, visitLabel);
+        addExistingVisitColumn(elements().assaysLoc, isVisitBased, visitLabel);
     }
 
     public void addNewVisitColumn(String label, Double rangeMin, Double rangeMax)
