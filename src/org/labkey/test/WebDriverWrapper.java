@@ -2295,7 +2295,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             catch (WebDriverException tryAgain)
             {
-                log("Retry click: " + tryAgain.getMessage());
+                log("Retry click: " + tryAgain.getMessage().split("\n")[0]);
                 scrollIntoView(el);
                 if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
                     sleep(2500);
