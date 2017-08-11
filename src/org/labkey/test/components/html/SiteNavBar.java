@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /* Wraps the new site/admin nav menus and site search */
@@ -63,15 +64,11 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     public SiteNavBar goToModule(String moduleName)
     {
         BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
-        menu.clickMenuButton(false, false, "Go To Module");
+        menu.openMenuTo("Go To Module", "More Modules");
+        /* at this point, we want to know if the module link is visible.
+         * if it is, click it- otherwise, expand the 'More Modules' link */
 
-        Locator.waitForAnyElement(new FluentWait<SearchContext>(menu.getComponentElement())
-            .withTimeout(2000, TimeUnit.MILLISECONDS),
-                BootstrapMenu.Locators.menuItem("More Modules").notHidden(),
-                BootstrapMenu.Locators.menuItem(moduleName).notHidden());
-
-        WebElement moduleLinkElement = BootstrapMenu.Locators.menuItem(moduleName).notHidden()
-                .findElementOrNull(menu.getComponentElement());
+        WebElement moduleLinkElement = menu.findVisibleMenuItemOrNull(moduleName);
         if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
         {
             getWrapper().scrollIntoView(moduleLinkElement);
@@ -80,10 +77,10 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
         else
         {
-            BootstrapMenu.Locators.menuItem("More Modules")
-                    .findElement(menu.getComponentElement()).click();
-            BootstrapMenu.Locators.menuItem(moduleName)
-                    .waitForElement(menu.getComponentElement(), 2000).click();
+            menu.findVisibleMenuItemOrNull("More Modules").click();
+            getWrapper().waitFor(()-> menu.findVisibleMenuItemOrNull(moduleName) != null,
+                    "Did not find expected module [" + moduleName + "]", 2000);
+            menu.findVisibleMenuItemOrNull(moduleName).click();
             return this;
         }
     }

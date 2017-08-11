@@ -74,7 +74,10 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     public void expand()
     {
         if (!isExpanded())
+        {
+            getWrapper().scrollIntoView(elementCache().toggleAnchor);
             elementCache().toggleAnchor.click();
+        }
         getWrapper().waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -88,6 +91,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     public List<WebElement> findVisibleMenuItems()
     {
         return elementCache().findVisibleMenuItems();
+    }
+
+    protected WebElement findVisibleMenuItemOrNull(String text)
+    {
+        return elementCache().findVisibleMenuItemOrNull(text);
     }
 
     @LogMethod(quiet = true)
@@ -186,6 +194,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         public List<WebElement> findVisibleMenuItems()
         {
             return Locator.xpath("./li/a").findElements(findVisibleMenuPanel()); /* direct children of the currently-open menu or submenu */
+        }
+
+        protected WebElement findVisibleMenuItemOrNull(String text)
+        {
+            return Locator.xpath("./li/a").withText(text).findElementOrNull(findVisibleMenuPanel());
         }
     }
 

@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
@@ -50,6 +51,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class FileBasedPipelineTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PIPELINETEST_MODULE = "pipelinetest";
     private static final File SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/sample.txt");
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
@@ -133,9 +135,9 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         // Running same protocol again is an error
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
-        waitForElement(Ext4Helper.Locators.window("Error"));
-        assertEquals("Cannot redefine an existing protocol", getText(Ext4Helper.Locators.windowBody("Error")));
-        clickButton("OK", 0);
+        ModalDialog error = ModalDialog.find(getDriver());
+        assertEquals("Cannot redefine an existing protocol", error.getBodyText());
+        error.close();
 
         // Delete the job, including any referenced runs
         deletePipelineJob(jobDescription, true);
