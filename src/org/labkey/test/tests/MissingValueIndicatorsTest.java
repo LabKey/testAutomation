@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.pages.AssayDesignerPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -34,6 +35,8 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
@@ -156,7 +159,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteListData(3);
 
         log("Test inserting a single new row");
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_name"), "Sid");
+        DataRegion(getDriver()).find().clickInsertNewRow();
+        setFormElement(Locator.name("quf_name"), "Sid");
         setFormElement(Locator.name("quf_sex"), "male");
         selectOptionByValue(Locator.name("quf_ageMVIndicator"), "Z");
         clickButton("Submit");
@@ -166,7 +170,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteListData(1);
 
         log("Test separate MVIndicator column");
-        DataRegionTable.findDataRegion(this).clickImportBulkData();
+        DataRegion(getDriver()).find().clickImportBulkData();
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_LIST_BAD);
         _listHelper.submitImportTsv_error(null);
         assertLabKeyErrorPresent();
@@ -238,8 +242,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
-        clickButton("View Data");
-        DataRegionTable.findDataRegion(this).clickImportBulkData();
+        mashButton("View Data");
+        DataRegion(getDriver()).find().clickImportBulkData();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error(null);
@@ -251,7 +255,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(3);
 
         log("Test inserting a single row");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        DataRegion(getDriver()).find().clickInsertNewRow();
         setFormElement(Locator.name("quf_ParticipantId"), "Sid");
         setFormElement(Locator.name("quf_SequenceNum"), "1");
         selectOptionByValue(Locator.name("quf_AgeMVIndicator"), "Z");
@@ -263,7 +267,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         deleteDatasetData(1);
 
         log("Import dataset data with two mv columns");
-        DataRegionTable.findDataRegion(this).clickImportBulkData();
+        DataRegion(getDriver()).find().clickImportBulkData();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_TWO_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error("Value is not a valid missing value indicator: .Q");
@@ -272,7 +276,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("Dataset", "ParticipantId");
 
         log("19874: Regression test for reshow of missing value indicators when submitting default forms with errors");
-        DataRegionTable.findDataRegion(this).clickInsertNewRow();
+        DataRegion(getDriver()).find().clickInsertNewRow();
         Locator mvSeletor = Locator.name("quf_AgeMVIndicator");
         Assert.assertEquals("There should not be a devault missing value indicator selection", "", getSelectedOptionText(mvSeletor));
         String mvSelection = "Z";
@@ -364,7 +368,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
-        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), targetStudyValue);
 
         clickButton("Next");
         setFormElement(Locator.name("name"), ASSAY_RUN_TWO_COLUMN);
@@ -456,20 +460,17 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
         clickButton("Next");
 
-        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
+        AssayDesignerPage assay = new AssayDesignerPage(getDriver());
+        assay.setName(assayName);
 
-        setFormElement(Locator.id("AssayDesignerName"), assayName);
-
-        _listHelper.addField("Data Fields", "age", "Age", ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Data Fields", "sex", "Sex", ListHelper.ListColumnType.String);
-        sleep(1000);
+        assay.addDataField("age", "Age", "Integer");
+        assay.addDataField("sex", "Sex", "String");
 
         log("setting fields to enable missing values");
-        _listHelper.clickRow(getPropertyXPath("Data Fields"), 4);
-        _listHelper.clickMvEnabled(getPropertyXPath("Data Fields"));
-
-        _listHelper.clickRow(getPropertyXPath("Data Fields"), 5);
-        _listHelper.clickMvEnabled(getPropertyXPath("Data Fields"));
+        assay.dataFields().selectField(4);
+        assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
+        assay.dataFields().selectField(5);
+        assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
 
         clickButton("Save & Close");
         assertNoLabKeyErrors();
@@ -488,7 +489,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Override
