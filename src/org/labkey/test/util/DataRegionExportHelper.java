@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.ColumnHeaderType;
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 
 import java.io.File;
 import java.util.function.Consumer;
@@ -72,13 +73,17 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         getWrapper().click(Locator.lkButton("Create Script"));
 
         getWrapper().switchToWindow(1);
-        String scriptText = getWrapper().getDriver().getPageSource();
-        verification.accept(scriptText);
+        StringBuilder scriptText = new StringBuilder();
+        WebDriverWrapper.waitFor(() -> {
+            scriptText.append(getWrapper().getDriver().getPageSource().trim());
+            return scriptText.toString().isEmpty();
+        }, "Exported script was empty", 10000);
+        verification.accept(scriptText.toString());
 
         getWrapper().getDriver().close();
         getWrapper().switchToMainWindow();
 
-        return scriptText;
+        return scriptText.toString();
     }
 
     public AbstractDataRegionExportOrSignHelper expandExportPanel()
