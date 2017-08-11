@@ -1043,7 +1043,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Import", 0);
         waitForText("First");
         clickButton("Save");
-        clickButton("View Data");
+        mashButton("View Data");
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
     }
