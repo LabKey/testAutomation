@@ -247,10 +247,10 @@ public class PropertiesEditor extends WebPartPanel
         @Override
         protected Locator.XPathLocator locator()
         {
-
             boolean prevSetting = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
             try
             {
+                LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT = false;
                 // TODO: properties editor uses hard-coded old UX. Remove try/catch once that is fixed (in org.labkey.api.gwt.client.ui.WebPartPanel)
                 return super.locator().withDescendant(Locator.tagContainingText("div", "No fields have been defined."));
                 // "No fields" message is always there, just hidden sometimes. See org/labkey/api/gwt/client/ui/PropertiesEditor.java
