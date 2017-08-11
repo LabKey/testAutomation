@@ -189,7 +189,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("APX-1"));
-        clickButton("Edit Definition");
+        mashButton("Edit Definition");
         waitForElement(Locator.xpath("//input[@name='dsName']"));
         assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
         setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
