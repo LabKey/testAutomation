@@ -52,6 +52,7 @@ import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.components.html.RadioButton;
+import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;
 import org.labkey.test.pages.search.SearchResultsPage;
 import org.labkey.test.util.*;
@@ -1462,7 +1463,10 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
 
     public void verifyTabSelected(String caption)
     {
-        assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '" + caption + "']")));
+        if (IS_BOOTSTRAP_LAYOUT)
+            assertTrue(PortalTab.find(caption, getDriver()).isActive());
+        else
+            assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '" + caption + "']")));
     }
 
     public int getImageWithAltTextCount(String altText)

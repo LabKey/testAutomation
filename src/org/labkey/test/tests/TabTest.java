@@ -15,11 +15,11 @@
  */
 package org.labkey.test.tests;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -29,22 +29,16 @@ import org.labkey.test.util.PortalHelper;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 public class TabTest extends SimpleModuleTest
 {
-    @Override public BrowserType bestBrowser()
+    {setIsBootstrapWhitelisted(true);}
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @Nullable
-    @Override
-    protected String getProjectName()
-    {
-        return getClass().getSimpleName() + " Project";
     }
 
     @Override
@@ -52,7 +46,9 @@ public class TabTest extends SimpleModuleTest
     {
         doTabManagementTests();
         doTestTabbedFolder();
-        doTestContainerTabConversion();
+        // TODO: enable when UX refresh UI supports container tabs
+        // https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31176
+        //doTestContainerTabConversion();
     }
 
     @LogMethod
@@ -70,10 +66,12 @@ public class TabTest extends SimpleModuleTest
         portalHelper.enableTabEditMode();
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.LEFT); // Nothing should happen.
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.RIGHT);
-        assertEquals("Mice tab not in the first position", "Tab 2", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")));
-        assertEquals("Overview tab not in the second position", "Tab 1", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")));
+        List<PortalTab> tabs = PortalTab.findTabs(getDriver());
+        assertEquals("Mice tab not in the first position", "Tab 2", tabs.get(0).getText());
+        assertEquals("Overview tab not in the second position", "Tab 1", tabs.get(1).getText());
         portalHelper.moveTab("Assay Container", PortalHelper.Direction.RIGHT); // Nothing should happen.
-        assertEquals("'Move Right' moved rightmost tab", "Assay Container", getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[4]//a[1]")));
+        tabs = PortalTab.findTabs(getDriver());
+        assertEquals("'Move Right' moved rightmost tab", "Assay Container", tabs.get(3).getText());
 
         // Remove tab
         portalHelper.hideTab("Tab 2");
@@ -111,7 +109,7 @@ public class TabTest extends SimpleModuleTest
 
         //Delete tab while on different  Tab
         String tab2Delete = "RENAMED TAB 1";
-        clickAndWait(Locator.linkWithText(tab2Delete));
+        portalHelper.activateTab(tab2Delete);
         portalHelper.deleteTab("Test Tab 2");
         List<BodyWebPart> bodyparts = portalHelper.getBodyWebParts();
         assertTrue("Webparts failed to load after tab delete while on page", bodyparts != null && bodyparts.size() > 0);
@@ -126,6 +124,7 @@ public class TabTest extends SimpleModuleTest
     @LogMethod
     private void doTestTabbedFolder()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
         clickFolder(FOLDER_NAME);
 
         //it should start on tab 2
@@ -136,7 +135,7 @@ public class TabTest extends SimpleModuleTest
         //verify Tab 1
         clickTab("Tab 1");
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List");
-        addWebPart("Messages");
+        portalHelper.addWebPart("Messages");
 
         clickTab("Tab 2");
 
@@ -149,23 +148,24 @@ public class TabTest extends SimpleModuleTest
         verifyTabSelected("Tab 2");
 
         //this is a controller selector
-        beginAt("/query/" + getProjectName() + "/" + FOLDER_NAME + "/begin.view?");
+        goToSchemaBrowser();
         verifyTabSelected("Tab 1");
 
         //this is a view selector
-        beginAt("/pipeline-status/" + getProjectName() + "/" + FOLDER_NAME + "/showList.view?");
+        goToModule("Pipeline");
         verifyTabSelected("Tab 2");
 
         //this is a regex selector
         clickFolder(FOLDER_NAME);
-        addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Sets");
         clickAndWait(Locator.linkWithText("Import Sample Set"));
         verifyTabSelected("Tab 1");
 
         // Test Container tabs
-        clickTab("Assay Container");
+        /* DISABLED until this issue can be addressed: https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31176
+        portalHelper.activateTab("Assay Container");
         assertTextPresent("Assay List");
-        clickTab(STUDY_FOLDER_TAB_LABEL);
+        portalHelper.activateTab(STUDY_FOLDER_TAB_LABEL);
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
@@ -178,7 +178,6 @@ public class TabTest extends SimpleModuleTest
         log("Container tab enhancements: change tab folder type, revert");
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
@@ -189,7 +188,6 @@ public class TabTest extends SimpleModuleTest
         // change type back to study
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", false);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Study"));
         clickButton("Update Folder", 0);
@@ -199,7 +197,6 @@ public class TabTest extends SimpleModuleTest
         // change to collaboration again
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
@@ -209,7 +206,6 @@ public class TabTest extends SimpleModuleTest
         // revert type
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", false);
         clickButton("Revert", 0);
         _extHelper.waitForExtDialog("Revert Folder(s)");
         click(Ext4Helper.Locators.ext4Button("Yes"));
@@ -221,7 +217,6 @@ public class TabTest extends SimpleModuleTest
         // Revert via parent container
         goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
@@ -231,7 +226,6 @@ public class TabTest extends SimpleModuleTest
         clickTab("Tab 1");
         goToFolderManagement();
         waitForText(STUDY_FOLDER_TAB_NAME);
-        assertTreeButtonHidden("Revert", false);
         clickButton("Revert", 0);
         _extHelper.waitForExtDialog("Revert Folder(s)");
         click(Ext4Helper.Locators.ext4Button("Yes"));
@@ -277,16 +271,19 @@ public class TabTest extends SimpleModuleTest
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
                 new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
+        */
     }
 
     @LogMethod
     private void doTestContainerTabConversion()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         // Set up a Collaboration folder with study and assay subfolders
         final String COLLAB_FOLDER = "collab1";
         final String COLLABFOLDER_PATH = getProjectName() + "/" + COLLAB_FOLDER;
         final String EXTRA_ASSAY_WEBPART = "Run Groups";
-        clickProject(getProjectName());
+        goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDY_FOLDER_TAB_NAME, "Study");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAY_FOLDER_TAB_NAME, "Assay");
@@ -296,7 +293,7 @@ public class TabTest extends SimpleModuleTest
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
         clickFolder(ASSAY_FOLDER_TAB_NAME);
-        addWebPart(EXTRA_ASSAY_WEBPART);
+        portalHelper.addWebPart(EXTRA_ASSAY_WEBPART);
 
         // Change folder type to XML Tabbed
         clickFolder(COLLAB_FOLDER);
@@ -349,23 +346,12 @@ public class TabTest extends SimpleModuleTest
         _containerHelper.deleteFolder(getProjectName(), COLLAB_FOLDER);
     }
 
-    private void assertTreeButtonHidden(String buttonText, boolean hidden)
-    {
-        // TODO: Dave: the locator's presence seems to be inconsistent. These are not central to the test but would be nice
-/*        Locator.XPathLocator locator = Locator.ext4Button(buttonText);
-        if (hidden && (isElementPresent(locator) && !isElementPresent(locator.withClass("x4-btn-disabled"))))   // if present should be disabled
-            fail("Button '" + buttonText + "' not hidden.");
-        else if (!hidden && (!isElementPresent(locator) || isElementPresent(locator.withClass("x4-btn-disabled"))))
-            fail("Button '" + buttonText + "' is hidden.");                */
-    }
-
     @LogMethod(quiet = true)
     public void goToTabFolderManagement(@LoggedParam String tabText)
     {
         Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
         waitForElement(tabMenuXPath);
 
-//        _ext4Helper.clickExt4MenuButton(true, tabMenuXPath, false, "Folder", "Management");       // Tab menu hidden so this doesn't work; do it inline with fireEvent instead
         fireEvent(tabMenuXPath, SeleniumEvent.click);
         Locator parentLocator = Ext4Helper.Locators.menuItem("Folder");
         waitForElement(parentLocator, 1000);

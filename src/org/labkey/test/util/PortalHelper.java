@@ -23,7 +23,9 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.BodyWebPart;
 import org.labkey.test.components.SideWebPart;
 import org.labkey.test.components.WebPart;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.components.labkey.PortalTab;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -59,23 +61,51 @@ public class PortalHelper extends WebDriverWrapper
 
     public void enableTabEditMode()
     {
-        click(Locator.linkWithTitle("Toggle Edit Mode"));
-        waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-enabled']"));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            new SiteNavBar(getDriver()).enterPageAdminMode();
+            sleep(1000);
+        }
+        else
+        {
+            click(Locator.linkWithTitle("Toggle Edit Mode"));
+            waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-enabled']"));
+        }
     }
 
     public void disableTabEditMode()
     {
-        click(Locator.linkWithTitle("Toggle Edit Mode"));
-        waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-disabled']"));
+        if (IS_BOOTSTRAP_LAYOUT)
+            new SiteNavBar(getDriver()).exitPageAdminMode();
+        else
+        {
+            click(Locator.linkWithTitle("Toggle Edit Mode"));
+            waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-disabled']"));
+        }
+    }
+
+    public PortalTab activateTab(String tabText)
+    {
+        return PortalTab.find(tabText, getDriver()).activate();
     }
 
     @LogMethod(quiet = true)
     private void clickTabMenuItem(@LoggedParam String tabText, boolean wait, @LoggedParam String... items)
     {
-        mouseOver(Locator.linkWithText(tabText));
-        Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
-        waitForElement(tabMenuXPath);
-        _extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            BootstrapMenu tabMenu = new BootstrapMenu(getDriver(),
+                    BootstrapMenu.Locators.bootstrapMenuContainer()
+                            .withChild(Locator.linkWithText(tabText)).findElement(getDriver()));
+            tabMenu.clickSubMenu(wait,  items);
+        }
+        else
+        {
+            mouseOver(Locator.linkWithText(tabText));
+            Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText + "']/following-sibling::span//a");
+            waitForElement(tabMenuXPath);
+            _extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
+        }
     }
 
     @LogMethod(quiet = true)
@@ -85,7 +115,9 @@ public class PortalHelper extends WebDriverWrapper
             throw new IllegalArgumentException("Can't move folder tabs vertically.");
 
         String tabId = tabText.replace(" ", "") + "Tab";
-        Locator.XPathLocator tabList = Locator.xpath("//ul[contains(@class, 'tab-nav')]//li");
+        Locator.XPathLocator tabList = Locator.xpath( IS_BOOTSTRAP_LAYOUT ?
+                "//ul[contains(@class, 'lk-nav-tabs-admin')]//li[@role='presentation']" :
+                "//ul[contains(@class, 'tab-nav')]//li");
         Locator.XPathLocator tabLink = Locator.xpath("//a[@id=" + Locator.xq(tabId) + "]");
 
         int tabCount = getElementCount(tabList) - 1;
@@ -112,26 +144,43 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void hideTab(@LoggedParam String tabText)
     {
-        clickTabMenuItem(tabText, true, "Hide");
+        if (IS_BOOTSTRAP_LAYOUT)
+            PortalTab.find(tabText, getDriver()).hide();
+        else
+            clickTabMenuItem(tabText, true, "Hide");
+
         disableTabEditMode();
-        assertElementNotVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        if (IS_BOOTSTRAP_LAYOUT)
+            assertElementNotPresent(Locator.xpath("//div[@class='lk-nav-tabs-ct']//ul//li//a[text()='" + tabText +"']"));
+        else
+            assertElementNotVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
         enableTabEditMode();
     }
 
     @LogMethod(quiet = true)
     public void showTab(@LoggedParam String tabText)
     {
-        clickTabMenuItem(tabText, true, "Show");
+        if (IS_BOOTSTRAP_LAYOUT)
+            PortalTab.find(tabText, getDriver()).show();
+        else
+            clickTabMenuItem(tabText, true, "Show");
         disableTabEditMode();
-        assertElementVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        assertElementVisible(Locator.xpath(IS_BOOTSTRAP_LAYOUT ?
+                "//div[@class='lk-nav-tabs-ct']//ul//li//a[contains(text(),'" + tabText +"')]" :
+                "//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
         enableTabEditMode();
     }
 
     @LogMethod(quiet = true)
     public void deleteTab(@LoggedParam String tabText)
     {
-        Locator tabLocator = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']");
-        clickTabMenuItem(tabText, true, "Delete");
+        Locator tabLocator = Locator.xpath(IS_BOOTSTRAP_LAYOUT ?
+                "//div[@class='lk-nav-tabs-ct']//ul//li//a[text()='" + tabText +"']" :
+                "//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']");
+        if (IS_BOOTSTRAP_LAYOUT)
+            PortalTab.find(tabText, getDriver()).delete();
+        else
+            clickTabMenuItem(tabText, true, "Delete");
         waitForElementToDisappear(tabLocator);
         assertElementNotPresent(tabLocator);
     }
@@ -145,7 +194,8 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void addTab(@LoggedParam String tabName, @Nullable @LoggedParam String expectedError)
     {
-        click(Locator.linkWithText("+"));
+        mouseOver(Locator.folderTab("+"));
+        click(Locator.folderTab("+"));
         waitForText("Add Tab");
         setFormElement(Locator.input("tabName"), tabName);
 
@@ -171,10 +221,20 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void renameTab(@LoggedParam String tabText, @LoggedParam String newName, @Nullable @LoggedParam String expectedError)
     {
-        clickTabMenuItem(tabText, false, "Rename");
-        waitForText("Rename Tab");
-        setFormElement(Locator.input("tabName"),newName);
-        clickButton("Ok", 0);
+        boolean wasAlreadyInEditMode = enterAdminMode();
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            PortalTab portalTab = PortalTab.find(tabText, getDriver());
+            portalTab.rename(newName);
+        }
+        else
+        {
+            clickTabMenuItem(tabText, false, "Rename");
+            waitForText("Rename Tab");
+            setFormElement(Locator.input("tabName"),newName);
+            clickButton("Ok", 0);
+        }
+
         if (expectedError != null)
         {
             waitForText(expectedError);
@@ -187,6 +247,9 @@ public class PortalHelper extends WebDriverWrapper
             waitForElement(Locator.linkWithText(newName));
             assertElementNotPresent(Locator.linkWithText(tabText));
         }
+
+        if (wasAlreadyInEditMode)
+            exitAdminMode();
     }
 
     public List<String> getWebPartTitles()
@@ -261,10 +324,16 @@ public class PortalHelper extends WebDriverWrapper
         }
     }
 
-    public void enterAdminMode()
+    public boolean enterAdminMode()
     {
         if (IS_BOOTSTRAP_LAYOUT)
-            new SiteNavBar(getDriver()).enterPageAdminMode();
+        {
+            SiteNavBar navBar = new SiteNavBar(getDriver());
+            boolean wasInAdminModeAlready = navBar.isInPageAdminMode();
+            navBar.enterPageAdminMode();
+            return wasInAdminModeAlready;
+        }
+        return false;
     }
 
     public void exitAdminMode()
@@ -283,12 +352,14 @@ public class PortalHelper extends WebDriverWrapper
     @LogMethod(quiet = true)
     public void addWebPart(@LoggedParam String webPartName)
     {
-        enterAdminMode();
+        boolean wasInAdminModeAlready = enterAdminMode();
         waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         selectOptionByText(form.append("//select"), webPartName);
+        sleep(250); // todo; better wait for 'add' button to be interactive
         clickAndWait(form.append(Locator.lkButton("Add")));
-        exitAdminMode();
+        if (!wasInAdminModeAlready)
+            exitAdminMode();
     }
 
     @LogMethod(quiet = true)

@@ -7,6 +7,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -76,8 +77,14 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         return new BootstrapMenu(getDriver(), getComponentElement()); // componentElement should be the li containing the
     }
 
+    public String getName()
+    {
+        return elementCache().anchor.getText();
+    }
+
     public PortalTab moveLeft()
     {
+        getWrapper().log("Attempting to move tab [" + getName() + "] to the left");
         String text = getText();
         getMenu().clickSubMenu(false, "Move", "Left");
         return PortalTab.find(text, getDriver());
@@ -85,6 +92,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
 
     public PortalTab moveRight()
     {
+        getWrapper().log("Attempting to move tab [" + getName() + "] to the right");
         String text = getText();
         getMenu().clickSubMenu(false, "Move", "Right");
         return PortalTab.find(text, getDriver());
@@ -109,6 +117,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
             return this;
         else
         {
+            TestLogger.log("Activating tab [" + getName() + "]");
             String text = getText();
             getWrapper().clickAndWait(elementCache().anchor);
             return PortalTab.find(text, getDriver());
@@ -117,6 +126,7 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
 
     public PortalTab show()
     {
+        getWrapper().log("Attempting to show tab [" + getName() + "]");
         String text = getText();
         getMenu().clickSubMenu(false,"Show");
         return PortalTab.find(text, getDriver());
@@ -124,16 +134,17 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
 
     public PortalTab hide()
     {
+        getWrapper().log("Attempting to hide tab [" + getName() + "]");
         String text = getText();
         getMenu().clickSubMenu(false,"Hide");
         return PortalTab.find(text, getDriver());
     }
 
-    public PortalTab delete()
+    public void delete()
     {
+        getWrapper().log("Attempting to delete tab [" + getName() + "]");
         String text = getText();
         getMenu().clickSubMenu(false,"Delete");
-        return PortalTab.find(text, getDriver());
     }
 
     /* clicking 'rename' will pop a form to take the name */
@@ -151,7 +162,9 @@ public class PortalTab extends WebDriverComponent<PortalTab.ElementCache>
         getWrapper().setFormElement(Locator.input("tabName"),newName);
         getWrapper().clickButton("Ok", 0);
 
-        return PortalTab.find(newName, getDriver());
+        /* if the rename is bogus (there's already a tab by that name)
+         * calling code will have to handle that */
+        return this;
     }
 
     protected ElementCache newElementCache()

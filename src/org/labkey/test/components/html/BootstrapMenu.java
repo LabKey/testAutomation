@@ -98,6 +98,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         return elementCache().findVisibleMenuItemOrNull(text);
     }
 
+    protected WebElement findVisibleMenuItem(String text)
+    {
+        return elementCache().findVisibleMenuItem(text);
+    }
+
     @LogMethod(quiet = true)
     public WebElement openMenuTo(@LoggedParam String ... subMenuLabels)
     {
@@ -194,6 +199,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         public List<WebElement> findVisibleMenuItems()
         {
             return Locator.xpath("./li/a").findElements(findVisibleMenuPanel()); /* direct children of the currently-open menu or submenu */
+        }
+
+        protected WebElement findVisibleMenuItem(String text)
+        {
+            return Locator.xpath("./li/a").withText(text).findElement(findVisibleMenuPanel());
         }
 
         protected WebElement findVisibleMenuItemOrNull(String text)

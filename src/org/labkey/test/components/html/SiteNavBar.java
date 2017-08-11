@@ -64,9 +64,9 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     public SiteNavBar goToModule(String moduleName)
     {
         BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
-        menu.openMenuTo("Go To Module", "More Modules");
-        /* at this point, we want to know if the module link is visible.
-         * if it is, click it- otherwise, expand the 'More Modules' link */
+        WebElement moreModulesElement = menu.openMenuTo("Go To Module", "More Modules");
+        /* at this point, we want to know if the module link is visible above the 'more modules' break.
+         * if it is, click it- otherwise, expand the 'More Modules' link and  */
 
         WebElement moduleLinkElement = menu.findVisibleMenuItemOrNull(moduleName);
         if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
@@ -77,10 +77,12 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         }
         else
         {
-            menu.findVisibleMenuItemOrNull("More Modules").click();
+            moreModulesElement.click();
             getWrapper().waitFor(()-> menu.findVisibleMenuItemOrNull(moduleName) != null,
                     "Did not find expected module [" + moduleName + "]", 2000);
-            menu.findVisibleMenuItemOrNull(moduleName).click();
+            WebElement moduleLink =  menu.findVisibleMenuItemOrNull(moduleName);
+            getWrapper().scrollIntoView(moduleLink);        // todo: consider using filter to bring the module into view
+            menu.findVisibleMenuItem(moduleName).click();
             return this;
         }
     }
