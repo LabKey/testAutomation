@@ -48,6 +48,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -555,11 +556,15 @@ public class ListTest extends BaseWebDriverTest
         clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
-        new DataRegionTable("qwp2", getDriver()).setSort(_listCol4.getName(), SortDirection.ASC);
-        String source = getHtmlSource();
-        int index;
-        assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
-                source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
+        DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
+        DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
+        firstList.setSort(_listCol4.getName(), SortDirection.ASC);
+        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[1]));
+        List<String> firstListColumn = secondList.getColumnDataAsText(_listCol4.getName());
+        assertEquals("Second query webpart shouldn't have been sorted", expectedColumn, firstListColumn);
+        expectedColumn.sort(null);
+        List<String> secondListColumn = firstList.getColumnDataAsText(_listCol4.getName());
+        assertEquals("First query webpart should have been sorted", expectedColumn, secondListColumn);
 
         log("Test list history");
         clickAndWait(Locator.linkWithText("manage lists"));
