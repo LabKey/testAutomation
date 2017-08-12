@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Reports.class, Charting.class})
 public class GenericMeasurePickerTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final File STUDY_ZIP = TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip");
     private static final String DATASET = "HIV Test Results";
 
@@ -105,7 +106,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.clickHeaderMenu("Charts", "Create Chart");
+        datasetTable.goToReport( "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
@@ -141,7 +142,7 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(DATASET));
 
         DataRegionTable datasetTable = new DataRegionTable("Dataset", this);
-        datasetTable.clickHeaderMenu("Charts", "Create Chart");
+        datasetTable.goToReport( "Create Chart");
 
         chartTypeDialog = new ChartTypeDialog(getDriver());
         chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Box);
