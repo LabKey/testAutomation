@@ -33,11 +33,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected final static String PROJECT_NAME = "ButtonVerifyProject";
     private static final String LIST_NAME = "Cities"; // If changed, update in CUSTOMIZER_FILE as well.
     private static final String METADATA_OVERRIDE_BUTTON = "Metadata Button";
@@ -128,7 +129,8 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
-        assertButtonPresent("Insert");
+
+        assertElementPresent(Locator.tagWithAttribute("a", "data-original-title","Insert data"));
 
         // assert custom buttons can REPLACE the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
@@ -162,30 +164,30 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         wikiHelper.setWikiBody(TestFileUtils.getFileContents(new File(TestFileUtils.getApiScriptFolder(), PARAM_ECHO_CONTENT_FILE)));
         clickButton("Save & Close");
 
-        DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
+        DataRegionTable buttonRegion = DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
         clickButton("JavaScript Link Button");
+        waitForText("No messages");
         assertTextPresent("No messages");
         clickProject(PROJECT_NAME);
 
-        DataRegionTable buttonRegion = DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
         clickButton("JavaScript OnClick Button", 0);
         assertAlert(JAVASCRIPT_MENU_ONCLICK_ALERT_TEXT);
 
         clickButton("JavaScript Handler Button", 0);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT1_TEXT);
 
-        _extHelper.clickMenuButton(false, "JavaScript Menu Button", "JavaScript Menu1");
+        buttonRegion.clickHeaderMenu("JavaScript Menu Button", false,"JavaScript Menu1");
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT2_TEXT);
 
-        _extHelper.clickMenuButton(false, "JavaScript Menu Button", "JavaScript Menu2", "JavaScript Fly Out");
+        buttonRegion.clickHeaderMenu("JavaScript Menu Button",false,  "JavaScript Menu2", "JavaScript Fly Out");
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT3_TEXT);
 
-        assertEquals("expect get button to be disabled",
-                "labkey-disabled-button",
-                Locator.lkButton(METADATA_GET_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("class"));    // it's there, just not enabled
-        assertEquals("expect get button to be disabled",
-                "labkey-disabled-button",
-                Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("class"));
+        assertTrue("expect get button to be disabled",
+                Locator.lkButton(METADATA_GET_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
+                        .getAttribute("class").contains("labkey-disabled-button"));    // it's there, just not enabled
+        assertTrue("expect link button to be disabled",
+                Locator.lkButton(METADATA_LINK_BUTTON).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT)
+                        .getAttribute("class").contains("labkey-disabled-button"));
 
         buttonRegion.checkCheckbox(buttonRegion.getIndexWhereDataAppears("Portland", "Name"));
         // wait for the button to enable:
@@ -210,15 +212,21 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     {
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
         waitForElement(Locator.lkButton(METADATA_OVERRIDE_BUTTON), 10000);
-
         assertButtonNotPresent(DataRegionTable.getInsertNewButtonText());
 
-        _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
+        DataRegionTable dt;
+        if (isTextPresent("My Query Web Part"))
+            dt = DataRegionTable.findDataRegionWithinWebpart(this, "buttonTest");
+        else
+            dt = new DataRegionTable("query", getDriver());
+
+        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, false,METADATA_OVERRIDE_ON_CLICK_BUTTON);
+        //_extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);
 
         sleep(100); // Menu button sometimes isn't ready to open right away
 
-        _extHelper.clickMenuButton(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_LINK_BUTTON);
+        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, false, METADATA_OVERRIDE_LINK_BUTTON);
         assertTextPresent("No messages");
     }
 
