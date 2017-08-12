@@ -27,6 +27,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
@@ -76,7 +77,14 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         if (!isExpanded())
         {
             getWrapper().scrollIntoView(elementCache().toggleAnchor);
-            elementCache().toggleAnchor.click();
+            for (int retry = 0; retry < 3; retry++)
+            {
+                elementCache().toggleAnchor.click();
+                if (getWrapper().waitFor(()-> isExpanded(), 1000))
+                    break;
+                else
+                    TestLogger.log("retrying menu expand, attempt #" + retry);
+            }
         }
         getWrapper().waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
