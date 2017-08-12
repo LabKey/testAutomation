@@ -47,6 +47,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Assays.class})
 public class ModuleAssayTest extends AbstractAssayTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private final static String PROJECT_NAME = "ModuleAssayTest";
     private static final String MODULE_NAME = "miniassay";
     private static final String ASSAY_NAME = "My Simple Assay";
@@ -156,17 +157,18 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Batches: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignBatches");
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaBatches");
+        DataRegionTable batchDt = new DataRegionTable("Batches", getDriver());
+        batchDt.goToView("AssayDesignBatches");
+        batchDt.goToView("AssayDesignChildSchemaBatches");
         assertTextPresent("Modified", "Created By");
         assertTextNotPresent("First Batch", "Target Study", "Target Study", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayTypeBatches");
+        batchDt.goToView("AssayTypeBatches");
         assertTextPresent("First Batch", "Created By");
         assertTextNotPresent("Modified", "Run Count");
 
-        _extHelper.clickMenuButton("Grid Views", "default");
+        batchDt.goToView( "default");
 
         log("Visit batch details page");
         DataRegionTable table = new DataRegionTable("Batches", this);
@@ -185,23 +187,24 @@ public class ModuleAssayTest extends AbstractAssayTest
         goBack();
         clickAndWait(Locator.linkWithText(batchName));
         assertTitleEquals(ASSAY_NAME + " Runs: /" + PROJECT_NAME);
+        DataRegionTable runsDt = new DataRegionTable("Runs", getDriver());
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignRuns");
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaRuns");
+        runsDt.goToView("AssayDesignRuns");
+        runsDt.goToView("AssayDesignChildSchemaRuns");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Assay Id", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayTypeRuns");
+        runsDt.goToView("AssayTypeRuns");
         assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
         assertTextNotPresent("Modified", "Run Count");
 
-        _extHelper.clickMenuButton("Grid Views", "default");
+        runsDt.goToView("default");
 
         log("Visit run details page");
-        setSort("Runs", "Name", SortDirection.ASC);
-        clickAndWait(Locator.linkWithText("details"));
+        runsDt.setSort("Name", SortDirection.ASC);
+        clickAndWait(runsDt.detailsLink(0));
         assertTitleEquals("run01.tsv Details: /" + PROJECT_NAME);
         assertElementContains(Locator.id("SampleId_0"), "Monkey 1");
         assertElementContains(Locator.id("DoubleData_0"), String.valueOf(3.2));
@@ -211,22 +214,23 @@ public class ModuleAssayTest extends AbstractAssayTest
         goBack();
         clickAndWait(Locator.linkWithText("run01.tsv"));
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
+        DataRegionTable dataTable = new DataRegionTable("Data", getDriver());
 
                 // Verify file-based view associated with assay design shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignData");
-        _extHelper.clickMenuButton("Grid Views", "AssayDesignChildSchemaData");
+        dataTable.goToView( "AssayDesignData");
+        dataTable.goToView( "AssayDesignChildSchemaData");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Sample Id", "Monkey 1", "Monkey 2", "MetaOverride Double Run", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        _extHelper.clickMenuButton("Grid Views", "AssayTypeData");
+        dataTable.goToView(  "AssayTypeData");
         assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
         assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
 
-        _extHelper.clickMenuButton("Grid Views", "default");
+        dataTable.goToView(  "default");
 
         log("Visit result details page");
-        clickAndWait(Locator.linkWithText("details"));
+        clickAndWait(dataTable.detailsLink(0));
         assertElementContains(Locator.id("SampleId_div"), "Monkey 1");
         assertElementContains(Locator.id("TimePoint_div"), "2008/11/01 11:22:33");
         assertElementContains(Locator.id("DoubleData_div"), String.valueOf(3.2));
