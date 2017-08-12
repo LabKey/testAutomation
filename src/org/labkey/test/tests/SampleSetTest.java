@@ -43,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class SampleSetTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "SampleSetTestProject";
     private static final String FOLDER_NAME = "SampleSetTestFolder";
     private static final String PROJECT_SAMPLE_SET_NAME = "ProjectSampleSet";
@@ -346,7 +347,8 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void insertNewWithFileAttachmentTest()
     {
-        _extHelper.clickInsertNewRow();
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        drt.clickInsertNewRow();
         setFormElement(Locator.name("quf_Name"), "SampleSetInsertedManually");
         setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
         clickButton("Submit");
@@ -366,11 +368,10 @@ public class SampleSetTest extends BaseWebDriverTest
 
     private void setFileAttachment(int index, File attachment)
     {
-        clickAndWait(Locator.linkWithText("edit").index(index));
+        DataRegionTable drt = DataRegionTable.findDataRegionWithinWebpart(this, "Sample Set Contents");
+        drt.clickEditRow(index);
         setFormElement(Locator.name("quf_FileAttachment"),  attachment);
         clickButton("Submit");
-
-        DataRegionTable drt = new DataRegionTable("Material", this.getDriver());
 
         String path = drt.getDataAsText(index, "File Attachment");
         assertNotNull("Path shouldn't be null", path);
