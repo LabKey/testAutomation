@@ -32,6 +32,7 @@ import java.util.List;
 @Category({DailyB.class})
 public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String TEST_GROUP = "HiddenEmail Test group";
     private static final String ADMIN_USER = "experimental_admin@experimental.test";
     private static final String IMPERSONATED_USER = "experimental_user@experimental.test";
@@ -159,12 +160,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickProject(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).goToView( EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", EMAIL_VIEW);
+        DataRegionTable.findDataRegion(this).goToView( EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         stopImpersonating();
