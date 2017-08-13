@@ -252,6 +252,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         waitForText(ASSAY_NAME + " Protocol"); // Protocol parameters: XarTemplate.ApplicationName
         goToDashboard();
+        waitForElement(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent("Agilent Feature Extraction Software");
