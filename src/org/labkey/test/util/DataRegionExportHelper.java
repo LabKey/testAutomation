@@ -76,7 +76,7 @@ public class DataRegionExportHelper extends AbstractDataRegionExportOrSignHelper
         StringBuilder scriptText = new StringBuilder();
         WebDriverWrapper.waitFor(() -> {
             scriptText.append(getWrapper().getDriver().getPageSource().trim());
-            return scriptText.toString().isEmpty();
+            return !scriptText.toString().isEmpty();
         }, "Exported script was empty", 10000);
         verification.accept(scriptText.toString());
 
