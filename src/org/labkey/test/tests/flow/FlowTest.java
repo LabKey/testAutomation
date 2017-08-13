@@ -293,6 +293,7 @@ public class FlowTest extends BaseFlowTest
         assertElementNotPresent(Locator.linkWithImage("/flagFCSFile.gif"));
         pushLocation();
         clickAndWait(Locator.linkWithText("91761.fcs"));
+        waitForText(FCS_FILE_1);
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
