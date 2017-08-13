@@ -34,6 +34,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 {
     protected final WebDriver _driver;
     protected final WebElement _componentElement;
+    private int _expandRetryCount = 1;
 
     /* componentElement should contain the toggle anchor *and* the UL containing list items */
     public BootstrapMenu(WebDriver driver, WebElement componentElement)
@@ -52,6 +53,14 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         WebElement container = Locators.bootstrapMenuContainer()
                 .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(driver);
         return new BootstrapMenu(driver, container);
+    }
+
+    /* Sometimes the menu doesn't expand on the first try.
+     * Sets the number of attempts it will make to expand the menu before failing/giving up. */
+    public BootstrapMenu withExpandRetries(int retries)
+    {
+        _expandRetryCount = retries;
+        return this;
     }
 
     @Override
@@ -77,7 +86,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         if (!isExpanded())
         {
             getWrapper().scrollIntoView(elementCache().toggleAnchor);
-            for (int retry = 0; retry < 3; retry++)
+            for (int retry = 0; retry < _expandRetryCount; retry++)
             {
                 elementCache().toggleAnchor.click();
                 if (getWrapper().waitFor(()-> isExpanded(), 1000))

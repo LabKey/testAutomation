@@ -63,7 +63,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
 
     public SiteNavBar goToModule(String moduleName)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
+        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer).withExpandRetries(4);
         WebElement moreModulesElement = menu.openMenuTo("Go To Module", "More Modules");
         /* at this point, we want to know if the module link is visible above the 'more modules' break.
          * if it is, click it- otherwise, expand the 'More Modules' link and  */
