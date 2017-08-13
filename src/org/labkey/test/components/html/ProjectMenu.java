@@ -47,6 +47,11 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return _el;
     }
 
+    public String getCurrentProject()
+    {
+        return newElementCache().menuToggle.getText().replace("&nbsp;", "").trim();
+    }
+
     public WebElement getMenuToggle()
     {
         return newElementCache().menuToggle;
@@ -73,36 +78,52 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return this;
     }
 
-    public void navigateToProject(String projectName)
+    /* Hovering over the project link (in the left pane) shows the folder links for that project
+     * in the (right) folder pane. */
+    public WebElement mouseOverProjectLink(String projectName)
     {
         open();
-        getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
-        getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
+        WebElement menuItem = newElementCache().getMenuItem(projectName);
+        getWrapper().scrollIntoView(menuItem);
+        getWrapper().fireEvent(menuItem, WebDriverWrapper.SeleniumEvent.mouseover);
+        return menuItem;
+    }
+
+    public void navigateToProject(String projectName)
+    {
+        mouseOverProjectLink(projectName);
         getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getFolderLink(projectName).click());
     }
 
     /* Will navigate to a folder or subfolder of the specified project */
     public void navigateToFolder(String projectName, String folder)
     {
-        open();                                     // selecting the project (menu item) will reveal the nav link in the right pane
-        getWrapper().scrollIntoView(newElementCache().getMenuItem(projectName));
-        getWrapper().fireEvent(newElementCache().getMenuItem(projectName), WebDriverWrapper.SeleniumEvent.mouseover);
+        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
+            mouseOverProjectLink(projectName);
+        expandFolderLinksTo(folder);
+        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderLink(folder).click());
+    }
+
+    /* opens the expandos until the desired folder link is in view, or
+    * no expandos are present in the folder list container*/
+    public void expandFolderLinksTo(String folder)
+    {
+        open();
+        Locator expandoLoc = Locator.tagWithClass("li", "clbl collapse-folder")
+                .child(Locator.tagWithClass("span", "marked"));
 
         getWrapper().waitFor(()-> {
-            if (folderLinkIsPresent(folder))
+            if (folderLinkIsPresent(folder) || expandoLoc.findElementOrNull(newElementCache().folderListContainer)==null)
                 return true;
             else    // expand any collapsed expandos until the navigation link becomes clickable
             {
-                WebElement expando = Locator.tagWithClass("li", "clbl collapse-folder")
-                        .child(Locator.tagWithClass("span", "marked"))         // expandos are 'clbl expand-folder' when opened
+                WebElement expando = expandoLoc        // expandos are 'clbl expand-folder' when opened
                         .findElementOrNull(newElementCache().folderListContainer);
                 if (expando != null)
                     expando.click();
             }
             return false;
         }, WAIT_FOR_JAVASCRIPT);
-
-        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderLink(folder).click());
     }
 
     public void navigateToContainer(String project, String... subfolders)

@@ -230,12 +230,12 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickProject(PERM_PROJECT_NAME);
         impersonate(GAMMA_READER_USER);
         clickProject(PERM_PROJECT_NAME);
-        openFolderMenu();
-        ProjectMenu projectMenu = new ProjectMenu(getDriver());
-        assertTrue(projectMenu.folderLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
-        assertFalse(projectMenu.folderLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
+        projectMenu().expandFolderLinksTo(GAMMA_SUB_FOLDER_NAME);
+        assertTrue(projectMenu().folderLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
+        projectMenu().expandFolderLinksTo(DENIED_SUB_FOLDER_NAME);
+        assertFalse(projectMenu().folderLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
-        assertEquals("Only one project should be visible while impersonating", 1, projectMenu.projectMenuLinks().size());
+        assertEquals("Only one project should be visible while impersonating", 1, projectMenu().projectMenuLinks().size());
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();
