@@ -46,6 +46,15 @@ public abstract class Locators
                 Locator.id("bodypanel");
     }
 
+    public static Locator.XPathLocator bodyTitle()
+    {
+        return Locator.tagWithClassContaining("div", "lk-body-title");
+    }
+    public static Locator.XPathLocator bodyTitle(String title)
+    {
+        return bodyTitle().append(Locator.tagWithText("h3", title));
+    }
+
     public static Locator footerPanel()
     {
         return Locator.css(".footer-block");
