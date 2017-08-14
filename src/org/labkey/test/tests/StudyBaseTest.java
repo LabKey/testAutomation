@@ -362,12 +362,22 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     protected void goToManageStudyPage(String projectName, String studyName)
     {
         log("Going to Manage Study Page of: " + studyName);
-        waitForElement(Locator.id("folderBar"));
-        if (!getText(Locator.id("folderBar")).equals(projectName))
-            clickProject(projectName);
-        clickFolder(studyName);
-        waitAndClick(Locator.linkWithText("Manage Study"));
-        waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            projectMenu().navigateToFolder(projectName, studyName);
+            waitAndClick(Locator.linkWithText("Manage Study"));
+            waitForElement(Locator.tagWithClassContaining("div", "lk-body-title")
+                    .withChild(Locator.tagWithText("h3", "Manage Study")));
+        }
+        else
+        {
+            waitForElement(Locator.id("folderBar"));
+            if (!getText(Locator.id("folderBar")).equals(projectName))
+                clickProject(projectName);
+            clickFolder(studyName);
+            waitAndClick(Locator.linkWithText("Manage Study"));
+            waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
+        }
     }
 
     protected void goToSpecimenData()
