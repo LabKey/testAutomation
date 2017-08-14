@@ -428,7 +428,7 @@ public class RReportHelper
         _test.waitForText(("Reports"));
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            DataRegion(_test.getDriver()).find().clickHeaderMenu("Charts / Reports", "Create R Report");
+            DataRegion(_test.getDriver()).find().goToReport("Create R Report");
         }else
         {
             _test._extHelper.clickMenuButton("Reports", "Create R Report");
