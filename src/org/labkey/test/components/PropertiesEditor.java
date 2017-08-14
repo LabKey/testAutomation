@@ -709,9 +709,9 @@ public class PropertiesEditor extends WebPartPanel
 
     public enum PhiSelectType
     {
-        NotPHI("Not Phi"),
-        Limited("Limited Phi"),
-        PHI("Full Phi"),
+        NotPHI("Not PHI"),
+        Limited("Limited PHI"),
+        PHI("Full PHI"),
         Restricted("Restricted");
 
         String _text;
