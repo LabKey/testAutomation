@@ -23,6 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.LookAndFeelTimeChart;
 import org.labkey.test.components.SaveChartDialog;
+import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.TimeChartWizard;
 import org.labkey.test.util.Ext4Helper;
@@ -118,7 +119,7 @@ public class ReportAndDatasetNotificationTest extends StudyBaseTest
         beginAt("/reports/" + getProjectName() + "/sendDailyDigest.view");
         clickFolder(getFolderName());
         goToModule("Dumbster");
-        click(Locator.linkContainingText("Report/Dataset Change Notification"));
+        new EmailRecordTable(getDriver()).clickSubject("Report/Dataset Change Notification");
         assertTextPresent(TIMECHART_NAME, R_NAME, LINKREPORT_NAME, PLOT_NAME);
 
     }
