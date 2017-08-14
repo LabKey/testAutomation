@@ -559,7 +559,7 @@ public class ListTest extends BaseWebDriverTest
         DataRegionTable firstList = DataRegionTable.DataRegion(getDriver()).find();
         DataRegionTable secondList = DataRegionTable.DataRegion(getDriver()).index(1).find();
         firstList.setSort(_listCol4.getName(), SortDirection.ASC);
-        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[1]));
+        List<String> expectedColumn = new ArrayList<>(Arrays.asList(TEST_DATA[4]));
         List<String> firstListColumn = secondList.getColumnDataAsText(_listCol4.getName());
         assertEquals("Second query webpart shouldn't have been sorted", expectedColumn, firstListColumn);
         expectedColumn.sort(null);
