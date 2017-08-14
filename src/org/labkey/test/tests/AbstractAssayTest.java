@@ -68,7 +68,6 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting up data pipeline for project " + project);
         clickProject(project);
         portalHelper.addWebPart("Data Pipeline");
-        clickButton("Setup");
         File dir = TestFileUtils.getTestTempDir();
         FileUtils.deleteDirectory(dir);
         dir.mkdirs();
