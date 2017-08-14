@@ -53,7 +53,6 @@ import org.labkey.test.components.internal.ImpersonateUserWindow;
 import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.labkey.test.util.APIUserHelper;
 import org.labkey.test.util.AbstractUserHelper;
-import org.labkey.test.util.ExperimentalFeaturesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -61,6 +60,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SimpleHttpRequest;
 import org.labkey.test.util.SimpleHttpResponse;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.TextSearcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -661,7 +661,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 long startTime = System.currentTimeMillis();
                 long elapsed = 0;
 
-                while (elapsed < waitMs && (!(isButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
+                while (elapsed < waitMs && (!isButtonPresent("Next")))
                 {
                     try
                     {
@@ -669,7 +669,8 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                         // in the sql script runner.
                         for (int i = 0; i < 5; i++)
                         {
-                            goToHome();
+                            int responseCode = WebTestHelper.getHttpResponse(buildURL("project", "Home", "begin")).getResponseCode();
+                            TestLogger.log("Home: " + responseCode);
                             sleep(200);
                         }
                         sleep(2000);
@@ -689,15 +690,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 if (elapsed > waitMs)
                     throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
 
-                WebElement nextButton;
-                for (int i = 0; i < 2 && (nextButton = Locator.lkButton("Next").findElementOrNull(getDriver())) != null; i++)
+                if (bootstrapped)
                 {
-                    clickAndWait(nextButton);
-                }
-
-                if (isElementPresent(Locator.linkContainingText("Go directly to the server's Home page")))
-                {
+                    // admin-moduleStatus
+                    assertEquals("Progress bar text", "Module startup complete", getText(Locator.id("status-progress-bar")));
+                    clickAndWait(Locator.lkButton("Next"));
+                    // admin-newInstallSiteSettings
+                    assertElementPresent(Locator.id("rootPath"));
+                    clickAndWait(Locator.lkButton("Next"));
+                    // admin-installComplete
                     clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
+                    assertEquals("Landed on wrong project after bootstrapping", "home", getCurrentProject().toLowerCase());
+                }
+                else
+                {
+                    goToHome(); // TODO: More specific checking of upgrade workflow
                 }
 
                 checkErrors(); // Check for errors from bootstrap/upgrade
