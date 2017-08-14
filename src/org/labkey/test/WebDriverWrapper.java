@@ -495,6 +495,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         String location = _locationStack.pop();
         assertNotNull("Cannot pop without a push.", location);
+        TestLogger.log("WARNING: pushing/popping locations can be hard to debug, please use beginAt(WebTestHelper.buildURL()) if possible.");
         beginAt(location, millis);
     }
 
