@@ -320,7 +320,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(datasetName));
-        clickButtonContainingText("Edit Definition");
+        mashButton("Edit Definition");
         waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if (demographics)
