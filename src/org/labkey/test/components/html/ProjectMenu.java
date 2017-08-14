@@ -59,7 +59,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     public boolean isExpanded()
     {
-        return newElementCache().menuContainer.getAttribute("class").contains("open");
+        return newElementCache().menuContainer().getAttribute("class").contains("open");
     }
 
     public ProjectMenu open()
@@ -113,12 +113,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
                 .child(Locator.tagWithClass("span", "marked"));
 
         getWrapper().waitFor(()-> {
-            if (folderLinkIsPresent(folder) || expandoLoc.findElementOrNull(newElementCache().folderListContainer)==null)
+            if (folderLinkIsPresent(folder) || expandoLoc.findElementOrNull(newElementCache().folderListContainer())==null)
                 return true;
             else    // expand any collapsed expandos until the navigation link becomes clickable
             {
                 WebElement expando = expandoLoc        // expandos are 'clbl expand-folder' when opened
-                        .findElementOrNull(newElementCache().folderListContainer);
+                        .findElementOrNull(newElementCache().folderListContainer());
                 if (expando != null)
                     expando.click();
             }
@@ -147,7 +147,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public boolean folderLinkIsPresent(String navigationLinkText)
     {
         WebElement linkElement = Locator.tag("li").childTag("a").withText(navigationLinkText).notHidden()
-                .findElementOrNull(newElementCache().folderListContainer);
+                .findElementOrNull(newElementCache().folderListContainer());
         return linkElement != null && linkElement.isDisplayed();
     }
 
@@ -179,10 +179,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
-        WebElement menuContainer = Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
-        WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer);
-        WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer);
-        WebElement folderListContainer = Locator.tagWithClass("div", "folder-list-container").refindWhenNeeded(menuContainer);
+        WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer());
+        WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer());
 
         WebElement projectNavTrail = Locator.tagWithClass("div", "lk-project-nav-trail").refindWhenNeeded(menu);
         WebElement projectNavBtnContainer = Locator.tagWithClass("div", "beta-nav-buttons").refindWhenNeeded(menu);
@@ -190,17 +188,26 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement newProjectButton = Locator.xpath("//span/a[@title='New Project']").refindWhenNeeded(projectNavBtnContainer);
         WebElement newSubFolderButton = Locator.xpath("//span/a[@title='New Subfolder']").refindWhenNeeded(projectNavBtnContainer);
 
+        WebElement menuContainer()
+        {
+            return Locators.menuProjectNav.waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+        }
+        WebElement folderListContainer()
+        {
+            return Locator.tagWithClass("div", "folder-list-container").waitForElement(menuContainer(), WAIT_FOR_JAVASCRIPT);
+        }
+
         WebElement getMenuItem(String text)
         {
             return Locator.tag("li").childTag("a").withAttribute("data-field", text).notHidden().waitForElement(menu, WAIT_FOR_JAVASCRIPT);
         }
         List<WebElement> getProjectMenuLinks()
         {
-            return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer);
+            return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer());
         }
         WebElement getFolderLink(String text)
         {
-            return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer, WAIT_FOR_JAVASCRIPT);
+            return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer(), WAIT_FOR_JAVASCRIPT);
         }
     }
 
