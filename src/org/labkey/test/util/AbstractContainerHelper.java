@@ -116,8 +116,7 @@ public abstract class AbstractContainerHelper
     @LogMethod(quiet = true)
     public void setFolderType(@LoggedParam String folderType)
     {
-        _test.goToFolderManagement();
-        _test.clickAndWait(Locator.linkWithText("Folder Type"));
+        _test.goToFolderManagement().goToFolderTypePane();
         _test.click(Locator.radioButtonByNameAndValue("folderType", folderType));
         _test.clickButton("Update Folder");
     }
