@@ -746,6 +746,8 @@ public class Crawler
         {
             // Go to the site
             long loadTime = _test.beginAt(relativeURL);
+            // Keep track of where crawler has been
+            _actionsVisited.add(new ControllerActionId(relativeURL));
 
             int depth = urlToCheck.getDepth();
             origin = urlToCheck.getOrigin();
@@ -758,8 +760,6 @@ public class Crawler
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
 
-            // Keep track of where crawler has been
-            _actionsVisited.add(new ControllerActionId(relativeURL));
             _actionProfiler.updateActionProfile(relativeURL, loadTime);
 
             checkForForbiddenWords(relativeURL);
