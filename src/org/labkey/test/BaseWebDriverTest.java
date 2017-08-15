@@ -1224,8 +1224,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     @LogMethod
     protected void checkLinks()
     {
-        if (isLinkCheckEnabled() && !IS_BOOTSTRAP_LAYOUT) // disable crawler when running in new UI until we can figure out
-        {                                                 // how to filter all the new/noisy things it will crawl to
+        if (isLinkCheckEnabled())
+        {
             pauseJsErrorChecker();
             String crawlerTimeoutProp = System.getProperty("crawlerTimeout");
             int crawlerTimeout = 90000;

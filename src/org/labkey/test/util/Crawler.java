@@ -19,11 +19,13 @@ package org.labkey.test.util;
 import com.google.common.base.Function;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.collections.CaseInsensitiveHashMap;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.ExtraSiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.ProjectMenu;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
@@ -52,14 +54,7 @@ public class Crawler
     private final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
-    private static Map<String, String> _sourceReplacements = new HashMap<>();
-
-    static
-    {
-        // Keys must be all lowercase
-        _sourceReplacements.put("http://help.labkey.org/wiki/home/cpas/documentation/", "");   // Allow forbidden word "cpas" in help links
-        _sourceReplacements.put("http://www.labkey.org/wiki/home/cpas/documentation/", "");   // Allow forbidden word "cpas" in help links
-    }
+    private static Map<String, String> _sourceReplacements = new CaseInsensitiveHashMap<>();
 
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
@@ -179,13 +174,15 @@ public class Crawler
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
-            new ControllerActionId("NAb", "download"),           // TODO: I think this controller is gone
             new ControllerActionId("wiki", "download"),
             new ControllerActionId("harvest", "sickSafeTime"),
             new ControllerActionId("harvest", "formatInvoice"),
+            new ControllerActionId("targetedms", "downloadDocument"),
 
-            // Actions from external modules
-            new ControllerActionId("targetedms", "downloadDocument")
+                // Begin actions that 404 when module is not enabled
+                new ControllerActionId("nlp", "begin"),
+                new ControllerActionId("biologics", "begin"),
+                new ControllerActionId("hdrl", "begin")
         );
 
         return list;
@@ -755,7 +752,7 @@ public class Crawler
             currentPageUrl = _test.getURL();
 
             // Find all the links at the site
-            if (depth == 1 && _test.isElementPresent(Locator.id("folderBar")))
+            if (depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
                 _test.openFolderMenu();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
