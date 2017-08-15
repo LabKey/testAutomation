@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
@@ -34,6 +35,7 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class WorkbookTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "Workbook Test Project";
     private static final String PROJECT_NAME2 = "Workbook Test Project 2";
     private static final String DEFAULT_WORKBOOK_NAME = "TestWorkbook";
@@ -81,6 +83,9 @@ public class WorkbookTest extends BaseWebDriverTest
         {
             assertEquals("nonsequential name for workbook found",ids[i],lastid + 1);
         }
+
+        /*  TODO: re-enable when edit-in-place is supported. Tracking issue:
+                https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31194
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
         waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), WAIT_FOR_JAVASCRIPT);
@@ -114,6 +119,7 @@ public class WorkbookTest extends BaseWebDriverTest
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row?");
         waitForTextToDisappear("Renamed"+DEFAULT_WORKBOOK_NAME);
+        */
 
         // Test Workbook APIs
 
@@ -154,7 +160,7 @@ public class WorkbookTest extends BaseWebDriverTest
         // Create Assay Workbook
         names[1] = (workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookHelper.WorkbookFolderType.ASSAY_WORKBOOK));
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
-        assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(assayWorkbookName, getText(Locators.bodyTitle()));
         assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
         assertElementNotPresent(Locator.linkWithText(assayWorkbookName)); // Should not appear in folder tree.
 
@@ -162,7 +168,7 @@ public class WorkbookTest extends BaseWebDriverTest
         names[2] = (workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
         assertElementPresent(Locator.linkWithText("Files"));
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
-        assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(defaultWorkbookName, getText(Locators.bodyTitle()));
         assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
         assertElementNotPresent(Locator.linkWithText(defaultWorkbookName)); // Should not appear in folder tree.
         return names;

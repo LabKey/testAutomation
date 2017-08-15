@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,14 +44,15 @@ public class WorkbookHelper
     public int createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         _test.clickProject(project);
-        _test.clickButton("Create Workbook");
+        DataRegionTable dt = DataRegionTable.findDataRegionWithinWebpart(_test, "Workbooks");
+        dt.clickInsertNewRow();
 
         _test.setFormElement(Locator.id("workbookTitle"), title);
         _test.setFormElement(Locator.id("workbookDescription"), description);
         _test.selectOptionByValue(Locator.id("workbookFolderType"), folderType.toString());
 
         _test.clickButton("Create Workbook");
-        _test.waitForElement(Locator.css(".wb-name"));
+        _test.waitForElement(Locator.id("wb-description"));
 
         return getWorkbookIdFromUrl(_test.getURL()) ;
     }
@@ -104,7 +106,7 @@ public class WorkbookHelper
         // Create File Workbook
         int id = createWorkbook(projectName, title, description, WorkbookFolderType.FILE_WORKBOOK);
         _test.waitForElement(Locator.linkWithText("Files"));
-        assertEquals(title, _test.getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(title, _test.getText(Locators.bodyTitle()));
         assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
         _test.assertElementNotPresent(Locator.linkWithText(title)); // Should not appear in folder tree.
         return id;
