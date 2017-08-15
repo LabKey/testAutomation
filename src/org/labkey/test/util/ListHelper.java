@@ -23,11 +23,11 @@ import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -240,11 +240,10 @@ public class ListHelper extends LabKeySiteWrapper
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
-    // TODO: This currently accepts either a project or a folder as the first argument (bad!). Refactor this to be more explicit possibly using Path?
     @LogMethod
-    public void createList(String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    public void createList(String containerPath, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-        beginCreateList(folderName, listName);
+        beginCreateList(containerPath, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);
     }
 
@@ -368,17 +367,9 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
     // initial "create list" steps common to both manual and import from file scenarios
-    public void beginCreateList(String folderName, String listName)
+    public void beginCreateList(String containerPath, String listName)
     {
-        try
-        {
-            clickFolder(folderName);
-        }
-        catch (WebDriverException ex)
-        {
-            clickProject(folderName);
-        }
-
+        beginAt(WebTestHelper.buildURL("project", containerPath, "begin"));
         beginCreateListHelper(listName);
     }
 
@@ -400,9 +391,9 @@ public class ListHelper extends LabKeySiteWrapper
     }
 
 
-    public void createListFromFile(String folderName, String listName, File inputFile)
+    public void createListFromFile(String containerPath, String listName, File inputFile)
     {
-        beginCreateList(folderName, listName);
+        beginCreateList(containerPath, listName);
 
         click(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         //test.clickCheckbox("fileImport");

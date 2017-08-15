@@ -133,7 +133,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             new ListHelper.ListColumn("LookupAge", "LookupAge", ListHelper.ListColumnType.Integer, "Lookup Age", null, null, null, "fake/action.view?key=${Key}")
         };
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
-        _listHelper.createList(SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
+        _listHelper.createList(getProjectName() + "/" + SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
 
         log("** Insert row into lookup target list");
         goToProjectHome();
@@ -279,7 +279,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name")
         };
         String listName = folder + "-Issue15751-List";
-        _listHelper.createList(folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
+        _listHelper.createList(getProjectName() + "/" + folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
 
         log("** Creating background R script");

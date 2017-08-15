@@ -235,7 +235,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
-        _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
@@ -266,7 +266,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         // Create Larger list for query test.
         File listFile = new File(TEST_XLS_DATA_FILE);
-        _listHelper.createListFromFile(FOLDER_NAME, QUERY_LIST_NAME, listFile);
+        _listHelper.createListFromFile(getProjectName() + "/" + FOLDER_NAME, QUERY_LIST_NAME, listFile);
         waitForElement(Locator.linkWithText("Norbert"));
     }
 
@@ -275,7 +275,7 @@ public class ClientAPITest extends BaseWebDriverTest
         String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
         // Create lists for cross-folder query test.
-        _listHelper.createList(SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.createList(PROJECT_NAME + "/" + FOLDER_NAME + "/" + SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
         setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();

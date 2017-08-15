@@ -103,7 +103,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         clickTab("Portal");
         ListHelper listHelper = new ListHelper(getDriver());
 
-        listHelper.createList(FOLDER_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY,
+        listHelper.createList(getProjectName() + "/" + FOLDER_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY,
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String),
                 new ListHelper.ListColumn("File", "File", ListHelper.ListColumnType.Attachment));
         clickButton("Done");

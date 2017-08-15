@@ -306,7 +306,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
         _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER);
         createList(AUDIT_TEST_PROJECT, "Parent List");
-        createList(AUDIT_TEST_SUBFOLDER, "Child List");
+        createList(AUDIT_TEST_PROJECT + "/" + AUDIT_TEST_SUBFOLDER, "Child List");
 
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
         clickButton("Save and Finish");
@@ -360,15 +360,14 @@ public class AuditLogTest extends BaseWebDriverTest
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
     }
 
-    private void createList(String folderName, String listName)
+    private void createList(String containerPath, String listName)
     {
         ListHelper.ListColumn  lc = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name");
-        _listHelper.createList(folderName, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
-        clickAndWait(Locator.linkWithText(folderName));
+        _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
+        clickAndWait(Locator.css(".labkey-folder-title"));
         clickAndWait(Locator.linkWithText(listName));
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
-        waitForElement(Locator.name("quf_Name"));
-        setFormElement(Locator.name("quf_Name"), "Data");
+        DataRegionTable.DataRegion(getDriver()).find().clickInsertNewRow();
+        setFormElement(Locator.name("quf_Name").waitForElement(shortWait()), "Data");
         submit();
     }
 

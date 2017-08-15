@@ -471,7 +471,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void createList()
     {
         log("** Importing some data...");
-        _listHelper.createList(SOURCE_FOLDER, LIST_NAME,
+        _listHelper.createList(getProjectName() + "/" + SOURCE_FOLDER, LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),

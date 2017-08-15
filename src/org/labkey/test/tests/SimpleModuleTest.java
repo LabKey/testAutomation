@@ -697,7 +697,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private void createPeopleListInFolder(String folderName)
     {
-        _listHelper.createList(folderName, LIST_NAME,
+        String containerPath = folderName.equals(getProjectName()) ? getProjectName() : getProjectName() + "/" + folderName;
+        _listHelper.createList(containerPath, LIST_NAME,
                 ListHelper.ListColumnType.AutoInteger, "Key",
                 new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
                 new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
