@@ -221,8 +221,8 @@ modules/simpletest/resources/queries/lists/People.js -text
 modules/simpletest/resources/queries/lists/People/Crazy[!!-~]People.qview.xml -text
 modules/simpletest/resources/queries/lists/TestQuery.sql -text
 modules/simpletest/resources/queries/study/Data[!!-~]Label.query.xml -text
-modules/simpletest/resources/queries/study/Data[!!-~]Label/My[!!-~]Custom[!!-~]View.qview.xml -text
 modules/simpletest/resources/queries/study/Data[!!-~]Name.query.xml -text
+modules/simpletest/resources/queries/study/Data[!!-~]Name/My[!!-~]Custom[!!-~]View.qview.xml -text
 modules/simpletest/resources/queries/study/verifyAssay.js -text
 modules/simpletest/resources/queries/vehicle/ParamParamVehicles.sql -text
 modules/simpletest/resources/queries/vehicle/ParameterizedVehicles.sql -text
