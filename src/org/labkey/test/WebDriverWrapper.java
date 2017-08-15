@@ -1576,50 +1576,21 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertTextPresentInThisOrder(text1, text2);
     }
 
-    private boolean _preppedForPageLoad = false;
-
-    private void prepForPageLoad()
+    private void waitForPageToLoad(WebElement toBeStale, int millis)
     {
-        executeScript("window.preppedForPageLoadMarker = true;");
-        _preppedForPageLoad = true;
-    }
-
-    private void waitForPageToLoad(int millis)
-    {
-        if (!_preppedForPageLoad)
-            throw new IllegalStateException("Call prepForPageLoad() before performing the action that would trigger the expected page load.");
         _testTimeout = true;
-        waitFor(() -> {
-            try
-            {
-                return (boolean) executeScript(
-                        "try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
-                        "catch(e) {return false;}");
-            }
-            catch (TimeoutException wait)
-            {
-                return false;
-            }
-            catch (WebDriverException wde)
-            {
-                if (wde.getMessage().contains("waiting for doc.body failed"))
-                    return false;
-                else
-                    throw wde;
-            }
-        },"Page failed to load", millis);
+        new WebDriverWait(getDriver(), millis / 1000).until(ExpectedConditions.stalenessOf(toBeStale));
+        executeAsyncScript("" +
+                "try " +
+                "{" +
+                "  LABKEY.Utils.onReady(callback);" +
+                "}" +
+                "catch(e)" +
+                "{" +
+                "  callback();" +
+                "}");
         mouseOut();
         _testTimeout = false;
-        _preppedForPageLoad = false;
-    }
-
-    /**
-     * @deprecated Use {@link #doAndWaitForPageToLoad(Runnable)}
-     */
-    @Deprecated
-    public void waitForPageToLoad()
-    {
-        waitForPageToLoad(defaultWaitForPage);
     }
 
     public long doAndWaitForPageToLoad(Runnable func)
@@ -1630,6 +1601,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public long doAndWaitForPageToLoad(Runnable func, final int msWait)
     {
         long startTime = System.currentTimeMillis();
+        WebElement toBeStale = null;
 
         if (msWait > 0)
         {
@@ -1638,14 +1610,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     listener.beforePageLoad();
             });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
-            prepForPageLoad();
+            toBeStale = Locator.css("*").findElement(getDriver()); // Just grab any element to wait for staleness
         }
 
         func.run();
 
         if (msWait > 0)
         {
-            waitForPageToLoad(msWait);
+            waitForPageToLoad(toBeStale, msWait);
             getDriver().manage().timeouts().pageLoadTimeout(defaultWaitForPage, TimeUnit.MILLISECONDS);
             _pageLoadListeners.getOrDefault(getDriver(), Collections.emptySet()).forEach((listener) -> {
                 if (null != listener)
