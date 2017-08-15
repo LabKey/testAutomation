@@ -513,6 +513,9 @@ public class PortalHelper extends WebDriverWrapper
      */
     public void setWebpartPermission(String webpart, String permission, String folder)
     {
+        boolean wasInAdminMode = isInAdminMode();
+        if (IS_BOOTSTRAP_LAYOUT && !wasInAdminMode)
+            enterAdminMode();
         openWebpartPermissionWindow(webpart);
 
         _ext4Helper.selectComboBoxItem("Required Permission:", permission);
@@ -526,6 +529,9 @@ public class PortalHelper extends WebDriverWrapper
         }
         click(Locator.tagWithText("span", "Save"));
         _ext4Helper.waitForMaskToDisappear();
+
+        if (IS_BOOTSTRAP_LAYOUT && !wasInAdminMode)
+            exitAdminMode();
     }
 
     /**

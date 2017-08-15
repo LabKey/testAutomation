@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {
-
+    {setIsBootstrapWhitelisted(true);}
     protected static final String DUMMY_PROJECT_NAME = "Dummy Project";
     protected static final String[] users = {"read_webpart@webpartpermissions.test", "edit_webpart@webpartpermissions.test", "admin_webpart@webpartpermissions.test"};
     @Override
