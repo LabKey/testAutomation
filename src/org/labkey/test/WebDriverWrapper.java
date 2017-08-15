@@ -26,6 +26,7 @@ import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.ModalDialog;
+import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
@@ -1143,12 +1144,19 @@ public abstract class WebDriverWrapper implements WrapsDriver
      */
     public void expandFolderTree(String folder)
     {
-        Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
-        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
-        List<WebElement> els = treeAncestor.findElements(getDriver());
-        for (WebElement el : els)
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            el.click();
+            new ProjectMenu(getDriver()).expandFolderLinksTo(folder);
+        }
+        else
+        {
+            Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
+            Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
+            List<WebElement> els = treeAncestor.findElements(getDriver());
+            for (WebElement el : els)
+            {
+                el.click();
+            }
         }
     }
 

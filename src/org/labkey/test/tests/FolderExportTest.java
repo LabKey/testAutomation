@@ -59,6 +59,7 @@ import static org.junit.Assert.fail;
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
     String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = TestFileUtils.getSampleData("FolderExport");
@@ -608,11 +609,11 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         log("verify child containers were imported");
         openFolderMenu();
-        expandFolderTree("Subfolder1"); // Will expand to all subfolders with this name
+        expandFolderTree("*all*"); // Will expand to all subfolders.  if you specify the folder name, it will open up the first with that name
         clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
         openFolderMenu();
-        expandFolderTree("_hidden");
+        expandFolderTree("*all*");  // TODO: implement a less-hacky way to expand all, or to the nth instance of a link
         clickAndWait(Locator.linkWithText("_hidden").index(subfolderIndex));
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         openFolderMenu();
