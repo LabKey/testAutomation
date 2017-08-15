@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -35,29 +37,50 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
 
     protected final PortalHelper _portalHelper = new PortalHelper(this);
     protected WikiHelper _wikiHelper = new WikiHelper(this);
+    protected final ApiPermissionsHelper _permissionsHelper = new ApiPermissionsHelper(this);
 
     protected static final String WIKI_TERMS_TITLE = "Terms of Use";
     protected static final String PROJECT_TERMS_SNIPPET = "fight club";
     protected static final String TERMS_OF_USE_NAME = "_termsOfUse";
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        _userHelper.deleteUsers(false, USER);
+        log("Deleting test projects");
+
+        _containerHelper.deleteProject(PUBLIC_NO_TERMS_PROJECT_NAME, false);
+        _containerHelper.deleteProject(PUBLIC_TERMS_PROJECT_NAME, false);
+        _containerHelper.deleteProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
+        _containerHelper.deleteProject(NON_PUBLIC_TERMS_PROJECT2_NAME, false);
+    }
+
+    @BeforeClass
+    public static void setupProject()
+    {
+        BaseTermsOfUseTest init = (BaseTermsOfUseTest) getCurrentTest();
+
+        init.doSetup();
+    }
+
+    protected void doSetup()
+    {
+        _userHelper.createUser(USER);
+        _permissionsHelper.createPermissionsGroup(USERS_GROUP, USER);
+
+        createPublicProject(PUBLIC_NO_TERMS_PROJECT_NAME);
+        createProjectWithTermsOfUse(PUBLIC_TERMS_PROJECT_NAME, "The first rule of fight club is do not talk about fight club.", true);
+        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT_NAME, "The second rule of fight club is do not talk about fight club.", false);
+        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT2_NAME, "The third rule of fight club is do not talk about fight club.", false);
+    }
+
     protected void createPublicProject(String projectName)
     {
         log("Create public project " + projectName);
         _containerHelper.createProject(projectName, null);
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
+        _permissionsHelper.setPermissions(USERS_GROUP, "Editor");
         _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
-    }
-
-    protected void createUser(String userName)
-    {
-        log("Create user with editor permisison");
-        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
-        _permissionsHelper.enterPermissionsUI();
-        _permissionsHelper.clickManageGroup(USERS_GROUP);
-        setFormElement(Locator.name("names"), USER);
-        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
-        clickButton("Update Group Membership");
     }
 
     protected void createWikiTabForProject(String projectName)
@@ -72,30 +95,16 @@ public class BaseTermsOfUseTest extends BaseWebDriverTest
         clickButton("Update Folder");
     }
 
-
-    protected void doSetup()
-    {
-        createPublicProject(PUBLIC_NO_TERMS_PROJECT_NAME);
-        goToHome();
-    }
-
     protected void createProjectWithTermsOfUse(String name, String termsText, boolean isPublic)
     {
         log("Create project " + name);
         _containerHelper.createProject(name, null);
-        pushLocation(); // For attempting to bypass Terms of Use
         createTermsOfUsePage(name, termsText);
         _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         if (isPublic)
         {
             _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
         }
-    }
-
-    @Before
-    public void preTest()
-    {
-        goToProjectHome();
     }
 
     protected void createTermsOfUsePage(String projectName, String body)

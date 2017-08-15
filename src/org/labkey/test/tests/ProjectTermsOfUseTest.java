@@ -15,62 +15,35 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PasswordUtil;
+
+import static org.junit.Assert.assertEquals;
 
 @Category({DailyB.class})
 public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
 {
     {setIsBootstrapWhitelisted(true);}
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteUsersIfPresent(USER);
-        log("Deleting test projects");
-
-        deleteProject(PUBLIC_TERMS_PROJECT_NAME, false);
-        deleteProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
-        deleteProject(NON_PUBLIC_TERMS_PROJECT2_NAME, false);
-
-        super.doCleanup(afterTest);
-    }
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        ProjectTermsOfUseTest init = (ProjectTermsOfUseTest) getCurrentTest();
-
-        init.doSetup();
-    }
 
     @Override
     protected void doSetup()
     {
         super.doSetup();
+
+        createWikiTabForProject(NON_PUBLIC_TERMS_PROJECT_NAME);
+        _containerHelper.createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", (String[]) null);
     }
 
     @Test
     public void projectTermsOfUseTest()
     {
-        createUser(USER);
-
-        createProjectWithTermsOfUse(PUBLIC_TERMS_PROJECT_NAME, "The first rule of fight club is do not talk about fight club.", true);
-        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT_NAME, "The second rule of fight club is do not talk about fight club.", false);
-        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT2_NAME, "The third rule of fight club is do not talk about fight club.", false);
-
-        createWikiTabForProject(NON_PUBLIC_TERMS_PROJECT_NAME);
-        pushLocation();
-
-        goToHome();
-        _containerHelper.createSubfolder(NON_PUBLIC_TERMS_PROJECT_NAME, "subfolder", (String[]) null);
-        pushLocation(); // For attempting to bypass Terms of Use
-
         log("Terms don't come into play until you log out");
         clickProject(NON_PUBLIC_TERMS_PROJECT2_NAME);
         assertTextNotPresent("fight club");
@@ -87,21 +60,36 @@ public class ProjectTermsOfUseTest extends BaseTermsOfUseTest
         // simulate a session expiration and make sure you can still log in to a project with terms.
         signOut();
         beginAt(WebTestHelper.buildURL("login", "login", Maps.of("returnUrl", "/labkey/project/" + PUBLIC_TERMS_PROJECT_NAME + "/begin.view?")));
-        simpleSignIn();
+        attemptSignIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        waitForElement(Locators.labkeyError.containing("you must log in and approve the terms of use"));
+        assertTextPresent(PROJECT_TERMS_SNIPPET);
+        checkCheckbox(Locators.termsOfUseCheckbox().findElement(getDriver()));
+        clickAndWait(Locator.css(".signin-btn"));
+        assertEquals("Wrong project after terms redirect", PUBLIC_TERMS_PROJECT_NAME, getCurrentProject());
 
         log("Attempt to bypass terms with saved URLs");
-        popLocation();
-        waitForText(PROJECT_TERMS_SNIPPET);
-        assertTextPresent(PROJECT_TERMS_SNIPPET); // PROJECT_NAME
-        popLocation();
-        waitForText(PROJECT_TERMS_SNIPPET);
-        assertTextPresent(PROJECT_TERMS_SNIPPET); // PUBLIC_TERMS_PROJECT_NAME
-        popLocation();
-        waitForText(PROJECT_TERMS_SNIPPET);
-        assertTextPresent(PROJECT_TERMS_SNIPPET); // NON_PUBLIC_TERMS_PROJECT_NAME
-        popLocation();
-        waitForText(PROJECT_TERMS_SNIPPET);
-        assertTextPresent(PROJECT_TERMS_SNIPPET); // NON_PUBLIC_TERMS_PROJECT_NAME/subfolder
+        beginAt(WebTestHelper.buildURL("project", PUBLIC_NO_TERMS_PROJECT_NAME, "begin"));
+        assertElementNotPresent(Locators.termsOfUseCheckbox());
+        assertTextNotPresent(PROJECT_TERMS_SNIPPET);
+
+        beginAt(WebTestHelper.buildURL("query", NON_PUBLIC_TERMS_PROJECT_NAME, "begin"));
+        waitForElement(Locators.termsOfUseCheckbox());
+        assertElementPresent(Locator.lkButton("Agree"));
+        assertTextPresent(PROJECT_TERMS_SNIPPET);
+
+        beginAt(WebTestHelper.buildURL("experiment", NON_PUBLIC_TERMS_PROJECT_NAME + "/subfolder", "begin"));
+        waitForElement(Locators.termsOfUseCheckbox());
+        assertElementPresent(Locator.lkButton("Agree"));
+        assertTextPresent(PROJECT_TERMS_SNIPPET);
+
+        beginAt(WebTestHelper.buildURL("announcements", NON_PUBLIC_TERMS_PROJECT2_NAME, "begin"));
+        waitForElement(Locators.termsOfUseCheckbox());
+        assertElementPresent(Locator.lkButton("Agree"));
+        assertTextPresent(PROJECT_TERMS_SNIPPET);
+
+        beginAt(WebTestHelper.buildURL("project", PUBLIC_TERMS_PROJECT_NAME, "begin"));
+        assertElementNotPresent(Locators.termsOfUseCheckbox());
+        assertTextNotPresent(PROJECT_TERMS_SNIPPET);
 
         goToHome();
         clickProject(NON_PUBLIC_TERMS_PROJECT2_NAME, false);

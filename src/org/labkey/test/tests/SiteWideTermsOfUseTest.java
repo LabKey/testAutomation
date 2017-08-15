@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -29,8 +29,7 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
     protected static final String NON_PUBLIC_NO_TERMS_PROJECT_NAME = "Non-public No Terms Project";
 
-
-    @Override
+    @Before
     public void preTest()
     {
         assureSiteWideTermsOfUsePage();
@@ -39,16 +38,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
             goToHome();
             acceptTermsOfUse(null, true);
         }
-        clickProject(getProjectName());
-    }
-
-
-    @BeforeClass
-    public static void setupProject()
-    {
-        SiteWideTermsOfUseTest init = (SiteWideTermsOfUseTest) getCurrentTest();
-
-        init.doSetup();
     }
 
     @Override
@@ -56,11 +45,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     {
         super.doSetup();
 
-        createUser(USER);
-
-        createProjectWithTermsOfUse(PUBLIC_TERMS_PROJECT_NAME, "The first rule of fight club is do not talk about fight club.", true);
-        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT_NAME, "The second rule of fight club is do not talk about fight club.", false);
-        createProjectWithTermsOfUse(NON_PUBLIC_TERMS_PROJECT2_NAME, "The third rule of fight club is do not talk about fight club.", false);
         log("Create project" + NON_PUBLIC_NO_TERMS_PROJECT_NAME);
         _containerHelper.createProject(NON_PUBLIC_NO_TERMS_PROJECT_NAME, null);
     }
@@ -68,14 +52,9 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteSiteWideTermsOfUsePage();
-        log("Deleting test projects");
-
-        deleteProject(PUBLIC_TERMS_PROJECT_NAME, false);
-        deleteProject(NON_PUBLIC_TERMS_PROJECT_NAME, false);
-        deleteProject(NON_PUBLIC_TERMS_PROJECT2_NAME, false);
-        deleteProject(NON_PUBLIC_NO_TERMS_PROJECT_NAME, false);
         super.doCleanup(afterTest);
+        _containerHelper.deleteProject(NON_PUBLIC_NO_TERMS_PROJECT_NAME, false);
+        deleteSiteWideTermsOfUsePage();
     }
 
 
@@ -257,7 +236,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         }
     }
 
-
     protected void doNotAcceptSiteWideTerms()
     {
         signIn();
@@ -267,7 +245,6 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 
     protected void acceptSiteWideTerms(boolean login)
     {
-
         if (login)
         {
             log("Accepting site-wide terms of use for logged in user");
