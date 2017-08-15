@@ -52,7 +52,8 @@ public class RefindingWebElement extends LazyWebElement<RefindingWebElement>
     }
 
     /**
-     * This constructor provides no guarantee that
+     * Refinding reliability depends on the specificity of the provided Locator
+     * There is no verification that the provided WebElement matches the provided Locator and SearchContext
      */
     public RefindingWebElement(WebElement element, Locator locator, SearchContext searchContext)
     {
