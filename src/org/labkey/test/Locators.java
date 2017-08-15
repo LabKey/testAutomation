@@ -72,4 +72,9 @@ public abstract class Locators
     {
         return Locator.css("#testSignals > div[name=" + Locator.cq(signalName) + "][value=" + Locator.cq(value) + "]");
     }
+
+    public static Locator termsOfUseCheckbox()
+    {
+        return Locator.id("approvedTermsOfUse");
+    }
 }

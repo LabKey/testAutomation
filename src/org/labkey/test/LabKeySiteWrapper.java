@@ -291,12 +291,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     protected void acceptTermsOfUse(String termsText, boolean clickAgree)
     {
-        if (isElementPresent(Locator.id("approvedTermsOfUse")))
+        WebElement termsCheckbox = Locators.termsOfUseCheckbox().findElementOrNull(getDriver());
+        if (termsCheckbox != null)
         {
-            Locator terms = Locator.id("approvedTermsOfUse");
-            if ( terms.findElement(getDriver()).isDisplayed())
+            if (termsCheckbox.isDisplayed())
             {
-                checkCheckbox(terms);
+                checkCheckbox(termsCheckbox);
                 if (null != termsText)
                 {
                     assertTextPresent(termsText);
