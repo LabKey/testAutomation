@@ -201,13 +201,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     public void signOut(@Nullable String termsText)
     {
         log("Signing out");
+        if (isImpersonating())
+        {
+            simpleSignOut(); // LogoutAction will stop impersonation and we can't always count on SiteNavBar being present when this is called
+            acceptTermsOfUse(termsText, true);
+        }
         simpleSignOut();
-
         acceptTermsOfUse(termsText, true);
-
-        if (!isElementPresent(Locators.signInButtonOrLink)) // Sign-out action stopped impersonation
-            simpleSignOut();
-        waitForElement(IS_BOOTSTRAP_LAYOUT ? Locators.UX_SIGNIN_LINK : Locators.signInButtonOrLink);
+        waitForElement(Locators.signInLink);
     }
 
     @LogMethod

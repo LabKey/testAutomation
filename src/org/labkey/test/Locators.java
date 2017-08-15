@@ -31,8 +31,7 @@ public abstract class Locators
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
     public static final Locator.XPathLocator alertWarning = Locator.tagWithClass("*", "alert alert-warning");
-    public static final Locator UX_SIGNIN_LINK = Locator.xpath("//a[contains(text(),'Sign In')]");
-    public static final Locator signInButtonOrLink = Locator.tag("a").withText("Sign\u00a0In"); // Will recognize link [BeginAction] or button [LoginAction]
+    public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("*", "labkey-folder-header").append(Locator.tagWithClass("ul", "tab-nav")).childTag("li");
     public static final Locator.XPathLocator UX_PAGE_NAV = Locator.xpath("//nav[@class='labkey-page-nav']");
     public static final Locator.XPathLocator UX_FOLDER_TAB = Locator.xpath("//li[contains(@class,'hidden') and ./a[@class='dropdown-toggle' and ./i[contains(@class, 'fa-folder-open')]]]");
@@ -48,11 +47,11 @@ public abstract class Locators
 
     public static Locator.XPathLocator bodyTitle()
     {
-        return Locator.tagWithClassContaining("div", "lk-body-title");
+        return Locator.tagWithClass("div", "lk-body-title").childTag("h3");
     }
     public static Locator.XPathLocator bodyTitle(String title)
     {
-        return bodyTitle().append(Locator.tagWithText("h3", title));
+        return bodyTitle().withText(title);
     }
 
     public static Locator footerPanel()

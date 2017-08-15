@@ -19,13 +19,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
 
+import static org.junit.Assert.assertEquals;
+
 @Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected static final String SITE_WIDE_TERMS_TEXT = "Site-wide terms of use text for the win";
     protected static final String NON_PUBLIC_NO_TERMS_PROJECT_NAME = "Non-public No Terms Project";
 
@@ -73,7 +77,9 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
     public void editTermsAdminConsoleLinkTest()
     {
         goToAdminConsole().clickSiteWideTerms();
-        assertElementContains(Locator.id("labkey-nav-trail-current-page"), "Edit");
+        assertEquals("Should be on wiki edit page for existing terms of use",
+                "Edit",
+                Locators.bodyTitle().findElement(getDriver()).getText());
     }
 
     protected void assureSiteWideTermsOfUsePage()
