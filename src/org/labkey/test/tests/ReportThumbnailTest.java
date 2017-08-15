@@ -45,6 +45,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class})
 public class ReportThumbnailTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ReportThumbnailTest";
     private static final String PROJECT_NAME_ROUNDTRIP = "ReportThumbnailTest_Roundtrip";
     private static final File TEST_STUDY = TestFileUtils.getSampleData("studies/LabkeyDemoStudyWithCharts.folder.zip");
@@ -136,21 +137,21 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Manage Views"));
 
         // Create pptx attachment report
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        clickMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU).findElement(getDriver()), false, ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_1);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
         setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "PowerPoint_JPEG_Thumbnail.pptx"));
         clickButton("Save", defaultWaitForPage);
 
         // Create xlsx attachment report
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        clickMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU).findElement(getDriver()), false, ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_2);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
         setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "Excel_Document_JPEG_Thumbnail.xlsx"));
         clickButton("Save", defaultWaitForPage);
 
         // Create docx attachment report
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU), ATTACH_REPORT_OPTION);
+        clickMenuButton(true, Locator.linkContainingText(ADD_REPORT_MENU).findElement(getDriver()), false, ATTACH_REPORT_OPTION);
         setFormElement(Locator.name(ATTACH_REPORT_NAME_ELMNT), ATTACHMENT_REPORT_3);
         _ext4Helper.selectRadioButton(ATTACH_TYPE_LABEL, ATTACH_TYPE_SERVER_PATH);
         setFormElement(Locator.name(ATTACH_FILE_NAME_ELMNT), new File(ATTACH_SAMPLE_DATA_PATH, "Word_Document_JPEG_Thumbnail.docx"));
@@ -296,8 +297,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
 
     protected void getCurrentCoreRevNumber()
     {
-        String imgSrc = Locator.xpath("//td[contains(@class, 'labkey-main-icon')]//a//img").findElement(getDriver()).getAttribute("src");
-        String rev = imgSrc.substring(imgSrc.lastIndexOf("&")+1);
+        String imgSrc = Locator.tagWithClass("a", "brand-logo").child("img").findElement(getDriver()).getAttribute("src");
+        String rev = imgSrc.substring(imgSrc.lastIndexOf("?")+1);
         CORE_REV_NUM = Integer.parseInt(rev.split("=")[1]);
     }
 
