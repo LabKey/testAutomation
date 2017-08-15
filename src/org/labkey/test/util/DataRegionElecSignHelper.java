@@ -48,6 +48,6 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
     @Override
     protected String getShowPanelButtonText()
     {
-        return "Sign Data";
+        return "Export";
     }
 }
