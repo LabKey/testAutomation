@@ -57,6 +57,7 @@ public class Crawler
     private static Map<String, String> _sourceReplacements = new CaseInsensitiveHashMap<>();
 
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
+    private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
     private int _finalDepth = 0;
@@ -431,6 +432,10 @@ public class Crawler
             if (getDepth() >= getMaxDepth() && _actionsVisited.contains(getActionId()))
                 return false;
 
+            // Don't let a single bad action fail multiple tests
+            if (_actionsWithErrors.contains(getActionId()))
+                return false;
+
             // never visit explicitly excluded actions:
             if (_excludedActions.contains(getActionId()))
                 return false;
@@ -738,6 +743,7 @@ public class Crawler
     {
         _finalDepth = Math.max(urlToCheck.getDepth(), _finalDepth);
         String relativeURL = urlToCheck.getRelativeURL();
+        ControllerActionId actionId = new ControllerActionId(relativeURL);
 
         URL origin = null;
         URL currentPageUrl;
@@ -747,7 +753,7 @@ public class Crawler
             // Go to the site
             long loadTime = _test.beginAt(relativeURL);
             // Keep track of where crawler has been
-            _actionsVisited.add(new ControllerActionId(relativeURL));
+            _actionsVisited.add(actionId);
             _actionProfiler.updateActionProfile(relativeURL, loadTime);
 
             int depth = urlToCheck.getDepth();
@@ -777,6 +783,7 @@ public class Crawler
         }
         catch (RuntimeException | AssertionError rethrow)
         {
+            _actionsWithErrors.add(actionId);
             // Collect origin page snapshot for failure and rethrow original failure
 
             if (origin != null)
