@@ -24,6 +24,7 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,6 +52,47 @@ public class SearchResultsPage extends LabKeyPage
         return Integer.parseInt(matcher.group(1));
     }
 
+    public List<WebElement> getResults()
+    {
+        return elements().searchResultCards();
+    }
+
+    public void openAdvancedOptions()
+    {
+        if (!isAdvancedOptionsOpen())
+            elements().advancedOptionsToggle.click();
+            waitFor(()-> isAdvancedOptionsOpen(), WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void closeAdvancedOptions()
+    {
+        if (isAdvancedOptionsOpen())
+            elements().advancedOptionsToggle.click();
+        waitFor(()-> !isAdvancedOptionsOpen(), WAIT_FOR_JAVASCRIPT);
+    }
+
+    public boolean isAdvancedOptionsOpen()
+    {
+        return Locator.tagContainingText("h5", "Scope").findElement(getDriver()).isDisplayed();
+    }
+
+    public SearchResultsPage setSearchScope(String scope)
+    {
+        openAdvancedOptions();
+        checkRadioButton(Locator.radioButtonByName("scope").containing(scope));
+        return this;
+    }
+
+    public SearchResultsPage setSearchCategories(String... categories)
+    {
+        openAdvancedOptions();
+        for(int i=0; i< categories.length; i++)
+        {
+            checkCheckbox(Locator.checkboxByNameAndValue("category", categories[i]));
+        }
+        return this;
+    }
+
     Elements elements()
     {
         return new Elements();
@@ -64,6 +106,8 @@ public class SearchResultsPage extends LabKeyPage
             return getDriver();
         }
 
+        public WebElement advancedOptionsToggle = Locator.tagWithClass("a", "search-advanced-toggle").waitForElement(this, WAIT_FOR_JAVASCRIPT);
+
         WebElement resultsCount()
         {
             return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
@@ -76,6 +120,11 @@ public class SearchResultsPage extends LabKeyPage
             return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
                     Locator.css(".labkey-search-results-counts div").index(1).findElement(this) :
                     Locator.css("table.labkey-search-results-counts td").index(1).findElement(this);
+        }
+
+        List<WebElement> searchResultCards()    // Todo: wrap these into a better component type
+        {
+            return Locator.tagWithClass("div", "labkey-search-result").findElements(this);
         }
     }
 }

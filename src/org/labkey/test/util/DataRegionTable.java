@@ -1644,17 +1644,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return IS_BOOTSTRAP_LAYOUT ? "Import bulk data" : "Import Bulk Data";
     }
 
-    public void goToView(String viewName)
+    public void goToView(String... menuTexts)
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", viewName);
+        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", menuTexts);
     }
 
-    public void goToReport(String reportName)
+    public void goToReport(String... menuTexts)
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
-            menu.clickMenuButton(true, false, reportName);
+            menu.clickSubMenu(true,  menuTexts);
         }
         else
         {
