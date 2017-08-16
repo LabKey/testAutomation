@@ -125,17 +125,13 @@ public class ScatterPlotTest extends GenericChartsTest
         datasetFieldsPanel.selectField(APXHEENT);
 
         log("Change the column's reporting status to 'measure'");
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
-        Checkbox measure = Checkbox.Checkbox(Locator.tagWithName("input", "measure")).findWhenNeeded(datasetFieldsPanel);
-        measure.check();
+        datasetFieldsPanel.fieldProperties().selectReportingTab().measure.check();
 
         log("click on the 'Pulse' field");
         datasetFieldsPanel.selectField(APXPULSE);
 
         log("Change the column's reporting status to 'dimension'");
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
-        Checkbox dimension = Checkbox.Checkbox(Locator.tagWithName("input", "dimension")).findWhenNeeded(datasetFieldsPanel);
-        dimension.check();
+        datasetFieldsPanel.fieldProperties().selectReportingTab().dimension.check();
 
         doAndWaitForPageToLoad(()->{
             click(Locator.linkWithSpan("Save"));
