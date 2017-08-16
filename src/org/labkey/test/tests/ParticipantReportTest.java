@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyC.class, Reports.class})
 public class ParticipantReportTest extends ReportTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PARTICIPANT_REPORT_NAME = "Test Participant Report";
     private static final String PARTICIPANT_REPORT_DESCRIPTION = "Participant report created by ReportTest";
     private static final String PARTICIPANT_REPORT2_NAME = "Test Participant Report 2";
@@ -145,8 +147,8 @@ public class ParticipantReportTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Mouse Report");
-
+        BootstrapMenu.find(getDriver(),"Add Report")
+                .clickSubMenu(true,"Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -315,7 +317,8 @@ public class ParticipantReportTest extends ReportTest
 
         // Test group filtering
         goToManageViews();
-        clickAddReport("Mouse Report");
+        BootstrapMenu.find(getDriver(),"Add Report")
+                .clickSubMenu(true,"Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -380,7 +383,7 @@ public class ParticipantReportTest extends ReportTest
 
         //Participant report with specimen fields.
         goToManageViews();
-        clickAddReport("Mouse Report");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Mouse Report");
         // select some measures from a dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -434,8 +437,7 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Save");
 
         goToManageViews();
-        clickAddReport("Mouse Report");
-
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Mouse Report");
         // select some measures from the demographics
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
