@@ -30,6 +30,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
+import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionExportHelper;
@@ -39,6 +40,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.TextSearcher;
@@ -65,6 +67,7 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 @Category({DailyA.class, Data.class})
 public class ListTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
@@ -146,8 +149,6 @@ public class ListTest extends BaseWebDriverTest
     private final File EXCEL_APILIST_FILE = TestFileUtils.getSampleData("dataLoading/excel/ClientAPITestList.xls");
     private final File TSV_SAMPLE_FILE = TestFileUtils.getSampleData("fileTypes/tsv_sample.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
-
-    private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(false); // whitelist me before constructor time
 
     public List<String> getAssociatedModules()
     {
@@ -534,8 +535,8 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.removeColumn(_listCol3.getName());
         _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
         _customizeViewsHelper.clickViewGrid();
-        Window warning = new Window("Selection required", getDriver());
-        assertEquals("Wrong warning message", "You must select at least one field to display in the grid.", warning.getBody());
+        ModalDialog warning = ModalDialog.find(getDriver());
+        assertEquals("Wrong warning message", "You must select at least one field to display in the grid.", warning.getBodyText());
         warning.close();
         _customizeViewsHelper.closePanel();
 
@@ -572,10 +573,11 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
         // List insert/update events should each have a link to the list item that was modified, but the other events won't have a link
-        assertEquals("details Links", 6, getElementCount(Locator.linkWithText("DETAILS")));
-        assertEquals("Project Links", 18 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
-        assertEquals("List Links", 18 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
-        clickAndWait(Locator.linkWithText("DETAILS"));
+        assertEquals("details Links", 6, DataRegionTable.detailsLinkLocator().findElements(getDriver()).size());
+        assertEquals("Project Links", 18 , Locator.linkWithText(PROJECT_VERIFY).findElements(getDriver()).size()); // Table links
+        assertEquals("List Links", 18 + 1, Locator.linkWithText(LIST_NAME_COLORS).findElements(getDriver()).size()); // Table links + header link
+        DataRegionTable dataRegionTable = new DataRegionTable("query", getDriver());
+        clickAndWait(dataRegionTable.detailsLink(0));
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.", "Unable to find the audit history detail for this event");
 
@@ -638,7 +640,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test export");
         DataRegionTable list = new DataRegionTable("query", getDriver());
-        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.tagWithAttribute("a", "data-original-title", "Export"));
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
@@ -652,20 +654,19 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresentInThisOrder(srch, LIST2_KEY3, LIST2_KEY2);
 
         log("Test edit row");
-        clickAndWait(Locator.linkWithText("edit"));
-        selectOptionByText(Locator.name("quf_Color"), TEST_DATA[1][1]);
-        selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
-        submit();
+        list.updateRow(LIST2_KEY3, Maps.of(
+                "Color", TEST_DATA[1][1],
+                "Owner", LIST2_FOREIGN_KEY_OUTSIDE));
 
-        final DataRegionTable dataRegionTable = DataRegion(getDriver()).withName("query").find();
-        dataRegionTable.clickHeaderMenu("Grid Views", "default");
+        final DataRegionTable dt = DataRegion(getDriver()).withName("query").find();
+        dt.goToView("default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
         dataRegionTable.checkAll();
         doAndWaitForPageToLoad(() ->
         {
-            clickButton("Delete", 0);
+            dt.clickHeaderButton("Delete");
             assertAlert("Are you sure you want to delete the selected rows?");
         });
         assertEquals("Failed to delete all rows", 0, dataRegionTable.getDataRowCount());
@@ -674,7 +675,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        clickAndWait(Locator.linkWithText("Design"));
+        dt.clickHeaderButtonAndWait("Design");
         _listHelper.clickDeleteList();
         assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
         clickButton("OK");
@@ -685,7 +686,7 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         waitForElement(Locator.tagWithAttribute("tr", "data-recordid", LIST3_KEY_NAME.toUpperCase()));
         assertElementNotPresent(Locator.tagWithAttribute("tr", "data-recordid", LIST_KEY_NAME.toUpperCase()));
-        clickAndWait(Locator.linkWithText(PROJECT_VERIFY));
+        goToProjectHome();
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
