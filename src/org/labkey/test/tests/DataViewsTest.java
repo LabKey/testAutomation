@@ -40,6 +40,7 @@ import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 @Category({DailyC.class})
 public class DataViewsTest extends ParticipantListTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String REPORT_NAME = "TestReport";
     private static final String RENAMED_WEBPART_TITLE = "TestDataViews";
     private static final String ORIGINAL_WEBPART_TITLE = "Data Views";
