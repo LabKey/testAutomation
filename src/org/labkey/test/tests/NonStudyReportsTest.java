@@ -23,6 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
@@ -35,6 +36,7 @@ import static org.junit.Assert.*;
 @Category({DailyC.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
 {
+    {setIsBootstrapWhitelisted(true);}
     protected final PortalHelper portalHelper = new PortalHelper(this);
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
 
@@ -60,7 +62,7 @@ public class NonStudyReportsTest extends ReportTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsersIfPresent(ATTACHMENT_USER);
+        _userHelper.deleteUsers(false, ATTACHMENT_USER);
         super.doCleanup(afterTest);
     }
 
@@ -89,10 +91,11 @@ public class NonStudyReportsTest extends ReportTest
     {
         clickProject(getProjectName());
         goToManageViews();
-        clickAddReport("Attachment Report");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Attachment Report");
         clickButton("Cancel");
 
-        clickAddReport("Attachment Report");
+        BootstrapMenu.find(getDriver(),"Add Report")
+                .clickSubMenu(true,"Attachment Report");
         setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT_NAME);
         setFormElement(Locator.name("description"), ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
@@ -104,7 +107,7 @@ public class NonStudyReportsTest extends ReportTest
         waitForText("Manage Views");
 
         // test creation from Data Views menu option
-        clickTab("Overview");
+        goToProjectHome();
         portalHelper.addWebPart("Data Views");
         portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Attachment Report");
         setFormElement(Locator.name("viewName"), ATTACHMENT_REPORT2_NAME);
@@ -156,7 +159,7 @@ public class NonStudyReportsTest extends ReportTest
         // verify a non-admin can edit a local attachment report but not a
         // server attachment report
         //
-        createUser(ATTACHMENT_USER, null);
+        _userHelper.createUser(ATTACHMENT_USER);
         clickProject(getProjectName());
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.setUserPermissions(ATTACHMENT_USER, "Editor");
@@ -164,7 +167,7 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
 
         // can edit local
-        clickTab("Overview");
+        goToProjectHome();
         portalHelper.clickWebpartMenuItem("Data Views", true, "Manage Views");
         waitForText("Manage Views");
         clickReportDetailsLink(ATTACHMENT_REPORT_NAME);
@@ -175,7 +178,7 @@ public class NonStudyReportsTest extends ReportTest
         waitForText("Report Details");
 
         // cannot edit server
-        clickTab("Overview");
+        goToProjectHome();
         clickReportDetailsLink(ATTACHMENT_REPORT2_NAME);
         waitForElement(Locator.lkButton("View Report"));
         assertElementNotPresent(Locator.lkButton("Edit Report"));
@@ -234,7 +237,7 @@ public class NonStudyReportsTest extends ReportTest
     @LogMethod
     private void doThumbnailChangeTest()
     {
-        clickTab("Overview");
+        goToProjectHome();
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_NAME, this);
         assertTextPresent("Share this report with all users");
@@ -254,22 +257,20 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
 
         goToManageViews();
-        clickAddReport("R Report");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
         RReportHelper RReportHelper = new RReportHelper(this);
         RReportHelper.executeScript("# Placeholder script for discussion", "");
         click(Locator.linkWithText("Source"));
         RReportHelper.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT);
 
-        _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), "Start new discussion");
-
+        clickMenuButton(true,Locator.id("discussionMenuToggle").findElement(getDriver()),false,"Start new discussion");
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
         setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
         clickButton("Submit");
 
-        _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), DISCUSSION_TITLE_1);
-
+        clickMenuButton(true,Locator.id("discussionMenuToggle").findElement(getDriver()),false,DISCUSSION_TITLE_1);
         waitForText(DISCUSSION_TITLE_1);
         assertTextPresent(DISCUSSION_BODY_1);
 
@@ -301,7 +302,7 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
         goToManageViews();
 
-        clickAddReport("Link Report");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Link Report");
         waitForElement(Locator.tag("li").containing("URL must be absolute"));
         assertElementPresent(Locator.tag("li").containing("This field is required"), 2);
         setFormElement(Locator.name("viewName"), LINK_REPORT1_NAME);
@@ -319,7 +320,7 @@ public class NonStudyReportsTest extends ReportTest
         waitForText("Manage Views");
 
         // test creation from menu option on Data Views webpart
-        clickTab("Overview");
+        goToProjectHome();
         portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), LINK_REPORT2_NAME);
         setFormElement(Locator.name("description"), LINK_REPORT2_DESCRIPTION);
