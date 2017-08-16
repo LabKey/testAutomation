@@ -183,6 +183,7 @@ public class Crawler
                 // Begin actions that 404 when module is not enabled
                 new ControllerActionId("nlp", "begin"),
                 new ControllerActionId("biologics", "begin"),
+                new ControllerActionId("reagent", "begin"),
                 new ControllerActionId("hdrl", "begin")
         );
 
