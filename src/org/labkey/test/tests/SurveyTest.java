@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class SurveyTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private final String folderName = "subfolder";
     protected final String pipelineLoc =  "/sampledata/survey";
     private final String projectSurveyDesign = "My Project Survey Design";
@@ -169,7 +170,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         log("Edit the survey in the specified folder");
         clickFolder(folderName);
-        clickEditForLabel(firstSurvey);
+        clickEditForLabel("Surveys: My Project Survey Design" ,firstSurvey);
         _ext4Helper.waitForMaskToDisappear();
         setFormElement(Locator.name("txtareafield"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
@@ -191,14 +192,14 @@ public class SurveyTest extends BaseWebDriverTest
 
         log("Submit the completed survey in the specified folder");
         clickFolder(folderName);
-        clickEditForLabel(firstSurvey);
+        clickEditForLabel("Surveys: My Project Survey Design", firstSurvey);
         _ext4Helper.waitForMaskToDisappear();
         assertElementPresent(Ext4Helper.Locators.ext4Button("Save"));
         assertElementPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         clickButton("Submit completed form");
         // go back to the submitted survey and verify the submit button is gone
         // TODO: add verification that site/project admins can still see Save button but other users can not for a submitted survey
-        clickEditForLabel(firstSurvey);
+        clickEditForLabel("Surveys: My Project Survey Design", firstSurvey);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         assertTextPresent("Submitted by");
@@ -248,7 +249,7 @@ public class SurveyTest extends BaseWebDriverTest
 
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);
-        clickEditForLabel(subfolderSurveyDesign);
+        clickEditForLabel("Survey Designs", subfolderSurveyDesign);
         String json = TestFileUtils.getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
         _extHelper.setCodeMirrorValue("metadata", json);
         clickButton("Save Survey");
@@ -368,15 +369,11 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextNotPresent("tobedeleted");
     }
 
-    private void clickEditForLabel(String label)
+    private void clickEditForLabel(String webPartTitle, String label)
     {
         waitForText(label);
-        Locator l = Locator.xpath("//a[text()='edit'][../../td[text()='" + label + "']]");
-        // check if the label is a link vs just text
-        if (!isElementPresent(l))
-            l = Locator.xpath("//a[text()='edit'][../..//a[text()='" + label + "']]");
-
-        clickAndWait(l);
+        DataRegionTable dt = DataRegionTable.findDataRegionWithinWebpart(this, webPartTitle);
+        dt.clickEditRow(dt.getRowIndex("Label", label));
     }
 
     @Override
