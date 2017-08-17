@@ -1658,10 +1658,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void goToReport(String... menuTexts)
     {
+        goToReport(true, menuTexts);
+    }
+
+    public void goToReport(boolean waitForPageRefresh, String... menuTexts)
+    {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
-            menu.clickSubMenu(true,  menuTexts);
+            menu.clickSubMenu(waitForPageRefresh,  menuTexts);
         }
         else
         {
@@ -1914,7 +1919,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         buttonBar,
                         Locator.lkButton().withAttribute("title", title),
                         Locator.lkButton(text),
-                        Locator.tagWithAttribute("a", "data-original-title", title)));
+                        Locator.tagWithAttribute("a", "data-original-title", title),
+                        Locator.tagWithAttribute("a", "title", title))); /* bootstrapjs modifies 'title' to data-original-title
+                                                    this is there to find those before that markup change happens */
             }
             return headerButtons.get(text);
         }
@@ -1932,7 +1939,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
                                 .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text)),
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text))));
+                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text)),
+                        Locator.tagWithClassContaining("div", "lk-menu-drop")
+                                .withChild(Locator.tagWithAttribute("a", "title", text))));
             }
             return headerMenus.get(text);
         }

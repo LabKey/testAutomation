@@ -16,7 +16,10 @@
 package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.SiteNavBar;
+import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +32,7 @@ import static org.junit.Assert.*;
 public class ResetTracker
 {
     BaseWebDriverTest test = null;
-    protected String searchBoxId = "query";
+    protected String searchBoxId = "query"; //TODO: remove after UX conversion.  New UI searchBox has name='q'
     protected String searchBoxEntry =  null;
 
     public ResetTracker(BaseWebDriverTest test)
@@ -43,7 +46,15 @@ public class ResetTracker
     public void startTrackingRefresh()
     {
         searchBoxEntry = BaseWebDriverTest.TRICKY_CHARACTERS + "this should not change" + resetTrackingCounter++;
-        test.setFormElement(Locator.id(searchBoxId), searchBoxEntry);
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+        {
+            WebElement searchInput = new SiteNavBar(test.getDriver()).expandSearchBar();
+            test.setFormElement(searchInput, searchBoxEntry);
+        }
+        else
+        {
+            test.setFormElement(Locator.id(searchBoxId), searchBoxEntry);
+        }
     }
 
     public void stopTrackingRefresh()
@@ -58,7 +69,11 @@ public class ResetTracker
         {
             throw new IllegalStateException("search box was not initialized to wait for refresh");
         }
-        String searchBoxContents = test.getFormElement(Locator.id(searchBoxId));
+        String searchBoxContents;
+        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            searchBoxContents = test.getFormElement(Locator.input("q"));
+        else
+            searchBoxContents = test.getFormElement(Locator.id(searchBoxId));
         return !searchBoxContents.equals(searchBoxEntry);
     }
 

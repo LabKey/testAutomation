@@ -23,6 +23,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
@@ -34,6 +35,7 @@ import java.util.List;
 @Category({DailyA.class, Wiki.class})
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     ResetTracker resetTracker = null;
 
     protected  final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES + "Embedded web part test";
@@ -91,7 +93,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
         resetTracker.startTrackingRefresh();
 
-        _extHelper.clickMenuButton(false, "Reports", rReportName);
+        DataRegionTable.DataRegion(getDriver()).find().goToReport(false, rReportName);
 
         resetTracker.assertWasNotRefreshed();
     }

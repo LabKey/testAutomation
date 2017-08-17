@@ -53,7 +53,10 @@ public class UIContainerHelper extends AbstractContainerHelper
         if (null != folderType && !folderType.equals("None"))
             _test.click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input"));
         else
+        {
             _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));
+            _test.waitForElementToBeVisible(Locator.input("defaultModule")); // wait for module-choice flyout
+        }
 
         _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
 
