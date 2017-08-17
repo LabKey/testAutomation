@@ -96,7 +96,7 @@ public class ExperimentRunTable extends DataRegionTable
 
     public void clickRunLink(int row)
     {
-        _driver.clickAndWait(Locator.linkWithText(getRunName(row)));
+        getWrapper().clickAndWait(Locator.linkWithText(getRunName(row)));
     }
 
     public void clickGraphLink(String name)
@@ -107,7 +107,7 @@ public class ExperimentRunTable extends DataRegionTable
     public void clickGraphLink(int row)
     {
         // todo: not hardcoded!
-        _driver.clickAndWait(link(row, 2));
+        getWrapper().clickAndWait(link(row, 2));
     }
 
     private int getExpectedRunRow(String name)
