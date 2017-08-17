@@ -16,10 +16,10 @@
 package org.labkey.test.pages.issues;
 
 import org.labkey.test.Locator;
-import org.labkey.test.components.core.FilePicker;
 import org.labkey.test.components.html.FormItem;
 import org.labkey.test.components.html.Input;
 import org.labkey.test.components.html.OptionSelect;
+import org.labkey.test.components.issues.FilePicker;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

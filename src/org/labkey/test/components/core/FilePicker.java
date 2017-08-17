@@ -33,24 +33,23 @@ import static org.labkey.test.components.ext4.Window.Window;
  */
 public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
 {
-    private static final String DEFAULT_TABLE_ID = "filePickerTable";
-    private static final String DEFAULT_LINK_ID = "filePickerLink";
-
     private final WebDriver _driver;
     private final WebElement _el;
-    private final String linkId;
-
-    // Make public if necessary. All current implementations use the same IDs
-    protected FilePicker(WebDriver driver, String tableId, String linkId)
-    {
-        _driver = driver;
-        _el = Locator.id(tableId).findWhenNeeded(_driver);
-        this.linkId = linkId;
-    }
 
     public FilePicker(WebDriver driver)
     {
-        this(driver, DEFAULT_TABLE_ID, DEFAULT_LINK_ID);
+        _driver = driver;
+        _el = Locator.id(getTableId()).findWhenNeeded(_driver);
+    }
+
+    protected String getTableId()
+    {
+        return "filePickerTable";
+    }
+
+    protected String getLinkId()
+    {
+        return "filePickerLink";
     }
 
     public FilePicker addAttachment(File file)
@@ -121,6 +120,6 @@ public class FilePicker extends WebDriverComponent<FilePicker.ElementCache>
         }
 
         // Note: pickerLink is outside of pickerTable (usually sibling)
-        protected WebElement pickerLink = Locator.id(linkId).findWhenNeeded(getDriver());
+        protected WebElement pickerLink = Locator.id(getLinkId()).findWhenNeeded(getDriver());
     }
 }

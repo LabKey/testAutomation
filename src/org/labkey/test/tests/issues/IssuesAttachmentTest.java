@@ -44,6 +44,7 @@ import static org.junit.Assert.assertFalse;
 @Category({DailyC.class})
 public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindowsTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final File FILES_ARCHIVE = TestFileUtils.getSampleData("filenames/illegal_chars.tar.gz");
     private static final File EXTRACTION_DIR = new File(FILES_ARCHIVE.getParentFile(), "extracted");
 
@@ -94,33 +95,36 @@ public class IssuesAttachmentTest extends BaseWebDriverTest implements NonWindow
         final DetailsPage detailsPage = issuesHelper.addIssue(issue, ALERT_FILE, ESCAPE_FILE);
         final String issueId = detailsPage.getIssueId();
 
+        final Locator.XPathLocator alertFile = Locator.linkWithText(" " + ALERT_FILE.getName());
+        final Locator.XPathLocator escapeFile = Locator.linkWithText(" " + ESCAPE_FILE.getName());
+
         // details page
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         detailsPage.clickPrint();
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         UpdatePage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         ResolvePage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         ClosePage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         ReopenPage.beginAt(this, issueId);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
 
         DetailsListPage.beginAt(this, LIST_DEF_NAME);
-        assertElementPresent(Locator.linkWithText(" " + ALERT_FILE.getName()));
-        assertElementPresent(Locator.linkWithText(" " + ESCAPE_FILE.getName()));
+        assertElementPresent(alertFile);
+        assertElementPresent(escapeFile);
     }
 
     @Override
