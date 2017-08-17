@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.pages.LabKeyPage;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -107,7 +108,13 @@ public class PipelineStatusTable extends DataRegionTable
 
     public void clickStatusLink(int row)
     {
-        _driver.clickAndWait(link(row, getStatusColumnIndex()));
+        getWrapper().clickAndWait(link(row, getStatusColumnIndex()));
+    }
+
+    public LabKeyPage clickSetup()
+    {
+        clickHeaderButton("Setup");
+        return null; // TODO: Create pipeline setup page
     }
 
     private int getExpectedJobRow(String description)
