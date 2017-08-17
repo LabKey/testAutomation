@@ -60,6 +60,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
+import static org.labkey.test.Locators.*;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -67,17 +68,16 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
  */
 public class DataRegionTable extends WebDriverComponent implements WebDriverWrapper.PageLoadListener
 {
-    @Deprecated // TODO: Make private and scope to a specific DataRegion
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
     public static final String PANEL_HIDE_SIGNAL = "dataRegionPanelHide";
     private static final int DEFAULT_WAIT = 30000;
-    
-    protected final String _regionName;
+
     protected final WebDriverWrapper _driver;
     private final WebElement _el;
-    protected final boolean _selectors;
-    protected final boolean _floatingHeaders;
+
+    // Set once when requested
+    private String _regionName;
 
     // Cached items
     private CustomizeView _customizeView;
@@ -98,28 +98,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         if (el == null)
         {
-            _driver.waitForElement(org.labkey.test.Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
             _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
             _regionName = name;
         }
         else
         {
             _el = el;
-            String regionName = StringUtils.trimToNull(el.getAttribute("lk-region-form")); // new UI
-            _regionName = regionName != null ? regionName : el.getAttribute("lk-region-name"); // old UI
         }
         if (_el instanceof RefindingWebElement)
         {
             ((RefindingWebElement) _el).
-                    withRefindListener(element ->
-                    {
-                        clearCache();
-                        _driver.waitForElement(org.labkey.test.Locators.pageSignal(UPDATE_SIGNAL), DEFAULT_WAIT);
-                    });
+                    withRefindListener(element -> clearCache());
         }
-
-        _selectors = !Locator.css(".labkey-selectors").findElements(_el).isEmpty();
-        _floatingHeaders = !Locator.xpath("tbody/tr").withClass("dataregion_column_header_row_spacer").findElements(_el).isEmpty();
 
         _driver.addPageLoadListener(this);
     }
@@ -200,9 +190,22 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         _dataCache.clear();
     }
 
+    /**
+     * Triggered by clientapi/dom/DataRegion.js
+     */
+    protected String getUpdateSignal()
+    {
+        return UPDATE_SIGNAL + "-" + getDataRegionName();
+    }
+
     public String doAndWaitForUpdate(Runnable run)
     {
-        return _driver.doAndWaitForPageSignal(run, DataRegionTable.UPDATE_SIGNAL);
+        return _driver.doAndWaitForPageSignal(run, getUpdateSignal());
+    }
+
+    protected boolean hasSelectors()
+    {
+        return elements().hasSelectors();
     }
 
     public CustomizeView getCustomizeView()
@@ -253,16 +256,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _exportHelper.expandExportPanel();
     }
 
-    protected int getHeaderRowCount()
-    {
-        return 2 + (_floatingHeaders ? 2 : 0);
-    }
-
-    protected int getFooterRowCount()
-    {
-        return hasSummaryStatisticRow() ? 1 : 0;
-    }
-
     public static DataRegionFinder DataRegion(WebDriver driver)
     {
         return new DataRegionFinder(driver);
@@ -271,6 +264,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public static class DataRegionFinder extends WebDriverComponentFinder<DataRegionTable, DataRegionFinder>
     {
         private Locator _loc = Locators.dataRegion();
+        private boolean _lazy = false;
 
         public DataRegionFinder(WebDriver driver)
         {
@@ -285,6 +279,20 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
 
         @Override
+        public DataRegionTable findWhenNeeded(SearchContext context)
+        {
+            try
+            {
+                _lazy = true;
+                return super.findWhenNeeded(context);
+            }
+            finally
+            {
+                _lazy = false;
+            }
+        }
+
+        @Override
         protected Locator locator()
         {
             return _loc;
@@ -293,7 +301,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         @Override
         protected DataRegionTable construct(WebElement el, WebDriver driver)
         {
-            return new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
+            DataRegionTable constructed = new DataRegionTable(new RefindingWebElement(el, buildLocator(), getContext()), driver);
+            if (!_lazy)
+                constructed.elements(); // Wait for data region to be ready
+            return constructed;
         }
     }
 
@@ -338,9 +349,24 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return DataRegion(test.getDriver()).find(new RefindingWebElement(PortalHelper.Locators.webPart(webPartTitle), test.getDriver()));
     }
 
+    public String getDataRegionName()
+    {
+        if (_regionName == null)
+        {
+            String regionName = StringUtils.trimToNull(getComponentElement().getAttribute("lk-region-form")); // new UI
+            _regionName = regionName != null ? regionName : getComponentElement().getAttribute("lk-region-name"); // old UI
+        }
+        return _regionName;
+    }
+
+    /**
+     * @deprecated Use {@link #getDataRegionName()}
+     * Rename to better match terminology in DataRegion.js
+     */
+    @Deprecated
     public String getTableName()
     {
-        return _regionName;
+        return getDataRegionName();
     }
 
     private String getTableId()
@@ -358,7 +384,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public int getColumnCount()
     {
-        return elements().getColumnHeaders().size() - (_selectors ? 1 : 0);
+        return elements().getColumnHeaders().size() - (hasSelectors() ? 1 : 0);
     }
 
     public boolean hasSummaryStatisticRow()
@@ -439,7 +465,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public String getSummaryStatFooterText(int columnIndex)
     {
-        columnIndex += _selectors ? 1 : 0;
+        columnIndex += hasSelectors() ? 1 : 0;
         String footerText = elements().getSummaryStatisticCells().get(columnIndex).getText();
         return footerText != null ? footerText.replaceAll("\\?", "") : null;
     }
@@ -525,7 +551,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public WebElement link(int row, int col)
     {
-        col += _selectors ? 1 : 0;
+        col += hasSelectors() ? 1 : 0;
         return Locator.xpath("a").findElement(elements().getCell(row, col));
     }
 
@@ -586,7 +612,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (_columnLabels.isEmpty())
         {
             _columnLabels.addAll(_driver.getTexts(elements().getColumnHeaders()));
-            if (_selectors)
+            if (hasSelectors())
                 _columnLabels.remove(0);
         }
 
@@ -600,11 +626,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         if (_columnNames.isEmpty())
         {
             List<WebElement> columnHeaders = elements().getColumnHeaders();
-            for (int i = _selectors ? 1 : 0; i < columnHeaders.size(); i++)
+            for (int i = hasSelectors() ? 1 : 0; i < columnHeaders.size(); i++)
             {
                 String columnName = columnHeaders.get(i).getAttribute("column-name");
-                if (columnName.startsWith(_regionName + ":"))
-                    columnName = columnName.substring(_regionName.length() + 1);
+                if (columnName.startsWith(getDataRegionName() + ":"))
+                    columnName = columnName.substring(getDataRegionName().length() + 1);
                 _columnNames.add(columnName);
             }
         }
@@ -752,7 +778,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public int getRowIndex(String pk)
     {
-        assertTrue("Need the selector checkboxes value to find row by pk", _selectors);
+        assertTrue("Need the selector checkboxes value to find row by pk", hasSelectors());
 
         getComponentElement().isDisplayed(); // refresh cache
 
@@ -791,7 +817,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public WebElement findCell(int row, int column)
     {
-        column += _selectors ? 1 : 0;
+        column += hasSelectors() ? 1 : 0;
         return elements().getCell(row, column);
     }
 
@@ -1012,14 +1038,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
         else
         {
-            _driver.setSort(_regionName, columnName, direction);
+            _driver.setSort(getDataRegionName(), columnName, direction);
         }
-    }
-
-    public WebElement getSubMenuItem(String columnName, String menuItem, String subMenuItem)
-    {
-        final WebElement menu = elements().getColumnHeader(columnName);
-        return _driver._ext4Helper.clickExt4MenuButton(false, menu, true /*openOnly*/, menuItem, subMenuItem);
     }
 
     public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
@@ -1035,7 +1055,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     private void clickSummaryStatistic(String columnName, String stat, boolean isExpectedToBeChecked, @Nullable String expectedValue)
     {
         String clearOrSet = isExpectedToBeChecked ? "Clearing" : "Setting";
-        TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + _regionName + " for " + columnName);
+        TestLogger.log(clearOrSet + " the " + stat + " summary statistic in " + getDataRegionName() + " for " + columnName);
         clickColumnMenu(columnName, false, "Summary Statistics...");
 
         SummaryStatisticsDialog statsWindow = new SummaryStatisticsDialog(getDriver());
@@ -1058,7 +1078,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void removeColumn(String columnName, boolean errorExpected)
     {
-        TestLogger.log("Removing column " + columnName + " in " + _regionName);
+        TestLogger.log("Removing column " + columnName + " in " + getDataRegionName());
         clickColumnMenu(columnName, !errorExpected, "Remove Column");
 
         if (errorExpected)
@@ -1070,7 +1090,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             }
             else
             {
-                Window removeError = new Window("Error", _driver.getDriver());
+                Window removeError = new Window("Error", getDriver());
                 assertTrue(removeError.getBody().contains("You must select at least one field to display in the grid."));
                 removeError.clickButton("OK", 0);
                 removeError.waitForClose();
@@ -1087,7 +1107,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
         else
         {
-            _driver.clearSort(_regionName, columnName);
+            _driver.clearSort(getDataRegionName(), columnName);
         }
     }
 
@@ -1099,7 +1119,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         final Locator.XPathLocator filterDialog = ExtHelper.Locators.window("Show Rows Where " + columnLabel + "...");
         _driver.waitForElement(filterDialog);
 
-        _driver.waitFor(() -> _driver.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
+        WebDriverWrapper.waitFor(() -> _driver.isElementPresent(filterDialog.append(Locator.linkWithText("[All]")).notHidden()) ||
                         _driver.isElementPresent(filterDialog.append(Locator.tagWithId("input", "value_1").notHidden())),
                 "Filter Dialog", WAIT_FOR_JAVASCRIPT);
         _driver._extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
@@ -1140,7 +1160,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void setUpFilter(String columnName, String filter1Type, @Nullable String filter1, @Nullable String filter2Type, @Nullable  String filter2)
     {
-        String log = "Setting filter in " + _regionName + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
+        String log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to " + filter1Type.toLowerCase() + (filter1 != null ? " " + filter1 : "");
         if (filter2Type != null)
         {
             log += " and " + filter2Type.toLowerCase() + (filter2 != null ? " " + filter2 : "");
@@ -1180,7 +1200,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         String log;
         if (values.length > 0)
         {
-            log = "Setting filter in " + _regionName + " for " + columnName + " to one of: [";
+            log = "Setting filter in " + getDataRegionName() + " for " + columnName + " to one of: [";
             for (String v : values)
             {
                 log += v + ", ";
@@ -1189,7 +1209,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         }
         else
         {
-            log = "Clear filter in " + _regionName + " for " + columnName;
+            log = "Clear filter in " + getDataRegionName() + " for " + columnName;
         }
 
         TestLogger.log(log);
@@ -1229,7 +1249,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void clearFilter(String columnName, int waitMillis)
     {
-        TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
+        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
 
         Runnable clickClearFilter = () -> clickColumnMenu(columnName, false, "Clear Filter");
 
@@ -1243,13 +1263,13 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void clearAllFilters()
     {
         // TODO: This should be updated to use the UI once the UX Refresh configures a "Clear all" mechanism again
-        TestLogger.log("Clearing all filters in " + _regionName);
+        TestLogger.log("Clearing all filters in " + getDataRegionName());
         api().expectingRefresh().executeScript("clearAllFilters()");
     }
 
     public void clearAllFilters(String columnName)
     {
-        TestLogger.log("Clearing filter in " + _regionName + " for " + columnName);
+        TestLogger.log("Clearing filter in " + getDataRegionName() + " for " + columnName);
         openFilterDialog(columnName);
         doAndWaitForUpdate(() -> _driver.clickButton("CLEAR ALL FILTERS"));
     }
@@ -1336,7 +1356,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void pageFirst()
     {
-        TestLogger.log("Clicking page first on data region '" + _regionName + "'");
+        TestLogger.log("Clicking page first on data region '" + getDataRegionName() + "'");
         if (IS_BOOTSTRAP_LAYOUT)
             getPagingWidget().clickGoToFirst();
         else
@@ -1345,7 +1365,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void pageLast()
     {
-        TestLogger.log("Clicking page last on data region '" + _regionName + "'");
+        TestLogger.log("Clicking page last on data region '" + getDataRegionName() + "'");
         if (IS_BOOTSTRAP_LAYOUT)
             getPagingWidget().clickGoToLast();
         else
@@ -1354,7 +1374,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void pageNext()
     {
-        TestLogger.log("Clicking page next on data region '" + _regionName + "'");
+        TestLogger.log("Clicking page next on data region '" + getDataRegionName() + "'");
         if (IS_BOOTSTRAP_LAYOUT)
             doAndWaitForUpdate(getPagingWidget()::clickNextPage);
         else
@@ -1363,7 +1383,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void pagePrev()
     {
-        TestLogger.log("Clicking page previous on data region '" + _regionName + "'");
+        TestLogger.log("Clicking page previous on data region '" + getDataRegionName() + "'");
         if (IS_BOOTSTRAP_LAYOUT)
             doAndWaitForUpdate(getPagingWidget()::clickPreviousPage);
         else
@@ -1413,7 +1433,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
      */
     public void setOffset(int offset)
     {
-        String url = replaceParameter(_regionName + ".offset", String.valueOf(offset));
+        String url = replaceParameter(getDataRegionName() + ".offset", String.valueOf(offset));
         _driver.beginAt(url);
     }
 
@@ -1423,7 +1443,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
      */
     public void setMaxRows(int size)
     {
-        String url = replaceParameter(_regionName + ".maxRows", String.valueOf(size));
+        String url = replaceParameter(getDataRegionName() + ".maxRows", String.valueOf(size));
         _driver.beginAt(url);
     }
 
@@ -1458,12 +1478,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public DatasetFacetPanel openSideFilterPanel()
     {
-        if (!_driver.isElementPresent(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName)))
+        if (!_driver.isElementPresent(DatasetFacetPanel.Locators.expandedFacetPanel(getDataRegionName())))
         {
             clickHeaderButton("Filter");
             _driver.waitForElement(Locator.css(".lk-filter-panel-label"));
         }
-        WebElement panelEl = _driver.waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(_regionName));
+        WebElement panelEl = _driver.waitForElement(DatasetFacetPanel.Locators.expandedFacetPanel(getDataRegionName()));
         return new DatasetFacetPanel(panelEl, this);
     }
 
@@ -1561,27 +1581,19 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     @Deprecated // use clickInsertNewRow()
     public void clickInsertNewRowDropdown()
     {
-        clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Insert data": "Insert", getInsertNewButtonText());
+        clickInsertNewRow();
     }
 
     @Deprecated // use clickImportBulkData()
     public void clickImportBulkDataDropdown()
     {
-        clickHeaderMenu("Insert", getImportBulkDataText());
+        clickImportBulkData();
     }
 
     @Deprecated // use clickInsertNewRow()
     public void clickInsertNewRowButton()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Insert data"));
-            menu.clickMenuButton(true, false, getInsertNewButtonText());
-        }
-        else
-        {
-            elements().getHeaderButton(getInsertNewButtonText()).click();
-        }
+        clickInsertNewRow();
     }
 
     /* sometimes 'insert new row' is a top-level button, other times it's a dropdown
@@ -1627,11 +1639,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         elements().getHeaderButton("Delete All Rows").click();
         getWrapper().waitAndClick(Locator.linkWithText("Yes"));  //Confirmation popup
         getWrapper().waitAndClick(Locator.linkWithText("Ok"));  //results popup
-    }
-
-    public void clickImportBulkDataButton()
-    {
-        elements().getHeaderButton(getImportBulkDataText()).click();
     }
 
     public static String getInsertNewButtonText()
@@ -1733,6 +1740,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public class Elements extends Component.ElementCache
     {
+        public Elements()
+        {
+            _driver.waitForElement(pageSignal(getUpdateSignal()), DEFAULT_WAIT);
+        }
+
         private final WebElement buttonBar = Locator.tagWithClass("*", "labkey-button-bar").findWhenNeeded(this);
         private final WebElement UX_ButtonBar = Locator.tagWithClass("div", "lk-region-bar").findWhenNeeded(this);
 
@@ -1741,7 +1753,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             return IS_BOOTSTRAP_LAYOUT ? UX_ButtonBar : buttonBar;
         }
 
-        private final WebElement tableElement = IS_BOOTSTRAP_LAYOUT ? Locators.table(_regionName).findWhenNeeded(this) : getComponentElement();
+        private Boolean _selectors;
+        protected boolean hasSelectors()
+        {
+            if (_selectors == null)
+            {
+                _selectors = Locator.css(".labkey-selectors").findElementOrNull(this) != null;
+            }
+            return _selectors;
+        }
 
         private List<WebElement> allHeaderButtons;
         private Map<String, WebElement> headerButtons;
@@ -1751,7 +1771,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         private final Map<String, WebElement> columnHeadersByName = new CaseInsensitiveHashMap<>();
         private List<WebElement> rows;
         private Map<Integer, List<WebElement>> cells;
-        private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(_driver.getDriver());
+        private final WebElement summaryStatRow = Locator.css("#" + getTableId() + " > tbody > tr.labkey-col-total").findWhenNeeded(getDriver());
         private List<WebElement> summaryStatCells;
         private final WebElement toggleAllOnPage = Locator.tagWithAttribute("input", "name", ".toggle").findWhenNeeded(this); // tri-state checkbox
 
@@ -1761,7 +1781,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                 rows = ImmutableList.copyOf(Locator.css(""+
                         "#" + getTableId() + " > tbody > tr.labkey-alternate-row:not(.labkey-col-total)," +
                         "#" + getTableId() + " > tbody > tr.labkey-row:not(.labkey-col-total)," +
-                        "#" + getTableId() + " > tbody > tr.labkey-error-row:not(.labkey-col-total)").findElements(_driver.getDriver()));
+                        "#" + getTableId() + " > tbody > tr.labkey-error-row:not(.labkey-col-total)").findElements(getDriver()));
             return rows;
         }
 
@@ -1841,8 +1861,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             if (!columnHeadersByName.containsKey(colName))
             {
                 columnHeadersByName.put(colName, Locator.findAnyElement("Column header named " + colName, this,
-                        Locators.columnHeader(_regionName, colName),
-                        Locators.columnHeader(_regionName, colName.toLowerCase())));
+                        Locators.columnHeader(getDataRegionName(), colName),
+                        Locators.columnHeader(getDataRegionName(), colName.toLowerCase())));
             }
             return columnHeadersByName.get(colName);
         }
@@ -1920,7 +1940,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     private abstract class BaseDataRegionApi
     {
-        final String regionJS = "LABKEY.DataRegions['" + getTableName() + "']";
+        final String regionJS = "LABKEY.DataRegions['" + getDataRegionName() + "']";
 
         public void executeScript(String methodWithArgs)
         {

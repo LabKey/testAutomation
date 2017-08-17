@@ -24,10 +24,4 @@ public class CrosstabDataRegion extends DataRegionTable
     {
         super(regionName, test);
     }
-
-    @Override
-    protected int getHeaderRowCount()
-    {
-        return super.getHeaderRowCount() + 2;
-    }
 }
