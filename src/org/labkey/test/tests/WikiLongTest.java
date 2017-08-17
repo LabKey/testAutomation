@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "WikiVerifyProject";
@@ -312,15 +313,16 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check that discussion board works");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         _ext4Helper.waitForOnReady();
-        click(Locator.linkWithText("discussion"));
+        click(Locator.linkWithText("discussions"));
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickAndWait(Locator.linkWithText("Start new discussion"));
         setFormElement(Locator.name("title"), DISC1_TITLE);
         setFormElement(Locator.id("body"), DISC1_BODY);
         submit();
         _ext4Helper.waitForOnReady();
-        click(Locator.linkWithText("see discussions (1)"));
-        clickAndWait(Locator.linkWithText(DISC1_TITLE));
+        clickMenuButton(true, Locator.linkWithText("discussions")
+                .findElement(getDriver()), false, DISC1_TITLE);
+
         assertTextPresent(DISC1_TITLE,
                 DISC1_BODY);
 
@@ -395,7 +397,7 @@ public class WikiLongTest extends BaseWebDriverTest
         portalHelper.clickWebpartMenuItem("Wiki", true, "Customize");
         log("check that container is set to current project");
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
-        click(Locator.linkWithText("Reset to Folder Default Page"));
+        click(Locator.linkWithText("restore to this folders default page."));
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         log("set container and page");
 
@@ -497,10 +499,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        click(Locator.css("span.labkey-wp-icon-button-active span.fa-caret-down"));
-        click(Locator.xpath("//div[contains(@class, 'x4-panel')]//div[contains(@class, 'x4-component')]//span[contains(@class, 'x4-menu-item-text')][text() = 'Remove From Page']"));
-        if(isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-wiki')]//h3[contains(@class, 'heading-1')][text()='Page AAA']")))
-            waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'labkey-wiki')]//h3[contains(@class, 'heading-1')][text()='Page AAA']"), WAIT_FOR_JAVASCRIPT);
+        portalHelper.removeWebPart(WIKI_PAGE2_TITLE);
 
         log("test wiki TOC customize link");
         _portalHelper.addWebPart("Wiki Table of Contents");
@@ -540,7 +539,10 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         assertElementPresent(Locator.linkWithText(WIKI_PAGE2_NAME), 1);
 
+        /* TODO: re-enable when this blocking issue is resolved:
+         https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31184
         indexTest();
+        */
 
         log("test delete subtree");
         // create child first

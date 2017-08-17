@@ -367,10 +367,13 @@ public class PortalHelper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            SiteNavBar navBar =new SiteNavBar(getDriver()).enterPageAdminMode();
+            SiteNavBar navBar =new SiteNavBar(getDriver());
+            boolean wasInAdminMode = navBar.isInPageAdminMode();
+            navBar.enterPageAdminMode();
             WebPart webPart = new BodyWebPart(getDriver(), webPartTitle);
             webPart.remove();
-            navBar.exitPageAdminMode();
+            if (!wasInAdminMode)                // leave the test in the prior state
+                navBar.exitPageAdminMode();
         }
         else
         {
