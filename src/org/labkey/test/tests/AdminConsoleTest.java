@@ -75,7 +75,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         setFormElement(Locator.name("ribbonMessageHtml"), html);
         clickButton("Save");
 
-        Locator ribbon = Locator.tagWithClass("div", "default-template-alert").containing("READ ME!!!");
+        Locator ribbon = Locator.tagWithClass("div", "alert alert-warning").containing("READ ME!!!");
         waitForElement(ribbon);
 
         Locator ribbonLink = Locator.tagWithClass("div", "default-template-alert").append(Locator.linkContainingText("and also click this..."));
