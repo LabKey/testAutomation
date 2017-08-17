@@ -44,11 +44,11 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.Locators.pageSignal;
+import static org.labkey.test.Locators.*;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -98,7 +98,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         if (el == null)
         {
-            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver()).withTimeout(DEFAULT_WAIT);
+            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver()).withTimeout(10000);
             _regionName = name;
         }
         else
@@ -862,6 +862,18 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void updateRow(String key, Map<String, String> data, boolean validateText)
     {
         clickEditRow(key);
+
+        setRowData(data, validateText);
+    }
+
+    public void updateRow(int rowIndex, Map<String, String> data)
+    {
+        updateRow(rowIndex, data, true);
+    }
+
+    public void updateRow(int rowIndex, Map<String, String> data, boolean validateText)
+    {
+        clickEditRow(rowIndex);
 
         setRowData(data, validateText);
     }
@@ -1656,17 +1668,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", menuTexts);
     }
 
-    public void goToReport(String... menuTexts)
-    {
-        goToReport(true, menuTexts);
-    }
-
-    public void goToReport(boolean waitForPageRefresh, String... menuTexts)
+    public void goToReport(boolean b, String... menuTexts)
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
-            menu.clickSubMenu(waitForPageRefresh,  menuTexts);
+            menu.clickSubMenu(true,  menuTexts);
         }
         else
         {
@@ -1919,9 +1926,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         buttonBar,
                         Locator.lkButton().withAttribute("title", title),
                         Locator.lkButton(text),
-                        Locator.tagWithAttribute("a", "data-original-title", title),
-                        Locator.tagWithAttribute("a", "title", title))); /* bootstrapjs modifies 'title' to data-original-title
-                                                    this is there to find those before that markup change happens */
+                        Locator.tagWithAttribute("a", "data-original-title", title)));
             }
             return headerButtons.get(text);
         }
@@ -1939,9 +1944,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
                                 .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text)),
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text)),
-                        Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "title", text))));
+                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text))));
             }
             return headerMenus.get(text);
         }
