@@ -178,13 +178,6 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         return new Elements();
     }
 
-    // TODO: Remove and verify that elements in cache won't go stale
-    @Override
-    protected Elements elementCache()
-    {
-        return newElementCache();
-    }
-
     protected class Elements extends Component.ElementCache
     {
         public WebElement toggleAnchor = Locators.toggleAnchor().findWhenNeeded(getComponentElement());
