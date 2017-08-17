@@ -175,7 +175,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String issueTitle = "A general issue";
 
-        Locator newIssueButton = Locator.bootstrapButtonContainingText("a", "New Issue");
+        Locator newIssueButton = Locator.bootstrapButton("New Issue");
         assertElementPresent(newIssueButton);
 
         // quick security test

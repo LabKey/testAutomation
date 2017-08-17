@@ -15,10 +15,12 @@
  */
 package org.labkey.test.pages.issues;
 
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.pages.LabKeyPage;
 import org.labkey.test.util.Maps;
 import org.openqa.selenium.WebDriver;
@@ -81,13 +83,28 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
 
     public LabKeyPage clickPrint()
     {
-        clickAndWait(elementCache().printLink);
+        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
+            elementCache().getMoreMenu().clickSubMenu(true, "Print");
+        else
+            clickAndWait(elementCache().printLink);
         return new LabKeyPage(getDriver());
     }
 
     public EmailPrefsPage clickEmailPrefs()
     {
-        clickAndWait(elementCache().emailPrefsLink);
+        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
+            elementCache().getMoreMenu().clickSubMenu(true, "Email Preferences");
+        else
+            clickAndWait(elementCache().emailPrefsLink);
+        return new EmailPrefsPage(getDriver());
+    }
+
+    public EmailPrefsPage clickCreateRelatedIssue()
+    {
+        if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
+            elementCache().getMoreMenu().clickSubMenu(true, "Create Related Issue");
+        else
+            clickAndWait(elementCache().emailPrefsLink);
         return new EmailPrefsPage(getDriver());
     }
 
@@ -99,23 +116,25 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
     protected class ElementCache extends BaseIssuePage.ElementCache
     {
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
-        protected WebElement newIssueLink = Locator.bootstrapButton("a", "New Issue").findWhenNeeded(this);
+        protected WebElement newIssueLink = Locator.bootstrapButton("New Issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI
         protected WebElement updateLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("a", "Update").findWhenNeeded(this)
+                Locator.bootstrapButton("Update").findWhenNeeded(this)
                 : Locator.linkWithText("update").findWhenNeeded(this);
         protected WebElement resolveLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("a", "Resolve").findWhenNeeded(this)
+                Locator.bootstrapButton("Resolve").findWhenNeeded(this)
                 : Locator.linkWithText("resolve").findWhenNeeded(this);
         protected WebElement closeLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("a", "Close").findWhenNeeded(this)
+                Locator.bootstrapButton("Close").findWhenNeeded(this)
                 : Locator.linkWithText("close").findWhenNeeded(this);
         protected WebElement reopenLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("a", "Reopen").findWhenNeeded(this)
+                Locator.bootstrapButton("Reopen").findWhenNeeded(this)
                 : Locator.linkWithText("reopen").findWhenNeeded(this);
-        protected WebElement printLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("a", "Print").findWhenNeeded(this)
-                : Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
+        protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
         protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this); //in menu in newUI
+        protected BootstrapMenu getMoreMenu()
+        {
+            return BootstrapMenu.find(getDriver(), "More");
+        }
     }
 }

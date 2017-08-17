@@ -27,7 +27,6 @@ import org.labkey.test.categories.Issues;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.issues.AdminPage;
-import org.labkey.test.pages.issues.InsertIssueDefPage;
 import org.labkey.test.pages.issues.InsertPage;
 import org.labkey.test.pages.issues.ListPage;
 import org.labkey.test.util.ApiPermissionsHelper;
@@ -137,7 +136,7 @@ public class IssuesAdminTest extends BaseWebDriverTest
         log("Verify issues-list action respects custom noun");
         assertTextPresent(plural + " List", singular + " ID");
         assertTextNotPresent(defaultPlural + " List", defaultSingular + " ID");
-        assertElementPresent(Locator.bootstrapButton("a", "New " + singular));
+        assertElementPresent(Locator.bootstrapButton("New " + singular));
 
         clickAndWait(Locator.lkButton("Admin"));
         assertTextPresent(plural + " Admin Page");
@@ -148,13 +147,13 @@ public class IssuesAdminTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(_issuesHelper.getDriver());
         portalHelper.addWebPart("Issues Summary");
         clickAndWait(Locator.linkWithText("Submit"));
-        assertElementPresent(Locator.bootstrapButton("a", "new " + singular.toLowerCase()));
+        assertElementPresent(Locator.bootstrapButton("new " + singular.toLowerCase()));
 
         portalHelper.addWebPart("Issues List");
         clickAndWait(Locator.linkWithText("Submit"));
         assertEquals("Wrong title for ID column", singular + " ID", new DataRegionTable("issues-issues", getDriver()).getColumnLabels().get(0));
-        assertElementPresent(Locator.bootstrapButton("a", "New " + singular));
-        assertElementNotPresent(Locator.bootstrapButton("a","New " + defaultSingular));
+        assertElementPresent(Locator.bootstrapButton("New " + singular));
+        assertElementNotPresent(Locator.bootstrapButton("New " + defaultSingular));
     }
 
     @Test @Ignore //TODO

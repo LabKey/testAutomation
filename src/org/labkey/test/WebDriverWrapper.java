@@ -2718,12 +2718,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // check for normal html button:
                 Locator.button(text).index(index),
                 // check for bootstrap button
-                Locator.bootstrapButton("button", text).index(index),
-                // check for bootstrap anchor
-                Locator.bootstrapButton("a", text).index(index),
-                //check for bootstrap input
-                Locator.bootstrapButton("input", text).index(index)
-
+                Locator.bootstrapButton(text).index(index)
         };
 
         try
@@ -2750,11 +2745,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // GWT button:
                 Locator.gwtButton(text),
                 // bootstrap button
-                Locator.bootstrapButton("button", text),
-                // bootstrap anchor
-                Locator.bootstrapButton("a", text),
-                // bootstrap input
-                Locator.bootstrapButton("input", text)
+                Locator.bootstrapButton(text)
         };
 
         try
@@ -2788,11 +2779,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 // normal HTML button:
                 Locator.buttonContainingText(text),
                 // check for bootstrap button
-                Locator.bootstrapButtonContainingText("button", text),
-                // check for bootstrap anchor
-                Locator.bootstrapButtonContainingText("a", text),
-                //check for bootstrap input
-                Locator.bootstrapButtonContainingText("input", text)
+                Locator.bootstrapButton().containing(text)
         };
 
         try
