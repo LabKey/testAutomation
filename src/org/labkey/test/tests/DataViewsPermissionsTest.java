@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyC;
 import org.labkey.test.components.BodyWebPart;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
@@ -28,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyC.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
 {
+   {setIsBootstrapWhitelisted(true);}
     public static final String AUTHOR_USER = "author@dataviews.test";
     public static final String EDITOR_USER = "editor@dataviews.test";
     private final PortalHelper portalHelper = new PortalHelper(this);
@@ -42,6 +44,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _userHelper.deleteUsers(afterTest, AUTHOR_USER, EDITOR_USER);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Override
@@ -56,12 +59,14 @@ public class DataViewsPermissionsTest extends StudyBaseTest
 
         clickFolder(getFolderName());
         portalHelper.addWebPart("Data Views");
+        portalHelper.enterAdminMode();
         BodyWebPart dataViewsWebPart = new BodyWebPart(getDriver(), "Data Views");
         dataViewsWebPart.moveUp();
         dataViewsWebPart.moveUp();
         dataViewsWebPart.moveUp();
         dataViewsWebPart.moveUp();
         dataViewsWebPart.moveUp();
+        portalHelper.exitAdminMode();
 
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
@@ -81,25 +86,25 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Grid View");
         setFormElement(Locator.id("label"), "Report 1");
         clickButton("Create View", defaultWaitForPage);
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Grid View");
         setFormElement(Locator.id("label"), "Report 2");
         clickButton("Create View", defaultWaitForPage);
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Grid View");
         setFormElement(Locator.id("label"), "Report 3");
         clickButton("Create View", defaultWaitForPage);
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Grid View");
         setFormElement(Locator.id("label"), "Report 4");
         clickButton("Create View", defaultWaitForPage);
         clickFolder(getFolderName());
