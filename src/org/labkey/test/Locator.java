@@ -235,8 +235,8 @@ public abstract class Locator
     }
 
     /**
-     * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-     * TODO: Make private and un-deprecate when able
+     * @deprecated For internal use only; has inconsistent behavior for CSSLocator and NameLocator.
+     * TODO: Make protected and un-deprecate when able
      */
     @Deprecated
     public abstract By toBy();
@@ -487,28 +487,14 @@ public abstract class Locator
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").withText(text);
     }
 
-    public static XPathLocator bootstrapButton(String tag, String text)
+    public static XPathLocator bootstrapButton()
     {
-        return tag(tag).notHidden().withPredicate("contains(@class, 'btn btn-default') " +
-                "or contains(@class, 'btn btn-primary') " +
-                "or contains(@class, 'btn btn-success') " +
-                "or contains(@class, 'btn btn-info') " +
-                "or contains(@class, 'btn btn-warning') " +
-                "or contains(@class, 'btn btn-danger') " +
-                "or contains(@class, 'btn btn-link')")
-                .withText(text);
+        return tagWithClass("a", "btn");
     }
 
-    public static XPathLocator bootstrapButtonContainingText(String tag, String text)
+    public static XPathLocator bootstrapButton(String text)
     {
-        return tag(tag).notHidden().withPredicate("contains(@class, 'btn btn-default') " +
-                "or contains(@class, 'btn btn-primary') " +
-                "or contains(@class, 'btn btn-success') " +
-                "or contains(@class, 'btn btn-info') " +
-                "or contains(@class, 'btn btn-warning') " +
-                "or contains(@class, 'btn btn-danger') " +
-                "or contains(@class, 'btn btn-link')")
-                .containing(text);
+        return bootstrapButton().withText(text);
     }
 
     public static XPathLocator buttonContainingText(String text)
@@ -600,7 +586,7 @@ public abstract class Locator
 
     public static XPathLocator bodyLinkContainingText(String text)
     {
-        return tag("td").withAttribute("id", "bodypanel").append(linkContainingText(text));
+        return Locators.bodyPanel().append(linkContainingText(text));
     }
 
     public static XPathLocator input(String name)
@@ -870,14 +856,14 @@ public abstract class Locator
         private final XPathLocator _xLoc;
         private final CssLocator _cssLoc;
 
-        public XPathCSSLocator(String tag)
+        protected XPathCSSLocator(String tag)
         {
             this(new XPathLocator("//" + tag), new CssLocator(tag));
         }
 
-        private XPathCSSLocator(XPathLocator xLoc, CssLocator cssLoc)
+        protected XPathCSSLocator(XPathLocator xLoc, CssLocator cssLoc)
         {
-            super("");
+            super(xLoc.getLoc());
             _xLoc = xLoc;
             _cssLoc = cssLoc;
         }
@@ -998,6 +984,24 @@ public abstract class Locator
                     _cssLoc.append(((XPathCSSLocator)child)._cssLoc));
         }
 
+        public CssLocator append(CssLocator child)
+        {
+            return _cssLoc.append(child);
+        }
+
+        public XPathLocator getXPathLoc()
+        {
+            if (_xLoc instanceof XPathCSSLocator)
+                return ((XPathCSSLocator)_xLoc).getXPathLoc();
+            else
+                return _xLoc;
+        }
+
+        public CssLocator getCssLoc()
+        {
+            return _cssLoc;
+        }
+
         @Override
         public String getLoc()
         {
@@ -1010,11 +1014,6 @@ public abstract class Locator
             return _cssLoc.toString();
         }
 
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make private and un-deprecate when able
-         */
-        @Deprecated
         @Override
         public By toBy()
         {
@@ -1024,7 +1023,7 @@ public abstract class Locator
 
     public static class XPathLocator extends Locator
     {
-        public XPathLocator(String loc)
+        protected XPathLocator(String loc)
         {
             super(loc);
         }
@@ -1072,12 +1071,6 @@ public abstract class Locator
             return new XPathLocator("("+getLoc()+")["+(index+1)+"]");
         }
 
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make protected and un-deprecate when able
-         */
-        @Deprecated
-        @Override
         public By toBy()
         {
             return By.xpath(getLoc());
@@ -1323,46 +1316,30 @@ public abstract class Locator
         }
     }
 
-    public static class IdLocator extends XPathLocator
+    public static class IdLocator extends XPathCSSLocator
     {
-        private String _id;
+        private final String _id;
 
-        public IdLocator(String loc)
+        protected IdLocator(String id)
         {
-            super(loc.length() > 0 ? "//*[@id = " + xq(loc) + "]" : "");
-            _id = loc;
+            super(Locator.xpath("//*").withAttribute("id", id), CssLocator.forId(id));
+            _id = id.contains(" ") ? null : id;
         }
 
-        public CssLocator append(CssLocator locator)
-        {
-            return toCssLocator().append(locator);
-        }
-
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make private and un-deprecate when able
-         */
-        @Deprecated
-        @Override
         public By toBy()
         {
-            return _id.contains(" ") ? super.toBy() : By.id(_id);
+            return _id == null ? super.toBy() : By.id(_id);
         }
 
         public String toString()
         {
-            return "id=" + _id;
-        }
-
-        public CssLocator toCssLocator()
-        {
-            return css(_id.length() > 0 ? "#" + _id : "");
+            return _id == null ? super.toString() : "id=" + _id;
         }
     }
 
     public static class NameLocator extends Locator
     {
-        public NameLocator(String loc)
+        protected NameLocator(String loc)
         {
             super(loc);
         }
@@ -1393,11 +1370,6 @@ public abstract class Locator
             return "name=" + getLoc() + (_index != null ? " index=" + _index : "");
         }
 
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make private and un-deprecate when able
-         */
-        @Deprecated
         public By toBy()
         {
             return By.name(getLoc());
@@ -1406,7 +1378,7 @@ public abstract class Locator
 
     public static class CssLocator extends Locator
     {
-        public CssLocator(String loc)
+        protected CssLocator(String loc)
         {
             super(loc);
         }
@@ -1414,6 +1386,12 @@ public abstract class Locator
         private CssLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
+        }
+
+        protected static CssLocator forId(String id)
+        {
+            String selector = id.contains(" ") ? "[id=" + cq(id) + "]" : "#" + id;
+            return new CssLocator(selector);
         }
 
         public static CssLocator union(CssLocator... locators)
@@ -1505,11 +1483,6 @@ public abstract class Locator
             return "css=" + getLoc();
         }
 
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make private and un-deprecate when able
-         */
-        @Deprecated
         public By toBy()
         {
             if (getLoc().contains(":contains("))
@@ -1544,11 +1517,6 @@ public abstract class Locator
             return "link=" + _linkText;
         }
 
-        /**
-         * @deprecated For internal use only; has inconsistent behavior for CSSLocator.
-         * TODO: Make private and un-deprecate when able
-         */
-        @Deprecated
         public By toBy()
         {
             return By.linkText(_linkText);

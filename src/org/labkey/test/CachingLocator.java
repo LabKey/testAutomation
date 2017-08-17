@@ -69,6 +69,11 @@ public class CachingLocator extends Locator
         return _locator.toString();
     }
 
+    /**
+     * @deprecated For internal use only; has inconsistent behavior for CSSLocator and NameLocator.
+     * TODO: Make protected and un-deprecate when able
+     */
+    @Deprecated
     @Override
     public By toBy()
     {
