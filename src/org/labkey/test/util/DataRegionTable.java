@@ -44,11 +44,11 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.Locators.*;
+import static org.labkey.test.Locators.pageSignal;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -98,7 +98,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         if (el == null)
         {
-            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver());
+            _el = new RefindingWebElement(Locators.dataRegion(name), driverWrapper.getDriver()).withTimeout(DEFAULT_WAIT);
             _regionName = name;
         }
         else
