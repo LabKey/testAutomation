@@ -11,7 +11,6 @@ bin/windows/amd64/VERSION -text
 bin/windows/chromedriver.exe -text
 bin/windows/i386/IEDriverServer.exe -text
 bin/windows/i386/VERSION -text
-/bootstrap_stress_test.cmd -text
 /build.gradle -text
 chromeextensions/jsErrorChecker/background.js -text
 chromeextensions/jsErrorChecker/jserrors.js -text
@@ -346,8 +345,6 @@ modules/triggerTestModule/resources/queries/exp.data/DataClassTest.js -text
 modules/triggerTestModule/resources/queries/lists/Employees.js -text
 modules/triggerTestModule/resources/queries/study/Demographics.js -text
 modules/triggerTestModule/resources/scripts/TriggerTestModule/EmployeeLib.js -text
-/resetDRT.cmd -text
-/resetDRT.sh -text
 src/org/labkey/junit/rules/TestWatcher.java -text
 src/org/labkey/junit/runner/WebTestProperties.java -text
 src/org/labkey/remoteapi/admin/GetModulesCommand.java -text
@@ -892,4 +889,3 @@ src/org/labkey/test/util/ext4cmp/Ext4GridRef.java -text
 src/org/labkey/test/util/search/SearchAdminAPIHelper.java -text
 /test.credentials.json.template -text
 /test.properties -text
-/upgrade_stress_test.cmd -text
