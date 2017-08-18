@@ -19,8 +19,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestProperties;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
@@ -64,17 +62,9 @@ public class TimelineTest extends BaseWebDriverTest
 
     private static final String WIKIPAGE_NAME = "TimelineTestPage";
 
-    private static final String CLIENTAPI_HEADER =
-        "<script type=\"text/javascript\">LABKEY.requiresClientAPI();</script>\n" +
-        "<script src='/labkey/timeline.js'></script>\n" +
-        "<script src='/labkey/similetimeline/bundle.js'></script>\n" +
-        "<script src='/labkey/similetimeline/scripts/l10n/en/timeline.js'></script>\n" +
-        "<script src='/labkey/similetimeline/scripts/l10n/en/labellers.js'></script>\n";
-
     private static final String TEST_DIV_NAME = "testDiv";
 
-
-    private static final String SRC_PREFIX = CLIENTAPI_HEADER +
+    private static final String SRC_PREFIX =
             "\n<script type=\"text/javascript\">\n" +
             "        var init = function()\n" +
             "        {";
@@ -82,13 +72,13 @@ public class TimelineTest extends BaseWebDriverTest
     private static final String SRC_SUFFIX =
             "        };\n" +
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
-            "    Ext4.onReady(init);\n" +
+            "    LABKEY.requiresScript('timeline', function() { Ext4.onReady(init); });\n" +
             "</script>\n" +
             "<div id=\"" + TEST_DIV_NAME + "\" style='height:400px'></div>";
 
     private static final String TIMELINE_TEST_SRC =
             "    LABKEY.Timeline.create({\n" +
-            "        renderTo:'testDiv',\n" +
+            "        renderTo:'" + TEST_DIV_NAME + "',\n" +
             "        start:'DOB',\n" +
             "        end:function(row){if (row.DOD) return row.DOD; else return new Date();},\n" +
             "        title:function(row) {return row.FirstName + ' ' + row.LastName;},\n" +
@@ -109,11 +99,6 @@ public class TimelineTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
-    }
-
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
     }
 
     @Test
@@ -164,12 +149,9 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void removeTestPage()
     {
-        if (true)//TestProperties.isLinkCheckEnabled())
-        {
-            clickFolder(FOLDER_NAME);
-            portalHelper.removeWebPart(WIKIPAGE_NAME);
-            portalHelper.removeWebPart("Timeline");
-        }
+        clickFolder(FOLDER_NAME);
+        portalHelper.removeWebPart(WIKIPAGE_NAME);
+        portalHelper.removeWebPart("Timeline");
     }
 
     private void createList()

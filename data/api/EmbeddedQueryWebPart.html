@@ -1,40 +1,11 @@
-<div id='queryTestDiv1'></div>
+<div id="queryTestDiv1"></div>
 <script type="text/javascript">
-    LABKEY.requiresExt3ClientAPI(function() {
-        var qwp1 = new LABKEY.QueryWebPart({
+    +function(){
+        new LABKEY.QueryWebPart({
             renderTo: 'queryTestDiv1',
             title: 'My Query Web Part',
             schemaName: 'core',
             queryName: 'SiteUsers'
         });
-
-        qwp1.on("render", onRender);
-    });
-
- //note that you may also register for the 'render' event
- //instead of using the success config property.
- //registering for events is done using Ext event registration.
- function onRender()
- {
-    //...do something after the part has rendered...
- }
-
- ///////////////////////////////////////
- // Custom Button Bar Example
-
-function onTestHandler(dataRegion)
-{
-    alert("onTestHandler called!");
-    return false;
-}
-
-function onItem1Handler(dataRegion)
-{
-    alert("onItem1Handler called!");
-}
-
-function onItem2Handler(dataRegion)
-{
-    alert("onItem2Handler called!");
-}
+    }();
 </script>
