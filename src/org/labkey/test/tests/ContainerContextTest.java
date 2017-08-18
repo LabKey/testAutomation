@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -57,6 +58,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyB.class, Data.class})
 public class ContainerContextTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String SUB_FOLDER_A = "A";
     private static final String SUB_FOLDER_B = "B";
 
@@ -84,7 +86,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        return Arrays.asList("query");
+        return Arrays.asList("query", "viscstudies");
     }
 
     @Override
@@ -101,7 +103,8 @@ public class ContainerContextTest extends BaseWebDriverTest
                 throw new RuntimeException(rethrow);
             }
         }
-        deleteProject(getProjectName(), afterTest);
+
+        super.doCleanup(afterTest);
     }
 
     @BeforeClass
@@ -161,41 +164,37 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insert row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(lookupSourceListName));
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        setFormElement(Locator.name("quf_MyName"), "MyName");
+        DataRegionTable table = new DataRegionTable("query", this);
+        table.clickInsertNewRow();
+        setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
         clickButton("Submit");
 
         log("** Adding in lookup list columns to grid");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "ListLookup", "LookupAge" });
+        _customizeViewsHelper.addColumn(new String[] { "ListLookup", "LookupAge" });
         _customizeViewsHelper.saveCustomView();
 
         log("** Checking URLs go to correct container...");
-        String href = getAttribute(Locator.linkWithText("EDIT"), "href");
+        String href = getAttribute(DataRegionTable.updateLinkLocator(), "href");
         assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/query/" + getProjectName() + "/updateQueryRow.view?") ||
-                href.contains("/" + getProjectName() + "/query-updateQueryRow.view?"));
+                href.contains(getProjectName()) && href.contains("query") && href.contains("updateQueryRow.view"));
 
-        href = getAttribute(Locator.linkWithText("DETAILS"), "href");
+        href = getAttribute(DataRegionTable.detailsLinkLocator(), "href");
         assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/details.view?") ||
-                href.contains("/" + getProjectName() + "/list-details.view?"));
+                href.contains(getProjectName()) && href.contains("list") && href.contains("details.view"));
 
         href = getAttribute(Locator.linkWithText("MyName"), "href");
         assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/details.view?") ||
-                href.contains("/" + getProjectName() + "/list-details.view?"));
+                href.contains(getProjectName()) && href.contains("list") && href.contains("details.view"));
 
         href = getAttribute(Locator.linkWithText("MyLookupItem2"), "href");
         assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view?") ||
-                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/list-details.view?"));
+                href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("list") && href.contains("details.view"));
 
         href = getAttribute(Locator.linkWithText("200"), "href");
         assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
-                href.contains("/fake/" + getProjectName() + "/" + SUB_FOLDER_A + "/action.view?key=2") ||
-                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/fake-action.view?key=2"));
-
+                href.contains(getProjectName() + "/" + SUB_FOLDER_A) && href.contains("fake") && href.contains("action.view?key=2"));
     }
 
     // Issue 15610: viscstudieslist - URLs generated from lookups are broken
@@ -228,10 +227,12 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Inserting row into list");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Issue15610-List"));
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
 
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
+        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_B + "-Study");
         clickButton("Submit");
 
         log("** Checking URLs go to correct container...");
@@ -286,13 +287,16 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", "Create R Report");
+
+        String reportName = folder + "-BackgroundReport";
+        DataRegionTable table = new DataRegionTable("query", this);
+        table.goToReport("Create R Report");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
-        _RReportHelper.saveReport(folder + "-BackgroundReport");
+        _RReportHelper.saveReport(reportName);
         DataRegionTable.waitForDataRegion(this, "query");
 
         log("** Executing background R script");
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Reports", folder + "-BackgroundReport");
+        table.goToReport(reportName);
         waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
@@ -320,13 +324,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         navigateToQuery("wiki", "CurrentWikiVersions");
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.clearCustomizeViewColumns();
-        _customizeViewsHelper.addCustomizeViewColumn("Created");
-        _customizeViewsHelper.addCustomizeViewSort("Created", "Ascending");
+        _customizeViewsHelper.clearColumns();
+        _customizeViewsHelper.addColumn("Created");
+        _customizeViewsHelper.addSort("Created", SortDirection.ASC);
         _customizeViewsHelper.saveCustomView("CreatedOnly");
 
-        DataRegionTable.findDataRegion(this).clickHeaderMenu("Grid Views", "Folder Filter", "Current folder and subfolders");
         DataRegionTable table = new DataRegionTable("query", this);
+        table.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_AND_SUBFOLDERS);
         assertEquals(2, table.getDataRowCount());
 
         log("** Validate detailsURL goes to " + SUB_FOLDER_A);
@@ -378,11 +382,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, true, vehicleId);
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
-        log("** Removing container column and rehecking lookup URLs...");
+        log("** Removing container column and rechecking lookup URLs...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.removeCustomizeViewColumn("Container");
+        _customizeViewsHelper.removeColumn("Container");
         _customizeViewsHelper.applyCustomView();
 
         verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
@@ -435,24 +439,6 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         createQuery(getProjectName(), "EmissionTests With Folder", "vehicle", customQueryFolderContainer, customMetadata, false);
         verifySimpleModuleTables("EmissionTests With Folder", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
-
-
-        // Container context won't work if the container column is named something other than container or folder.
-        /*
-        log("** Create custom query with custom metadata over vehicle.emissiontest table WITH RENAMED container");
-        String customQueryXXXContainer =
-                "SELECT emissiontest.rowid,\n" +
-                "emissiontest.name,\n" +
-                "emissiontest.vehicleid,\n" +
-                "emissiontest.result,\n" +
-                "emissiontest.parenttest,\n" +
-                "emissiontest.container AS XXX\n" +
-                "FROM emissiontest";
-
-        createQuery(getProjectName(), "EmissionTests XXX Container", "vehicle", customQueryXXXContainer, customMetadata, false);
-        verifySimpleModuleTables("EmissionTests XXX Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
-        */
-
 
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITHOUT container.");
         log("** The container column should be added as a suggested column.");
