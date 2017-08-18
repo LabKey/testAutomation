@@ -1668,12 +1668,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         clickHeaderMenu(IS_BOOTSTRAP_LAYOUT ? "Grid views" : "Grid Views", menuTexts);
     }
 
-    public void goToReport(boolean b, String... menuTexts)
+    public void goToReport(String... menuTexts)
+    {
+        goToReport(true, menuTexts);
+    }
+
+    public void goToReport(boolean waitForRefresh, String... menuTexts)
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
             BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
-            menu.clickSubMenu(true,  menuTexts);
+            menu.clickSubMenu(waitForRefresh,  menuTexts);
         }
         else
         {
