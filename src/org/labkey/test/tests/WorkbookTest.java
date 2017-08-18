@@ -19,13 +19,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
+import org.labkey.test.util.WorkbookHelper.WorkbookFolderType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -81,50 +81,48 @@ public class WorkbookTest extends BaseWebDriverTest
         int lastid = 0;
         for(int i=0; i>ids.length; i++)
         {
-            assertEquals("nonsequential name for workbook found",ids[i],lastid + 1);
+            assertEquals("non-sequential name for workbook found",ids[i],lastid + 1);
         }
 
-        /*  TODO: re-enable when edit-in-place is supported. Tracking issue:
-                https://www.labkey.org/home/Developer/issues/issues-details.view?issueId=31194
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
-        waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"));
         setFormElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), "Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Change the focus to trigger a save
-        click(Locator.xpath("//div[@id='wb-description']"));
+        click(Locator.id("wb-description"));
 
         // Make sure that the edit stuck
         assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Clear description
         setFormElement(Locator.xpath("//textarea"), ""); // textarea is a barely used tag, so this xpath is sufficient for now.
-        waitForText(WAIT_FOR_JAVASCRIPT, "No description provided. Click to add one."); // Takes a moment to appear.
+        waitForText("No description provided. Click to add one.");
 
         // Check that title and description are saved
         refresh();
-        assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
-        waitForText(WAIT_FOR_JAVASCRIPT, "No description provided. Click to add one."); // Takes a moment to appear.
+        assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
+        waitForText("No description provided. Click to add one.");
 
-        clickProject(PROJECT_NAME);
+        goToProjectHome();
 
         // Check for all workbooks in list.
-        assertElementPresent(Locator.linkWithText("Renamed"+DEFAULT_WORKBOOK_NAME));
+        assertElementPresent(Locator.linkWithText("Renamed" + DEFAULT_WORKBOOK_NAME));
         assertElementPresent(Locator.linkWithText(ASSAY_WORKBOOK_NAME));
         assertElementPresent(Locator.linkWithText(FILE_WORKBOOK_NAME));
-        assertTextPresentInThisOrder(FILE_WORKBOOK_NAME, ASSAY_WORKBOOK_NAME, "Renamed"+DEFAULT_WORKBOOK_NAME);
+        assertTextPresentInThisOrder(FILE_WORKBOOK_NAME, ASSAY_WORKBOOK_NAME, "Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Delete a workbook
-        new DataRegionTable("query", this).checkCheckbox(2);
-        clickButton("Delete", 0);
+        DataRegionTable workbooks = new DataRegionTable("query", this);
+        workbooks.checkCheckbox(2);
+        workbooks.clickHeaderButton("Delete");
         assertAlert("Are you sure you want to delete the selected row?");
-        waitForTextToDisappear("Renamed"+DEFAULT_WORKBOOK_NAME);
-        */
+        waitForTextToDisappear("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Test Workbook APIs
 
         // Initialize the Creation Wiki
-        clickProject(PROJECT_NAME);
+        goToProjectHome();
         portalHelper.addWebPart("Wiki");
 
         wikiHelper.createNewWikiPage();
@@ -135,46 +133,46 @@ public class WorkbookTest extends BaseWebDriverTest
 
         wikiHelper.setSourceFromFile(APITEST_FILE, APITEST_NAME);
 
-
         clickButton("RunAPITest", 0);
 
-        waitForText(WAIT_FOR_JAVASCRIPT, "Insert complete");
-        waitForText(WAIT_FOR_JAVASCRIPT, "Delete complete");
+        waitForText("Insert complete", "Delete complete");
         assertTextPresent("Insert complete - Success.", "Delete complete - Success.");
 
         //Create new project, add a workbook to it and ensure that the id is 1
         _containerHelper.createProject(PROJECT_NAME2, null);
         portalHelper.addWebPart("Workbooks");
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
-        int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookHelper.WorkbookFolderType.FILE_WORKBOOK);
-        assertEquals("workbook added to new project did not have id=1",id,1);
+        int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookFolderType.FILE_WORKBOOK);
+        assertEquals("workbook added to new project did not have id=1", id, 1);
     }
 
-    public int[] createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
-                                 String assayWorkbookName, String assayWorkbookDescription, String defaultWorkbookName, String defaultWorkbookDescription)
+    private int[] createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
+                                  String assayWorkbookName, String assayWorkbookDescription,
+                                  String defaultWorkbookName, String defaultWorkbookDescription)
     {
         int[] names = new int[3];
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
-        names[0] = (workbookHelper.createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription));
+        names[0] = workbookHelper.createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription);
 
         // Create Assay Workbook
-        names[1] = (workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookHelper.WorkbookFolderType.ASSAY_WORKBOOK));
+        names[1] = workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookFolderType.ASSAY_WORKBOOK);
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
-        assertEquals(assayWorkbookName, getText(Locators.bodyTitle()));
-        assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(assayWorkbookName, workbookHelper.getEditableTitleText());
+        assertEquals(assayWorkbookDescription, workbookHelper.getEditableDescriptionText());
         assertElementNotPresent(Locator.linkWithText(assayWorkbookName)); // Should not appear in folder tree.
 
         // Create Default Workbook
-        names[2] = (workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
+        names[2] = workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookFolderType.DEFAULT_WORKBOOK);
         assertElementPresent(Locator.linkWithText("Files"));
         assertElementPresent(Locator.linkWithText("Experiment Runs"));
-        assertEquals(defaultWorkbookName, getText(Locators.bodyTitle()));
-        assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(defaultWorkbookName, workbookHelper.getEditableTitleText());
+        assertEquals(defaultWorkbookDescription, workbookHelper.getEditableDescriptionText());
         assertElementNotPresent(Locator.linkWithText(defaultWorkbookName)); // Should not appear in folder tree.
         return names;
     }
 
-    @Override public BrowserType bestBrowser()
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }

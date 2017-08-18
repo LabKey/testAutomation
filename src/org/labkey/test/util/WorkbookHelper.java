@@ -106,10 +106,19 @@ public class WorkbookHelper
         // Create File Workbook
         int id = createWorkbook(projectName, title, description, WorkbookFolderType.FILE_WORKBOOK);
         _test.waitForElement(Locator.linkWithText("Files"));
-        assertEquals(title, _test.getText(Locators.bodyTitle()));
-        assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(title, getEditableTitleText());
+        assertEquals(description, getEditableDescriptionText());
         _test.assertElementNotPresent(Locator.linkWithText(title)); // Should not appear in folder tree.
         return id;
     }
 
+    public String getEditableDescriptionText()
+    {
+        return _test.getText(Locator.id("wb-description"));
+    }
+
+    public String getEditableTitleText()
+    {
+        return _test.getText(Locators.bodyTitle().child(Locator.tagWithClass("span", "labkey-edit-in-place")));
+    }
 }
