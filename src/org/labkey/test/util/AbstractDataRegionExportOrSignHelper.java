@@ -30,14 +30,9 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
         _expectedFileCount = 1;
     }
 
-    protected String getShowPanelButtonText()
-    {
-        return "Export";
-    }
-
     protected Locator getPanelLocator()
     {
-        return Locator.name("Export-panel");
+        return Locator.tag("div").withAttributeContaining("name", "-panel").withAttributeContaining("id", "PanelButtonContent");
     }
 
     protected String getExcelActionButtonText()
@@ -117,7 +112,7 @@ public abstract class AbstractDataRegionExportOrSignHelper extends WebDriverComp
     {
         if (!isPanelExpanded())
         {
-            getWrapper().doAndWaitForPageSignal(() -> getDataRegionTable().clickHeaderButton(getShowPanelButtonText()), DataRegionTable.PANEL_SHOW_SIGNAL);
+            getWrapper().doAndWaitForPageSignal(() -> getDataRegionTable().clickExportButton(), DataRegionTable.PANEL_SHOW_SIGNAL);
         }
         return this;
     }

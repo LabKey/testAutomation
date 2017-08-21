@@ -42,7 +42,7 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
         getWrapper().setFormElement(Locator.input("password"), _userPassword);
         getWrapper().click(submit);
         getWrapper().waitForElementToDisappear(submit);
-        getWrapper().waitForText("Signed Snapshot");
+        getWrapper().waitForText("Details");        // We should be on Details page for the newly signed snapshot
 
     }
 
@@ -56,11 +56,5 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
     protected String getTextActionButtonText()
     {
         return "Sign Data";
-    }
-
-    @Override
-    protected String getShowPanelButtonText()
-    {
-        return "Export";
     }
 }

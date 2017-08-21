@@ -1515,6 +1515,11 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         elements().getHeaderButton(buttonText).click();
     }
 
+    public void clickExportButton()
+    {
+        elements().getExportButton().click();
+    }
+
     public void openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
         if (IS_BOOTSTRAP_LAYOUT)
@@ -1907,7 +1912,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
             if (!headerButtons.containsKey(text))
             {
-                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
+//                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"  // This is screwy and limits what you can put in the button
+                String title = text;
                 headerButtons.put(text, Locator.findAnyElement(
                         "Button with title or text: " + text,
                         buttonBar,
@@ -1934,6 +1940,14 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         Locator.tagWithAttribute("a", "data-original-title", title)));
             }
             return headerButtons.get(text);
+        }
+
+        protected WebElement getExportButton()
+        {
+            WebElement button = getHeaderButtonOrNull("Export");
+            if (null != button)
+                return button;
+            return getHeaderButton("Export / Sign Data");
         }
 
         protected WebElement getHeaderMenu(String text)

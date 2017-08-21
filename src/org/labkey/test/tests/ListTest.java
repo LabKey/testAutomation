@@ -640,7 +640,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test export");
         DataRegionTable list = new DataRegionTable("query", getDriver());
-        waitForElement(Locator.tagWithAttribute("a", "data-original-title", "Export"));
+        waitForElement(Locator.tagWithAttribute("a", "data-original-title", "Delete"));
 
         DataRegionExportHelper helper = new DataRegionExportHelper(list);
         File expFile = helper.exportText(ColumnHeaderType.FieldKey, DataRegionExportHelper.TextSeparator.COMMA);
