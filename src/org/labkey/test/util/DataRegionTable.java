@@ -1913,7 +1913,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             if (!headerButtons.containsKey(text))
             {
 //                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"  // This is screwy and limits what you can put in the button
-                String title = text;
+                String title = "Grid Views".equals(text) ? "Grid views" : text;
                 headerButtons.put(text, Locator.findAnyElement(
                         "Button with title or text: " + text,
                         buttonBar,
@@ -1931,7 +1931,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
             if (!headerButtons.containsKey(text) || headerButtons.containsKey(text) && headerButtons.get(text) != null)
             {
-                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
+//                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
+                String title = "Grid Views".equals(text) ? "Grid views" : text;
                 headerButtons.put(text, Locator.findAnyElementOrNull(
                         "Button with title or text: " + text,
                         buttonBar,
