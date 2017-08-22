@@ -80,8 +80,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             moreModulesElement.click();
             getWrapper().waitFor(()-> menu.findVisibleMenuItemOrNull(moduleName) != null,
                     "Did not find expected module [" + moduleName + "]", 2000);
-            WebElement moduleLink =  menu.findVisibleMenuItemOrNull(moduleName);
-            getWrapper().scrollIntoView(moduleLink);        // todo: consider using filter to bring the module into view
+            getWrapper().setFormElement(Locator.tagWithClass("input", "dropdown-menu-filter"), moduleName);
             menu.findVisibleMenuItem(moduleName).click();
             return this;
         }
