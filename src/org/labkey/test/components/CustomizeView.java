@@ -141,6 +141,7 @@ public class CustomizeView extends Component
 
     public SaveWindow clickSave()
     {
+        _driver.scrollIntoView(elements().saveButton);
         elements().saveButton.click();
         return new SaveWindow(_driver.getDriver());
     }
