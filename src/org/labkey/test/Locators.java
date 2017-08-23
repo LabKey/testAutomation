@@ -34,7 +34,7 @@ public abstract class Locators
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("*", "labkey-folder-header").append(Locator.tagWithClass("ul", "tab-nav")).childTag("li");
     public static final Locator.XPathLocator UX_PAGE_NAV = Locator.xpath("//nav[@class='labkey-page-nav']");
-    public static final Locator.XPathLocator UX_FOLDER_TAB = Locator.xpath("//li[contains(@class,'hidden') and ./a[@class='dropdown-toggle' and ./i[contains(@class, 'fa-folder-open')]]]");
+    public static final Locator.XPathLocator UX_FOLDER_TAB = Locator.xpath("//li[@data-webpart='BetaNav']//i[contains(@class, 'fa-folder-open')]");
     public static final Locator.CssLocator labkeyHeader = Locator.css(".labkey-main .header-block");
     public static final Locator.CssLocator labkeyBody = Locator.css(".labkey-main .body-block");
 
