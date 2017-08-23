@@ -2009,7 +2009,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         setCodeEditorValue("queryText", sql);
         if (xml != null)
         {
-            _extHelper.clickExtTab("XML Metadata");
+            _ext4Helper.clickExt4Tab("XML Metadata");
             setCodeEditorValue("metadataText", xml);
         }
         clickButton("Save", 0);
