@@ -29,6 +29,7 @@ import org.labkey.test.components.studydesigner.VaccineDesignWebpart;
 import org.labkey.test.pages.StartImportPage;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.PermissionsHelper;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import java.util.Map;
 @Category(DailyB.class)
 public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String LIMITED_USER = "limited@advancedimport.test";
 
     private static final String IMPORT_STUDY_FILE = "/sampledata/AdvancedImportOptions/AdvancedImportStudyProject01.folder.zip";
@@ -338,9 +340,19 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         Locator.tagWithClass("span", "x4-tree-node-text").notHidden().withText(IMPORT_FOLDER_MULTI01).waitForElement(shortWait());
 
         log("Select sub folders to import into");
-        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        /* new UI behavior: clicking on the text doesn't toggle the box, but clicking the checkbox does.
+         * Also, using a checkbox to wrap this has issues; checkBox.get() always returns false, so
+         * set(true) unchecks the box.  Todo: salvage this logic into a component someplace.
+          * Todo: wonder if being already-selected here is a problem.*/
+        WebElement checkbox01 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01)
+                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5));
+        if (checkbox01.getAttribute("aria-checked") == null || !checkbox01.getAttribute("aria-checked").equals("true"))
+            checkbox01.click();
         sleep(250);
-        Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03).precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5)).click();
+        WebElement checkBox03 = Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI03)
+                .precedingSibling("input").waitForElement(new WebDriverWait(getDriver(), 5));
+        if (checkBox03.getAttribute("aria-checked") == null || !checkBox03.getAttribute("aria-checked").equals("true"))
+            checkBox03.click();
         sleep(250);
 
         log("Start the import and verify the confirmation dialog");
