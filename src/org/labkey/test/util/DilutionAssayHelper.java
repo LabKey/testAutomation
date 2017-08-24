@@ -91,9 +91,8 @@ public class DilutionAssayHelper
      */
     private void openDataIdentifierMenu()
     {
-        new BootstrapMenu(_test.getDriver(), detailMenu("Change Graph Options")
-                .waitForElement(_test.getDriver(), _test.WAIT_FOR_JAVASCRIPT))
-                .clickMenuButton(false, true, "Data Identifiers", "Data Identifiers");
+        BootstrapMenu.find(_test.getDriver(), "Change Graph Options")
+                .openMenuTo( "Data Identifiers", "Data Identifiers");
     }
 
     private void verifyDataIdentifierText(AssayImportOptions.VisitResolverType type, @Nullable String ptidSuffix)
@@ -136,11 +135,13 @@ public class DilutionAssayHelper
         }
         else
         {
-            new BootstrapMenu(_test.getDriver(), detailMenu(text).waitForElement(_test.getDriver(), _test.WAIT_FOR_JAVASCRIPT))
-                    .clickMenuButton(true, false, subMenuLabels);
+            BootstrapMenu.find(_test.getDriver(), text)
+                    .clickSubMenu(true, subMenuLabels);
         }
     }
 
+    // don't use this; it replicates locators to find bootstrapmenus;
+    @Deprecated
     private Locator.XPathLocator detailMenu(String text)
     {
         return Locator.tagWithClassContaining("div", "lk-menu-drop")
