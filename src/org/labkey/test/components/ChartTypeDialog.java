@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.selenium.LazyWebElement;
 import org.labkey.test.util.Ext4Helper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -66,6 +65,8 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
                 break;
             case Time:
                 elementCache().plotTypeTime.click();
+            case Line:
+                elementCache().plotTypeLine.click();
                 break;
         }
 
@@ -544,6 +545,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement plotTypePie = Locator.xpath("//div[@id='chart-type-pie_chart']").findWhenNeeded(this).withTimeout(1000);
         public WebElement plotTypeScatter = Locator.xpath("//div[@id='chart-type-scatter_plot']").findWhenNeeded(this).withTimeout(1000);
         public WebElement plotTypeTime = Locator.xpath("//div[@id='chart-type-time_chart']").findWhenNeeded(this).withTimeout(1000);
+        public WebElement plotTypeLine = Locator.xpath("//div[@id='chart-type-line_plot']").findWhenNeeded(this).withTimeout(1000);
 
         public WebElement xAxis() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement xAxisTitle() {return Locator.xpath(XAXIS_CONTAINER).findElement(this);}
@@ -603,6 +605,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         Box,
         Pie,
         Scatter,
+        Line,
         Time
     }
 

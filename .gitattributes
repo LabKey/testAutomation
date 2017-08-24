@@ -456,6 +456,7 @@ src/org/labkey/test/components/IssueListDefDataRegion.java -text
 src/org/labkey/test/components/ListsWebPart.java -text
 src/org/labkey/test/components/LookAndFeelBarPlot.java -text
 src/org/labkey/test/components/LookAndFeelBoxPlot.java -text
+src/org/labkey/test/components/LookAndFeelLinePlot.java -text
 src/org/labkey/test/components/LookAndFeelPieChart.java -text
 src/org/labkey/test/components/LookAndFeelScatterPlot.java -text
 src/org/labkey/test/components/LookAndFeelTimeChart.java -text
@@ -694,6 +695,7 @@ src/org/labkey/test/tests/JUnitDRTTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/KnitrReportTest.java -text
+src/org/labkey/test/tests/LinePlotTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListImportFieldsTest.java -text
