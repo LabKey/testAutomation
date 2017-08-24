@@ -91,7 +91,9 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     public void navigateToProject(String projectName)
     {
-        mouseOverProjectLink(projectName);
+        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
+            mouseOverProjectLink(projectName);
+        expandFolderLinksTo(projectName);
         getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getFolderLink(projectName).click());
     }
 
