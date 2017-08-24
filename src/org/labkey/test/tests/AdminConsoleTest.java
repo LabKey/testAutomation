@@ -78,7 +78,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         Locator ribbon = Locator.tagWithClass("div", "alert alert-warning").containing("READ ME!!!");
         waitForElement(ribbon);
 
-        Locator ribbonLink = Locator.tagWithClass("div", "default-template-alert").append(Locator.linkContainingText("and also click this..."));
+        Locator ribbonLink = Locator.tagWithClassContaining("div", "alert").append(Locator.linkContainingText("and also click this..."));
         assertElementPresent(ribbonLink);
         String href = ribbonLink.findElement(getDriver()).getAttribute("href");
         String expected = WebTestHelper.getBaseURL() + "/project/home/begin.view";
