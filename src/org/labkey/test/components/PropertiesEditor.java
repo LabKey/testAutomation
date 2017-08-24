@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.EnumSelect.EnumSelect;
 import static org.labkey.test.components.html.Input.Input;
@@ -85,7 +86,11 @@ public class PropertiesEditor extends WebPartPanel
     private void selectLastField()
     {
         if (!elementCache().findFieldRows().isEmpty())
-            elementCache().findFieldRows().get(elementCache().findFieldRows().size() - 1).select();
+        {
+            FieldRow lastRow = elementCache().findFieldRows().get(elementCache().findFieldRows().size() - 1);
+            getWrapper().scrollIntoView(lastRow._rowEl);
+            lastRow.select();
+        }
     }
 
     public FieldRow addField(FieldDefinition col)
@@ -148,6 +153,7 @@ public class PropertiesEditor extends WebPartPanel
     public FieldRow addField()
     {
         int initialRowCount = elementCache().findFieldRows().size();
+        getWrapper().scrollIntoView(elementCache().addFieldButton);
         getWrapper().waitFor(() -> {
                     elementCache().addFieldButton.click();
                     return initialRowCount + 1 == elementCache().findFieldRows().size();
@@ -280,6 +286,13 @@ public class PropertiesEditor extends WebPartPanel
         public void select()
         {
             spacer.click();
+            waitFor(()-> isSelected(), 2500);
+        }
+
+        private boolean isSelected()
+        {
+            String style = _rowEl.getAttribute("style");
+            return style != null && style.contains("background-color"); // when unselected, style for the fieldRow should be empty
         }
 
         public String getName()
