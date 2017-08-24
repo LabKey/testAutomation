@@ -772,8 +772,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         click(Locator.xpath("//select[@name='ff_baseTableName']"));
 
         clickButton("Create and Edit Source");
-        waitForElement(Locator.xpath("//button[text()='Save & Finish']"));
-        clickButton("Save & Finish");
+        Locator saveAndFinishBtn = Locator.tagWithClass("span", "x4-btn-button").withChild(Locator.tagWithText("span", "Save & Finish"));
+        waitForElement(saveAndFinishBtn);
+        clickAndWait(saveAndFinishBtn);
     }
 
 }
