@@ -2835,6 +2835,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void mashButton(final String text)
     {
         WebElement button = findButton(text);
+        scrollIntoView(button);
         doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(button)));
     }
 
