@@ -323,7 +323,9 @@ public abstract class AbstractContainerHelper
             }
 
             // verify that there's a link to our new folder:
-            _test.assertElementPresent(Locator.linkWithText(child));
+            _test.assertElementPresent( LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
+                    Locators.bodyTitle(child) :
+                    Locator.linkWithText(child));
         }
     }
 
