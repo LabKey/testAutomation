@@ -2,7 +2,9 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.ColumnHeaderType;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.compliance.SignedSnapshotDetailsPage;
 
 public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelper
 {
@@ -22,16 +24,18 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
         _userPassword = userPassword;
     }
 
-    public void signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
+    public SignedSnapshotDetailsPage signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
     {
         startExcelExport(headerType, type, selected);
         signDocument(reason);
+        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
     }
 
-    public void signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
+    public SignedSnapshotDetailsPage signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
     {
         startTextExport(headerType, delim, quote, exportSelected);
         signDocument(reason);
+        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
     }
 
     public void signDocument(String reason){
