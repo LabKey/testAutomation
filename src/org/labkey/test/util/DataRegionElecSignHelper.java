@@ -24,19 +24,31 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
         _userPassword = userPassword;
     }
 
-    public SignedSnapshotDetailsPage signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
+    public void signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
     {
         startExcelExport(headerType, type, selected);
         signDocument(reason);
-        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
     }
 
-    public SignedSnapshotDetailsPage signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
+//    public SignedSnapshotDetailsPage signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
+//    {
+//        startExcelExport(headerType, type, selected);
+//        signDocument(reason);
+//        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
+//    }
+
+    public void signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
     {
         startTextExport(headerType, delim, quote, exportSelected);
         signDocument(reason);
-        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
     }
+
+//    public SignedSnapshotDetailsPage signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
+//    {
+//        startTextExport(headerType, delim, quote, exportSelected);
+//        signDocument(reason);
+//        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
+//    }
 
     public void signDocument(String reason){
         Locator submit = Locator.linkWithText("Submit");
