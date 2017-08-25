@@ -20,6 +20,8 @@ import org.labkey.test.Locator;
 
 public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 {
+    private String currentSection = "Immunogens";
+
     public ManageStudyProductsPage(BaseWebDriverTest test, boolean canInsert)
     {
         super(test);
@@ -46,6 +48,7 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 
     public void addNewImmunogenAntigen(String gene, String subtype, String genBankId, String sequence, int outerRowIndex, int subgridRowIndex)
     {
+        currentSection = "Immunogens";
         clickSubgridAddNewRow(elements().immunogensLoc, "Antigens", outerRowIndex);
 
         if (gene != null)
@@ -60,6 +63,7 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 
     public void addNewAdjuvantRow(String label, int rowIndex)
     {
+        currentSection = "Adjuvants";
         clickOuterAddNewRow(elements().adjuvantsLoc);
 
         setOuterTextFieldValue(elements().adjuvantsLoc, "Label", label, rowIndex);
@@ -67,6 +71,7 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 
     public void addNewChallengeRow(String label, String challengeSubType, int rowIndex)
     {
+        currentSection = "Challenges";
         clickOuterAddNewRow(elements().challengesLoc);
         setOuterTextFieldValue(elements().challengesLoc, "Label", label, rowIndex);
         if (challengeSubType != null)
@@ -75,16 +80,19 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
 
     public void addNewImmunogenDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
+        currentSection = "Immunogens";
         addNewDoseAndRoute(elements().immunogensLoc, dose, route, outerRowIndex, subgridRowIndex);
     }
 
     public void addNewAdjuvantDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
+        currentSection = "Adjuvants";
         addNewDoseAndRoute(elements().adjuvantsLoc, dose, route, outerRowIndex, subgridRowIndex);
     }
 
     public void addNewChallengesDoseAndRoute(String dose, String route, int outerRowIndex, int subgridRowIndex)
     {
+        currentSection = "Challenges";
         addNewDoseAndRoute(elements().challengesLoc, dose, route, outerRowIndex, subgridRowIndex);
     }
 
@@ -96,6 +104,12 @@ public class ManageStudyProductsPage extends BaseManageVaccineDesignPage
             setSubgridTextFieldValue(table, "DoseAndRoute", "Dose", dose, outerRowIndex, subgridRowIndex);
         if (route != null)
             setSubgridComboFieldValue(table, "DoseAndRoute", "Route", route, outerRowIndex, subgridRowIndex);
+    }
+
+    @Override
+    protected void removeFocusAndWait()
+    {
+        super.removeFocusAndWait(currentSection);
     }
 
     public void save()

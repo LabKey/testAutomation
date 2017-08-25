@@ -98,9 +98,19 @@ public class BaseManageVaccineDesignPage extends LabKeyPage
 
     protected void removeFocusAndWait()
     {
+        removeFocusAndWait(null);
+    }
+
+    protected void removeFocusAndWait(String sectionTitle)
+    {
         Locator loc = Locator.tagWithClass("span", "labkey-nav-page-header");
         if (IS_BOOTSTRAP_LAYOUT)
-            loc = Locator.tagWithClass("div", "lk-body-title");
+        {
+            if (sectionTitle != null)
+                loc = Locator.tagWithClass("div", "main-title").withText(sectionTitle);
+            else
+                loc = Locator.tagWithClass("div", "lk-body-title");
+        }
 
         loc.findElement(getDriver()).click(); // click outside field to remove focus
         sleep(1000); // give the store a second to update
