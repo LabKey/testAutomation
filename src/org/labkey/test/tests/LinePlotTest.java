@@ -259,7 +259,7 @@ public class LinePlotTest extends GenericChartsTest
         final String EXPORTED_SCRIPT_CHECK_XAXIS = MEASURE_4_PULSE;
         final String EXPORTED_SCRIPT_CHECK_YAXIS = MEASURE_1_WEIGHT;
 
-        log("Validate that export of the bar plot works.");
+        log("Validate that export of the line plot works.");
         goToProjectHome();
         clickProject(getProjectName());
         clickFolder(getFolderName());
