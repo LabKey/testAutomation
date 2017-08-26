@@ -1303,8 +1303,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     public void openSelectionMenu()
     {
         WebElement firstColumnHeader = elements().getColumnHeaders().get(0);
-        WebElement toggleSpan = Locator.xpath("./div/span").findElement(firstColumnHeader);
-        toggleSpan.click();
+        Locator.XPathLocator loc = IS_BOOTSTRAP_LAYOUT ? Locator.tagWithClass("span", "dropdown-toggle") : Locator.xpath("./div/span");
+        loc.findElement(firstColumnHeader).click();
     }
 
     public void showSelected()
