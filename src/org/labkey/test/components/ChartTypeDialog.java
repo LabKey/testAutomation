@@ -65,6 +65,7 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
                 break;
             case Time:
                 elementCache().plotTypeTime.click();
+                break;
             case Line:
                 elementCache().plotTypeLine.click();
                 break;
@@ -121,6 +122,12 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
             setValue(elementCache().xAxisTitle(), columnName);
         else
             setValue(elementCache().xAxisDropText(), columnName);
+        return this;
+    }
+
+    public ChartTypeDialog setSeries(String columnName)
+    {
+        setValue(elementCache().seriesTitle(), columnName);
         return this;
     }
 
@@ -344,6 +351,15 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         return this;
     }
 
+    public ChartTypeDialog removeSeries()
+    {
+        getWrapper().mouseOver(elementCache().series());
+        final WebElement remove = elementCache().seriesRemove();
+        remove.click();
+        getWrapper().shortWait().until(ExpectedConditions.stalenessOf(remove));
+        return this;
+    }
+
     public ChartTypeDialog removeColor()
     {
         getWrapper().mouseOver(elementCache().color());
@@ -520,17 +536,18 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public final String MEASURE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Measure')]";
         public final String COLOR_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Color')]";
         public final String SHAPE_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Shape')]";
-
         public final String FIELD_AREA = "/following-sibling::div[contains(@class, 'field-area ')]";
+
         public final String FIELD_DISPLAY = "//div[contains(@class, 'field-selection-display')]";
         public final String DROP_TEXT = "/following-sibling::div[contains(@class, 'field-area-drop-text ')]";
         public final String REMOVE_ICON = FIELD_DISPLAY + "//div[contains(@class, 'field-selection-remove')]";
-
         public Locator Y_FIELD_TEXT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//div[contains(@class, 'field-selection-text')]");
+
         public Locator Y_FIELD_SIDE_LEFT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-left')]");
         public Locator Y_FIELD_SIDE_RIGHT = Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + FIELD_DISPLAY + "//i[contains(@class, 'fa-arrow-circle-right')]");
-
         public WebElement typeTitle = new LazyWebElement(Locator.xpath("//div[contains(@class, 'type-title')]"), this);
+
+        public final String SERIES_CONTAINER = "//div[contains(@class, 'field-title')][contains(text(), 'Series')]";
 
         public WebElement columnList = new LazyWebElement(Locator.xpath("//div[contains(@class, 'mapping-query-col')]"), this);
         public WebElement getColumn(String column, String columnGridCls)
@@ -551,12 +568,14 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement xAxisTitle() {return Locator.xpath(XAXIS_CONTAINER).findElement(this);}
         public WebElement xAxisDropText() {return Locator.xpath(XAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xAxisRemove() {return Locator.xpath(XAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
-
         public WebElement xCategories() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
+
         public WebElement xCategoriesTitle() {return Locator.xpath(XCATEGORY_CONTAINER).findElement(this);}
         public WebElement xCategoriesDisplay(){return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + FIELD_DISPLAY).findElement(this);}
         public WebElement xCategoriesDropText() {return Locator.xpath(XCATEGORY_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement xCategoriesRemove() {return Locator.xpath(XCATEGORY_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
+
+        public WebElement seriesTitle() {return Locator.xpath(SERIES_CONTAINER).findElement(this);}
 
         public WebElement xSubCategories() {return Locator.xpath(XSUBCATEGORY_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement xSubCategoriesTitle() {return Locator.xpath(XSUBCATEGORY_CONTAINER).findElement(this);}
@@ -568,6 +587,9 @@ public class ChartTypeDialog<EC extends ChartTypeDialog.ElementCache> extends Ch
         public WebElement yAxisTitle() {return Locator.xpath(YAXIS_CONTAINER).findElement(this);}
         public WebElement yAxisDropText() {return Locator.xpath(YAXIS_CONTAINER + DROP_TEXT).findElement(this);}
         public WebElement yAxisRemove() {return Locator.xpath(YAXIS_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
+
+        public WebElement series() {return Locator.xpath(SERIES_CONTAINER + FIELD_AREA).findElement(this);}
+        public WebElement seriesRemove() {return Locator.xpath(SERIES_CONTAINER + FIELD_AREA + REMOVE_ICON).findElement(this);}
 
         public WebElement categories() {return Locator.xpath(CATEGORIES_CONTAINER + FIELD_AREA).findElement(this);}
         public WebElement categoriesTitle() {return Locator.xpath(CATEGORIES_CONTAINER).findElement(this);}

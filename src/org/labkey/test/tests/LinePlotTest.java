@@ -16,9 +16,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +45,6 @@ public class LinePlotTest extends GenericChartsTest
         doCustomizeLinePlotTest(); // Uses Line plot created by doDataRegionLinePlotTest()
         doPlotExport();
         doPointClickLinePlotTest(); // Uses Line plot created by doManageViewsLinePlotTest()
-        doBinnedLinePlotTest();
     }
 
     private static final String LINE_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam\n4. Pulse\n1. Weight";
@@ -58,6 +55,7 @@ public class LinePlotTest extends GenericChartsTest
     private static final String MEASURE_1_WEIGHT = "1. Weight";
     private static final String MEASURE_2_BODY_TEMP = "2. Body Temp";
     private static final String MEASURE_4_PULSE = "4. Pulse";
+    private static final String MEASURE_MOUSE_ID = "Mouse Id";
 
     private static final String QUERY_APX_1 = "APX-1 (APX-1: Abbreviated Physical Exam)";
 
@@ -110,10 +108,6 @@ public class LinePlotTest extends GenericChartsTest
         lookAndFeelDialog.setXAxisLabel("TestXAxis")
                 .clickApply();
 
-        chartTypeDialog = clickChartTypeButton();
-        chartTypeDialog.setXAxis("Mouse Group: " + MOUSE_GROUP_CATEGORY, true)
-                .clickApply();
-
         assertSVG(LINE_PLOT_MV_2);
 
         clickButton("Save", 0);
@@ -129,6 +123,18 @@ public class LinePlotTest extends GenericChartsTest
         saveChartDialog.setReportDescription("TestReportDescription");
         saveChartDialog.clickCancel();
         assertTextNotPresent("TestReportName");
+
+        List<WebElement> layers = Locator.css(".line").findElements(getDriver());
+        assertEquals("Line count is wrong", 2, layers.size());
+
+        //confirm series creates separate lines
+        chartTypeDialog = clickChartTypeButton();
+        chartTypeDialog.setSeries(MEASURE_MOUSE_ID)
+                .clickApply();
+
+        layers = Locator.css(".line").findElements(getDriver());
+        assertEquals("Line count is wrong", 34, layers.size());
+
 
         savePlot(LINE_PLOT_NAME_MV, LINE_PLOT_DESC_MV);
     }
@@ -167,8 +173,6 @@ public class LinePlotTest extends GenericChartsTest
         clickButton("View Chart", 0);
         _ext4Helper.waitForMaskToDisappear();
         assertSVG(LINE_PLOT_DR_2);
-
-        log("Verify point stying");
 
         savePlot(LINE_PLOT_NAME_DR, LINE_PLOT_DESC_DR);
     }
@@ -241,6 +245,17 @@ public class LinePlotTest extends GenericChartsTest
         points = Locator.css("svg g a path").findElements(getDriver());
         assertEquals("Point at (70, 67) was an unexpected color", COLOR_RED, points.get(14).getAttribute("fill"));
         assertEquals("Point at (70, 67) did not have the expected fill opacity.", "0.9", points.get(14).getAttribute("fill-opacity"));
+
+        //confirm the hide data points feature
+        clickChartLayoutButton();
+        lookAndFeelDialog = new LookAndFeelLinePlot(getDriver());
+        lookAndFeelDialog
+                .clickHideDataPoints()
+                .clickApply();
+
+        log("Validate that there are no points on the plot.");
+        points = Locator.css("svg g a path").findElements(getDriver());
+        assertEquals("Point found that should be hidden", 0, points.size());
 
         List<WebElement> layers = Locator.css(".line").findElements(getDriver());
         assertEquals("Line layer was an unexpected color", COLOR_RED, layers.get(0).getAttribute("stroke"));
@@ -375,82 +390,6 @@ public class LinePlotTest extends GenericChartsTest
         assertTrue("Did not find the 'Developer' tab on the the Look and Feel dialog. It should be there for this user.", lookAndFeelDialog.getAvailableTabs().contains("Developer"));
         lookAndFeelDialog.clickCancel();
         stopImpersonating();
-    }
-
-    private static final String LINE_PLOT_CPF_1 = "0.5\n1.0\n1.5\n2.0\n2.5\n3.0\n3.5\n50\n100\n150\n200\n250\n300\n350\n400\nCPF-1: Follow-up Chemistry Panel\n2a. Creatinine\n1a. ALT (SGPT)";
-    private static final String LINE_PLOT_NAME_BIN = "BinnedLinePlotTest";
-    private static final String LINE_PLOT_DESC_BIN = "This line plot was created with the binning threshold set to a number smaller than the data point count.";
-
-    @LogMethod
-    private void doBinnedLinePlotTest()
-    {
-        Map<String, Integer> expectedBinSizeCounts = new HashMap<>();
-        expectedBinSizeCounts.put("1 point", 5);
-        expectedBinSizeCounts.put("2 points", 1);
-        expectedBinSizeCounts.put("3 points", 1);
-
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("CPF-1: Follow-up Chemistry Panel"));
-        DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.clickHeaderMenu("Charts / Reports", "Create Chart");
-
-        // create line lot with point geom
-        ChartTypeDialog chartTypeDialog = new ChartTypeDialog(getDriver());
-        chartTypeDialog.setChartType(ChartTypeDialog.ChartType.Line)
-                .setYAxis("1a. ALT (SGPT)")
-                .setXAxis("2a. Creatinine")
-                .clickApply();
-        assertSVG(LINE_PLOT_CPF_1);
-        validateBinWarningMsg(false);
-        validatePointsAndBins(10, 0, 0);
-
-        savePlot(LINE_PLOT_NAME_BIN, LINE_PLOT_DESC_BIN);
-    }
-
-    private void validateBinWarningMsg(boolean expectMsg)
-    {
-        Locator warningMsg = Locator.tagContainingText("div", "The number of individual points exceeds the limit");
-        if (expectMsg)
-            assertElementPresent(warningMsg);
-        else
-            assertElementNotPresent(warningMsg);
-    }
-
-    private void validatePointsAndBins(int expectedPointCount, int expectedHexBinCount, int expectedSquareBinCount)
-    {
-        Locator pointLoc = Locator.css("svg g.layer a.point");
-        Locator hexBinLoc = Locator.css("svg g.layer a.vis-bin-hexagon");
-        Locator squareBinLoc = Locator.css("svg g.layer a.vis-bin-square");
-
-        assertEquals("Unexpected number of points", expectedPointCount, getVisiblePlotElementCount(pointLoc.findElements(getDriver())));
-        assertEquals("Unexpected number of hex bins", expectedHexBinCount, getVisiblePlotElementCount(hexBinLoc.findElements(getDriver())));
-        assertEquals("Unexpected number of square bins", expectedSquareBinCount, getVisiblePlotElementCount(squareBinLoc.findElements(getDriver())));
-    }
-
-    private int getVisiblePlotElementCount(List<WebElement> elements)
-    {
-        if (elements.isEmpty())
-            return 0;
-
-        int squareBinSize = 10;
-        Locator plotRegionLoc = Locator.css("svg g.axis");
-        WebElement plotRegion = plotRegionLoc.findElement(getDriver());
-        int left = plotRegion.getLocation().getX() - squareBinSize;
-        int right = left + plotRegion.getSize().getWidth() + (2*squareBinSize);
-        int top = plotRegion.getLocation().getY() - squareBinSize;
-        int bottom = top + plotRegion.getSize().getHeight() + (2*squareBinSize);
-        int count = 0;
-
-        for (WebElement element : elements)
-        {
-            int x = element.getLocation().getX();
-            int y = element.getLocation().getY();
-            if (x >= left && x <= right && y >= top && y <= bottom)
-                count++;
-        }
-
-        return count;
     }
 
 }

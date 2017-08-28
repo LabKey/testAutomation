@@ -24,6 +24,26 @@ public class LookAndFeelLinePlot extends ChartLayoutDialog<LookAndFeelLinePlot.E
         return this;
     }
 
+    public LookAndFeelLinePlot clickHideDataPoints()
+    {
+        clickGeneralTab();
+        getWrapper().click(elementCache().hidePointsCheckbox);
+        return this;
+    }
+
+    public boolean hideDataPointsChecked()
+    {
+        String classValue;
+
+        classValue = elementCache().hidePointsCheckboxValue.getAttribute("class");
+
+        if(classValue.toLowerCase().contains("x4-form-cb-checked"))
+            return true;
+        else
+            return false;
+    }
+
+
     public LookAndFeelLinePlot setPlotWidth(String width)
     {
         super.setPlotWidth(width);
@@ -147,17 +167,13 @@ public class LookAndFeelLinePlot extends ChartLayoutDialog<LookAndFeelLinePlot.E
         return this;
     }
 
-    public LookAndFeelLinePlot setBinShape(ChartLayoutDialog.BinShape shape)
-    {
-        super.setBinShape(shape);
-        return this;
-    }
-
     class ElementCache extends ChartLayoutDialog.ElementCache
     {
         public WebElement opacitySlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Opacity:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement pointSizeSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Point Size:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
         public WebElement lineWidthSlider = new LazyWebElement(Locator.xpath(ElementCache.VISIBLE_PANEL_XPATH + "//table[not(contains(@class, 'x4-item-disabled'))]//label[text()='Line Width:']/parent::td/following-sibling::td//div[contains(@class, 'x4-slider-horz')]"), this);
+        public WebElement hidePointsCheckbox = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Hide Data Points:']/parent::td/following-sibling::td//input"), this);
+        public WebElement hidePointsCheckboxValue = new LazyWebElement(Locator.xpath(VISIBLE_PANEL_XPATH + "//td//label[text()='Hide Data Points:']/ancestor::table"), this);
     }
 
 }
