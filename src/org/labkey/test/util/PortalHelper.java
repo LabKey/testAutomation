@@ -271,7 +271,7 @@ public class PortalHelper extends WebDriverWrapper
     public List<BodyWebPart> getBodyWebParts()
     {
         List<WebElement> webPartElements = Locator.css( IS_BOOTSTRAP_LAYOUT ?
-                "div.labkey-portal-container[name=webpart]" :
+                "div[name=webpart]" :
                 "#bodypanel > table[name=webpart]").findElements(getDriver());
         List<BodyWebPart> bodyWebParts = new ArrayList<>();
         
