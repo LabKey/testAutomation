@@ -48,7 +48,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        super.doCleanup(afterTest);
+
         try{deleteEngine();}
         catch(Throwable ignored) {}
     }
