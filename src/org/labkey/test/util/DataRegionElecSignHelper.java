@@ -28,27 +28,19 @@ public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelp
     {
         startExcelExport(headerType, type, selected);
         signDocument(reason);
-    }
-
-//    public SignedSnapshotDetailsPage signExcel(ColumnHeaderType headerType, ExcelFileType type, @Nullable Boolean selected, String reason)
-//    {
-//        startExcelExport(headerType, type, selected);
-//        signDocument(reason);
+        // Ideally these should be returning an instance of the SignedSnapshotDetailsPage.
+        // Because the detail page is defined in a git branch this code in the svn branch can't see it until the branch is merged with develop.
 //        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
-//    }
+    }
 
     public void signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
     {
         startTextExport(headerType, delim, quote, exportSelected);
         signDocument(reason);
-    }
-
-//    public SignedSnapshotDetailsPage signText(ColumnHeaderType headerType, TextSeparator delim, TextQuote quote, @Nullable Boolean exportSelected, String reason)
-//    {
-//        startTextExport(headerType, delim, quote, exportSelected);
-//        signDocument(reason);
+        // Ideally these should be returning an instance of the SignedSnapshotDetailsPage.
+        // Because the detail page is defined in a git branch this code in the svn branch can't see it until the branch is merged with develop.
 //        return new SignedSnapshotDetailsPage(BaseWebDriverTest.getCurrentTest());
-//    }
+    }
 
     public void signDocument(String reason){
         Locator submit = Locator.linkWithText("Submit");
