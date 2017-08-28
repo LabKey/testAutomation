@@ -2,9 +2,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.api.data.ColumnHeaderType;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-//import org.labkey.test.pages.compliance.SignedSnapshotDetailsPage;
 
 public class DataRegionElecSignHelper extends AbstractDataRegionExportOrSignHelper
 {
