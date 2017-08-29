@@ -70,8 +70,11 @@ public class UIContainerHelper extends AbstractContainerHelper
         }
         else
         {
-            // There may be additional steps based on
             _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
+
+            // There may be additional steps based on the folder type. In that case return so the caller can set
+            // the information for that wizard step.
+            return;
         }
 
         // block until the project exists
