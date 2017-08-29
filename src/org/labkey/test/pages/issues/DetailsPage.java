@@ -93,7 +93,7 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
     public EmailPrefsPage clickEmailPrefs()
     {
         if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            elementCache().getMoreMenu().clickSubMenu(true, "Email Preferences");
+            elementCache().getMoreMenu().clickSubMenu(true, "Email preferences");
         else
             clickAndWait(elementCache().emailPrefsLink);
         return new EmailPrefsPage(getDriver());
@@ -102,7 +102,7 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
     public EmailPrefsPage clickCreateRelatedIssue()
     {
         if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            elementCache().getMoreMenu().clickSubMenu(true, "Create Related Issue");
+            elementCache().getMoreMenu().clickSubMenu(true, "Create related issue");
         else
             clickAndWait(elementCache().emailPrefsLink);
         return new EmailPrefsPage(getDriver());
