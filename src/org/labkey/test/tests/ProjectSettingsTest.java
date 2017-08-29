@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,12 +36,6 @@ import static org.junit.Assert.*;
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
     {setIsBootstrapWhitelisted(true);}
-    private static final Locator supportLink = IS_BOOTSTRAP_LAYOUT ?
-            Locator.tagWithAttributeContaining("a", "href", "support" ).withText("Support") :
-            Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
-    private static final Locator helpLink = IS_BOOTSTRAP_LAYOUT ?
-            Locator.xpath("//a[@target='labkeyHelp' and contains(text(),'LabKey Documentation')]") :
-            Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
     private Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
@@ -67,18 +62,12 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     {
         if(projectName!=null)
             clickProject(projectName);
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new SiteNavBar(getDriver()).userMenu().expand();    // the support and help links are now on the user menu
-            assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
-            assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
-        }
-        else
-        {
-            click(helpMenuLink);
-            assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
-            assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
-        }
+
+        BootstrapMenu menu = new SiteNavBar(getDriver()).userMenu();
+        menu.expand();    // the support and help links are now on the user menu
+        List<WebElement> visibleLinks = menu.findVisibleMenuItems();
+        assertEquals("Support link state unexpected.", supportLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("Support")));
+        assertEquals("Help link state unexpected.", helpLinkPresent, visibleLinks.stream().anyMatch((a)-> a.getText().equals("LabKey Documentation")));
     }
 
     protected void setUpTest()
