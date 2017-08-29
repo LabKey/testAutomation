@@ -1907,21 +1907,10 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
         protected WebElement getHeaderButton(String text)
         {
-            if (headerButtons == null)
-                headerButtons = new CaseInsensitiveHashMap<>();
-
-            if (!headerButtons.containsKey(text))
-            {
-//                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"  // This is screwy and limits what you can put in the button
-                String title = "Grid Views".equals(text) ? "Grid views" : text;
-                headerButtons.put(text, Locator.findAnyElement(
-                        "Button with title or text: " + text,
-                        buttonBar,
-                        Locator.lkButton().withAttribute("title", title),
-                        Locator.lkButton(text),
-                        Locator.tagWithAttribute("a", "data-original-title", title)));
-            }
-            return headerButtons.get(text);
+            WebElement button = getHeaderButtonOrNull(text);
+            if (button == null)
+                throw new NoSuchElementException("No header button: " + text);
+            return button;
         }
 
         protected WebElement getHeaderButtonOrNull(String text)
@@ -1929,9 +1918,8 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             if (headerButtons == null)
                 headerButtons = new CaseInsensitiveHashMap<>();
 
-            if (!headerButtons.containsKey(text) || headerButtons.containsKey(text) && headerButtons.get(text) != null)
+            if (!headerButtons.containsKey(text)) // This assumes buttons can't be added after data region is created
             {
-//                String title = StringUtils.capitalize(text.toLowerCase()); // "Grid Views" becomes "Grid views"
                 String title = "Grid Views".equals(text) ? "Grid views" : text;
                 headerButtons.put(text, Locator.findAnyElementOrNull(
                         "Button with title or text: " + text,
@@ -1951,6 +1939,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
             return getHeaderButton("Export / Sign Data");
         }
 
+        // Only works with new UX
         protected WebElement getHeaderMenu(String text)
         {
             if (headerMenus == null)
@@ -1964,7 +1953,9 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
                                 .withChild(Locator.tagWithAttribute("a", "data-toggle", "dropdown").withText(text)),
                         Locator.tagWithClassContaining("div", "lk-menu-drop")
-                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text))));
+                                .withChild(Locator.tagWithAttribute("a", "data-original-title", text)),
+                        Locator.tagWithClassContaining("div", "lk-menu-drop")
+                                .withChild(Locator.tagWithAttribute("a", "title", text))));
             }
             return headerMenus.get(text);
         }
