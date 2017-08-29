@@ -544,7 +544,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         boolean hitFirstPage = false;
         log("Verifying that server has started...");
         long ms = System.currentTimeMillis();
-        while (!hitFirstPage && ((System.currentTimeMillis() - ms)/1000) < MAX_SERVER_STARTUP_WAIT_SECONDS)
+        do
         {
             try
             {
@@ -552,11 +552,12 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 getDriver().manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
                 getDriver().get(buildURL("login", "logout"));
 
-                if (isElementPresent(Locator.css("table.labkey-main")) || isElementPresent(Locator.id("permalink")) || isElementPresent(Locator.id("headerpanel")))
+                try
                 {
+                    waitForElement(Locator.CssLocator.union(Locator.css("table.labkey-main"), Locator.css("#permalink"), Locator.css("#headerpanel")));
                     hitFirstPage = true;
                 }
-                else
+                catch (NoSuchElementException notReady)
                 {
                     long elapsedMs = System.currentTimeMillis() - ms;
                     log("Server is not ready.  Waiting " + (MAX_SERVER_STARTUP_WAIT_SECONDS -
@@ -584,7 +585,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
             }
 
-        }
+        } while (!hitFirstPage && ((System.currentTimeMillis() - ms)/1000) < MAX_SERVER_STARTUP_WAIT_SECONDS);
         if (!hitFirstPage)
         {
             throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
