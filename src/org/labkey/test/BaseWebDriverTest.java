@@ -1568,15 +1568,25 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return table.getFullColumnValues(columnNames);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
+     */
     @Deprecated
     public String getPropertyXPath(String propertyHeading)
     {
+        if (IS_BOOTSTRAP_LAYOUT)
+            return "//h3[text() = '" + propertyHeading + "']/../..";
         return "//td[text() = '" + propertyHeading + "']/../..";
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor} from _assayHelper or _listHelper
+     */
     @Deprecated
     public String getPropertyXPathContains(String propertyHeading)
     {
+        if (IS_BOOTSTRAP_LAYOUT)
+            return "//h3[contains(text(), '" + propertyHeading + "')]/../..";
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 

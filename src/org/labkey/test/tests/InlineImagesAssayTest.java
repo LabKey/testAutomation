@@ -25,10 +25,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExcelHelper;
@@ -48,8 +48,6 @@ import static org.junit.Assert.assertTrue;
 public class InlineImagesAssayTest extends BaseWebDriverTest
 {
     {setIsBootstrapWhitelisted(true);}
-    protected DataRegionTable dataRegion;
-
     protected final static File XLS_FILE = TestFileUtils.getSampleData("InlineImages/foo.xls");
     protected final static File PNG01_FILE =  TestFileUtils.getSampleData("InlineImages/crest.png");
     protected final static File LRG_PNG_FILE = TestFileUtils.getSampleData("InlineImages/screenshot.png");
@@ -73,12 +71,6 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    @Override
-    public void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
-    }
-
     @Before
     public void preTest()
     {
@@ -100,7 +92,6 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
     @Test
     public final void testAssayInlineImages() throws Exception
     {
-
         String assayName = "InlineImageTest";
         String runName = "inlineImageRun01";
         String importData = 
@@ -115,20 +106,10 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Mark the assay as editable.");
         assayDesigner.setEditableRuns(true);
         assayDesigner.setEditableResults(true);
-
-        log("Create a 'File' column for the assay batch.");
-        assayDesigner.addBatchField("BatchFileField", "Batch File Field", "File");
-
-        log("Create a 'File' column for the assay run.");
-        assayDesigner.addRunField("RunFileField", "Run File Field", "File");
-
-        log("Create a 'File' column for the assay data.");
-        assayDesigner.addDataField("DataFileField", "Data File Field", "File");
-
-        log("Save the changes.");
-        assayDesigner.save();
+        assayDesigner.addBatchField("BatchFileField", "Batch File Field", FieldDefinition.ColumnType.File);
+        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
+        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
         assayDesigner.saveAndClose();
-        sleep(1000);
 
         log("upload inline files to the pipeline root");
         goToModule("FileContent");
@@ -213,7 +194,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         log("Remove the 'File' (last) column from the batch and see that things still work.");
 
         assayDesigner = _assayHelper.clickEditAssayDesign();
-        assayDesigner.removeBatchField("BatchFileField");
+        assayDesigner.batchFields().selectField("BatchFileField").markForDeletion();
         assayDesigner.saveAndClose();
         waitAndClickAndWait(Locator.linkWithText("view results"));
 
@@ -244,10 +225,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
 
     private void validateExcelExport(File exportedFile, Workbook workbook)
     {
-        Sheet sheet;
-        List<String> exportedColumn;
-
-        sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
+        Sheet sheet = workbook.getSheetAt(workbook.getActiveSheetIndex());
 
         log("Validate number of rows exported");
         assertEquals("Wrong number of rows exported to " + exportedFile.getName(), 3, sheet.getLastRowNum());
@@ -266,7 +244,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assertTrue("Column '" + sheet.getRow(0).getCell(IMAGE_COL_01).getStringCellValue() + "' width not in expected range (" + COLUMN_WIDTH_LARGE_LBOUND + " to " + COLUMN_WIDTH_LARGE_UBOUND + "). Actual width: " + sheet.getColumnWidth(IMAGE_COL_01), (sheet.getColumnWidth(IMAGE_COL_01) > COLUMN_WIDTH_LARGE_LBOUND) && (sheet.getColumnWidth(IMAGE_COL_01) < COLUMN_WIDTH_LARGE_UBOUND));
         assertTrue("Column '" + sheet.getRow(0).getCell(IMAGE_COL_02).getStringCellValue() + "' width not in expected range (" + COLUMN_WIDTH_SMALL_LBOUND + " to " + COLUMN_WIDTH_SMALL_UBOUND + "). Actual width: " + sheet.getColumnWidth(IMAGE_COL_02), (sheet.getColumnWidth(IMAGE_COL_02) > COLUMN_WIDTH_SMALL_LBOUND) && (sheet.getColumnWidth(IMAGE_COL_02) < COLUMN_WIDTH_SMALL_UBOUND));
 
-        for(int j=0; j <= sheet.getLastRowNum(); j++)
+        for (int j=0; j <= sheet.getLastRowNum(); j++)
         {
             log("Row " + j + " height: " + sheet.getRow(j).getHeight());
         }
@@ -280,7 +258,7 @@ public class InlineImagesAssayTest extends BaseWebDriverTest
         assertTrue("Height of row 3 not in expected range (" + ROW_HEIGHT_SMALL_LBOUND + " to " + ROW_HEIGHT_SMALL_UBOUND + "). Actual height: " + sheet.getRow(3).getHeight(), (sheet.getRow(3).getHeight() > ROW_HEIGHT_SMALL_LBOUND) && (sheet.getRow(3).getHeight() < ROW_HEIGHT_SMALL_UBOUND));
 
         log("Validate that the value for the file columns is as expected.");
-        exportedColumn = ExcelHelper.getColumnData(sheet, 4);
+        List<String> exportedColumn = ExcelHelper.getColumnData(sheet, 4);
         assertEquals("Values in 'File' column not exported as expected [" + exportedFile.getName() + "]",
                 Arrays.asList("Data File Field", LRG_PNG_FILE.getName(), "", HELP_JPG_FILE.getName()),
                 exportedColumn);

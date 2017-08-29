@@ -25,10 +25,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.html.ModalDialog;
+import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -172,7 +172,18 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), folderName);
 
         // Create a target assay
-        createAssay("General", "myassay");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Assay List");
+        clickButton("Manage Assays");
+
+        AssayDesignerPage assayDesignerPage = _assayHelper.createAssayAndEdit("General", "myassay");
+        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // SpecimenID
+        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // ParticipantID
+        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // VisitID
+        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // Date
+        assayDesignerPage.addDataField("Name", "Name", FieldDefinition.ColumnType.String);
+        assayDesignerPage.addDataField("Age", "Age", FieldDefinition.ColumnType.Integer);
+        assayDesignerPage.save();
 
         clickProject(getProjectName());
         clickFolder(folderName);
@@ -258,35 +269,6 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
             _fileBrowserHelper.selectFileBrowserItem("/" + pipelineName);
             assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(protocolName));
         }
-    }
-
-    // Create an assay with 'Name' and 'Age' columns.
-    @LogMethod
-    private void createAssay(String providerName, String protocolName)
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Assay List");
-
-        clickButton("Manage Assays");
-        clickButton("New Assay Design");
-
-        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", providerName));
-        clickButton("Next", 0);
-
-        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), protocolName);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.change); // GWT compensation
-
-        _listHelper.deleteField("Data Fields", 0); // SpecimenID
-        _listHelper.deleteField("Data Fields", 0); // ParticipantID
-        _listHelper.deleteField("Data Fields", 0); // VisitID
-        _listHelper.deleteField("Data Fields", 0); // Date
-        _listHelper.addField("Data Fields", "Name", "Name", ListHelper.ListColumnType.String);
-        _listHelper.addField("Data Fields", "Age", "Age", ListHelper.ListColumnType.Integer);
-
-        clickButton("Save", 0);
-        waitForText(WAIT_FOR_JAVASCRIPT, "Save successful.");
-        waitForText(20000, "Save successful.");
     }
 
     @LogMethod

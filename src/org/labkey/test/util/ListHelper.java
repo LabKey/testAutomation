@@ -22,7 +22,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
-import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.params.FieldDefinition;
@@ -30,7 +29,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.List;
@@ -71,14 +69,19 @@ public class ListHelper extends LabKeySiteWrapper
 
     public PropertiesEditor getListFieldEditor()
     {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle("List Fields").find();
+        return getSomeEditorByTitle("List Fields");
+    }
+
+    // TODO: Remove callers who use ListHelper to edit non-list PropertiesEditors (hence "some")
+    private PropertiesEditor getSomeEditorByTitle(final String title)
+    {
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle(title).find();
     }
 
     public void uploadData(String listData)
     {
         clickImportData();
-        setFormElement(Locator.id("tsv3"), listData);
-        submitImportTsv_success();
+        submitTsvData(listData);
     }
 
     public void submitTsvData(String listData)
@@ -86,7 +89,6 @@ public class ListHelper extends LabKeySiteWrapper
         setFormElement(Locator.id("tsv3"), listData);
         submitImportTsv_success();
     }
-
 
     public void submitImportTsv_success()
     {
@@ -110,9 +112,8 @@ public class ListHelper extends LabKeySiteWrapper
     {
         doAndWaitForPageSignal(() -> clickButton("Submit", 0),
                 IMPORT_ERROR_SIGNAL);
-        if (errors == null || errors.isEmpty()){
+        if (errors == null || errors.isEmpty())
             waitForElement(Locator.css(".labkey-error"));
-        }
         else
         {
             for (String err : errors)
@@ -196,7 +197,6 @@ public class ListHelper extends LabKeySiteWrapper
         {
             assertTextPresent(data.values().iterator().next());  //make sure some text from the map is present
         }
-
     }
 
     /**
@@ -741,24 +741,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void deleteField(String areaTitle, int index)
     {
-        String prefix = getPropertyXPathContains(areaTitle);
-        WebElement deleteButton = waitForElement(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
-        deleteButton.click();
-
-        waitFor(() ->
-        {
-            if (ExpectedConditions.stalenessOf(deleteButton).apply(getDriver()))
-                return true;
-
-            try
-            {
-                WebElement okButton = Locator.lkButton("OK").findElement(getDriver());
-                okButton.click();
-                shortWait().until(ExpectedConditions.stalenessOf(okButton));
-            }
-            catch (NoSuchElementException ignore) {}
-            return false;
-        }, "Failed to delete field #" + index, WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        getSomeEditorByTitle(areaTitle).selectField(index).markForDeletion();
     }
 
     public void addFieldsNoImport(String fieldList)
@@ -968,13 +951,25 @@ public class ListHelper extends LabKeySiteWrapper
         public static Locator.XPathLocator scaleTextbox = Locator.xpath("//input[@name='scale']");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor}
+     */
+    @Deprecated
     public String getPropertyXPath(String propertyHeading)
     {
+        if (IS_BOOTSTRAP_LAYOUT)
+            return "//h3[text() = '" + propertyHeading + "']/../..";
         return "//td[text() = '" + propertyHeading + "']/../..";
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.components.PropertiesEditor}
+     */
+    @Deprecated
     public String getPropertyXPathContains(String propertyHeading)
     {
+        if (IS_BOOTSTRAP_LAYOUT)
+            return "//h3[contains(text(), '" + propertyHeading + "')]/../..";
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 }

@@ -29,7 +29,6 @@ import org.labkey.test.components.LookAndFeelScatterPlot;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -562,13 +561,13 @@ public class ScatterPlotTest extends GenericChartsTest
 
     private List<String> getLabels(String areaTitle)
     {
-        String prefix = _listHelper.getPropertyXPathContains(areaTitle);
+        String prefix = getPropertyXPathContains(areaTitle);
         List<String> labels = new ArrayList<>();
         List<WebElement> labelsElements;
 
         labelsElements = Locator.findElements(getDriver(),  Locator.xpath(prefix + "//div[contains(@id, 'label')]//input"));
 
-        for(WebElement we : labelsElements)
+        for (WebElement we : labelsElements)
         {
             labels.add(getFormElement(we));
         }

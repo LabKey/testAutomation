@@ -23,10 +23,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -68,7 +68,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.checkboxById("inherit"));
 
         // Delete all site-level settings
-        while(isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
+        while (isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
         {
             click(Locator.tagWithAttribute("img", "alt", "delete"));
             sleep(500);
@@ -454,17 +454,11 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Assay List");
 
-        //copied from old test
         clickButton("Manage Assays");
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
-        clickButton("Next");
 
-        AssayDesignerPage assay = new AssayDesignerPage(getDriver());
-        assay.setName(assayName);
-
-        assay.addDataField("age", "Age", "Integer");
-        assay.addDataField("sex", "Sex", "String");
+        AssayDesignerPage assay = _assayHelper.createAssayAndEdit("General", assayName);
+        assay.addDataField("age", "Age", FieldDefinition.ColumnType.Integer);
+        assay.addDataField("sex", "Sex", FieldDefinition.ColumnType.String);
 
         log("setting fields to enable missing values");
         assay.dataFields().selectField(4);
@@ -472,8 +466,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assay.dataFields().selectField(5);
         assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
 
-        clickButton("Save & Close");
-        assertNoLabKeyErrors();
+        assay.saveAndClose();
     }
 
     private void deleteDatasetData(int rowCount)
@@ -484,12 +477,6 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             new DataRegionTable("Dataset", getDriver()).clickHeaderButton("Delete");
             assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
         });
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Override

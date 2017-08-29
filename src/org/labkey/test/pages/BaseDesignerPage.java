@@ -28,7 +28,6 @@ import org.openqa.selenium.WebElement;
 public abstract class BaseDesignerPage<EC extends BaseDesignerPage.ElementCache> extends LabKeyPage<EC>
 {
     protected static final String DESIGNER_DIRTY_SIGNAL = "designerDirty"; //org.labkey.api.gwt.client.AbstractDesignerMainPanel.java
-    private static final String ROW_HIGHLIGHT = "238"; // rgb(238,238,238)
 
     public BaseDesignerPage(WebDriver driver)
     {

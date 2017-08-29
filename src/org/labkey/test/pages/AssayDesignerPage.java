@@ -180,7 +180,12 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
 
     public AssayDesignerPage addBatchField(String name, @Nullable String label, @Nullable String type)
     {
-        batchFields().addField(new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type)));
+        return addBatchField(name, label, FieldDefinition.ColumnType.valueOf(type));
+    }
+
+    public AssayDesignerPage addBatchField(String name, @Nullable String label, @Nullable FieldDefinition.ColumnType type)
+    {
+        batchFields().addField(new FieldDefinition(name).setLabel(label).setType(type));
         return this;
     }
 
@@ -191,8 +196,12 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
 
     public AssayDesignerPage addRunField(String name, @Nullable String label, @Nullable String type)
     {
-        FieldDefinition fieldDef = new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type));
-        runFields().addField(fieldDef);
+        return addRunField(name, label, FieldDefinition.ColumnType.valueOf(type));
+    }
+
+    public AssayDesignerPage addRunField(String name, @Nullable String label, @Nullable FieldDefinition.ColumnType type)
+    {
+        runFields().addField(new FieldDefinition(name).setLabel(label).setType(type));
         return this;
     }
 
@@ -203,7 +212,12 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
 
     public AssayDesignerPage addDataField(String name, @Nullable String label, @Nullable String type)
     {
-        dataFields().addField(new FieldDefinition(name).setLabel(label).setType(FieldDefinition.ColumnType.valueOf(type)));
+        return addDataField(name, label, FieldDefinition.ColumnType.valueOf(type));
+    }
+
+    public AssayDesignerPage addDataField(String name, @Nullable String label, @Nullable FieldDefinition.ColumnType type)
+    {
+        dataFields().addField(new FieldDefinition(name).setLabel(label).setType(type));
         return this;
     }
 
@@ -240,7 +254,6 @@ public class AssayDesignerPage extends BaseDesignerPage<AssayDesignerPage.Elemen
             Locator.xpath(xpathSection + xpathDelete1 + index + xpathDelete2).findElement(getDriver()).click();
             clickButton("OK", 0);
         }
-
     }
 
     @Override

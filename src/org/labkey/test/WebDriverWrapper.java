@@ -3182,6 +3182,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             suffix = "#" + (parts.length > 1 ? parts[1] : "");
         }
         if (!currentURL.contains(parameter))
+        {
             if (currentURL.contains("?"))
             {
                 if (currentURL.indexOf("?") == currentURL.length() - 1)
@@ -3191,6 +3192,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             }
             else
                 beginAt(currentURL.concat("?" + parameter + suffix));
+        }
     }
 
     public String getUrlParam(String paramName)

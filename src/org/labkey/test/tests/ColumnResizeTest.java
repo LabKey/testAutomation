@@ -229,7 +229,7 @@ public class ColumnResizeTest extends BaseWebDriverTest
         _listHelper.selectPropertyTab("Advanced");
 
         Integer scale = _listHelper.getColumnScale();
-        Assert.assertEquals(String.format("Scale for row [%d] is actually [%d] vs expexted [%d]", rowIndex, scale, expected), expected, scale);
+        Assert.assertEquals(String.format("Scale for row [%d] is actually [%d] vs expected [%d]", rowIndex, scale, expected), expected, scale);
     }
 
     private void assertWidgetNotVisible(int rowIndex)

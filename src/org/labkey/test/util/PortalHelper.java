@@ -478,7 +478,8 @@ public class PortalHelper extends WebDriverWrapper
             navBar.enterPageAdminMode();
             new BodyWebPart<>(getDriver(), webPartTitle).moveWebPart(direction==Direction.DOWN);
             navBar.exitPageAdminMode();
-        }else
+        }
+        else
         {
             Locator.XPathLocator webPartLoc = Locator.xpath("//table[@name='webpart']").withPredicate(Locator.tagWithClass("span", "labkey-wp-title-text").withText(webPartTitle));
             final WebElement webPart = webPartLoc.findElement(getDriver());

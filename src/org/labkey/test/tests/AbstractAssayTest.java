@@ -255,7 +255,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
     protected void setRequired(String where, int index)
     {
-        String prefix = getPropertyXPath(where);
+        String prefix = getPropertyXPathContains(where);
         _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Validators']"));
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);

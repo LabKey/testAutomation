@@ -23,6 +23,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.ImportRunResponse;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.APIAssayHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Maps;
@@ -185,13 +186,11 @@ public class AssayAPITest extends BaseWebDriverTest
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         AssayDesignerPage assayDesigner = assayHelper.createAssayAndEdit("General", assayName);
         log("Create a 'File' column for the assay run.");
-        assayDesigner.addRunField("RunFileField", "Run File Field", "File");
+        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
 
         log("Create a 'File' column for the assay data.");
-        assayDesigner.addDataField("DataFileField", "Data File Field", "File");
-        assayDesigner.save();
+        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
         assayDesigner.saveAndClose();
-        DataRegionTable.waitForDataRegion(this, "AssayList");
 
         int assayId = assayHelper.getIdFromAssayName(assayName, getProjectName(), false);
 
@@ -241,14 +240,9 @@ public class AssayAPITest extends BaseWebDriverTest
         log("create GPAT assay");
         String assayName = "GPAT-SaveBatch";
         AssayDesignerPage assayDesigner = _assayHelper.createAssayAndEdit("General", assayName);
-        log("Create a 'File' column for the assay run.");
-        assayDesigner.addRunField("RunFileField", "Run File Field", "File");
-
-        log("Create a 'File' column for the assay data.");
-        assayDesigner.addDataField("DataFileField", "Data File Field", "File");
-        assayDesigner.save();
+        assayDesigner.addRunField("RunFileField", "Run File Field", FieldDefinition.ColumnType.File);
+        assayDesigner.addDataField("DataFileField", "Data File Field", FieldDefinition.ColumnType.File);
         assayDesigner.saveAndClose();
-        DataRegionTable.waitForDataRegion(this, "AssayList");
 
         log("create run via saveBatch");
         String runName = "created-via-saveBatch";
@@ -287,12 +281,6 @@ public class AssayAPITest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(assayName));
         clickAndWait(Locator.linkContainingText(runName));
         assertElementPresent("Did not find the expected number of icons for " + HELP_ICON_FILE.getName() + " from the runs.", Locator.xpath("//img[contains(@title, '" + HELP_ICON_FILE.getName() + "')]"), 2);
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

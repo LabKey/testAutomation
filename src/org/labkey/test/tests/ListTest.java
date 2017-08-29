@@ -32,7 +32,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.PropertiesEditor;
-import org.labkey.test.components.ext4.Window;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
