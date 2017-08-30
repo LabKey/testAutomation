@@ -75,7 +75,7 @@ public class ListHelper extends LabKeySiteWrapper
     // TODO: Remove callers who use ListHelper to edit non-list PropertiesEditors (hence "some")
     private PropertiesEditor getSomeEditorByTitle(final String title)
     {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitle(title).find();
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(title).find();
     }
 
     public void uploadData(String listData)
@@ -724,8 +724,7 @@ public class ListHelper extends LabKeySiteWrapper
     @LogMethod(quiet = true)
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
-        PropertiesEditor propertiesEditor = PropertiesEditor.PropertiesEditor(getDriver()).withTitle(areaTitle).find();
-        propertiesEditor.addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
+        getSomeEditorByTitle(areaTitle).addField(new FieldDefinition(name).setLabel(label).setType(type.toNew()));
     }
 
     public void addLookupField(String areaTitle, int index, String name, String label, LookupInfo type)
