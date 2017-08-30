@@ -79,8 +79,7 @@ public class MicroarrayTest extends BaseWebDriverTest
                 .addBatchField(BATCH_STRING_FIELD, BATCH_STRING_FIELD, "String")
                 .addRunField(RUN_STRING_FIELD, RUN_STRING_FIELD, "String");
 
-        // Set description for RUN_STRING_FIELD
-        setFormElement(Locator.xpath("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']"), XPATH_TEST);
+        designerPage.runFields().fieldProperties().selectDisplayTab().description.set(XPATH_TEST);
 
         designerPage.addRunField(RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, "Integer")
                 .addRunField(DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, "String")
