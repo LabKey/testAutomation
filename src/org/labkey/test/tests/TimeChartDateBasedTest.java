@@ -32,9 +32,13 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
 @Category({DailyC.class, Reports.class, Charting.class})
 public class TimeChartDateBasedTest extends TimeChartTest
@@ -236,14 +240,15 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForElement(Locator.paginationText(31));
 
         // verify column headers for date based plotting option
-        Locator.XPathLocator colHeaderLoc = Locator.tagWithClass("tr", "labkey-col-header-row");
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Participant ID")));
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Visit Date")));
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Visit")));
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Viral Load Quantified")));
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Start Date")));
-        assertElementPresent(colHeaderLoc.append(Locator.tag("div").containing("Days")));
-        assertElementNotPresent(colHeaderLoc.child(Locator.tag("div").containing("sequencenum")));
+        DataRegionTable dataRegion = DataRegion(getDriver()).find();
+        List<String> expectedColumns = Arrays.asList(
+                "Participant ID",
+                "Visit Date",
+                "Visit",
+                "Viral Load Quantified (copies/ml)",
+                "Start Date",
+                "Days");
+        assertEquals("Wrong columns for date-base plotting option", expectedColumns, dataRegion.getColumnLabels());
 
         log("Test X-Axis default axis label on interval change");
         clickButton("View Chart(s)", 0);
