@@ -29,6 +29,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.pages.admin.CreateSubFolderPage;
+import org.labkey.test.pages.admin.SetFolderPermissionsPage;
 import org.openqa.selenium.NoSuchElementException;
 
 import java.io.IOException;
@@ -242,46 +244,35 @@ public abstract class AbstractContainerHelper
     @LogMethod
     public void createSubfolder(@LoggedParam String project, String parent, @LoggedParam String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
-        // TODO: Convert this to use the CreateSubFolderPage
-        startCreateFolder(project, parent, child);
+        CreateSubFolderPage createSubFolderPage = startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
         {
-            _test.click(Locator.xpath("//td[./label[text()='" + folderType + "']]/input[@type='button' and contains(@class, 'radio')]"));
+            createSubFolderPage.selectFolderType(folderType);
             if(folderType.equals("Create From Template Folder"))
             {
                 _test.log("create from template");
-                _test.click(Locator.xpath("//td[./label[text()='" + folderType + "']]/input[@type='button' and contains(@class, 'radio')]"));
-                _test._ext4Helper.waitForMaskToDisappear();
-                _test._ext4Helper.selectComboBoxItem(Locator.xpath("//div").withClass("labkey-wizard-header").withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
-                _test._ext4Helper.checkCheckbox("Include Subfolders");
+                createSubFolderPage.createFromTemplateFolder(templateFolder);
                 if (templatePartsToUncheck != null)
                 {
                     for(String part : templatePartsToUncheck)
                     {
-                        _test.click(Locator.xpath("//td[label[text()='" + part + "']]/input"));
+                        createSubFolderPage.setTemplatePartCheckBox(part, false);
                     }
                 }
             }
         }
         else {
-            _test.click(Locator.xpath("//td[./label[text()='Custom']]/input[@type='button' and contains(@class, 'radio')]"));
-
-
-            if (tabsToAdd != null)
-            {
-                for (String tabname : tabsToAdd)
-                    _test.waitAndClick(Locator.xpath("//td[./label[text()='" + tabname + "']]/input[@type='button' and contains(@class, 'checkbox')]"));
-            }
+            createSubFolderPage.selectFolderType("Custom");
+            createSubFolderPage.addTabs(tabsToAdd);
         }
 
-        _test.clickButton("Next", _test.defaultWaitForPage);
+        SetFolderPermissionsPage setFolderPermissionsPage = createSubFolderPage.clickNext();
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
 
         //second page of the wizard
-        _test.waitForElement(Locator.css(".labkey-nav-page-header").withText("Users / Permissions"));
         if (!inheritPermissions)
         {
-            _test.waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
+            setFolderPermissionsPage.setMyUserOnly();
         }
 
         if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
@@ -309,8 +300,7 @@ public abstract class AbstractContainerHelper
 
         if (null != folderType && !folderType.equals("None")) // Added in the wizard for custom folders
         {
-            _test.goToFolderManagement();
-            _test.clickAndWait(Locator.linkWithText("Folder Type"));
+            _test.goToFolderManagement().goToFolderTypePane();
 
             for (String tabname : tabsToAdd)
                 _test.checkCheckbox(Locator.checkboxByTitle(tabname));
@@ -329,7 +319,7 @@ public abstract class AbstractContainerHelper
         }
     }
 
-    private void startCreateFolder(String project, String parent, String child)
+    private CreateSubFolderPage startCreateFolder(String project, String parent, String child)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
@@ -338,7 +328,7 @@ public abstract class AbstractContainerHelper
             if (!parent.equals(project))
                 menu.navigateToFolder(project, parent);
 
-            menu.navigateToCreateSubFolderPage()
+            return menu.navigateToCreateSubFolderPage()
                     .setFolderName(child);
         }
         else
@@ -353,8 +343,9 @@ public abstract class AbstractContainerHelper
                 throw new IllegalArgumentException("Folder: " + child + " already exists in project: " + project);
             _test.log("Creating subfolder " + child + " under " + parent);
             _test.clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
-            _test.waitForElement(Locator.name("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.setFormElement(Locator.name("name"), child);
+            CreateSubFolderPage createSubFolderPage = new CreateSubFolderPage(_test.getDriver());
+            createSubFolderPage.setFolderName(child);
+            return createSubFolderPage;
         }
     }
 

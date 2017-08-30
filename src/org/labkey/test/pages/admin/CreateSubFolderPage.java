@@ -16,9 +16,13 @@
 package org.labkey.test.pages.admin;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.Checkbox;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CreateSubFolderPage extends LabKeyPage
 {
@@ -36,7 +40,8 @@ public class CreateSubFolderPage extends LabKeyPage
 
     public SetFolderPermissionsPage clickNext()
     {
-        doAndWaitForPageToLoad(() -> newElementCache().nextButton.click());
+        scrollIntoView(newElementCache().nextButton);
+        shortWait().until(LabKeyExpectedConditions.clickUntilStale(newElementCache().nextButton));
         return new SetFolderPermissionsPage(getDriver());
     }
 
@@ -45,6 +50,52 @@ public class CreateSubFolderPage extends LabKeyPage
         setFormElement(newElementCache().nameInput, name);
         return this;
     }
+
+    public CreateSubFolderPage selectFolderType(String folderType)
+    {
+        WebElement folderTypeRadioButton =Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+         folderTypeRadioButton.click();
+
+         if (folderType.equalsIgnoreCase("Custom"))
+             waitFor(()-> Locator.tagWithText("div", "Choose Modules:").findElementOrNull(getDriver()) != null, 4000 );
+
+        if (folderType.equalsIgnoreCase("Create From Template Folder"))
+            waitFor(()-> Locator.input("templateSourceId").findElementOrNull(getDriver()) != null, 4000 );
+
+         return this;
+    }
+
+    public CreateSubFolderPage createFromTemplateFolder(String templateFolder)
+    {
+        selectFolderType("Create From Template Folder");
+        _ext4Helper.waitForMaskToDisappear();
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//div")
+                .withClass("labkey-wizard-header")
+                .withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
+        _ext4Helper.checkCheckbox("Include Subfolders");
+
+        return this;
+    }
+
+    public CreateSubFolderPage setTemplatePartCheckBox(String templatePart, boolean checked)
+    {
+        Checkbox checkbox = new Checkbox(Locator.xpath("//td[label[text()='"+templatePart+"']]/input").waitForElement(getDriver(), 4000));
+        checkbox.set(checked);
+        return this;
+    }
+
+    public CreateSubFolderPage addTabs(String[] tabsToAdd)
+    {
+        if (tabsToAdd != null)
+        {
+            for (String tabname : tabsToAdd)
+                waitAndClick(Locator.xpath("//td[./label[text()='" + tabname + "']]/input[@type='button' and contains(@class, 'checkbox')]"));
+        }
+        return this;
+    }
+
+
 
     @Override
     protected Elements newElementCache()
@@ -55,11 +106,13 @@ public class CreateSubFolderPage extends LabKeyPage
     private class Elements extends LabKeyPage.ElementCache
     {
         final WebElement nameInput = Locator.input("name").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        final WebElement nextButton = Locator.button("Next").findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
+        final WebElement nextButton = Locator.lkButton("Next").refindWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         // TODO: Add support for "Use name as title" setting
         // TODO: Add support for configuring the "Folder Type" settings
 
         // See AbstractContainerHelper.createSubfolder for what it supports and replace it
+
+
     }
 }

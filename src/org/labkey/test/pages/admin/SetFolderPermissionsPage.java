@@ -16,6 +16,7 @@
 package org.labkey.test.pages.admin;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,9 +28,35 @@ public class SetFolderPermissionsPage extends LabKeyPage
         super(test);
     }
 
+    @Override
+    protected void waitForPage()
+    {
+        waitFor(()-> Locator.css(".labkey-nav-page-header").withText("Users / Permissions")
+                .findElementOrNull(getDriver()) != null,
+                "Expected page title [Users / Permissions] did not appear",
+                WAIT_FOR_PAGE);
+    }
+
     public void clickFinish()
     {
         doAndWaitForPageToLoad(() -> newElementCache().finishButton.click());
+    }
+
+
+    public SetFolderPermissionsPage setInheritFromParentFolder()
+    {
+        RadioButton radio = new RadioButton(Locator.xpath("//td[./label[text()='Inherit From Parent Folder']]/input")
+                .waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+        radio.set(true);
+        return this;
+    }
+
+    public SetFolderPermissionsPage setMyUserOnly()
+    {
+        RadioButton radio = new RadioButton(
+            Locator.xpath("//td[./label[text()='My User Only']]/input").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT));
+        radio.set(true);
+        return this;
     }
 
     @Override
