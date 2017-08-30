@@ -44,6 +44,7 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Hosting.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     public static final String USER_AUDIT_EVENT = "User events";
     public static final String GROUP_AUDIT_EVENT = "Group events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
@@ -124,11 +125,11 @@ public class AuditLogTest extends BaseWebDriverTest
         lmp.setSearchText("org.labkey.audit.event");
 
         log("Setting org.labkey.audit.event and org.labkey.audit.event.UserAuditEvent to ALL.");
-        if(lmp.getLoggingLevel("org.labkey.audit.event") != LoggingLevel.ALL)
+        if (lmp.getLoggingLevel("org.labkey.audit.event") != LoggingLevel.ALL)
             lmp.setLoggingLevel("org.labkey.audit.event", LoggingLevel.ALL).clickRefresh();
 
         // Setting org.labkey.audit.event.UserAuditEvent because it is called out in the webapps/log4j.xml file.
-        if((lmp.isLoggerPresent("org.labkey.audit.event.UserAuditEvent")) && (lmp.getLoggingLevel("org.labkey.audit.event.UserAuditEvent") != LoggingLevel.ALL))
+        if ((lmp.isLoggerPresent("org.labkey.audit.event.UserAuditEvent")) && (lmp.getLoggingLevel("org.labkey.audit.event.UserAuditEvent") != LoggingLevel.ALL))
             lmp.setLoggingLevel("org.labkey.audit.event.UserAuditEvent", LoggingLevel.ALL).clickRefresh();
 
         lmp.setSearchText("").clickRefresh();
@@ -140,7 +141,7 @@ public class AuditLogTest extends BaseWebDriverTest
         ArrayList<String> auditLog = new ArrayList<>();
         File auditLogFile = new File(TestProperties.getTomcatHome(), "logs/labkey-audit.log");
 
-        try(FileReader fileReader = new FileReader(auditLogFile))
+        try (FileReader fileReader = new FileReader(auditLogFile))
         {
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
@@ -165,7 +166,7 @@ public class AuditLogTest extends BaseWebDriverTest
         diff.removeAll(auditLogBefore);
 
         // First check if the count is right.
-        if(expectedValues.size() != diff.size())
+        if (expectedValues.size() != diff.size())
         {
             stringBuilder.append("Number of audit logs recorded in the file not as expected. Expected: ")
                     .append(expectedValues.size())
@@ -176,13 +177,13 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         // Check to see if all of the expected values did show up.
-        for(String expectedValue : expectedValues)
+        for (String expectedValue : expectedValues)
         {
             log("Searching Audit Log file for entry: '" + expectedValue + "'.");
             boolean found = false;
-            for(int j = 0; (!found) && (j < diff.size()); j ++)
+            for (int j = 0; (!found) && (j < diff.size()); j ++)
             {
-                if(diff.get(j).contains(expectedValue))
+                if (diff.get(j).contains(expectedValue))
                 {
                     // If we found the expected message remove it from the list and stop checking.
                     found = true;
@@ -190,7 +191,7 @@ public class AuditLogTest extends BaseWebDriverTest
                 }
             }
 
-            if(!found)
+            if (!found)
             {
                 stringBuilder.append("Did not find '")
                         .append(expectedValue)
@@ -201,10 +202,10 @@ public class AuditLogTest extends BaseWebDriverTest
         }
 
         // If there is anything left in the list it means there was an log message recorded that we weren't expecting.
-        if(diff.size() > 0)
+        if (diff.size() > 0)
         {
             pass = false;
-            for(String extraLog : diff)
+            for (String extraLog : diff)
                 stringBuilder.append("Found this unexpected log in the file: ")
                         .append(extraLog)
                         .append("\n");
@@ -221,14 +222,14 @@ public class AuditLogTest extends BaseWebDriverTest
         auditLogBefore = getAuditLogFromFile();
 
         log("testing user audit events");
-        createUser(AUDIT_TEST_USER, null);
+        _userHelper.createUser(AUDIT_TEST_USER);
         impersonate(AUDIT_TEST_USER);
         stopImpersonating();
         signOut();
         signInShouldFail(AUDIT_TEST_USER, "asdf"); // Bad login.  Existing User
         signInShouldFail(AUDIT_TEST_USER + "fail", "asdf"); // Bad login.  Non-existent User
         simpleSignIn();
-        deleteUsers(true, AUDIT_TEST_USER);
+        _userHelper.deleteUsers(true, AUDIT_TEST_USER);
 
         ArrayList<String> expectedLogValues = new ArrayList<>();
         expectedLogValues.add(AUDIT_TEST_USER + " was added to the system and the administrator chose not to send a verification email.");
@@ -242,7 +243,7 @@ public class AuditLogTest extends BaseWebDriverTest
         expectedLogValues.add(AUDIT_TEST_USER + "fail failed to login: user does not exist");
         expectedLogValues.add(AUDIT_TEST_USER + " was deleted from the system");
 
-        for(String msg : expectedLogValues)
+        for (String msg : expectedLogValues)
         {
             verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, msg, 10);
         }
@@ -271,7 +272,7 @@ public class AuditLogTest extends BaseWebDriverTest
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
-        deleteUsers(true, AUDIT_TEST_USER);
+        _userHelper.deleteUsers(true, AUDIT_TEST_USER);
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
 
         ArrayList<String> expectedLogValues = new ArrayList<>();
@@ -364,7 +365,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
         ListHelper.ListColumn  lc = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name");
         _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
-        clickAndWait(Locator.css(".labkey-folder-title"));
+        goToManageLists();
         clickAndWait(Locator.linkWithText(listName));
         DataRegionTable.DataRegion(getDriver()).find().clickInsertNewRow();
         setFormElement(Locator.name("quf_Name").waitForElement(shortWait()), "Data");
@@ -438,7 +439,8 @@ public class AuditLogTest extends BaseWebDriverTest
         return false;
     }
 
-    @Override public BrowserType bestBrowser()
+    @Override
+    public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
     }

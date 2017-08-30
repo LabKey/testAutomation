@@ -311,7 +311,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     @LogMethod
     public void signIn()
     {
-        if ( isGuestModeTest() )
+        if (isGuestModeTest())
         {
             waitForStartup();
             log("Skipping sign in.  Test runs as guest.");
@@ -329,7 +329,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
         waitForStartup();
         log("Signing in");
-        //
         simpleSignOut();
         checkForUpgrade();
         simpleSignIn();
@@ -346,26 +345,23 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void attemptSignIn(String email, String password)
     {
-        if (!getDriver().getTitle().equals("Sign In"))
+        if (isSignedIn())
+            throw new IllegalStateException("You need to be logged out to log in. Please log out to log in.");
+
+        if (!getDriver().getTitle().contains("Sign In"))
         {
             try
             {
+                // attempt to navigate to login page
                 clickAndWait(Locator.linkWithText("Sign In"));
             }
             catch (NoSuchElementException error)
             {
-                throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.", error);
+                throw new IllegalStateException("Unable to find \"Sign In\" link on current page.", error);
             }
         }
 
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            assertTitleContains("Sign In");
-        }
-        else
-        {
-            assertTitleEquals("Sign In");
-        }
+        assertTitleContains("Sign In");
 
         assertElementPresent(Locator.tagWithName("form", "login"));
         setFormElement(Locator.id("email"), email);
@@ -377,7 +373,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         attemptSignIn(email, password);
         String errorText = waitForElement(Locator.id("errors").withText()).getText();
-        assertTitleContains("Sign In"); // UX refresh UI appends /home to title
         assertElementPresent(Locator.tagWithName("form", "login"));
 
         List<String> missingErrors = getMissingTexts(new TextSearcher(() -> errorText).setSourceTransformer(text -> text), expectedMessages);
