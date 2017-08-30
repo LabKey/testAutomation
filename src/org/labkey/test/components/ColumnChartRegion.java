@@ -15,7 +15,6 @@
  */
 package org.labkey.test.components;
 
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.DataRegionTable;
@@ -25,9 +24,8 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-public class ColumnChartRegion//<EC extends Component.ElementCache> extends Component<EC>
+public class ColumnChartRegion
 {
     WebDriverWrapper _driver;
     DataRegionTable _dataRegionTable;
@@ -69,15 +67,7 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
 
     public boolean isRegionVisible()
     {
-        if(null != getComponentElement())
-            return getComponentElement().isDisplayed();
-        else
-            return false;
-    }
-
-    public void toggleRegion()
-    {
-        _dataRegionTable.findElement(By.cssSelector(" span.labkey-dataregion-msg-toggle")).click();
+        return null != getComponentElement() && getComponentElement().isDisplayed();
     }
 
     public boolean isViewModified()
@@ -102,41 +92,4 @@ public class ColumnChartRegion//<EC extends Component.ElementCache> extends Comp
             revertButton.click();
         }
     }
-
-    public void saveView(boolean makeDefault, @Nullable String name, boolean availableToAll)
-    {
-
-        final String SAVE_VIEW_DIALOG_TITLE = "Save Custom Grid View";
-        String dialogXpath;
-
-        WebElement saveButton = _dataRegionTable.findElement(By.cssSelector(" span.unsavedview-save"));
-
-        if(!saveButton.isDisplayed())
-        {
-            _driver.mouseOver(_dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-customizeview")));
-        }
-
-        saveButton.click();
-
-        _driver._extHelper.waitForExtDialog(SAVE_VIEW_DIALOG_TITLE);
-
-        dialogXpath = _driver._extHelper.getExtDialogXPath(SAVE_VIEW_DIALOG_TITLE);
-
-        if(makeDefault)
-            _driver.click(Locator.xpath(dialogXpath + "//label[contains(@class, 'x4-form-cb-label')][contains(text(), 'Default grid view')]/preceding-sibling::input"));
-        else
-        {
-            _driver.click(Locator.xpath(dialogXpath + "//label[contains(@class, 'x4-form-cb-label')][contains(text(), 'Named')]/preceding-sibling::input"));
-            _driver.setFormElement(Locator.xpath(dialogXpath + "//input[@name='saveCustomView_name']"), name);
-        }
-
-        if(availableToAll)
-        {
-            _driver.click(Locator.xpath(dialogXpath + "//label[contains(@class, 'x4-form-cb-label')][contains(text(), 'Make this grid view available')]/preceding-sibling::input"));
-        }
-
-        _driver.clickButton("Save");
-
-    }
-
 }

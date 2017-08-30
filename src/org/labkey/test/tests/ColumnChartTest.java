@@ -23,10 +23,11 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.components.ColumnChartRegion;
 import org.labkey.test.components.ColumnChartComponent;
+import org.labkey.test.components.CustomizeView;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.ArrayList;
@@ -39,25 +40,27 @@ import java.util.Map;
 @Category({DailyB.class})
 public class ColumnChartTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(false);} // TODO: whitelist after issue #31171 is addressed
+    {setIsBootstrapWhitelisted(true);}
+    public static final String LANGUAGE_COLUMN_NAME = "Language";
+    public static final String PTID_COLUMN_NAME = "ParticipantId";
+    public static final String PREGNANCY_COLUMN_NAME = "Pregnancy";
+    public static final String PULSE_COLUMN_NAME = "Pulse";
+    public static final String RESPIRATIONS_COLUMN_NAME = "Respirations";
+    public static final String SIGNATURE_COLUMN_NAME = "Signature";
+    public static final String WEIGHT_COLUMN_NAME = "Weight_kg";
+
     public static final String DATA_SOURCE_1 = "Physical Exam";
     public static final List<String> DATA_SOURCE_1_COLNAMES = Arrays.asList(
-        "ParticipantId", "date", "Weight_kg", "Temp_C",
+        PTID_COLUMN_NAME, "date", WEIGHT_COLUMN_NAME, "Temp_C",
         "SystolicBloodPressure", "DiastolicBloodPressure",
-        "Pulse", "Respirations", "Signature", "Pregnancy", "Language"
+        PULSE_COLUMN_NAME, RESPIRATIONS_COLUMN_NAME, SIGNATURE_COLUMN_NAME, PREGNANCY_COLUMN_NAME, LANGUAGE_COLUMN_NAME
     );
     public static final List<String> DATA_SOURCE_1_NUMERIC_COLNAMES = Arrays.asList(
-        "Weight_kg", "Temp_C", "SystolicBloodPressure", "DiastolicBloodPressure",
-        "Pulse", "Respirations", "Signature"
+        WEIGHT_COLUMN_NAME, "Temp_C", "SystolicBloodPressure", "DiastolicBloodPressure",
+        PULSE_COLUMN_NAME, RESPIRATIONS_COLUMN_NAME, SIGNATURE_COLUMN_NAME
     );
     public static List<String> DATA_SOURCE_1_DIMENSIONS = new ArrayList<>();
     public static List<String> DATA_SOURCE_1_MEASURES = new ArrayList<>();
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
 
     @BeforeClass
     public static void setupProject()
@@ -69,13 +72,6 @@ public class ColumnChartTest extends BaseWebDriverTest
 
     private void doSetup()
     {
-        final String PREGNANCY_FIELD_ID = "name7-input";
-        final String LANGUAGE_FIELD_ID = "name8-input";
-        final String PULSE_FIELD_ID = "name4-input";
-        final String RESPIRATIONS_FIELD_ID = "name5-input";
-        final String SIGNATURE_FIELD_ID = "name6-input";
-        final String WEIGHT_FIELD_ID = "name0-input";
-
         log("Create a study and import the data from the LabkeyDemoStudy.zip");
         _containerHelper.createProject(getProjectName(), "Study");
         importStudyFromZip(TestFileUtils.getSampleData("studies/LabkeyDemoStudy.zip"), true);
@@ -86,44 +82,45 @@ public class ColumnChartTest extends BaseWebDriverTest
         click(Locator.linkWithText("edit definition"));
 
         waitForText("Edit Dataset Definition");
-        waitForElement(Locator.inputById(PREGNANCY_FIELD_ID));
 
-        log("Set the 'Pregnancy', 'Language', 'Respirations', 'Signature', and 'Weight_kg' fields to be dimensions but not measures.");
+        log("Set the '" + PREGNANCY_COLUMN_NAME + "', '" + LANGUAGE_COLUMN_NAME + "', and '" + SIGNATURE_COLUMN_NAME + "' fields to be dimensions but not measures.");
 
-        click(Locator.inputById(PREGNANCY_FIELD_ID));
-        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text')][text()='Reporting']"));
-        setCheckbox(Locator.input("dimension"), true);
-        setCheckbox(Locator.input("measure"), false);
-        DATA_SOURCE_1_DIMENSIONS.add("Pregnancy");
+        waitForText("Dataset Fields");
+        PropertiesEditor editor = PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").find();
+        editor.selectField(PREGNANCY_COLUMN_NAME);
+        PropertiesEditor.FieldPropertyDock.ReportingTabPane pane = editor.fieldProperties().selectReportingTab();
+        pane.dimension.check();
+        pane.measure.uncheck();
+        editor.fieldProperties().selectReportingTab().dimension.check();
+        DATA_SOURCE_1_DIMENSIONS.add(PREGNANCY_COLUMN_NAME);
 
-        // Since the field property dock is already displayed and showing the 'Reporting' tab I do not need to show it again, just set the field.
-        click(Locator.inputById(LANGUAGE_FIELD_ID));
-        setCheckbox(Locator.input("dimension"), true);
-        setCheckbox(Locator.input("measure"), false);
-        DATA_SOURCE_1_DIMENSIONS.add("Language");
+        editor.selectField(LANGUAGE_COLUMN_NAME);
+        pane.dimension.check();
+        pane.measure.uncheck();
+        DATA_SOURCE_1_DIMENSIONS.add(LANGUAGE_COLUMN_NAME);
 
-        click(Locator.inputById(SIGNATURE_FIELD_ID));
-        setCheckbox(Locator.input("dimension"), true);
-        setCheckbox(Locator.input("measure"), false);
-        DATA_SOURCE_1_DIMENSIONS.add("Signature");
+        editor.selectField(SIGNATURE_COLUMN_NAME);
+        pane.dimension.check();
+        pane.measure.uncheck();
+        DATA_SOURCE_1_DIMENSIONS.add(SIGNATURE_COLUMN_NAME);
 
-        log("Set the 'Respirations' and 'Weight_kg' fields to be both dimensions and measures.");
-        click(Locator.inputById(RESPIRATIONS_FIELD_ID));
-        setCheckbox(Locator.input("dimension"), true);
-        setCheckbox(Locator.input("measure"), true);
-        DATA_SOURCE_1_DIMENSIONS.add("Respirations");
-        DATA_SOURCE_1_MEASURES.add("Respirations");
+        log("Set the '" + RESPIRATIONS_COLUMN_NAME + "' and '" + WEIGHT_COLUMN_NAME + "' fields to be both dimensions and measures.");
+        editor.selectField(RESPIRATIONS_COLUMN_NAME);
+        pane.dimension.check();
+        pane.measure.check();
+        DATA_SOURCE_1_DIMENSIONS.add(RESPIRATIONS_COLUMN_NAME);
+        DATA_SOURCE_1_MEASURES.add(RESPIRATIONS_COLUMN_NAME);
 
-        click(Locator.inputById(WEIGHT_FIELD_ID));
-        setCheckbox(Locator.input("dimension"), true);
-        setCheckbox(Locator.input("measure"), true);
-        DATA_SOURCE_1_DIMENSIONS.add("Weight_kg");
-        DATA_SOURCE_1_MEASURES.add("Weight_kg");
+        editor.selectField(WEIGHT_COLUMN_NAME);
+        pane.dimension.check();
+        pane.measure.check();
+        DATA_SOURCE_1_DIMENSIONS.add(WEIGHT_COLUMN_NAME);
+        DATA_SOURCE_1_MEASURES.add(WEIGHT_COLUMN_NAME);
 
-        log("Set 'Pulse' to not be a measure or dimensions");
-        click(Locator.inputById(PULSE_FIELD_ID));
-        setCheckbox(Locator.input("dimension"), false);
-        setCheckbox(Locator.input("measure"), false);
+        log("Set '" + PULSE_COLUMN_NAME + "' to not be a measure or dimensions");
+        editor.selectField(PULSE_COLUMN_NAME);
+        pane.dimension.uncheck();
+        pane.measure.uncheck();
 
         log("Add the default measures to the ArrayList");
         DATA_SOURCE_1_MEASURES.add("Temp_C");
@@ -131,15 +128,12 @@ public class ColumnChartTest extends BaseWebDriverTest
         DATA_SOURCE_1_MEASURES.add("DiastolicBloodPressure");
 
         log("Add the default dimension to the ArrayList");
-        DATA_SOURCE_1_DIMENSIONS.add("ParticipantId");
+        DATA_SOURCE_1_DIMENSIONS.add(PTID_COLUMN_NAME);
 
         doAndWaitForPageToLoad(()->{
             click(Locator.linkWithSpan("Save"));
             waitForText("" + DATA_SOURCE_1 + " Dataset Properties");
         });
-
-        goToProjectHome();
-
     }
 
     @Before
@@ -169,10 +163,10 @@ public class ColumnChartTest extends BaseWebDriverTest
     @Test
     public void basicValidation()
     {
-        final String COL_NAME_PIE = "Weight_kg";
-        final String COL_NAME_BAR = "Pregnancy";
+        final String COL_NAME_PIE = WEIGHT_COLUMN_NAME;
+        final String COL_NAME_BAR = PREGNANCY_COLUMN_NAME;
         final String COL_NAME_BOX1 = "Temp_C";
-        final String COL_NAME_BOX2 = "Respirations";
+        final String COL_NAME_BOX2 = RESPIRATIONS_COLUMN_NAME;
 
         ColumnChartRegion plotRegion;
         ColumnChartComponent plotComponent;
@@ -224,22 +218,6 @@ public class ColumnChartTest extends BaseWebDriverTest
         plotRegion = dataRegionTable.getColumnPlotRegion();
         Assert.assertEquals("Number of plots not as expected.", expectedPlotCount, plotRegion.getPlots().size());
 
-        log("Collapse the region.");
-        plotRegion.toggleRegion();
-
-        sleep(500);
-
-        log("Assert that the plot region is not visible.");
-        Assert.assertFalse("The plot region is showing as visible, it should not be.", plotRegion.isRegionVisible());
-
-        log("Expand the region and validate the plots are still there.");
-        plotRegion.toggleRegion();
-
-        sleep(500);
-
-        plotRegion = dataRegionTable.getColumnPlotRegion();
-        Assert.assertEquals("After collapsing and expanding the region the number of plots not as expected.", expectedPlotCount, plotRegion.getPlots().size());
-
         log("Validate that each of the plots is of the type expected and has the column name as a title.");
         plotComponent = plotRegion.getColumnPlotWrapper(plotRegion.getPlots().get(0));
         Assert.assertTrue("Plot type not as expected. Expected: '" + ColumnChartComponent.TYPE_PIE + "'. Found: '" + plotComponent.getPlotType() + "'.", ColumnChartComponent.TYPE_PIE.equals(plotComponent.getPlotType()));
@@ -272,15 +250,12 @@ public class ColumnChartTest extends BaseWebDriverTest
 
         log("We are done so clean up (revert the view).");
         plotRegion.revertView();
-
-        log("All done, let's go home.");
     }
 
     @Test
     public void validateChartingColumnRestrictions()
     {
         log("Go to the '" + DATA_SOURCE_1 + "' grid and verify the presence of column chart restrictions (or lack thereof).");
-        goToProjectHome();
         clickTab("Clinical and Assay Data");
         waitAndClick(Locator.linkWithText(DATA_SOURCE_1));
 
@@ -349,9 +324,9 @@ public class ColumnChartTest extends BaseWebDriverTest
     @Test
     public void validateFilteringData()
     {
-        final String COL_NAME_PIE = "Pregnancy";
-        final String COL_NAME_BAR1 = "Weight_kg";
-        final String COL_NAME_BAR2 = "Respirations";
+        final String COL_NAME_PIE = PREGNANCY_COLUMN_NAME;
+        final String COL_NAME_BAR1 = WEIGHT_COLUMN_NAME;
+        final String COL_NAME_BAR2 = RESPIRATIONS_COLUMN_NAME;
         final String COL_NAME_BOX = "SystolicBloodPressure";
 
         final int UNFILTERED_BAR1_COUNT = 28;
@@ -422,7 +397,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         Assert.assertEquals("Number of data points for the box chart are not as expected.", UNFILTERED_BOX_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("Filter the data in the Pregnancy column.");
-        dataRegionTable.setFacetedFilter("Pregnancy", "Pregnancy");
+        dataRegionTable.setFacetedFilter(PREGNANCY_COLUMN_NAME, PREGNANCY_COLUMN_NAME);
 
         log("Validate the values of the plots have changed as expected.");
 
@@ -444,7 +419,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         Assert.assertEquals("Number of data points for the bar chart (" + plotTitleBar2 + ") are not as expected.", FILTERED_BAR2_COUNT, plotComponent.getNumberOfDataPoints());
 
         log("Remove the filter, and make sure the counts go back to unfiltered values.");
-        dataRegionTable.clearFilter("Pregnancy");
+        dataRegionTable.clearFilter(PREGNANCY_COLUMN_NAME);
 
         // Sleep just a moment for the plot to redraw.
         sleep(1000);
@@ -463,26 +438,15 @@ public class ColumnChartTest extends BaseWebDriverTest
 
         log("We are done so clean up (revert the view).");
         plotRegion.revertView();
-
-        log("All done, let's go home.");
     }
 
     @Test
     public void validatingSavingTheView()
     {
-        Date date = new Date();
-        final String SAVED_VIEW = "ColumnChartView " + date.getTime();
-        final String COL_NAME_BAR = "Weight_kg";
-        final String COL_NAME_BOX = "Signature";
-        final String COL_NAME_PIE = "Respirations";
-
-        ColumnChartRegion plotRegion;
-        DataRegionTable dataRegionTable;
-        List<Map<String, String>> columnChartProps = new ArrayList<>();
-        Map<String, String> singleChartProps;
-        List<String> columnLabels;
-
-        // Should be at project home (navigated here by the preTest function)
+        final String SAVED_VIEW = "ColumnChartView " + new Date().getTime();
+        final String COL_NAME_BAR = WEIGHT_COLUMN_NAME;
+        final String COL_NAME_BOX = SIGNATURE_COLUMN_NAME;
+        final String COL_NAME_PIE = RESPIRATIONS_COLUMN_NAME;
 
         log("Go to the '" + DATA_SOURCE_1 + "' grid create a few charts then save the view and make sure everything is okily dokily.");
 
@@ -490,17 +454,18 @@ public class ColumnChartTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(DATA_SOURCE_1));
         click(Locator.linkWithText(DATA_SOURCE_1));
 
-        dataRegionTable = new DataRegionTable("Dataset", getDriver());
-        plotRegion = dataRegionTable.getColumnPlotRegion();
-        columnLabels = dataRegionTable.getColumnLabels();
+        DataRegionTable dataRegionTable = new DataRegionTable("Dataset", getDriver());
+        ColumnChartRegion plotRegion = dataRegionTable.getColumnPlotRegion();
+        List<String> columnLabels = dataRegionTable.getColumnLabels();
 
         log("If the plot view is visible, revert it.");
-        if(plotRegion.isRegionVisible())
+        if (plotRegion.isRegionVisible())
             plotRegion.revertView();
 
         log("Create a bar chart.");
         dataRegionTable.createBarChart(COL_NAME_BAR);
-        singleChartProps = new HashMap<>();
+        Map<String, String> singleChartProps = new HashMap<>();
+        List<Map<String, String>> columnChartProps = new ArrayList<>();
         singleChartProps.put("type", ColumnChartComponent.TYPE_BAR);
         singleChartProps.put("title", columnLabels.get(dataRegionTable.getColumnIndex(COL_NAME_BAR)));
         singleChartProps.put("dataPointCount", "28");
@@ -527,10 +492,10 @@ public class ColumnChartTest extends BaseWebDriverTest
 
         log("Validate column charts and save the view");
         validateSavedViewColumnCharts(columnChartProps);
-        plotRegion.saveView(false, SAVED_VIEW, true);
+        CustomizeView view = dataRegionTable.openCustomizeGrid();
+        view.saveCustomView(SAVED_VIEW, true);
 
         log("Validate plots display on navigation back to view.");
-        goToHome();
         goToProjectHome();
         goToSavedView(DATA_SOURCE_1, SAVED_VIEW);
         validateSavedViewColumnCharts(columnChartProps);
@@ -573,7 +538,7 @@ public class ColumnChartTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText(dataSource));
         click(Locator.linkWithText(dataSource));
         DataRegionTable drt = new DataRegionTable("Dataset", getDriver());
-        drt.goToView( viewName);
+        drt.goToView(viewName);
     }
 
     private void validateSavedViewColumnCharts(List<Map<String, String>> columnChartProps)
@@ -612,5 +577,4 @@ public class ColumnChartTest extends BaseWebDriverTest
         uncheckCheckbox(Locator.name("restrictedColumnsEnabled"));
         clickButton("Save");
     }
-
 }
