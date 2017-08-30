@@ -19,16 +19,22 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Hosting;
 import org.labkey.test.pages.core.admin.logger.ManagerPage;
 import org.labkey.test.pages.core.admin.logger.ManagerPage.LoggingLevel;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,17 +42,24 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Hosting.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
-    {setIsBootstrapWhitelisted(true);}
+    {
+        setIsBootstrapWhitelisted(true);
+    }
+
     public static final String USER_AUDIT_EVENT = "User events";
     public static final String GROUP_AUDIT_EVENT = "Group events";
+    public static final String QUERY_UPDATE_EVENT = "Query update events";
     public static final String PROJECT_AUDIT_EVENT = "Project and Folder events";
     public static final String ASSAY_AUDIT_EVENT = "Copy-to-Study Assay events";
 
@@ -91,10 +104,14 @@ public class AuditLogTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void checkQueries(){} // Skip.  Project is deleted as part of test
+    protected void checkQueries()
+    {
+    } // Skip.  Project is deleted as part of test
 
     @Override
-    protected void checkViews(){} // Skip.  Project is deleted as part of test
+    protected void checkViews()
+    {
+    } // Skip.  Project is deleted as part of test
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -181,7 +198,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             log("Searching Audit Log file for entry: '" + expectedValue + "'.");
             boolean found = false;
-            for (int j = 0; (!found) && (j < diff.size()); j ++)
+            for (int j = 0; (!found) && (j < diff.size()); j++)
             {
                 if (diff.get(j).contains(expectedValue))
                 {
@@ -361,9 +378,40 @@ public class AuditLogTest extends BaseWebDriverTest
         _containerHelper.deleteProject(AUDIT_TEST_PROJECT, true);
     }
 
+    @Test
+    public void testDetailedQueryUpdateAuditLog() throws IOException, CommandException
+    {
+        _containerHelper.createProject(AUDIT_TEST_PROJECT, "Custom");
+        _containerHelper.enableModule("simpletest");
+        goToProjectHome();
+
+        Connection cn = new Connection(WebTestHelper.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        // create manufacturer (which has summary audit log level)
+        InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+        Map<String, Object> rowMap = new HashMap<>();
+        rowMap.put("name", "Kia");
+        insertCmd.addRow(rowMap);
+        SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+
+        Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
+        assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
+
+        //then create model (which has detailed audit log level)
+        InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
+        rowMap = new HashMap<>();
+        rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
+        rowMap.put("name", "Soul");
+        insertCmd2.addRow(rowMap);
+        insertCmd2.execute(cn, getProjectName());
+
+        auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
+        assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
+    }
+
     private void createList(String containerPath, String listName)
     {
-        ListHelper.ListColumn  lc = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name");
+        ListHelper.ListColumn lc = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name");
         _listHelper.createList(containerPath, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
         goToManageLists();
         clickAndWait(Locator.linkWithText(listName));
@@ -394,7 +442,7 @@ public class AuditLogTest extends BaseWebDriverTest
             assertTextPresent("No data to show.");
     }
 
-    public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)
+    public static void goToAuditEventView(BaseWebDriverTest instance, String eventType)
     {
         if (!instance.isTextPresent("Audit Log"))
         {
@@ -407,6 +455,11 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             instance.doAndWaitForPageToLoad(() -> instance.selectOptionByText(Locator.name("view"), eventType));
         }
+    }
+
+    public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)
+    {
+        goToAuditEventView(instance, eventType);
 
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
     }
@@ -414,6 +467,14 @@ public class AuditLogTest extends BaseWebDriverTest
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch)
     {
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch, true);
+    }
+
+    public static Map<String, String> getAuditLogRow(BaseWebDriverTest instance, String eventType, String column, String msg)
+    {
+        goToAuditEventView(instance, eventType);
+        instance.log("searching for entry " + column + " = " + msg);
+        DataRegionTable table = new DataRegionTable("query", instance);
+        return table.getRowDataAsMap(column, msg);
     }
 
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch, boolean shouldFindText)
