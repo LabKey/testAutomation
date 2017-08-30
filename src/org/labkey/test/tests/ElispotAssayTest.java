@@ -47,6 +47,7 @@ import static org.labkey.test.components.PlateSummary.Row.*;
 @Category({DailyB.class, Assays.class})
 public class ElispotAssayTest extends AbstractQCAssayTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private final static String TEST_ASSAY_PRJ_ELISPOT = "Elispot Test Verify Project";
 
     protected static final String TEST_ASSAY_ELISPOT = "TestAssayElispot";
