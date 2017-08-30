@@ -75,21 +75,8 @@ public class ColumnChartRegion
         return _dataRegionTable.findElements(Locator.tagWithText("span", "This grid view has been modified.")).size() > 0;
     }
 
-    public void revertView()    // TODO: implement 'revert view' on dataRegion
+    public void revertView()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            _dataRegionTable.openCustomizeGrid();
-            _driver.clickButton("Revert");
-        }
-        else
-        {
-            WebElement revertButton = _dataRegionTable.findElement(By.cssSelector(" span.unsavedview-revert"));
-            if (!revertButton.isDisplayed())
-            {
-                _driver.mouseOver(_dataRegionTable.findElement(By.cssSelector(" div.labkey-dataregion-msg-part-customizeview")));
-            }
-            revertButton.click();
-        }
+        _dataRegionTable.openCustomizeGrid().revertUnsavedView();
     }
 }
