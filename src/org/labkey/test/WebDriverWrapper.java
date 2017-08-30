@@ -2200,9 +2200,50 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
     }
 
+    // Allows interaction with elements that have been obscured by the floating page header
+    protected void revealElement(WebElement el, boolean clickBlocked)
+    {
+        boolean revealed = false;
+        if (clickBlocked)
+        {
+            WebElement floatingHeader = Locators.floatingHeaderContainer().findElementOrNull(getDriver());
+            if (floatingHeader != null)
+            {
+                int headerHeight = floatingHeader.getSize().getHeight();
+                if (headerHeight > el.getLocation().getY())
+                {
+                    scrollBy(0, -headerHeight);
+                    revealed = true;
+                }
+            }
+        }
+        if (!revealed)
+        {
+            scrollIntoView(el);
+            if (clickBlocked)
+                sleep(2500); // Wait for a mask to disappear
+            shortWait().until(ExpectedConditions.elementToBeClickable(el));
+        }
+    }
+
+    // WebElement#click() doesn't use our scroll/retry logic
     public void click(WebElement el)
     {
-        clickAndWait(el, 0); // WebElement#click() doesn't use our scroll/retry logic
+        try
+        {
+            el.click();
+        }
+        catch (TimeoutException timeout)
+        {
+            throw timeout; // No retry for WebDriver timeout
+        }
+        catch (WebDriverException tryAgain)
+        {
+            log("Retry click: " + tryAgain.getMessage().split("\n")[0]);
+            boolean clickBlocked = tryAgain.getMessage().contains("Other element would receive the click");
+            revealElement(el, clickBlocked);
+            el.click();
+        }
     }
 
     public void click(Locator l)
@@ -2268,23 +2309,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         doAndWaitForPageToLoad(() ->
         {
-            try
-            {
-                el.click();
-            }
-            catch (TimeoutException timeout)
-            {
-                throw timeout; // No retry for WebDriver timeout
-            }
-            catch (WebDriverException tryAgain)
-            {
-                log("Retry click: " + tryAgain.getMessage().split("\n")[0]);
-                scrollIntoView(el);
-                if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
-                    sleep(2500);
-                shortWait().until(ExpectedConditions.elementToBeClickable(el));
-                el.click();
-            }
+            click(el);
         }, pageTimeoutMs);
 
         if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
@@ -3080,6 +3105,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
         if ("radio".equals(type))
         {
             log("WARNING: Use checkRadioButton for radio buttons");
+            if (!check)
+                throw new IllegalArgumentException("Unable to deselect a radio button directly");
         }
         else if (!"checkbox".equals(type))
         {
