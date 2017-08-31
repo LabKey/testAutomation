@@ -185,6 +185,7 @@ public class Crawler
                 new ControllerActionId("biologics", "begin"),
                 new ControllerActionId("reagent", "begin"),
                 new ControllerActionId("su2c", "begin"),
+                new ControllerActionId("trialshare", "begin"),
                 new ControllerActionId("hdrl", "begin")
         );
 
