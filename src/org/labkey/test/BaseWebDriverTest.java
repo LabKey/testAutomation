@@ -2010,7 +2010,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         clickButton("Create and Edit Source", 0);
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            waitForElement(Locator.tag("h3").withText("Edit " + name));
+            waitForElement(Locators.bodyTitle().containing("Edit " + name));
         }
         else
         {
