@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.util.Properties;
 
 import static org.openqa.selenium.chrome.ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY;
+import static org.openqa.selenium.firefox.GeckoDriverService.GECKO_DRIVER_EXE_PROPERTY;
 
 public abstract class TestProperties
 {
@@ -110,6 +111,42 @@ public abstract class TestProperties
     public static boolean isHeapDumpCollectionEnabled()
     {
         return "true".equals(System.getProperty("enable.heap.dump"));
+    }
+
+    public static String ensureGeckodriverExeProperty()
+    {
+        final String key = GECKO_DRIVER_EXE_PROPERTY;
+        String currentProperty = System.getProperty(key);
+        if (currentProperty == null)
+        {
+            String executable = null;
+            if(SystemUtils.IS_OS_MAC)
+            {
+                executable = "mac/geckodriver";
+            }
+            else if (SystemUtils.IS_OS_WINDOWS)
+            {
+                executable = "windows/geckodriver.exe";
+            }
+            else if (SystemUtils.IS_OS_LINUX)
+            {
+                switch (SystemUtils.OS_ARCH)
+                {
+                    case "amd64":
+                        executable = "linux/amd64/geckodriver";
+                        break;
+                    case "i386":
+                        executable = "linux/i386/geckodriver";
+                        break;
+                }
+            }
+
+            File testBin = new File(TestFileUtils.getLabKeyRoot(), "server/test/bin");
+            File driverPath = new File(testBin, executable);
+            System.setProperty(key, driverPath.getAbsolutePath());
+        }
+
+        return System.getProperty(key);
     }
 
     public static String ensureChromedriverExeProperty()
