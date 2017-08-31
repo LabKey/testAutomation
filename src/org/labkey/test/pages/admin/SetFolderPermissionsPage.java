@@ -33,8 +33,7 @@ public class SetFolderPermissionsPage extends LabKeyPage
     {
         waitFor(()-> Locator.css(".labkey-nav-page-header").withText("Users / Permissions")
                 .findElementOrNull(getDriver()) != null,
-                "Expected page title [Users / Permissions] did not appear",
-                WAIT_FOR_PAGE);
+                WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickFinish()
