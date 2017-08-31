@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import com.google.common.base.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
@@ -73,6 +74,53 @@ public abstract class Locator
         _index = index;
         _contains = contains;
         _text = text == null ? null : text.trim();
+    }
+
+    protected static class WrappedLocator extends Locator
+    {
+        private final Locator wrappedLocator;
+
+        protected WrappedLocator(Locator wrappedLocator)
+        {
+            super(wrappedLocator.getLoc());
+            this.wrappedLocator = wrappedLocator;
+        }
+
+        @Override
+        public Locator containing(String contains)
+        {
+            return wrappedLocator.containing(contains);
+        }
+
+        @Override
+        public Locator withText(String text)
+        {
+            return wrappedLocator.withText(text);
+        }
+
+        @Override
+        public Locator index(Integer index)
+        {
+            return wrappedLocator.index(index);
+        }
+
+        @Override
+        public String toString()
+        {
+            return wrappedLocator.toString();
+        }
+
+        @Override
+        public String getLoggableDescription()
+        {
+            return wrappedLocator.getLoggableDescription();
+        }
+
+        @Override
+        public By toBy()
+        {
+            return wrappedLocator.toBy();
+        }
     }
 
     /**
@@ -868,6 +916,11 @@ public abstract class Locator
             _cssLoc = cssLoc;
         }
 
+        protected XPathCSSLocator(XPathCSSLocator copy)
+        {
+            this(copy._xLoc, copy._cssLoc);
+        }
+
         @Override
         public XPathLocator containing(String contains)
         {
@@ -917,7 +970,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.withAttribute(attribute),
-                    _cssLoc.append("[" + attribute + "]"));
+                    _cssLoc.withAttribute(attribute));
         }
 
         @Override
@@ -925,7 +978,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.withAttributeContaining(attribute, text),
-                    _cssLoc.append("[" + attribute + "*=" + cq(text) + "]"));
+                    _cssLoc.withAttributeContaining(attribute, text));
         }
 
         @Override
@@ -933,7 +986,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.attributeStartsWith(attribute, text),
-                    _cssLoc.append("[" + attribute + "^=" + cq(text) + "]"));
+                    _cssLoc.attributeStartsWith(attribute, text));
         }
 
         @Override
@@ -941,7 +994,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.attributeEndsWith(attribute, text),
-                    _cssLoc.append("[" + attribute + "$=" + cq(text) + "]"));
+                    _cssLoc.attributeEndsWith(attribute, text));
         }
 
         @Override
@@ -1394,7 +1447,7 @@ public abstract class Locator
             return new CssLocator(selector);
         }
 
-        public static CssLocator union(CssLocator... locators)
+        public static Locator union(CssLocator... locators)
         {
             if (locators.length == 0)
                 throw new IllegalArgumentException("Specify one or more locators to union");
@@ -1413,19 +1466,7 @@ public abstract class Locator
                 unionedLocators.append(locators[i].getLoc());
             }
 
-            return new CssLocator(unionedLocators.toString()){
-                @Override
-                public CssLocator append(CssLocator loc)
-                {
-                    throw new UnsupportedOperationException("Don't append to unioned CSS selectors.");
-                }
-
-                @Override
-                public Locator index(Integer index)
-                {
-                    throw new UnsupportedOperationException("Don't index into unioned CSS selectors.");
-                }
-            };
+            return new WrappedLocator(new CssLocator(unionedLocators.toString()));
         }
 
         public Locator containing(String contains)
@@ -1457,14 +1498,45 @@ public abstract class Locator
             return new CssLocator(getLoc(), index, _contains, _text);
         }
 
-        public CssLocator append(String clause)
+        public CssLocator append(final String clause)
         {
-            return new CssLocator(getLoc() + clause);
+            if (clause.isEmpty())
+                return this;
+            List<String> elementSeparators = Arrays.asList(" ", ",", ">", "+", "~");
+            if (StringUtils.endsWith(getLoc(), "*") && !elementSeparators.contains(clause.substring(clause.length())))
+                return new CssLocator(getLoc().substring(0, getLoc().length() - 1)); // *.class becomes .class
+            else
+                return new CssLocator(getLoc() + clause);
         }
 
         public CssLocator append(CssLocator clause)
         {
             return append(" " + clause.getLoc());
+        }
+
+        public CssLocator withAttribute(String attribute)
+        {
+            return append("[" + attribute + "]");
+        }
+
+        public CssLocator withAttributeContaining(String attribute, String text)
+        {
+            return append("[" + attribute + "*=" + cq(text) + "]");
+        }
+
+        public CssLocator attributeStartsWith(String attribute, String text)
+        {
+            return append("[" + attribute + "^=" + cq(text) + "]");
+        }
+
+        public CssLocator attributeEndsWith(String attribute, String text)
+        {
+            return append("[" + attribute + "$=" + cq(text) + "]");
+        }
+
+        public CssLocator followingSibling(String tag)
+        {
+            return append(" ~ " + tag);
         }
 
         public CssLocator withClass(String cssClass)
