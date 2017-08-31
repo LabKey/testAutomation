@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class PlateGrid
 {
-    public final String EXCLUDED_PLATE_SUMMARY_XPATH = "//table[contains(@class, 'plate-summary')]//tbody//tr//th[contains(@class, 'labkey-data-region-header-container')][text()='$']/ancestor::table[contains(@class, 'plate-summary')]";
+    public final String EXCLUDED_PLATE_SUMMARY_XPATH = "//h3[text()='$']/../..//table[contains(@class, 'plate-summary')]";
 
     private WebDriver _driver;
     private WebElement[][] _gridValues;

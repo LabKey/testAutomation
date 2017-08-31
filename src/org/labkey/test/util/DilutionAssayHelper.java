@@ -123,7 +123,7 @@ public class DilutionAssayHelper
             _test.waitForElement(Locator.xpath("//table").withClass("cutoff-table").append("//td").withClass("sample-heading").withText(text));
 
             // dilution
-            _test.assertElementPresent(Locator.xpath("//table").withClass("labkey-data-region").append("//td").withClass("labkey-data-region-header-container").withText(text));
+            _test.assertElementPresent(Locator.tagWithClass("table", "lk-sample-dilutions-table").append(Locator.tagWithClass("td", "lk-sample-dilutions-header")).withText(text));
         }
     }
 

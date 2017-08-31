@@ -219,16 +219,16 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
         DilutionAssayHelper detailHelper = new DilutionAssayHelper(this);
 
         // Imported with polynomial curve fit
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC PositiveAUC"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC PositiveAUC"));
 
         detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Polynomial");
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_poly PositiveAUC_poly"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_poly PositiveAUC_poly"));
 
         detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Four Parameter");
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_4pl PositiveAUC_4pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_4pl PositiveAUC_4pl"));
 
         detailHelper.clickDetailsLink("Change Graph Options", "Curve Type", "Five Parameter");
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
 
         log("Verify different graph sizes");
         Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
@@ -287,7 +287,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
 
         log("Verify customizations are applied to print page");
         clickAndWait(Locator.linkContainingText("Print"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region-legacy").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 

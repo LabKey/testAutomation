@@ -181,9 +181,9 @@ public class RunQCPage<EC extends RunQCPage.ElementCache> extends LabKeyPage<EC>
         public final String FINISH_XPATH = "//span[text()='Finish']/following-sibling::span[@role='img']";
         public final String RUN_SUMMARY_XPATH = "//table[contains(@class, 'run-summary')]";
         public final String PLATE_CONTROLS_XPATH = "//table[contains(@class, 'plate-controls')]";
-        public final String PLATE_CONTROLS_VALUES_XPATH = PLATE_CONTROLS_XPATH + "//tbody//tr//th[contains(@class, 'labkey-data-region-header-container')][text()='$']/ancestor::table[contains(@class, 'plate-controls')]";
+        public final String PLATE_CONTROLS_VALUES_XPATH = "//h3[text()='$']/../.." + PLATE_CONTROLS_XPATH;
         public final String DILUTION_SUMMARY_XPATH = "//table[contains(@class, 'dilution-summary')]";
-        public final String DILUTION_SUMMARY_VALUES_XPATH = DILUTION_SUMMARY_XPATH + "//tbody//tr//td[text()='$']/ancestor::table[contains(@class, 'dilution-summary')]//table[contains(@class, 'labkey-data-region')]";
+        public final String DILUTION_SUMMARY_VALUES_XPATH = "//h3[text()='$']/../.." + DILUTION_SUMMARY_XPATH + "//table[contains(@class, 'labkey-data-region')]";
         public final String DILUTION_SUMMARY_ALL_VALUES_XPATH = DILUTION_SUMMARY_VALUES_XPATH + "//td[@class='dilution-checkbox']//label[contains(@class, 'x4-form-cb-label')]";
         public final String EXCLUDED_FIELD_WELLS_XPATH = "//table[contains(@class, 'field-exclusions')]";
         public final String EXCLUDED_FIELDS_XPATH = EXCLUDED_FIELD_WELLS_XPATH + "//tr[contains(@class, 'field-exclusion')]";
