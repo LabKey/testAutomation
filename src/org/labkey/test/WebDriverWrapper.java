@@ -1610,7 +1610,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
                     listener.beforePageLoad();
             });
             getDriver().manage().timeouts().pageLoadTimeout(msWait, TimeUnit.MILLISECONDS);
-            toBeStale = Locator.css("*").findElement(getDriver()); // Just grab any element to wait for staleness
+            toBeStale = Locator.css(":root").findElement(getDriver()); // Document should become stale
         }
 
         func.run();
