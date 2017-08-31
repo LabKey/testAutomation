@@ -295,7 +295,7 @@ public class ListHelper extends LabKeySiteWrapper
 
         setColumnType(null, col.getLookup(), ListColumnType.fromNew(col.getType()), lastFieldIndex);
 
-        _extHelper.clickExtTab("Display");
+        getListFieldEditor().fieldProperties().selectDisplayTab();
         if (col.getDescription() != null)
         {
             setFormElement(Locator.id("propertyDescription"), col.getDescription());
@@ -303,8 +303,7 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.getFormat() != null)
         {
-            _extHelper.clickExtTab("Format");
-            setFormElement(Locator.id("propertyFormat"), col.getFormat());
+            getListFieldEditor().fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
         }
 
         if (null != col.getURL())
@@ -314,14 +313,13 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.isRequired())
         {
-            _extHelper.clickExtTab("Validators");
-            clickRequired("");
+            getListFieldEditor().fieldProperties().selectValidatorsTab().required.set(true);
         }
 
         FieldDefinition.FieldValidator validator = col.getValidator();
         if (validator != null)
         {
-            _extHelper.clickExtTab("Validators");
+            getListFieldEditor().fieldProperties().selectValidatorsTab();
             if (validator instanceof RegExValidator)
                 clickButton("Add RegEx Validator", 0);
             else
@@ -343,13 +341,13 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.isMvEnabled())
         {
-            _extHelper.clickExtTab("Advanced");
+            getListFieldEditor().fieldProperties().selectAdvancedTab();
             clickMvEnabled("");
         }
 
         if (col.getScale() != null)
         {
-            _extHelper.clickExtTab("Advanced");
+            getListFieldEditor().fieldProperties().selectAdvancedTab();
             setColumnScale(col.getScale());
         }
     }
