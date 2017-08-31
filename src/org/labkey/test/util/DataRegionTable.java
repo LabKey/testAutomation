@@ -441,7 +441,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public int getRowIndex(String columnLabel, String value)
     {
-        return getRowIndex(getColumnIndex(columnLabel), value);
+        return getRowIndex(getColumnIndexStrict(columnLabel), value);
     }
 
     public int getRowIndex(int columnIndex, String value)
@@ -455,12 +455,25 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return -1;
     }
 
+    protected int getRowIndexStrict(String columnLabel, String value)
+    {
+        int rowIndex = getRowIndex(columnLabel, value);
+        if (rowIndex < 0)
+            throw new NoSuchElementException("No row where: " + columnLabel + "=" + value);
+        return rowIndex;
+    }
+
+    protected int getRowIndexStrict(int columnIndex, String value)
+    {
+        int rowIndex = getRowIndex(columnIndex, value);
+        if (rowIndex < 0)
+            throw new NoSuchElementException("No row where: " + elements().getColumnHeaders().get(columnIndex).getText() + " = " + value);
+        return rowIndex;
+    }
+
     public String getSummaryStatFooterText(String columnLabel)
     {
-        final int col = getColumnIndex(columnLabel);
-        if (col == -1)
-            fail("Couldn't find column '" + columnLabel + "'");
-        return getSummaryStatFooterText(col);
+        return getSummaryStatFooterText(getColumnIndexStrict(columnLabel));
     }
 
     public String getSummaryStatFooterText(int columnIndex)
@@ -557,10 +570,15 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public WebElement link(int row, String columnName)
     {
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            fail("Couldn't find column '" + columnName + "'");
-        return link(row, col);
+        return link(row, getColumnIndexStrict(columnName));
+    }
+
+    protected int getColumnIndexStrict(String name)
+    {
+        int columnIndex = getColumnIndex(name);
+        if (columnIndex < 0)
+            throw new NoSuchElementException("No column: " + name);
+        return columnIndex;
     }
 
     /**
@@ -655,12 +673,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public List<String> getColumnDataAsText(String name)
     {
-        return getColumnDataAsText(getColumnIndex(name));
+        return getColumnDataAsText(getColumnIndexStrict(name));
     }
 
     public Map<String, String> getRowDataAsMap(String colName, String value)
     {
-        return getRowDataAsMap(getRowIndex(colName, value));
+        return getRowDataAsMap(getRowIndexStrict(colName, value));
     }
 
     public Map<String, String> getRowDataAsMap(int row)
@@ -766,16 +784,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return elements().getDataRow(index);
     }
 
-    /**
-     * @deprecated Misleading method name. Use {@link #getRowIndex(String)}
-     * TODO: Remove in 16.2.3. In use by NLP feature branches
-     */
-    @Deprecated
-    public int getRow(String pk)
-    {
-        return getRowIndex(pk);
-    }
-
     public int getRowIndex(String pk)
     {
         assertTrue("Need the selector checkboxes value to find row by pk", hasSelectors());
@@ -808,11 +816,17 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return -1;
     }
 
+    protected int getRowIndexStrict(String pk)
+    {
+        int rowIndex = getRowIndex(pk);
+        if (rowIndex < 0)
+            throw new NoSuchElementException("No row with primary key: " + pk);
+        return rowIndex;
+    }
+
     public WebElement findCell(int row, String column)
     {
-        if (getColumnIndex(column) < 0)
-            throw new NoSuchElementException("No such column '" + column + "'");
-        return findCell(row, getColumnIndex(column));
+        return findCell(row, getColumnIndexStrict(column));
     }
 
     public WebElement findCell(int row, int column)
@@ -835,21 +849,12 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public String getDataAsText(int row, String columnName)
     {
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return getDataAsText(row, col);
+        return getDataAsText(row, getColumnIndexStrict(columnName));
     }
 
     public String getDataAsText(String pk, String columnName)
     {
-        int row = getRowIndex(pk);
-        if (row == -1)
-            return null;
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return getDataAsText(row, col);
+        return getDataAsText(getRowIndexStrict(pk), getColumnIndexStrict(columnName));
     }
 
     /* Key is the PK on the table, it is usually the contents of the 'value' attribute of the row selector checkbox  */
@@ -896,7 +901,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     //todo: return edit page
     public void clickEditRow(String key)
     {
-        clickEditRow(getRowIndex(key));
+        clickEditRow(getRowIndexStrict(key));
     }
 
     public void clickRowDetails(int rowIndex)
@@ -915,7 +920,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public void clickRowDetails(String key)
     {
-        clickRowDetails(getRowIndex(key));
+        clickRowDetails(getRowIndexStrict(key));
     }
 
 
@@ -969,21 +974,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public String getHref(int row, String columnName)
     {
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return getHref(row, col);
-    }
-
-    public String getHref(String pk, String columnName)
-    {
-        int row = getRowIndex(pk);
-        if (row == -1)
-            return null;
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            return null;
-        return getHref(row, col);
+        return getHref(row, getColumnIndexStrict(columnName));
     }
 
     public boolean hasHref(int row, int column)
@@ -1002,10 +993,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     public boolean hasHref(int row, String columnName)
     {
-        int col = getColumnIndex(columnName);
-        if (col == -1)
-            fail("Column '" + columnName + "' not found.");
-        return hasHref(row, col);
+        return hasHref(row, getColumnIndexStrict(columnName));
     }
 
     public ColumnChartRegion createBarChart(String columnName)
