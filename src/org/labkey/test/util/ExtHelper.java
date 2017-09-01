@@ -469,7 +469,7 @@ public class ExtHelper
     public void clickExtTab(String tabname)
     {
         _test.log("Selecting Ext tab " + tabname);
-        Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') or contains(@class, 'x4-tab-inner') and text() = '" + tabname + "']");
+        Locator l = Locator.xpath("//span[(contains(@class, 'x-tab-strip-text') or contains(@class, 'x4-tab-inner')) and text() = '" + tabname + "']");
         _test.waitAndClick(l);
     }
 
