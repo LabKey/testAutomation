@@ -178,13 +178,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
         assertSignedInNotImpersonating();
 
-        if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Start Modules"))||
-                isElementPresent(Locator.css(".labkey-nav-page-header").withText("Upgrade Modules")))
-        {
-            waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
-            clickAndWait(Locator.lkButton("Next"));
-        }
-
         _userHelper.saveCurrentDisplayName();
         WebTestHelper.setDefaultSession(getDriver());
     }
@@ -701,7 +694,16 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 }
                 else
                 {
-                    goToHome(); // TODO: More specific checking of upgrade workflow
+                    WebElement header = Locator.css(".labkey-nav-page-header").findElementOrNull(getDriver());
+                    if (header != null && Arrays.asList("Start Modules", "Upgrade Modules").contains(header.getText().trim()))
+                    {
+                        waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
+                        clickAndWait(Locator.lkButton("Next"));
+                    }
+                    else
+                    {
+                        goToHome();
+                    }
                 }
 
                 checkErrors(); // Check for errors from bootstrap/upgrade
