@@ -1,9 +1,13 @@
 package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.Collections;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -26,8 +30,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void waitForReady()
     {
-        getWrapper().waitFor(()-> Locators.title.findElementOrNull(this ) != null &&
-                newElementCache().title.getText().length() > 0, 2000);
+        WebDriverWrapper.waitFor(()-> Locators.title.findElementOrNull(this ) != null &&
+                elementCache().title.getText().length() > 0, "Modal dialog not ready", 2000);
     }
 
     @Override
@@ -44,19 +48,18 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public String getTitle()
     {
-        return newElementCache().title.getText();
+        return elementCache().title.getText();
     }
 
     public String getBodyText()
     {
-        return newElementCache().body.getText();
+        return elementCache().body.getText();
     }
 
     public void close()
     {
-        newElementCache().closeButton.click();
-        getWrapper().waitFor(()-> !Locators.component.findElementOrNull(getDriver()).isDisplayed(), 2000);
-        getWrapper().waitFor(()-> Locators.modalFade.findElementOrNull(getDriver())==null, 2000);
+        elementCache().closeButton.click();
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
     protected ElementCache newElementCache()
@@ -72,15 +75,13 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         WebElement closeButton = Locators.closeBtn.findWhenNeeded(header);
     }
 
-    public static class Locators
+    private static abstract class Locators
     {
-        public static final Locator modalFade = Locator.tagWithClass("div", "modal fade")
-                .withAttribute("style", "display:block;");
-        public static final Locator component = Locator.tagWithClass("div", "modal-dialog");
-        public static final Locator contents = Locator.tagWithClass("div","modal-content");
-        public static final Locator header = Locator.tagWithClass("div","modal-header");
-        public static final Locator body = Locator.tagWithClass("div","modal-body");
-        public static final Locator title = Locator.tagWithClass("*", "modal-title");
-        public static final Locator closeBtn = Locator.tagWithClass("button", "close").withAttribute("data-dismiss", "modal");
+        private static final Locator component = Locator.tagWithClass("div", "modal-dialog");
+        private static final Locator contents = Locator.tagWithClass("div","modal-content");
+        private static final Locator header = Locator.tagWithClass("div","modal-header");
+        private static final Locator body = Locator.tagWithClass("div","modal-body");
+        private static final Locator title = Locator.tagWithClass("*", "modal-title");
+        private static final Locator closeBtn = Locator.tagWithClass("button", "close").withAttribute("data-dismiss", "modal");
     }
 }
