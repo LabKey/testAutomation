@@ -1504,7 +1504,7 @@ public abstract class Locator
                 return this;
             List<String> elementSeparators = Arrays.asList(" ", ",", ">", "+", "~");
             if (StringUtils.endsWith(getLoc(), "*") && !elementSeparators.contains(clause.substring(clause.length())))
-                return new CssLocator(getLoc().substring(0, getLoc().length() - 1)); // *.class becomes .class
+                return new CssLocator(getLoc().substring(0, getLoc().length() - 1) + clause); // *.class becomes .class
             else
                 return new CssLocator(getLoc() + clause);
         }
