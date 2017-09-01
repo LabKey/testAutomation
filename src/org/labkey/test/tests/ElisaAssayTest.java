@@ -21,12 +21,14 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.components.PropertiesEditor;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 
 @Category({DailyB.class, Assays.class})
 public class ElisaAssayTest extends AbstractQCAssayTest
@@ -100,12 +102,10 @@ public class ElisaAssayTest extends AbstractQCAssayTest
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
         setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_ELISA_DESC);
 
-
         // set the specimenId field default value to be : last entered
-        Locator specimenField = Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//div[@id='name1']");
-        click(specimenField);
-        click(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//span[text()='Advanced']"));
-        selectOptionByValue(Locator.xpath("//td[@class='labkey-wp-title-left' and text() ='Sample Fields']/../..//select[@class='gwt-ListBox']"), "LAST_ENTERED");
+        PropertiesEditor sample_fields = PropertiesEditor(getDriver()).withTitleContaining("Sample Fields").find();
+        sample_fields.selectField("SpecimenId");
+        sample_fields.fieldProperties().selectAdvancedTab().defaultTypeSelect.set(PropertiesEditor.DefaultType.LAST_ENTERED);
 
         clickButton("Save", 0);
         waitForText(20000, "Save successful.");
