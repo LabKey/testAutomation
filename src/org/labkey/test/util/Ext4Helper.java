@@ -262,7 +262,7 @@ public class Ext4Helper
             // try Ext 4.1.0 version
             radioButton = Locator.xpath("//div[./table//label[text()='" + groupLabel + "']]//label[text()='" + selection + "']").findElement(_test.getDriver());
         }
-        radioButton.click();
+        _test.click(radioButton);
     }
 
     @LogMethod(quiet = true)
@@ -292,7 +292,7 @@ public class Ext4Helper
     @LogMethod(quiet = true)
     public void waitForComponentNotDirty(@LoggedParam final String componentId)
     {
-        _test.waitFor(() -> !(Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();"),
+        WebDriverWrapper.waitFor(() -> !(Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();"),
                 "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -364,7 +364,7 @@ public class Ext4Helper
         if (!gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
         {
             WebElement gridRowChecker = gridRow.findElement(By.cssSelector("." + _cssPrefix + "grid-cell-row-checker"));
-            gridRowChecker.click();
+            _test.click(gridRowChecker);
         }
     }
 
@@ -533,8 +533,7 @@ public class Ext4Helper
     public void clickGridRowText(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = Locators.getGridRow(cellText).index(index);
-        _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '" + cellText + "']"));
+        _test.waitAndClick(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-cell')][normalize-space() = '" + cellText + "']"));
     }
 
     /**
@@ -546,8 +545,7 @@ public class Ext4Helper
     {
         _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
         Locator.XPathLocator rowLoc = Locators.getGridRow(cellText).index(index);
-        _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'group-label')][normalize-space() = '" + cellText + "']"));
+        _test.waitAndClick(rowLoc.append("//div[contains(@class, 'lk-filter-panel-label') and contains(@class, 'group-label')][normalize-space() = '" + cellText + "']"));
     }
 
     /**
@@ -688,14 +686,14 @@ public class Ext4Helper
     public WebElement clickExt4MenuButton(boolean wait, WebElement menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
         waitForOnReady();
-        menu.click();
+        _test.click(menu);
         try
         {
             _test.waitForElement(Locators.menuItem().notHidden(), 1000);
         }
         catch (NoSuchElementException retry)
         {
-            menu.click(); // Sometimes ext4 menus don't open on the first try
+            _test.click(menu); // Sometimes ext4 menus don't open on the first try
             _test.waitForElement(Locators.menuItem().notHidden(), 1000);
         }
         if (onlyOpen && subMenuLabels.length == 0)
