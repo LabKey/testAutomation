@@ -2201,7 +2201,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     // Allows interaction with elements that have been obscured by the floating page header
-    protected void revealElement(WebElement el, boolean clickBlocked)
+    private void revealElement(WebElement el, boolean clickBlocked)
     {
         boolean revealed = false;
         if (clickBlocked)
@@ -3116,7 +3116,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         boolean selected = el.isSelected();
         if (check != selected)
-            el.click();
+            click(el);
     }
 
     public void setCheckbox(Locator checkBoxLocator, boolean check)
