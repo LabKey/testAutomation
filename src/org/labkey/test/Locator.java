@@ -814,7 +814,7 @@ public abstract class Locator
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
     {
-        DecimalFormat numFormat = new DecimalFormat("#,###");
+        DecimalFormat numFormat = new DecimalFormat("####");
 
         int rowsPerPage = lastRow - firstRow + 1;
         int pageCount = (int)Math.ceil((double)maxRows / (double)rowsPerPage);
