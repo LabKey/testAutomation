@@ -41,7 +41,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
-import static org.labkey.test.WebDriverWrapper.waitFor;
 import static org.labkey.test.components.html.Checkbox.Checkbox;
 import static org.labkey.test.components.html.EnumSelect.EnumSelect;
 import static org.labkey.test.components.html.Input.Input;
@@ -153,7 +152,7 @@ public class PropertiesEditor extends WebPartPanel
     {
         int initialRowCount = elementCache().findFieldRows().size();
         getWrapper().scrollIntoView(elementCache().addFieldButton);
-        getWrapper().waitFor(() -> {
+        WebDriverWrapper.waitFor(() -> {
                     elementCache().addFieldButton.click();
                     return initialRowCount + 1 == elementCache().findFieldRows().size();
                 },
@@ -267,8 +266,8 @@ public class PropertiesEditor extends WebPartPanel
 
         public void select()
         {
-            spacer.click();
-            waitFor(()-> isSelected(), 2500);
+            getWrapper().click(spacer);
+            WebDriverWrapper.waitFor(this::isSelected, 2500);
         }
 
         private boolean isSelected()
@@ -314,9 +313,7 @@ public class PropertiesEditor extends WebPartPanel
                 WebDriverWrapper.waitFor(() ->
                         Locator.xpath("//div[@class='gwt-Label' and contains(text(), 'Are you sure you want to remove this field?')]")
                                 .findElementOrNull(getDriver()) != null, 1000);
-                WebElement okBtn = Locator.xpath("//a[@class='labkey-button']")
-                        .withChild(Locator.xpath("./span[text()='OK']"))
-                        .findElementOrNull(getDriver());
+                WebElement okBtn = Locator.lkButton("OK").findElementOrNull(getDriver());
                 if (null != okBtn)
                     okBtn.click();
                 _haveAlreadyDeletedOneFieldRow = true;
