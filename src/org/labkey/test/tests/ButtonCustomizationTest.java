@@ -212,7 +212,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     {
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
         waitForElement(Locator.lkButton(METADATA_OVERRIDE_BUTTON), 10000);
-        assertButtonNotPresent(DataRegionTable.getInsertNewButtonText());
+        assertElementNotPresent(Locator.tagWithAttribute("a", "data-original-title","Insert data"));
 
         DataRegionTable dt;
         if (isTextPresent("My Query Web Part"))
@@ -220,13 +220,12 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         else
             dt = new DataRegionTable("query", getDriver());
 
-        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, false,METADATA_OVERRIDE_ON_CLICK_BUTTON);
-        //_extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
+        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, false, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);
 
         sleep(100); // Menu button sometimes isn't ready to open right away
 
-        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, false, METADATA_OVERRIDE_LINK_BUTTON);
+        dt.clickHeaderMenu(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_LINK_BUTTON);
         assertTextPresent("No messages");
     }
 
