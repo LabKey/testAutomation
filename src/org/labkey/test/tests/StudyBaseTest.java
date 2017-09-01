@@ -295,7 +295,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        click(Locator.checkboxByTitle("Pipeline"));
+        checkCheckbox(Locator.checkboxByTitle("Pipeline"));
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
             clickButton("Update Folder");
