@@ -555,9 +555,18 @@ public abstract class Locator
         return lkButton().withText(text);
     }
 
+    /**
+     * {@link org.labkey.api.util.Button}
+     */
     public static XPathLocator lkButton()
     {
-        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
+        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? tagWithClass("a", "labkey-button") :
+                tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
+    }
+
+    public static XPathLocator enabledLkButton()
+    {
+        return lkButton().withoutClass("labkey-disabled-button");
     }
 
     public static XPathLocator lkLabel(String text)
@@ -954,7 +963,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.withoutClass(cssClass),
-                    _cssLoc.append(":not(." + cssClass + ")"));
+                    _cssLoc.withoutClass(cssClass));
         }
 
         @Override
@@ -962,7 +971,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.withAttribute(attribute, text),
-                    _cssLoc.append("[" + attribute + "=" + cq(text) + "]"));
+                    _cssLoc.withAttribute(attribute, text));
         }
 
         @Override
@@ -1002,7 +1011,7 @@ public abstract class Locator
         {
             return new XPathCSSLocator(
                     _xLoc.followingSibling(tag),
-                    _cssLoc.append(" ~ " + tag));
+                    _cssLoc.followingSibling(tag));
         }
 
         @Override
@@ -1014,7 +1023,7 @@ public abstract class Locator
 
             return new XPathCSSLocator(
                     xLoc,
-                    _cssLoc.append(" > " + ((XPathCSSLocator)childLocator)._cssLoc.getLoc()));
+                    _cssLoc.child(((XPathCSSLocator)childLocator)._cssLoc));
         }
 
         @Override
@@ -1514,6 +1523,11 @@ public abstract class Locator
             return append(" " + clause.getLoc());
         }
 
+        public CssLocator withAttribute(String attribute, String text)
+        {
+            return append("[" + attribute + "=" + cq(text) + "]");
+        }
+
         public CssLocator withAttribute(String attribute)
         {
             return append("[" + attribute + "]");
@@ -1542,6 +1556,21 @@ public abstract class Locator
         public CssLocator withClass(String cssClass)
         {
             return append("." + cssClass);
+        }
+
+        public CssLocator withoutClass(String cssClass)
+        {
+            return append(":not(." + cssClass + ")");
+        }
+
+        public CssLocator child(CssLocator childLocator)
+        {
+            return child(childLocator.getLoc());
+        }
+
+        public CssLocator child(String childSelector)
+        {
+            return append(" > " + childSelector);
         }
 
         public CssLocator lastChild()
