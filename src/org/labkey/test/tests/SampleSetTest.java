@@ -361,7 +361,7 @@ public class SampleSetTest extends BaseWebDriverTest
         String fileField = "FileAttachment";
         clickButton("Edit Fields");
         waitForElement(Locator.lkButton("Add Field"), defaultWaitForPage);
-        ListHelper listHelper = new ListHelper(this);
+        ListHelper listHelper = new ListHelper(this).withEditorTitle("Field Properties");
         listHelper.addField(new ListHelper.ListColumn(fileField, fileField, ListHelper.ListColumnType.File, fileField));
         clickButton("Save");
     }

@@ -42,6 +42,7 @@ public class ListHelper extends LabKeySiteWrapper
 {
     public static final String IMPORT_ERROR_SIGNAL = "importFailureSignal"; // See query/import.jsp
     private WrapsDriver _wrapsDriver;
+    private String _editorTitle = "List Fields"; // todo: capture the title of the first propertiesEditor and use it
 
     public ListHelper(WrapsDriver wrapsDriver)
     {
@@ -51,6 +52,12 @@ public class ListHelper extends LabKeySiteWrapper
     public ListHelper(WebDriver driver)
     {
         this(() -> driver);
+    }
+
+    public ListHelper withEditorTitle(String editorTitle)
+    {
+        _editorTitle = editorTitle;
+        return this;
     }
 
     @Override
@@ -69,7 +76,7 @@ public class ListHelper extends LabKeySiteWrapper
 
     public PropertiesEditor getListFieldEditor()
     {
-        return getSomeEditorByTitle("List Fields");
+        return getSomeEditorByTitle(_editorTitle);
     }
 
     // TODO: Remove callers who use ListHelper to edit non-list PropertiesEditors (hence "some")
@@ -280,22 +287,13 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addField(ListColumn col)
     {
-        waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
-        if (lastFieldIndex > 0)
-        {
-            Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
-            click(lastField);
-        }
-        scrollIntoView(Locator.xpath("//a[contains(@class, 'labkey-button')]//span[text()='Add Field']"));
-        clickButton("Add Field", 0);
-        lastFieldIndex++;
-        setFormElement(Locator.name("ff_name" + lastFieldIndex),  col.getName());
-        setFormElement(Locator.name("ff_label" + lastFieldIndex), col.getLabel());
+        PropertiesEditor.FieldRow newField = getListFieldEditor().addField();
+        newField.setName(col.getName());
+        newField.setLabel(col.getLabel());
+        newField.setType(col.getLookup(), col.getType());
 
-        setColumnType(null, col.getLookup(), ListColumnType.fromNew(col.getType()), lastFieldIndex);
-
-        getListFieldEditor().fieldProperties().selectDisplayTab();
+        PropertiesEditor listFieldEditor = getListFieldEditor();
+        listFieldEditor.fieldProperties().selectDisplayTab();
         if (col.getDescription() != null)
         {
             setFormElement(Locator.id("propertyDescription"), col.getDescription());
@@ -303,7 +301,7 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.getFormat() != null)
         {
-            getListFieldEditor().fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
+            listFieldEditor.fieldProperties().selectFormatTab().propertyFormat.set(col.getFormat());
         }
 
         if (null != col.getURL())
@@ -313,13 +311,13 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.isRequired())
         {
-            getListFieldEditor().fieldProperties().selectValidatorsTab().required.set(true);
+            listFieldEditor.fieldProperties().selectValidatorsTab().required.set(true);
         }
 
         FieldDefinition.FieldValidator validator = col.getValidator();
         if (validator != null)
         {
-            getListFieldEditor().fieldProperties().selectValidatorsTab();
+            listFieldEditor.fieldProperties().selectValidatorsTab();
             if (validator instanceof RegExValidator)
                 clickButton("Add RegEx Validator", 0);
             else
@@ -341,13 +339,13 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.isMvEnabled())
         {
-            getListFieldEditor().fieldProperties().selectAdvancedTab();
+            listFieldEditor.fieldProperties().selectAdvancedTab();
             clickMvEnabled("");
         }
 
         if (col.getScale() != null)
         {
-            getListFieldEditor().fieldProperties().selectAdvancedTab();
+            listFieldEditor.fieldProperties().selectAdvancedTab();
             setColumnScale(col.getScale());
         }
     }

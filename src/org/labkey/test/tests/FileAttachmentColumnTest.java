@@ -63,7 +63,8 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_TIF.getName())));
 
         // expected behavior for pdf: render as a web page.
-        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
+        doAndWaitForPageToLoad(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
+        goBack();
 
         // verify popup/sprite for jpeg
         mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
@@ -150,7 +151,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
 
         // add a 'file' column
         log("editing fields in Vial Groups");
-        ListHelper vialGroupsFieldEditHelper = new ListHelper(getDriver());
+        ListHelper vialGroupsFieldEditHelper = new ListHelper(getDriver()).withEditorTitle("Field Properties");
         vialGroupsFieldEditHelper.clickEditFields();
         vialGroupsFieldEditHelper.addField(new ListHelper.ListColumn("File", ListHelper.ListColumnType.File));
         clickButton("Save");
