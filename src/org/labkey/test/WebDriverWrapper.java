@@ -2212,7 +2212,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 int headerHeight = floatingHeader.getSize().getHeight();
                 if (headerHeight > el.getLocation().getY())
                 {
-                    scrollBy(0, -headerHeight);
+                    int elHeight = el.getSize().getHeight();
+                    scrollBy(0, -(headerHeight + elHeight));
                     revealed = true;
                 }
             }
