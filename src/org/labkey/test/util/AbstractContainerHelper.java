@@ -178,8 +178,7 @@ public abstract class AbstractContainerHelper
         if (getActiveModules().containsAll(moduleNames))
             return;
 
-        _test.goToFolderManagement();
-        _test.clickAndWait(Locator.linkWithText("Folder Type"));
+        _test.goToFolderManagement().goToFolderTypePane();
         for (String moduleName : moduleNames)
         {
             try
