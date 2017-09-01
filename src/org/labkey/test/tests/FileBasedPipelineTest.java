@@ -178,9 +178,9 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         AssayDesignerPage assayDesignerPage = _assayHelper.createAssayAndEdit("General", "myassay");
         assayDesignerPage.dataFields().selectField(0).markForDeletion(); // SpecimenID
-        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // ParticipantID
-        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // VisitID
-        assayDesignerPage.dataFields().selectField(0).markForDeletion(); // Date
+        assayDesignerPage.dataFields().selectField(1).markForDeletion(); // ParticipantID
+        assayDesignerPage.dataFields().selectField(2).markForDeletion(); // VisitID
+        assayDesignerPage.dataFields().selectField(3).markForDeletion(); // Date
         assayDesignerPage.addDataField("Name", "Name", FieldDefinition.ColumnType.String);
         assayDesignerPage.addDataField("Age", "Age", FieldDefinition.ColumnType.Integer);
         assayDesignerPage.save();
