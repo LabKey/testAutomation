@@ -118,15 +118,15 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("edit metadata"));
         // wait for the domain editor to appear:
         clickButton("Edit Source", defaultWaitForPage);
-        _extHelper.clickExtTab("XML Metadata");
+        _ext4Helper.clickExt4Tab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(true));
-        _extHelper.clickExtTab("Source");
+        _ext4Helper.clickExt4Tab("Source");
         clickButton("Save", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Saved");
         clickButton("Execute Query", 0);
         waitForText(WAIT_FOR_JAVASCRIPT, "Seattle");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
-        _extHelper.clickExtTab("Source");
+        _ext4Helper.clickExt4Tab("Source");
         clickButton("Save & Finish");
         assertButtonPresent(METADATA_OVERRIDE_BUTTON);
 
@@ -138,11 +138,11 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         waitForText(10000, "edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         clickButton("Edit Source", defaultWaitForPage);
-        _extHelper.clickExtTab("XML Metadata");
+        _ext4Helper.clickExt4Tab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"));
-        _extHelper.clickExtTab("Source");
+        _ext4Helper.clickExt4Tab("Source");
         clickButton("Save & Finish");
         verifyMetadataButtons();
 

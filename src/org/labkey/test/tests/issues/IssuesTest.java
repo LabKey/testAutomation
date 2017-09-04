@@ -587,7 +587,7 @@ public class IssuesTest extends BaseWebDriverTest
         setFormElement(Locator.name("ff_newQueryName"), "xxyzzy");
         selectOptionByText(Locator.name("ff_baseTableName"), "issues");
         clickButton("Create and Edit Source");
-        _extHelper.clickExtTab("Data");
+        _ext4Helper.clickExt4Tab("Data");
 
         waitForText(WAIT_FOR_JAVASCRIPT, ISSUE_TITLE_0);
         waitForText(WAIT_FOR_JAVASCRIPT, ISSUE_TITLE_1);

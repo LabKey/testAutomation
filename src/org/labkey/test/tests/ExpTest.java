@@ -117,7 +117,7 @@ public class ExpTest extends BaseWebDriverTest
                 "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
                 "Datas.Created AS Created\n" +
                 "FROM Datas");
-        _extHelper.clickExtTab("Data");
+        _ext4Helper.clickExt4Tab("Data");
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -125,7 +125,7 @@ public class ExpTest extends BaseWebDriverTest
         assertTextPresent("file:/", 10);
 
         // Edit the metadata to use a special date format
-        _extHelper.clickExtTab("Source");
+        _ext4Helper.clickExt4Tab("Source");
         clickButton("Save", 0);
         waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata");
@@ -141,11 +141,11 @@ public class ExpTest extends BaseWebDriverTest
         // Verify that it ended up in the XML version of the metadata
         clickButton("Edit Source");
         sleep(1000);
-        _extHelper.clickExtTab("XML Metadata");
+        _ext4Helper.clickExt4Tab("XML Metadata");
         assertTextPresent("<columnTitle>editedCreated</columnTitle>", "<formatString>ddd MMM dd yyyy</formatString>");
 
         // Run it and see if we used the format correctly
-        _extHelper.clickExtTab("Data");
+        _ext4Helper.clickExt4Tab("Data");
         waitForText(WAIT_FOR_JAVASCRIPT, "editedCreated");
         dateFormat = new SimpleDateFormat("ddd MMM dd yyyy");
         waitForText(WAIT_FOR_JAVASCRIPT, dateFormat.format(new Date()));
