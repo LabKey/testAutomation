@@ -180,12 +180,13 @@ public class Crawler
             new ControllerActionId("harvest", "formatInvoice"),
             new ControllerActionId("targetedms", "downloadDocument"),
 
-                // Begin actions that 404 when module is not enabled
+                // Actions that error from Admin->GoToModule->MoreModules when module is not enabled
                 new ControllerActionId("nlp", "begin"),
                 new ControllerActionId("biologics", "begin"),
                 new ControllerActionId("reagent", "begin"),
                 new ControllerActionId("su2c", "begin"),
                 new ControllerActionId("trialshare", "begin"),
+                new ControllerActionId("ehr_compliancedb", "requirementDetails"),
                 new ControllerActionId("hdrl", "begin")
         );
 
@@ -748,20 +749,17 @@ public class Crawler
         String relativeURL = urlToCheck.getRelativeURL();
         ControllerActionId actionId = new ControllerActionId(relativeURL);
 
-        URL origin = null;
-        URL currentPageUrl;
-        // Helps breadth first crawl
+        // Keep track of where crawler has been
+        _actionsVisited.add(actionId);
+        URL origin = urlToCheck.getOrigin();
+        int depth = urlToCheck.getDepth();
+
         try
         {
-            // Go to the site
             long loadTime = _test.beginAt(relativeURL);
-            // Keep track of where crawler has been
-            _actionsVisited.add(actionId);
             _actionProfiler.updateActionProfile(relativeURL, loadTime);
 
-            int depth = urlToCheck.getDepth();
-            origin = urlToCheck.getOrigin();
-            currentPageUrl = _test.getURL();
+            URL currentPageUrl = _test.getURL();
 
             // Find all the links at the site
             if (depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
@@ -769,7 +767,6 @@ public class Crawler
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
-
 
             checkForForbiddenWords(relativeURL);
 
@@ -783,6 +780,9 @@ public class Crawler
                 String[] errorLines = serverError.get(0).split("\n");
                 fail(relativeURL + " produced error: \"" + errorLines[0] + "\".  Originating page: " + origin.toString());
             }
+
+            if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
+                testInjection(currentPageUrl);
         }
         catch (RuntimeException | AssertionError rethrow)
         {
@@ -801,11 +801,11 @@ public class Crawler
                 }
             }
 
-            throw rethrow;
+            if (rethrow instanceof AssertionError)
+                throw rethrow;
+            else
+                throw new RuntimeException(relativeURL + " triggered an exception." + (origin != null ? "  Originating page: " + origin.toString() : ""), rethrow);
         }
-
-        if (urlToCheck.isInjectableURL() && _injectionCheckEnabled)
-            testInjection(currentPageUrl);
     }
 
     protected void checkForForbiddenWords(String relativeURL)
