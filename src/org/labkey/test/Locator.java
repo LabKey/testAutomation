@@ -560,8 +560,9 @@ public abstract class Locator
      */
     public static XPathLocator lkButton()
     {
-        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? tagWithClass("a", "labkey-button") :
-                tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
+        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
+//        return LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ? tagWithClass("a", "labkey-button") :
+//                tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button') or contains(@class, 'labkey-disabled-button')");
     }
 
     public static XPathLocator enabledLkButton()
