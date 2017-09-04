@@ -17,6 +17,7 @@ package org.labkey.test.components;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -267,13 +268,17 @@ public class PropertiesEditor extends WebPartPanel
         public void select()
         {
             getWrapper().click(spacer);
-            WebDriverWrapper.waitFor(this::isSelected, 2500);
+            WebDriverWrapper.waitFor(this::isSelected, "Failed to select field row", 1000);
         }
 
         private boolean isSelected()
         {
-            String style = _rowEl.getAttribute("style");
-            return style != null && style.contains("background-color"); // when unselected, style for the fieldRow should be empty
+            if (!LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
+            {
+                String style = _rowEl.getAttribute("style");
+                return style != null && style.contains("background-color"); // when unselected, style for the fieldRow should be empty
+            }
+            return _rowEl.getAttribute("class").contains("selected-field-row");
         }
 
         public String getName()
