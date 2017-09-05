@@ -37,7 +37,6 @@ import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 
 public class ListHelper extends LabKeySiteWrapper
 {
@@ -77,18 +76,13 @@ public class ListHelper extends LabKeySiteWrapper
 
     public PropertiesEditor getListFieldEditor()
     {
-        return PropertiesEditor(getDriver()).withTitle(_editorTitle).find();
+        return getSomeEditorByTitle(_editorTitle);
     }
 
     // TODO: Remove callers who use ListHelper to edit non-list PropertiesEditors (hence "some")
     private PropertiesEditor getSomeEditorByTitle(final String title)
     {
-        return PropertiesEditor(getDriver()).withTitleContaining(title).find();
-    }
-
-    private PropertiesEditor getFieldEditor()
-    {
-        return PropertiesEditor(getDriver()).find();
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(title).find();
     }
 
     public void uploadData(String listData)
@@ -293,12 +287,12 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addField(ListColumn col)
     {
-        PropertiesEditor listFieldEditor = getFieldEditor();
-        PropertiesEditor.FieldRow newField = listFieldEditor.addField();
+        PropertiesEditor.FieldRow newField = getListFieldEditor().addField();
         newField.setName(col.getName());
         newField.setLabel(col.getLabel());
         newField.setType(col.getLookup(), col.getType());
 
+        PropertiesEditor listFieldEditor = getListFieldEditor();
         listFieldEditor.fieldProperties().selectDisplayTab();
         if (col.getDescription() != null)
         {
@@ -345,7 +339,8 @@ public class ListHelper extends LabKeySiteWrapper
 
         if (col.isMvEnabled())
         {
-            listFieldEditor.fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
+            listFieldEditor.fieldProperties().selectAdvancedTab();
+            clickMvEnabled("");
         }
 
         if (col.getScale() != null)
@@ -669,6 +664,22 @@ public class ListHelper extends LabKeySiteWrapper
     public void selectPropertyTab(@Nullable String prefix, String name)
     {
         click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
+    }
+
+    public void clickRequired(String prefix)
+    {
+        selectPropertyTab(prefix, "Validators");
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='required']");
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(l);
+    }
+
+    public void clickMvEnabled(String prefix)
+    {
+        selectPropertyTab(prefix, "Advanced");
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='mvEnabled']");
+        waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(l);
     }
 
     /**
