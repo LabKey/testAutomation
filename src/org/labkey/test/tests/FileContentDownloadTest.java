@@ -30,14 +30,10 @@ import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -188,7 +184,7 @@ public class FileContentDownloadTest extends BaseWebDriverTest
 
         signOut();
         // Test that renderAs can be observed through a login
-        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/%40files/" + EscapeUtil.encode(folderName) + "/" + textFile.getName() + "?renderAs=INLINE");
+        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/" + EscapeUtil.encode(folderName) + "/%40files/" + textFile.getName() + "?renderAs=INLINE");
         assertTitleContains("Sign In");
 
         log("Test renderAs through login and ensure that page is rendered inside of server UI");
