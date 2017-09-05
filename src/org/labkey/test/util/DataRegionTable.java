@@ -66,7 +66,7 @@ import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 /**
  * Component wrapper class for interacting with a LabKey Data Region (see clientapi/dom/DataRegion.js)
  */
-public class DataRegionTable extends WebDriverComponent implements WebDriverWrapper.PageLoadListener
+public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements> implements WebDriverWrapper.PageLoadListener
 {
     public static final String UPDATE_SIGNAL = "dataRegionUpdate";
     public static final String PANEL_SHOW_SIGNAL = "dataRegionPanelShow";
@@ -86,7 +86,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
     private final List<String> _columnLabels = new ArrayList<>();
     private final List<String> _columnNames = new ArrayList<>();
     private final Map<String, Integer> _mapRows = new HashMap<>();
-    private Elements _elements;
     private String _tableId;
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
@@ -149,12 +148,22 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         return _el;
     }
 
-    public Elements elements()
+    @Override
+    public Elements elementCache()
     {
         getComponentElement().isDisplayed(); // Trigger cache reset
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return super.elementCache();
+    }
+
+    @Override
+    protected Elements newElementCache()
+    {
+        return new Elements();
+    }
+
+    public Elements elements()
+    {
+        return elementCache();
     }
 
     public DataRegionApi api()
@@ -179,7 +188,6 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
 
     protected void clearCache()
     {
-        _elements = null;
         _customizeView = null;
         _exportHelper = null;
         _pagingWidget = null;
@@ -188,6 +196,7 @@ public class DataRegionTable extends WebDriverComponent implements WebDriverWrap
         _columnNames.clear();
         _mapRows.clear();
         _dataCache.clear();
+        clearElementCache();
     }
 
     /**
