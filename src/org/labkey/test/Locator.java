@@ -636,7 +636,7 @@ public abstract class Locator
 
     public static XPathLocator menuBarItem(String text)
     {
-        return tag("div").withAttribute("id", "menubar").append(tag("a").containing(text));
+        return tagWithClass("div", "navbar-header").append(tagWithClass("li", "dropdown hidden-xs")).append(tagWithText("a", text));
     }
 
     public static XPathLocator linkWithTitle(String title)
