@@ -40,6 +40,18 @@ public class PipelineStatusTable extends DataRegionTable
         _mapDescriptionStatus.clear();
     }
 
+    @Override
+    protected Elements newElementCache()
+    {
+        disablePipelineRefresh();
+        return super.newElementCache();
+    }
+
+    private void disablePipelineRefresh()
+    {
+        getWrapper().executeScript("LABKEY.disablePipelineRefresh = true;");
+    }
+
     private int getStatusColumnIndex()
     {
         return getColumnIndex("Status");
