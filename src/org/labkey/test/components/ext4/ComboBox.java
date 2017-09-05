@@ -234,6 +234,7 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
     public static class ComboBoxFinder extends FormItemFinder<ComboBox, ComboBoxFinder>
     {
         WebDriver _driver;
+        String _idPrefix = "combobox";
 
         public ComboBoxFinder(WebDriver driver)
         {
@@ -241,10 +242,16 @@ public class ComboBox extends WebDriverComponent<ComboBox.ElementCache>
             _driver = driver;
         }
 
+        public ComboBoxFinder withIdPrefix(String idPrefix)
+        {
+            _idPrefix = idPrefix;
+            return this;
+        }
+
         @Override
         protected Locator.XPathLocator itemLoc()
         {
-            return Locator.tagWithClass("td", getCssPrefix() + "form-item-body").attributeStartsWith("id", "combobox");
+            return Locator.tagWithClass("td", getCssPrefix() + "form-item-body").attributeStartsWith("id", _idPrefix);
         }
 
         @Override

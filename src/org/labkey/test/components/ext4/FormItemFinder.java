@@ -21,7 +21,7 @@ import org.openqa.selenium.SearchContext;
 
 public abstract class FormItemFinder<C, F extends FormItemFinder<C, F>> extends Component.ComponentFinder<SearchContext, C, F>
 {
-    private String labelText = "";
+    private String labelText = null;
     private boolean partialText = true;
 
     public F withLabel(String text)
@@ -40,6 +40,8 @@ public abstract class FormItemFinder<C, F extends FormItemFinder<C, F>> extends 
 
     protected Locator locator()
     {
+        if (labelText == null)
+            return itemLoc();
         return itemLoc().withPredicate(
                 partialText
                         ? labelLoc().containing(labelText)
