@@ -273,11 +273,6 @@ public class PropertiesEditor extends WebPartPanel
 
         private boolean isSelected()
         {
-            if (!LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            {
-                String style = _rowEl.getAttribute("style");
-                return style != null && style.contains("background-color"); // when unselected, style for the fieldRow should be empty
-            }
             return _rowEl.getAttribute("class").contains("selected-field-row");
         }
 
