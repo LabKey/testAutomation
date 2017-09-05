@@ -22,7 +22,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public static FolderManagementPage beginAt(WebDriverWrapper driver, String containerPath)
     {
-        driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "folderManagement"));
+        driver.beginAt(WebTestHelper.buildURL("admin", containerPath, "manageFolders"));
         return new FolderManagementPage(driver.getDriver());
     }
 

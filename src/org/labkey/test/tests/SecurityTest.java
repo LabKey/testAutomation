@@ -137,10 +137,10 @@ public class SecurityTest extends BaseWebDriverTest
             "/security/group.view?group=Administrators"};
 
     protected static final String[] unreachableUrlsExtendedList = {"/security/group.view?group=Developers",
-        "user/showUsers.view?","security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F","admin/createFolder.view?",
-        "/analytics/begin.view?","/login/configure.view?", "/admin/customizeEmail.view?",
+        "user/showUsers.view?", "security/project.view?returnUrl=%2Fuser%2FshowUsers.view%3F", "admin/createFolder.view?",
+        "/analytics/begin.view?", "/login/configure.view?", "/admin/customizeEmail.view?",
         "/admin/filesSiteSettings.view?", "/admin/projectSettings.view?",
-        "/flow/flowAdmin.view?","/admin/folderManagement.view?",
+        "/flow/flowAdmin.view?", "/admin/folderManagement.view?",
         "/admin/reorderFolders.view?", "/admin/customizeSite.view?",
         "/reports/configureReportsAndScripts.view?", "/audit/showAuditLog.view?",
         "/search/admin.view?", "/ms1/showAdmin.view?", "/ms2/showMS2Admin.view?",
@@ -151,10 +151,10 @@ public class SecurityTest extends BaseWebDriverTest
         "/admin/dumpHeap.view?", "/admin/environmentVariables.view?", "/admin/memTracker.view?",
         "/admin/queries.view?", "/admin/resetErrorMark.view?", "/admin/showThreads.view?",
         "/admin-sql/scripts.view?", "/admin/systemProperties.view?", "/admin/emailTest.view?",
-        "/admin/showAllErrors.view?","/admin/showErrorsSinceMark.view?",  "/admin/showPrimaryLog.view?"};
+        "/admin/showAllErrors.view?", "/admin/showErrorsSinceMark.view?",  "/admin/showPrimaryLog.view?"};
 
     /**
-     * verify that a normal user does not get a link to a the admin console or see their own history, nor
+     * verify that a normal user does not get a link to the admin console or see their own history, nor
      * reach an admin-only url directly.
      *
      *
@@ -289,7 +289,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(resetUrl);
 
-        String[][] passwords = {{"fooba", null}, {"foobar","foobar2"}};
+        String[][] passwords = {{"fooba", null}, {"foobar", "foobar2"}};
         String[][] messages = {{"Your password must be six non-whitespace characters or more."}, {"Your password entries didn't match."}};
         attemptSetInvalidPasswords(PasswordAlterType.RESET_PASSWORD, passwords, messages);
 
