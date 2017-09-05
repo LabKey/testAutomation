@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.selenium.LazyWebElement;
+import org.labkey.test.selenium.ReclickingWebElement;
 import org.labkey.test.selenium.RefindingWebElement;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.By;
@@ -310,7 +311,7 @@ public abstract class Locator
     public WebElement findElementOrNull(SearchContext context)
     {
         List<WebElement> elements = findElements(context);
-        if (elements.size() < 1)
+        if (elements.isEmpty())
             return null;
         return elements.get(0);
     }
@@ -355,13 +356,25 @@ public abstract class Locator
         }
 
         if (_index == null)
-            return elements;
+            return decorateWebElements(elements);
         else
         {
             if (elements.size() > _index)
-                return Collections.singletonList(elements.get(_index));
+                return decorateWebElements(Collections.singletonList(elements.get(_index)));
             return Collections.emptyList();
         }
+    }
+
+    protected final List<WebElement> decorateWebElements(List<WebElement> elements)
+    {
+        List<WebElement> decoratedElements = new ArrayList<>(elements.size());
+        elements.forEach(el -> decoratedElements.add(decorateWebElement(el)));
+        return decoratedElements;
+    }
+
+    protected WebElement decorateWebElement(WebElement toBeDecorated)
+    {
+        return new ReclickingWebElement(toBeDecorated);
     }
 
     public List<WebElement> waitForElements(final SearchContext context, final int msTimeout)
@@ -1345,24 +1358,12 @@ public abstract class Locator
         }
 
         @Override
-        public WebElement findElement(SearchContext context)
-        {
-            if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
-            {
-                String relativeXPath = getRelativeXPath();
-                if (!relativeXPath.equals(getLoc()))
-                    return new XPathLocator(relativeXPath).findElement(context);
-            }
-            return super.findElement(context);
-        }
-
-        @Override
         public List<WebElement> findElements(SearchContext context)
         {
             if (!(context instanceof WebDriver || context instanceof WrapsDriver) || context instanceof WebElement)
-                return context.findElements(By.xpath(getRelativeXPath()));
+                return decorateWebElements(context.findElements(By.xpath(getRelativeXPath())));
             else
-                return context.findElements(this.toBy());
+                return decorateWebElements(context.findElements(this.toBy()));
         }
 
         private String getRelativeXPath()
@@ -1609,7 +1610,7 @@ public abstract class Locator
             if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
                 return (new LinkLocator(_linkText.toUpperCase())).findElements(context);
             else
-                return elements;
+                return decorateWebElements(elements);
         }
 
         @Override

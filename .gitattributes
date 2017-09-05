@@ -632,7 +632,9 @@ src/org/labkey/test/pipeline/PipelineTestsBase.java -text
 src/org/labkey/test/pipeline/PipelineWebTestBase.java -text
 src/org/labkey/test/selenium/EphemeralWebElement.java -text
 src/org/labkey/test/selenium/LazyWebElement.java -text
+src/org/labkey/test/selenium/ReclickingWebElement.java -text
 src/org/labkey/test/selenium/RefindingWebElement.java -text
+src/org/labkey/test/selenium/WebElementDecorator.java -text
 src/org/labkey/test/selenium/WebElementWrapper.java -text
 src/org/labkey/test/studysampler/Runner.java -text
 src/org/labkey/test/studysampler/words.txt -text

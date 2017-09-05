@@ -2200,51 +2200,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
         executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
     }
 
-    // Allows interaction with elements that have been obscured by the floating page header
-    private void revealElement(WebElement el, boolean clickBlocked)
-    {
-        boolean revealed = false;
-        if (clickBlocked)
-        {
-            WebElement floatingHeader = Locators.floatingHeaderContainer().findElementOrNull(getDriver());
-            if (floatingHeader != null)
-            {
-                int headerHeight = floatingHeader.getSize().getHeight();
-                if (headerHeight > el.getLocation().getY())
-                {
-                    int elHeight = el.getSize().getHeight();
-                    scrollBy(0, -(headerHeight + elHeight));
-                    revealed = true;
-                }
-            }
-        }
-        if (!revealed)
-        {
-            scrollIntoView(el);
-            if (clickBlocked)
-                sleep(2500); // Wait for a mask to disappear
-            shortWait().until(ExpectedConditions.elementToBeClickable(el));
-        }
-    }
-
-    // WebElement#click() doesn't use our scroll/retry logic
+    /**
+     * @deprecated Just use {@link WebElement#click()}
+     * Special click handling now lives in {@link org.labkey.test.selenium.ReclickingWebElement}
+     */
+    @Deprecated
     public void click(WebElement el)
     {
-        try
-        {
-            el.click();
-        }
-        catch (TimeoutException timeout)
-        {
-            throw timeout; // No retry for WebDriver timeout
-        }
-        catch (WebDriverException tryAgain)
-        {
-            log("Retry click: " + tryAgain.getMessage().split("\n")[0]);
-            boolean clickBlocked = tryAgain.getMessage().contains("Other element would receive the click");
-            revealElement(el, clickBlocked);
-            el.click();
-        }
+        el.click();
     }
 
     public void click(Locator l)
@@ -2298,6 +2261,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
             sleep(500);
             el = l.findElement(getDriver());
             clickAndWait(el, pageTimeoutMs);
+            log("WARNING: Need to improve timing, clicked element immediately became stale.: " + el.toString());
         }
     }
 
