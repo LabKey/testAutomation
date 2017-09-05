@@ -70,6 +70,7 @@ public class AuditLogTest extends BaseWebDriverTest
     private static final String AUDIT_SECURITY_GROUP = "Testers";
 
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
+    private static final String AUDIT_DETAILED_TEST_PROJECT = "AuditDetailedLogTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
 
     public static final String COMMENT_COLUMN = "Comment";
@@ -120,6 +121,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             _userHelper.deleteUsers(false, AUDIT_TEST_USER);
             _containerHelper.deleteProject(getProjectName(), false);
+            _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
         }
     }
 
@@ -381,7 +383,7 @@ public class AuditLogTest extends BaseWebDriverTest
     @Test
     public void testDetailedQueryUpdateAuditLog() throws IOException, CommandException
     {
-        _containerHelper.createProject(AUDIT_TEST_PROJECT, "Custom");
+        _containerHelper.createProject(AUDIT_DETAILED_TEST_PROJECT, "Custom");
         _containerHelper.enableModule("simpletest");
         goToProjectHome();
 
@@ -392,7 +394,7 @@ public class AuditLogTest extends BaseWebDriverTest
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("name", "Kia");
         insertCmd.addRow(rowMap);
-        SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+        SaveRowsResponse resp1 = insertCmd.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
         Map<String, String> auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Manufacturers");
         assertEquals("Did not find expected audit log for summary log level", "1 row(s) were inserted.", auditLog.get("Comment"));
@@ -403,10 +405,11 @@ public class AuditLogTest extends BaseWebDriverTest
         rowMap.put("manufacturerId", resp1.getRows().get(0).get("rowid"));
         rowMap.put("name", "Soul");
         insertCmd2.addRow(rowMap);
-        insertCmd2.execute(cn, getProjectName());
+        insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
         auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
         assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
+        _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
     }
 
     private void createList(String containerPath, String listName)
