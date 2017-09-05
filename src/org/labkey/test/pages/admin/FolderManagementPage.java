@@ -4,14 +4,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
-import org.labkey.test.selenium.LazyWebElement;
-import org.labkey.test.util.Ext4Helper;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-
-import java.net.URL;
 
 // TODO: Page classes should contain all functionality for a single page/action
 public class FolderManagementPage extends LabKeyPage<FolderManagementPage.ElementCache>
@@ -60,10 +54,10 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
     //                    && newElementCache().isTabActive(Locators.folderTypeTab),
     //                    "Could not navigate to Folder Type Pane", 4000 );
     //            return this;
-        URL url = getURL();
-        String newUrl = url.getPath() + "?tabId=folderType";
-        beginAt(newUrl);
-        return new FolderManagementPage(getDriver());
+        newElementCache().folderTypeTabLink.click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=folderType")
+                && newElementCache().isTabActive(Locators.folderTypeTab), 4000);
+        return this;
     }
 
     public FolderManagementPage goToMissingValuesPane()
@@ -76,10 +70,10 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public FolderManagementPage goToModulePropertiesPane()
     {
-        URL url = getURL();
-        String newUrl = url.getPath() + "?tabId=props";
-        beginAt(newUrl);
-        return new FolderManagementPage(getDriver());
+        newElementCache().modulePropertiesTabLink.click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=props")
+                && newElementCache().isTabActive(Locators.modulePropertiesTab), 4000);
+        return this;
     }
 
     public void assertModuleEnabled(String moduleName)
@@ -90,19 +84,19 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public FolderManagementPage goToExportPane()
     {
-        URL url = getURL();
-        String newUrl = url.getPath() + "?tabId=export";
-        beginAt(newUrl);
-        return new FolderManagementPage(getDriver());
+        newElementCache().exportTabLink.click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=export")
+                && newElementCache().isTabActive(Locators.exportTab), 4000);
+        return this;
     }
 
     /* activates the 'import' pane */
     public FolderManagementPage goToImportPane()
     {
-        URL url = getURL();
-        String newUrl = url.getPath() + "?tabId=import";
-        beginAt(newUrl);
-        return new FolderManagementPage(getDriver());
+        newElementCache().importTabLink.click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=import")
+                && newElementCache().isTabActive(Locators.importTab), 4000);
+        return this;
     }
 
     public ReorderFoldersPage clickChangeDisplayOrder()
@@ -123,6 +117,8 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         WebElement folderTypeTabLink = Locators.folderTypeTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement missingValuesLink = Locators.missingValuesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement modulePropertiesTabLink = Locators.modulePropertiesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement exportTabLink = Locators.exportTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement importTabLink = Locators.importTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
 
         public boolean isTabActive(Locator loc)
         {
@@ -147,5 +143,11 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
         public static Locator.XPathLocator conceptsTab = Locator.id("tabconcepts");
         public static Locator.XPathLocator conceptsTabLink = conceptsTab.child("a");
+
+        public static Locator.XPathLocator exportTab = Locator.id("tabexport");
+        public static Locator.XPathLocator exportTabLink = exportTab.child("a");
+
+        public static Locator.XPathLocator importTab = Locator.id("tabimport");
+        public static Locator.XPathLocator importTabLink = importTab.child("a");
     }
 }
