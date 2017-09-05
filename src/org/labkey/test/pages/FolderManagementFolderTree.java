@@ -120,7 +120,7 @@ public class FolderManagementFolderTree
         {
             if (!isFolderExpanded(folder))
             {
-                _test.longWait().until(ExpectedConditions.elementToBeClickable(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander")).toBy()));
+                _test.longWait().until(ExpectedConditions.elementToBeClickable(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander"))));
                 _test.sleep(500);
                 _test.click(Locator.tagWithText("span", folder).parent().child(Locator.tagWithClassContaining("img", "x4-tree-expander")));
                 _test.waitForElement(Locator.xpath("//tr[contains(@class,'x4-grid-tree-node-expanded')]/td/div/span[text()='" + folder + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -252,7 +252,7 @@ public class FolderManagementFolderTree
     private List<String> getDisplayedFolderNames()
     {
         List<String> names = new ArrayList<>();
-        List<WebElement> folderEls = _test.getDriver().findElements(Locator.xpath("//div[@class='x4-grid-cell-inner x4-grid-cell-inner-treecolumn']/span").toBy());
+        List<WebElement> folderEls = _test.getDriver().findElements(Locator.xpath("//div[@class='x4-grid-cell-inner x4-grid-cell-inner-treecolumn']/span"));
         for(WebElement el : folderEls)
         {
             names.add(el.getText());

@@ -273,12 +273,12 @@ public class Table extends WebDriverComponent<Table.Elements>
     public int getHeaderRowCount(String columnHeaderClass)
     {
         //return 2 + (_floatingHeaders ? 2 : 0);
-        return getComponentElement().findElements(Locator.xpath("./tr[@class='"+columnHeaderClass+"']").toBy()).size();
+        return getComponentElement().findElements(Locator.xpath("./tr[@class='"+columnHeaderClass+"']")).size();
     }
 
     public int getHeaderRowCount(int headerRowIndex)
     {
-        return getComponentElement().findElements(Locator.xpath("./tr[" + headerRowIndex + "]").toBy()).size();
+        return getComponentElement().findElements(Locator.xpath("./tr[" + headerRowIndex + "]")).size();
     }
 
     public int getHeaderRowCount()
@@ -288,12 +288,12 @@ public class Table extends WebDriverComponent<Table.Elements>
 
     public int getColumnCount(String columnHeaderClass)
     {
-        return getComponentElement().findElements(Locator.xpath("./tbody/tr/td").toBy()).size();
+        return getComponentElement().findElements(Locator.xpath("./tbody/tr/td")).size();
     }
 
     public int getColumnCount(int columnIndex)
     {
-        return getComponentElement().findElements(Locator.xpath("./tbody/tr["+ columnIndex +"]/td").toBy()).size();
+        return getComponentElement().findElements(Locator.xpath("./tbody/tr["+ columnIndex +"]/td")).size();
     }
 
     protected static String[] trimAll(String[] strings)

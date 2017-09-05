@@ -545,12 +545,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            longWait().until(ExpectedConditions.elementToBeClickable(Locators.UX_ADMIN_MENU_TOGGLE.toBy()));
+            longWait().until(ExpectedConditions.elementToBeClickable(Locators.UX_ADMIN_MENU_TOGGLE));
             new SiteNavBar(getDriver()).clickAdminMenuItem(true, false, items);
         }
         else
         {
-            longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
+            longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU));
             _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
         }
     }

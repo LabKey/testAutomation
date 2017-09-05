@@ -43,7 +43,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public abstract class Locator
+public abstract class Locator extends By
 {
     private final String _loc;
     protected final Integer _index;

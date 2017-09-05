@@ -1488,7 +1488,14 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     public List<String> getPipelineStatusValues()
     {
         PipelineStatusTable status = new PipelineStatusTable(this);
-        return status.getColumnDataAsText("Status");
+        try
+        {
+            return status.getColumnDataAsText("Status");
+        }
+        catch (StaleElementReferenceException retry) // Page auto-refreshes
+        {
+            return status.getColumnDataAsText("Status");
+        }
     }
 
     public void setPipelineRoot(String rootPath)
@@ -1912,7 +1919,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             Locator.XPathLocator loc = Locator.schemaTreeNode(schemaPart);
 
             //first load of schemas might a few seconds
-            shortWait().until(ExpectedConditions.elementToBeClickable(loc.toBy()));
+            shortWait().until(ExpectedConditions.elementToBeClickable(loc));
             Locator.XPathLocator selectedSchema = Locator.xpath("//tr").withClass("x4-grid-row-selected").append("/td/div/span").withText(schemaPart);
 
             if (getDriver().getCurrentUrl().endsWith("schemaName=" + schemaPart))

@@ -59,7 +59,7 @@ public class MetadataEditorHelper
     {
         List<WebElement> headerCells = tr.findElements(By.xpath("td"));
 
-        WebElement desiredCell = tr.findElement(Locator.xpath("td").withText(cellText).toBy());
+        WebElement desiredCell = tr.findElement(Locator.xpath("td").withText(cellText));
 
         return headerCells.indexOf(desiredCell);
     }
