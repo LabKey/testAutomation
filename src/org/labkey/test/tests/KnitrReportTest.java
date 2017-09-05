@@ -27,6 +27,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -49,6 +50,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
+
     private static final Path scriptpadReports = Paths.get(TestFileUtils.getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
@@ -90,8 +93,6 @@ public class KnitrReportTest extends BaseWebDriverTest
         _containerHelper.enableModule(getProjectName(), "scriptpad");
 
         PortalHelper portalHelper = new PortalHelper(this);
-
-//        portalHelper.addReportWebPart("script_rmd");
         portalHelper.addWebPart("Data Views");
     }
 
@@ -101,7 +102,6 @@ public class KnitrReportTest extends BaseWebDriverTest
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
                                     Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
                                     Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64,17,0,\"false\",\"English\",\"urn:lsid:labkey.com:Study.Data-2156:5004.249318596.20080517.0000\""),
-//                                    Locator.css("span.functioncall").withText("message"),
                                     Locator.tag("pre").withText("## knitr says hello to HTML!"),
                                     Locator.tag("pre").startsWith("## Error").containing(": non-numeric argument to binary operator"),
                                     Locator.tag("p").startsWith("Well, everything seems to be working. Let's ask R what is the value of \u03C0? Of course it is 3.141")};
@@ -282,7 +282,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToManageViews();
 
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R Report");
+        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"R Report");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
         return reportSource;
