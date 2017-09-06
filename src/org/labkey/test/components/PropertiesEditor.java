@@ -320,6 +320,11 @@ public class PropertiesEditor extends WebPartPanel
             }
         }
 
+        public FieldPropertyDock properties()
+        {
+            return PropertiesEditor.this.elementCache().fieldPropertyDock;
+        }
+
         private FormItem<String> findNameEl()
         {
             WebElement nameEl = this.customFieldName.findElementOrNull(this);
