@@ -377,7 +377,7 @@ public class ListHelper extends LabKeySiteWrapper
             portalHelper.addWebPart("Lists");
         }
 
-        clickAndWait(Locator.linkWithText("manage lists"));
+        waitAndClickAndWait(Locator.linkWithText("manage lists"));
 
         log("Add List");
         clickButton("Create New List");
@@ -431,7 +431,7 @@ public class ListHelper extends LabKeySiteWrapper
             portalHelper.addWebPart("Lists");
         }
 
-        clickAndWait(Locator.linkWithText("manage lists"));
+        waitAndClickAndWait(Locator.linkWithText("manage lists"));
 
         log("Import List Archive");
         clickButton("Import List Archive");
