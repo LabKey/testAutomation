@@ -44,11 +44,11 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +58,8 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.labkey.test.LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT;
-import static org.labkey.test.Locators.*;
+import static org.labkey.test.Locators.pageSignal;
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
 /**
@@ -324,33 +323,15 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     }
 
     @Deprecated
-    public static DataRegionTable waitForDataRegion(WebDriverWrapper test, String regionName, int msTimeout)
-    {
-        return DataRegion(test.getDriver()).withName(regionName).timeout(msTimeout).waitFor();
-    }
-
-    @Deprecated
     public static DataRegionTable findDataRegion(WebDriverWrapper test)
     {
         return DataRegion(test.getDriver()).find();
     }
 
     @Deprecated
-    public static DataRegionTable findDataRegion(WebDriverWrapper test, int index)
-    {
-        return DataRegion(test.getDriver()).index(index).find();
-    }
-
-    @Deprecated
     public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context)
     {
         return DataRegion(test.getDriver()).find(context);
-    }
-
-    @Deprecated
-    public static DataRegionTable findDataRegionWithin(WebDriverWrapper test, SearchContext context, int index)
-    {
-        return DataRegion(test.getDriver()).index(index).find(context);
     }
 
     public static DataRegionTable findDataRegionWithinWebpart(WebDriverWrapper test, String webPartTitle)
@@ -1039,16 +1020,8 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public void setSort(String columnName, SortDirection direction)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            String sortDirection = "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending");
-            BootstrapMenu headerMenu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
-            headerMenu.clickMenuButton(true, false, sortDirection);
-        }
-        else
-        {
-            getWrapper().setSort(getDataRegionName(), columnName, direction);
-        }
+        getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnName + " to " + direction.toString());
+        clickColumnMenu(columnName, true, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
     }
 
     public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
@@ -1109,15 +1082,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public void clearSort(String columnName)
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            BootstrapMenu headerMenu = new BootstrapMenu(getDriver(), elements().getColumnHeader(columnName));
-            headerMenu.clickMenuButton(true, false, "Clear Sort");
-        }
-        else
-        {
-            getWrapper().clearSort(getDataRegionName(), columnName);
-        }
+        clickColumnMenu(columnName, true, "Clear Sort");
     }
 
     public void openFilterDialog(String columnName)
@@ -1306,7 +1271,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public void showSelected()
     {
-        if (!getTableName().contains("'") && !getTableName().contains(">") &&!getTableName().contains("<"))
+        if (!getDataRegionName().contains("'") && !getDataRegionName().contains(">") &&!getDataRegionName().contains("<"))
         {   // use API unless the table name contains illegal chars for script
             new DataRegionApiExpectingRefresh().executeScript("showSelected()");
         }
@@ -1522,7 +1487,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
-                    .clickMenuButton(false, true, subMenuLabels);
+                    .clickSubMenu(false, subMenuLabels);
         }
         else
         {
