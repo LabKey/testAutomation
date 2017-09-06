@@ -407,6 +407,7 @@ public class AuditLogTest extends BaseWebDriverTest
         insertCmd2.addRow(rowMap);
         insertCmd2.execute(cn, AUDIT_DETAILED_TEST_PROJECT);
 
+        refresh();
         auditLog = getAuditLogRow(this, "Query update events", "Query Name", "Models");
         assertEquals("Did not find expected audit log for detailed log level", "A row was inserted.", auditLog.get("Comment"));
         _containerHelper.deleteProject(AUDIT_DETAILED_TEST_PROJECT, false);
