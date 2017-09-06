@@ -94,7 +94,6 @@ public class PropertiesEditor extends WebPartPanel
 
     public FieldRow addField(FieldDefinition col)
     {
-        selectLastField(); // So that new field appears at the bottom
         FieldRow newFieldRow = addField();
         newFieldRow.setName(col.getName());
         if (col.getLabel() != null)
@@ -152,6 +151,7 @@ public class PropertiesEditor extends WebPartPanel
     public FieldRow addField()
     {
         int initialRowCount = elementCache().findFieldRows().size();
+        selectLastField(); // So that new field appears at the bottom
         getWrapper().scrollIntoView(elementCache().addFieldButton);
         WebDriverWrapper.waitFor(() -> {
                     elementCache().addFieldButton.click();
