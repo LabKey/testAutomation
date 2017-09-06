@@ -188,16 +188,13 @@ public class DataRegionTest extends BaseWebDriverTest
     private void testQWPTab(Pair<String, String> titleSignalPair)
     {
         log("Testing " + titleSignalPair.first);
-        if (IS_BOOTSTRAP_LAYOUT && !titleSignalPair.first.equals("Change Page Offset")) // need to fix this one for the new UI
+        click(Locator.linkWithText(titleSignalPair.first));
+        if (pageHasAlert(3000, titleSignalPair.second))
         {
-            click(Locator.linkWithText(titleSignalPair.first));
-            if (pageHasAlert(3000, titleSignalPair.second))
-            {
-                dismissAllAlerts();
-                fail(titleSignalPair.first + " failed");
-            }
-            waitForElement(Locator.css(".labkey-data-region"));
+            dismissAllAlerts();
+            fail(titleSignalPair.first + " failed");
         }
+        waitForElement(Locator.css(".labkey-data-region"));
     }
 
     private void exportLoggingTest()
@@ -218,15 +215,8 @@ public class DataRegionTest extends BaseWebDriverTest
             assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
 
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            list = new DataRegionTable("query", getDriver());
-            list.detailsLink(list.getRowIndex("Project", getProjectName())).click();
-        }
-        else
-        {
-            clickAndWait(Locator.linkContainingText("details"));
-        }
+        list = new DataRegionTable("query", getDriver());
+        list.clickRowDetails(list.getRowIndex("Project", getProjectName()));
         assertTextPresent(LIST_NAME);
     }
 
@@ -254,43 +244,20 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals(TOTAL_ROWS, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, "Name"));
         assertEquals("#FFFF00", table.getDataAsText(15, "Hex"));
-
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            assertElementNotPresent(Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]"));
-            assertElementNotPresent(Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]"));
-        }
-        else
-        {
-            assertElementPresent(Locator.lkButton("Paging"));
-            assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
-        }
+        assertEquals(false, table.getPagingWidget().hasPagingButton(true));
+        assertEquals(false, table.getPagingWidget().hasPagingButton(false));
 
         log("Test 3 per page");
         table.setMaxRows(3);
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            table.getPagingWidget().viewPagingOptions();
-            assertElementPresent(Locator.linkContainingText("3 per page"));
-            assertElementPresent(Locator.linkContainingText("20 per page"));
-            assertElementPresent(Locator.linkContainingText("40 per page"));
-            assertElementPresent(Locator.linkContainingText("100 per page"));
-            assertElementPresent(Locator.linkContainingText("250 per page"));
-        }
-        else
-        {
-            WebElement menuItem = _ext4Helper.openMenu(Locator.lkButton("Paging"), "3 per page");
-            assertNotNull("'Paging' menu selection doesn't match URL parameter", Locator.xpath("preceding-sibling::div").withClass("fa-check-square-o").findElementOrNull(menuItem));
-            assertElementPresent(Locator.linkWithText("3 per page"));
-            assertElementPresent(Locator.linkWithText("40 per page"));
-            assertElementPresent(Locator.linkWithText("100 per page"));
-            assertElementPresent(Locator.linkWithText("250 per page"));
-            assertElementPresent(Locator.linkWithText("1000 per page"));
-            assertElementPresent(Locator.linkWithText("Show Selected"));
-            assertElementPresent(Locator.linkWithText("Show Unselected"));
-            assertElementPresent(Locator.linkWithText("Show All"));
-        }
+        assertEquals(true, table.getPagingWidget().hasPagingButton(true));
+        assertEquals(true, table.getPagingWidget().hasPagingButton(false));
+        table.getPagingWidget().viewPagingOptions();
+        assertElementPresent(Locator.linkWithText("3 per page").notHidden().append(Locator.tagWithClass("i", "fa-check-square-o")));
+        assertElementPresent(Locator.linkWithText("20 per page").notHidden());
+        assertElementPresent(Locator.linkWithText("40 per page").notHidden());
+        assertElementPresent(Locator.linkWithText("100 per page").notHidden());
+        assertElementPresent(Locator.linkWithText("250 per page").notHidden());
+        assertElementNotPresent(Locator.linkWithText("1000 per page"));
         table.assertPaginationText(1, 3, 16);
         assertEquals(3, table.getDataRowCount());
 
@@ -299,87 +266,40 @@ public class DataRegionTest extends BaseWebDriverTest
         table.assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, "Name"));
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), false);
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), false);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
-        }
-        else
-        {
-            assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementPresent(Locator.linkWithTitle(LAST_LINK));
-        }
+        assertEquals(false, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertEquals(false, table.getPagingWidget().pagingButtonEnabled(true));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Next Page");
         table.pageNext();
         table.assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, "Name"));
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
-        }
-        else
-        {
-            assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementPresent(Locator.linkWithTitle(LAST_LINK));
-        }
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
 
+        log("Last Page");
+        table.pageLast();
+        table.assertPaginationText(16, 16, 16);
+        assertEquals(1, table.getDataRowCount());
+        assertEquals("yellow", table.getDataAsText(0, "Name"));
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertEquals(false, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
+        assertEquals(false, table.getPagingWidget().pagingButtonEnabled(false));
 
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            log("Last Page");
-            table.pageLast();
-            table.assertPaginationText(16, 16, 16);
-            assertEquals(1, table.getDataRowCount());
-            assertEquals("yellow", table.getDataAsText(0, "Name"));
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), false);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), false);
-
-            log("Previous Page");
-            table.pagePrev();
-            table.assertPaginationText(11, 15, 16);
-            assertEquals(5, table.getDataRowCount());
-            assertEquals("purple", table.getDataAsText(0, "Name"));
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show first", "Show first"), true);
-            assertEquals(table.getPagingWidget().menuOptionEnabled("Show last", "Show last"), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(true), true);
-            assertEquals(table.getPagingWidget().pagingButtonEnabled(false), true);
-        }
-        else
-        {
-            log("Last Page");
-            table.pageLast();
-            table.assertPaginationText(16, 16, 16);
-            assertEquals(1, table.getDataRowCount());
-            assertEquals("yellow", table.getDataAsText(0, "Name"));
-            assertElementPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-
-            log("Previous Page");
-            table.pagePrev();
-            table.assertPaginationText(11, 15, 16);
-            assertEquals(5, table.getDataRowCount());
-            assertEquals("purple", table.getDataAsText(0, 3));
-            assertElementPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-        }
-
+        log("Previous Page");
+        table.pagePrev();
+        table.assertPaginationText(11, 15, 16);
+        assertEquals(5, table.getDataRowCount());
+        assertEquals("purple", table.getDataAsText(0, "Name"));
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show first", "Show first"));
+        assertEquals(true, table.getPagingWidget().menuOptionEnabled("Show last", "Show last"));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(true));
+        assertEquals(true, table.getPagingWidget().pagingButtonEnabled(false));
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
@@ -388,61 +308,22 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show Selected");
         table.checkAllOnPage();
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            waitForElement(Locator.tagWithAttribute("div", "data-msgpart", "selection"));
-            WebElement msgDiv = Locator.tagWithAttribute("div", "data-msgpart", "selection").findElement(getDriver());
-            assertEquals(msgDiv.getText().contains("Selected 5 of 15 rows."), true);
+        Locator.XPathLocator selectionPart = Locator.tagWithAttribute("div", "data-msgpart", "selection");
+        waitForElement(selectionPart);
+        WebElement msgDiv = selectionPart.findElement(getDriver());
+        assertEquals(true, msgDiv.getText().contains("Selected 5 of 15 rows."));
 
-            table.showSelected();
-            assertEquals(5, table.getDataRowCount());
-            assertElementPresent(Locator.xpath("//div[contains(@class,'labkey-pagination')]"));
+        assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "select-all")));
+        assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "select-none")));
+        assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "show-all")));
+        assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "show-selected")));
+        assertElementPresent(selectionPart.append(Locator.tagWithClass("span", "show-unselected")));
 
-            table.showAll();
-            assertEquals(15, table.getDataRowCount());
-            assertElementPresent(Locator.xpath("//div[contains(@class,'labkey-pagination')]"));
+        clickAndWait(selectionPart.append(Locator.tagWithClass("span", "show-selected")));
+        assertEquals(5, table.getDataRowCount());
 
-        }
-        else
-        {
-            waitForElements(Locator.css(".labkey-dataregion-msg"), 3);
-            boolean found = false;
-            for (WebElement msg : Locator.css(".labkey-dataregion-msg").findElements(getDriver()))
-            {
-                if (msg.getText().contains("Selected 5 of 15 rows."))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-                fail("Didn't find 'Selected 5 of 15 rows.' message");
-            clickButton("Paging", 0);
-            clickAndWait(Locator.linkWithText("Show Selected"));
-            assertEquals(5, table.getDataRowCount());
-            assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-
-
-            log("Show All");
-            clickButton("Paging", 0);
-            clickAndWait(Locator.linkWithText("Show All"));
-            assertEquals(15, table.getDataRowCount());
-            assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-
-            log("Test 1000 per page");
-            clickButton("Paging", 0);
-            clickAndWait(Locator.linkWithText("1000 per page"));
-            assertElementNotPresent(Locator.linkWithTitle(FIRST_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
-            assertElementNotPresent(Locator.linkWithTitle(LAST_LINK));
-        }
+        table.showAll();
+        assertEquals(15, table.getDataRowCount());
     }
 
     private void enableComplianceIfInstalled()

@@ -83,7 +83,7 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
 
     public List<WebElement> viewPagingOptions()
     {
-        elementCache().paginationMenu.openMenuTo( "Paging");
+        elementCache().paginationMenu.openMenuTo( "Paging", "100 per page");
         return elementCache().paginationMenu.findVisibleMenuItems();
     }
 
@@ -100,6 +100,14 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
                 .getAttribute("class").contains("disabled");
         collapseMenu();
         return result;
+    }
+
+    public boolean hasPagingButton(boolean isPrevious)
+    {
+        if (isPrevious)
+            return getWrapper().isElementPresent(elementCache().previousPageLoc);
+        else
+            return getWrapper().isElementPresent(elementCache().nextPageLoc);
     }
 
     public boolean pagingButtonEnabled(boolean isPrevious)
@@ -123,10 +131,11 @@ public class PagingWidget extends WebDriverComponent<PagingWidget.ElementCache>
 
     protected class ElementCache extends WebDriverComponent.ElementCache
     {
+        Locator.XPathLocator nextPageLoc = Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]");
+        Locator.XPathLocator previousPageLoc = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]");
+
         BootstrapMenu paginationMenu = new BootstrapMenu(getDriver(), getComponentElement());
-        WebElement nextPageButton = Locator.xpath("//button[ ./i[@class='fa fa-chevron-right']]")
-                .findWhenNeeded(getComponentElement());
-        WebElement previousPageButton = Locator.xpath("//button[ ./i[@class='fa fa-chevron-left']]")
-                .findWhenNeeded(getComponentElement());
+        WebElement nextPageButton = nextPageLoc.findWhenNeeded(getComponentElement());
+        WebElement previousPageButton = previousPageLoc.findWhenNeeded(getComponentElement());
     }
 }
