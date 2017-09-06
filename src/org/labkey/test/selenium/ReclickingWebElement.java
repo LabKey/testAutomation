@@ -1,16 +1,14 @@
 package org.labkey.test.selenium;
 
-import org.labkey.test.Locators;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.util.TestLogger;
-import org.openqa.selenium.JavascriptExecutor;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.internal.WrapsElement;
-import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -55,42 +53,18 @@ public class ReclickingWebElement extends WebElementDecorator
     private void revealElement(WebElement el, boolean clickBlocked)
     {
         boolean revealed = false;
+        WebDriverUtils.ScrollUtil scrollUtil = new WebDriverUtils.ScrollUtil(getDriver());
         if (clickBlocked)
         {
-            WebElement floatingHeader = Locators.floatingHeaderContainer().findElementOrNull(getDriver());
-            if (floatingHeader != null)
-            {
-                int headerHeight = floatingHeader.getSize().getHeight();
-                if (headerHeight > ((RemoteWebElement) el).getCoordinates().inViewPort().getY())
-                {
-                    int elHeight = el.getSize().getHeight();
-                    scrollBy(0, -(headerHeight + elHeight));
-                    revealed = true;
-                }
-            }
+            revealed = scrollUtil.scrollUnderFloatingHeader(el);
         }
         if (!revealed)
         {
-            scrollIntoView(el);
+            scrollUtil.scrollIntoView(el);
             if (clickBlocked)
                 WebDriverWrapper.sleep(2500); // Wait for a mask to disappear
             new WebDriverWait(getDriver(), 10).until(ExpectedConditions.elementToBeClickable(el));
         }
-    }
-
-    private Object executeScript(String script, Object... arguments)
-    {
-        return ((JavascriptExecutor) getDriver()).executeScript(script, arguments);
-    }
-
-    private void scrollIntoView(WebElement el)
-    {
-        executeScript("arguments[0].scrollIntoView();", el);
-    }
-
-    private void scrollBy(Integer x, Integer y)
-    {
-        executeScript("window.scrollBy(" + x.toString() +", " + y.toString() + ");");
     }
 
     private final List<WebDriver> _webDriver = new ArrayList<>();
