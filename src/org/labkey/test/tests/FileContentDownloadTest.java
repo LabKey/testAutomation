@@ -184,10 +184,10 @@ public class FileContentDownloadTest extends BaseWebDriverTest
 
         signOut();
         // Test that renderAs can be observed through a login
-        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/" + EscapeUtil.encode(folderName) + "/%40files/" + textFile.getName() + "?renderAs=INLINE");
+        log("Test renderAs through login and ensure that page is rendered inside of server UI");
+        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/%40files/" + EscapeUtil.encode(folderName) + "/" + textFile.getName() + "?renderAs=INLINE");
         assertTitleContains("Sign In");
 
-        log("Test renderAs through login and ensure that page is rendered inside of server UI");
         // If this succeeds, then page has been rendered in frame
         simpleSignIn();
 
