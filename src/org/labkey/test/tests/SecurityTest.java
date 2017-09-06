@@ -150,7 +150,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         /* Management actions shouldn't be reachable by non-admins */
         "/admin-missingValues.view", "/admin-manageFolders.view", "/admin-moduleProperties.view", "/admin-concepts.view",
-        "/admin-search.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
+        "/search-searchSettings.view", "/admin-notifications.view", "/admin-exportFolder.view", "/admin-importFolder.view",
         "/admin-fileRoots.view", "/admin-folderInformation.view"
     };
 
