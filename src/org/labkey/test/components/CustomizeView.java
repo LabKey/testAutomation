@@ -34,10 +34,11 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.selenium.WebDriverUtils;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -49,15 +50,15 @@ import java.util.List;
 import static org.labkey.test.components.ext4.Checkbox.Ext4Checkbox;
 import static org.labkey.test.components.ext4.RadioButton.RadioButton;
 import static org.labkey.test.components.ext4.Window.Window;
+import static org.labkey.test.util.DataRegionTable.DataRegion;
 
-public class CustomizeView extends Component
+public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 {
     protected static final Locator.CssLocator CUSTOMIZE_VIEW_LOCATOR = Locator.css(".labkey-customize-grid-panel");
 
     protected final WebDriverWrapper _driver;
     protected final DataRegionTable _dataRegion;
     private WebElement panelEl;
-    private Elements _elements;
 
     public CustomizeView(WebDriverWrapper driver)
     {
@@ -72,18 +73,28 @@ public class CustomizeView extends Component
         panelEl = new RefindingWebElement(CUSTOMIZE_VIEW_LOCATOR, _dataRegion.getComponentElement());
     }
 
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _driver.getDriver();
+    }
+
+    @Override
+    protected WebDriverWrapper getWrapper()
+    {
+        return _driver;
+    }
+
     public DataRegionTable getDataRegion()
     {
         if (_dataRegion != null)
             return _dataRegion;
-        return DataRegionTable.findDataRegion(_driver); // Not tied to a specific DataRegion
+        return DataRegion(_driver.getDriver()).find(); // Not tied to a specific DataRegion
     }
 
     private Elements elements()
     {
-        if (_elements == null)
-            _elements = new Elements();
-        return _elements;
+        return elementCache();
     }
 
     public void openCustomizeViewPanel()
@@ -131,7 +142,7 @@ public class CustomizeView extends Component
         if (waitMillis > 0)
             _driver.clickAndWait(elements().viewGridButton, waitMillis);
         else
-            _driver.doAndWaitForPageSignal(() -> clickViewGrid(), DataRegionTable.PANEL_HIDE_SIGNAL);
+            _driver.doAndWaitForPageSignal(this::clickViewGrid, DataRegionTable.PANEL_HIDE_SIGNAL);
     }
 
     public void clickViewGrid()
@@ -262,7 +273,7 @@ public class CustomizeView extends Component
     public void deleteView()
     {
         elements().deleteButton.click();
-        Window confirm = new Window(Ext4Helper.Locators.windowWithTitleContaining("Delete").findElement(_driver.getDriver()), _driver.getDriver());
+        Window confirm = Window(getDriver()).withTitleContaining("Delete").find();
         confirm.clickButton("Yes");
     }
 
@@ -465,7 +476,7 @@ public class CustomizeView extends Component
 
         // XXX: why doesn't 'clauseIndex' work?
         Locator.XPathLocator clauseXPath = itemXPath.append("//tr[@clauseindex]");
-        int clauseIndex = _driver.getElementCount(clauseXPath) -1;
+        int clauseIndex = clauseXPath.findElements(getDriver()).size() -1;
 
         Locator.XPathLocator newClauseXPath = itemXPath.append("//tr[@clauseindex='" + clauseIndex + "']");
         _driver.assertElementPresent(newClauseXPath);
@@ -526,9 +537,10 @@ public class CustomizeView extends Component
                 {
                     builder.moveToElement(el).click().build().perform();
                 }
-                catch (StaleElementReferenceException ignore)
+                catch (StaleElementReferenceException ignore) {}
+                catch (WebDriverException ignore)
                 {
-                    continue;
+                    new WebDriverUtils.ScrollUtil(getDriver()).scrollUnderFloatingHeader(el);
                 }
             }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(el));
@@ -704,10 +716,7 @@ public class CustomizeView extends Component
                 {
                     closeButton.click();
                 }
-                catch (StaleElementReferenceException ignore)
-                {
-                    continue;
-                }
+                catch (StaleElementReferenceException ignore) {}
             }
             _driver.shortWait().until(ExpectedConditions.stalenessOf(closeButton));
         }
@@ -747,7 +756,7 @@ public class CustomizeView extends Component
 
         moveItem(itemIndex, moveUp, type);
 
-        _driver.waitFor(() -> itemIndex != _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this)),
+        WebDriverWrapper.waitFor(() -> itemIndex != _driver.getElementIndex(itemXPath(type, fieldKey).findElement(this)),
                 "Item was not reordered.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -852,14 +861,14 @@ public class CustomizeView extends Component
         return Locator.css("img.x4-tree-expander").findElements(fieldRow).size() > 0;
     }
 
-    private class Elements extends ComponentElements
+    @Override
+    protected Elements newElementCache()
     {
-        @Override
-        protected SearchContext getContext()
-        {
-            return getComponentElement();
-        }
+        return new Elements();
+    }
 
+    protected class Elements extends Component.ElementCache
+    {
         protected final WebElement deleteButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Delete"), this);
         protected final WebElement revertButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("Revert"), this);
         protected final WebElement viewGridButton = new RefindingWebElement(Ext4Helper.Locators.ext4Button("View Grid"), this);
@@ -907,7 +916,7 @@ public class CustomizeView extends Component
             WebElement gear = Locator.css("div.labkey-tool-gear").findElement(getComponentElement());
             _driver.scrollIntoView(gear);
             gear.click();
-            return Window().withTitleContaining("Edit title for").find(_driver.getDriver());
+            return Window(getDriver()).withTitleContaining("Edit title for").find();
         }
     }
 
