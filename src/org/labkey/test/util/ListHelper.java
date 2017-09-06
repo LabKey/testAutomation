@@ -287,12 +287,12 @@ public class ListHelper extends LabKeySiteWrapper
 
     public void addField(ListColumn col)
     {
-        PropertiesEditor.FieldRow newField = getListFieldEditor().addField();
+        PropertiesEditor listFieldEditor = getListFieldEditor();
+        PropertiesEditor.FieldRow newField = listFieldEditor.addField();
         newField.setName(col.getName());
         newField.setLabel(col.getLabel());
         newField.setType(col.getLookup(), col.getType());
 
-        PropertiesEditor listFieldEditor = getListFieldEditor();
         listFieldEditor.fieldProperties().selectDisplayTab();
         if (col.getDescription() != null)
         {
