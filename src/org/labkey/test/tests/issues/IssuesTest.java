@@ -34,6 +34,7 @@ import org.labkey.test.components.dumbster.EmailRecordTable;
 import org.labkey.test.components.dumbster.EmailRecordTable.EmailMessage;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.issues.AdminPage;
 import org.labkey.test.pages.issues.ClosePage;
 import org.labkey.test.pages.issues.DetailsPage;
 import org.labkey.test.pages.issues.EmailPrefsPage;
@@ -73,9 +74,9 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
     private static final String user = "reader@issues.test";
-    private final String NAME = _userHelper.getDisplayNameForEmail(getUsername());
-    private final Map<String, String> ISSUE_0 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light");
-    private final Map<String, String> ISSUE_1 = Maps.of("assignedTo", NAME, "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy");
+    private String NAME;
+    private final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
+    private final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
     private static final String ISSUE_LIST_REGION_NAME = "issues-issues";
 
@@ -127,6 +128,9 @@ public class IssuesTest extends BaseWebDriverTest
 
     public void doInit()
     {
+        NAME = getDisplayName();
+        ISSUE_0.put("assignedTo", NAME);
+        ISSUE_1.put("assignedTo", NAME);
         _containerHelper.createProject(getProjectName(), null);
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
         _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
@@ -223,11 +227,11 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        _issuesHelper.goToAdmin();
+        AdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
-            _listHelper.addField(col);
+            adminPage.configureFields().addField(col);
         }
         clickButton("Save");
 
@@ -340,17 +344,11 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void setRequiredFields(int[] positions, boolean selected)
+    private void setRequiredFields(AdminPage adminPage, int[] positions, boolean selected)
     {
         for (int pos : positions)
         {
-            click(Locator.tag("div").withAttribute("id", "label" + pos));
-            click(Locator.tag("span").withClass("x-tab-strip-text").withText("Validators"));
-
-            if (selected)
-                checkCheckbox(Locator.checkboxByName("required"));
-            else
-                uncheckCheckbox(Locator.checkboxByName("required"));
+            adminPage.configureFields().selectField(pos).properties().selectValidatorsTab().required.set(selected);
         }
     }
 
@@ -502,14 +500,14 @@ public class IssuesTest extends BaseWebDriverTest
 
         clickFolder(subFolder);
         waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        _issuesHelper.goToAdmin();
+        AdminPage adminPage = _issuesHelper.goToAdmin();
 
         for (ListHelper.ListColumn col : fields)
         {
-            _listHelper.addField(col);
+            adminPage.configureFields().addField(col);
         }
-        setRequiredFields(requiredFieldPos, true);
-        clickButton("Save");
+        setRequiredFields(adminPage, requiredFieldPos, true);
+        adminPage.save();
         clickButton("New Issue");
         clickButton("Save");
 
@@ -523,11 +521,11 @@ public class IssuesTest extends BaseWebDriverTest
         Assert.assertEquals("Wrong errors", expectedErrors, errors);
         clickButton("Cancel");
 
-        _issuesHelper.goToAdmin();
+        adminPage = _issuesHelper.goToAdmin();
         // clear all required selections except title
-        setRequiredFields(requiredFieldPos, false);
-        setRequiredFields(new int[]{0}, true);
-        clickButton("Save");
+        setRequiredFields(adminPage, requiredFieldPos, false);
+        setRequiredFields(adminPage, new int[]{0}, true);
+        adminPage.save();
 
         clickButton("New Issue");
         clickButton("Save");
