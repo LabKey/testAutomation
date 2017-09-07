@@ -1009,67 +1009,6 @@ public class ListTest extends BaseWebDriverTest
     }
 
     @Test
-    public void exportProtectedFileColumn() throws Exception
-    {
-        goToProjectHome(PROJECT_VERIFY);
-        String listName= "protectedFileColumnList";
-        String protectedColumn = "protected";
-        String unprotectedColumn = "unprotected";
-        log("Issue 28035: Protected file attachment columns shouldn't export their files when redaction is requested");
-        clickAndWait(Locator.linkContainingText("manage lists").waitForElement(getDriver(), 2000));
-        _listHelper.createList(PROJECT_VERIFY, listName, ListColumnType.AutoInteger, "key",
-                new ListColumn("FileName", "FileName", ListColumnType.String, "name of the file"),
-                new ListColumn("FileExtension", "ext", ListColumnType.String, "the file extension"),
-                new ListColumn(unprotectedColumn, "PubFile", ListColumnType.Attachment, "the file itself"));
-        _listHelper.clickEditDesign();
-        _listHelper.addField(new ListColumn(protectedColumn, "File", ListColumnType.Attachment, "the file itself"));
-
-        // set 'protected'
-        _listHelper.selectPropertyTab("Advanced");
-        checkCheckbox(Locator.checkboxByName("protected"));
-        _listHelper.clickSave();
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
-
-        // add rows to list
-        Map<String, String> xlsRow = new HashMap<>();
-        xlsRow.put(unprotectedColumn, EXCEL_APILIST_FILE.getAbsolutePath());
-        xlsRow.put("FileName", EXCEL_DATA_FILE.getName());
-        xlsRow.put("FileExtension", ".xls");
-        xlsRow.put(protectedColumn, EXCEL_DATA_FILE.getAbsolutePath());
-        _listHelper.insertNewRow(xlsRow, false);
-
-        Map<String, String> tsvRow = new HashMap<>();
-        tsvRow.put(unprotectedColumn, TSV_SAMPLE_FILE.getAbsolutePath());
-        tsvRow.put("FileName", TSV_DATA_FILE.getName());
-        tsvRow.put("FileExtension", ".tsv");
-        tsvRow.put(protectedColumn, TSV_DATA_FILE.getAbsolutePath());
-        _listHelper.insertNewRow(tsvRow, false);
-
-        // go to admin/folder/management, click 'export'
-        clickAdminMenuItem("Folder", "Management");
-        click(Locator.linkContainingText("Export"));
-        // select 'remove all columns tagged as protected'
-        checkCheckbox(Locator.checkboxByName("removeProtected").waitForElement(getDriver(), 2000));
-
-        // click 'export', capture the zip archive download
-        File projectZipArchive = clickAndWaitForDownload(Locator.buttonContainingText("Export").waitForElement(getDriver(), 2000));
-
-        assertFalse("Protected column attachment should not be included in export",
-                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_DATA_FILE.getName()));
-        assertFalse("Protected column attachment should not be included in export",
-                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_DATA_FILE.getName()));
-        assertTrue("Unprotected column attachment should be included in export",
-                TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
-        assertTrue("Unprotected column attachment should be included in export",
-                TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
-
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(listName));
-        _listHelper.deleteList();
-    }
-
-    @Test
     public void exportPhiFileColumn() throws Exception
     {
         goToProjectHome(PROJECT_VERIFY);
@@ -1133,7 +1072,7 @@ public class ListTest extends BaseWebDriverTest
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_DATA_FILE.getName()));
         assertTrue("Not PHI column attachment should be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, EXCEL_APILIST_FILE.getName()));
-        assertFalse("PHI column attachment should be included in export",
+        assertFalse("PHI column attachment should not be included in export",
                 TestFileUtils.isFileInZipArchive(projectZipArchive, TSV_SAMPLE_FILE.getName()));
 
         goToProjectHome();

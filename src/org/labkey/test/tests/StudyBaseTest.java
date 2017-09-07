@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+import org.labkey.api.data.PHI;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
@@ -239,15 +240,15 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
 
     protected void exportStudy(boolean zipFile)
     {
-        exportStudy(zipFile, true);
+        exportStudy(zipFile, true, null);
     }
 
-    protected void exportStudy(boolean zipFile, boolean exportProtected)
+    protected void exportStudy(boolean zipFile, boolean exportPhi, PHI exportPhiLevel)
     {
-        exportStudy(zipFile, exportProtected, false, false, false, Collections.emptySet());
+        exportStudy(zipFile, exportPhi, exportPhiLevel, false, false, false, Collections.emptySet());
     }
 
-    @LogMethod protected void exportStudy(boolean zipFile, boolean exportProtected,
+    @LogMethod protected void exportStudy(boolean zipFile, boolean exportPhi, PHI exportPhiLevel,
                                           boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
                                           @Nullable Set<String> uncheckObjects)
     {
@@ -263,8 +264,11 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
                 uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
         }
         checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
-        if(!exportProtected)
-            checkCheckbox(Locator.name("removeProtected"));
+        if(!exportPhi)
+        {
+            checkCheckbox(Locator.name("removePhi"));
+            setFormElementJS(Locator.input("exportPhiLevel"), exportPhiLevel.name());
+        }
         if(useAlternateIDs)
             checkCheckbox(Locator.name("alternateIds"));
         if(useAlternateDates)

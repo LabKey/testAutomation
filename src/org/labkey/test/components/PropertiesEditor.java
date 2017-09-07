@@ -535,7 +535,6 @@ public class PropertiesEditor extends WebPartPanel
                 return new SetDefaultValuesListPage(getDriver());
             }
             public final Input importAliasesInput = Input(Locator.id("importAliases"), getDriver()).findWhenNeeded(this);
-            public final Checkbox protectedCheckbox = Checkbox(Locator.tagWithName("input", "protected")).findWhenNeeded(this);
             public final EnumSelect<PhiSelectType> phi = EnumSelect(Locator.tagWithName("select", "phiLevel"), PhiSelectType.class).findWhenNeeded(this);
             public final Checkbox excludeFromShiftingCheckbox = Checkbox(Locator.tagWithName("input", "excludeFromShifting")).findWhenNeeded(this);
             public final Checkbox maxTextCheckbox = Checkbox(Locator.tagWithName("input", "isMaxText")).findWhenNeeded(this);
