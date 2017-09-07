@@ -2,6 +2,7 @@ package org.labkey.test.components.html;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
+import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -67,7 +68,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         return new ElementCache();
     }
 
-    protected class ElementCache extends WebDriverComponent.ElementCache
+    protected class ElementCache extends Component.ElementCache
     {
         WebElement header = Locators.header.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement title = Locators.title.findWhenNeeded(header).withTimeout(WAIT_FOR_JAVASCRIPT);
