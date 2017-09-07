@@ -34,6 +34,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ApiPermissionsHelper;
 import org.labkey.test.util.Ext4Helper;
@@ -471,6 +472,7 @@ public class FolderExportTest extends BaseWebDriverTest
                 "subfolders/Subfolder1/subfolders/_hidden/folder.xml",
                 "subfolders/Subfolder2/folder.xml"};
 
+        WebDriverWrapper.waitFor(exportDir::exists, "Folder export not present: " + exportDir.getAbsolutePath(), WAIT_FOR_PAGE);
         List<String> missingFiles = new ArrayList<>();
         for (String expectedItem : expectedExportItems)
         {
