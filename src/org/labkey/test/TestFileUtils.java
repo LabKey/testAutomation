@@ -43,6 +43,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -163,18 +165,18 @@ public abstract class TestFileUtils
     @NotNull
     public static File getSampleData(String relativePath)
     {
-        String path;
+        Set<String> sampledataDirs = new TreeSet<>();
+        sampledataDirs.add(DEFAULT_SAMPLEDATA_DIR.toString());
+
         File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
-
         if (sampledataDirsFile.exists())
-            path = getFileContents(sampledataDirsFile);
-        else
-            path = DEFAULT_SAMPLEDATA_DIR.toString();
-
-        List<String> splitPath = Arrays.asList(path.split(";"));
+        {
+            String path = getFileContents(sampledataDirsFile);
+            sampledataDirs.addAll(Arrays.asList(path.split(";")));
+        }
 
         File foundFile = null;
-        for (String sampledataDir : splitPath)
+        for (String sampledataDir : sampledataDirs)
         {
             File checkFile = new File(sampledataDir, relativePath);
             if (checkFile.exists())
@@ -190,8 +192,8 @@ public abstract class TestFileUtils
         }
 
         assertNotNull("Sample data not found: " + relativePath + "\n" +
-                "In: " + path + "\n" +
-                "You may need to build or run your test from the command line once to find its sample data", foundFile);
+                "Run `gradlew :server:test:writeSampleDataFile` once to locate all sampledata" + "\n" +
+                "Currently known sample data locations: " + String.join("\n", sampledataDirs), foundFile);
         return foundFile;
     }
 
