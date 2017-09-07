@@ -286,19 +286,8 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
-        SimpleComponentFinder<RadioButton> finder = RadioButton().
-                locatedBy(Locator.tagContainingText("label", actionName).precedingSibling("input[@type='button' and not(@disabled)]"));
-        RadioButton radio;
-        Timer timer = new Timer(Duration.ofMillis(WAIT_FOR_JAVASCRIPT));
-        while (!(radio = finder.find(importWindow)).isEnabled() && !timer.isTimedOut())
-        { // Retry until action is present
-            importWindow.clickButton("Cancel", true);
-            _ext4Helper.waitForMaskToDisappear();
-            clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-            importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
-        }
-        radio.check();
-        clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
+        RadioButton().withLabelContaining(actionName).find(importWindow).check();
+        importWindow.clickButton("Import");
     }
 
     /** If the upload panel isn't visible, click the "Upload Files" button in the toolbar. */
