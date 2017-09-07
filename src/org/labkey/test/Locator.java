@@ -1253,6 +1253,21 @@ public abstract class Locator extends By
             return this.endsWith("@" + attribute, substring);
         }
 
+        public XPathLocator withLabel(String labelText)
+        {
+            return withAttributeMatchingOtherElementAttribute("id", Locator.tagWithText("label", labelText), "for");
+        }
+
+        public XPathLocator withLabelContaining(String labelText)
+        {
+            return withAttributeMatchingOtherElementAttribute("id", Locator.tagContainingText("label", labelText), "for");
+        }
+
+        public XPathLocator withAttributeMatchingOtherElementAttribute(String attribute, XPathLocator otherElement, String otherAttribute)
+        {
+            return this.withPredicate(String.format("@%s = %s/@%s", attribute, otherElement.toXpath(), otherAttribute));
+        }
+
         public XPathLocator endsWith(String substring)
         {
             return this.endsWith("normalize-space()", substring);
