@@ -4,7 +4,7 @@ import org.labkey.test.Locators;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.internal.Locatable;
 
 public abstract class WebDriverUtils
 {
@@ -27,7 +27,7 @@ public abstract class WebDriverUtils
             if (floatingElement != null)
             {
                 int headerHeight = floatingElement.getSize().getHeight();
-                if (headerHeight > ((RemoteWebElement) blockedElement).getCoordinates().inViewPort().getY())
+                if (headerHeight > ((Locatable) blockedElement).getCoordinates().inViewPort().getY())
                 {
                     int elHeight = blockedElement.getSize().getHeight();
                     scrollBy(0, -(headerHeight + elHeight));
