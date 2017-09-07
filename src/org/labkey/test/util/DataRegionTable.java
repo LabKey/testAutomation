@@ -1528,8 +1528,17 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public List<String> getHeaderMenuOptions(String buttonText)
     {
-        List<WebElement> menuItems = getWrapper()._ext4Helper.getMenuItems(elements().getHeaderButton(buttonText));
-        return getWrapper().getTexts(menuItems);
+        if (IS_BOOTSTRAP_LAYOUT)
+        {
+            BootstrapMenu menu = BootstrapMenu.find(getDriver(), elements().buttonBar, buttonText);
+            menu.expand();
+            return getWrapper().getTexts(menu.findVisibleMenuItems());
+        }
+        else
+        {
+            List<WebElement> menuItems = getWrapper()._ext4Helper.getMenuItems(elements().getHeaderButton(buttonText));
+            return getWrapper().getTexts(menuItems);
+        }
     }
 
     public boolean columnHasChartOption(String columnName, String chartType)

@@ -23,6 +23,7 @@ import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -50,9 +51,18 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
 
     static public BootstrapMenu find(WebDriver driver, String menuToggleText)
     {
-        WebElement container = Locators.bootstrapMenuContainer()
-                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(driver);
-        return new BootstrapMenu(driver, container);
+        return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find();
+//        WebElement container = Locators.bootstrapMenuContainer()
+//                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(driver);
+//        return new BootstrapMenu(driver, container);
+    }
+
+    static public BootstrapMenu find(WebDriver driver, SearchContext searchContext, String menuToggleText)
+    {
+        return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find(searchContext);
+//        WebElement container = Locators.bootstrapMenuContainer()
+//                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(searchContext);
+//        return new BootstrapMenu(driver, container);
     }
 
     /* Sometimes the menu doesn't expand on the first try.
@@ -244,6 +254,40 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             return Locator.tag("*")
                     .withPredicate(toggleAnchor()
                     .followingSibling("ul"));
+        }
+    }
+
+    public static class BootstrapMenuFinder extends WebDriverComponentFinder<BootstrapMenu, BootstrapMenu.BootstrapMenuFinder>
+    {
+        private Locator _locator = Locators.bootstrapMenuContainer();
+
+        public BootstrapMenuFinder(WebDriver driver)
+        {
+            super(driver);
+        }
+
+        public BootstrapMenuFinder withButtonText(String text)
+        {
+            _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor().withText(text));
+            return this;
+        }
+
+        public BootstrapMenuFinder withButtonTextContaining(String text)
+        {
+            _locator = Locators.bootstrapMenuContainer().withChild(Locators.toggleAnchor().containing(text));
+            return this;
+        }
+
+        @Override
+        protected BootstrapMenu construct(WebElement el, WebDriver driver)
+        {
+            return new BootstrapMenu(driver, el);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
         }
     }
 }
