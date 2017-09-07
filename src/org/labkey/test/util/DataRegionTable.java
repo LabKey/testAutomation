@@ -1487,7 +1487,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         if (IS_BOOTSTRAP_LAYOUT)
         {
             new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
-                    .clickSubMenu(false, subMenuLabels);
+                    .openMenuTo(subMenuLabels);
         }
         else
         {
