@@ -166,13 +166,16 @@ public abstract class TestFileUtils
     public static File getSampleData(String relativePath)
     {
         Set<String> sampledataDirs = new TreeSet<>();
-        sampledataDirs.add(DEFAULT_SAMPLEDATA_DIR.toString());
 
         File sampledataDirsFile = new File(getTestBuildDir(), "sampledata.dirs");
         if (sampledataDirsFile.exists())
         {
             String path = getFileContents(sampledataDirsFile);
             sampledataDirs.addAll(Arrays.asList(path.split(";")));
+        }
+        else
+        {
+            sampledataDirs.add(DEFAULT_SAMPLEDATA_DIR.toString());
         }
 
         File foundFile = null;
@@ -181,7 +184,7 @@ public abstract class TestFileUtils
             File checkFile = new File(sampledataDir, relativePath);
             if (checkFile.exists())
             {
-                if (foundFile != null)
+                if (foundFile != null && !foundFile.equals(checkFile))
                     throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
                             "Found:\n" +
                             foundFile + "\n" +
