@@ -75,6 +75,17 @@ public class StudyOverviewWebPart extends BodyWebPart<StudyOverviewWebPart.Eleme
         return new Elements();
     }
 
+    public int getDatasetCount()
+    {
+        String studyProperties = elementCache().studyProperties.getText();
+        Pattern datasetCountPattern = Pattern.compile("tracks data in (\\d+)");
+        Matcher matcher = datasetCountPattern.matcher(studyProperties);
+        if (matcher.find())
+            return Integer.parseInt(matcher.group(1));
+        else
+            throw new IllegalStateException("Unable to get dataset count from Study Overview webpart");
+    }
+
     protected class Elements extends BodyWebPart.ElementCache
     {
         WebElement studyProperties = new LazyWebElement(Locator.css("td.study-properties"), this);
