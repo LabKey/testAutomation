@@ -38,6 +38,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 @Category(DailyB.class)
 public class AdvancedImportOptionsTest extends BaseWebDriverTest
 {
@@ -102,7 +105,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
         importPage.setSelectSpecificImportOptions(true);
-        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         log("Start the import");
         importPage.clickStartImport();
@@ -158,7 +161,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromFile(this, zipFile, true, true);
         importPage.setSelectSpecificImportOptions(true);
-        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         boolean chkSet = false;
         Map<StartImportPage.AdvancedOptionsCheckBoxes, Boolean> myList = new HashMap<>();
@@ -183,17 +186,17 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate assay schedule.");
         clickTab("Assays");
         AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
-        Assert.assertTrue(assayScheduleWebpart.isEmpty());
+        assertTrue(assayScheduleWebpart.isEmpty());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
         ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
-        Assert.assertTrue(immunizationScheduleWebpart.isEmpty());
+        assertTrue(immunizationScheduleWebpart.isEmpty());
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
         VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
-        Assert.assertTrue(vaccineDesignWebpart.isEmpty());
+        assertTrue(vaccineDesignWebpart.isEmpty());
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
@@ -224,7 +227,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
 
         log("Get to the import page and validate that is looks as expected.");
         StartImportPage importPage = StartImportPage.startImportFromPipeline(this, zipFile, true, true);
-        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         boolean chkSet = false;
         Map<StartImportPage.AdvancedOptionsCheckBoxes, Boolean> myList = new HashMap<>();
@@ -249,17 +252,17 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         log("Validate assay schedule.");
         clickTab("Assays");
         AssayScheduleWebpart assayScheduleWebpart = new AssayScheduleWebpart(getDriver());
-        Assert.assertTrue(assayScheduleWebpart.isEmpty());
+        assertTrue(assayScheduleWebpart.isEmpty());
 
         log("Validate Immunizations.");
         clickTab("Immunizations");
         ImmunizationScheduleWebpart immunizationScheduleWebpart = new ImmunizationScheduleWebpart(getDriver());
-        Assert.assertTrue(immunizationScheduleWebpart.isEmpty());
+        assertTrue(immunizationScheduleWebpart.isEmpty());
 
         log("Validate Vaccine Design.");
         clickTab("Vaccine Design");
         VaccineDesignWebpart vaccineDesignWebpart = new VaccineDesignWebpart(getDriver());
-        Assert.assertTrue(vaccineDesignWebpart.isEmpty());
+        assertTrue(vaccineDesignWebpart.isEmpty());
 
         log("Validate that Locations have been imported unchanged.");
         clickTab("Manage");
@@ -313,7 +316,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         importPage.setSelectSpecificImportOptions(true);
         importPage.setApplyToMultipleFoldersCheckBox(true);
 
-        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
 
         log("Verify user can import only into folders they have admin access to");
         waitForElement(Locator.tagWithClass("span", "x4-tree-node-text").withText(IMPORT_FOLDER_MULTI01).notHidden(), 5000);
@@ -336,7 +339,7 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         importPage.setAdvancedOptionCheckBoxes(StartImportPage.AdvancedOptionsCheckBoxes.SpecimenSettings, false);
         importPage.setApplyToMultipleFoldersCheckBox(true);
 
-        Assert.assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
+        assertTrue("The 'Select specific objects to import' is not visible, and it should be in this case.", importPage.isSelectSpecificImportOptionsVisible());
         Locator.tagWithClass("span", "x4-tree-node-text").notHidden().withText(IMPORT_FOLDER_MULTI01).waitForElement(shortWait());
 
         log("Select sub folders to import into");
@@ -415,8 +418,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         openFolderMenu();
         expandFolderTree(folderName);
         if (hasSubfolder)
-            assertElementPresent(Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME));
+            assertTrue("project menu should have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
         else
-            assertElementNotPresent(Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME));
+            assertFalse("project menu should not have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
     }
 }
