@@ -276,6 +276,8 @@ public class Ext4GridRef extends Ext4CmpRef
                 }
             }
 
+            _test.scrollIntoView(cell); // aligns to bottom
+            _test.scrollBy(0, 100); // bumps up a few rows, above any footers or scrollbars
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);
             else
