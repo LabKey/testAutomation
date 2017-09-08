@@ -64,6 +64,7 @@ public class MenuBarTest extends BaseWebDriverTest
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
 
+        log("Add menu bar webparts");
         portalHelper.addWebPart("AssayList2");
         portalHelper.addWebPart("Study List");
         portalHelper.addWebPart("Wiki Menu");
