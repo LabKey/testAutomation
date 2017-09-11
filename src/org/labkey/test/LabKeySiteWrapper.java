@@ -1217,17 +1217,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (IS_BOOTSTRAP_LAYOUT)
         {
             waitForElement(Locators.UX_FOLDER_TAB);
-            Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
+            projectMenu().expandFolderLinksTo("*all");
 
             return shortWait().until(new ExpectedCondition<WebElement>()
             {
                 @Override
                 public WebElement apply(@Nullable WebDriver driver)
                 {
-                    WebElement projectList = Locators.UX_PROJECT_LIST_CONTAINER.findElementOrNull(getDriver());
-                    if (null == projectList || !projectList.isDisplayed())
-                        Locators.UX_FOLDER_TAB.findElement(getDriver()).click();
-                    return ExpectedConditions.visibilityOfElementLocated(Locators.UX_FOLDER_LIST_CONTAINER).apply(driver);
+                    return projectMenu().getMenuToggle();
                 }
             });
         }
