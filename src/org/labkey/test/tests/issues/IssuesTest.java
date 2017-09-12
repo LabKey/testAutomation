@@ -163,7 +163,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // clear region selection and filters
         issuesTable.uncheckAll();
-        issuesTable.clearAllFilters("IssueId");
+        issuesTable.clearAllFilters();
 
         // reset folder filter
         issuesTable.setContainerFilter(DataRegionTable.ContainerFilterType.CURRENT_FOLDER);
