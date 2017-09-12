@@ -1156,6 +1156,16 @@ public abstract class Locator extends By
             return new XPathLocator("(" + getLoc() + ")/..");
         }
 
+        /**
+         * Only select parent if it is tag
+         * @param tag of parent
+         * @return xpath locator
+         */
+        public XPathLocator parent(String tag)
+        {
+            return new XPathLocator("(" + getLoc() + ")/parent::" + tag);
+        }
+
         public XPathLocator child(String str)
         {
             return new XPathLocator(getLoc() + "/" + str);
