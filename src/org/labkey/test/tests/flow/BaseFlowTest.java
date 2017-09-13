@@ -230,14 +230,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             }
             else
             {
-                if (IS_BOOTSTRAP_LAYOUT)
-                {   // single tab doesn't appear in new ui; navigating to the subfolder gets you there
-                    new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), getFolderName());
-                }else
-                {
-                   clickProject(getProjectName());
-                   clickFolder(getFolderName());
-                }
+                navigateToFolder(getProjectName(), getFolderName());
             }
         }
         BodyWebPart.find(getDriver(), "Flow Experiment Management", 0);
@@ -261,13 +254,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         clickButton("Submit");
 
         log("** Join sample set with FCSFile keywords");
-        if (IS_BOOTSTRAP_LAYOUT)
-        {   // single tab doesn't appear in new ui; navigating to the subfolder gets you there
-            new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), "FlowTest");
-        }else
-        {
-            clickAndWait(Locator.linkWithText("Flow Dashboard"));
-        }
+        goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("ff_samplePropertyURI").index(i), idCols[i]);

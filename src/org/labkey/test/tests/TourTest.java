@@ -184,8 +184,7 @@ public class TourTest extends BaseWebDriverTest
 
     private void navigateToFolder(String folder)
     {
-        ProjectMenu menu = new ProjectMenu(this.getDriver());
-        menu.navigateToFolder(getProjectName(), folder);
+        navigateToFolder(getProjectName(), folder);
     }
 
     private TourEditor navigateToEditTour(String folder, String tourTitle)

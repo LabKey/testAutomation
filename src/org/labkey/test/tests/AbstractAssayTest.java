@@ -268,19 +268,6 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         clickButton("Study Security");
     }
 
-    protected void navigateToFolder(String project, String folder)
-    {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            new ProjectMenu(getDriver()).navigateToFolder(project, folder);
-        }
-        else
-        {
-            clickProject(project);
-            clickFolder(folder);
-        }
-    }
-
     @Override
     public List<String> getAssociatedModules()
     {

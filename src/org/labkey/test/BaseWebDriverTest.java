@@ -1077,16 +1077,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             if(!checked.contains(folder))
             {
-                if (IS_BOOTSTRAP_LAYOUT)
-                {
-                    new ProjectMenu(getDriver()).navigateToFolder(project, folder);
-                }
-                else
-                {
-                    if (!getText(Locator.id("folderBar")).equals(project))
-                        clickProject(project);
-                    clickFolder(folder);
-                }
+                navigateToFolder(project, folder);
 
                 doViewCheck(folder);
                 checked.add(folder);
@@ -2186,10 +2177,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         {
             log("Waiting for completion of specimen archives");
 
-            if (IS_BOOTSTRAP_LAYOUT)
-                new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), _studyFolderName); // maybe just refresh the page instead?
-            else
-                clickFolder(_studyFolderName);
+            clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
             if (_expectError)

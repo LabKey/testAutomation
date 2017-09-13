@@ -145,7 +145,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
-        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -160,7 +160,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Author can read as well, edit his own but not edit the Edtiors
         impersonate(GAMMA_AUTHOR_USER);
-        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -180,7 +180,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Reader can read but not edit
         impersonate(GAMMA_READER_USER);
-        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
 
         clickAndWait(Locator.linkContainingText("view message").index(0));
         assertTextPresent(GAMMA_AUTHOR_PAGE_TITLE);
@@ -194,7 +194,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //switch back to Editor and edit
         impersonate(GAMMA_EDITOR_USER);
-        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         //Go back and Edit
         clickAndWait(Locator.linkContainingText("view message").index(1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
@@ -204,7 +204,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Remove permission from folder to verify unviewability
         log("Check for disallowed folder links");
         stopImpersonating();
-        new ProjectMenu(getDriver()).navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save and Finish", defaultWaitForPage);

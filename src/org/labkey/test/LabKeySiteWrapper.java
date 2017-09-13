@@ -1259,11 +1259,27 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    protected void navigateToFolder(String project, String folderName)
+    {
+        if (IS_BOOTSTRAP_LAYOUT)
+            new ProjectMenu(getDriver()).navigateToFolder(project, folderName);
+        else
+        {
+            if (!getText(Locator.id("folderBar")).equals(project))
+                clickProject(project);
+            clickFolder(folderName);
+        }
+    }
+
     public String getCurrentContainer()
     {
         return (String) executeScript( "return LABKEY.container.title;");
     }
 
+    /**
+     * @deprecated Only used by old UX
+     */
+    @Deprecated
     private void waitForFolderNavigationReady()
     {
         waitForHoverNavigationReady();
@@ -1271,21 +1287,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
                 "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
 
+    /**
+     * @deprecated Only used by old UX
+     */
+    @Deprecated
     private void waitForHoverNavigationReady()
     {
-        if (IS_BOOTSTRAP_LAYOUT)
-        {
-            waitFor(()->
-            {
-                WebElement elem = Locators.UX_FOLDER_LIST_CONTAINER.findElementOrNull(getDriver());
-                return  elem != null && elem.isDisplayed();
-            }, WAIT_FOR_JAVASCRIPT);
-        }
-        else
-        {
-            waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
-                    "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
-        }
+        waitFor(() -> (boolean) executeScript("if (window.HoverNavigation) return true; else return false;"),
+                "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     public void impersonateGroup(String group, boolean isSiteGroup)

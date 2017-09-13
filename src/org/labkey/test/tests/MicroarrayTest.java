@@ -261,7 +261,7 @@ public class MicroarrayTest extends BaseWebDriverTest
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new ProjectMenu(getDriver()).navigateToFolder(getProjectName(), PROJECT_NAME);
+            navigateToFolder(getProjectName(), PROJECT_NAME);
         }
         else
         {
