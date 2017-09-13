@@ -66,7 +66,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         if (!isExpanded())
             newElementCache().menuToggle.click();
-        WebDriverWrapper.waitFor(()-> isExpanded(), "Menu didn't open", 1000);
+        WebDriverWrapper.waitFor(()-> isExpanded(), 1000);
         return this;
     }
 
