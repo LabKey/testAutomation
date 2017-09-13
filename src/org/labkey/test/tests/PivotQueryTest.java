@@ -96,12 +96,12 @@ public class PivotQueryTest extends ReportTest
         Locator ConcInRange_CONCAT_cell;
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            AnalyteName_header = region.append("/tbody/tr[1]/td[2]");
-            IL_10_header = region.append("/tbody/tr[2]/td[1]");
-            Participant_cell = region.append("/tbody[2]/tr[1]/td[1]");
-            ParticipantCount_cell = region.append("/tbody[2]/tr[1]/td[2]");
-            ConcInRange_MIN_cell = region.append("/tbody[2]/tr[1]/td[3]");
-            ConcInRange_CONCAT_cell = region.append("/tbody[2]/tr[1]/td[6]");
+            AnalyteName_header = region.append("/thead[1]/tr[1]/th[2]");
+            IL_10_header = region.append("/thead[2]/tr[1]/th[2]");
+            Participant_cell = region.append("/tbody[1]/tr[1]/td[1]");
+            ParticipantCount_cell = region.append("/tbody[1]/tr[1]/td[2]");
+            ConcInRange_MIN_cell = region.append("/tbody[1]/tr[1]/td[3]");
+            ConcInRange_CONCAT_cell = region.append("/tbody[1]/tr[1]/td[6]");
         }
         else
         {
