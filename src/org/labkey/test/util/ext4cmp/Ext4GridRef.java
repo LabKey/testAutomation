@@ -53,7 +53,7 @@ public class Ext4GridRef extends Ext4CmpRef
         if(parentId != null)
             base = "//*[@id='" + parentId + "']" + base;
 
-        return Locator.xpath("(" + base + "//tr[contains(@class, 'x4-grid-row')])[" + rowIndex + "]");
+        return Locator.xpath("(" + base + "//tr[contains(@class, 'x4-grid-data-row')])[" + rowIndex + "]");
     }
 
     public Locator getRow(int rowIndex)
