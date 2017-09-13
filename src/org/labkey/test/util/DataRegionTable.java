@@ -88,6 +88,9 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     private String _tableId;
     private final Map<Integer, Map<Integer, String>> _dataCache = new TreeMap<>();
 
+    // Settable
+    private boolean _isAsync = false;
+
     private DataRegionTable(WebElement el, String name, WebDriverWrapper driverWrapper)
     {
         _webDriverWrapper = driverWrapper;
@@ -178,6 +181,16 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     public WebDriver getDriver()
     {
         return getWrapper().getDriver();
+    }
+
+    protected boolean isAsync()
+    {
+        return _isAsync;
+    }
+
+    public void setAsync(boolean async)
+    {
+        _isAsync = async;
     }
 
     public void afterPageLoad()
@@ -1007,7 +1020,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         Locator cssPlotLocator = Locator.css("div.labkey-dataregion-msg-plot-analytic svg");
         int initialNumOfPlots = cssPlotLocator.findElements(this).size();
 
-        this.clickColumnMenu(columnName, false, chartType);
+        clickColumnMenu(columnName, false, chartType);
         cssPlotLocator.index(initialNumOfPlots).waitForElement(this, 60000);
 
         return new ColumnChartRegion(getWrapper(), this);
@@ -1021,7 +1034,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     public void setSort(String columnName, SortDirection direction)
     {
         getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnName + " to " + direction.toString());
-        clickColumnMenu(columnName, true, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
+        clickColumnMenu(columnName, !isAsync(), "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
     }
 
     public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
@@ -1082,7 +1095,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public void clearSort(String columnName)
     {
-        clickColumnMenu(columnName, true, "Clear Sort");
+        clickColumnMenu(columnName, !isAsync(), "Clear Sort");
     }
 
     public void openFilterDialog(String columnName)
