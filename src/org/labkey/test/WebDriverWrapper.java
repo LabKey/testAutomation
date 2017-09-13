@@ -1097,6 +1097,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
     }
 
+    public void assertExt4MsgBox(String bodyText, String buttonToClick)
+    {
+        waitForElement(Locator.css(".x4-window div").withText(bodyText));
+        clickButton(buttonToClick, 0);
+    }
+
     public String acceptModalAlert()
     {
         ModalDialog alert = ModalDialog.find(getDriver());

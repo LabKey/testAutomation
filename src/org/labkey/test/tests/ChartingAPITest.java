@@ -363,10 +363,10 @@ public class ChartingAPITest extends BaseWebDriverTest
         click(nextBtn);
         waitForSvgWithTitle(SCATTER_HOVER_CLICK);
         click(Locator.css("svg g a path"));
-        assertEquals("Unexpected alert message for point click handler", "Look a click handler!", acceptModalAlert());
+        assertExt4MsgBox("Look a click handler!", "OK");
         click(setAesBtn);
         click(Locator.css("svg g a path"));
-        assertEquals("Unexpected alert message for point click handler", "The click handler has changed!", acceptModalAlert());
+        assertExt4MsgBox("The click handler has changed!", "OK");
 
         click(nextBtn);
         waitForSvgWithTitle(LINE_ERROR_COLOR_Y);

@@ -296,10 +296,8 @@ public class GroupTest extends BaseWebDriverTest
     {
         _permissionsHelper.startCreateGlobalPermissionsGroup(BAD_GROUP, true);
         _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.window(BAD_GROUP + " Information").append("//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
-
-        waitForText("Can't add a system group to another group");
+        assertExt4MsgBox("Can't add a system group to another group", "OK");
         clickButton("Done", 0);
-        Locator.tagWithClass("button", "close").findElement(getDriver()).click();
         clickButton("Save and Finish");
     }
 
