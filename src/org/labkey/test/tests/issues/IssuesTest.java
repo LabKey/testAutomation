@@ -75,8 +75,8 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String USER3 = "user3_issuetest@issues.test";
     private static final String user = "reader@issues.test";
     private static String NAME;
-    private final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
-    private final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
+    private static final Map<String, String> ISSUE_0 = new HashMap<>(Maps.of("title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
+    private static final Map<String, String> ISSUE_1 = new HashMap<>(Maps.of("title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
     private static final String ISSUE_SUMMARY_WEBPART_NAME = "Issues Summary";
     private static final String ISSUE_LIST_REGION_NAME = "issues-issues";
 
@@ -137,6 +137,10 @@ public class IssuesTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
 
         _issuesHelper.createNewIssuesList("issues", _containerHelper);
+        waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
+        _issuesHelper.goToAdmin();
+        _issuesHelper.setIssueAssignmentList(null);
+        clickButton("Save");
 
         // Add to group so user appears
         _userHelper.createUser(USER1);

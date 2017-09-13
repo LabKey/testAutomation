@@ -603,6 +603,8 @@ src/org/labkey/test/pages/issues/DetailsPage.java -text
 src/org/labkey/test/pages/issues/EmailPrefsPage.java -text
 src/org/labkey/test/pages/issues/InsertIssueDefPage.java -text
 src/org/labkey/test/pages/issues/InsertPage.java -text
+src/org/labkey/test/pages/issues/IssuesFormItemFinder.java -text
+src/org/labkey/test/pages/issues/IssuesReadOnlyFormItem.java -text
 src/org/labkey/test/pages/issues/ListPage.java -text
 src/org/labkey/test/pages/issues/ReopenPage.java -text
 src/org/labkey/test/pages/issues/ResolvePage.java -text

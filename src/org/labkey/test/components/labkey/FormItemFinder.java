@@ -28,9 +28,9 @@ import static org.labkey.test.Locator.xq;
 
 public abstract class FormItemFinder<C> extends Component.ComponentFinder<SearchContext, C, FormItemFinder<C>>
 {
-    private String name = null;
-    private String labelText = "";
-    private boolean partialText = true;
+    protected String name = null;
+    protected String labelText = "";
+    protected boolean partialText = true;
 
     public static FormItemFinder<FormItem> FormItem(WebDriver driver)
     {

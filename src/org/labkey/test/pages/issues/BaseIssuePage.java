@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
 
 import static org.labkey.test.components.html.Input.Input;
 import static org.labkey.test.components.html.OptionSelect.OptionSelect;
-import static org.labkey.test.components.labkey.FormItemFinder.FormItem;
-import static org.labkey.test.components.labkey.ReadOnlyFormItem.ReadOnlyFormItem;
+import static org.labkey.test.pages.issues.IssuesFormItemFinder.IssueFormItem;
+import static org.labkey.test.pages.issues.IssuesReadOnlyFormItem.IssueReadOnlyFormItem;
 
 public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> extends LabKeyPage<EC>
 {
@@ -145,17 +145,17 @@ public abstract class BaseIssuePage<EC extends BaseIssuePage.ElementCache> exten
 
         protected <T> FormItem<T> formItemWithLabel(String label)
         {
-            return replaceIfNewer(label, FormItem(getDriver()).withLabel(label).timeout(1000).findWhenNeeded(this));
+            return replaceIfNewer(label, IssueFormItem(getDriver()).withLabel(label).timeout(1000).findWhenNeeded(this));
         }
 
         protected <T> FormItem<T> formItemNamed(String name)
         {
-            return replaceIfNewer(name, FormItem(getDriver()).withName(name).timeout(1000).findWhenNeeded(this));
+            return replaceIfNewer(name, IssueFormItem(getDriver()).withName(name).timeout(1000).findWhenNeeded(this));
         }
 
         protected ReadOnlyFormItem readOnlyItem(String label)
         {
-            return (ReadOnlyFormItem) replaceIfNewer(label, ReadOnlyFormItem().withLabel(label).timeout(1000).findWhenNeeded(this));
+            return (ReadOnlyFormItem) replaceIfNewer(label, IssueReadOnlyFormItem().withLabel(label).timeout(1000).findWhenNeeded(this));
         }
 
         protected OptionSelect getSelect(String name)
