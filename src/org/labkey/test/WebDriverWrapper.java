@@ -545,7 +545,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            longWait().until(ExpectedConditions.elementToBeClickable(Locators.UX_ADMIN_MENU_TOGGLE));
             new SiteNavBar(getDriver()).clickAdminMenuItem(true, false, items);
         }
         else
@@ -621,7 +620,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            SiteNavBar navBar = new SiteNavBar(getDriver()).goToModule(moduleName);
+            new SiteNavBar(getDriver()).goToModule(moduleName);
         }
         else
         {
