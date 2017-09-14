@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
-
 /**
  * Wraps the project/folder menu nav in labkey pages
  */
@@ -65,8 +64,13 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public ProjectMenu open()
     {
         if (!isExpanded())
-            newElementCache().menuToggle.click();
-        WebDriverWrapper.waitFor(()-> isExpanded(), 1000);
+        {
+            if (getWrapper().isElementPresent(Locator.css("li.dropdown.open > .lk-custom-dropdown-menu")))
+                getWrapper().mouseOver(newElementCache().menuToggle); // Just need to hover if another menu is already open
+            else
+                newElementCache().menuToggle.click();
+        }
+        WebDriverWrapper.waitFor(this::isExpanded, 1000);
         return this;
     }
 
@@ -114,7 +118,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         Locator expandoLoc = Locator.tagWithClass("li", "clbl collapse-folder")
                 .child(Locator.tagWithClass("span", "marked"));
 
-        getWrapper().waitFor(()-> {
+        WebDriverWrapper.waitFor(()-> {
             if (folderLinkIsPresent(folder) || expandoLoc.findElementOrNull(newElementCache().folderListContainer())==null)
                 return true;
             else    // expand any collapsed expandos until the navigation link becomes clickable
@@ -219,6 +223,5 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
                 .withDescendant(Locator.tagWithClass("div", "navbar-header"));
         public static final Locator menuProjectNav = Locator.tagWithClassContaining("li", "dropdown")
                 .withAttribute("data-name", "BetaNav");
-        public static final Locator containerMobile = Locator.tagWithId("li", "project-mobile");
     }
 }
