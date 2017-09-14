@@ -28,7 +28,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
@@ -52,17 +51,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
     static public BootstrapMenu find(WebDriver driver, String menuToggleText)
     {
         return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find();
-//        WebElement container = Locators.bootstrapMenuContainer()
-//                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(driver);
-//        return new BootstrapMenu(driver, container);
     }
 
     static public BootstrapMenu find(WebDriver driver, SearchContext searchContext, String menuToggleText)
     {
         return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find(searchContext);
-//        WebElement container = Locators.bootstrapMenuContainer()
-//                .withChild(Locators.toggleAnchor().containing(menuToggleText)).findElement(searchContext);
-//        return new BootstrapMenu(driver, container);
     }
 
     /* Sometimes the menu doesn't expand on the first try.
@@ -99,20 +92,20 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             for (int retry = 0; retry < _expandRetryCount; retry++)
             {
                 elementCache().toggleAnchor.click();
-                if (getWrapper().waitFor(()-> isExpanded(), 1000))
+                if (WebDriverWrapper.waitFor(this::isExpanded, 1000))
                     break;
                 else
                     TestLogger.log("retrying menu expand, attempt #" + retry);
             }
         }
-        getWrapper().waitFor(()-> isExpanded(), "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        WebDriverWrapper.waitFor(this::isExpanded, "Menu did not expand as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public void collapse()
     {
         if (isExpanded())
             elementCache().toggleAnchor.click();
-        getWrapper().waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        WebDriverWrapper.waitFor(()-> !isExpanded(), "Menu did not collapse as expected", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
     }
 
     public List<WebElement> findVisibleMenuItems()
@@ -143,7 +136,7 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
                     .waitForElement(elementCache().findOpenMenu(), 2000);
             TestLogger.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
-            getWrapper().click(subMenuItem);
+            subMenuItem.click();
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
                 .notHidden()
