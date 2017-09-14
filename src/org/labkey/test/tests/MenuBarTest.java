@@ -97,7 +97,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         log("Assert wiki, assay, and study portals not loaded");
         assertTextNotPresent(WIKI_PAGE_CONTENT);
-        assertButtonNotPresent("Manage Assays");
+        assertElementNotPresent(Locator.lkButton("Manage Assays"));
         assertTextNotPresent("No Studies Found");
 
         openMenu(WIKI_PAGE_TITLE);
@@ -190,7 +190,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Override
