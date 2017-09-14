@@ -20,13 +20,8 @@ import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.Component;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.search.SearchResultsPage;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.FluentWait;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /* Wraps the new site/admin nav menus and site search */
 public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
@@ -39,11 +34,6 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         _driver = driver;
     }
 
-    public SiteNavBar(WebDriverWrapper wrapper)
-    {
-        this(wrapper.getDriver());
-    }
-
     @Override
     public WebElement getComponentElement()
     {
@@ -54,71 +44,43 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         return _driver;
     }
 
-    public SiteNavBar clickAdminMenuItem(boolean wait, boolean onlyOpen, String ... subMenuLabels)
+    public void clickAdminMenuItem(boolean wait, String ... subMenuLabels)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
-        menu.clickMenuButton(wait, onlyOpen, subMenuLabels);
-        return this;
+        adminMenu().clickSubMenu(wait, subMenuLabels);
     }
 
-    public SiteNavBar goToModule(String moduleName)
+    public void goToModule(String moduleName)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().adminMenuContainer).withExpandRetries(4);
-        WebElement moreModulesElement = menu.openMenuTo("Go To Module", "More Modules");
-        /* at this point, we want to know if the module link is visible above the 'more modules' break.
-         * if it is, click it- otherwise, expand the 'More Modules' link and  */
-
-        WebElement moduleLinkElement = menu.findVisibleMenuItemOrNull(moduleName);
-        if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
-        {
-            getWrapper().scrollIntoView(moduleLinkElement);
-            getWrapper().doAndWaitForPageToLoad(()-> moduleLinkElement.click());
-            return this;
-        }
-        else
-        {
-            moreModulesElement.click();
-            getWrapper().waitFor(()-> menu.findVisibleMenuItemOrNull(moduleName) != null,
-                    "Did not find expected module [" + moduleName + "]", 2000);
-            getWrapper().setFormElement(Locator.tagWithClass("input", "dropdown-menu-filter"), moduleName);
-            menu.findVisibleMenuItem(moduleName).click();
-            return this;
-        }
+        adminMenu().goToModule(moduleName);
     }
 
-    public SiteNavBar clickUserMenuItem(boolean wait, boolean onlyOpen, String ... subMenuLabels)
+    public void clickUserMenuItem(boolean wait, String ... subMenuLabels)
     {
-        BootstrapMenu menu = new BootstrapMenu(getDriver(), elementCache().userMenuContainer);
-        menu.clickMenuButton(wait, onlyOpen, subMenuLabels);
-        return this;
+        userMenu().clickSubMenu(wait, subMenuLabels);
     }
 
-    public SiteNavBar enterPageAdminMode()
+    public void enterPageAdminMode()
     {
-        if (isInPageAdminMode())
-            return this;
-        adminMenu().clickSubMenu(true, "Page Admin Mode");
-        return this;
+        if (!isInPageAdminMode())
+            adminMenu().clickSubMenu(true, "Page Admin Mode");
     }
 
-    public SiteNavBar exitPageAdminMode()
+    public void exitPageAdminMode()
     {
         if (isInPageAdminMode())
         {
             Locators.exitAdminBtn.findElement(getDriver()).click();
-            getWrapper().waitFor(()-> !isInPageAdminMode(), "Failed to exit page admin mode", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            WebDriverWrapper.waitFor(()-> !isInPageAdminMode(), "Failed to exit page admin mode", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
-        return this;
     }
 
-    public SiteNavBar stopImpersonating()
+    public void stopImpersonating()
     {
         if (getWrapper().isImpersonating())
         {
             Locators.stopImpersonatingBtn.findElement(getDriver()).click();
-            getWrapper().waitFor(() -> !getWrapper().isImpersonating(), "Failed to stop impersonating", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            WebDriverWrapper.waitFor(() -> !getWrapper().isImpersonating(), "Failed to stop impersonating", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
-        return this;
     }
 
     public boolean isInPageAdminMode()
@@ -146,19 +108,19 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
         if (!isSearchBarExpanded())
         {
             elementCache().searchToggle.click();
-            getWrapper().waitFor(()-> isSearchBarExpanded(), "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+            WebDriverWrapper.waitFor(this::isSearchBarExpanded, "Search bar didn't expand", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
         return elementCache().searchInput;
     }
 
-    public BootstrapMenu adminMenu()
+    public AdminMenu adminMenu()
     {
-        return new BootstrapMenu(getDriver(), elementCache().adminMenuContainer);
+        return elementCache().adminMenu;
     }
 
     public BootstrapMenu userMenu()
     {
-        return new BootstrapMenu(getDriver(), elementCache().userMenuContainer);
+        return elementCache().userMenu;
     }
 
     @Override
@@ -181,25 +143,93 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 .withTimeout(WebDriverWrapper.WAIT_FOR_PAGE);
 
         public WebElement navbarNavBlock = Locator.xpath("//ul[@class='navbar-nav-lk']")
-                .refindWhenNeeded(headerBlock)
+                .findWhenNeeded(headerBlock)
                 .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
 
         public WebElement searchContainer = Locators.searchMenuToggle.parent()
-                .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchToggle = Locators.searchMenuToggle
-                .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchInput = Locators.searchInput
-                .refindWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(headerBlock).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchInputElement = Locator.xpath("//div[@id='global-search']//input[@type='text']")
-                .refindWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         public WebElement searchSubmitInput = Locator.xpath("//div[@id='global-search']//a[@class='btn-search fa fa-search']")
-                .refindWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement userMenuContainer = Locators.userMenuToggle.parent()
-                .refindWhenNeeded(headerBlock)
-                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
-        public WebElement adminMenuContainer = Locators.adminMenuToggle.parent()
-                .refindWhenNeeded(navbarNavBlock)
-                .withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+                .findWhenNeeded(searchContainer).withTimeout(WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
+        public final AdminMenu adminMenu = (AdminMenu) new AdminMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+        public final UserMenu userMenu = (UserMenu) new UserMenuFinder(getDriver()).findWhenNeeded(navbarNavBlock).withExpandRetries(4);
+    }
+
+    public class AdminMenu extends BootstrapMenu
+    {
+        protected AdminMenu(WebDriver driver, WebElement componentElement)
+        {
+            super(driver, componentElement);
+        }
+
+        public void goToModule(String moduleName)
+        {
+            WebElement moreModulesElement = openMenuTo("Go To Module", "More Modules");
+        /* at this point, we want to know if the module link is visible above the 'more modules' break.
+         * if it is, click it- otherwise, expand the 'More Modules' link and  */
+
+            WebElement moduleLinkElement = findVisibleMenuItemOrNull(moduleName);
+            if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
+            {
+                getWrapper().scrollIntoView(moduleLinkElement);
+                getWrapper().doAndWaitForPageToLoad(moduleLinkElement::click);
+            }
+            else
+            {
+                moreModulesElement.click();
+                WebDriverWrapper.waitFor(()-> findVisibleMenuItemOrNull(moduleName) != null,
+                        "Did not find expected module [" + moduleName + "]", 2000);
+                getWrapper().setFormElement(Locator.tagWithClass("input", "dropdown-menu-filter"), moduleName);
+                findVisibleMenuItem(moduleName).click();
+            }
+        }
+    }
+
+    protected class AdminMenuFinder extends SimpleComponentFinder<AdminMenu>
+    {
+        final WebDriver _driver;
+
+        public AdminMenuFinder(WebDriver driver)
+        {
+            super(Locators.adminMenuToggle.parent());
+            _driver = driver;
+        }
+
+        @Override
+        protected AdminMenu construct(WebElement el)
+        {
+            return new AdminMenu(_driver, el);
+        }
+    }
+
+    public class UserMenu extends BootstrapMenu
+    {
+        protected UserMenu(WebDriver driver, WebElement componentElement)
+        {
+            super(driver, componentElement);
+        }
+    }
+
+    protected class UserMenuFinder extends SimpleComponentFinder<UserMenu>
+    {
+        final WebDriver _driver;
+
+        public UserMenuFinder(WebDriver driver)
+        {
+            super(Locators.userMenuToggle.parent());
+            _driver = driver;
+        }
+
+        @Override
+        protected UserMenu construct(WebElement el)
+        {
+            return new UserMenu(_driver, el);
+        }
     }
 
     private static class Locators

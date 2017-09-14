@@ -1159,6 +1159,11 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return new ProjectMenu(getDriver());
     }
 
+    public SiteNavBar navBar()
+    {
+        return new SiteNavBar(getDriver());
+    }
+
     public WebElement openProjectMenu()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
@@ -1298,7 +1303,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        clickUserMenuItem(false, false, "Impersonate", "Group");
+        clickUserMenuItem(false, "Impersonate", "Group");
         final ImpersonateGroupWindow window = new ImpersonateGroupWindow(getDriver());
         if (isSiteGroup)
             window.selectSiteGroup(group);
@@ -1315,7 +1320,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonateRoles(String oneRole, String... roles)
     {
-        clickUserMenuItem(false, false, "Impersonate", "Roles");
+        clickUserMenuItem(false, "Impersonate", "Roles");
         final ImpersonateRoleWindow window = new ImpersonateRoleWindow(getDriver());
         window.selectRoles(oneRole);
         window.selectRoles(roles);
@@ -1324,7 +1329,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
 
     public void impersonate(String fakeUser)
     {
-        clickUserMenuItem(false, false, "Impersonate", "User");
+        clickUserMenuItem(false, "Impersonate", "User");
         final ImpersonateUserWindow window = new ImpersonateUserWindow(getDriver());
         window.selectUser(fakeUser);
         window.clickImpersonate();

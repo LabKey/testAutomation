@@ -545,7 +545,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            new SiteNavBar(getDriver()).clickAdminMenuItem(true, false, items);
+            new SiteNavBar(getDriver()).clickAdminMenuItem(true, items);
         }
         else
         {
@@ -563,20 +563,20 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickUserMenuItem(String... items)
     {
-        clickUserMenuItem(true, false, items);
+        clickUserMenuItem(true, items);
     }
 
-    public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
+    public void clickUserMenuItem(boolean wait, String... items)
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            new SiteNavBar(getDriver()).clickUserMenuItem(wait, onlyOpen, items);
+            new SiteNavBar(getDriver()).clickUserMenuItem(wait, items);
         }
         else
         {
             final WebElement userMenu = waitForElement(Locators.USER_MENU);
             scrollIntoView(userMenu);
-            _ext4Helper.clickExt4MenuButton(wait,userMenu,onlyOpen,items);
+            _ext4Helper.clickExt4MenuButton(wait,userMenu,false,items);
         }
     }
 
