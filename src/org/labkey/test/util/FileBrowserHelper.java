@@ -19,9 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
-import org.labkey.test.components.Component.SimpleComponentFinder;
 import org.labkey.test.components.ext4.Checkbox;
-import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -32,7 +30,6 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -222,7 +219,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         WebElement folder = Locator.tagWithClass("span", "x4-tree-node-text").withText(destinationPath).waitForElement(moveWindow, 1000);
         shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
         sleep(500);
-        click(folder);
+        folder.click();
         moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         waitForElementToDisappear(fileGridCell.withText(fileName));
@@ -284,7 +281,7 @@ public class FileBrowserHelper extends WebDriverWrapper
 
     public void selectImportDataAction(@LoggedParam String actionName)
     {
-        clickFileBrowserButton(BrowserAction.IMPORT_DATA);
+        doAndWaitForPageSignal(() -> clickFileBrowserButton(BrowserAction.IMPORT_DATA), IMPORT_SIGNAL_NAME);
         Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
         RadioButton().withLabelContaining(actionName).find(importWindow).check();
         importWindow.clickButton("Import");
@@ -303,7 +300,8 @@ public class FileBrowserHelper extends WebDriverWrapper
         {
             log("Opening upload panel...");
             click(BrowserAction.UPLOAD.button());
-            WebElement uploadPanelEl = waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);            shortWait().until(LabKeyExpectedConditions.animationIsDone(uploadPanelEl));
+            WebElement uploadPanelEl = waitForElement(uploadPanel, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            shortWait().until(LabKeyExpectedConditions.animationIsDone(uploadPanelEl));
             fireEvent(BrowserAction.UPLOAD.button(), BaseWebDriverTest.SeleniumEvent.mouseout); // Dismiss qtip
         }
     }
