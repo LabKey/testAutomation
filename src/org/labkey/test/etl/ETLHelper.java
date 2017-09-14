@@ -17,6 +17,7 @@ package org.labkey.test.etl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -153,8 +154,13 @@ public class ETLHelper
 
     void doBasicSetup()
     {
+        doBasicSetup(null);
+    }
+
+    public void doBasicSetup(@Nullable String folderType)
+    {
         _test.log("running setup");
-        _test._containerHelper.createProject(_projectName, null);
+        _test._containerHelper.createProject(_projectName, folderType);
         _test._containerHelper.enableModules(Arrays.asList(DATAINTEGRATION_MODULE, "ETLtest"));
     }
 
