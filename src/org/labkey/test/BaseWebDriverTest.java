@@ -50,7 +50,6 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Checkbox;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.components.html.RadioButton;
 import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.components.search.SearchBodyWebPart;

@@ -38,7 +38,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;

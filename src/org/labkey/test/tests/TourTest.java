@@ -23,7 +23,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.components.html.ProjectMenu;
 import org.labkey.test.pages.TourEditor;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;

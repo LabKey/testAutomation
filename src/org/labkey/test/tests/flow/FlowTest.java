@@ -28,8 +28,6 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.flow.FlowReportsWebpart;
 import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.html.ProjectMenu;
-import org.labkey.test.components.html.TextSelect;
 import org.labkey.test.pages.flow.reports.QCReportEditorPage;
 import org.labkey.test.pages.flow.reports.ReportEditorPage;
 import org.labkey.test.util.DataRegionTable;
