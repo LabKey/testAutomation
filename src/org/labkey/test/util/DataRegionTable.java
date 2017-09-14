@@ -1718,13 +1718,6 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
             return Locator.tagWithAttribute("table", "lk-region-name", regionName);
         }
 
-        @Deprecated
-        public static Locator.XPathLocator headerMenuButton(String regionName, String text)
-        {
-            return dataRegion(regionName).append(Locator.tagWithClass("a", "labkey-menu-button")
-                    .withText(text));
-        }
-
         public static Locator.XPathLocator facetRow(String category)
         {
             return Locator.xpath("//div").withClass("x4-grid-body")
