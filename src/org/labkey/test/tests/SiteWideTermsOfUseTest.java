@@ -25,6 +25,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category({DailyB.class})
 public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
@@ -208,21 +209,23 @@ public class SiteWideTermsOfUseTest extends BaseTermsOfUseTest
         assertTextNotPresent(PROJECT_TERMS_SNIPPET);
     }
 
-    // Attempt to log in without accepting site-wide terms.  Should show terms of use again.
+    // Accept terms of use as a guest, then login. Shouldn't have to agree to terms again.
     @Test
-    public void testFailedLoginNoAccept()
+    public void testAcceptTermsThenLogin()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
-        signInShouldFail(PasswordUtil.getUsername(), PasswordUtil.getPassword(), "To use this site, you must check the box to approve the terms of use.");
-        waitForText(SITE_WIDE_TERMS_TEXT); // should show
+        signIn(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        String title = getDriver().getTitle();
+        assertFalse("Unexpected title " + title, title.contains("Sign In") || title.contains("Terms of Use"));
+        assertTextNotPresent("To use this site, you must check the box to approve the terms of use.", SITE_WIDE_TERMS_TEXT);
     }
 
-    // Attempt to log in with bad password.  Should show the terms of use again.
+    // Attempt to log in with bad password. Should show bad password error, not terms of use error.
     @Test
     public void testFailedLoginBadPassword()
     {
         signOutWithSiteWideTerms(SITE_WIDE_TERMS_TEXT, true); // agrees to terms of use as guest
-        signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "To use this site, you must check the box to approve the terms of use.");
+        signInShouldFail(PasswordUtil.getUsername(), "baaaaaaaad", "The email address and password you entered did not match any accounts on file. Note: Passwords are case sensitive; make sure your Caps Lock is off.");
         waitForText(SITE_WIDE_TERMS_TEXT); // should show
     }
 
