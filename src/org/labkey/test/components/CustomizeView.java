@@ -114,12 +114,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         }
     }
 
-    @Deprecated
-    public void closeCustomizeViewPanel()
-    {
-        closePanel();
-    }
-
     public void closePanel()
     {
         if (isPanelExpanded())
@@ -305,12 +299,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         addColumn(column_name);
     }
 
-    @Deprecated
-    public void addCustomizeViewColumn(String[] fieldKeyParts)
-    {
-        addColumn(fieldKeyParts);
-    }
-
     /**
      * add a column to an already open customize view grid
      *
@@ -392,39 +380,9 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     }
 
     @Deprecated
-    public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
-    {
-        addColumn(fieldKeyParts, label);
-    }
-
-    @Deprecated
     public void addCustomizeViewColumn(String fieldKey, String column_name)
     {
         addColumn(fieldKey, column_name);
-    }
-
-    @Deprecated
-    public void addCustomizeViewFilter(String fieldKey, String filter_type)
-    {
-        addFilter(fieldKey, filter_type);
-    }
-
-    @Deprecated
-    public void addCustomizeViewFilter(String fieldKey, String filter_type, String filter)
-    {
-        addFilter(fieldKey, filter_type, filter);
-    }
-
-    @Deprecated
-    public void addCustomizeViewFilter(String fieldKey, String column_name, String filter_type, String filter)
-    {
-        addFilter(fieldKey, column_name, filter_type, filter);
-    }
-
-    @Deprecated
-    public void addCustomizeViewFilter(String[] fieldKeyParts, String column_name, String filter_type, String filter)
-    {
-        addFilter(fieldKeyParts, column_name, filter_type, filter);
     }
 
     public void addColumn(String[] fieldKeyParts, String label)
@@ -591,24 +549,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         BaseWebDriverTest.sleep(250); // wait for columns to display
     }
 
-    @Deprecated
-    public void addCustomizeViewSort(String column_name, String order)
-    {
-        addSort(column_name, SortDirection.fromString(order));
-    }
-
-    @Deprecated
-    public void addCustomizeViewSort(String fieldKey, String column_name, String order)
-    {
-        addSort(fieldKey, column_name, SortDirection.fromString(order));
-    }
-
-    @Deprecated
-    public void addCustomizeViewSort(String[] fieldKeyParts, String column_name, String order)
-    {
-        addSort(fieldKeyParts, column_name, SortDirection.fromString(order));
-    }
-
     public void addSort(String column_name, SortDirection order)
     {
         addSort(column_name, column_name, order);
@@ -636,18 +576,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
         removeColumn(fieldKey);
     }
 
-    @Deprecated
-    public void removeCustomizeViewFilter(String fieldKey)
-    {
-        removeFilter(fieldKey);
-    }
-
-    @Deprecated
-    public void removeCustomizeViewSort(String fieldKey)
-    {
-        removeSort(fieldKey);
-    }
-
     public void removeColumn(String fieldKey)
     {
         _driver.log("Removing " + fieldKey + " column");
@@ -664,24 +592,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
     {
         _driver.log("Removing " + fieldKey + " sort");
         removeItem(fieldKey, ViewItemType.Sort);
-    }
-
-    @Deprecated
-    public void clearCustomizeViewColumns()
-    {
-        clearColumns();
-    }
-
-    @Deprecated
-    public void clearCustomizeViewFilters()
-    {
-        clearFilters();
-    }
-
-    @Deprecated
-    public void clearCustomizeViewSorts()
-    {
-        clearSorts();
     }
 
     public void clearColumns()
@@ -769,24 +679,6 @@ public class CustomizeView extends WebDriverComponent<CustomizeView.Elements>
 
         Actions builder = new Actions(_driver.getDriver());
         builder.dragAndDrop(fromItem, toItem).build().perform();
-    }
-
-    @Deprecated
-    public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
-    {
-        moveColumn(fieldKey, moveUp);
-    }
-
-    @Deprecated
-    public void moveCustomizeViewFilter(String fieldKey, boolean moveUp)
-    {
-        moveFilter(fieldKey, moveUp);
-    }
-
-    @Deprecated
-    public void moveCustomizeViewSort(String fieldKey, boolean moveUp)
-    {
-        moveSort(fieldKey, moveUp);
     }
 
     public void removeColumnTitle(String fieldKey)
