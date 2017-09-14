@@ -18,7 +18,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
-import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.components.api.ProjectMenu;
 
 import static org.junit.Assert.*;
 

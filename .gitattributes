@@ -476,6 +476,7 @@ src/org/labkey/test/components/SummaryStatisticsDialog.java -text
 src/org/labkey/test/components/WebDriverComponent.java -text
 src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/components/WebPartPanel.java -text
+src/org/labkey/test/components/api/ProjectMenu.java -text
 src/org/labkey/test/components/core/FilePicker.java -text
 src/org/labkey/test/components/core/NotificationPanelItem.java -text
 src/org/labkey/test/components/core/UserNotificationsPanel.java -text
@@ -497,7 +498,6 @@ src/org/labkey/test/components/html/FormItem.java -text
 src/org/labkey/test/components/html/Input.java -text
 src/org/labkey/test/components/html/ModalDialog.java -text
 src/org/labkey/test/components/html/OptionSelect.java -text
-src/org/labkey/test/components/html/ProjectMenu.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
 src/org/labkey/test/components/html/SelectWrapper.java -text
 src/org/labkey/test/components/html/SiteNavBar.java -text

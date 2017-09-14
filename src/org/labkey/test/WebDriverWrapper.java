@@ -26,7 +26,7 @@ import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.ModalDialog;
-import org.labkey.test.components.html.ProjectMenu;
+import org.labkey.test.components.api.ProjectMenu;
 import org.labkey.test.components.html.SiteNavBar;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
