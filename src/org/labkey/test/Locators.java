@@ -18,7 +18,6 @@ package org.labkey.test;
 public abstract class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
-    public static final Locator.XPathLocator UX_ADMIN_MENU_TOGGLE = Locator.xpath("//li[contains(@class,'dropdown dropdown-rollup') and ./a/i[@class='fa fa-cog']]");
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.XPathLocator UX_USER_MENU = Locator.xpath("//ul[@class='navbar-nav-lk' and ./li/a/i[@class='fa fa-user']]");
     public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
