@@ -19,24 +19,15 @@ public abstract class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");
     public static final Locator.XPathLocator UX_ADMIN_MENU_TOGGLE = Locator.xpath("//li[contains(@class,'dropdown dropdown-rollup') and ./a/i[@class='fa fa-cog']]");
-    //public static final Locator.XPathLocator UX_ADMIN_MENU = Locator.xpath()
     public static final Locator.IdLocator USER_MENU = Locator.id("userMenuPopupLink");
     public static final Locator.XPathLocator UX_USER_MENU = Locator.xpath("//ul[@class='navbar-nav-lk' and ./li/a/i[@class='fa fa-user']]");
     public static final Locator.IdLocator DEVELOPER_MENU = Locator.id("devMenuPopupLink");
     public static final Locator.IdLocator projectBar = Locator.id("projectBar");
-    public static final Locator.XPathLocator UX_PROJECT_LIST_CONTAINER = Locator.xpath("//div[contains(@class, 'project-list-container iScroll') and ./p[@class='title' and contains(text(), 'Projects')]]");
-    public static final Locator.XPathLocator UX_PROJECT_LIST = Locator.xpath("//div[@class='project-list']");
-    public static final Locator.XPathLocator UX_FOLDER_LIST_CONTAINER = Locator.xpath("//div[contains(@class, 'folder-list-container') and ./p[@class='title' and contains(text(), 'Project Folders & Pages')]]");
-    public static final Locator.XPathLocator UX_FOLDER_LIST = Locator.xpath("//div[@class='folder-tree_wrap']");
     public static final Locator.IdLocator folderMenu = Locator.id("folderBar");
     public static final Locator.XPathLocator labkeyError = Locator.tagWithClass("*", "labkey-error");
     public static final Locator.XPathLocator alertWarning = Locator.tagWithClass("*", "alert alert-warning");
     public static final Locator signInLink = Locator.tagWithAttributeContaining("a", "href", "login.view");
     public static final Locator.XPathLocator folderTab = Locator.tagWithClass("div", "lk-nav-tabs-ct").append(Locator.tagWithClass("ul", "lk-nav-tabs")).childTag("li");
-    public static final Locator.XPathLocator UX_PAGE_NAV = Locator.xpath("//nav[@class='labkey-page-nav']");
-    public static final Locator.XPathLocator UX_FOLDER_TAB = Locator.xpath("//li[@data-webpart='BetaNav']//i[contains(@class, 'fa-folder-open')]");
-    public static final Locator.CssLocator labkeyHeader = Locator.css(".labkey-main .header-block");
-    public static final Locator.CssLocator labkeyBody = Locator.css(".labkey-main .body-block");
 
     public static Locator.CssLocator headerContainer()
     {

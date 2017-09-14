@@ -1216,7 +1216,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            waitForElement(Locators.UX_FOLDER_TAB);
             projectMenu().expandFolderLinksTo("*all");
 
             return shortWait().until(new ExpectedCondition<WebElement>()
