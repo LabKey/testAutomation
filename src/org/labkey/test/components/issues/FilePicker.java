@@ -14,7 +14,7 @@ public class FilePicker extends org.labkey.test.components.core.FilePicker
     protected String getTableId()
     {
         if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            return "filePickerTableHead";
+            return "filePickerTable";
         else
             return super.getTableId();
     }
@@ -23,7 +23,7 @@ public class FilePicker extends org.labkey.test.components.core.FilePicker
     protected String getLinkId()
     {
         if (BaseWebDriverTest.IS_BOOTSTRAP_LAYOUT)
-            return "filePickerLinked";
+            return "filePickerLink";
         else
             return super.getLinkId();
     }
