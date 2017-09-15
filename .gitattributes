@@ -97,6 +97,9 @@ modules/ETLtest/resources/ETLs/merge.xml -text
 modules/ETLtest/resources/ETLs/mergeManyColumns.xml -text
 modules/ETLtest/resources/ETLs/mergeWithAlternateKey.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/multipleTransactions.xml -text svneol=unset#application/xml
+modules/ETLtest/resources/ETLs/projects1.xml -text
+modules/ETLtest/resources/ETLs/projects2.xml -text
+modules/ETLtest/resources/ETLs/projects3.xml -text
 modules/ETLtest/resources/ETLs/remote.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/ETLtest/resources/ETLs/remote_noTruncate.xml -text svneol=unset#application/xml
@@ -112,6 +115,9 @@ modules/ETLtest/resources/ETLs/targetFileWithSleep.xml -text svneol=unset#applic
 modules/ETLtest/resources/ETLs/truncate.xml -text
 modules/ETLtest/resources/ETLs/truncateWithoutDataTransfer.xml -text
 modules/ETLtest/resources/queries/etltest/TransactionTest.sql -text
+modules/ETLtest/resources/queries/etltest/deleteProject.sql -text
+modules/ETLtest/resources/queries/etltest/projects1.sql -text
+modules/ETLtest/resources/queries/etltest/projects2.sql -text
 modules/ETLtest/resources/schemas/dbscripts/postgresql/etltest-0.00-16.30.sql -text
 modules/ETLtest/resources/schemas/dbscripts/sqlserver/etltest-0.00-16.30.sql -text
 modules/ETLtest/resources/schemas/etltest.xml -text
