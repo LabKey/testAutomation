@@ -224,12 +224,11 @@ public class ListTest extends BaseWebDriverTest
         // Previously it was called from the @BeforeClass method, even though none of the other test cases use this list.
 
         log("Add list -- " + LIST_NAME_COLORS);
-        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
+        _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
         _listHelper.clickEditDesign();
         setFormElement(Locator.id("ff_description"), LIST_DESCRIPTION);
-        setColumnName(0, LIST_KEY_NAME2);
         _listHelper.clickSave();
 
         log("Check that edit list definition worked");
