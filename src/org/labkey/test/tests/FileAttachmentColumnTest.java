@@ -61,9 +61,7 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
         // verify file download behavior for csv, tif
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_CSV.getName())));
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_TIF.getName())));
-
-        // expected behavior for pdf: render as a web page.
-        doAndWaitForPageToLoad(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
+        doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
         goBack();
 
         // verify popup/sprite for jpeg
