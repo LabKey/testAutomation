@@ -106,11 +106,11 @@ public class InsertIssueDefPage extends LabKeyPage
         }
     }
 
-    public class CreateListDefError extends ModalDialog
+    public class CreateListDefError extends Window
     {
         private CreateListDefError(WebDriver driver)
         {
-            super(ModalDialog.find(driver).getComponentElement(), driver);
+            super("Error", driver);
         }
 
         public InsertIssueDefPage clickClose()

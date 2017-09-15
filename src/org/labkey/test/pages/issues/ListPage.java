@@ -98,9 +98,7 @@ public class ListPage extends LabKeyPage<ListPage.ElementCache>
     protected class ElementCache extends LabKeyPage.ElementCache
     {
         WebElement jumpToForm = Locator.tagWithName("form", "jumpToIssue").findWhenNeeded(this);
-        WebElement newIssueButton = IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithAttribute("a", "role", "button").startsWith("New ").findWhenNeeded(getDriver()) :
-                Locator.lkButton().startsWith("New ").findWhenNeeded(this);
+        WebElement newIssueButton = Locator.lkButton().startsWith("New ").findWhenNeeded(this);
         Input issueJumpInput = Input(Locator.name("issueId"), getDriver()).findWhenNeeded(jumpToForm);
         WebElement issueJumpButton = IS_BOOTSTRAP_LAYOUT
                 ? Locator.lkButton("Search").findWhenNeeded(bodyBlock)

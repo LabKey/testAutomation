@@ -224,12 +224,12 @@ public class IssueDomainSharingTest extends BaseWebDriverTest
                 getCurrentContainerPath());
     }
 
-    @Test @Ignore //TODO
+    //@Test @Ignore //TODO
     public void testDeletingInheritedListDef() throws Exception
     {
     }
 
-    @Test @Ignore //TODO
+    //@Test @Ignore //TODO
     public void testProtectedFields() throws Exception
     {
     }
