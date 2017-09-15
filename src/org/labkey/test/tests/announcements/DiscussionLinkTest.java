@@ -21,8 +21,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.WikiHelper;
@@ -32,17 +31,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({InDevelopment.class})
+@Category({DailyC.class})
 public class DiscussionLinkTest extends BaseWebDriverTest
 {
-
+    {setIsBootstrapWhitelisted(true);}
     public static final String WIKI_NAME = "Link test";
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        super.doCleanup(afterTest);
-    }
 
     @BeforeClass
     public static void setupProject()
@@ -90,7 +83,6 @@ public class DiscussionLinkTest extends BaseWebDriverTest
         goToProjectHome();
         click(Locator.linkContainingText(WIKI_NAME));
         assertElementNotPresent(Locator.linkContainingText("discussion"));
-
     }
 
     @Override

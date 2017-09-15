@@ -264,13 +264,13 @@ public class NonStudyReportsTest extends ReportTest
         RReportHelper.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT);
 
-        clickMenuButton(true,Locator.id("discussionMenuToggle").findElement(getDriver()),false,"Start new discussion");
+        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()),false,"Start new discussion");
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("title"), DISCUSSION_TITLE_1);
         setFormElement(Locator.id("body"), DISCUSSION_BODY_1);
         clickButton("Submit");
 
-        clickMenuButton(true,Locator.id("discussionMenuToggle").findElement(getDriver()),false,DISCUSSION_TITLE_1);
+        clickMenuButton(true, Locator.tagWithClass("div", "discussion-toggle").findElement(getDriver()),false,DISCUSSION_TITLE_1);
         waitForText(DISCUSSION_TITLE_1);
         assertTextPresent(DISCUSSION_BODY_1);
 
