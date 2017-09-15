@@ -144,16 +144,16 @@ public class NabAssayTest extends AbstractQCAssayTest
             "                               if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
             "                               var done = Ext4.create(\"Ext.form.TextField\", { renderTo : config.renderTo, value : 'Success!'});\n" +
             "                            },\n" +
-            "                            failure : function() {throw 'GetStudyGraphURL failure';}\n" +
+            "                            failure : function(response) {throw 'GetStudyGraphURL failure: ' + JSON.stringify(response);}\n" +
             "                        }\n" +
             "                        var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
             "                    },\n" +
-            "                    failure : function() {throw 'GetStudyNabRuns failure 2';}\n" +
+            "                    failure : function(response) {throw 'GetStudyNabRuns failure 2: ' + JSON.stringify(response);}\n" +
             "                }\n" +
             "                var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
             "            }\n" +
             "        },\n" +
-            "        failure : function() {throw 'GetNabRuns failure 2';}\n" +
+            "        failure : function(response) {throw 'GetNabRuns failure 2: ' + JSON.stringify(response);}\n" +
             "    };\n" +
             "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
             "}" +
