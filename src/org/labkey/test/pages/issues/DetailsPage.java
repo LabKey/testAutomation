@@ -116,19 +116,19 @@ public class DetailsPage extends BaseIssuePage<DetailsPage.ElementCache>
     protected class ElementCache extends BaseIssuePage.ElementCache
     {
         protected WebElement searchButton = Locator.tagWithAttribute("a", "data-original-title", "Search").findWhenNeeded(this);
-        protected WebElement newIssueLink = Locator.bootstrapButton("New Issue").findWhenNeeded(this);
+        protected WebElement newIssueLink = Locator.lkButton("New Issue").findWhenNeeded(this);
         protected WebElement returnLink = Locator.linkWithText("return to grid").findWhenNeeded(this); //gone in newUI
         protected WebElement updateLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("Update").findWhenNeeded(this)
+                Locator.lkButton("Update").findWhenNeeded(this)
                 : Locator.linkWithText("update").findWhenNeeded(this);
         protected WebElement resolveLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("Resolve").findWhenNeeded(this)
+                Locator.lkButton("Resolve").findWhenNeeded(this)
                 : Locator.linkWithText("resolve").findWhenNeeded(this);
         protected WebElement closeLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("Close").findWhenNeeded(this)
+                Locator.lkButton("Close").findWhenNeeded(this)
                 : Locator.linkWithText("close").findWhenNeeded(this);
         protected WebElement reopenLink = IS_BOOTSTRAP_LAYOUT ?
-                Locator.bootstrapButton("Reopen").findWhenNeeded(this)
+                Locator.lkButton("Reopen").findWhenNeeded(this)
                 : Locator.linkWithText("reopen").findWhenNeeded(this);
         protected WebElement printLink = Locator.linkWithText("print").findWhenNeeded(this); //in menu in newUI
         protected WebElement emailPrefsLink = Locator.linkWithText("email prefs").findWhenNeeded(this); //in menu in newUI

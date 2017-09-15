@@ -183,7 +183,7 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String issueTitle = "A general issue";
 
-        Locator newIssueButton = Locator.bootstrapButton("New Issue");
+        Locator newIssueButton = Locator.lkButton("New Issue");
         assertElementPresent(newIssueButton);
 
         // quick security test
@@ -329,24 +329,6 @@ public class IssuesTest extends BaseWebDriverTest
         // RssAction
     }
 
-    private void setDefaultValues(Map<String, String> defaultValues)
-    {
-        waitAndClickAndWait(Locator.linkContainingText(ISSUE_SUMMARY_WEBPART_NAME));
-        _issuesHelper.goToAdmin();
-        click(Locator.tag("div").withClass("gwt-Label").withText("Area"));
-        click(Locator.tag("span").withClass("x-tab-strip-text").withText("Advanced"));
-        clickAndWait(Locator.linkWithText("set value"));
-
-        for (Map.Entry<String, String> field : defaultValues.entrySet())
-        {
-            if ("select".equals(Locator.name(field.getKey()).findElement(getDriver()).getTagName()))
-                selectOptionByText(Locator.name(field.getKey()), field.getValue());
-            else
-                setFormElement(Locator.id(field.getKey()), field.getValue());
-        }
-        clickButton("Save Defaults");
-    }
-
     @LogMethod
     private void setRequiredFields(AdminPage adminPage, int[] positions, boolean selected)
     {
@@ -472,8 +454,8 @@ public class IssuesTest extends BaseWebDriverTest
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
         assertTrue("User did not receive issue notification", recipients.contains(getUsername()));
-        assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
-        assertFalse(USER2 + " receieved issue notification without container read permission", recipients.contains(USER2));
+        assertTrue(USER1 + " did not receive issue notification", recipients.contains(USER1));
+        assertFalse(USER2 + " received issue notification without container read permission", recipients.contains(USER2));
 
         assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE.get("title")));
 
@@ -686,7 +668,7 @@ public class IssuesTest extends BaseWebDriverTest
         new SiteNavBar(getDriver()).goToModule("Issues");
         clickAndWait(Locator.linkWithText(issueTitle));
         BootstrapMenu.find(getDriver(), "More")
-                .clickMenuButton(false, false, "Move");
+                .clickSubMenu(false, "Move");
 
         // handle move dialog
         waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
@@ -749,6 +731,18 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(issueIdC));
         assertElementPresent(Locator.linkWithText(issueIdB));
         assertTextPresent(String.format("%s, %s", issueIdB, issueIdC));
+
+        // show related comments
+        final Locator.XPathLocator related = Locator.tagWithClass("div", "relatedIssue");
+        assertElementNotVisible(related);
+        BootstrapMenu.find(getDriver(), "More")
+                .clickSubMenu(false, "Show related comments");
+        assertElementVisible(related);
+
+        // hide related comments
+        BootstrapMenu.find(getDriver(), "More")
+                .clickSubMenu(false, "Hide related comments");
+        assertElementNotVisible(related);
 
         // NOTE: still need to test for case where user doesn't have permission to related issue...
     }
