@@ -47,7 +47,7 @@ public abstract class Locators
 
     public static Locator.XPathLocator bodyTitle()
     {
-        return Locator.tagWithClass("div", "lk-body-title").childTag("h3");
+        return Locator.tagWithClassContaining("div", "lk-body-title").childTag("h3");
     }
     public static Locator.XPathLocator bodyTitle(String title)
     {
