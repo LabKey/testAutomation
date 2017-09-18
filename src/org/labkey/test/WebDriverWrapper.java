@@ -1090,10 +1090,11 @@ public abstract class WebDriverWrapper implements WrapsDriver
         assertAlert(alertText);
     }
 
-    public void assertExtMsgBox(String title, String text)
+    public void assertExtMsgBox(String title, String text, String buttonToClick)
     {
         String actual = _extHelper.getExtMsgBoxText(title);
         assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
+        clickButton(buttonToClick, 0);
     }
 
     public void assertExt4MsgBox(String bodyText, String buttonToClick)

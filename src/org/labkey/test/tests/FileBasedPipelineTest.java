@@ -135,9 +135,7 @@ public class FileBasedPipelineTest extends BaseWebDriverTest
 
         // Running same protocol again is an error
         pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
-        ModalDialog error = ModalDialog.find(getDriver());
-        assertEquals("Cannot redefine an existing protocol", error.getBodyText());
-        error.close();
+        assertExtMsgBox("Error", "Cannot redefine an existing protocol", "OK");
 
         // Delete the job, including any referenced runs
         deletePipelineJob(jobDescription, true);

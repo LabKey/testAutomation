@@ -533,9 +533,7 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.removeColumn(_listCol3.getName());
         _customizeViewsHelper.removeColumn(EscapeUtil.fieldKeyEncodePart(_listCol6.getName()));
         _customizeViewsHelper.clickViewGrid();
-        ModalDialog warning = ModalDialog.find(getDriver());
-        assertEquals("Wrong warning message", "You must select at least one field to display in the grid.", warning.getBodyText());
-        warning.close();
+        assertExt4MsgBox("You must select at least one field to display in the grid.", "OK");
         _customizeViewsHelper.closePanel();
 
         log("Test Export");

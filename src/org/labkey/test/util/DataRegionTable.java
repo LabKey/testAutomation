@@ -1080,8 +1080,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         {
             if (IS_BOOTSTRAP_LAYOUT)
             {
-                String alertMsg = getWrapper().acceptModalAlert();
-                assertTrue("Unexpected alert message", alertMsg.contains("You must select at least one field to display in the grid."));
+                getWrapper().assertExt4MsgBox("You must select at least one field to display in the grid.", "OK");
             }
             else
             {
