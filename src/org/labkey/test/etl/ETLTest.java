@@ -59,12 +59,6 @@ public class ETLTest extends ETLAbstractTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        super.doCleanup(afterTest);
-    }
-
-    @Override
     protected boolean isResetInPreTest()
     {
         return true;
