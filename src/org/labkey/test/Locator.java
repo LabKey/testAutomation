@@ -1205,7 +1205,7 @@ public abstract class Locator extends By
 
         public XPathLocator last()
         {
-            return append("[last()]");
+            return withPredicate("last()");
         }
 
         public XPathLocator append(String clause)
