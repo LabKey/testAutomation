@@ -35,9 +35,6 @@ public class ChartHelper
      */
     public void editDrtRow(int row, Map<String, String> nameAndValue)
     {
-        _test.clickAndWait(Locator.linkWithText("edit").index(row));
-        for(String name : nameAndValue.keySet())
-            _test.setFormElement(Locator.xpath("//tr[td[contains(text(),'" + name + "')]]/td//input"), nameAndValue.get(name));
-        _test.clickButton("Submit");
+        DataRegionTable.DataRegion(_test.getDriver()).find().updateRow(row, nameAndValue);
     }
 }
