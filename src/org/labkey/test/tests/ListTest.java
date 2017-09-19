@@ -30,7 +30,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
-import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;

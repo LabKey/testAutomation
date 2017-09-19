@@ -19,7 +19,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.components.IssueListDefDataRegion;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.Input;
-import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.html.OptionSelect;
 import org.labkey.test.pages.LabKeyPage;
 import org.openqa.selenium.WebDriver;
