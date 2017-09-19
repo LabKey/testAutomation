@@ -483,6 +483,7 @@ src/org/labkey/test/components/WebDriverComponent.java -text
 src/org/labkey/test/components/WebPart.java -text
 src/org/labkey/test/components/WebPartPanel.java -text
 src/org/labkey/test/components/api/ProjectMenu.java -text
+src/org/labkey/test/components/bootstrap/ModalDialog.java -text
 src/org/labkey/test/components/core/FilePicker.java -text
 src/org/labkey/test/components/core/NotificationPanelItem.java -text
 src/org/labkey/test/components/core/UserNotificationsPanel.java -text
@@ -502,7 +503,6 @@ src/org/labkey/test/components/html/EnumSelect.java -text
 src/org/labkey/test/components/html/FileInput.java -text
 src/org/labkey/test/components/html/FormItem.java -text
 src/org/labkey/test/components/html/Input.java -text
-src/org/labkey/test/components/html/ModalDialog.java -text
 src/org/labkey/test/components/html/OptionSelect.java -text
 src/org/labkey/test/components/html/RadioButton.java -text
 src/org/labkey/test/components/html/SelectWrapper.java -text
@@ -516,6 +516,7 @@ src/org/labkey/test/components/internal/ImpersonateWindow.java -text
 src/org/labkey/test/components/issues/FilePicker.java -text
 src/org/labkey/test/components/labkey/FormItemFinder.java -text
 src/org/labkey/test/components/labkey/GenericFormItem.java -text
+src/org/labkey/test/components/labkey/LabKeyAlert.java -text
 src/org/labkey/test/components/labkey/PortalTab.java -text
 src/org/labkey/test/components/labkey/ReadOnlyFormItem.java -text
 src/org/labkey/test/components/list/ManageListsGrid.java -text

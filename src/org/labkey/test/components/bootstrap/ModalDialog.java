@@ -1,4 +1,4 @@
-package org.labkey.test.components.html;
+package org.labkey.test.components.bootstrap;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
@@ -24,15 +24,9 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         waitForReady();
     }
 
-    public static ModalDialog find(WebDriver driver)
-    {
-        return new ModalDialog(Locators.component.waitForElement(driver, WAIT_FOR_JAVASCRIPT), driver);
-    }
-
     public void waitForReady()
     {
-        WebDriverWrapper.waitFor(()-> Locators.title.findElementOrNull(this ) != null &&
-                elementCache().title.getText().length() > 0, "Modal dialog not ready", 2000);
+        WebDriverWrapper.waitFor(() -> elementCache().title.getText().length() > 0, "Modal dialog not ready", 2000);
     }
 
     @Override
@@ -70,19 +64,10 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected class ElementCache extends Component.ElementCache
     {
-        WebElement header = Locators.header.findWhenNeeded(this).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement title = Locators.title.findWhenNeeded(header).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement body = Locators.body.findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement closeButton = Locators.closeBtn.findWhenNeeded(header);
-    }
-
-    private static abstract class Locators
-    {
-        private static final Locator component = Locator.tagWithClass("div", "modal-dialog");
-        private static final Locator contents = Locator.tagWithClass("div","modal-content");
-        private static final Locator header = Locator.tagWithClass("div","modal-header");
-        private static final Locator body = Locator.tagWithClass("div","modal-body");
-        private static final Locator title = Locator.tagWithClass("*", "modal-title");
-        private static final Locator closeBtn = Locator.tagWithClass("button", "close").withAttribute("data-dismiss", "modal");
+        WebElement dialog = Locator.tagWithClass("div", "modal-dialog").findWhenNeeded(this);
+        WebElement header = Locator.tagWithClass("div","modal-header").findWhenNeeded(dialog).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement title = Locator.tagWithClass("*", "modal-title").findWhenNeeded(header);
+        WebElement closeButton = Locator.tagWithClass("button", "close").withAttribute("data-dismiss", "modal").findWhenNeeded(header);
+        WebElement body = Locator.tagWithClass("div","modal-body").findWhenNeeded(dialog).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 }

@@ -24,10 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.api.util.FileUtil;
 import org.labkey.api.util.Pair;
 import org.labkey.remoteapi.Connection;
-import org.labkey.test.components.html.BootstrapMenu;
-import org.labkey.test.components.html.ModalDialog;
 import org.labkey.test.components.api.ProjectMenu;
+import org.labkey.test.components.html.BootstrapMenu;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
@@ -1105,9 +1105,9 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public String acceptModalAlert()
     {
-        ModalDialog alert = ModalDialog.find(getDriver());
-        String bodyText = alert.getBodyText();
-        alert.close();
+        Alert alert = new LabKeyAlert(getDriver());
+        String bodyText = alert.getText();
+        alert.accept();
         return bodyText;
     }
 
