@@ -564,7 +564,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("view history"));
         assertTextPresent(":History");
         assertTextPresent("record was modified", 2);    // An existing list record was modified
-        assertTextPresent("were modified", 8);          // The column(s) of domain ></% 1äöüColors were modified
+        assertTextPresent("were modified", 7);          // The column(s) of domain ></% 1äöüColors were modified
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("was created", 2);                // Once for the list, once for the domain
