@@ -520,6 +520,11 @@ public abstract class Locator extends By
         return tag(tag).withAttributeContaining("class", partialCssClass);
     }
 
+    public static XPathLocator byClass(String cssClass)
+    {
+        return tag("*").withClass(cssClass);
+    }
+
     public static XPathLocator tagWithText(String tag, String text)
     {
         return tag(tag).withText(text);
