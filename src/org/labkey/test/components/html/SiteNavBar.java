@@ -69,7 +69,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         if (isInPageAdminMode())
         {
-            Locators.exitAdminBtn.findElement(getDriver()).click();
+            getWrapper().clickAndWait(Locators.exitAdminBtn.findElement(getDriver()));
             WebDriverWrapper.waitFor(()-> !isInPageAdminMode(), "Failed to exit page admin mode", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
     }
@@ -78,7 +78,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         if (getWrapper().isImpersonating())
         {
-            Locators.stopImpersonatingBtn.findElement(getDriver()).click();
+            getWrapper().clickAndWait(Locators.stopImpersonatingBtn.findElement(getDriver()));
             WebDriverWrapper.waitFor(() -> !getWrapper().isImpersonating(), "Failed to stop impersonating", WebDriverWrapper.WAIT_FOR_JAVASCRIPT);
         }
     }
@@ -92,7 +92,7 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
     {
         expandSearchBar();
         getWrapper().setFormElement(elementCache().searchInputElement, searchTerm);
-        getWrapper().doAndWaitForPageToLoad(() -> elementCache().searchSubmitInput.click(), WebDriverWrapper.WAIT_FOR_PAGE);
+        getWrapper().clickAndWait(elementCache().searchSubmitInput);
         return new SearchResultsPage(getDriver());
     }
 
@@ -177,7 +177,6 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
             if (moduleLinkElement != null && moduleLinkElement.isDisplayed())
             {
                 getWrapper().scrollIntoView(moduleLinkElement);
-                getWrapper().doAndWaitForPageToLoad(moduleLinkElement::click);
             }
             else
             {
@@ -185,8 +184,9 @@ public class SiteNavBar extends WebDriverComponent<SiteNavBar.Elements>
                 WebDriverWrapper.waitFor(()-> findVisibleMenuItemOrNull(moduleName) != null,
                         "Did not find expected module [" + moduleName + "]", 2000);
                 getWrapper().setFormElement(Locator.tagWithClass("input", "dropdown-menu-filter"), moduleName);
-                findVisibleMenuItem(moduleName).click();
+                moduleLinkElement = findVisibleMenuItem(moduleName);
             }
+            getWrapper().clickAndWait(moduleLinkElement);
         }
     }
 
