@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.ext4.Checkbox;
+import org.labkey.test.components.ext4.RadioButton;
 import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
@@ -175,7 +176,7 @@ public class FileBrowserHelper extends WebDriverWrapper
     //In case desired element is not present due to infinite scrolling
     private void scrollToGridRow(String nodeIdEndsWith)
     {
-        Locator lastFileGridItem = Locators.gridRow().withPredicate("last()");
+        Locator lastFileGridItem = Locators.gridRow().last();
         Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
 
         waitForFileGridReady();
@@ -283,7 +284,14 @@ public class FileBrowserHelper extends WebDriverWrapper
     {
         doAndWaitForPageSignal(() -> clickFileBrowserButton(BrowserAction.IMPORT_DATA), IMPORT_SIGNAL_NAME);
         Window importWindow = Window(getDriver()).withTitle("Import Data").waitFor();
-        RadioButton().withLabelContaining(actionName).find(importWindow).check();
+        RadioButton actionRadioButton = RadioButton().withLabelContaining(actionName).find(importWindow);
+        actionRadioButton.check();
+        if (!actionRadioButton.isSelected())
+        {
+            scrollIntoView(actionRadioButton.getComponentElement(), true);
+            actionRadioButton.check();
+            assertTrue("Failed to select action: " + actionName, actionRadioButton.isSelected());
+        }
         importWindow.clickButton("Import");
     }
 
@@ -546,7 +554,7 @@ public class FileBrowserHelper extends WebDriverWrapper
         {
             return Locator.tag("tr")
                     .withClass("x4-grid-data-row")
-                    .withPredicate("starts-with(@id, 'gridview')");
+                    .attributeStartsWith("id", "gridview");
         }
 
         public static Locator.XPathLocator gridRow(String fileName)
