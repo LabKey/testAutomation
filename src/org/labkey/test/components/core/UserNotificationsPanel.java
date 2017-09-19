@@ -20,30 +20,29 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.components.Component;
-import org.labkey.test.components.ComponentElements;
+import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.selenium.LazyWebElement;
-import org.openqa.selenium.By;
-import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UserNotificationsPanel extends Component
+public class UserNotificationsPanel extends WebDriverComponent<UserNotificationsPanel.Elements>
 {
+    private static final Locator inboxIcon = Locator.xpath("//a[contains(@onclick, 'LABKEY.Notification.showPanel')]");
+    private static final Locator inboxCount = Locator.byClass("labkey-notification-inbox").followingSibling("span").attributeStartsWith("id", "labkey-notifications-count");
+    private static final Locator.XPathLocator visibleNotification = Locator.byClass("labkey-notification");
 
-    private static final Locator.XPathLocator menuBar = Locator.xpath("//div[@id='menubar']");
-    private static final Locator.XPathLocator inboxIcon = menuBar.append("//a[contains(@onclick, 'LABKEY.Notification.showPanel')]");
-    private static final Locator.XPathLocator inboxCount = inboxIcon.append("//span[2]");
+    protected final WebDriver _driver;
+    protected final WebElement _notificationPanel;
 
-    protected WebElement _notificationPanel;
-
-    public UserNotificationsPanel(WebElement we)
+    public UserNotificationsPanel(WebDriver driver)
     {
-        _notificationPanel = we;
+        _driver = driver;
+        _notificationPanel = Locator.tagWithClass("div", "labkey-notification-panel").findElement(driver);
     }
 
     public static int getInboxCount(BaseWebDriverTest test)
@@ -58,36 +57,36 @@ public class UserNotificationsPanel extends Component
     {
         test.click(inboxIcon);
         test.waitForElement(Locators.pageSignal("notificationPanelShown"), 2000);
-        return new UserNotificationsPanel(Locator.css("div.labkey-notification-panel").findElement(test.getDriver()));
+        return new UserNotificationsPanel(test.getDriver());
+    }
+
+    @Override
+    protected WebDriver getDriver()
+    {
+        return _driver;
     }
 
     public boolean isNotificationPanelVisible()
     {
-        return _notificationPanel.isDisplayed();
+        return getComponentElement().isDisplayed();
     }
 
     public List<String> getNotificationTypesShown()
     {
-        List<String> types = new ArrayList<>();
-        for(WebElement we : _notificationPanel.findElements(By.cssSelector(" div.labkey-notification-area div.labkey-notification-type")))
-        {
-            types.add(we.getText());
-        }
-
-        return types;
+        return getWrapper().getTexts(Locator.css("div.labkey-notification-area div.labkey-notification-type-label").findElements(this));
     }
 
     public int getNotificationCount()
     {
         int count;
 
-        if(elements().notificationArea.getAttribute("style").toLowerCase().contains("display: none"))
+        if (elementCache().notificationArea.getAttribute("style").toLowerCase().contains("display: none"))
         {
             count = 0;
         }
         else
         {
-            count = _notificationPanel.findElements(By.cssSelector(" div.labkey-notification:not([style='display: none;'])")).size();
+            count = visibleNotification.findElements(this).size();
         }
 
         return count;
@@ -96,7 +95,7 @@ public class UserNotificationsPanel extends Component
     public List<NotificationPanelItem> getAllNotifications()
     {
         List<NotificationPanelItem> notifications = new ArrayList<>();
-        for(WebElement we : _notificationPanel.findElements(By.cssSelector(" div.labkey-notification:not([style='display: none;'])")))
+        for (WebElement we : visibleNotification.findElements(this))
         {
             notifications.add(new NotificationPanelItem(we));
         }
@@ -107,60 +106,44 @@ public class UserNotificationsPanel extends Component
     public NotificationPanelItem getNotificationAtIndex(int idx)
     {
         List<WebElement> notifications;
-        notifications = _notificationPanel.findElements(By.cssSelector(" div.labkey-notification:not([style='display: none;'])"));
+        notifications = visibleNotification.findElements(this);
         return new NotificationPanelItem(notifications.get(idx));
     }
 
-    public List<NotificationPanelItem> getNotificationsOfType(NotificationTypes notificationType)
+    public List<NotificationPanelItem> getNotificationsOfType(String notificationType)
     {
         List<NotificationPanelItem> notificationItemListlist = new ArrayList<>();
         List<WebElement> notifications;
-        String tagId;
 
-        switch(notificationType)
+        notifications = elementCache().findNotificationsOfType(notificationType);
+        for (WebElement we : notifications)
         {
-            case ISSUES:
-                tagId = NotificationTypes.ISSUES.tagId;
-                break;
-            case STUDY:
-                tagId = NotificationTypes.STUDY.tagId;
-                break;
-            default:
-                tagId = "";
-                break;
-        }
-
-        // This will return all div's that are a sibling of the type you are looking for.
-        // Unfortunately this will include any other div of a different type (they are still a sibling).
-        // So loop through the list of elements returned and add any element that is of class labkey-notification,
-        // once we hit a div not of that class it means we are in a new section, so we can stop.
-
-        notifications = elements().findElements(By.cssSelector(" div#" + tagId + " ~ div:not([style='display: none;'])"));
-        for(WebElement we : notifications)
-        {
-            if(we.getAttribute("class").equals("labkey-notification"))
-            {
-                NotificationPanelItem ni = new NotificationPanelItem(we);
-                notificationItemListlist.add(ni);
-            }
-            else
-            {
-                break;
-            }
+            NotificationPanelItem ni = new NotificationPanelItem(we);
+            notificationItemListlist.add(ni);
         }
 
         return notificationItemListlist;
     }
 
+    @Deprecated
+    public List<NotificationPanelItem> getNotificationsOfType(NotificationTypes notificationType)
+    {
+        return getNotificationsOfType(notificationType.textValue);
+    }
+
+    @Deprecated
     public NotificationPanelItem findNotificationInList(String searchBody, @Nullable NotificationTypes notificationType)
     {
-        int noticeIndex;
-        boolean noticeFound;
-        List<NotificationPanelItem> notificationItemList = new ArrayList<>();
+        return findNotificationInList(searchBody, notificationType.textValue);
+    }
 
-        if(notificationType == null)
+    public NotificationPanelItem findNotificationInList(String searchBody, @Nullable String notificationType)
+    {
+        List<NotificationPanelItem> notificationItemList;
+
+        if (notificationType == null)
         {
-            notificationItemList =getAllNotifications();
+            notificationItemList = getAllNotifications();
         }
         else
         {
@@ -168,31 +151,15 @@ public class UserNotificationsPanel extends Component
         }
 
         Pattern pattern = Pattern.compile(searchBody);
-        Matcher matcher;
-        noticeIndex = 0;
-        noticeFound = false;
-        for(NotificationPanelItem ni : notificationItemList)
+        for (NotificationPanelItem ni : notificationItemList)
         {
-            matcher = pattern.matcher(ni.getBody());
-            if(matcher.find())
+            if (pattern.matcher(ni.getBody()).find())
             {
-                noticeFound = true;
-                break;
+                return ni;
             }
-            else
-            {
-                noticeIndex++;
-            }
-
         }
-
-        if(noticeFound)
-            return notificationItemList.get(noticeIndex);
-        else
-            return null;
-
+        return null;
     }
-
 
     @Override
     public WebElement getComponentElement()
@@ -200,25 +167,31 @@ public class UserNotificationsPanel extends Component
         return _notificationPanel;
     }
 
+    @Deprecated
     public Elements elements()
+    {
+        return elementCache();
+    }
+
+    @Override
+    protected Elements newElementCache()
     {
         return new Elements();
     }
 
-    public class Elements extends ComponentElements
+    public class Elements extends Component.ElementCache
     {
-        @Override
-        protected SearchContext getContext()
+        private final WebElement notificationArea = new LazyWebElement(Locator.css("div.labkey-notification-area"), this);
+        public final WebElement clearAll = new LazyWebElement(Locator.css("div.labkey-notification-clear-all"), this);
+        public final WebElement noNotifications = new LazyWebElement(Locator.css("div.labkey-notification-none"), this);
+        public final WebElement viewAll = new LazyWebElement(Locator.css("div.labkey-notification-footer"), this);
+        protected List<WebElement> findNotificationsOfType(String notificationType)
         {
-            return getComponentElement();
+            return Locator.id("notificationtype-" + notificationType).child(visibleNotification).findElements(this);
         }
-
-        private final WebElement  notificationArea = new LazyWebElement(Locator.css("div.labkey-notification-panel div.labkey-notification-area"), this);
-        public final WebElement clearAll = new LazyWebElement(Locator.css("div.labkey-notification-panel div.labkey-notification-clear-all"), this);
-        public final WebElement noNotifications = new LazyWebElement(Locator.css("div.labkey-notification-panel div.labkey-notification-none"), this);
-        public final WebElement viewAll = new LazyWebElement(Locator.css("div.labkey-notification-panel div.labkey-notification-footer"), this);
     }
 
+    @Deprecated
     public enum NotificationTypes
     {
         ISSUES("Issues", "notificationtype-Issues"),
@@ -233,5 +206,4 @@ public class UserNotificationsPanel extends Component
             tagId = id;
         }
     }
-
 }
