@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.DailyC;
+import org.labkey.test.categories.Git;
 import org.labkey.test.io.Grep;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
@@ -34,7 +36,7 @@ import java.util.TreeMap;
 
 import static org.junit.Assert.assertTrue;
 
-@Category({DailyA.class, DailyB.class})
+@Category({DailyA.class, DailyB.class, DailyC.class, Git.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
     private final boolean IS_BOOTSTRAP_LAYOUT_WHITELISTED = setIsBootstrapWhitelisted(true);
