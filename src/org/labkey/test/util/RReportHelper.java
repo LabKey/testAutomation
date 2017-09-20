@@ -202,7 +202,7 @@ public class RReportHelper
         String dockerEngineName = "R Docker Scripting Engine";
         _test.log("Try configuring R");
         String rVersion = null;
-        if (_test.isElementVisible(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(dockerEngineName)))
+        if (_test.isElementPresent(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(dockerEngineName)))
         {
             scripts.editEngine(dockerEngineName);
             if (useDocker)
