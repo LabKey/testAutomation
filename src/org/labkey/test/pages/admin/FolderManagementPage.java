@@ -4,6 +4,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.pages.LabKeyPage;
+import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -40,6 +41,16 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
                         && newElementCache().isTabActive(Locators.folderTreeTab),
                 "Could not navigate to Folder Tree pane", 4000);
         return this;
+    }
+
+    public FileRootsManagementPage goToFilesPane()
+    {
+        scrollIntoView(newElementCache().filesTabLink);
+        newElementCache().filesTabLink.click();
+        waitFor(() -> getURL().toString().endsWith("?tabId=files")
+                        && newElementCache().isTabActive(Locators.filesTab),
+                "Could not navigate to Files pane", 4000);
+        return new FileRootsManagementPage(getDriver());
     }
 
     // TODO: Add specific pane component
@@ -115,10 +126,13 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         // TODO: Add other elements that are on the page
         WebElement folderTreeTabLink = Locators.folderTreeTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement folderTypeTabLink = Locators.folderTypeTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement filesTabLink = Locators.filesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement missingValuesLink = Locators.missingValuesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement modulePropertiesTabLink = Locators.modulePropertiesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement exportTabLink = Locators.exportTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement importTabLink = Locators.importTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement saveButton = new LazyWebElement(Locator.xpath(".//a[contains(@class, 'labkey-button')]//span[contains(text(), 'Save')]/ancestor::a"),this);
+
 
         public boolean isTabActive(Locator loc)
         {
@@ -134,6 +148,9 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
         public static Locator.XPathLocator folderTypeTab = Locator.id("tabfolderType");
         public static Locator.XPathLocator folderTypeTabLink = folderTypeTab.child("a");
+
+        public static Locator.XPathLocator filesTab = Locator.id("tabfiles");
+        public static Locator.XPathLocator filesTabLink = filesTab.child("a");
 
         public static Locator.XPathLocator missingValuesTab = Locator.id("tabmvIndicators");
         public static Locator.XPathLocator missingValuesTabLink = missingValuesTab.child("a");

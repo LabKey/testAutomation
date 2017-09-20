@@ -574,6 +574,7 @@ src/org/labkey/test/pages/TimeChartWizard.java -text
 src/org/labkey/test/pages/TourEditor.java -text
 src/org/labkey/test/pages/ViewDatasetDataPage.java -text
 src/org/labkey/test/pages/admin/CreateSubFolderPage.java -text
+src/org/labkey/test/pages/admin/FileRootsManagementPage.java -text
 src/org/labkey/test/pages/admin/FolderManagementPage.java -text
 src/org/labkey/test/pages/admin/ReorderFoldersPage.java -text
 src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
@@ -596,6 +597,7 @@ src/org/labkey/test/pages/core/admin/ProjectSettingsPage.java -text
 src/org/labkey/test/pages/core/admin/ShowAdminPage.java -text
 src/org/labkey/test/pages/core/admin/logger/ManagerPage.java -text
 src/org/labkey/test/pages/dataintegration/ETLScheduler.java -text
+src/org/labkey/test/pages/files/CustomizeFilesWebPartPage.java -text
 src/org/labkey/test/pages/flow/reports/BeginPage.java -text
 src/org/labkey/test/pages/flow/reports/PositivityReportEditorPage.java -text
 src/org/labkey/test/pages/flow/reports/QCReportEditorPage.java -text
