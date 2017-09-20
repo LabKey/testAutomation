@@ -29,6 +29,7 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -181,8 +182,13 @@ public class RReportHelper
             fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
-    @LogMethod
     public String ensureRConfig()
+    {
+        return ensureRConfig(false);
+    }
+
+    @LogMethod
+    public String ensureRConfig(boolean useDocker)
     {
         _test.ensureAdminMode();
 
@@ -192,28 +198,53 @@ public class RReportHelper
 
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
-        String defaultScriptName = "R Scripting Engine";
-        if (scripts.isEnginePresent("R"))
+        String localEngineName = "R Scripting Engine";
+        String dockerEngineName = "R Docker Scripting Engine";
+        _test.log("Try configuring R");
+        String rVersion = null;
+        if (_test.isElementVisible(ConfigureReportsAndScriptsPage.Locators.enginesGridRowForName(dockerEngineName)))
         {
-            if (!TestProperties.isTestRunningOnTeamCity())
+            scripts.editEngine(dockerEngineName);
+            if (useDocker)
             {
-                scripts.editEngine(defaultScriptName);
-                rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
-                String rVersion = getRVersion(rExecutable);
-                _test.clickButton("Cancel", 0);
-                return rVersion;
+                _test.checkCheckbox(Locator.id("editEngine_enabled"));
+                rVersion = "RDocker";
             }
-            else // Reset R scripting engine on TeamCity
-                scripts.deleteEngine(defaultScriptName);
+            else
+            {
+                _test.uncheckCheckbox(Locator.id("editEngine_enabled"));
+            }
+
+            _test.clickButton("Submit", 0);
+        }
+        else if (useDocker)
+        {
+            scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R_DOCKER, new HashMap<>());
+            rVersion = "RDocker";
         }
 
-        _test.log("Try configuring R");
-        String rVersion = getRVersion(getRExecutable());
+        if (!useDocker)
+        {
+            if (scripts.isEnginePresent("R"))
+            {
+                if (!TestProperties.isTestRunningOnTeamCity())
+                {
+                    scripts.editEngine(localEngineName);
+                    rExecutable = new File(_test.getFormElement(Locator.id("editEngine_exePath")));
+                    rVersion = getRVersion(rExecutable);
+                    _test.clickButton("Cancel", 0);
+                    return rVersion;
+                }
+                else // Reset R scripting engine on TeamCity
+                    scripts.deleteEngine(localEngineName);
+            }
 
-        ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getRExecutable());
-        config.setVersion(rVersion);
-        scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R, config);
+            rVersion = getRVersion(getRExecutable());
 
+            ConfigureReportsAndScriptsPage.EngineConfig config = new ConfigureReportsAndScriptsPage.EngineConfig(getRExecutable());
+            config.setVersion(rVersion);
+            scripts.addEngine(ConfigureReportsAndScriptsPage.EngineType.R, config);
+        }
         return rVersion;
     }
 

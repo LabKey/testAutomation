@@ -53,13 +53,16 @@ public class ConfigureReportsAndScriptsPage
         return _test.isElementPresent(Locators.enginesGridRowForLanguage(language));
     }
 
-    @LogMethod
     public void addEngine(@LoggedParam EngineType type, EngineConfig config)
+    {
+        addEngine(type, config.getConfigMap());
+    }
+
+    @LogMethod
+    public void addEngine(@LoggedParam EngineType type, Map<Locator, String> configMap)
     {
         _test._extHelper.clickExtMenuButton(false, Locator.id("btn_addEngine"), "New " + type + " Engine");
         WebElement window = _test.waitForElement(Locators.editEngineWindow);
-
-        Map<Locator, String> configMap = config.getConfigMap();
 
         for (Map.Entry<Locator, String> entry : configMap.entrySet())
         {
@@ -98,11 +101,19 @@ public class ConfigureReportsAndScriptsPage
         _test.waitForElement(Locators.editEngineWindow);
     }
 
-    public static enum EngineType
+    public enum EngineType
     {
         PERL,
         R,
-        EXTERNAL;
+        EXTERNAL,
+        R_DOCKER
+                {
+                    @Override
+                    public String toString()
+                    {
+                        return "R Docker";
+                    }
+                };
 
         public String toString()
         {
@@ -225,7 +236,7 @@ public class ConfigureReportsAndScriptsPage
 
         public static Locator.XPathLocator enginesGrid = Locator.id("enginesGrid");
 
-        private static Locator enginesGridRowForName(String engineName)
+        public static Locator enginesGridRowForName(String engineName)
         {
             return enginesGrid.append(Locator.tagWithClass("div", "x-grid3-row").withPredicate(Locator.xpath(String.format("//td[%d]", nameColumnIndex + 1)).containing(engineName + "enabled")));
         }
