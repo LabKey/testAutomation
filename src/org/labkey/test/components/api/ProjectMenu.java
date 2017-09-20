@@ -37,7 +37,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public ProjectMenu(WebDriver driver)
     {
         _driver = driver;
-        _el = Locators.lableyPageNavbar.refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT);
+        _el = Locators.labkeyPageNavbar.refindWhenNeeded(driver).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -219,7 +219,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     public static class Locators
     {
-        public static final Locator lableyPageNavbar = Locator.tagWithClass("nav", "labkey-page-nav")
+        public static final Locator labkeyPageNavbar = Locator.tagWithClass("nav", "labkey-page-nav")
                 .withDescendant(Locator.tagWithClass("div", "navbar-header"));
         public static final Locator menuProjectNav = Locator.tagWithClassContaining("li", "dropdown")
                 .withAttribute("data-name", "BetaNav");
