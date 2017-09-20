@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-    <name>Extended Table Test2</name>
+    <name>Extended Table Test2 (merge)</name>
     <description>Merge rows from source to target</description>
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">

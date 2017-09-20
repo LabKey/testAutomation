@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
-    <name>Extended Table Test3</name>
-    <description>Merge rows from source to target</description>
+    <name>Extended Table Test3 (delete)</name>
+    <description>Merge and delete rows from source to target</description>
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
             <description>Copy to target</description>
