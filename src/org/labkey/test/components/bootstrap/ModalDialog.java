@@ -26,6 +26,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void waitForReady()
     {
+        elementCache().title.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
         WebDriverWrapper.waitFor(() -> elementCache().title.getText().length() > 0, "Modal dialog not ready", 2000);
     }
 
