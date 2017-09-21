@@ -32,21 +32,7 @@ public abstract class ReportTest extends StudyBaseTest
     @LogMethod
     protected void deleteReport(String reportName)
     {
-        goToManageViews();
-        final Locator report = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName);
-
-        // select the report and click the delete button
-        waitForElement(report, 10000);
-        click(report);
-
-        click(Locator.linkContainingText("Delete Selected"));
-
-        _extHelper.waitForExtDialog("Delete", WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.clickWindowButton("Delete", "OK", 0, 0);
-
-        // make sure the report is deleted
-        waitFor(() -> !isElementPresent(report),
-                "Failed to delete report: " + reportName, WAIT_FOR_JAVASCRIPT);
+        goToManageViews().deleteReport(reportName);
     }
 
     @LogMethod
@@ -105,20 +91,7 @@ public abstract class ReportTest extends StudyBaseTest
     {
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("Manage Files"));
-        if (isTextPresent(item))
-        {
-            checkCheckbox(Locator.xpath("//td/a[contains(text(), '" + item + "')]/../../td/input"));
-            clickButton("Delete");
-            assertTextPresent(item);
-            clickButton("Confirm Delete");
-            assertTextNotPresent(item);
-        }
-    }
-
-    protected void clickAddReport(String reportName)
-    {
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
+        deletePipelineJob(item, false);
     }
 
     protected ChartTypeDialog clickAddChart(String schemaName, String queryName)
@@ -128,25 +101,5 @@ public abstract class ReportTest extends StudyBaseTest
         ChartQueryDialog queryDialog = new ChartQueryDialog(getDriver());
         queryDialog.selectSchema(schemaName).selectQuery(queryName);
         return queryDialog.clickOk();
-    }
-
-    public static enum ChartTypes
-    {
-        BAR("Bar Chart"),
-        BOX("Box Plot"),
-        PIE("Pie Chart"),
-        SCATTER("Scatter Plot"),
-        TIME("Time Chart");
-
-        private String menuTextValue;
-        ChartTypes(String menuText)
-        {
-            menuTextValue = menuText;
-        }
-
-        public String getMenuText()
-        {
-            return menuTextValue;
-        }
     }
 }
