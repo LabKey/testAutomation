@@ -508,7 +508,7 @@
                         "uniqueName": "org.labkey.api.security.permissions.DeletePermission"
                     },
                     {
-                        "description": "Allows management of the form shown during a new speciment request",
+                        "description": "Allows management of the form shown during a new specimen request",
                         "name": "Manage New Request Form",
                         "sourceModule": "Study",
                         "uniqueName": "org.labkey.study.security.permissions.ManageNewRequestFormPermission"
