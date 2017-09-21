@@ -39,7 +39,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.labkey.test.components.PropertiesEditor.PropertiesEditor;
 import static org.labkey.test.components.ext4.Window.Window;
 
@@ -561,7 +563,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
     private List<String> getLabels(String areaTitle)
     {
-        String prefix = getPropertyXPathContains(areaTitle);
+        String prefix = "//h3[contains(text(), '" + areaTitle + "')]/../..";
         List<String> labels = new ArrayList<>();
         List<WebElement> labelsElements;
 
