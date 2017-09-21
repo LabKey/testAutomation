@@ -24,6 +24,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestProperties;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.pages.ConfigureReportsAndScriptsPage;
+import org.labkey.test.pages.core.admin.ShowAdminPage;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -192,7 +193,7 @@ public class RReportHelper
     {
         _test.ensureAdminMode();
 
-        _test.goToAdminConsole().clickViewsAndScripting();
+        ShowAdminPage.beginAt(_test).clickViewsAndScripting();
 
         _test.log("Check if R already is configured");
 
