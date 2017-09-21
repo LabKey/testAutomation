@@ -59,7 +59,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         PipelineStatusTable statusTable = new PipelineStatusTable(this);
         statusTable.clickStatusLink(0);
 
-        waitForTextWithRefresh(30000, "Check complete");
+        waitForTextWithRefresh(120000, "Check complete");
         assertTextPresent("Check complete, 0 errors found");
     }
 
