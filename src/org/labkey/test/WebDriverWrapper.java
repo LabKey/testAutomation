@@ -31,6 +31,7 @@ import org.labkey.test.components.labkey.LabKeyAlert;
 import org.labkey.test.pages.admin.FolderManagementPage;
 import org.labkey.test.pages.core.admin.ProjectSettingsPage;
 import org.labkey.test.pages.list.BeginPage;
+import org.labkey.test.pages.reports.ManageViewsPage;
 import org.labkey.test.selenium.EphemeralWebElement;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExperimentalFeaturesHelper;
@@ -696,11 +697,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
         }
     }
 
-    public void goToManageViews()
+    public ManageViewsPage goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
         waitForElement(Locator.xpath("//*[starts-with(@id, 'dataviews-panel')]"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        return new ManageViewsPage(getDriver());
     }
 
     public void goToManageStudy()
