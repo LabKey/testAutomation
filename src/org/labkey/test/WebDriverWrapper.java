@@ -543,9 +543,14 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public void clickAdminMenuItem(String... items)
     {
+        clickAdminMenuItem(false, items);
+    }
+
+    public void clickAdminMenuItem(boolean wait, String... items)
+    {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            new SiteNavBar(getDriver()).clickAdminMenuItem(true, items);
+            new SiteNavBar(getDriver()).clickAdminMenuItem(wait, items);
         }
         else
         {
