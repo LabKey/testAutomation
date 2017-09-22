@@ -32,6 +32,7 @@ import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
+import org.labkey.test.categories.DailyC;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -40,7 +41,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,9 +50,10 @@ import java.util.Map;
 /**
  * Test trigger script matrix, expands on ScriptValidationTest which covers custom schemas (Vehicles)
  */
-@Category({Data.class})
+@Category({DailyC.class, Data.class})
 public class TriggerScriptTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     //List constants
     private static final String TRIGGER_MODULE = "triggerTestModule";
     private static final String SIMPLE_MODULE = "simpletest";
@@ -79,13 +81,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
     @Override
     public List<String> getAssociatedModules()
     {
-        List<String> modules = new ArrayList<>();
-        modules.add("Query");
-        modules.add(STUDY_SCHEMA);
-        modules.add(SIMPLE_MODULE);
-        modules.add(TRIGGER_MODULE);
-
-        return modules;
+        return Arrays.asList("Query", STUDY_SCHEMA, SIMPLE_MODULE, TRIGGER_MODULE);
     }
     @Nullable
 
@@ -249,7 +245,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Check AfterUpdate Event
         step = "AfterUpdate";
         log("** " + testName + step + " Event");
-        click(Locator.linkWithText("Edit"));
+        new DataRegionTable("query", getDriver()).clickEditRow(0);
         clickButton("Submit");
         assertTextPresent(AFTER_UPDATE_ERROR);
         clickButton("Cancel");
@@ -706,7 +702,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
      */
     private void insertSingleRowViaUI(Map<String,String> record)
     {
-        DataRegionTable.findDataRegion(this).clickInsertNewRowDropdown();
+        DataRegionTable.DataRegion(getDriver()).find().clickInsertNewRow();
         record.entrySet().forEach((entry) -> setFormElement( Locator.xpath("//*[@name='quf_"+ entry.getKey() + "']"), entry.getValue()));
         clickButton("Submit");
     }
@@ -720,10 +716,13 @@ public class TriggerScriptTest extends BaseWebDriverTest
     private void deleteSingleRowViaUI(String columnName, String columnValue, String tableName)
     {
         DataRegionTable drt = new DataRegionTable(tableName, this);
-        int rowId = drt.getRow(columnName, columnValue);
+        int rowId = drt.getRowIndex(columnName, columnValue);
         drt.checkCheckbox(rowId);
-        clickButton("Delete", 0);
-        acceptAlert();
+        doAndWaitForPageToLoad(() ->
+        {
+            drt.clickHeaderButton("Delete");
+            acceptAlert();
+        });
     }
 
     /**
@@ -817,7 +816,7 @@ public class TriggerScriptTest extends BaseWebDriverTest
         //Setup Data Class
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Data Classes"));
-        clickButton(DataRegionTable.getInsertNewButtonText());
+        new DataRegionTable("DataClass", getDriver()).clickInsertNewRow();
         setFormElement(Locator.name("name"), DATA_CLASSES_NAME);
         clickButton("Create");
         clickButton("Add Field", 0);
@@ -837,9 +836,9 @@ public class TriggerScriptTest extends BaseWebDriverTest
     {
         goToProjectHome();
         DataRegionTable drt = new DataRegionTable("qwp3", this);
-        int rowId = drt.getRow("Name", DATA_CLASSES_NAME);
+        int rowId = drt.getRowIndex("Name", DATA_CLASSES_NAME);
         drt.checkCheckbox(rowId);
-        clickButton("Delete");
+        drt.clickHeaderButtonAndWait("Delete");
         clickButton("Confirm Delete");
     }
 }
