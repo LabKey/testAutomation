@@ -31,9 +31,15 @@ public class FileRootsManagementPage extends FolderManagementPage
         return this;
     }
 
+    public String getRootPath()
+    {
+        return getFormElement(Locators.rootPath);
+    }
 
     public static class Locators
     {
+        public static Locator rootPath = Locator.id("rootPath");
+
         public static Locator cloudStoreCheckBox(String name)
         {
             return Locator.tagWithAttribute("input", "value", name);
