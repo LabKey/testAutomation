@@ -8,7 +8,6 @@ import org.labkey.test.selenium.LazyWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// TODO: Page classes should contain all functionality for a single page/action
 public class FolderManagementPage extends LabKeyPage<FolderManagementPage.ElementCache>
 {
     public FolderManagementPage(WebDriver driver)
@@ -53,13 +52,12 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return new FileRootsManagementPage(getDriver());
     }
 
-    // TODO: Add specific pane component
-    public FolderManagementPage goToFolderTypePane()
+    public FolderTypePage goToFolderTypePane()
     {
         elementCache().folderTypeTabLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=folderType")
                 && elementCache().isTabActive(Locators.folderTypeTab), 4000);
-        return this;
+        return new FolderTypePage(getDriver());
     }
 
     public FolderManagementPage goToMissingValuesPane()
