@@ -251,12 +251,11 @@ public class RReportHelper
 
     public void setPandocEnabled(Boolean enabled)
     {
+        _test.goToProjectHome();
         _test.ensureAdminMode();
 
-        _test.goToAdminConsole().clickViewsAndScripting();
-
         _test.log("Check if R already is configured");
-
+        _test.goToAdminConsole().clickViewsAndScripting();
         ConfigureReportsAndScriptsPage scripts = new ConfigureReportsAndScriptsPage(_test);
 
         String defaultScriptName = "R Scripting Engine";

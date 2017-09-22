@@ -199,12 +199,6 @@ public class KnitrReportTest extends AbstractKnitrReportTest
         _rReportHelper.clickSourceTab();
         _rReportHelper.ensureFieldSetExpanded("knitr");
         setFormElement(Locator.name("scriptDependencies"), dependencies);
-
-        _rReportHelper.clickReportTab();
-        waitForElement(Locator.id("mtcars_table_wrapper"));
-
-        assertReportContents(reportContains, reportNotContains);
-        _rReportHelper.clickSourceTab();
         saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
     }
 }
