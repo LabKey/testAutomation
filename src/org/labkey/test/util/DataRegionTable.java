@@ -1699,12 +1699,12 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
         public static Locator.XPathLocator form()
         {
-            return Locator.tag("form").withAttribute("lk-region-form");
+            return Locator.tag("form").withAttribute("lk-region-form").withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
         }
 
         public static Locator.XPathLocator form(String regionName)
         {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
+            return Locator.tagWithAttribute("form", "lk-region-form", regionName).withDescendant(table(regionName));
         }
 
         public static Locator.XPathLocator table()
