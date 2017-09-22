@@ -131,7 +131,7 @@ public abstract class AbstractKnitrReportTest extends BaseWebDriverTest
 
     protected WebElement assertReportContents(Locator[] reportContains, String[] reportNotContains)
     {
-        WebElement reportDiv = waitForElement(Locator.css("div.reportView > div.labkey-knitr"));
+        WebElement reportDiv = waitForElement(Locator.css("div.reportView > div.labkey-knitr"), BaseWebDriverTest.WAIT_FOR_PAGE);
 
         for (Locator contains : reportContains)
         {
