@@ -35,20 +35,20 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public FolderManagementPage goToFolderTreePane()
     {
-        scrollIntoView(newElementCache().folderTreeTabLink);
-        newElementCache().folderTreeTabLink.click();
+        scrollIntoView(elementCache().folderTreeTabLink);
+        elementCache().folderTreeTabLink.click();
         waitFor(() -> getURL().toString().endsWith("?tabId=folderTree")
-                        && newElementCache().isTabActive(Locators.folderTreeTab),
+                        && elementCache().isTabActive(Locators.folderTreeTab),
                 "Could not navigate to Folder Tree pane", 4000);
         return this;
     }
 
     public FileRootsManagementPage goToFilesPane()
     {
-        scrollIntoView(newElementCache().filesTabLink);
-        newElementCache().filesTabLink.click();
+        scrollIntoView(elementCache().filesTabLink);
+        elementCache().filesTabLink.click();
         waitFor(() -> getURL().toString().endsWith("?tabId=files")
-                        && newElementCache().isTabActive(Locators.filesTab),
+                        && elementCache().isTabActive(Locators.filesTab),
                 "Could not navigate to Files pane", 4000);
         return new FileRootsManagementPage(getDriver());
     }
@@ -56,34 +56,25 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
     // TODO: Add specific pane component
     public FolderManagementPage goToFolderTypePane()
     {
-    //        This is a gross workaround to a silly problem; sometimes clicking the tab fails
-    //          because another element (an ext4 mask, invisible, is in the way).
-    //
-    //            scrollIntoView(newElementCache().folderTypeTabLink);
-    //            newElementCache().folderTypeTabLink.click();
-    //            waitFor(()-> getURL().toString().endsWith("?tabId=folderType")
-    //                    && newElementCache().isTabActive(Locators.folderTypeTab),
-    //                    "Could not navigate to Folder Type Pane", 4000 );
-    //            return this;
-        newElementCache().folderTypeTabLink.click();
+        elementCache().folderTypeTabLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=folderType")
-                && newElementCache().isTabActive(Locators.folderTypeTab), 4000);
+                && elementCache().isTabActive(Locators.folderTypeTab), 4000);
         return this;
     }
 
     public FolderManagementPage goToMissingValuesPane()
     {
-        newElementCache().missingValuesLink.click();
+        elementCache().missingValuesLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=mvIndicators")
-                && newElementCache().isTabActive(Locators.missingValuesTab), 4000 );
+                && elementCache().isTabActive(Locators.missingValuesTab), 4000 );
         return this;
     }
 
     public FolderManagementPage goToModulePropertiesPane()
     {
-        newElementCache().modulePropertiesTabLink.click();
+        elementCache().modulePropertiesTabLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=props")
-                && newElementCache().isTabActive(Locators.modulePropertiesTab), 4000);
+                && elementCache().isTabActive(Locators.modulePropertiesTab), 4000);
         return this;
     }
 
@@ -95,18 +86,18 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
 
     public FolderManagementPage goToExportPane()
     {
-        newElementCache().exportTabLink.click();
+        elementCache().exportTabLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=export")
-                && newElementCache().isTabActive(Locators.exportTab), 4000);
+                && elementCache().isTabActive(Locators.exportTab), 4000);
         return this;
     }
 
     /* activates the 'import' pane */
     public FolderManagementPage goToImportPane()
     {
-        newElementCache().importTabLink.click();
+        elementCache().importTabLink.click();
         waitFor(()-> getURL().toString().endsWith("?tabId=import")
-                && newElementCache().isTabActive(Locators.importTab), 4000);
+                && elementCache().isTabActive(Locators.importTab), 4000);
         return this;
     }
 
@@ -131,7 +122,7 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         WebElement modulePropertiesTabLink = Locators.modulePropertiesTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement exportTabLink = Locators.exportTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
         WebElement importTabLink = Locators.importTabLink.refindWhenNeeded(getDriver()).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement saveButton = new LazyWebElement(Locator.xpath(".//a[contains(@class, 'labkey-button')]//span[contains(text(), 'Save')]/ancestor::a"),this);
+        WebElement saveButton = new LazyWebElement(Locator.lkButton("Save"),this);
 
 
         public boolean isTabActive(Locator loc)
