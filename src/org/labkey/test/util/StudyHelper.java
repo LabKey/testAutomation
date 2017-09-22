@@ -334,7 +334,7 @@ public class StudyHelper
         _test.waitForElement(Locator.css(".studyWizardPublishOptionsList .x-grid3-col-1")); // Make sure grid is filled in
         _test._extHelper.selectExtGridItem("name", "Use Alternate " + subjectNounSingular + " IDs", -1, "studyWizardPublishOptionsList", true);
         _test._extHelper.selectExtGridItem("name", "Shift " + subjectNounSingular + " Dates", -1, "studyWizardPublishOptionsList", true);
-        _test._extHelper.selectExtGridItem("name", "Remove PHI Protected Columns", -1, "studyWizardPublishOptionsList", true);
+        _test._extHelper.selectExtGridItem("name", "Exclude Columns At This PHI Level And Higher", -1, "studyWizardPublishOptionsList", true);
         _test._extHelper.selectExtGridItem("name", "Mask Clinic Names", -1, "studyWizardPublishOptionsList", true);
         _test.clickButton("Finish");
         _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
