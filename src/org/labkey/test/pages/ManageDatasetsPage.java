@@ -16,24 +16,16 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-/**
- * Created by RyanS on 5/18/2017.
- */
 public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCache>
 {
     public ManageDatasetsPage(WebDriver driver)
     {
         super(driver);
-        waitForElement(elementCache().datasetsDataRegion);
-        datasetsTable = new DataRegionTable(dataSetTableId, getDriver());
+        elementCache();
     }
-
-    protected final static String dataSetTableId = "dataregion_datasets";
-    protected DataRegionTable datasetsTable;
 
     public void clickStudySchedule()
     {
@@ -78,50 +70,50 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
 
     public String getDefaultDateTimeFormat()
     {
-        return getText(elementCache().dateTimeFormat);
+        return elementCache().dateTimeFormat.getText();
     }
 
     public String getDefaultNumberFormat()
     {
-        return getText(elementCache().numberFormat);
-    }
-
-    public DatasetPropertiesPage selectDatasetByName(String name)
-    {
-        clickAndWait(findLinkInColWithText("Name",name));
-        return new DatasetPropertiesPage(getDriver());
+        return elementCache().numberFormat.getText();
     }
 
     public DatasetPropertiesPage selectDatasetById(String id)
     {
-        clickAndWait(findLinkInColWithText("ID", id));
+        clickAndWait(Locator.tag("td").position(1).append(Locator.linkWithText(id)).findElement(elementCache().datasetGrid));
+        return new DatasetPropertiesPage(getDriver());
+    }
+
+    public DatasetPropertiesPage selectDatasetByName(String name)
+    {
+        clickAndWait(Locator.tag("td").position(2).append(Locator.linkWithText(name)).findElement(elementCache().datasetGrid));
         return new DatasetPropertiesPage(getDriver());
     }
 
     public DatasetPropertiesPage selectDatasetByLabel(String label)
     {
-        clickAndWait(findLinkInColWithText("Label", label));
+        clickAndWait(Locator.tag("td").position(3).append(Locator.linkWithText(label)).findElement(elementCache().datasetGrid));
         return new DatasetPropertiesPage(getDriver());
     }
 
-    private WebElement findLinkInColWithText(String column, String text)
+    @Override
+    protected ElementCache newElementCache()
     {
-        int row = datasetsTable.getIndexWhereDataAppears(text, column);
-        return datasetsTable.findCell(row,column);
+        return new ElementCache();
     }
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        Locator studyScheduleLink = Locator.linkWithText("Study Schedule");
-        Locator changeDisplayOrderLink = Locator.linkWithText("Change Display Order");
-        Locator changePropertiesLink = Locator.linkWithText("Change Properties");
-        Locator deleteMultipleDatasetsLink = Locator.linkWithText("Delete Multiple Datasets");
-        Locator manageDatasetSecurityLink = Locator.linkWithText("Manage Dataset Security");
-        Locator createNewDatasetLink = Locator.linkWithText("Create New Dataset");
-        Locator folderSettingsLink = Locator.linkWithText("folder settings page");
-        Locator projectSettingsLink = Locator.linkWithText("project settings page");
-        Locator dateTimeFormat = Locator.xpath("//td[text()='Default date-time format:']/following-sibling::td");
-        Locator numberFormat = Locator.xpath("//td[text()='Default number format:']/following-sibling::td");
-        Locator datasetsDataRegion = Locator.id(dataSetTableId);
+        WebElement studyScheduleLink = Locator.linkWithText("Study Schedule").findWhenNeeded(this);
+        WebElement changeDisplayOrderLink = Locator.linkWithText("Change Display Order").findWhenNeeded(this);
+        WebElement changePropertiesLink = Locator.linkWithText("Change Properties").findWhenNeeded(this);
+        WebElement deleteMultipleDatasetsLink = Locator.linkWithText("Delete Multiple Datasets").findWhenNeeded(this);
+        WebElement manageDatasetSecurityLink = Locator.linkWithText("Manage Dataset Security").findWhenNeeded(this);
+        WebElement createNewDatasetLink = Locator.linkWithText("Create New Dataset").findWhenNeeded(this);
+        WebElement folderSettingsLink = Locator.linkWithText("folder settings page").findWhenNeeded(this);
+        WebElement projectSettingsLink = Locator.linkWithText("project settings page").findWhenNeeded(this);
+        WebElement dateTimeFormat = Locator.xpath("//td[text()='Default date-time format:']/following-sibling::td").findWhenNeeded(this);
+        WebElement numberFormat = Locator.xpath("//td[text()='Default number format:']/following-sibling::td").findWhenNeeded(this);
+        WebElement datasetGrid = Locator.id("dataregion_datasets").waitForElement(this, 10000);
     }
 }

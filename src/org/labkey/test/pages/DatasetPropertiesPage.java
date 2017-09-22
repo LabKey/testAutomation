@@ -16,11 +16,12 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.ext4.Window;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
-/**
- * Created by RyanS on 5/17/2017.
- */
+import static org.labkey.test.components.ext4.Window.Window;
+
 public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.ElementCache>
 {
     public DatasetPropertiesPage(WebDriver driver){super(driver);}
@@ -32,13 +33,13 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     public EditDatasetDefinitionPage clickEditDefinition()
     {
-        waitAndClickAndWait(elementCache().editDefinitionButton);
+        clickAndWait(elementCache().editDefinitionButton);
         return new EditDatasetDefinitionPage(getDriver());
     }
 
     public ViewDatasetDataPage clickViewData()
     {
-        waitAndClickAndWait(elementCache().viewDataButton);
+        clickAndWait(elementCache().viewDataButton);
         return new ViewDatasetDataPage(getDriver());
     }
 
@@ -48,20 +49,73 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
         return new ManageDatasetsPage(getDriver());
     }
 
-    protected class ElementCache extends LabKeyPage.ElementCache
+    public LabKeyPage deleteDataset()
     {
-        Locator.XPathLocator viewDataButton = Locator.lkButton("View Data");
-        Locator.XPathLocator manageDatasetsButton = Locator.lkButton("Manage Datasets");
-        Locator.XPathLocator deleteDatasetButton = Locator.lkButton("Delete Dataset");
-        Locator.XPathLocator deleteAllRowsButton = Locator.lkButton("Delete All Rows");
-        Locator.XPathLocator showImportHistoryButton = Locator.lkButton("Show Import History");
-        Locator.XPathLocator editDefinitionButton = Locator.lkButton("Edit Definition");
+        click(elementCache().deleteDatasetButton);
+        return null;
+    }
 
-        Locator getDatasetPropertyValue(String property)
+    public ResultWindow deleteAllRows()
+    {
+        click(elementCache().deleteAllRowsButton);
+        return new ConfirmationWindow().confirm();
+    }
+
+    public class ConfirmationWindow
+    {
+        private final Window _window;
+
+        private ConfirmationWindow()
         {
-            return Locator.xpath("//*[preceding-sibling::td='"+property+"'][1]");
+            _window = Window(DatasetPropertiesPage.this.getDriver()).withTitle("Confirm Deletion").waitFor();
         }
 
-        //TODO: Wrap Dataset Fields portion of page in convenience methods
+        public ResultWindow confirm()
+        {
+            _window.clickButton("Yes", false);
+            return new ResultWindow();
+        }
+
+        public DatasetPropertiesPage reject()
+        {
+            _window.clickButton("No", true);
+            return DatasetPropertiesPage.this;
+        }
+    }
+
+    public class ResultWindow
+    {
+        private final Window _window;
+
+        protected ResultWindow()
+        {
+            _window = Window(DatasetPropertiesPage.this.getDriver()).waitFor();
+        }
+
+        public String getResult()
+        {
+            return _window.getTitle();
+        }
+
+        public String getMessage()
+        {
+            return _window.getBody();
+        }
+
+        public DatasetPropertiesPage accept()
+        {
+            _window.clickButton("OK", true);
+            return DatasetPropertiesPage.this;
+        }
+    }
+
+    protected class ElementCache extends LabKeyPage.ElementCache
+    {
+        WebElement viewDataButton = Locator.lkButton("View Data").findWhenNeeded(this);
+        WebElement manageDatasetsButton = Locator.lkButton("Manage Datasets").findWhenNeeded(this);
+        WebElement deleteDatasetButton = Locator.lkButton("Delete Dataset").findWhenNeeded(this);
+        WebElement deleteAllRowsButton = Locator.lkButton("Delete All Rows").findWhenNeeded(this);
+        WebElement showImportHistoryButton = Locator.lkButton("Show Import History").findWhenNeeded(this);
+        WebElement editDefinitionButton = Locator.lkButton("Edit Definition").findWhenNeeded(this);
     }
 }
