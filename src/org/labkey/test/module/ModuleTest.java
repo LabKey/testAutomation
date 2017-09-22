@@ -19,7 +19,6 @@ package org.labkey.test.module;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.NoSuite;
 
@@ -28,12 +27,13 @@ import java.util.List;
 @Category({NoSuite.class})
 public class ModuleTest extends BaseWebDriverTest
 {
+    {setIsBootstrapWhitelisted(true);}
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteProject(getProjectName(), afterTest);
+        _containerHelper.deleteProject(getProjectName(), afterTest);
     }
 
     @Test
@@ -41,11 +41,10 @@ public class ModuleTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         log("Test module created from moduleTemplate");
-        clickProject(PROJECT_NAME);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkCheckbox(Locator.xpath("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
-        clickButton("Update Folder");
+        goToFolderManagement()
+                .goToFolderTypePane()
+                .enableModule(TEST_MODULE_TEMPLATE_FOLDER_NAME)
+                .save();
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);
         assertTextPresent("Hello, and welcome to the " + TEST_MODULE_TEMPLATE_FOLDER_NAME + " module.");
     }
