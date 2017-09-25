@@ -1034,7 +1034,10 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     public void setSort(String columnName, SortDirection direction)
     {
         getWrapper().log("Setting sort in " + getDataRegionName() + " for " + columnName + " to " + direction.toString());
-        clickColumnMenu(columnName, !isAsync(), "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
+        if (isAsync())
+            doAndWaitForUpdate(() -> clickColumnMenu(columnName, false, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending")));
+        else
+            clickColumnMenu(columnName, true, "Sort " + (direction.equals(SortDirection.ASC) ? "Ascending" : "Descending"));
     }
 
     public void setSummaryStatistic(String columnName, String stat, @Nullable String expectedValue)
@@ -1094,7 +1097,10 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
 
     public void clearSort(String columnName)
     {
-        clickColumnMenu(columnName, !isAsync(), "Clear Sort");
+        if (isAsync())
+            doAndWaitForUpdate(() -> clickColumnMenu(columnName, false, "Clear Sort"));
+        else
+            clickColumnMenu(columnName, true, "Clear Sort");
     }
 
     public void openFilterDialog(String columnName)
