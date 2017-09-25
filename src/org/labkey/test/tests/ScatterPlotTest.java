@@ -29,6 +29,7 @@ import org.labkey.test.components.LookAndFeelScatterPlot;
 import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.components.labkey.PortalTab;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -507,7 +508,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Save");
 
         log("Verify proper error messages for removed measures.");
-        click(Locator.linkContainingText("Clinical and Assay Data"));
+        PortalTab.find("Clinical and Assay Data", getDriver()).activate();
         waitForText(SCATTER_PLOT_NAME_DR + " Colored");
         clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
         _ext4Helper.waitForMaskToDisappear();
