@@ -179,9 +179,8 @@ public class KnitrReportTest extends AbstractKnitrReportTest
     private void verifyAdhocReportDependencies(String viewName, String dependencies)
     {
         // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
-        Locator[] reportContains = {Locator.css("h1").withText("jQuery DataTables")};
+        Locator[] reportContains = {Locator.id("mtcars_table_wrapper"), Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
-        String expectedError = "$ is not";
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
