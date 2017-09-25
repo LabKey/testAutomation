@@ -56,13 +56,12 @@ public class FileAttachmentColumnTest extends BaseWebDriverTest
     public void verifyFileDownloadOnClick()
     {
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        DataRegionTable testListRegion = new DataRegionTable("query", getDriver());
+        DataRegionTable testListRegion = new DataRegionTable("query", getDriver()); // Just make sure the DRT is ready
 
         // verify file download behavior for csv, tif
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_CSV.getName())));
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_TIF.getName())));
         doAndWaitForDownload(()->click(Locator.linkContainingText(SAMPLE_PDF.getName())));
-        goBack();
 
         // verify popup/sprite for jpeg
         mouseOver(Locator.tagWithAttribute("img", "title", SAMPLE_JPG.getName()));
