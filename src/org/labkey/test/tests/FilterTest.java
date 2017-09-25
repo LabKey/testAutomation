@@ -610,8 +610,9 @@ public class FilterTest extends BaseWebDriverTest
             clickButtonContainingText("CANCEL", 0);
         }
 
-        executeScript("LABKEY.DataRegions['" + TABLE_NAME + "'].clearAllFilters();");
-        waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
+        DataRegionTable table = new DataRegionTable(TABLE_NAME, this.getDriver());
+        table.clearAllFilters();
+        assertElementNotPresent("Expected message to disappear", Locator.css(".labkey-dataregion-msg"));
     }
 
     @LogMethod
@@ -665,7 +666,6 @@ public class FilterTest extends BaseWebDriverTest
         {
             assertFilterTextPresent(columnName, filter2Type, filter2);
         }
-
     }
 
     @Override

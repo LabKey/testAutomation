@@ -443,10 +443,10 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertAUCColumnsHidden();
         addAUCColumns();
 
-        executeScript("LABKEY.DataRegions['Data'].clearAllFilters();");
+        DataRegionTable region = new DataRegionTable("Data", this);
+        region.clearAllFilters();
         assertAliasedAUCCellData();
 
-        DataRegionTable region = new DataRegionTable("Data", this);
         region.setFilter("SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
         assertTextPresent("ptid 1 C");
         String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
