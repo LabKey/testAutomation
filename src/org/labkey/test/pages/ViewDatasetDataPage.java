@@ -40,8 +40,9 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     public DatasetInsertPage insertDatasetRow()
     {
+        String datasetName = elementCache().datasetNavLink.getText();
         _dataRegionTable.clickInsertNewRowDropdown();
-        return new DatasetInsertPage(getDriver(), elementCache().datasetNavLink.getText());
+        return new DatasetInsertPage(getDriver(), datasetName);
     }
 
     public ImportDataPage importBulkData()
