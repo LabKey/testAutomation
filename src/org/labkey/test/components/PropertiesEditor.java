@@ -17,7 +17,6 @@ package org.labkey.test.components;
 
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.WebDriverWrapperImpl;
@@ -265,10 +264,11 @@ public class PropertiesEditor extends WebPartPanel
             return _rowEl;
         }
 
-        public void select()
+        public FieldRow select()
         {
-            getWrapper().click(spacer);
+            spacer.click();
             WebDriverWrapper.waitFor(this::isSelected, "Failed to select field row", 1000);
+            return this;
         }
 
         private boolean isSelected()
@@ -281,17 +281,19 @@ public class PropertiesEditor extends WebPartPanel
             return findNameEl().get();
         }
 
-        public void setName(String name)
+        public FieldRow setName(String name)
         {
             findNameEl().set(name);
+            return this;
         }
 
-        public void setLabel(String label)
+        public FieldRow setLabel(String label)
         {
             labelInput.set(label);
+            return this;
         }
 
-        public void setType(FieldDefinition.LookupInfo lookupInfo, FieldDefinition.ColumnType type)
+        public FieldRow setType(FieldDefinition.LookupInfo lookupInfo, FieldDefinition.ColumnType type)
         {
             if (lookupInfo == null && type == null)
                 throw new IllegalArgumentException("Specify a type or lookup");
@@ -303,9 +305,10 @@ public class PropertiesEditor extends WebPartPanel
                 window.selectLookup(lookupInfo);
 
             window.clickApply();
+            return this;
         }
 
-        public void markForDeletion()
+        public PropertiesEditor markForDeletion()
         {
             Locator.xpath(".//div[contains(@id, 'partdelete_')]").waitForElement(getComponentElement(), 500).click();
             if (!_haveAlreadyDeletedOneFieldRow) // if you've already dismissed this dialog, it won't appear again
@@ -318,11 +321,17 @@ public class PropertiesEditor extends WebPartPanel
                     okBtn.click();
                 _haveAlreadyDeletedOneFieldRow = true;
             }
+            return PropertiesEditor.this;
         }
 
         public FieldPropertyDock properties()
         {
             return PropertiesEditor.this.elementCache().fieldPropertyDock;
+        }
+
+        public PropertiesEditor up()
+        {
+            return PropertiesEditor.this;
         }
 
         private FormItem<String> findNameEl()
