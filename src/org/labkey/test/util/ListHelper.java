@@ -31,6 +31,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -791,6 +792,23 @@ public class ListHelper extends LabKeySiteWrapper
             if (mvenabled.equals("TRUE")) newCol.setMvEnabled(true);
             addField(newCol);
         }
+    }
+
+    public List<String> getColumnNames()
+    {
+        List<String> columns = new ArrayList<>();
+
+        List<WebElement> nameFields = Locator.xpath("//input[contains(@name, 'ff_name')]").findElements(getDriver());
+        for(WebElement webElement : nameFields)
+        {
+            // If it is not the list name element then add it to the list.
+            if (!webElement.getAttribute("name").trim().toLowerCase().equals("ff_name"))
+            {
+                columns.add(webElement.getAttribute("value"));
+            }
+        }
+
+        return columns;
     }
 
     public enum RangeType

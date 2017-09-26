@@ -157,14 +157,33 @@ public class FileBrowserHelper extends WebDriverWrapper
     @LogMethod
     public void checkFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
+        checkFileBrowserFileCheckbox(fileName, true);
+    }
+
+    @LogMethod
+    public void checkFileBrowserFileCheckbox(@LoggedParam String fileName, boolean checkTheBox)
+    {
         scrollToGridRow(fileName);
 
         final Checkbox checkbox = Ext4Checkbox().locatedBy(Locators.gridRowCheckbox(fileName)).find(getDriver());
-        if(!checkbox.isChecked())
+
+        // Check the box if it is not checked and should be or if if it is checked and it should not be.
+        if((!checkbox.isChecked()) && (checkTheBox))
         {
             scrollIntoView(checkbox.getComponentElement());
             doAndWaitForPageSignal(checkbox::check, IMPORT_SIGNAL_NAME);
         }
+        else if((checkbox.isChecked()) && (!checkTheBox))
+        {
+            scrollIntoView(checkbox.getComponentElement());
+            doAndWaitForPageSignal(checkbox::uncheck, IMPORT_SIGNAL_NAME);
+        }
+    }
+
+    @LogMethod
+    public void uncheckFileBrowserFileCheckbox(@LoggedParam String fileName)
+    {
+        checkFileBrowserFileCheckbox(fileName, false);
     }
 
     public boolean fileIsPresent(String nodeIdEndsWith)

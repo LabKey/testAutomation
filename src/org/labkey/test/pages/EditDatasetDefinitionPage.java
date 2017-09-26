@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.html.RadioButton;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -147,6 +148,11 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
     public boolean isShownInOverview()
     {
         return elementCache().showInOverviewCheckbox.isSelected();
+    }
+
+    public PropertiesEditor getFieldsEditor(String name)
+    {
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(name).find();
     }
 
     public void addDatasetField(String name, String label, FieldType fieldType)

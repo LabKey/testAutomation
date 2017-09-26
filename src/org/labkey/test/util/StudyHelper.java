@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 
@@ -413,6 +414,32 @@ public class StudyHelper
         return new ManageVisitPage(_test.getDriver());
     }
 
+    public PropertiesEditor goToEditSpecimenProperties()
+    {
+        return goToEditSpecimenProperties(SpecimenPropertyEditors.SPECIMEN_EVENT);
+    }
+
+    public PropertiesEditor goToEditSpecimenProperties(SpecimenPropertyEditors editor)
+    {
+        String editorTitle;
+        switch(editor)
+        {
+            case VIAL:
+                editorTitle = "Vial";
+                break;
+            case SPECIMEN:
+                editorTitle = "Specimen";
+                break;
+            case SPECIMEN_EVENT:
+            default:
+                editorTitle = "SpecimenEvent";
+        }
+
+        _test.goToManageStudy();
+        _test.waitAndClickAndWait(Locator.linkWithText("Edit specimen properties"));
+        return PropertiesEditor.PropertiesEditor(_test.getDriver()).withTitleContaining(editorTitle).waitFor();
+    }
+
     public static String getStudySampleDataPath()
     {
         return "/sampledata/study/";
@@ -441,5 +468,12 @@ public class StudyHelper
         BASIC_WRITE,
         ADVANCED_READ,
         ADVANCED_WRITE
+    }
+
+    public enum SpecimenPropertyEditors
+    {
+        SPECIMEN_EVENT,
+        VIAL,
+        SPECIMEN
     }
 }

@@ -76,6 +76,11 @@ public class PropertiesEditor extends WebPartPanel
         return elementCache().findFieldRows().get(index);
     }
 
+    public  List<FieldRow> getFields()
+    {
+        return elementCache().findFieldRows();
+    }
+
     private FieldRow getSelectedField()
     {
         return new FieldRow(Locator.css(".editor-field-row.selected-field-row").findElement(this));
@@ -714,16 +719,18 @@ public class PropertiesEditor extends WebPartPanel
 
     public enum PhiSelectType
     {
-        NotPHI("Not PHI"),
-        Limited("Limited PHI"),
-        PHI("Full PHI"),
-        Restricted("Restricted");
+        NotPHI("Not PHI", org.labkey.api.data.PHI.NotPHI.getRank()),
+        Limited("Limited PHI", org.labkey.api.data.PHI.Limited.getRank()),
+        PHI("Full PHI", org.labkey.api.data.PHI.PHI.getRank()),
+        Restricted("Restricted", org.labkey.api.data.PHI.Restricted.getRank());
 
         String _text;
+        int _rank;
 
-        PhiSelectType(String text)
+        PhiSelectType(String text, int rank)
         {
             _text = text;
+            _rank = rank;
         }
 
         public String getValue()
@@ -734,6 +741,11 @@ public class PropertiesEditor extends WebPartPanel
         public String getText()
         {
             return _text;
+        }
+
+        public int getRank()
+        {
+            return _rank;
         }
     }
 }
