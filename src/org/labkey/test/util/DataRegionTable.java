@@ -1690,7 +1690,7 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         public static Locator.XPathLocator dataRegion()
         {
             if (IS_BOOTSTRAP_LAYOUT)
-                return form();
+                return form().withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
             else
                 return table();
         }
@@ -1698,19 +1698,19 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         public static Locator.XPathLocator dataRegion(String regionName)
         {
             if (IS_BOOTSTRAP_LAYOUT)
-                return form(regionName);
+                return form(regionName).withDescendant(table(regionName));
             else
                 return table(regionName);
         }
 
         public static Locator.XPathLocator form()
         {
-            return Locator.tag("form").withAttribute("lk-region-form").withAttributeMatchingOtherElementAttribute("lk-region-form", Locator.xpath(".//table"), "lk-region-name");
+            return Locator.tag("form").withAttribute("lk-region-form");
         }
 
         public static Locator.XPathLocator form(String regionName)
         {
-            return Locator.tagWithAttribute("form", "lk-region-form", regionName).withDescendant(table(regionName));
+            return Locator.tagWithAttribute("form", "lk-region-form", regionName);
         }
 
         public static Locator.XPathLocator table()

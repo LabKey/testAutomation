@@ -513,7 +513,7 @@ public class UserTest extends BaseWebDriverTest
 
         clickButton("Cancel");
 
-        String userInfo = getText(DataRegionTable.Locators.dataRegion("SiteUsers"));
+        String userInfo = getText(DataRegionTable.Locators.form("SiteUsers"));
         assertFalse("Too-long property persists after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
     }
 
