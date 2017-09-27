@@ -88,6 +88,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -1249,7 +1250,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         List<String> orderedTexts = new ArrayList<>();
         foundTexts.stream()
-                .sorted((o1, o2) -> o1.getValue().compareTo(o2.getValue()))
+                .sorted(Comparator.comparing(Pair::getValue))
                 .forEachOrdered((pair) -> orderedTexts.add(pair.getKey()));
 
         return orderedTexts;
@@ -2339,7 +2340,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
     public int getElementIndex(Locator.XPathLocator l)
     {
-        return getElementCount(l.child("preceding-sibling::*"));
+        return l.child("preceding-sibling::*").findElements(getDriver()).size();
     }
 
     public int getElementIndex(WebElement el)
@@ -3016,7 +3017,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
 
         boolean selected = el.isSelected();
         if (check != selected)
-            click(el);
+            el.click();
     }
 
     public void setCheckbox(Locator checkBoxLocator, boolean check)
@@ -3271,8 +3272,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
     public void waitForElements(final Locator loc, final int count, int wait)
     {
         waitFor(() -> count == loc.findElements(getDriver()).size(), wait);
-
         assertEquals("Element not present expected number of times", count, loc.findElements(getDriver()).size());
     }
-
 }
