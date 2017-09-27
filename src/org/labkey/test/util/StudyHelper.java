@@ -22,6 +22,7 @@ import org.labkey.test.Locators;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.components.PropertiesEditor;
+import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.pages.study.CreateStudyPage;
 import org.labkey.test.pages.study.ManageVisitPage;
 
@@ -401,10 +402,11 @@ public class StudyHelper
         _test.clickButton("Done");
     }
 
-    public void goToManageDatasets()
+    public ManageDatasetsPage goToManageDatasets()
     {
         _test.goToManageStudy();
         _test.waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
+        return new ManageDatasetsPage(_test.getDriver());
     }
 
     public ManageVisitPage goToManageVisits()

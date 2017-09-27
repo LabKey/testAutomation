@@ -17,6 +17,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
+import org.labkey.test.selenium.ReclickingWebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -33,7 +34,7 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     public EditDatasetDefinitionPage clickEditDefinition()
     {
-        clickAndWait(elementCache().editDefinitionButton);
+        clickAndWait(new ReclickingWebElement(elementCache().editDefinitionButton));
         return new EditDatasetDefinitionPage(getDriver());
     }
 

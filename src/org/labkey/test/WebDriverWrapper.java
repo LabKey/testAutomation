@@ -2282,7 +2282,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         doAndWaitForPageToLoad(() ->
         {
-            click(el);
+            el.click();
         }, pageTimeoutMs);
 
         if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
