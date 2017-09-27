@@ -2209,8 +2209,8 @@ public abstract class WebDriverWrapper implements WrapsDriver
     }
 
     /**
-     * @deprecated Just use {@link WebElement#click()}
-     * Special click handling now lives in {@link org.labkey.test.selenium.ReclickingWebElement}
+     * @deprecated Use {@link WebElement#click()}
+     * find and waitFor methods in Locator now return decorated WebElements that provide special click handling
      */
     @Deprecated
     public void click(WebElement el)
