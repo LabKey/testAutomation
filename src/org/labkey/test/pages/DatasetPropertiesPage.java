@@ -34,7 +34,7 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     public EditDatasetDefinitionPage clickEditDefinition()
     {
-        clickAndWait(new ReclickingWebElement(elementCache().editDefinitionButton));
+        clickAndWait(elementCache().editDefinitionButton);
         return new EditDatasetDefinitionPage(getDriver());
     }
 
