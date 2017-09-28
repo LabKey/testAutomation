@@ -830,6 +830,18 @@ public abstract class Locator extends By
             return id(text.replace(" ", "") + "Tab");
     }
 
+    public static XPathLocator paginationText(String firstRow, String lastRow, String maxRows)
+    {
+        try
+        {
+            return paginationText(Integer.parseInt(firstRow), Integer.parseInt(lastRow), Integer.parseInt(maxRows));
+        }
+        catch (NumberFormatException e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
     {
         DecimalFormat numFormat = new DecimalFormat("####");
@@ -1174,6 +1186,16 @@ public abstract class Locator extends By
         public XPathLocator child(String str)
         {
             return new XPathLocator(getLoc() + "/" + str);
+        }
+
+        public XPathLocator descendant(String str)
+        {
+            return new XPathLocator(getLoc() + "//" + str);
+        }
+
+        public XPathLocator descendant(XPathLocator descendantLocator)
+        {
+            return this.descendant(stripLeadingSlashes(descendantLocator.getLoc()));
         }
 
         public XPathLocator childTag(String tag)
