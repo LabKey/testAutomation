@@ -48,6 +48,11 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         _driver = wrapper.getDriver();
     }
 
+    static public BootstrapMenuFinder finder(WebDriver driver)
+    {
+        return new BootstrapMenuFinder(driver);
+    }
+
     static public BootstrapMenu find(WebDriver driver, String menuToggleText)
     {
         return new BootstrapMenuFinder(driver).withButtonTextContaining(menuToggleText).find();
