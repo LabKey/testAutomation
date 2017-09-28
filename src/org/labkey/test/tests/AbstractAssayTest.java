@@ -176,7 +176,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
 
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
-        navigateToFolder(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1);
+        navigateToMenuLink(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_LAB1);
         portalHelper.addWebPart("Assay List");
     }
 
@@ -194,7 +194,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
         if (isElementPresent(Locator.permissionRendered()) && isButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        navigateToFolder(project, subfolder);
+        navigateToMenuLink(project, subfolder);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save", 0);
@@ -238,7 +238,7 @@ public abstract class AbstractAssayTest extends BaseWebDriverTest
     private void setStudyQCStates(String project, String folder)
     {
         log("Setting QC states in study " + folder + ".");
-        navigateToFolder(project, folder);
+        navigateToMenuLink(project, folder);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement(Locator.name("newLabel"), "Approved");

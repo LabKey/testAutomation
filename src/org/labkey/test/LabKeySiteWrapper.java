@@ -1169,7 +1169,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
             projectMenu().open();
-            return projectMenu().getMenuToggle();
+            return projectMenu().getComponentElement();
         }
         else
         {
@@ -1195,7 +1195,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            projectMenu().navigateToProject(project);
+            projectMenu().navigateToMenuLink(project);
         }
         else
         {
@@ -1221,14 +1221,14 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            projectMenu().expandFolderLinksTo("*all");
+            projectMenu().expandTree();
 
             return shortWait().until(new ExpectedCondition<WebElement>()
             {
                 @Override
                 public WebElement apply(@Nullable WebDriver driver)
                 {
-                    return projectMenu().getMenuToggle();
+                    return projectMenu().getComponentElement();
                 }
             });
         }
@@ -1253,7 +1253,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            projectMenu().navigateToFolder(getCurrentProject(), folder);
+            projectMenu().navigateToMenuLink(getCurrentProject(), folder);
         }
         else
         {
@@ -1263,10 +1263,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    protected void navigateToFolder(String project, String folderName)
+    protected void navigateToMenuLink(String project, String folderName)
     {
         if (IS_BOOTSTRAP_LAYOUT)
-            new ProjectMenu(getDriver()).navigateToFolder(project, folderName);
+            new ProjectMenu(getDriver()).navigateToMenuLink(project, folderName);
         else
         {
             if (!getText(Locator.id("folderBar")).equals(project))
@@ -1281,6 +1281,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     }
 
     /**
+     * TODO: Possibly remove if folder nav is removed.
      * @deprecated Only used by old UX
      */
     @Deprecated

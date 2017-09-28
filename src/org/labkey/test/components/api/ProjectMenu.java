@@ -15,6 +15,7 @@
  */
 package org.labkey.test.components.api;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
@@ -22,7 +23,10 @@ import org.labkey.test.pages.admin.CreateSubFolderPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import static org.labkey.test.WebDriverWrapper.WAIT_FOR_JAVASCRIPT;
 
@@ -46,120 +50,106 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return _el;
     }
 
-    public String getCurrentProject()
+    private boolean isOpen()
     {
-        return newElementCache().menuToggle.getText().replace("&nbsp;", "").trim();
+        return elementCache().menuContainer().getAttribute("class").contains("open");
     }
 
-    public WebElement getMenuToggle()
+    /**
+     * expand tree should take in an arbitrary number of strings. It works it's way down the list, stoping
+     * when it finds the last string. Passing in zero strings should result in the entire tree being expanded.
+     */
+    public void expandTree(String... menuPath)
     {
-        return newElementCache().menuToggle;
+        if (menuPath.length == 0)
+        {
+            expandTree(null, null);
+        }
+        else if (menuPath.length == 1)
+        {
+            expandTree(null, menuPath[0]);
+        }
+        else if (menuPath.length == 2)
+        {
+            expandTree(menuPath[0], menuPath[1]);
+        }
+        else
+        {
+            throw new NotImplementedException("ExpandTree cannot yet except arbitrary paths.");
+        }
     }
 
-    public boolean isExpanded()
+    private void expandTree(String project, String terminal)
     {
-        return newElementCache().menuContainer().getAttribute("class").contains("open");
+        WebElement context = elementCache().menuContainer();
+        if (project != null)
+        {
+            context = elementCache().getMenuRow(project).findElementOrNull(elementCache().menuContainer());
+        }
+
+        List<WebElement> expandoButtons;
+        while (!(expandoButtons = Locator.tag("li")
+                .withClass("collapse-folder")
+                .childTag("span")
+                .findElements(context)).isEmpty())
+        {
+            for (WebElement expandoButton : expandoButtons)
+            {
+                if (terminal != null && elementCache().getMenuLink(terminal) != null)
+                {
+                    return;
+                }
+                expandoButton.click();
+            }
+        }
     }
 
     public ProjectMenu open()
     {
-        if (!isExpanded())
+        if (!isOpen())
         {
             if (getWrapper().isElementPresent(Locator.css("li.dropdown.open > .lk-custom-dropdown-menu")))
-                getWrapper().mouseOver(newElementCache().menuToggle); // Just need to hover if another menu is already open
+                getWrapper().mouseOver(elementCache().menuToggle); // Just need to hover if another menu is already open
             else
-                newElementCache().menuToggle.click();
+                elementCache().menuToggle.click();
         }
-        WebDriverWrapper.waitFor(this::isExpanded, 1000);
+        WebDriverWrapper.waitFor(this::isOpen, 1000);
         return this;
     }
 
     public ProjectMenu close()
     {
-        if (isExpanded())
-            newElementCache().menuToggle.click();
-        WebDriverWrapper.waitFor(()-> !isExpanded(), "Menu didn't close", 1000);
+        if (isOpen())
+            getWrapper().mouseOut(); // more in line with the user experience than clicking the toggle.
+        WebDriverWrapper.waitFor(()-> !isOpen(), "Menu didn't close", 1000);
         return this;
     }
 
-    /* Hovering over the project link (in the left pane) shows the folder links for that project
-     * in the (right) folder pane. */
-    public WebElement mouseOverProjectLink(String projectName)
+    public void navigateToMenuLink(String... menuPath)
     {
         open();
-        WebElement menuItem = newElementCache().getMenuItem(projectName);
-        getWrapper().scrollIntoView(menuItem);
-        getWrapper().fireEvent(menuItem, WebDriverWrapper.SeleniumEvent.mouseover);
-        return menuItem;
-    }
-
-    public void navigateToProject(String projectName)
-    {
-        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
-            mouseOverProjectLink(projectName);
-        expandFolderLinksTo(projectName);
-        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getFolderLink(projectName).click());
-    }
-
-    /* Will navigate to a folder or subfolder of the specified project */
-    public void navigateToFolder(String projectName, String folder)
-    {
-        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
-            mouseOverProjectLink(projectName);
-        expandFolderLinksTo(folder);
-        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderLink(folder).click());
-    }
-
-    /* opens the expandos until the desired folder link is in view, or
-    * no expandos are present in the folder list container*/
-    public void expandFolderLinksTo(String folder)
-    {
-        open();
-        Locator expandoLoc = Locator.tagWithClass("li", "clbl collapse-folder")
-                .child(Locator.tagWithClass("span", "marked"));
-
-        WebDriverWrapper.waitFor(()-> {
-            if (folderLinkIsPresent(folder) || expandoLoc.findElementOrNull(newElementCache().folderListContainer())==null)
-                return true;
-            else    // expand any collapsed expandos until the navigation link becomes clickable
-            {
-                WebElement expando = expandoLoc        // expandos are 'clbl expand-folder' when opened
-                        .findElementOrNull(newElementCache().folderListContainer());
-                if (expando != null)
-                    expando.click();
-            }
-            return false;
-        }, WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void navigateToContainer(String project, String... subfolders)
-    {
-        if (subfolders.length == 0)
-            navigateToProject(project);
-        else
-            throw new IllegalArgumentException("Navigating a specific subfolder path is not yet supported"); // TODO
+        expandTree(menuPath);
+        getWrapper().doAndWaitForPageToLoad(()-> elementCache().getMenuLink(menuPath).click());
     }
 
     /* This is a way to discover via the UI if the specified project exists (or did the last time the
         * UI refreshed). */
-    public boolean projectLinkExists(String projectName)
+    public boolean menuLinkExists(String... menuPath)
     {
         open();
-        return Locator.tag("li").childTag("a").withAttribute("data-field", projectName).notHidden()
-                .findElementOrNull(elementCache().menu) != null;
+        return elementCache().getMenuLink(menuPath) != null;
     }
 
     /* real-time check to see if the destination nav-link (folder or project) is present and visible*/
-    public boolean folderLinkIsPresent(String navigationLinkText)
+    public boolean menuLinkIsPresent(String... menuPath)
     {
-        WebElement linkElement = Locator.tag("li").childTag("a").withText(navigationLinkText).notHidden()
-                .findElementOrNull(newElementCache().folderListContainer());
+        WebElement linkElement = elementCache().getMenuLink(menuPath);
         return linkElement != null && linkElement.isDisplayed();
     }
 
     public List<WebElement> projectMenuLinks()
     {
-        return newElementCache().getProjectMenuLinks();
+        return elementCache().getProjectMenuLinks();
     }
 
     /**
@@ -168,7 +158,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     public CreateSubFolderPage navigateToCreateSubFolderPage()
     {
         open();
-        getWrapper().doAndWaitForPageToLoad(() -> newElementCache().newSubFolderButton.click());
+        getWrapper().doAndWaitForPageToLoad(() -> elementCache().newSubFolderButton.click());
         return new CreateSubFolderPage(getDriver());
     }
 
@@ -187,6 +177,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer());
         WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer());
+        WebElement anyRow = Locator.tagWithClass("ul", "dropdown-menu").childTag("li").refindWhenNeeded(menuContainer());
 
         WebElement projectNavTrail = Locator.tagWithClass("div", "lk-project-nav-trail").refindWhenNeeded(menu);
         WebElement projectNavBtnContainer = Locator.tagWithClass("div", "beta-nav-buttons").refindWhenNeeded(menu);
@@ -198,22 +189,34 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         {
             return Locators.menuProjectNav.waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
         }
-        WebElement folderListContainer()
-        {
-            return Locator.tagWithClass("div", "folder-list-container").waitForElement(menuContainer(), WAIT_FOR_JAVASCRIPT);
-        }
 
-        WebElement getMenuItem(String text)
-        {
-            return Locator.tag("li").childTag("a").withAttribute("data-field", text).notHidden().waitForElement(menu, WAIT_FOR_JAVASCRIPT);
-        }
         List<WebElement> getProjectMenuLinks()
         {
             return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer());
         }
-        WebElement getFolderLink(String text)
+
+        Locator.XPathLocator getMenuRow(String... path)
         {
-            return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer(), WAIT_FOR_JAVASCRIPT);
+            return getMenuRowLocator(new LinkedList<>(Arrays.asList(path)));
+        }
+
+        WebElement getMenuLink(String... path)
+        {
+            return getMenuRow(path).childTag("a").findElementOrNull(menuContainer());
+        }
+
+        WebElement getMenuExpando(String... path)
+        {
+            return getMenuRow(path).childTag("span").findElementOrNull(menuContainer());
+        }
+
+        private Locator.XPathLocator getMenuRowLocator(Queue<String> path)
+        {
+            Locator.XPathLocator base = Locator.tag("li").childTag("a").withText(path.remove()).parent();
+            if (!path.isEmpty())
+                return base.descendant(getMenuRowLocator(path));
+            else
+                return base;
         }
     }
 

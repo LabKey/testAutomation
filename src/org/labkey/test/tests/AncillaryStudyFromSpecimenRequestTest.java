@@ -54,7 +54,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void verifyStudy(String name, String description)
     {
-        navigateToFolder(getProjectName(), name);
+        navigateToMenuLink(getProjectName(), name);
         //clickFolder(name);
         assertTextPresent(description);
         clickTab("Mice");

@@ -229,7 +229,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             }
             else
             {
-                navigateToFolder(getProjectName(), getFolderName());
+                navigateToMenuLink(getProjectName(), getFolderName());
             }
         }
         BodyWebPart.find(getDriver(), "Flow Experiment Management", 0);

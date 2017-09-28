@@ -1114,7 +1114,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestDatasetsAndFileBasedQueries()
     {
-        navigateToFolder(getProjectName(), FOLDER_NAME);
+        navigateToMenuLink(getProjectName(), FOLDER_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Study Overview");
         waitForText("Create Study");

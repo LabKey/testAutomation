@@ -126,7 +126,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         // Add the list we'll use for the thaw list lookup
         new ListHelper(this).importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE);
 
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -177,7 +177,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         // Verify fix for 20441.
         log("Verify links to default values in parent folder work");
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
@@ -208,7 +208,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
     protected void navToRunDetails()
     {
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("run details"));
     }
@@ -250,7 +250,7 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
     private void setDefaultThawList(String listName)
     {
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         _assayHelper.setDefaultValues(TEST_ASSAY_NAB, AbstractAssayHelper.AssayDefaultAreas.BATCH_FIELDS);
         waitForElement(Locator.css(".query-loaded-marker"));

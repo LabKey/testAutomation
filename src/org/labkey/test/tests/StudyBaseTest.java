@@ -368,7 +368,7 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
         log("Going to Manage Study Page of: " + studyName);
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            projectMenu().navigateToFolder(projectName, studyName);
+            projectMenu().navigateToMenuLink(projectName, studyName);
             waitAndClick(Locator.linkWithText("Manage Study"));
             waitForElement(Locator.tagWithClassContaining("div", "lk-body-title")
                     .withChild(Locator.tagWithText("h3", "Manage Study")));

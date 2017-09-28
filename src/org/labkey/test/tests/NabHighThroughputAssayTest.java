@@ -124,7 +124,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class NabHighThroughputAssayTest extends BaseWebDriverTest
     @LogMethod
     private void doNAbTest(String assayName, File dataFile, @Nullable File metadataFile, List<String> expectedText, int expectedRowCount)
     {
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(assayName));

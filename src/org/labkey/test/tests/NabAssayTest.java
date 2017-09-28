@@ -288,7 +288,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
         assertTextNotPresent("NAb: 5 specimens in duplicate");
 
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -427,7 +427,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                 "Name changed from 'ptid + visit + specimenid' to 'NameEdited.xlsx'");
 
         // Return to the run list
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         // test creating a custom details view via a "magic" named run-level view:
@@ -470,7 +470,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertNabData();
 
         // Delete a single run (regression test for issue 24487)
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("View Runs"));
 
@@ -484,7 +484,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         doResolverTypeTest();
 
         // create user with read permissions to study and dataset, but no permissions to source assay
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
+        navigateToMenuLink(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1);
         pushLocation();  // Save our location because impersonated user won't have permission to project
         _permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
         setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
@@ -549,7 +549,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         final String QUERY_NAME = "Data";
 
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         goToSchemaBrowser();
         selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
@@ -597,7 +597,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         PortalHelper portalHelper = new PortalHelper(this);
         WikiHelper wikiHelper = new WikiHelper(this);
 
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
@@ -761,7 +761,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         assayDesigner.addTransformScript(new File(TestFileUtils.getLabKeyRoot(), "/sampledata/qc/transform.jar"));
         assayDesigner.saveAndClose();
 
-        navigateToFolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
+        navigateToMenuLink(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         importData(
                 new AssayImportOptions.ImportOptionsBuilder().
@@ -881,7 +881,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected void testWellAndDilutionData()
     {
         log("Test WellData and DilutionData tables");
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         goToSchemaBrowser();
         DataRegionTable table = viewQueryData("assay.NAb.TestAssayNab", "WellData");
         List<String> row11 = table.getRowDataAsText(11);
@@ -904,7 +904,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         File assayFile = new File(TestFileUtils.getLabKeyRoot(), "/build/testTemp/assaydata/" + NAB_FILENAME2);
         boolean deleteSuccess = assayFile.delete();
         assertTrue("Failed to delete file: " + NAB_FILENAME2, deleteSuccess);
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickAndWait(Locator.linkWithText("ptid + date"));
         clickAndWait(Locator.linkWithText("run details"));
@@ -919,7 +919,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected void runNabQCTest()
     {
         goToProjectHome();
-        navigateToFolder(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
+        navigateToMenuLink(getProjectName(), TEST_ASSAY_FLDR_NAB_RENAME);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         DataRegionTable dataRegionTable = new DataRegionTable("Runs", this);
