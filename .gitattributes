@@ -246,10 +246,14 @@ modules/simpletest/resources/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfol
 modules/simpletest/resources/queries/vehicle/Vehicles/~~INSERT~~.qview.xml -text
 modules/simpletest/resources/queries/vehicle/Vehicles/~~UPDATE~~.qview.xml -text
 modules/simpletest/resources/queries/vehicle/colors.js -text
+modules/simpletest/resources/reports/schemas/lists/People/Knitr[!!-~]People/SmallThumbnail.png -text
+modules/simpletest/resources/reports/schemas/lists/People/Knitr[!!-~]People/Thumbnail.png -text
 modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.js -text
 modules/simpletest/resources/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.report.xml -text
 modules/simpletest/resources/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
+modules/simpletest/resources/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report/Thumbnail.png -text
 modules/simpletest/resources/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
+modules/simpletest/resources/reports/schemas/lists/People/Want[!!-~]To[!!-~]Be[!!-~]Cool/Thumbnail.png -text
 modules/simpletest/resources/reports/schemas/lists/People/peopleKnitr.r -text
 modules/simpletest/resources/reports/schemas/lists/People/peopleKnitr.report.xml -text
 modules/simpletest/resources/reports/schemas/schemaFolderReport.r -text

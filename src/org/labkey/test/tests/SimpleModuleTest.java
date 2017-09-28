@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +36,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
@@ -99,6 +101,16 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String RESTRICTED_FOLDER_IMPORT_NAME =
             "/sampledata/SimpleAndRestrictedModule/FolderWithRestricted.folder.zip";
 
+    private static final String THUMBNAIL_FOLDER = "thumbnails/";
+    private static final String THUMBNAIL_FILENAME = "/Thumbnail.png";
+    private static final String ICON_FILENAME = "/SmallThumbnail.png";
+
+    private static final String KNITR_PEOPLE = "Knitr People";
+    private static final String SUPER_COOL_R_REPORT = "Super Cool R Report";
+    private static final String WANT_TO_BE_COOL = "Want To Be Cool";
+
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+
     private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected String getProjectName()
@@ -127,6 +139,17 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertModuleEnabledByDefault(MODULE_NAME);
         assertModuleEnabledByDefault("Query");
         assertModuleEnabledByDefault("Study");
+
+        goToProjectHome();
+        portalHelper.addWebPart("Data Views");
+        for (int i = 0; i < 5; i ++)
+            portalHelper.moveWebPart("Data Views", PortalHelper.Direction.UP);
+
+        goToProjectSettings();
+        setFormElement(Locator.name("defaultDateFormat"), DATE_FORMAT);
+        clickAndWait(Locator.lkButton("Save"));
+
+        goToProjectHome();
     }
 
     @Test
@@ -792,6 +815,72 @@ public class SimpleModuleTest extends BaseWebDriverTest
         table.goToReport( "Super Cool R Report");
         waitForText(WAIT_FOR_JAVASCRIPT, "Console output");
         assertTextPresent("\"name\"", "\"age\"", "\"crazy\"");
+
+        doTestReportThumbnails();
+        doTestReportIcon();
+        doTestReportCreatedDate();
+    }
+
+    @LogMethod
+    private void doTestReportThumbnails()
+    {
+        goToProjectHome();
+        log("Verify custom module report thumbnail images");
+        verifyReportThumbnail(KNITR_PEOPLE);
+        verifyReportThumbnail(SUPER_COOL_R_REPORT);
+        verifyReportThumbnail(WANT_TO_BE_COOL);
+    }
+
+    @LogMethod
+    private void doTestReportIcon()
+    {
+
+        log("Verify custom module report icon image");
+        setFormElement(Locator.xpath("//table[contains(@class, 'dataset-search')]//input"), KNITR_PEOPLE);
+        waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(WANT_TO_BE_COOL).notHidden());
+
+        File expectedIconFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + KNITR_PEOPLE + ICON_FILENAME);
+        String expectedIcon = TestFileUtils.getFileContents(expectedIconFile);
+
+        String iconStyle = waitForElement(Locator.tag("img").withClass("dataview-icon").withoutClass("x4-tree-icon-parent").notHidden()).getAttribute("style");
+        assertTrue("Module report icon style is not as expected", iconStyle.indexOf("background-image") == 0);
+        String iconSrc = iconStyle.replace("background-image:url(\"", "").replace("background-image: url(\"", "").replace("\");", "");
+
+        String portPortion = 80 == WebTestHelper.getWebPort() ? "" : ":" + WebTestHelper.getWebPort();
+        String protocol = WebTestHelper.getTargetServer() + portPortion;
+        String iconData = WebTestHelper.getHttpResponse(protocol + iconSrc).getResponseBody();
+
+        int lengthToCompare = 3000;
+        int diff = StringUtils.getLevenshteinDistance(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
+        assertTrue("Module report icon is not as expected", expectedIcon.equals(iconData) ||
+                diff  <= lengthToCompare * 0.01); // Might be slightly different due to indentations
+    }
+
+    @LogMethod
+    private void doTestReportCreatedDate()
+    {
+        log("Verify module report \"created\" date");
+        click(Locator.tag("span").withClass("fa-list-ul").notHidden());
+        assertTextPresent("2015-08-01");
+    }
+
+    @LogMethod
+    private void verifyReportThumbnail(String reportTitle)
+    {
+        File expectedThumbnailFile = TestFileUtils.getSampleData(THUMBNAIL_FOLDER + reportTitle + THUMBNAIL_FILENAME);
+        String expectedThumbnail = TestFileUtils.getFileContents(expectedThumbnailFile);
+
+        waitForElement(Locator.xpath("//a[text()='"+reportTitle+"']"));
+        mouseOver(Locator.xpath("//a[text()='"+reportTitle+"']"));
+        Locator.XPathLocator thumbnail = Locator.xpath("//div[@class='thumbnail']/img").notHidden();
+        waitForElement(thumbnail);
+        String thumbnailData;
+        thumbnailData = WebTestHelper.getHttpResponse(getAttribute(thumbnail, "src")).getResponseBody();
+
+        int lengthToCompare = 5000;
+        int diff = StringUtils.getLevenshteinDistance(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
+        assertTrue("Module report thumbnail is not as expected", expectedThumbnail.equals(thumbnailData) ||
+                diff  <= lengthToCompare * 0.01); // Might be slightly different due to indentations
     }
 
     @LogMethod

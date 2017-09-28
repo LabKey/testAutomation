@@ -4,6 +4,9 @@
     <category>Category From XML</category>
     <description>Showing how to be less cool!</description>
     <hidden>false</hidden>
+    <Properties>
+        <Prop name="moduleReportCreatedDate">2017-09-26</Prop>
+    </Properties>
     <reportType>
         <JavaScript>
             <dependencies>
