@@ -17,7 +17,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
 import org.labkey.test.components.ext4.Window;
-import org.labkey.test.selenium.ReclickingWebElement;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -25,7 +25,11 @@ import static org.labkey.test.components.ext4.Window.Window;
 
 public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.ElementCache>
 {
-    public DatasetPropertiesPage(WebDriver driver){super(driver);}
+    public DatasetPropertiesPage(WebDriver driver)
+    {
+        super(driver);
+        // TODO: Need to figure out a way to wait for buttons to be responsive so that we don't need to use clickUntilStale
+    }
 
     protected DatasetPropertiesPage.ElementCache newElementCache()
     {
@@ -34,31 +38,31 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     public EditDatasetDefinitionPage clickEditDefinition()
     {
-        clickAndWait(elementCache().editDefinitionButton);
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().editDefinitionButton)));
         return new EditDatasetDefinitionPage(getDriver());
     }
 
     public ViewDatasetDataPage clickViewData()
     {
-        clickAndWait(elementCache().viewDataButton);
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().viewDataButton)));
         return new ViewDatasetDataPage(getDriver());
     }
 
     public ManageDatasetsPage clickManageDatasets()
     {
-        clickAndWait(elementCache().manageDatasetsButton);
+        doAndWaitForPageToLoad(() -> shortWait().until(LabKeyExpectedConditions.clickUntilStale(elementCache().manageDatasetsButton)));
         return new ManageDatasetsPage(getDriver());
     }
 
     public LabKeyPage deleteDataset()
     {
-        click(elementCache().deleteDatasetButton);
+        elementCache().deleteDatasetButton.click();
         return null;
     }
 
     public ResultWindow deleteAllRows()
     {
-        click(elementCache().deleteAllRowsButton);
+        elementCache().deleteAllRowsButton.click();
         return new ConfirmationWindow().confirm();
     }
 
