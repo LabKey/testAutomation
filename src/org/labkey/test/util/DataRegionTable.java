@@ -1740,6 +1740,11 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
             return Locator.tagWithAttribute(IS_BOOTSTRAP_LAYOUT ? "th":"td",
                     "column-name", regionName + ":" + fieldName);
         }
+
+        public static Locator.XPathLocator floatingHeader()
+        {
+            return Locator.tagWithClass("tr", "labkey-col-header-row").attributeEndsWith("id", "-float");
+        }
     }
 
     public class Elements extends Component.ElementCache

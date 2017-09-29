@@ -1,10 +1,14 @@
 package org.labkey.test.util.selenium;
 
+import org.labkey.test.Locator;
 import org.labkey.test.Locators;
+import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.Locatable;
+
+import java.util.List;
 
 public abstract class WebDriverUtils
 {
@@ -19,20 +23,18 @@ public abstract class WebDriverUtils
 
         public boolean scrollUnderFloatingHeader(WebElement blockedElement)
         {
-            return scrollUnderFloatingElement(blockedElement, Locators.floatingHeaderContainer().findElementOrNull(_webDriver));
-        }
+            List<WebElement> floatingHeaders = Locator.findElements(_webDriver, Locators.floatingHeaderContainer(), DataRegionTable.Locators.floatingHeader().notHidden());
 
-        public boolean scrollUnderFloatingElement(WebElement blockedElement, WebElement floatingElement)
-        {
-            if (floatingElement != null)
+            int headerHeight = 0;
+            for (WebElement floatingHeader : floatingHeaders)
             {
-                int headerHeight = floatingElement.getSize().getHeight();
-                if (headerHeight > ((Locatable) blockedElement).getCoordinates().inViewPort().getY())
-                {
-                    int elHeight = blockedElement.getSize().getHeight();
-                    scrollBy(0, -(headerHeight + elHeight));
-                    return true;
-                }
+                headerHeight += floatingHeader.getSize().getHeight();
+            }
+            if (headerHeight > 0 && headerHeight > ((Locatable) blockedElement).getCoordinates().inViewPort().getY())
+            {
+                int elHeight = blockedElement.getSize().getHeight();
+                scrollBy(0, -(headerHeight + elHeight));
+                return true;
             }
             return false;
         }
