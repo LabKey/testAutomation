@@ -176,12 +176,12 @@ public class ClientAPITest extends BaseWebDriverTest
     @Before
     public void preTest()
     {
-        navigateToMenuLink(getProjectName(), FOLDER_NAME);
+        navigateToFolder(getProjectName(), FOLDER_NAME);
 
         if (dirtyList)
         {
             refreshPeopleList();
-            navigateToMenuLink(getProjectName(), FOLDER_NAME);
+            navigateToFolder(getProjectName(), FOLDER_NAME);
         }
     }
 

@@ -1076,7 +1076,7 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             }
             if(!checked.contains(folder))
             {
-                navigateToMenuLink(project, folder);
+                navigateToFolder(project, folder);
 
                 doViewCheck(folder);
                 checked.add(folder);

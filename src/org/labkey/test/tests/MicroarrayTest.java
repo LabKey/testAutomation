@@ -260,7 +260,7 @@ public class MicroarrayTest extends BaseWebDriverTest
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            navigateToMenuLink(getProjectName(), PROJECT_NAME);
+            navigateToFolder(getProjectName(), PROJECT_NAME);
         }
         else
         {

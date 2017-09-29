@@ -418,8 +418,8 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         openFolderMenu();
         expandFolderTree(folderName);
         if (hasSubfolder)
-            assertTrue("project menu should have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().menuLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
+            assertTrue("project menu should have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
         else
-            assertFalse("project menu should not have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().menuLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
+            assertFalse("project menu should not have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
     }
 }

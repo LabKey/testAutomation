@@ -144,7 +144,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
-        navigateToMenuLink(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -159,7 +159,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Author can read as well, edit his own but not edit the Edtiors
         impersonate(GAMMA_AUTHOR_USER);
-        navigateToMenuLink(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
@@ -179,7 +179,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Reader can read but not edit
         impersonate(GAMMA_READER_USER);
-        navigateToMenuLink(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
 
         clickAndWait(Locator.linkContainingText("view message").index(0));
         assertTextPresent(GAMMA_AUTHOR_PAGE_TITLE);
@@ -193,7 +193,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //switch back to Editor and edit
         impersonate(GAMMA_EDITOR_USER);
-        navigateToMenuLink(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         //Go back and Edit
         clickAndWait(Locator.linkContainingText("view message").index(1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
@@ -203,7 +203,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Remove permission from folder to verify unviewability
         log("Check for disallowed folder links");
         stopImpersonating();
-        navigateToMenuLink(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
+        navigateToFolder(PERM_PROJECT_NAME, GAMMA_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
         clickButton("Save and Finish", defaultWaitForPage);
@@ -229,10 +229,10 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickProject(PERM_PROJECT_NAME);
         impersonate(GAMMA_READER_USER);
         clickProject(PERM_PROJECT_NAME);
-        projectMenu().expandTree(GAMMA_SUB_FOLDER_NAME);
-        assertTrue(projectMenu().menuLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
-        projectMenu().expandTree(DENIED_SUB_FOLDER_NAME);
-        assertFalse(projectMenu().menuLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
+        projectMenu().expandFolderLinksTo(GAMMA_SUB_FOLDER_NAME);
+        assertTrue(projectMenu().folderLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
+        projectMenu().expandFolderLinksTo(DENIED_SUB_FOLDER_NAME);
+        assertFalse(projectMenu().folderLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
         assertEquals("Only one project should be visible while impersonating", 1, projectMenu().projectMenuLinks().size());
 

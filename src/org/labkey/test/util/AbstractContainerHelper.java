@@ -325,7 +325,7 @@ public abstract class AbstractContainerHelper
             _test.clickProject(project);
             ProjectMenu menu = new ProjectMenu(_test.getDriver());
             if (!parent.equals(project))
-                menu.navigateToMenuLink(project, parent);
+                menu.navigateToFolder(project, parent);
 
             return menu.navigateToCreateSubFolderPage()
                     .setFolderName(child);
@@ -385,7 +385,7 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            assertTrue( new ProjectMenu(_test.getDriver()).menuLinkExists(project));
+            assertTrue( new ProjectMenu(_test.getDriver()).projectLinkExists(project));
         else
             _test.assertElementPresent(Locators.folderMenu.withText(project));
         _test.openFolderMenu();

@@ -118,10 +118,10 @@ public class TourTest extends BaseWebDriverTest
     public void testBasicTour()
     {
         TourNavigator tourNavigator = new TourNavigator();
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         assertBasicTour();
         //tour should only run once
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
 
@@ -134,10 +134,10 @@ public class TourTest extends BaseWebDriverTest
         tourEditor.importTour(tourJSON);
         tourEditor.setTitle(TOUR_NAME);
         tourEditor.save();
-        navigateToMenuLink(SUBFOLDER2);
+        navigateToFolder(SUBFOLDER2);
         assertBasicTour();
         //tour should only run once
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
 
@@ -146,9 +146,9 @@ public class TourTest extends BaseWebDriverTest
         TourEditor tourEditor = navigateToEditTour(SUBFOLDER1, TOUR_NAME);
         tourEditor.setMode(TourEditor.TourMode.RUNALWAYS);
         tourEditor.save();
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         assertBasicTour();
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         assertBasicTour();
     }
 
@@ -158,7 +158,7 @@ public class TourTest extends BaseWebDriverTest
         TourEditor tourEditor = navigateToEditTour(SUBFOLDER1, TOUR_NAME);
         tourEditor.setMode(TourEditor.TourMode.OFF);
         tourEditor.save();
-        navigateToMenuLink(SUBFOLDER1);
+        navigateToFolder(SUBFOLDER1);
         tourNavigator.assertNoTourBubble();
     }
 
@@ -181,9 +181,9 @@ public class TourTest extends BaseWebDriverTest
         tourNavigator.assertNoTourBubble();
     }
 
-    private void navigateToMenuLink(String folder)
+    private void navigateToFolder(String folder)
     {
-        navigateToMenuLink(getProjectName(), folder);
+        navigateToFolder(getProjectName(), folder);
     }
 
     private TourEditor navigateToEditTour(String folder, String tourTitle)

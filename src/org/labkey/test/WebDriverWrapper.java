@@ -1155,7 +1155,7 @@ public abstract class WebDriverWrapper implements WrapsDriver
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            new ProjectMenu(getDriver()).expandTree(folder);
+            new ProjectMenu(getDriver()).expandFolderLinksTo(folder);
         }
         else
         {
