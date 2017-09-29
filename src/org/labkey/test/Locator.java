@@ -36,11 +36,14 @@ import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Locator extends By
@@ -834,9 +837,10 @@ public abstract class Locator extends By
     {
         try
         {
-            return paginationText(Integer.parseInt(firstRow), Integer.parseInt(lastRow), Integer.parseInt(maxRows));
+            NumberFormat fmt = NumberFormat.getNumberInstance(Locale.getDefault());
+            return paginationText(fmt.parse(firstRow).intValue(), fmt.parse(lastRow).intValue(), fmt.parse(maxRows).intValue());
         }
-        catch (NumberFormatException e)
+        catch (ParseException e)
         {
             throw new RuntimeException(e.getMessage());
         }
@@ -844,7 +848,7 @@ public abstract class Locator extends By
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
     {
-        DecimalFormat numFormat = new DecimalFormat("####");
+        DecimalFormat numFormat = new DecimalFormat("#,###");
 
         int rowsPerPage = lastRow - firstRow + 1;
         int pageCount = (int)Math.ceil((double)maxRows / (double)rowsPerPage);
