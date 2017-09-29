@@ -2257,6 +2257,16 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         return statusValues;
     }
 
+    public List<String> waitForRunningPipelineJobs(boolean expectError, long timeoutMilliseconds)
+    {
+        List<String> statusValues = waitForRunningPipelineJobs(timeoutMilliseconds);
+        if (expectError)
+            assertTrue("Didn't find expected pipeline error", statusValues.contains("ERROR"));
+        else
+            assertFalse("Found unexpected pipeline error", statusValues.contains("ERROR"));
+        return statusValues;
+    }
+
     @LogMethod
     protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns)
     {
