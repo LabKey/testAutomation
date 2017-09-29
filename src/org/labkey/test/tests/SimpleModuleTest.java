@@ -852,8 +852,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         int lengthToCompare = 3000;
         int diff = StringUtils.getLevenshteinDistance(expectedIcon.substring(0, lengthToCompare), iconData.substring(0, lengthToCompare));
-        assertTrue("Module report icon is not as expected", expectedIcon.equals(iconData) ||
-                diff  <= lengthToCompare * 0.01); // Might be slightly different due to indentations
+        assertTrue("Module report icon is not as expected, diff is " + diff, expectedIcon.equals(iconData) ||
+                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }
 
     @LogMethod
@@ -861,7 +861,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Verify module report \"created\" date");
         click(Locator.tag("span").withClass("fa-list-ul").notHidden());
-        assertTextPresent("2015-08-01");
+        waitForText("2015-08-01");
     }
 
     @LogMethod
@@ -879,8 +879,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         int lengthToCompare = 5000;
         int diff = StringUtils.getLevenshteinDistance(expectedThumbnail.substring(0, lengthToCompare), thumbnailData.substring(0, lengthToCompare));
-        assertTrue("Module report thumbnail is not as expected", expectedThumbnail.equals(thumbnailData) ||
-                diff  <= lengthToCompare * 0.01); // Might be slightly different due to indentations
+        assertTrue("Module report thumbnail is not as expected, diff is " + diff, expectedThumbnail.equals(thumbnailData) ||
+                diff  <= lengthToCompare * 0.03); // Might be slightly different due to indentations, etc
     }
 
     @LogMethod
@@ -1150,12 +1150,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         createPeopleListInFolder(RESTRICTED_FOLDER_NAME);
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
-        clickFolder(RESTRICTED_FOLDER_NAME);
+        navigateToMenuLink(getProjectName(), RESTRICTED_FOLDER_NAME);
         impersonateRole("Reader");
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
         stopImpersonating();
         clickProject(getProjectName());
-        clickFolder(RESTRICTED_FOLDER_NAME);
+        navigateToMenuLink(getProjectName(), RESTRICTED_FOLDER_NAME);
         impersonateRole("Folder Administrator");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -1166,7 +1166,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("folder admin without restricted permission cannot import restricted folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
-        clickFolder(NEW_FOLDER_NAME);
+        navigateToMenuLink(getProjectName(), NEW_FOLDER_NAME);
         importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
