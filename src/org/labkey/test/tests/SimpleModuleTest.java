@@ -1150,12 +1150,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         createPeopleListInFolder(RESTRICTED_FOLDER_NAME);
 
         log("folder admin without restricted permission can still see existing restricted folder, web parts");
-        navigateToMenuLink(getProjectName(), RESTRICTED_FOLDER_NAME);
+        navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
         impersonateRole("Reader");
         assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
         stopImpersonating();
         clickProject(getProjectName());
-        navigateToMenuLink(getProjectName(), RESTRICTED_FOLDER_NAME);
+        navigateToFolder(getProjectName(), RESTRICTED_FOLDER_NAME);
         impersonateRole("Folder Administrator");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -1166,7 +1166,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("folder admin without restricted permission cannot import restricted folder");
         _containerHelper.createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
         createPeopleListInFolder(NEW_FOLDER_NAME);
-        navigateToMenuLink(getProjectName(), NEW_FOLDER_NAME);
+        navigateToFolder(getProjectName(), NEW_FOLDER_NAME);
         importFolderFromZip(new File(TestFileUtils.getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent(
