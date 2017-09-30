@@ -31,6 +31,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -341,6 +342,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         final File ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD = TestFileUtils.getSampleData("mvIndicators/assay_single_column_bad.xls");
         final File ASSAY_TWO_COLUMN_EXCEL_FILE_BAD = TestFileUtils.getSampleData("mvIndicators/assay_two_column_bad.xls");
 
+        defineList();
         defineAssay(ASSAY_NAME);
 
         log("Import single column MV data");
@@ -438,6 +440,24 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertNoLabKeyErrors();
         clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
         validateTwoColumnData("Data", "ParticipantID");
+
+        setPipelineRoot(StudyHelper.getPipelinePath());
+        log("Export study folder to the pipeline as indiviual files");
+        exportFolderAsIndividualFiles(null, false, false, false);
+
+        log("Import exported study into subfolder");
+        String importedFolderName = "Imported MV";
+        _containerHelper.createSubfolder(getProjectName(), getProjectName(), importedFolderName, "Study", null, true);
+        clickFolder(importedFolderName);
+        setPipelineRoot(StudyHelper.getPipelinePath());
+        importFolderFromPipeline("/export/folder.xml");
+
+        log("Verify MV indicators are imported correctly");
+        goToProjectHome();
+        clickFolder(importedFolderName);
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText("MVAssay"));
+        assertMvIndicatorPresent();
     }
 
     private void assertMvIndicatorPresent()
@@ -449,8 +469,26 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     }
 
     @LogMethod
+    private void defineList()
+    {
+        final String TEST_DATA_AGE_LIST =
+                        "Age\n" +
+                        "10\n" +
+                        "17\n" +
+                        "25\n" +
+                        "50";
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
+
+        _listHelper.createList(getProjectName(), "Ages", ListHelper.ListColumnType.Integer, "Age");
+        _listHelper.uploadData(TEST_DATA_AGE_LIST);
+    }
+
+    @LogMethod
     private void defineAssay(String assayName)
     {
+        goToProjectHome();
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Assay List");
 
@@ -460,8 +498,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assay.addDataField("age", "Age", FieldDefinition.ColumnType.Integer);
         assay.addDataField("sex", "Sex", FieldDefinition.ColumnType.String);
 
-        log("setting fields to enable missing values");
-        assay.dataFields().selectField(4);
+        log("setting fields to enable missing values and look up");
+        assay.dataFields().selectField(4).setType(new ListHelper.LookupInfo(null, "lists", "Ages"), FieldDefinition.ColumnType.Lookup);
         assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
         assay.dataFields().selectField(5);
         assay.dataFields().fieldProperties().selectAdvancedTab().mvEnabledCheckbox.check();
