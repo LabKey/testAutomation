@@ -367,9 +367,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             @Override
             protected void succeeded(Description description)
             {
-                if (reenableMiniProfiler)
-                    getCurrentTest().setMiniProfilerEnabled(true);
-
                 if (!_anyTestFailed)
                     getCurrentTest().doPostamble();
                 else
@@ -871,6 +868,8 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
             checkLeaksAndErrors();
         }
 
+        if (reenableMiniProfiler)
+            setMiniProfilerEnabled(true);
     }
 
     private void waitForPendingRequests(int msWait)
