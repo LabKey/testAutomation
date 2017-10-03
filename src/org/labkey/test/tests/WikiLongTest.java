@@ -397,7 +397,7 @@ public class WikiLongTest extends BaseWebDriverTest
         portalHelper.clickWebpartMenuItem("Wiki", true, "Customize");
         log("check that container is set to current project");
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
-        click(Locator.linkWithText("restore to this folders default page."));
+        click(Locator.linkWithText("restore to this folder's default page."));
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         log("set container and page");
 
