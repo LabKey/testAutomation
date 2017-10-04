@@ -1500,16 +1500,18 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
         elements().getExportButton().click();
     }
 
-    public void openHeaderMenu(String buttonText, String ... subMenuLabels)
+    public BootstrapMenu openHeaderMenu(String buttonText, String ... subMenuLabels)
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText))
-                    .openMenuTo(subMenuLabels);
+            BootstrapMenu headerMenu = new BootstrapMenu(getDriver(), elements().getHeaderMenu(buttonText));
+            headerMenu.openMenuTo(subMenuLabels);
+            return headerMenu;
         }
         else
         {
             getWrapper()._ext4Helper.clickExt4MenuButton(false, elements().getHeaderButton(buttonText), true, subMenuLabels);
+            return null;
         }
     }
 
@@ -1671,13 +1673,19 @@ public class DataRegionTable extends WebDriverComponent<DataRegionTable.Elements
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            BootstrapMenu menu = new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
+            BootstrapMenu menu = getReportMenu();
             menu.clickSubMenu(waitForRefresh,  menuTexts);
         }
         else
         {
             throw new NotImplementedException("This is only implemented in the new UI");
         }
+    }
+
+    @NotNull
+    public BootstrapMenu getReportMenu()
+    {
+        return new BootstrapMenu(getDriver(), elements().getHeaderMenu("Charts / Reports"));
     }
 
     public void clickApplyGridFilter()
