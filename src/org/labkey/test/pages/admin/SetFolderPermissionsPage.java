@@ -66,7 +66,7 @@ public class SetFolderPermissionsPage extends LabKeyPage
 
     private class Elements extends LabKeyPage.ElementCache
     {
-        final WebElement finishButton = Locator.button("Finish").findWhenNeeded(this);
+        final WebElement finishButton = Locator.lkButton("Finish").findWhenNeeded(this).withTimeout(4000);
 
         // TODO: Set security configuration to "My User Only"
         // TODO: "Finish and Configure Permissions"
