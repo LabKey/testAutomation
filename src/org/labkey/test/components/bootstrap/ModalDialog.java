@@ -24,6 +24,11 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         waitForReady();
     }
 
+    static public ModalDialogFinder finder(WebDriver driver)
+    {
+        return new ModalDialogFinder(driver);
+    }
+
     public void waitForReady()
     {
         elementCache().title.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
@@ -58,6 +63,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
+    public void dismiss(String buttonText)
+    {
+        Locators.dismissButton(buttonText).findElement(elementCache().body).click();
+        getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
+    }
+
     protected ElementCache newElementCache()
     {
         return new ElementCache();
@@ -65,10 +76,50 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     protected class ElementCache extends Component.ElementCache
     {
-        WebElement dialog = Locator.tagWithClass("div", "modal-dialog").findWhenNeeded(this);
-        WebElement header = Locator.tagWithClass("div","modal-header").findWhenNeeded(dialog).withTimeout(WAIT_FOR_JAVASCRIPT);
-        WebElement title = Locator.tagWithClass("*", "modal-title").findWhenNeeded(header);
-        WebElement closeButton = Locator.tagWithClass("button", "close").withAttribute("data-dismiss", "modal").findWhenNeeded(header);
-        WebElement body = Locator.tagWithClass("div","modal-body").findWhenNeeded(dialog).withTimeout(WAIT_FOR_JAVASCRIPT);
+        WebElement title = Locators.title.findWhenNeeded(getComponentElement());
+        WebElement closeButton = Locator.tagWithClass("button", "close")
+                .withAttribute("data-dismiss", "modal")
+                .findWhenNeeded(getComponentElement());
+        WebElement body = Locator.tagWithClass("div","modal-body")
+                .findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static class Locators
+    {
+        static public Locator.XPathLocator dialog = Locator.tagWithClassContaining("div", "modal-dialog");
+        static public Locator.XPathLocator title = Locator.tagWithClass("*", "modal-title");
+        static public Locator.XPathLocator dismissButton(String text)
+        {
+            return Locator.button(text);
+        }
+    }
+
+    public static class ModalDialogFinder extends WebDriverComponent.WebDriverComponentFinder<ModalDialog, ModalDialogFinder>
+    {
+        private Locator _locator;
+
+        private ModalDialogFinder(WebDriver driver)
+        {
+            super(driver);
+            _locator=Locators.dialog;
+        }
+
+        public ModalDialogFinder withTitle(String title)
+        {
+            _locator = Locators.dialog.withDescendant(Locators.title).containing(title);
+            return this;
+        }
+
+        @Override
+        protected ModalDialog construct(WebElement el, WebDriver driver)
+        {
+            return new ModalDialog(el, driver);
+        }
+
+        @Override
+        protected Locator locator()
+        {
+            return _locator;
+        }
     }
 }
