@@ -70,7 +70,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
             else
                 newElementCache().menuToggle.click();
         }
-        WebDriverWrapper.waitFor(this::isExpanded, 1000);
+        getWrapper().waitForElement(Locator.tagWithClass("div", "folder-nav"));
+        WebDriverWrapper.waitFor(this::isExpanded, 2000);
         return this;
     }
 
@@ -82,32 +83,17 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         return this;
     }
 
-    /* Hovering over the project link (in the left pane) shows the folder links for that project
-     * in the (right) folder pane. */
-    public WebElement mouseOverProjectLink(String projectName)
-    {
-        open();
-        WebElement menuItem = newElementCache().getMenuItem(projectName);
-        getWrapper().scrollIntoView(menuItem);
-        getWrapper().fireEvent(menuItem, WebDriverWrapper.SeleniumEvent.mouseover);
-        return menuItem;
-    }
-
     public void navigateToProject(String projectName)
     {
-        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
-            mouseOverProjectLink(projectName);
-        expandFolderLinksTo(projectName);
-        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getFolderLink(projectName).click());
+        open();
+        getWrapper().doAndWaitForPageToLoad(()-> newElementCache().getProjectLink(projectName, false).click());
     }
 
     /* Will navigate to a folder or subfolder of the specified project */
     public void navigateToFolder(String projectName, String folder)
     {
-        if (!getCurrentProject().equals(projectName))   //only hover the project link if it's different... right?
-            mouseOverProjectLink(projectName);
         expandFolderLinksTo(folder);
-        getWrapper().doAndWaitForPageToLoad(()->newElementCache().getFolderLink(folder).click());
+        getWrapper().doAndWaitForPageToLoad(() -> newElementCache().getFolderLink(folder).click());
     }
 
     /* opens the expandos until the desired folder link is in view, or
@@ -132,21 +118,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         }, WAIT_FOR_JAVASCRIPT);
     }
 
-    public void navigateToContainer(String project, String... subfolders)
-    {
-        if (subfolders.length == 0)
-            navigateToProject(project);
-        else
-            throw new IllegalArgumentException("Navigating a specific subfolder path is not yet supported"); // TODO
-    }
-
     /* This is a way to discover via the UI if the specified project exists (or did the last time the
         * UI refreshed). */
     public boolean projectLinkExists(String projectName)
     {
         open();
-        return Locator.tag("li").childTag("a").withAttribute("data-field", projectName).notHidden()
-                .findElementOrNull(elementCache().menu) != null;
+        return elementCache().getProjectLink(projectName, true) != null;
     }
 
     /* real-time check to see if the destination nav-link (folder or project) is present and visible*/
@@ -188,29 +165,47 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         WebElement menuToggle = Locator.tagWithAttribute("a", "data-toggle", "dropdown").refindWhenNeeded(menuContainer());
         WebElement menu = Locator.tagWithClass("ul", "dropdown-menu").refindWhenNeeded(menuContainer());
 
-        WebElement projectNavTrail = Locator.tagWithClass("div", "lk-project-nav-trail").refindWhenNeeded(menu);
-        WebElement projectNavBtnContainer = Locator.tagWithClass("div", "beta-nav-buttons").refindWhenNeeded(menu);
+        WebElement projectNavBtnContainer = Locator.tagWithClass("div", "folder-menu-buttons").refindWhenNeeded(menu);
 
         WebElement newProjectButton = Locator.xpath("//span/a[@title='New Project']").refindWhenNeeded(projectNavBtnContainer);
         WebElement newSubFolderButton = Locator.xpath("//span/a[@title='New Subfolder']").refindWhenNeeded(projectNavBtnContainer);
 
         WebElement menuContainer()
         {
-            return Locators.menuProjectNav.waitForElement(getComponentElement(), WAIT_FOR_JAVASCRIPT);
+            return Locators.menuProjectNav.refindWhenNeeded(getComponentElement());
         }
+
         WebElement folderListContainer()
         {
-            return Locator.tagWithClass("div", "folder-list-container").waitForElement(menuContainer(), WAIT_FOR_JAVASCRIPT);
+            return Locator.tagWithClass("div", "folder-nav").refindWhenNeeded(menuContainer());
         }
 
         WebElement getMenuItem(String text)
         {
-            return Locator.tag("li").childTag("a").withAttribute("data-field", text).notHidden().waitForElement(menu, WAIT_FOR_JAVASCRIPT);
+            return Locator.tag("li")
+                    .childTag("a").withText(text).notHidden()
+                    .waitForElement(folderListContainer(), WAIT_FOR_JAVASCRIPT);
         }
+
         List<WebElement> getProjectMenuLinks()
         {
-            return Locator.tag("li").childTag("a").withAttribute("data-field").notHidden().findElements(menuContainer());
+            return Locator.xpath("./ul").childTag("li")
+                    .childTag("a")
+                    .notHidden()
+                    .findElements(folderListContainer());
         }
+
+        WebElement getProjectLink(String projectName, boolean acceptNull)
+        {
+            Locator.XPathLocator path = Locator.xpath("./ul").childTag("li")
+                    .childTag("a").withText(projectName)
+                    .notHidden();
+
+            if (acceptNull)
+                return path.findElementOrNull(folderListContainer());
+            return path.findElement(folderListContainer());
+        }
+
         WebElement getFolderLink(String text)
         {
             return Locator.tag("li").childTag("a").withText(text).notHidden().waitForElement(folderListContainer(), WAIT_FOR_JAVASCRIPT);
@@ -222,6 +217,6 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         public static final Locator labkeyPageNavbar = Locator.tagWithClass("nav", "labkey-page-nav")
                 .withDescendant(Locator.tagWithClass("div", "navbar-header"));
         public static final Locator menuProjectNav = Locator.tagWithClassContaining("li", "dropdown")
-                .withAttribute("data-name", "BetaNav");
+                .withAttribute("data-name", "FolderNav");
     }
 }
