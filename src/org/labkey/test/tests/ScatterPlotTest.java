@@ -30,6 +30,9 @@ import org.labkey.test.components.PropertiesEditor;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.labkey.PortalTab;
+import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
+import org.labkey.test.pages.ManageDatasetsPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -491,9 +494,9 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
 
-        clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
-        clickButton("Manage", WAIT_FOR_PAGE);
-        clickButton("Edit Definition");
+        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+                .selectDatasetByName("APX-1")
+                .clickEditDefinition();
 
         waitForText(FIELDS_REGION_TITLE);
 
@@ -505,7 +508,8 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Remove shape measure.");
         listIndex = listOfMeasureLabels.indexOf(MEASURE_16_EVAL_SUM);
         _listHelper.deleteField(FIELDS_REGION_TITLE, listIndex);
-        clickButton("Save");
+
+        editDatasetPage.save();
 
         log("Verify proper error messages for removed measures.");
         PortalTab.find("Clinical and Assay Data", getDriver()).activate();
@@ -536,7 +540,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
         clickButton("Manage", WAIT_FOR_PAGE);
-        clickButton("Edit Definition");
+        new DatasetPropertiesPage(getDriver()).clickEditDefinition();
 
         waitForText(FIELDS_REGION_TITLE);
         listOfMeasureLabels = getLabels(FIELDS_REGION_TITLE);

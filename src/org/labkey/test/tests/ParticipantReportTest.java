@@ -428,16 +428,13 @@ public class ParticipantReportTest extends ReportTest
         clickSaveParticipantReport();
 
         //Participant report with multiple demographic fields
-        clickAndWait(Locator.linkWithText("Manage"));
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        clickButtonContainingText("Edit Definition");
-        waitForElement(Locator.xpath("//input[@name='demographicData']"));
-        checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
-        clickButton("Save");
+        _studyHelper.goToManageDatasets()
+                .selectDatasetByName("DEM-1")
+                .clickEditDefinition()
+                .setIsDemographicData(true)
+                .save();
 
-        goToManageViews();
-        BootstrapMenu.find(getDriver(),"Add Report").clickSubMenu(true,"Mouse Report");
+        goToManageViews().clickAddReport("Mouse Report");
         // select some measures from the demographics
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);

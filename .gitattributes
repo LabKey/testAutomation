@@ -565,7 +565,6 @@ src/org/labkey/test/pages/FolderManagementFolderTree.java -text
 src/org/labkey/test/pages/ImportDataPage.java -text
 src/org/labkey/test/pages/InsertPage.java -text
 src/org/labkey/test/pages/LabKeyPage.java -text
-src/org/labkey/test/pages/ManageDatasetProperties.java -text
 src/org/labkey/test/pages/ManageDatasetsPage.java -text
 src/org/labkey/test/pages/OlapTestJson.java -text
 src/org/labkey/test/pages/PermissionsEditor.java -text

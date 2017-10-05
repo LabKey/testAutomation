@@ -26,6 +26,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestFileUtils;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.util.APITestHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -319,37 +320,23 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     }
 
     // Must be on study home page or "manage study" page
-    protected void setDemographicsBit(String datasetName, boolean demographics)
+    protected DatasetPropertiesPage setDemographicsBit(String datasetName, boolean demographics)
     {
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        clickAndWait(Locator.linkWithText(datasetName));
-        mashButton("Edit Definition");
-        waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        if (demographics)
-            checkCheckbox(Locator.checkboxByName("demographicData"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("demographicData"));
-
-        clickButton("Save");
+        return _studyHelper.goToManageDatasets()
+                .selectDatasetByName(datasetName)
+                .clickEditDefinition()
+                .setIsDemographicData(demographics)
+                .save();
     }
 
     // Must be on study home page or "manage study" page
-    protected void setVisibleBit(String datasetName, boolean showByDefault)
+    protected DatasetPropertiesPage setVisibleBit(String datasetName, boolean showByDefault)
     {
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        clickAndWait(Locator.linkWithText(datasetName));
-        clickButtonContainingText("Edit Definition");
-        waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        if (showByDefault)
-            checkCheckbox(Locator.checkboxByName("showByDefault"));
-        else
-            uncheckCheckbox(Locator.checkboxByName("showByDefault"));
-
-        clickButton("Save");
+        return _studyHelper.goToManageDatasets()
+                .selectDatasetByName(datasetName)
+                .clickEditDefinition()
+                .setShowInOverview(showByDefault)
+                .save();
     }
 
     public void selectOption(String name, int i, String value)

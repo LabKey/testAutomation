@@ -29,6 +29,8 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.components.ChartTypeDialog;
 import org.labkey.test.components.SaveChartDialog;
 import org.labkey.test.pages.BaseDesignerPage;
+import org.labkey.test.pages.DatasetPropertiesPage;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.util.BoxPlotReportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DatasetDesignerPage;
@@ -78,13 +80,12 @@ public class GenericMeasurePickerTest extends BaseWebDriverTest
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(DATASET));
-        clickButton("Edit Definition");
 
-        BaseDesignerPage domainEditor = new DatasetDesignerPage(this);
-        domainEditor.selectField(5); // HIVRapidTest
-        domainEditor.clickTab("Reporting");
-        checkCheckbox(Locator.checkboxByName("dimension"));
-        clickButton("Save");
+        EditDatasetDefinitionPage editDatasetDefinitionPage = new DatasetPropertiesPage(getDriver()).clickEditDefinition();
+        editDatasetDefinitionPage.getFieldsEditor()
+                .selectField("HIVRapidTest").properties().selectReportingTab()
+                .dimension.check();
+        editDatasetDefinitionPage.save();
     }
 
     @Before

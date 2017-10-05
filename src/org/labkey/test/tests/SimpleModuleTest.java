@@ -41,6 +41,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.components.CustomizeView;
 import org.labkey.test.components.ext4.Window;
 import org.labkey.test.components.html.SiteNavBar;
+import org.labkey.test.pages.EditDatasetDefinitionPage;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -1120,19 +1121,18 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Create Study");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        waitForText("Manage Study");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        clickAndWait(Locator.linkWithText("Create New Dataset"));
-        setFormElement(Locator.xpath("//input[@name='typeName']"), DATASET_NAME);
-        clickButton("Next");
-        waitForElement(Locator.xpath("//input[@name='dsLabel']"));
-        setFormElement(Locator.xpath("//input[@name='dsLabel']"), DATASET_LABEL);
+        EditDatasetDefinitionPage editDatasetPage = _studyHelper.goToManageDatasets()
+                .clickCreateNewDataset()
+                .setName(DATASET_NAME)
+                .submit()
+                .setDatasetLabel(DATASET_LABEL);
         clickButton("Import Fields", "Paste tab-delimited");
         setFormElement(Locator.name("tsv"), DATASET_FIELDS);
         clickButton("Import", 0);
         waitForText("First");
-        clickButton("Save");
-        mashButton("View Data");
+        editDatasetPage
+                .save()
+                .clickViewData();
         assertTextPresent("My Custom View", "Hello Dataset", "Visit");
         assertTextNotPresent("Participant Identifier");
     }

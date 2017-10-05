@@ -26,6 +26,7 @@ import org.labkey.test.TestFileUtils;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.pages.AssayDesignerPage;
+import org.labkey.test.pages.DatasetPropertiesPage;
 import org.labkey.test.params.FieldDefinition;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -243,8 +244,10 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         log("Import dataset data");
         clickAndWait(Locator.linkWithText(datasetName));
-        mashButton("View Data");
-        DataRegion(getDriver()).find().clickImportBulkData();
+        new DatasetPropertiesPage(getDriver())
+                .clickViewData()
+                .getDataRegion()
+                .clickImportBulkData();
 
         setFormElementJS(Locator.id("tsv3"), TEST_DATA_SINGLE_COLUMN_DATASET_BAD);
         _listHelper.submitImportTsv_error(null);

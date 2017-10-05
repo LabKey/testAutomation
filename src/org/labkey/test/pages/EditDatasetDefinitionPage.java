@@ -152,12 +152,6 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().showInOverviewCheckbox.isSelected();
     }
 
-    @Deprecated
-    public PropertiesEditor getFieldsEditor(String name)
-    {
-        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(name).find();
-    }
-
     public PropertiesEditor getFieldsEditor()
     {
         return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").find();
