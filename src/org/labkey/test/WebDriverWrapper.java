@@ -3097,8 +3097,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             fail("Too many matches for '" + value + "': ['" + StringUtils.join(matches, "', '") + "']");
 
     }
-
     public void addUrlParameter(String parameter)
+    {
+        addUrlParameter(parameter, defaultWaitForPage);
+    }
+
+    public void addUrlParameter(String parameter, int mils)
     {
         String currentURL = getCurrentRelativeURL();
         // Strip off any '#' on the end of the URL
@@ -3115,12 +3119,12 @@ public abstract class WebDriverWrapper implements WrapsDriver
             if (currentURL.contains("?"))
             {
                 if (currentURL.indexOf("?") == currentURL.length() - 1)
-                    beginAt(currentURL.concat(parameter + suffix));
+                    beginAt(currentURL.concat(parameter + suffix), mils);
                 else
-                    beginAt(currentURL.concat("&" + parameter + suffix));
+                    beginAt(currentURL.concat("&" + parameter + suffix), mils);
             }
             else
-                beginAt(currentURL.concat("?" + parameter + suffix));
+                beginAt(currentURL.concat("?" + parameter + suffix), mils);
         }
     }
 
