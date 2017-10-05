@@ -116,11 +116,11 @@ public class DatasetPropertiesPage extends LabKeyPage<DatasetPropertiesPage.Elem
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement viewDataButton = Locator.lkButton("View Data").findWhenNeeded(this);
-        WebElement manageDatasetsButton = Locator.lkButton("Manage Datasets").findWhenNeeded(this);
-        WebElement deleteDatasetButton = Locator.lkButton("Delete Dataset").findWhenNeeded(this);
-        WebElement deleteAllRowsButton = Locator.lkButton("Delete All Rows").findWhenNeeded(this);
-        WebElement showImportHistoryButton = Locator.lkButton("Show Import History").findWhenNeeded(this);
-        WebElement editDefinitionButton = Locator.lkButton("Edit Definition").findWhenNeeded(this);
+        final WebElement viewDataButton = Locator.lkButton("View Data").findWhenNeeded(this);
+        final WebElement manageDatasetsButton = Locator.lkButton("Manage Datasets").findWhenNeeded(this);
+        final WebElement deleteDatasetButton = Locator.lkButton("Delete Dataset").findWhenNeeded(this);
+        final WebElement deleteAllRowsButton = Locator.lkButton("Delete All Rows").findWhenNeeded(this);
+        final WebElement showImportHistoryButton = Locator.lkButton("Show Import History").findWhenNeeded(this);
+        final WebElement editDefinitionButton = Locator.lkButton("Edit Definition").findWhenNeeded(this);
     }
 }

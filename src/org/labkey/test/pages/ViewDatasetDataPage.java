@@ -36,17 +36,21 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
     private static final String dataRegionName = "Dataset";
     protected DataRegionTable _dataRegionTable;
 
-    //public String getQCStates = elementCache().QCStates.getText();
+    public DataRegionTable getDataRegion()
+    {
+        return _dataRegionTable;
+    }
 
     public DatasetInsertPage insertDatasetRow()
     {
-        _dataRegionTable.clickInsertNewRowDropdown();
-        return new DatasetInsertPage(getDriver(), elementCache().datasetNavLink.getText());
+        String datasetName = elementCache().datasetNavLink.getText();
+        _dataRegionTable.clickInsertNewRow();
+        return new DatasetInsertPage(getDriver(), datasetName);
     }
 
     public ImportDataPage importBulkData()
     {
-        _dataRegionTable.clickImportBulkDataDropdown();
+        _dataRegionTable.clickImportBulkData();
         return new ImportDataPage(getDriver());
     }
 

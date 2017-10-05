@@ -16,6 +16,7 @@
 package org.labkey.test.pages;
 
 import org.labkey.test.Locator;
+import org.labkey.test.pages.study.CreateDatasetPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -47,10 +48,10 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
         clickAndWait(elementCache().manageDatasetSecurityLink);
     }
 
-    public DatasetPropertiesPage clickCreateNewDataset()
+    public CreateDatasetPage clickCreateNewDataset()
     {
         clickAndWait(elementCache().createNewDatasetLink);
-        return new DatasetPropertiesPage(getDriver());
+        return new CreateDatasetPage(getDriver());
     }
 
     public void clickProjectSettings()

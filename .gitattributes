@@ -627,6 +627,7 @@ src/org/labkey/test/pages/list/SetDefaultValuesListPage.java -text
 src/org/labkey/test/pages/query/ExecuteQueryParameterized.java -text
 src/org/labkey/test/pages/reports/ManageViewsPage.java -text
 src/org/labkey/test/pages/search/SearchResultsPage.java -text
+src/org/labkey/test/pages/study/CreateDatasetPage.java -text
 src/org/labkey/test/pages/study/CreateStudyPage.java -text
 src/org/labkey/test/pages/study/DeleteMultipleVisitsPage.java -text
 src/org/labkey/test/pages/study/ManageParticipantGroupsPage.java -text

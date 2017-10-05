@@ -29,14 +29,13 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
     public EditDatasetDefinitionPage(WebDriver driver)
     {
         super(driver);
-        //WebDriverWrapper.waitFor(()-> elementCache().datasetFieldRow.isDisplayed(),WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.checkboxByName("demographicData"));
         sleep(10000);
     }
 
     public EditDatasetDefinitionPage saveExpectFail(String partialAlertTxt)
     {
-        click(elementCache().saveButton);
+        elementCache().saveButton.click();
         sleep(1000);
         assertAlertContains(partialAlertTxt);
         cancel();
@@ -54,9 +53,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         clickAndWait(elementCache().cancelButton);
     }
 
-    public void setDatasetName(String name)
+    public EditDatasetDefinitionPage setDatasetName(String name)
     {
         setFormElement(elementCache().nameTextField,name);
+        return this;
     }
 
     public String getDatasetName()
@@ -64,9 +64,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().nameTextField.getText();
     }
 
-    public void setDatasetLabel(String label)
+    public EditDatasetDefinitionPage setDatasetLabel(String label)
     {
         setFormElement(elementCache().labelTextField, label);
+        return this;
     }
 
     public String getDatasetLabel()
@@ -74,9 +75,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().labelTextField.getText();
     }
 
-    public void setCategory(String category)
+    public EditDatasetDefinitionPage setCategory(String category)
     {
         setFormElement(elementCache().categoryTextField,category);
+        return this;
     }
 
     public String getCategory()
@@ -84,9 +86,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().categoryTextField.getText();
     }
 
-    public void setTag(String tag)
+    public EditDatasetDefinitionPage setTag(String tag)
     {
         setFormElement(elementCache().tagTextField,tag);
+        return this;
     }
 
     public String getTag()
@@ -94,9 +97,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().tagTextField.getText();
     }
 
-    public void setDescription(String description)
+    public EditDatasetDefinitionPage setDescription(String description)
     {
         setFormElement(elementCache().descriptionTextField,description);
+        return this;
     }
 
     public String getDescription()
@@ -104,18 +108,17 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().descriptionTextField.getText();
     }
 
-    public void setAdditionalKeyColumnType(LookupAdditionalKeyColType type)
+    public EditDatasetDefinitionPage setAdditionalKeyColumnType(LookupAdditionalKeyColType type)
     {
         waitForElement(type.getTypeLocator(), WAIT_FOR_JAVASCRIPT);
-        RadioButton typeBtn = new RadioButton(type.getTypeLocator().findElement(getDriver()));
-        if(!typeBtn.isSelected()){typeBtn.check();}
+        new RadioButton(type.getTypeLocator().findElement(getDriver())).check();
+        return this;
     }
 
-    public void setIsDemographicData(boolean isDemographic)
+    public EditDatasetDefinitionPage setIsDemographicData(boolean isDemographic)
     {
-        if(isDemographic)
-        checkCheckbox(elementCache().demographicsCheckbox);
-        else uncheckCheckbox(elementCache().demographicsCheckbox);
+        setCheckbox(elementCache().demographicsCheckbox, isDemographic);
+        return this;
     }
 
     public boolean isDemographicsData()
@@ -123,11 +126,10 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().demographicsCheckbox.isSelected();
     }
 
-    public void setShowInOverview(boolean showInOverview)
+    public EditDatasetDefinitionPage setShowInOverview(boolean showInOverview)
     {
-        if(showInOverview)
-            checkCheckbox(elementCache().showInOverviewCheckbox);
-        else uncheckCheckbox(elementCache().showInOverviewCheckbox);
+        setCheckbox(elementCache().showInOverviewCheckbox, showInOverview);
+        return this;
     }
 
     public boolean isAdditionalKeyManagedEnabled()
@@ -150,34 +152,27 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return elementCache().showInOverviewCheckbox.isSelected();
     }
 
+    @Deprecated
     public PropertiesEditor getFieldsEditor(String name)
     {
         return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining(name).find();
     }
 
-    public void addDatasetField(String name, String label, FieldType fieldType)
+    public PropertiesEditor getFieldsEditor()
     {
-        click(elementCache().addFieldButton);
-        //waitForElement(elementCache().newDatasetLabel);
-        waitFor(()->{return elementCache().newDatasetLabel.isDisplayed();},WAIT_FOR_JAVASCRIPT);
-        setFormElement(elementCache().newDatasetName,name);
-        setFormElement(elementCache().newDatasetLabel, label);
-        click(elementCache().newDatasetType);
-        waitForElement(getChooseFieldTypeRadio(fieldType));
-        getChooseFieldTypeRadioButton(fieldType).check();
-        click(elementCache().applyChosenFieldTypeButton);
-        //waitForElementToDisappear(elementCache().applyChosenFieldTypeButton);
-        waitFor(()->{return elementCache().applyChosenFieldTypeButton.isDisplayed();},WAIT_FOR_JAVASCRIPT);
+        return PropertiesEditor.PropertiesEditor(getDriver()).withTitleContaining("Dataset Fields").find();
     }
 
-    public void setAdditionalKeyColDataField(String field)
+    public EditDatasetDefinitionPage setAdditionalKeyColDataField(String field)
     {
         setFormElement(Locator.id("list_dataField"),field);
+        return this;
     }
 
-    public void setAdditionalKeyColManagedField(String field)
+    public EditDatasetDefinitionPage setAdditionalKeyColManagedField(String field)
     {
         setFormElement(Locator.id("list_managedField"),field);
+        return this;
     }
 
     enum FieldType{
@@ -213,21 +208,6 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         return new RadioButton(radioBtnLoc.findElement(getDriver()));
     }
 
-    Locator getChooseFieldTypeRadio(FieldType fieldType)
-    {
-        return Locator.xpath("//div[./label[text()='"+fieldType.type+"']]/input");
-    }
-
-    RadioButton getChooseFieldTypeRadioButton(FieldType fieldType)
-    {
-        return new RadioButton(getChooseFieldTypeRadio(fieldType).findElement(getDriver()));
-    }
-
-    private boolean isButtonSelected(Locator radioBtnLoc)
-    {
-        return getRadioBtn(radioBtnLoc).isSelected();
-    }
-
     @Override
     protected ElementCache newElementCache()
     {
@@ -251,11 +231,6 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         WebElement additionalKeyManagedFieldSelect = Locator.inputById("list_managedField").findWhenNeeded(this);
         WebElement demographicsCheckbox = Locator.checkboxByName("demographicData").findWhenNeeded(this);
         WebElement showInOverviewCheckbox = Locator.checkboxByName("showByDefault").findWhenNeeded(this);
-        WebElement datasetFieldRow = Locator.xpath("//tr[contains(@class,'editor-field-row')]").findWhenNeeded(this);
-        WebElement datasetFieldNames = Locator.xpath("//input[contains(@name,'ff_name')]").findWhenNeeded(this);
-        WebElement datasetLabels = Locator.xpath("//input[contains(@name,'ff_label')]").findWhenNeeded(this);
-        WebElement datasetTypes = Locator.xpath("//input[contains(@name,'ff_type')").findWhenNeeded(this);
-        WebElement addFieldButton = Locator.lkButton("Add Field").findWhenNeeded(this);
         WebElement importFieldsButton = Locator.lkButton("Import Fields").findWhenNeeded(this);
         WebElement exportFieldsButton = Locator.lkButton("Export Fields").findWhenNeeded(this);
         WebElement inferFieldsButton = Locator.lkButton("Infer Fields from File").findWhenNeeded(this);
@@ -267,11 +242,6 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         WebElement lookupFieldSchema = Locator.name("schema").findWhenNeeded(this);
         WebElement lookupFieldTable = Locator.name("table").findWhenNeeded(this);
 
-        Locator.XPathLocator newDatasetFieldRow = Locator.xpath("//tr[contains(@class,'editor-field-row')][descendant::span[contains(@class,'fa-plus-circle')]]");
-        WebElement newDatasetName = newDatasetFieldRow.append("/descendant::input[contains(@name,'ff_name')]").findWhenNeeded(this);
-        WebElement newDatasetLabel = newDatasetFieldRow.append("/descendant::input[contains(@name,'ff_label')]").findWhenNeeded(this);
-        WebElement newDatasetType = newDatasetFieldRow.append("/descendant::input[contains(@name,'ff_type')]").findWhenNeeded(this);
-
         WebElement additionalKeyManagedKeyParentSpan = Locator.xpath("//span[descendant::input[@id='button_managedField']]").findWhenNeeded(this);
         WebElement additionalKeyDataFieldParentSpan = Locator.xpath("//span[descendant::input[@id='button_dataField']]").findWhenNeeded(this);
         WebElement additionalKeyNoneParentSpan = Locator.xpath("//span[descendant::input[@id='button_none']]").findWhenNeeded(this);
@@ -279,13 +249,5 @@ public class EditDatasetDefinitionPage extends LabKeyPage<EditDatasetDefinitionP
         Locator.XPathLocator additionalKeyDisabledNone = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
         Locator.XPathLocator additionalKeyDataFieldDisabled = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
         Locator.XPathLocator additionalKeyMangedFieldDisabled = Locator.xpath("//span[contains(@class,'gwt-RadioButton-disabled')]/input[@id='button_none']");
-
-
-
-//        WebElement getDatasetFieldRowByIndex(int index)
-//        {
-//            return datasetFieldRow.findElements().get(index);
-//        }
-
     }
 }
