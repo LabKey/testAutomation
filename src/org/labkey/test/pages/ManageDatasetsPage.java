@@ -81,19 +81,19 @@ public class ManageDatasetsPage extends LabKeyPage<ManageDatasetsPage.ElementCac
 
     public DatasetPropertiesPage selectDatasetById(String id)
     {
-        clickAndWait(Locator.tag("td").append(Locator.linkWithText(id)).findElement(elementCache().datasetGrid));
+        clickAndWait(Locator.tag("td").position(1).append(Locator.linkWithText(id)).findElement(elementCache().datasetGrid));
         return new DatasetPropertiesPage(getDriver());
     }
 
     public DatasetPropertiesPage selectDatasetByName(String name)
     {
-        clickAndWait(Locator.tag("td").append(Locator.linkWithText(name)).findElement(elementCache().datasetGrid));
+        clickAndWait(Locator.tag("td").position(2).append(Locator.linkWithText(name)).findElement(elementCache().datasetGrid));
         return new DatasetPropertiesPage(getDriver());
     }
 
     public DatasetPropertiesPage selectDatasetByLabel(String label)
     {
-        clickAndWait(Locator.tag("td").append(Locator.linkWithText(label)).findElement(elementCache().datasetGrid));
+        clickAndWait(Locator.tag("td").position(3).append(Locator.linkWithText(label)).findElement(elementCache().datasetGrid));
         return new DatasetPropertiesPage(getDriver());
     }
 
