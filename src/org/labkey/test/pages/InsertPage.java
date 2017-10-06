@@ -18,6 +18,7 @@ package org.labkey.test.pages;
 
 import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends LabKeyPage
@@ -44,10 +45,10 @@ public class InsertPage extends LabKeyPage
     protected class Elements
     {
         public Locator.XPathLocator title = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClassContaining("div", "lk-body-title").append("//h3") :
+                Locators.bodyTitle() :
                 Locator.tagWithId("span", "labkey-nav-trail-current-page");
         public Locator.XPathLocator body = LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT ?
-                Locator.tagWithClass("div", "lk-body-ct") :
+                Locators.bodyPanel() :
                 Locator.tagWithClass("table", "labkey-proj");
         public Locator.XPathLocator submit = body.append(Locator.lkButton("Submit"));
         public Locator.XPathLocator cancel = body.append(Locator.lkButton("Cancel"));
