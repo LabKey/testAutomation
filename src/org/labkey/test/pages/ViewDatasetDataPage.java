@@ -15,10 +15,9 @@
  */
 package org.labkey.test.pages;
 
-import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.util.DataRegionTable;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     public DatasetInsertPage insertDatasetRow()
     {
-        String datasetName = elementCache().datasetNavLink.getText();
+        String datasetName = Locators.bodyTitle().findElement(getDriver()).getText();
         _dataRegionTable.clickInsertNewRow();
         return new DatasetInsertPage(getDriver(), datasetName);
     }
@@ -56,7 +55,7 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     public DatasetPropertiesPage clickManageDataset()
     {
-        clickAndWait(elementCache().manageDataset);
+        getDataRegion().clickHeaderButtonAndWait("Manage");
         return new DatasetPropertiesPage(getDriver());
     }
 
@@ -73,8 +72,5 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     protected class ElementCache extends LabKeyPage.ElementCache
     {
-        WebElement QCStates = Locator.xpath("//span[b[text()='QC States:']]").findWhenNeeded(this);
-        WebElement datasetNavLink = Locator.xpath("//ol[contains(@class, 'breadcrumb')]//a").findWhenNeeded(this);
-        WebElement manageDataset = Locator.lkButton("Manage").findWhenNeeded(this);
     }
 }
