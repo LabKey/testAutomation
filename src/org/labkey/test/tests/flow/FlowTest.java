@@ -710,7 +710,7 @@ public class FlowTest extends BaseFlowTest
         WebElement matchedFileInput;
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            WebElement container = Locator.tagWithClassContaining("div", "lk-region-header-bar")
+            WebElement container = Locator.tagWithClassContaining("div", "lk-region-ct")
                     .parent().findElement(getDriver());
             Locator.css(".labkey-selectors > input[type=checkbox][value]") // Can't use helper. Grid doesn't fire row selection events
                     .findElement(container).click();
