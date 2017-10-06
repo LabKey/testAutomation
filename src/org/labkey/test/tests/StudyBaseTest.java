@@ -320,20 +320,20 @@ public abstract class StudyBaseTest extends BaseWebDriverTest
     }
 
     // Must be on study home page or "manage study" page
-    protected DatasetPropertiesPage setDemographicsBit(String datasetName, boolean demographics)
+    protected DatasetPropertiesPage setDemographicsBit(String datasetLabel, boolean demographics)
     {
         return _studyHelper.goToManageDatasets()
-                .selectDatasetByName(datasetName)
+                .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setIsDemographicData(demographics)
                 .save();
     }
 
     // Must be on study home page or "manage study" page
-    protected DatasetPropertiesPage setVisibleBit(String datasetName, boolean showByDefault)
+    protected DatasetPropertiesPage setVisibleBit(String datasetLabel, boolean showByDefault)
     {
         return _studyHelper.goToManageDatasets()
-                .selectDatasetByName(datasetName)
+                .selectDatasetByLabel(datasetLabel)
                 .clickEditDefinition()
                 .setShowInOverview(showByDefault)
                 .save();
