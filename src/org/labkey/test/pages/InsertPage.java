@@ -23,7 +23,7 @@ import org.openqa.selenium.WebDriver;
 
 public class InsertPage extends LabKeyPage
 {
-    protected String _title;
+    private final String _title;
 
     public InsertPage(WebDriver driver, String title)
     {

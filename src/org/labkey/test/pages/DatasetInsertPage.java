@@ -33,12 +33,11 @@ public class DatasetInsertPage extends InsertPage
     public DatasetInsertPage(WebDriver driver, String datasetName)
     {
         super(driver, "Insert new entry: " + datasetName);
-        waitForReady();
     }
 
     protected void waitForReady()
     {
-        waitForElement(elements().title.withText(_title));
+        super.waitForReady();
         waitForElement(Locator.tag("*").attributeStartsWith("name", "quf_"));
     }
 
