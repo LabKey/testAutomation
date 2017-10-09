@@ -1588,7 +1588,22 @@ public abstract class WebDriverWrapper implements WrapsDriver
     private void waitForPageToLoad(WebElement toBeStale, int millis)
     {
         _testTimeout = true;
-        new WebDriverWait(getDriver(), millis / 1000).until(ExpectedConditions.stalenessOf(toBeStale));
+        new WebDriverWait(getDriver(), millis / 1000).until(new Function<WebDriver, Boolean>()
+        {
+            private final ExpectedCondition<Boolean> staleCheck = ExpectedConditions.stalenessOf(toBeStale);
+
+            @Override
+            public Boolean apply(WebDriver input)
+            {
+                return staleCheck.apply(input);
+            }
+
+            @Override
+            public String toString()
+            {
+                return "waiting for browser to navigate";
+            }
+        });
         executeAsyncScript("" +
                 "try " +
                 "{" +
