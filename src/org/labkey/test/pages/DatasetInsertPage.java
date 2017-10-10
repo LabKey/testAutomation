@@ -35,6 +35,11 @@ public class DatasetInsertPage extends InsertPage
         super(driver, "Insert new entry: " + datasetName);
     }
 
+    public DatasetInsertPage(WebDriver driver)
+    {
+        super(driver);
+    }
+
     protected void waitForReady()
     {
         super.waitForReady();

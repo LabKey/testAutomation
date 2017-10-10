@@ -32,9 +32,17 @@ public class InsertPage extends LabKeyPage
         waitForReady();
     }
 
+    public InsertPage(WebDriver driver)
+    {
+        this(driver, null);
+    }
+
     protected void waitForReady()
     {
-        waitForElement(elements().title.withText(_title));
+        if (_title != null)
+            waitForElement(elements().title.withText(_title));
+        else
+            waitForElement(elements().title);
     }
 
     protected Elements elements()

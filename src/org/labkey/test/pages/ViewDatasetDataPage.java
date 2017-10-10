@@ -42,9 +42,8 @@ public class ViewDatasetDataPage extends LabKeyPage<ViewDatasetDataPage.ElementC
 
     public DatasetInsertPage insertDatasetRow()
     {
-        String datasetName = Locators.bodyTitle().findElement(getDriver()).getText().replace("Dataset: ", "");
         _dataRegionTable.clickInsertNewRow();
-        return new DatasetInsertPage(getDriver(), datasetName);
+        return new DatasetInsertPage(getDriver());
     }
 
     public ImportDataPage importBulkData()
