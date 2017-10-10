@@ -246,8 +246,6 @@ public class FileBrowserHelper extends WebDriverWrapper
         moveWindow.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         waitForElementToDisappear(fileGridCell.withText(fileName));
-        selectFileBrowserItem(destinationPath + "/" + fileName);
-        waitForElement(fileGridCell.withText(fileName));
     }
 
     public void deleteFile(String fileName)
