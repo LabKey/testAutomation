@@ -368,6 +368,11 @@ public abstract class Locator extends By
         }
     }
 
+    public boolean existsIn(SearchContext context)
+    {
+        return findElementOrNull(context) != null;
+    }
+
     protected final List<WebElement> decorateWebElements(List<WebElement> elements)
     {
         List<WebElement> decoratedElements = new ArrayList<>(elements.size());
