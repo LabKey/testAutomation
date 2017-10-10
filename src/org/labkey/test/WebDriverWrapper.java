@@ -1146,29 +1146,6 @@ public abstract class WebDriverWrapper implements WrapsDriver
                 "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
-    /**
-     * Expand folder tree nodes to expose all folders with the given name
-     * Expects folder menu to be open
-     * @param folder Folder label
-     */
-    public void expandFolderTree(String folder)
-    {
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-        {
-            new ProjectMenu(getDriver()).expandFolderLinksTo(folder);
-        }
-        else
-        {
-            Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
-            Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
-            List<WebElement> els = treeAncestor.findElements(getDriver());
-            for (WebElement el : els)
-            {
-                el.click();
-            }
-        }
-    }
-
     public void assertTitleEquals(String match)
     {
         assertEquals("Wrong page title", match, getDriver().getTitle());

@@ -1169,7 +1169,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
             projectMenu().open();
-            return projectMenu().getMenuToggle();
+            return null;
         }
         else
         {
@@ -1221,16 +1221,7 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
     {
         if (IS_BOOTSTRAP_LAYOUT)
         {
-            projectMenu().expandFolderLinksTo("*all");
-
-            return shortWait().until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(@Nullable WebDriver driver)
-                {
-                    return projectMenu().getMenuToggle();
-                }
-            });
+            return projectMenu().expandProjectFully(getCurrentProject());
         }
         else
         {
@@ -1249,6 +1240,21 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
+    /**
+     * @deprecated Old UX only. Used by {@link #clickFolder(String)} below.
+     */
+    @Deprecated
+    public void expandFolderTree(String folder)
+    {
+        Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
+        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
+        List<WebElement> els = treeAncestor.findElements(getDriver());
+        for (WebElement el : els)
+        {
+            el.click();
+        }
+    }
+
     public void clickFolder(String folder)
     {
         if (IS_BOOTSTRAP_LAYOUT)
@@ -1263,10 +1269,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         }
     }
 
-    protected void navigateToFolder(String project, String folderName)
+    public void navigateToFolder(String project, String folderName)
     {
         if (IS_BOOTSTRAP_LAYOUT)
-            new ProjectMenu(getDriver()).navigateToFolder(project, folderName);
+            projectMenu().navigateToFolder(project, folderName);
         else
         {
             if (!getText(Locator.id("folderBar")).equals(project))

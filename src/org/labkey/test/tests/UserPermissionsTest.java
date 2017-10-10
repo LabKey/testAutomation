@@ -25,12 +25,14 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
@@ -228,13 +230,11 @@ public class UserPermissionsTest extends BaseWebDriverTest
         signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword());
         clickProject(PERM_PROJECT_NAME);
         impersonate(GAMMA_READER_USER);
-        clickProject(PERM_PROJECT_NAME);
-        projectMenu().expandFolderLinksTo(GAMMA_SUB_FOLDER_NAME);
-        assertTrue(projectMenu().folderLinkIsPresent(GAMMA_SUB_FOLDER_NAME));
-        projectMenu().expandFolderLinksTo(DENIED_SUB_FOLDER_NAME);
-        assertFalse(projectMenu().folderLinkIsPresent(DENIED_SUB_FOLDER_NAME)); // it will appear as a span, no link
+        WebElement projectTree = projectMenu().expandProjectFully(PERM_PROJECT_NAME);
+        assertNotNull("No link to subfolder: /" + PERM_PROJECT_NAME + "/" + GAMMA_SUB_FOLDER_NAME, Locator.linkWithText(GAMMA_SUB_FOLDER_NAME).findElementOrNull(projectTree));
+        assertNotNull("Link found to inaccessable subfolder: /" + PERM_PROJECT_NAME + "/" + GAMMA_SUB_FOLDER_NAME, Locator.linkWithText(GAMMA_SUB_FOLDER_NAME).findElementOrNull(projectTree)); // it will appear as a span, no link
         // Ensure only one project visible during project impersonation. Regression test 13346
-        assertEquals("Only one project should be visible while impersonating", 1, projectMenu().projectMenuLinks().size());
+        assertEquals("Only one project should be visible while impersonating", Arrays.asList(PERM_PROJECT_NAME), getTexts(projectMenu().projectMenuLinks()));
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();

@@ -415,11 +415,10 @@ public class AdvancedImportOptionsTest extends BaseWebDriverTest
         waitForText(hasSpecimens ? "This study uses the advanced specimen repository" : "This study uses the standard specimen repository");
 
         log("Verify whether a subfolder should be present");
-        openFolderMenu();
-        expandFolderTree(folderName);
+        WebElement folderTree = projectMenu().expandFolderFully(getCurrentProject(), folderName);
         if (hasSubfolder)
-            assertTrue("project menu should have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
+            assertTrue("project menu should have link for subfolder:" + IMPORTED_SUB_FOLDER_NAME, Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME).existsIn(folderTree));
         else
-            assertFalse("project menu should not have link for subfolder:" +IMPORTED_SUB_FOLDER_NAME, projectMenu().folderLinkIsPresent(IMPORTED_SUB_FOLDER_NAME));
+            assertFalse("project menu should not have link for subfolder:" + IMPORTED_SUB_FOLDER_NAME, Locator.linkWithText(IMPORTED_SUB_FOLDER_NAME).existsIn(folderTree));
     }
 }

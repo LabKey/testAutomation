@@ -611,11 +611,9 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         log("verify child containers were imported");
         openFolderMenu();
-        expandFolderTree("*all*"); // Will expand to all subfolders.  if you specify the folder name, it will open up the first with that name
         clickAndWait(Locator.linkWithText("Subfolder1").index(subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
         openFolderMenu();
-        expandFolderTree("*all*");  // TODO: implement a less-hacky way to expand all, or to the nth instance of a link
         clickAndWait(Locator.linkWithText("_hidden").index(subfolderIndex));
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         openFolderMenu();

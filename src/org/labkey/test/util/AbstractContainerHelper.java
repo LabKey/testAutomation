@@ -322,12 +322,12 @@ public abstract class AbstractContainerHelper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            _test.clickProject(project);
-            ProjectMenu menu = new ProjectMenu(_test.getDriver());
             if (!parent.equals(project))
-                menu.navigateToFolder(project, parent);
+                _test.navigateToFolder(project, parent);
+            else
+                _test.clickProject(project);
 
-            return menu.navigateToCreateSubFolderPage()
+            return _test.projectMenu().navigateToCreateSubFolderPage()
                     .setFolderName(child);
         }
         else
@@ -385,7 +385,7 @@ public abstract class AbstractContainerHelper
         _test.clickButton("Delete", waitTime);
         // verify that we're not on an error page with a check for a project link:
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            assertTrue( new ProjectMenu(_test.getDriver()).projectLinkExists(project));
+            assertTrue("Parent project does not exist after deleting folder", _test.projectMenu().projectLinkExists(project));
         else
             _test.assertElementPresent(Locators.folderMenu.withText(project));
         _test.openFolderMenu();

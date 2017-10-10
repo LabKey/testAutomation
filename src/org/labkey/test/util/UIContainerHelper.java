@@ -154,7 +154,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
         {
-            return new ProjectMenu(_test.getDriver()).projectLinkExists(project);
+            return _test.projectMenu().projectLinkExists(project);
         }
         else
         {
