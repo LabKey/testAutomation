@@ -104,7 +104,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (CommandException | IOException e)
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to create container: " + parentPath + (name == null ? "" : "/" + name), e);
         }
     }
 
@@ -139,16 +139,16 @@ public class APIContainerHelper extends AbstractContainerHelper
             }
             else
             {
-                throw new RuntimeException("Failed to delete container", e);
+                throw new RuntimeException("Failed to delete container: " + path, e);
             }
         }
         catch (SocketTimeoutException e)
         {
-            throw new TestTimeoutException(e);
+            throw new TestTimeoutException("Timed out deleting container: " + path, e);
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Failed to delete container", e);
+            throw new RuntimeException("Failed to delete container: " + path, e);
         }
     }
 
@@ -187,7 +187,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (IOException fail)
         {
-            throw new RuntimeException(fail);
+            throw new RuntimeException("Failed to move '" + containerPath.toString() + "' to '" + newParentPath.toString() + "'", fail);
         }
     }
 }
