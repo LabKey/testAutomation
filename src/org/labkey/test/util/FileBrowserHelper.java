@@ -195,11 +195,11 @@ public class FileBrowserHelper extends WebDriverWrapper
     //In case desired element is not present due to infinite scrolling
     private void scrollToGridRow(String nodeIdEndsWith)
     {
-        Locator lastFileGridItem = Locators.gridRow().last();
+        Locator lastRowLoc = Locators.gridRow().last();
         Locator targetFile = Locators.gridRowWithNodeId(nodeIdEndsWith);
 
         waitForFileGridReady();
-        waitForElement(lastFileGridItem);
+        waitForElement(lastRowLoc);
 
         String previousLastItemText = null;
         String currentLastItemText = null;
@@ -207,9 +207,12 @@ public class FileBrowserHelper extends WebDriverWrapper
         {
             try
             {
-                scrollIntoView(lastFileGridItem);
+                WebElement lastRow = lastRowLoc.findElementOrNull(getDriver());
+                if (lastRow == null)
+                    return;
+                scrollIntoView(lastRowLoc);
                 previousLastItemText = currentLastItemText;
-                currentLastItemText = lastFileGridItem.findElement(getDriver()).getAttribute("data-recordid");
+                currentLastItemText = lastRowLoc.findElement(getDriver()).getAttribute("data-recordid");
             }
             catch (StaleElementReferenceException ignore) {}
         }
