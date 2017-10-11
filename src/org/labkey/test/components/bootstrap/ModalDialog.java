@@ -31,8 +31,8 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void waitForReady()
     {
-        elementCache().title.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
-        WebDriverWrapper.waitFor(() -> elementCache().title.getText().length() > 0, "Modal dialog not ready", 2000);
+        elementCache().body.isDisplayed(); // Make sure timeout doesn't get used up by waiting for the dialog to appear
+        WebDriverWrapper.waitFor(() -> elementCache().body.getText().length() > 0, "Modal dialog not ready", 2000);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
 
     public void dismiss(String buttonText)
     {
-        Locators.dismissButton(buttonText).findElement(elementCache().body).click();
+        Locators.dismissButton(buttonText).findElement(getComponentElement()).click();
         getWrapper().shortWait().until(ExpectedConditions.invisibilityOfAllElements(Collections.singletonList(getComponentElement())));
     }
 
@@ -80,7 +80,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         WebElement closeButton = Locator.tagWithClass("button", "close")
                 .withAttribute("data-dismiss", "modal")
                 .findWhenNeeded(getComponentElement());
-        WebElement body = Locator.tagWithClass("div","modal-body")
+        WebElement body = Locators.body
                 .findWhenNeeded(getComponentElement()).withTimeout(WAIT_FOR_JAVASCRIPT);
     }
 
@@ -88,6 +88,7 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
     {
         static public Locator.XPathLocator dialog = Locator.tagWithClassContaining("div", "modal-dialog");
         static public Locator.XPathLocator title = Locator.tagWithClass("*", "modal-title");
+        static public Locator.XPathLocator body = Locator.tagWithClass("div","modal-body");
         static public Locator.XPathLocator dismissButton(String text)
         {
             return Locator.button(text);
@@ -107,6 +108,12 @@ public class ModalDialog extends WebDriverComponent<ModalDialog.ElementCache>
         public ModalDialogFinder withTitle(String title)
         {
             _locator = Locators.dialog.withDescendant(Locators.title).containing(title);
+            return this;
+        }
+
+        public ModalDialogFinder withBodyTextContaining(String text)
+        {
+            _locator = Locators.dialog.withDescendant(Locators.body).containing(text);
             return this;
         }
 
