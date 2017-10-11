@@ -1164,6 +1164,10 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         return new SiteNavBar(getDriver());
     }
 
+    /**
+     * @deprecated Use {@link #projectMenu().open()}
+     */
+    @Deprecated
     public WebElement openProjectMenu()
     {
         if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
