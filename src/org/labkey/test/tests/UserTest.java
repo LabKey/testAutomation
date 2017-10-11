@@ -34,6 +34,7 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.UIUserHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -378,6 +379,8 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testRequiredFields()
     {
+        ensureRequiredFieldsSet();
+
         _userHelper.createUserAndNotify(BLANK_USER);
         setInitialPassword(BLANK_USER, TEST_PASSWORD);
 
@@ -409,6 +412,22 @@ public class UserTest extends BaseWebDriverTest
         assertTextPresent("This field is required");
         setFormElement(Locator.name("quf_FirstName"), "*");
         clickButton("Submit");
+    }
+
+    /**
+     * Set required fields to prevent collateral failures caused by redirect during sign-in
+     */
+    private void ensureRequiredFieldsSet()
+    {
+        goToMyAccount();
+        clickAndWait(Locator.lkButton("Edit"));
+        for (String field : REQUIRED_FIELDS)
+        {
+            WebElement el = Locator.name("quf_" + field).waitForElement(new WebDriverWait(getDriver(), 5));
+            if (getFormElement(el).isEmpty())
+                setFormElement(el, getDisplayName());
+        }
+        clickAndWait(Locator.lkButton("Submit"));
     }
 
     @Test
