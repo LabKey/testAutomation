@@ -119,6 +119,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     private WebElement expandAllUnder(WebElement parent)
     {
+        open();
         Locator expandoLoc = Locator.tagWithClass("li", "clbl collapse-folder")
                 .child(Locator.tagWithClass("span", "marked"));
 
