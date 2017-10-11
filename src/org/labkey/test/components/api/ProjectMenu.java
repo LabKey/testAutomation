@@ -92,10 +92,10 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     /* Will navigate to a folder or subfolder of the specified project */
     public void navigateToFolder(String projectName, String folder)
     {
-        if (projectName.equals(folder))
+        if (projectName.equals(folder) | projectName.equals("/"))
         {
             TestLogger.log("WARNING: Don't use folder navigation helper to navigate to projects");
-            navigateToProject(projectName);
+            navigateToProject(folder);
             return;
         }
         open();
