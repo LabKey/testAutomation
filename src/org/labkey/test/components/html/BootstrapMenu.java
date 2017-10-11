@@ -140,7 +140,6 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
         {
             WebElement subMenuItem = Locators.menuItem(subMenuLabels[i])
                     .waitForElement(elementCache().findOpenMenu(), 2000);
-            TestLogger.log("attempting to click menu item with text [" + subMenuItem.getText() + "]");
             subMenuItem.click();
         }
         WebElement item = Locators.menuItem(subMenuLabels[subMenuLabels.length - 1])
@@ -159,7 +158,6 @@ public class BootstrapMenu extends WebDriverComponent<BootstrapMenu.Elements>
             throw new IllegalArgumentException("Specify menu item(s)");
 
         WebElement item = openMenuTo(subMenuLabels);
-        TestLogger.log("attempting to click menu item with text [" + item.getText() + "]");
 
         if (wait)
             getWrapper().clickAndWait(item);
