@@ -1593,16 +1593,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
         new DataRegionTable(dataRegionName, getDriver()).checkCheckbox(index);
     }
 
-    @Deprecated
-    public void addUserToGroupFromGroupScreen(String userName)
-    {
-        waitForElement(Locator.name("names"));
-        setFormElement(Locator.name("names"), userName);
-        uncheckCheckbox(Locator.name("sendEmail"));
-        clickButton("Update Group Membership");
-
-    }
-
     /**
      * Create a user with the specified permissions for the specified project
      */

@@ -18,6 +18,7 @@ package org.labkey.test.pages;
 import org.labkey.api.security.PrincipalType;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -30,6 +31,8 @@ import java.util.List;
 
 public class PermissionsEditor
 {
+    private static final String READY_SIGNAL = "policyRendered";
+    private static final Locator SIGNAL_LOC = Locators.pageSignal(READY_SIGNAL);
     protected BaseWebDriverTest _test;
 
     public PermissionsEditor(BaseWebDriverTest test)
@@ -39,7 +42,7 @@ public class PermissionsEditor
 
     public void selectFolder(String folderName)
     {
-        _test.click(Locator.linkWithText(folderName));
+        _test.clickAndWait(Locator.linkWithText(folderName).withClass("x4-tree-node-text"));
     }
 
     public void createPermissionsGroup(String groupName)
@@ -78,8 +81,7 @@ public class PermissionsEditor
 
     public void savePermissions()
     {
-        _test.clickButton("Save", 0);
-        _test.waitForElement(Locator.permissionRendered(), _test.defaultWaitForPage);
+        _test.doAndWaitForPageSignal(() -> _test.clickButton("Save", 0), READY_SIGNAL);
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
@@ -169,39 +171,33 @@ public class PermissionsEditor
     }
 
     /**
-     * Adds a new or existing user to an existing group within an existing project
+     * Adds a new or existing user to an existing group within an the current project
      *
      * @param userName    new or existing user name
-     * @param projectName existing project name
      * @param groupName   existing group within the project to which we should add the user
      */
-    public void addUserToProjGroup(String userName, String projectName, String groupName)
+    public void addUserToProjGroup(String userName, String groupName)
     {
-        exitPermissionsUI();
-        _test.clickProject(projectName);
-        enterPermissionsUI();
-        clickManageGroup(groupName);
-        _test.addUserToGroupFromGroupScreen(userName);
+        addUsersToGroup(groupName, userName);
     }
 
-    public void enterPermissionsUI()
+    private PermissionsEditor enterPermissionsUI()
     {
-        enterPermissionsUI(_test);
+        return enterPermissionsUI(_test);
     }
 
     public static PermissionsEditor enterPermissionsUI(BaseWebDriverTest test)
     {
-        if (!test.isElementPresent(Locator.permissionRendered()))
+        if (!test.isElementPresent(SIGNAL_LOC))
         {
             test.clickAdminMenuItem("Folder", "Permissions");
-            test.waitForElement(Locator.permissionRendered());
+            test.waitForElement(SIGNAL_LOC);
         }
         return new PermissionsEditor(test);
     }
 
-    public void exitPermissionsUI()
+    public void saveAndFinish()
     {
-        _test._ext4Helper.clickTabContainingText("Permissions");
         _test.clickButton("Save and Finish");
     }
 
@@ -305,21 +301,12 @@ public class PermissionsEditor
         _test.waitForElement(Locator.name("names"));
     }
 
-    public void createPermissionsGroup(String groupName, String... memberNames)
+    @LogMethod
+    public PermissionsEditor createPermissionsGroup(@LoggedParam String groupName, String... memberNames)
     {
         createPermissionsGroup(groupName);
-        clickManageGroup(groupName);
-
-        StringBuilder namesList = new StringBuilder();
-        for(String member : memberNames)
-        {
-            namesList.append(member).append("\n");
-        }
-
-        _test.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
-        _test.addUserToGroupFromGroupScreen(namesList.toString());
-
-        enterPermissionsUI();
+        addUsersToGroup(groupName, memberNames);
+        return enterPermissionsUI();
     }
 
     @LogMethod(quiet = true)
@@ -336,7 +323,7 @@ public class PermissionsEditor
         _test.waitForElement(Locator.permissionButton(group, destRole));
     }
 
-    public boolean isUserInGroup(String user, String groupName, String projectName, PrincipalType principalType)
+    public boolean isUserInGroup(String user, String groupName, PrincipalType principalType)
     {
         _test._ext4Helper.clickTabContainingText("Project Groups");
         _test.waitForElement(Locator.css(".groupPicker"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -352,25 +339,39 @@ public class PermissionsEditor
         return ret;
     }
 
-    public boolean selectGroup(String groupName)
+    public void selectGroup(String groupName)
     {
-        return selectGroup(groupName, false);
+        selectGroup(groupName, true);
     }
 
-    public boolean doesGroupExist(String groupName, String projectName)
+    public boolean doesGroupExist(String groupName)
     {
         _test._ext4Helper.clickTabContainingText("Project Groups");
         _test.waitForText("Member Groups");
         List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
         Ext4CmpRef ref = refs.get(0);
         Long idx = (Long) ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        exitPermissionsUI();
         return (idx >= 0);
     }
 
     public boolean doesPermissionExist(String groupName, String permissionSetting)
     {
-        _test.waitForElement(Locator.permissionRendered(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForReady();
         return _test.waitForElement(Locator.permissionButton(groupName, permissionSetting), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, false);
+    }
+
+    private void waitForReady()
+    {
+        _test.waitForElement(Locators.pageSignal(READY_SIGNAL), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod
+    private void addUsersToGroup(String groupName, @LoggedParam String... userNames)
+    {
+        clickManageGroup(groupName);
+
+        _test.setFormElement(Locator.name("names"), String.join("\n", userNames));
+        _test.uncheckCheckbox(Locator.name("sendEmail"));
+        _test.clickButton("Update Group Membership");
     }
 }
