@@ -60,6 +60,7 @@ public class Crawler
     private static Set<ControllerActionId> _actionsWithErrors = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
     public static ActionProfiler _actionProfiler = new ActionProfiler();
+    private boolean _needToGetProjectMenuLinks = true;
     private int _finalDepth = 0;
     private int _crawlTime = 0;
     private int _maxDepth = 3;
@@ -762,8 +763,11 @@ public class Crawler
             URL currentPageUrl = _test.getURL();
 
             // Find all the links at the site
-            if (depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
-                _test.openFolderMenu();
+            if (_needToGetProjectMenuLinks && depth == 1 && _test.isElementPresent(ProjectMenu.Locators.menuProjectNav))
+            {
+                _needToGetProjectMenuLinks = false;
+                _test.projectMenu().open();
+            }
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1));
