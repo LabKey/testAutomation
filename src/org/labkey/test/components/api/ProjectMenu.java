@@ -109,16 +109,14 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
         WebElement projectNode = elementCache().findProjectNode(project);
         WebElement folderLink = Locators.folderTreeLink.withText(subfolder).findElement(projectNode);
-        Locator expandoLoc = Locator.xpath("descendant-or-self::li").withClass("collapse-folder")
-                .withDescendant(Locators.folderTreeLink.withText(subfolder))
-                .child(Locator.tagWithClass("span", "marked"));
+        Locator collapsedFolderLoc = Locators.collapsedFolderTreeNode
+                .withDescendant(Locators.folderTreeLink.withText(subfolder));
 
-        List<WebElement> elements = expandoLoc.findElements(projectNode);
+        List<WebElement> collapsedNodes = collapsedFolderLoc.findElements(projectNode);
 
-        for (WebElement expando : elements)
+        for (WebElement folderTreeNode : collapsedNodes)
         {
-            expando.click();
-            getWrapper().shortWait().until(ExpectedConditions.attributeContains(expando, "class", "expand-folder"));
+            expandFolderTreeNode(folderTreeNode);
         }
 
         return folderLink;
@@ -126,17 +124,18 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     private WebElement expandAllUnder(WebElement parent)
     {
-        open();
-        Locator expandoLoc = Locator.tagWithClass("li", "clbl collapse-folder")
-                .child(Locator.tagWithClass("span", "marked"));
-
-        for (WebElement expando : expandoLoc.findElements(parent))
+        for (WebElement folderTreeNode : Locators.collapsedFolderTreeNode.findElements(parent))
         {
-            expando.click();
-            getWrapper().shortWait().until(ExpectedConditions.attributeContains(expando, "class", "expand-folder"));
+            expandFolderTreeNode(folderTreeNode);
         }
 
         return parent;
+    }
+
+    private void expandFolderTreeNode(WebElement folderTreeNode)
+    {
+        Locators.childExpando.findElement(folderTreeNode).click();
+        getWrapper().shortWait().until(ExpectedConditions.attributeContains(folderTreeNode, "class", "expand-folder"));
     }
 
     /**
@@ -242,6 +241,8 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
         private static final Locator.XPathLocator childFolderTreeNode = Locator.xpath("./ul").child(folderTreeNode);
         private static final Locator.XPathLocator childFolderTreeLink = childFolderTreeNode.childTag("a");
         private static final Locator.XPathLocator childFolderTreeFolder = childFolderTreeNode.childTag("*").position(2); // Finds readable and unreadable folders
+        private static final Locator.XPathLocator childExpando = Locator.xpath("./span").withClass("marked");
+        private static final Locator.XPathLocator collapsedFolderTreeNode = Locator.xpath("descendant-or-self::li").withClass("collapse-folder");
 
         private static Locator.XPathLocator folderTreeNode(String folder)
         {
