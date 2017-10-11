@@ -19,6 +19,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebDriverWrapper;
 import org.labkey.test.components.WebDriverComponent;
 import org.labkey.test.pages.admin.CreateSubFolderPage;
+import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -91,6 +92,12 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     /* Will navigate to a folder or subfolder of the specified project */
     public void navigateToFolder(String projectName, String folder)
     {
+        if (projectName.equals(folder))
+        {
+            TestLogger.log("WARNING: Don't use folder navigation helper to navigate to projects");
+            navigateToProject(projectName);
+            return;
+        }
         open();
         getWrapper().clickAndWait(expandToFolder(projectName, folder));
     }
