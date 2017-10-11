@@ -1623,12 +1623,6 @@ public abstract class BaseWebDriverTest extends LabKeySiteWrapper implements Cle
     }
 
     @Deprecated
-    public CreateUserResponse createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
-    {
-        return _userHelper.createUser(userName, verifySuccess);
-    }
-
-    @Deprecated
     public void createUserAndNotify(String userName, String cloneUserName)
     {
         createUserAndNotify(userName, cloneUserName, true);

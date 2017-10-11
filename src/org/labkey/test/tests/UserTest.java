@@ -110,7 +110,7 @@ public class UserTest extends BaseWebDriverTest
     {
         _containerHelper.deleteProject(getProjectName(), afterTest);
 
-        deleteUsersIfPresent(CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
+        _userHelper.deleteUsers(false, CHANGE_EMAIL_USER, CHANGE_EMAIL_USER_ALTERNATE, NORMAL_USER, DEACTIVATED_USER, PASSWORD_RESET_USER, BLANK_USER, SELF_SERVICE_EMAIL_USER, SELF_SERVICE_EMAIL_USER_CHANGED);
         waitAndClickAndWait(Locator.tagContainingText("span", "Change User Properties"));
         for (String field : REQUIRED_FIELDS)
         {
@@ -378,7 +378,7 @@ public class UserTest extends BaseWebDriverTest
     @Test
     public void testRequiredFields()
     {
-        createUserAndNotify(BLANK_USER, null);
+        _userHelper.createUserAndNotify(BLANK_USER);
         setInitialPassword(BLANK_USER, TEST_PASSWORD);
 
         goToSiteUsers();
