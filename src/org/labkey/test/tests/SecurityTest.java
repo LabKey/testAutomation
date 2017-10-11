@@ -489,13 +489,10 @@ public class SecurityTest extends BaseWebDriverTest
     {
         // create admin templates, plus test bogus & duplicate email addresses
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
-        assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
+        assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address",
+                NORMAL_USER_TEMPLATE + " was already a registered system user.");//here to see this user's profile and history.");
         //nav trail check
-        if (LabKeySiteWrapper.IS_BOOTSTRAP_LAYOUT)
-            assertElementPresent(Locator.tagWithClass("ol", "breadcrumb").child("li").child(Locator.tagContainingText("a", "Site Users")));
-        else
-            assertElementPresent(Locator.xpath("//div[@class='labkey-crumb-trail']/span[@id='navTrailAncestors']/a[text()='Site Users']"));
-        assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user.");//here to see this user's profile and history.");
+        assertElementPresent(Locator.tagWithClass("ol", "breadcrumb").child("li").child(Locator.tagContainingText("a", "Site Users")));
 
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
