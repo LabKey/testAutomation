@@ -67,9 +67,9 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
                 getWrapper().mouseOver(elementCache().menuToggle); // Just need to hover if another menu is already open
             else
                 elementCache().menuToggle.click();
+            WebDriverWrapper.waitFor(this::isOpen, "Project menu didn't open", 2000);
+            getWrapper().waitForElement(Locator.tagWithClass("div", "folder-nav"));
         }
-        WebDriverWrapper.waitFor(this::isOpen, "Project menu didn't open", 2000);
-        getWrapper().waitForElement(Locator.tagWithClass("div", "folder-nav"));
         return this;
     }
 
@@ -137,6 +137,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
      */
     public WebElement expandProjectFully(String project)
     {
+        open();
         return expandAllUnder(elementCache().findProjectNode(project));
     }
 
@@ -151,6 +152,7 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
 
     public WebElement expandAll()
     {
+        open();
         return expandAllUnder(elementCache().folderTree);
     }
 
@@ -160,14 +162,6 @@ public class ProjectMenu extends WebDriverComponent<ProjectMenu.ElementCache>
     {
         open();
         return elementCache().findProjectLink(projectName, true) != null;
-    }
-
-    /* real-time check to see if the destination nav-link (folder or project) is present and visible*/
-    public boolean folderLinkIsPresent(String navigationLinkText)
-    {
-        WebElement linkElement = Locator.tag("li").childTag("a").withText(navigationLinkText)
-                .findElementOrNull(elementCache().findProjectNode(getWrapper().getCurrentProject()));
-        return linkElement != null && linkElement.isDisplayed();
     }
 
     public List<WebElement> projectMenuLinks()
