@@ -234,16 +234,6 @@ public abstract class LabKeySiteWrapper extends WebDriverWrapper
         assertElementPresent(IS_BOOTSTRAP_LAYOUT ? Locators.UX_USER_MENU : Locators.USER_MENU);
     }
 
-    /**
-     * Renamed to {@link #ensureSignedInAsPrimaryTestUser()}
-     * TODO: Remove in 16.3
-     */
-    @Deprecated
-    public void ensureSignedInAsAdmin()
-    {
-        ensureSignedInAsPrimaryTestUser();
-    }
-
     @LogMethod
     public void ensureSignedInAsPrimaryTestUser()
     {
