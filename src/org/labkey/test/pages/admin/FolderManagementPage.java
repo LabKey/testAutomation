@@ -99,6 +99,29 @@ public class FolderManagementPage extends LabKeyPage<FolderManagementPage.Elemen
         return this;
     }
 
+    public void goToPane(String tabId)
+    {
+        Locator.IdLocator tabLoc = Locator.id(tabId);
+        tabLoc.childTag("a").findElement(getDriver()).click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=" + tabId)
+                && elementCache().isTabActive(tabLoc), 4000);
+    }
+
+// Wave of the future:
+
+    public <T extends FolderManagementTab> T goToPane(Class<T> tabClass) throws InstantiationException, IllegalAccessException
+    {
+        T tab = tabClass.newInstance();
+        tab.setDriver(getDriver());
+        String tabId = tab.getTabId();
+
+        Locator.IdLocator tabLoc = Locator.id(tabId);
+        tabLoc.childTag("a").findElement(getDriver()).click();
+        waitFor(()-> getURL().toString().endsWith("?tabId=" + tabId)
+                && elementCache().isTabActive(tabLoc), 4000);
+        return tab;
+    }
+
     public ReorderFoldersPage clickChangeDisplayOrder()
     {
         beginAt(WebTestHelper.buildRelativeUrl("admin", getCurrentContainerPath(), "reorderFolders"));

@@ -576,6 +576,7 @@ src/org/labkey/test/pages/ViewDatasetDataPage.java -text
 src/org/labkey/test/pages/admin/CreateSubFolderPage.java -text
 src/org/labkey/test/pages/admin/FileRootsManagementPage.java -text
 src/org/labkey/test/pages/admin/FolderManagementPage.java -text
+src/org/labkey/test/pages/admin/FolderManagementTab.java -text
 src/org/labkey/test/pages/admin/FolderTypePage.java -text
 src/org/labkey/test/pages/admin/ReorderFoldersPage.java -text
 src/org/labkey/test/pages/admin/SetFolderPermissionsPage.java -text
