@@ -574,6 +574,26 @@
             ]]>
         </response>
     </test>
+    <test name="select with maxRows and rowOffset" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+                 selectedRow<-labkey.selectRows("%baseUrl%", folderPath="/%projectName%",
+                     schemaName="lists", queryName="AllTypes", colSelect="DisplayFld",
+                     maxRows=2, rowOffset=1, method="GET") # TODO: issue 31833: maxRows not respected in selectRows POST
+                 selectedRow
+                 paste("rows: ", dim(selectedRow)[1], ", cols:", dim(selectedRow)[2], sep="")
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                  DisplayName
+                 1 Row 2 Empty Vals
+                 2 Row 3 (plain)
+                 [1] "rows: 2, cols:1"
+             ]]>
+        </response>
+    </test>
     <test name="final test" type="post">
         <url>
             <![CDATA[
