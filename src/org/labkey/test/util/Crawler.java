@@ -129,6 +129,7 @@ public class Crawler
             new ControllerActionId("assay", "designer"), // assay designer prompts to save design when navigating away
             new ControllerActionId("assay", "template"),
             new ControllerActionId("core", "downloadFileLink"),
+            new ControllerActionId("dumbster", "begin"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("flow-compensation", "download"),
             new ControllerActionId("flow-editscript", "download"),
