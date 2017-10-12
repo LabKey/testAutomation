@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.api.util.Pair;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.LabKeySiteWrapper;
 import org.labkey.test.Locator;
 import org.labkey.test.Locators;
 import org.labkey.test.categories.DailyA;
@@ -40,18 +39,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 @Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
 {
     {setIsBootstrapWhitelisted(true);}
-    private static final String FIRST_LINK = "First Page";
-    private static final String PREV_LINK = "Previous Page";
-    private static final String NEXT_LINK = "Next Page";
-    private static final String LAST_LINK = "Last Page";
-
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
     private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
