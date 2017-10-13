@@ -41,13 +41,13 @@ public class AssayImporter
         {
             if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
             {
-                test.checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
                 Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
                 test.waitForElement(checkBox);
                 test.checkCheckbox(checkBox);
             }
             else
-                test.checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+                test.checkRadioButton(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
         }
         else
         {
